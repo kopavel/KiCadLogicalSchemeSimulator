@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Configuration status="info">
+	<Properties>
+		<Property name="logdir">./logs</Property>
+		<Property name="layout">%d [%t] %-5p %c- %m%n</Property>
+	</Properties>
+	<Appenders>
+		<Console name="STDOUT" target="SYSTEM_OUT">
+			<PatternLayout pattern="${layout}" charset="UTF-8"/>
+		</Console>
+		<RollingRandomAccessFile name="FILE"
+		                         fileName="${logdir}/simulator.log"
+		                         filePattern="${logdir}/%d{yyyy-MM-dd}/simulator.%d{yyyy-MM-dd}.%i.log"
+		                         immediateFlush="false"
+		                         append="false">
+			<PatternLayout pattern="${layout}" charset="UTF-8"/>
+			<Policies>
+				<OnStartupTriggeringPolicy/>
+				<SizeBasedTriggeringPolicy size="100 MB"/>
+				<CronTriggeringPolicy schedule="0 0 0 ? * 2" evaluateOnStartup="true"/>
+			</Policies>
+			<DefaultRolloverStrategy fileIndex="nomax"/>
+		</RollingRandomAccessFile>
+		<!--
+				<RollingRandomAccessFile name="DFILE"
+										 fileName="${logdir}/display.log"
+										 filePattern="${logdir}/%d{yyyy-MM-dd}/display.%d{yyyy-MM-dd}.%i.log"
+										 immediateFlush="false"
+										 append="false">
+					<PatternLayout pattern="${layout}" charset="UTF-8"/>
+					<Policies>
+						<OnStartupTriggeringPolicy/>
+						<SizeBasedTriggeringPolicy size="100 MB"/>
+						<CronTriggeringPolicy schedule="0 0 0 ? * 2" evaluateOnStartup="true"/>
+					</Policies>
+					<DefaultRolloverStrategy fileIndex="nomax"/>
+				</RollingRandomAccessFile>
+		-->
+	</Appenders>
+	<Loggers>
+		<Root level="INFO">
+			<AppenderRef ref="FILE"/>
+			<AppenderRef ref="STDOUT" level="INFO"/>
+		</Root>
+		<!--
+				<logger name="lv.pko.DigitalNetSimulator.components.display" level="TRACE" additivity="false">
+					<AppenderRef ref="DFILE"/>
+				</logger>
+		-->
+		<logger name="lv.pko" level="TRACE" additivity="false">
+			<AppenderRef ref="FILE"/>
+			<AppenderRef ref="STDOUT" level="DEBUG"/>
+		</logger>
+	</Loggers>
+</Configuration>

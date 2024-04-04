@@ -1,0 +1,36 @@
+[versions]
+lombok = '1.18.32'
+log4j2 = '2.23.1'
+jackson = '2.17.0'
+
+[libraries]
+idea-gui = 'com.jetbrains.intellij.java:java-gui-forms-rt:+'
+swing-flatlaf = 'com.formdev:flatlaf:3.4.1'
+lombok = { module = 'org.projectlombok:lombok', version.ref = 'lombok' }
+z80 = 'com.codingrodent.microprocessor:Z80Processor:4.2.0'
+jackson-databind = { module = 'com.fasterxml.jackson.core:jackson-databind', version.ref = 'jackson' }
+jackson-jakarta-annotations = { module = 'com.fasterxml.jackson.module:jackson-module-jakarta-xmlbind-annotations', version.ref = 'jackson' }
+jackson-dataformat-xml = { module = 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml', version.ref = 'jackson' }
+jackson-datatype-jsr310 = { module = 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310', version.ref = 'jackson' }
+jackson-jaxb-annotations = { module = 'com.fasterxml.jackson.module:jackson-module-jaxb-annotations', version.ref = 'jackson' }
+jakarta-api = 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.1'
+jaxb-api = 'javax.xml.bind:jaxb-api:2.3.1'
+picocli = 'info.picocli:picocli:4.7.5'
+
+#log4j2
+log4j-slf4j = { version.ref = 'log4j2', module = 'org.apache.logging.log4j:log4j-slf4j-impl' }
+log4j-old = { version.ref = 'log4j2', module = 'org.apache.logging.log4j:log4j-1.2-api' }
+log4j-core = { version.ref = 'log4j2', module = 'org.apache.logging.log4j:log4j-core' }
+log4j-jcl = { version.ref = 'log4j2', module = 'org.apache.logging.log4j:log4j-jcl' }
+log4j-jul = { version.ref = 'log4j2', module = 'org.apache.logging.log4j:log4j-jul' }
+log4j-jpl = { version.ref = 'log4j2', module = 'org.apache.logging.log4j:log4j-jpl' }
+api-log4j = { version.ref = 'log4j2', module = 'org.apache.logging.log4j:log4j-api' }
+xz = 'org.tukaani:xz:1.9'
+commons-compress = 'org.apache.commons:commons-compress:1.26.1'
+disruptor = 'com.lmax:disruptor:4.0.0'
+asm = 'org.ow2.asm:asm:9.7'
+asm-tree = 'org.ow2.asm:asm-tree:9.7'
+[bundles]
+
+[plugins]
+guidesigner = 'io.github.file5.guidesigner:1.0.2'

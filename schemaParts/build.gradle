@@ -1,0 +1,95 @@
+/*
+ * Copyright (c) 2024 Pavel Korzh
+ * <p>
+ * All rights reserved.
+ * <p>
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * <p>
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ * <p>
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ * <p>
+ * 3. Neither the name of the copyright holder nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ * <p>
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
+
+sourceSets {
+    main {
+        java {
+            srcDirs = [] // Empty source directories list to disable Java source directory
+        }
+        resources {
+            srcDirs = [] // Empty source directories list to disable resources directory
+        }
+    }
+    test {
+        java {
+            srcDirs = [] // Empty source directories list to disable Java source directory
+        }
+        resources {
+            srcDirs = [] // Empty source directories list to disable resources directory
+        }
+    }
+}
+dependencies {
+    runtimeOnly project(":schemaParts:and")
+    runtimeOnly project(":schemaParts:buffer")
+    runtimeOnly project(":schemaParts:oscillator")
+    runtimeOnly project(":schemaParts:counter")
+    runtimeOnly project(":schemaParts:dcTrigger")
+    runtimeOnly project(":schemaParts:decoder")
+    runtimeOnly project(":schemaParts:display")
+    runtimeOnly project(":schemaParts:led")
+    runtimeOnly project(":schemaParts:multiplexer")
+    runtimeOnly project(":schemaParts:or")
+    runtimeOnly project(":schemaParts:power")
+    runtimeOnly project(":schemaParts:ram")
+    runtimeOnly project(":schemaParts:rom")
+    runtimeOnly project(":schemaParts:sdram")
+    runtimeOnly project(":schemaParts:shifter")
+    runtimeOnly project(":schemaParts:switch")
+    runtimeOnly project(":schemaParts:xor")
+    runtimeOnly project(":schemaParts:z80")
+}
+
+tasks.named("jar") {
+    onlyIf { false }
+}
+
+configure(subprojects) { subproject ->
+    sourceSets {
+        test {
+            java {
+                srcDirs = []
+            }
+            resources {
+                srcDirs = []
+            }
+        }
+    }
+    dependencies {
+        implementation project(":simulator")
+    }
+    tasks.named("jar") {
+        destinationDirectory = file("$rootDir/distro/schemaParts")
+
+    }
+}
