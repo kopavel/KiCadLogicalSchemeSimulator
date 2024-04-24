@@ -13,7 +13,7 @@ combination of both approaches works best. For example, a ROM chip has size and 
 the file path is configured in the symbol instance on the schema itself. Since you can have many ROMs with individual files for each, the mapping file might not be
 helpful in all cases.
 
-Refer to the [information](..%2F..%2FschemaParts%2Freadme.md) about supported schema parts and their parameters.
+Refer to the [information](..%2F..%2FschemaParts%2FREADME.md) about supported schema parts and their parameters.
 
 ### XML Map File Format
 

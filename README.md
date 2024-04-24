@@ -5,7 +5,7 @@ Supports two usage methods: directly from KiCad or standalone, using a schema fi
 
 Focuses on performance and simplicity of the model chip API, allowing easy implementation of custom chip behaviors for simulation.
 
-[Here is more info](stuff%2Fkicad_symbols%2Freadme.md) about the supported schema part list and how to configure KiCad symbols mapping for the simulator.
+[Here is more info](stuff%2Fkicad_symbols%2FREADME.md) about the supported schema part list and how to configure KiCad symbols mapping for the simulator.
 
 ## Building
 
@@ -49,7 +49,7 @@ generation" using that script, the simulator will be started instantly with the 
 After launching the project, the simulator builds the simulation model and displays all "interactive" schema parts, such as LEDs, displays, or oscillators, on the
 desk. Parts can be arranged freely, and the layout is saved near the Netlist file in a file with the `.sym_layout` extension.
 
-For a detailed description of components, see [more information](schemaParts%2Freadme.md).
+For a detailed description of components, see [more information](schemaParts%2FREADME.md).
 
 ## Examples
 
