@@ -31,7 +31,7 @@
 		<symbol name="RAM64K" symPartClass="Ram" symPartParam="aSize=16;size=8;reverse"/>
 		<symbol name="RAM256" symPartClass="Ram" symPartParam="aSize=8;size=8;reverse"/>
 		<symbol name="ROM4K" symPartClass="Rom" symPartParam="aSize=12;size=8;reverse"/>
-		<symbol name="SDRAM64K" symPartClass="SdRam" symPartParam="size=8;reverse"/>
+		<symbol name="SDRAM64K" symPartClass="SdRam" symPartParam="aSize=8;size=8;reverse"/>
 		<symbol name="SHIFT" symPartClass="Shifter" symPartParam="size=8;reverse"/>
 		<symbol name="SWITCH" symPartClass="Switch"/>
 		<symbol name="XOR" symPartClass="XorGate"/>
