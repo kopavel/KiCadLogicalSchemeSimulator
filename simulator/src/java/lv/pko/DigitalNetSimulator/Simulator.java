@@ -32,8 +32,8 @@
 package lv.pko.DigitalNetSimulator;
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import lv.pko.DigitalNetSimulator.api.AbstractUiComponent;
-import lv.pko.DigitalNetSimulator.api.chips.Chip;
-import lv.pko.DigitalNetSimulator.api.chips.InteractiveChip;
+import lv.pko.DigitalNetSimulator.api.schemaPart.InteractiveSchemaPart;
+import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPart;
 import lv.pko.DigitalNetSimulator.model.Model;
 import lv.pko.DigitalNetSimulator.parsers.net.NetFileParser;
 import lv.pko.DigitalNetSimulator.parsers.pojo.Export;
@@ -102,8 +102,8 @@ public class Simulator implements Runnable {
                         addMonitoringPart(parts[1],
                                 new Rectangle(Integer.parseInt(parts[2]), Integer.parseInt(parts[3]), Integer.parseInt(parts[4]), Integer.parseInt(parts[5])));
                     } else if (!parts[0].equals("locale")) {
-                        Chip component = model.chips.get(parts[0]);
-                        if (component instanceof InteractiveChip uiComponent) {
+                        SchemaPart component = model.schemaParts.get(parts[0]);
+                        if (component instanceof InteractiveSchemaPart uiComponent) {
                             int x = Integer.parseInt(parts[1]);
                             int y = Integer.parseInt(parts[2]);
                             AbstractUiComponent g = uiComponent.getComponent();
@@ -128,10 +128,10 @@ public class Simulator implements Runnable {
             bw.write("\n");
             bw.write("main:" + ui.getX() + ":" + ui.getY() + ":" + ui.getWidth() + ":" + ui.getHeight());
             bw.write("\n");
-            String content = model.chips.values()
+            String content = model.schemaParts.values()
                     .stream()
-                    .filter(c -> c instanceof InteractiveChip)
-                    .map(c -> c.id + ":" + ((InteractiveChip) c).getComponent().getX() + ":" + ((InteractiveChip) c).getComponent().getY())
+                    .filter(c -> c instanceof InteractiveSchemaPart)
+                    .map(c -> c.id + ":" + ((InteractiveSchemaPart) c).getComponent().getX() + ":" + ((InteractiveSchemaPart) c).getComponent().getY())
                     .collect(Collectors.joining("\n"));
             bw.write(content);
             bw.write("\n");
@@ -178,10 +178,10 @@ public class Simulator implements Runnable {
             } else {
                 throw new RuntimeException("Unsupported file extension. " + netFilePath);
             }
-            model.chips.values().forEach(chip -> {
-                if (chip instanceof InteractiveChip) {
+            model.schemaParts.values().forEach(schemaPart -> {
+                if (schemaPart instanceof InteractiveSchemaPart) {
                     try {
-                        SwingUtilities.invokeAndWait(() -> ui.add(((InteractiveChip) chip).getComponent()));
+                        SwingUtilities.invokeAndWait(() -> ui.add(((InteractiveSchemaPart) schemaPart).getComponent()));
                     } catch (InterruptedException | InvocationTargetException e) {
                         throw new RuntimeException(e);
                     }
@@ -191,9 +191,9 @@ public class Simulator implements Runnable {
                 ui.setJMenuBar(new MainMenu());
                 ui.revalidate();
                 ui.repaint();
-                for (Chip c : model.chips.values()) {
-                    if (c instanceof InteractiveChip) {
-                        AbstractUiComponent component = ((InteractiveChip) c).getComponent();
+                for (SchemaPart c : model.schemaParts.values()) {
+                    if (c instanceof InteractiveSchemaPart) {
+                        AbstractUiComponent component = ((InteractiveSchemaPart) c).getComponent();
                         component.revalidate();
                         component.repaint();
                     }

@@ -30,13 +30,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.DigitalNetSimulator.components.AND;
-import lv.pko.DigitalNetSimulator.api.chips.Chip;
 import lv.pko.DigitalNetSimulator.api.pins.in.FloatingPinException;
 import lv.pko.DigitalNetSimulator.api.pins.in.InPin;
 import lv.pko.DigitalNetSimulator.api.pins.out.OutPin;
+import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPart;
 
-public class AndGate extends Chip {
-    private final InPin inPin;
+public class AndGate extends SchemaPart {
     private OutPin out;
 
     public AndGate(String id, String sParam) {
@@ -46,7 +45,7 @@ public class AndGate extends Chip {
             throw new RuntimeException("Component " + id + " has no parameter \"size\"");
         }
         int pinAmount = Integer.parseInt(params.get("size"));
-        inPin = addInPin(new InPin("IN", this, pinAmount) {
+        addInPin(new InPin("IN", this, pinAmount) {
             @Override
             public void onChange(long newState, boolean hiImpedance) {
                 if (hiImpedance) {
@@ -58,8 +57,7 @@ public class AndGate extends Chip {
                     out.setState(loState);
                 }
             }
-        });
-        inPin.useBitPresentation = true;
+        }).useBitPresentation = true;
     }
 
     @Override

@@ -31,9 +31,9 @@
  */
 package lv.pko.DigitalNetSimulator.ui.oscilloscope;
 import lv.pko.DigitalNetSimulator.Simulator;
-import lv.pko.DigitalNetSimulator.api.chips.Chip;
-import lv.pko.DigitalNetSimulator.api.chips.InteractiveChip;
 import lv.pko.DigitalNetSimulator.api.pins.out.OutPin;
+import lv.pko.DigitalNetSimulator.api.schemaPart.InteractiveSchemaPart;
+import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPart;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -92,16 +92,16 @@ public class Oscilloscope extends JFrame {
     public void loadPins() {
         // Example: Load pins from Simulator
         SwingUtilities.invokeLater(() -> {
-            for (Chip component : Simulator.model.chips.values()) {
+            for (SchemaPart component : Simulator.model.schemaParts.values()) {
                 for (OutPin pin : component.outMap.values()) {
                     connectToPin(pin);
-                    if (component instanceof InteractiveChip) {
+                    if (component instanceof InteractiveSchemaPart) {
 //                        pin.bus = new OscilloscopePin(pin.bus);
                     }
                 }
 /* FixMe
                 for (PassivePin pin : component.passiveMap.values()) {
-                    if (component instanceof InteractiveChip) {
+                    if (component instanceof InteractiveSchemaPart) {
                         pin.bus = new OscilloscopeBus(pin.bus);
                     }
                 }

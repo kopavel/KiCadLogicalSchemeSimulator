@@ -30,12 +30,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.DigitalNetSimulator.components.decoder;
-import lv.pko.DigitalNetSimulator.api.chips.Chip;
 import lv.pko.DigitalNetSimulator.api.pins.in.FloatingPinException;
 import lv.pko.DigitalNetSimulator.api.pins.in.InPin;
 import lv.pko.DigitalNetSimulator.api.pins.out.TriStateOutPin;
+import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPart;
 
-public class Decoder extends Chip {
+public class Decoder extends SchemaPart {
     private final InPin cs;
     private TriStateOutPin outPin;
     private boolean csState;

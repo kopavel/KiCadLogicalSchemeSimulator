@@ -30,12 +30,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.DigitalNetSimulator.components.XOR;
-import lv.pko.DigitalNetSimulator.api.chips.Chip;
 import lv.pko.DigitalNetSimulator.api.pins.in.FloatingPinException;
 import lv.pko.DigitalNetSimulator.api.pins.in.InPin;
 import lv.pko.DigitalNetSimulator.api.pins.out.OutPin;
+import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPart;
 
-public class XorGate extends Chip {
+public class XorGate extends SchemaPart {
     private OutPin out;
     private boolean in1Active;
     private boolean in2Active;

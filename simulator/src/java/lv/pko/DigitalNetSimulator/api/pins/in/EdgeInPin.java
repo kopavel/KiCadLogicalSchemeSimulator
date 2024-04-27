@@ -30,10 +30,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.DigitalNetSimulator.api.pins.in;
-import lv.pko.DigitalNetSimulator.api.chips.Chip;
+import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPart;
 
 public abstract class EdgeInPin extends InPin {
-    public EdgeInPin(String id, Chip parent) {
+    public EdgeInPin(String id, SchemaPart parent) {
         super(id, parent);
     }
 

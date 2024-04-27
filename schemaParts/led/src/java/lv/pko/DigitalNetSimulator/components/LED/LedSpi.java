@@ -30,17 +30,17 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.DigitalNetSimulator.components.LED;
-import lv.pko.DigitalNetSimulator.api.chips.Chip;
-import lv.pko.DigitalNetSimulator.api.chips.ChipSpi;
+import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPart;
+import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPartSpi;
 
-public class LedSpi implements ChipSpi {
+public class LedSpi implements SchemaPartSpi {
     @Override
-    public Chip getChip(String id, String params) {
+    public SchemaPart getSchemaPart(String id, String params) {
         return new Led(id, params);
     }
 
     @Override
-    public Class<? extends Chip> getChipClass() {
+    public Class<? extends SchemaPart> getSchemaPartClass() {
         return Led.class;
     }
 }

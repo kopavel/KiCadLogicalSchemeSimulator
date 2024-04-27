@@ -32,10 +32,10 @@
 package lv.pko.DigitalNetSimulator.ui.schemaPartMonitor;
 import lv.pko.DigitalNetSimulator.Simulator;
 import lv.pko.DigitalNetSimulator.api.AbstractUiComponent;
-import lv.pko.DigitalNetSimulator.api.chips.Chip;
 import lv.pko.DigitalNetSimulator.api.pins.in.InPin;
 import lv.pko.DigitalNetSimulator.api.pins.out.OutPin;
 import lv.pko.DigitalNetSimulator.api.pins.out.TriStateOutPin;
+import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPart;
 
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
@@ -50,7 +50,7 @@ import static lv.pko.DigitalNetSimulator.tools.Utils.addToArray;
 import static org.apache.commons.lang3.StringUtils.leftPad;
 
 public class SchemaPartMonitor extends JFrame {
-    public final Chip schemaPart;
+    public final SchemaPart schemaPart;
     private final ScheduledExecutorService scheduler;
     private final JTextArea extraPanel;
     InPin[] ins = new InPin[0];
@@ -65,7 +65,7 @@ public class SchemaPartMonitor extends JFrame {
     private JPanel outputsValues;
     private JLabel title;
     private JPanel panel;
-    private JPanel chipBox;
+    private JPanel schemaPartBox;
 
     public SchemaPartMonitor(String id) {
         Color borderColor = UIManager.getColor("TextField.border");
@@ -81,9 +81,9 @@ public class SchemaPartMonitor extends JFrame {
                 dispose();
             }
         });
-        schemaPart = Simulator.model.chips.get(id);
+        schemaPart = Simulator.model.schemaParts.get(id);
         title.setText(id);
-        chipBox.setBorder(BorderFactory.createLineBorder(borderColor));
+        schemaPartBox.setBorder(BorderFactory.createLineBorder(borderColor));
         for (InPin inPin : schemaPart.inMap.values()) {
             JLabel label;
             if (inPin.useBitPresentation) {

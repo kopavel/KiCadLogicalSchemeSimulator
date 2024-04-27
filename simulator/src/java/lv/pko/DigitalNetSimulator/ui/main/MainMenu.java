@@ -34,17 +34,14 @@ import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import com.formdev.flatlaf.FlatLaf;
 import lv.pko.DigitalNetSimulator.Simulator;
-import lv.pko.DigitalNetSimulator.api.chips.Chip;
+import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPart;
 import lv.pko.DigitalNetSimulator.tools.Log;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
 public class MainMenu extends JMenuBar {
-    private static final Logger log = LoggerFactory.getLogger(MainMenu.class);
     private static final ResourceBundle mainI81n = ResourceBundle.getBundle("i81n/main");
 
     public MainMenu() {
@@ -68,7 +65,7 @@ public class MainMenu extends JMenuBar {
         oscilloscopeItem.addActionListener(e -> Simulator.oscilloscope.bringUp());
         simulationMenu.add(oscilloscopeItem);
         JMenu schemaParts = new JMenu(mainI81n.getString("schemaParts"));
-        for (Chip schemaPart : Simulator.model.chips.values()) {
+        for (SchemaPart schemaPart : Simulator.model.schemaParts.values()) {
             JMenuItem schemaPartItem = new JMenuItem(schemaPart.id);
             schemaPartItem.addActionListener(e -> Simulator.addMonitoringPart(schemaPart.id, null));
             schemaParts.add(schemaPartItem);
@@ -84,15 +81,9 @@ public class MainMenu extends JMenuBar {
         lang.add(lvLang);
         JMenuItem ruLang = new JMenuItem(mainI81n.getString("ruLang"));
         lang.add(ruLang);
-        engLang.addActionListener(e -> {
-            setLocale("en");
-        });
-        lvLang.addActionListener(e -> {
-            setLocale("lv");
-        });
-        ruLang.addActionListener(e -> {
-            setLocale("ru");
-        });
+        engLang.addActionListener(e -> setLocale("en"));
+        lvLang.addActionListener(e -> setLocale("lv"));
+        ruLang.addActionListener(e -> setLocale("ru"));
         JMenu themeMenu = new JMenu(mainI81n.getString("themes"));
         settings.add(themeMenu);
         JMenuItem lightTheme = new JMenuItem(mainI81n.getString("light"));

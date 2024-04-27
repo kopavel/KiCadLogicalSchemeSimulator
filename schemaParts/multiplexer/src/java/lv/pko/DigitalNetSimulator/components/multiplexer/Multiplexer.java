@@ -30,15 +30,15 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.DigitalNetSimulator.components.multiplexer;
-import lv.pko.DigitalNetSimulator.api.chips.Chip;
 import lv.pko.DigitalNetSimulator.api.pins.in.FloatingPinException;
 import lv.pko.DigitalNetSimulator.api.pins.in.InPin;
 import lv.pko.DigitalNetSimulator.api.pins.out.OutPin;
+import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPart;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Multiplexer extends Chip {
+public class Multiplexer extends SchemaPart {
     private final InPin[] inPins;
     private OutPin outPin;
     private int nState;

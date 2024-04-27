@@ -30,13 +30,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.DigitalNetSimulator.components.BUF;
-import lv.pko.DigitalNetSimulator.api.chips.Chip;
 import lv.pko.DigitalNetSimulator.api.pins.in.FallingEdgeInPin;
 import lv.pko.DigitalNetSimulator.api.pins.in.FloatingPinException;
 import lv.pko.DigitalNetSimulator.api.pins.in.InPin;
 import lv.pko.DigitalNetSimulator.api.pins.out.TriStateOutPin;
+import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPart;
 
-public class Buffer extends Chip {
+public class Buffer extends SchemaPart {
     private final int pinAmount;
     private final boolean isLatch;
     private final InPin dPin;

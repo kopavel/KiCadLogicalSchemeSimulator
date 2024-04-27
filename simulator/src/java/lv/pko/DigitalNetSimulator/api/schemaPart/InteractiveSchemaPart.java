@@ -29,8 +29,9 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lv.pko.DigitalNetSimulator.api.chips;
-public interface ChipSpi {
-    Chip getChip(String id, String params);
-    Class<? extends Chip> getChipClass();
+package lv.pko.DigitalNetSimulator.api.schemaPart;
+import lv.pko.DigitalNetSimulator.api.AbstractUiComponent;
+
+public interface InteractiveSchemaPart {
+    AbstractUiComponent getComponent();
 }

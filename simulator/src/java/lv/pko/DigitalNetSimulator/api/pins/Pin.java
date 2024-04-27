@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.DigitalNetSimulator.api.pins;
-import lv.pko.DigitalNetSimulator.api.chips.Chip;
+import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPart;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -38,12 +38,12 @@ import java.util.Map;
 
 public abstract class Pin {
     public final String id;
-    public final Chip parent;
+    public final SchemaPart parent;
     public final int size;
     public Map<String, Byte> aliases = new HashMap<>();
     public boolean useBitPresentation;
 
-    public Pin(String id, Chip parent, int size, String... names) {
+    public Pin(String id, SchemaPart parent, int size, String... names) {
         this.id = id;
         this.parent = parent;
         this.size = size;

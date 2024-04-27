@@ -29,7 +29,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lv.pko.DigitalNetSimulator.api.chips;
+package lv.pko.DigitalNetSimulator.api.schemaPart;
 import lv.pko.DigitalNetSimulator.api.pins.PassivePin;
 import lv.pko.DigitalNetSimulator.api.pins.in.InPin;
 import lv.pko.DigitalNetSimulator.api.pins.out.OutPin;
@@ -41,7 +41,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @SuppressWarnings("unused")
-public abstract class Chip {
+public abstract class SchemaPart {
     public final String id;
     public final Map<String, OutPin> outMap = new LinkedHashMap<>();
     public final Map<String, InPin> inMap = new LinkedHashMap<>();
@@ -52,8 +52,9 @@ public abstract class Chip {
     protected final boolean reverse;
     private final Map<String, InPin> inAliasMap = new HashMap<>();
     private final Map<String, OutPin> outAliasMap = new HashMap<>();
+    public Map<Integer, String> pinNumberMap;
 
-    protected Chip(String id, String sParam) {
+    protected SchemaPart(String id, String sParam) {
         this.id = id;
         if (sParam != null) {
             for (String param : sParam.split(";")) {
@@ -65,10 +66,10 @@ public abstract class Chip {
         }
         if (params.containsKey("reverse")) {
             hiState = 0;
-            loState = Long.MAX_VALUE;
+            loState = -1;
             reverse = true;
         } else {
-            hiState = Long.MAX_VALUE;
+            hiState = -1;
             loState = 0;
             reverse = false;
         }

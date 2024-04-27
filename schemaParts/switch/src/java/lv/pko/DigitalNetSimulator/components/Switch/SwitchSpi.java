@@ -30,17 +30,17 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.DigitalNetSimulator.components.Switch;
-import lv.pko.DigitalNetSimulator.api.chips.Chip;
-import lv.pko.DigitalNetSimulator.api.chips.ChipSpi;
+import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPart;
+import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPartSpi;
 
-public class SwitchSpi implements ChipSpi {
+public class SwitchSpi implements SchemaPartSpi {
     @Override
-    public Chip getChip(String id, String params) {
+    public SchemaPart getSchemaPart(String id, String params) {
         return new Switch(id, params);
     }
 
     @Override
-    public Class<? extends Chip> getChipClass() {
+    public Class<? extends SchemaPart> getSchemaPartClass() {
         return Switch.class;
     }
 }

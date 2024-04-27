@@ -44,5 +44,6 @@ import lombok.Setter;
 public class Node {
     protected String pinfunction;
     protected String pintype;
+    protected String pin;
     protected String ref;
 }

@@ -31,19 +31,17 @@
  *
  */
 package lv.pko.DigitalNetSimulator.model;
-import lv.pko.DigitalNetSimulator.api.chips.Chip;
-import lv.pko.DigitalNetSimulator.api.chips.ChipSpi;
 import lv.pko.DigitalNetSimulator.api.pins.in.FloatingPinException;
 import lv.pko.DigitalNetSimulator.api.pins.in.InPin;
 import lv.pko.DigitalNetSimulator.api.pins.out.*;
+import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPart;
+import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPartSpi;
 import lv.pko.DigitalNetSimulator.model.merger.Merger;
 import lv.pko.DigitalNetSimulator.parsers.pojo.Comp;
 import lv.pko.DigitalNetSimulator.parsers.pojo.Export;
 import lv.pko.DigitalNetSimulator.parsers.pojo.Net;
 import lv.pko.DigitalNetSimulator.parsers.pojo.Property;
-import lv.pko.DigitalNetSimulator.parsers.pojo.symbolMap.Library;
-import lv.pko.DigitalNetSimulator.parsers.pojo.symbolMap.Symbol;
-import lv.pko.DigitalNetSimulator.parsers.pojo.symbolMap.SymbolMap;
+import lv.pko.DigitalNetSimulator.parsers.pojo.symbolMap.*;
 import lv.pko.DigitalNetSimulator.parsers.xml.XmlParser;
 import lv.pko.DigitalNetSimulator.tools.Log;
 
@@ -53,43 +51,47 @@ import java.util.stream.Collectors;
 
 public class Model {
     public static boolean stabilizing;
-    public final Map<String, Chip> chips;
-    public final Map<String, ChipSpi> chipsSpiMap;
+    public final Map<String, SchemaPart> schemaParts = new TreeMap<>();
+    public final Map<String, Map<String, PinMapDescriptor>> shemaPartPinMap = new TreeMap<>();
+    public final Map<String, SchemaPartSpi> schemaPartSpiMap;
     private final Map<OutPin, OutPinNet> outMap = new HashMap<>();
     private final Map<InPin, InPinNet> inMap = new HashMap<>();
 
     public Model(Export export, String mapPath) throws IOException {
         Log.info(Model.class, "Start Model building");
-        chipsSpiMap = ServiceLoader.load(ChipSpi.class)
+        schemaPartSpiMap = ServiceLoader.load(SchemaPartSpi.class)
                 .stream()
                 .map(ServiceLoader.Provider::get)
-                .collect(Collectors.toMap(spi -> spi.getChipClass().getSimpleName(), spi -> spi));
-        ChipMap chipMap;
+                .collect(Collectors.toMap(spi -> spi.getSchemaPartClass().getSimpleName(), spi -> spi));
+        SchemaPartMap schemaPartMap;
         if (mapPath != null) {
             SymbolMap symbolMap = XmlParser.parse(mapPath, SymbolMap.class);
-            chipMap = new ChipMap();
+            schemaPartMap = new SchemaPartMap();
             for (Library library : symbolMap.getLib()) {
-                SymbolLib lib = chipMap.libs.computeIfAbsent(library.getName(), name -> new SymbolLib());
+                SymbolLibMap lib = schemaPartMap.libs.computeIfAbsent(library.getName(), name -> new SymbolLibMap());
                 for (Symbol symbol : library.getSymbol()) {
                     SymbolDesc symbolDesc = lib.symbols.computeIfAbsent(symbol.getName(), name -> new SymbolDesc());
                     symbolDesc.clazz = symbol.getSymPartClass();
                     symbolDesc.params = symbol.getSymPartParam();
+                    if (symbol.getUnit() != null) {
+                        symbolDesc.units = symbol.getUnit()
+                                .stream()
+                                .map(Unit::getPinMap)
+                                .collect(Collectors.toCollection(ArrayList::new));
+                    }
                 }
             }
         } else {
-            chipMap = null;
+            schemaPartMap = null;
         }
-        chips = export.getComponents().getComp()
-                .stream()
-                .map((Comp component) -> createSchemaPart(component, chipMap))
-                .collect(Collectors.toMap(chip -> chip.id, chip -> chip, (first, second) -> first, TreeMap::new));
-        Chip gnd = getSchemaPart("Power", "gnd", "state=0");
-        chips.put(gnd.id, gnd);
-        Chip pwr = getSchemaPart("Power", "pwr", "state=1");
-        chips.put(pwr.id, pwr);
+        export.getComponents().getComp().forEach((Comp component) -> createSchemaPart(component, schemaPartMap));
+        SchemaPart gnd = getSchemaPart("Power", "gnd", "state=0");
+        schemaParts.put(gnd.id, gnd);
+        SchemaPart pwr = getSchemaPart("Power", "pwr", "state=1");
+        schemaParts.put(pwr.id, pwr);
         export.getNets().getNet().forEach(this::processNet);
         buildBuses();
-        chips.values().forEach(Chip::initOuts);
+        schemaParts.values().forEach(SchemaPart::initOuts);
         Log.info(Model.class, "Stabilizing model");
         stabilise();
         Log.info(Model.class, "Model build complete");
@@ -98,38 +100,51 @@ public class Model {
     @SuppressWarnings("LocalVariableUsedAndDeclaredInDifferentSwitchBranches")
     private void processNet(Net net) {
         Map<OutPin, Byte> outPins = new HashMap<>();
-        Map<InPin, Byte> inPins = new HashMap<>();
+        Map<InPin, List<Byte>> inPins = new HashMap<>();
         net.getNode().forEach(node -> {
             if ("gnd".equals(net.getName())) {
-                outPins.put(chips.get("gnd").getOutPin("OUT"), (byte) 1);
+                outPins.put(schemaParts.get("gnd").getOutPin("OUT"), (byte) 1);
             } else if ("pwr".equals(net.getName())) {
-                outPins.put(chips.get("pwr").getOutPin("OUT"), (byte) 1);
+                outPins.put(schemaParts.get("pwr").getOutPin("OUT"), (byte) 1);
             }
-            String pinName = node.getPinfunction();
+            Map<String, PinMapDescriptor> pinMap = shemaPartPinMap.get(node.getRef());
+            String pinName;
+            SchemaPart schemaPart;
+            if (pinMap != null) {
+                PinMapDescriptor pinMapDescriptor = pinMap.get(node.getPin());
+                if (pinMapDescriptor == null) {
+                    //ignore unmapped pins (power one?)
+                    return;
+                }
+                pinName = pinMapDescriptor.pinName;
+                schemaPart = pinMapDescriptor.schemaPart;
+            } else {
+                pinName = node.getPinfunction();
+                schemaPart = this.schemaParts.get(node.getRef());
+            }
             String pinType = node.getPintype();
             if (pinType.contains("+")) {
                 pinType = pinType.substring(0, pinType.indexOf('+'));
             }
-            Chip chip = chips.get(node.getRef());
             switch (pinType) {
                 case "input":
-                    InPin inPin = chip.getInPin(pinName);
-                    inPins.put(inPin, inPin.aliases.get(pinName));
+                    InPin inPin = schemaPart.getInPin(pinName);
+                    inPins.computeIfAbsent(inPin, p -> new ArrayList<>()).add(inPin.aliases.get(pinName));
                     break;
                 case "tri_state":
                 case "output":
-                    OutPin outPin = chip.getOutPin(pinName);
+                    OutPin outPin = schemaPart.getOutPin(pinName);
                     outPins.put(outPin, outPin.aliases.get(pinName));
                     break;
 /*
                 case "passive":
-                    outPins.add(chip.getPassivePin(pinName));
+                    outPins.add(schemaPart.getPassivePin(pinName));
                     break;
 */
                 case "bidirectional":
-                    inPin = chip.getInPin(pinName);
-                    inPins.put(inPin, inPin.aliases.get(pinName));
-                    outPin = chip.getOutPin(pinName);
+                    inPin = schemaPart.getInPin(pinName);
+                    inPins.computeIfAbsent(inPin, p -> new ArrayList<>()).add(inPin.aliases.get(pinName));
+                    outPin = schemaPart.getOutPin(pinName);
                     outPins.put(outPin, outPin.aliases.get(pinName));
                     break;
                 case "power_in":
@@ -141,10 +156,20 @@ public class Model {
         });
         for (Map.Entry<OutPin, Byte> outEntry : outPins.entrySet()) {
             OutPin outPin = outEntry.getKey();
-            for (Map.Entry<InPin, Byte> inPin : inPins.entrySet()) {
+            for (Map.Entry<InPin, List<Byte>> inPin : inPins.entrySet()) {
                 if (!outPin.id.equals(inPin.getKey().id) || !outPin.parent.equals(inPin.getKey().parent)) {
-                    outMap.computeIfAbsent(outPin, p -> new OutPinNet()).addInPin(inPin.getKey());
-                    inMap.computeIfAbsent(inPin.getKey(), p -> new InPinNet()).addOutPin(outPin, outEntry.getValue(), inPin.getValue());
+                    if (inPin.getValue().size() > 1) {
+                        long interMask = 0;
+                        for (Byte b : inPin.getValue()) {
+                            interMask |= (1L << b);
+                        }
+                        InPinInterconnect interconnect = new InPinInterconnect(inPin.getKey(), interMask);
+                        outMap.computeIfAbsent(outPin, p -> new OutPinNet()).addInPin(interconnect);
+                        inMap.computeIfAbsent(interconnect, p -> new InPinNet()).addOutPin(outPin, outEntry.getValue(), inPin.getValue().getFirst());
+                    } else {
+                        outMap.computeIfAbsent(outPin, p -> new OutPinNet()).addInPin(inPin.getKey());
+                        inMap.computeIfAbsent(inPin.getKey(), p -> new InPinNet()).addOutPin(outPin, outEntry.getValue(), inPin.getValue().getFirst());
+                    }
                 }
             }
         }
@@ -195,17 +220,10 @@ public class Model {
         }
     }
 
-    private Chip getSchemaPart(String className, String id, String params) {
-        if (!chipsSpiMap.containsKey(className)) {
-            throw new RuntimeException("Unknown SchemaPart class " + className + " for SchemaPart id " + id);
-        }
-        return chipsSpiMap.get(className).getChip(id, params);
-    }
-
-    private Chip createSchemaPart(Comp component, ChipMap map) {
+    private void createSchemaPart(Comp component, SchemaPartMap map) {
         SymbolDesc symbolDesc = null;
         if (map != null) {
-            SymbolLib lib = map.libs.get(component.getLibsource().getLib());
+            SymbolLibMap lib = map.libs.get(component.getLibsource().getLib());
             if (lib != null) {
                 symbolDesc = lib.symbols.get(component.getLibsource().getPart());
             }
@@ -223,11 +241,31 @@ public class Model {
             parameters += symbolDesc.params + ";";
         }
         parameters += findSchemaPartProperty(component, "SymPartParam");
-        Chip SchemaPart = getSchemaPart(className, id, parameters);
-        if (SchemaPart == null) {
+        if (symbolDesc == null || symbolDesc.units == null) {
+            SchemaPart schemaPart = getSchemaPart(className, id, parameters);
+            schemaParts.put(schemaPart.id, schemaPart);
+        } else {
+            for (int i = 0; i < symbolDesc.units.size(); i++) {
+                String unit = symbolDesc.units.get(i);
+                SchemaPart schemaPart = getSchemaPart(className, id + "_" + (char) (((byte) 'A') + i), parameters);
+                schemaParts.put(schemaPart.id, schemaPart);
+                for (String pinMapInfo : unit.split(";")) {
+                    String[] mapInfo = pinMapInfo.split("=");
+                    shemaPartPinMap.computeIfAbsent(id, s -> new HashMap<>()).put(mapInfo[0], new PinMapDescriptor(mapInfo[1], schemaPart));
+                }
+            }
+        }
+    }
+
+    private SchemaPart getSchemaPart(String className, String id, String params) {
+        if (!schemaPartSpiMap.containsKey(className)) {
+            throw new RuntimeException("Unknown SchemaPart class " + className + " for SchemaPart id " + id);
+        }
+        SchemaPart schemaPart = schemaPartSpiMap.get(className).getSchemaPart(id, params);
+        if (schemaPart == null) {
             throw new RuntimeException("SchemaPart " + id + " parameter SymPartClass doesn't reflect AbstractSchemaPart class");
         }
-        return SchemaPart;
+        return schemaPart;
     }
 
     private String findSchemaPartProperty(Comp component, String name) {
@@ -243,7 +281,7 @@ public class Model {
 
     private void stabilise() {
         stabilizing = true;
-        List<OutPin> pins = chips.values()
+        List<OutPin> pins = schemaParts.values()
                 .stream()
                 .flatMap(p -> p.outMap.values()
                         .stream())
@@ -260,16 +298,6 @@ public class Model {
         }
     }
 
-    private static class ChipMap {
-        public Map<String, SymbolLib> libs = new HashMap<>();
-    }
-
-    private static class SymbolLib {
-        public Map<String, SymbolDesc> symbols = new HashMap<>();
-    }
-
-    private static class SymbolDesc {
-        public String clazz;
-        public String params;
+    public record PinMapDescriptor(String pinName, SchemaPart schemaPart) {
     }
 }

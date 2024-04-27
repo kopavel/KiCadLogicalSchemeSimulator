@@ -38,6 +38,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @XmlAccessorType(XmlAccessType.FIELD)
 @Getter
 @Setter
@@ -49,4 +51,5 @@ public class Symbol {
     String symPartClass;
     @XmlAttribute
     String symPartParam;
+    List<Unit> unit;
 }

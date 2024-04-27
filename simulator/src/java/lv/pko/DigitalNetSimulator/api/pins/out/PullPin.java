@@ -30,10 +30,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.DigitalNetSimulator.api.pins.out;
-import lv.pko.DigitalNetSimulator.api.chips.Chip;
+import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPart;
 
 public class PullPin extends OutPin {
-    public PullPin(String id, Chip parent, long value) {
+    public PullPin(String id, SchemaPart parent, long value) {
         super(id, parent, 1);
         this.state = value;
     }

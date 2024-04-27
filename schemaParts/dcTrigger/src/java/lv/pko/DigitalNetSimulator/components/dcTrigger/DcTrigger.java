@@ -30,13 +30,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.DigitalNetSimulator.components.dcTrigger;
-import lv.pko.DigitalNetSimulator.api.chips.Chip;
 import lv.pko.DigitalNetSimulator.api.pins.in.FallingEdgeInPin;
 import lv.pko.DigitalNetSimulator.api.pins.in.InPin;
 import lv.pko.DigitalNetSimulator.api.pins.in.RisingEdgeInPin;
 import lv.pko.DigitalNetSimulator.api.pins.out.OutPin;
+import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPart;
 
-public class DcTrigger extends Chip {
+public class DcTrigger extends SchemaPart {
     private final InPin dPin;
     private OutPin qOut;
     private OutPin iqOut;

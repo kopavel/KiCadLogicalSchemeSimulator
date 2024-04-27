@@ -3,7 +3,7 @@
 [KiCad](https://www.kicad.org) plugin for interactive logical scheme simulation.
 Supports two usage methods: directly from KiCad or standalone, using a schema file exported from KiCad in the "PCB Netlist"(`.net`) file format.
 
-Focuses on performance and simplicity of the model chip API, allowing easy implementation of custom chip behaviors for simulation.
+Focuses on performance and simplicity of the model schema part API, allowing easy implementation of custom schema part behaviors for simulation.
 
 [Here is more info](stuff%2Fkicad_symbols%2FREADME.md) about the supported schema part list and how to configure KiCad symbols mapping for the simulator.
 

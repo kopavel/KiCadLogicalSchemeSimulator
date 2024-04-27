@@ -30,15 +30,15 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.DigitalNetSimulator.components.counter;
-import lv.pko.DigitalNetSimulator.api.chips.Chip;
 import lv.pko.DigitalNetSimulator.api.pins.in.FallingEdgeInPin;
 import lv.pko.DigitalNetSimulator.api.pins.in.RisingEdgeInPin;
 import lv.pko.DigitalNetSimulator.api.pins.out.OutPin;
+import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPart;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Counter extends Chip {
+public class Counter extends SchemaPart {
     String qAlias = "Q";
     String cAlias = "C";
     String rAlias = "";

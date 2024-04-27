@@ -29,10 +29,10 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-import lv.pko.DigitalNetSimulator.api.chips.ChipSpi;
+import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPartSpi;
 
 module DigitalNetSimulator.simulator {
-    uses ChipSpi;
+    uses SchemaPartSpi;
     requires static lombok;
     requires jdk.unsupported;
     requires java.desktop;
@@ -65,7 +65,7 @@ module DigitalNetSimulator.simulator {
     exports lv.pko.DigitalNetSimulator.tools;
     exports lv.pko.DigitalNetSimulator.api;
     exports lv.pko.DigitalNetSimulator.api.pins;
-    exports lv.pko.DigitalNetSimulator.api.chips;
+    exports lv.pko.DigitalNetSimulator.api.schemaPart;
     exports lv.pko.DigitalNetSimulator.api.pins.in;
     exports lv.pko.DigitalNetSimulator.api.pins.out;
     exports lv.pko.DigitalNetSimulator.parsers.pojo;

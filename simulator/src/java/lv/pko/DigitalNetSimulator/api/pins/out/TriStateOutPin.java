@@ -30,13 +30,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.DigitalNetSimulator.api.pins.out;
-import lv.pko.DigitalNetSimulator.api.chips.Chip;
+import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPart;
 
 public class TriStateOutPin extends OutPin {
     //Fixme make here 3 states, hiImpedance/Week/Strong , use it for pull up resisters and Power pins
     public boolean hiImpedance;
 
-    public TriStateOutPin(String id, Chip parent, int size, String... names) {
+    public TriStateOutPin(String id, SchemaPart parent, int size, String... names) {
         super(id, parent, size, names);
     }
 

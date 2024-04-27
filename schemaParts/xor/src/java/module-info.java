@@ -29,10 +29,10 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-import lv.pko.DigitalNetSimulator.api.chips.ChipSpi;
+import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPartSpi;
 import lv.pko.DigitalNetSimulator.components.XOR.XorGateSpi;
 
 module DigitalNetSimulator.components.XOR {
     requires DigitalNetSimulator.simulator;
-    provides ChipSpi with XorGateSpi;
+    provides SchemaPartSpi with XorGateSpi;
 }

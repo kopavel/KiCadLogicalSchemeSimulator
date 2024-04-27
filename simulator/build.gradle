@@ -100,7 +100,11 @@ run {
         args(appArgsList)
     }
     if (project.hasProperty('workDir')) {
-        workingDir = "$rootDir/" + project.getProperties().get('workDir')
+        if (project.getProperties().get('workDir').toString().contains(":")) {
+            workingDir = project.getProperties().get('workDir')
+        } else {
+            workingDir = "$rootDir/" + project.getProperties().get('workDir')
+        }
     } else {
         workingDir = "$rootDir/stuff/work"
 

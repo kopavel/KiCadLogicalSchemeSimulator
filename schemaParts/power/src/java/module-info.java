@@ -29,9 +29,9 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-import lv.pko.DigitalNetSimulator.api.chips.ChipSpi;
+import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPartSpi;
 
 module DigitalNetSimulator.components.power {
     requires DigitalNetSimulator.simulator;
-    provides ChipSpi with lv.pko.DigitalNetSimulator.components.power.PowerSpi;
+    provides SchemaPartSpi with lv.pko.DigitalNetSimulator.components.power.PowerSpi;
 }

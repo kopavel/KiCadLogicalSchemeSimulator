@@ -29,10 +29,10 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-import lv.pko.DigitalNetSimulator.api.chips.ChipSpi;
+import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPartSpi;
 import lv.pko.DigitalNetSimulator.components.counter.CounterSpi;
 
 module DigitalNetSimulator.components.counter {
     requires DigitalNetSimulator.simulator;
-    provides ChipSpi with CounterSpi;
+    provides SchemaPartSpi with CounterSpi;
 }

@@ -30,9 +30,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.DigitalNetSimulator.components.power;
-import lv.pko.DigitalNetSimulator.api.chips.Chip;
+import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPart;
 
-public class Power extends Chip {
+public class Power extends SchemaPart {
     protected Power(String id, String sParams) {
         super(id, sParams);
         String state = params.get("state");

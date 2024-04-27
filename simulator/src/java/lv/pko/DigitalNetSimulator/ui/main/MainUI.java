@@ -31,6 +31,7 @@
  */
 package lv.pko.DigitalNetSimulator.ui.main;
 import lv.pko.DigitalNetSimulator.Simulator;
+import lv.pko.DigitalNetSimulator.model.Model;
 
 import javax.swing.*;
 import java.awt.event.WindowAdapter;
@@ -45,7 +46,9 @@ public class MainUI extends JFrame {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                Simulator.saveLayout();
+                if (!Model.stabilizing) {
+                    Simulator.saveLayout();
+                }
                 System.exit(0);
             }
 

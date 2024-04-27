@@ -31,15 +31,15 @@
  */
 package lv.pko.DigitalNetSimulator.components.LED;
 import lv.pko.DigitalNetSimulator.api.AbstractUiComponent;
-import lv.pko.DigitalNetSimulator.api.chips.Chip;
-import lv.pko.DigitalNetSimulator.api.chips.InteractiveChip;
 import lv.pko.DigitalNetSimulator.api.pins.in.FloatingPinException;
 import lv.pko.DigitalNetSimulator.api.pins.in.InPin;
+import lv.pko.DigitalNetSimulator.api.schemaPart.InteractiveSchemaPart;
+import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPart;
 import lv.pko.DigitalNetSimulator.tools.UiTools;
 
 import java.awt.*;
 
-public class Led extends Chip implements InteractiveChip {
+public class Led extends SchemaPart implements InteractiveSchemaPart {
     final InPin in;
     private final LedUiComponent ledUiComponent;
 

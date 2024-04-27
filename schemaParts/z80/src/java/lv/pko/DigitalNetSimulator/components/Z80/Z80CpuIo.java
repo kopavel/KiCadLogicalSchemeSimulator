@@ -30,12 +30,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.DigitalNetSimulator.components.Z80;
-import lv.pko.DigitalNetSimulator.api.chips.Chip;
 import lv.pko.DigitalNetSimulator.api.pins.in.InPin;
 import lv.pko.DigitalNetSimulator.api.pins.out.OutPin;
 import lv.pko.DigitalNetSimulator.api.pins.out.TriStateOutPin;
+import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPart;
 
-public class Z80CpuIo extends Chip {
+public class Z80CpuIo extends SchemaPart {
     protected InPin dIn;
     protected TriStateOutPin dOut;
     protected TriStateOutPin addOut;

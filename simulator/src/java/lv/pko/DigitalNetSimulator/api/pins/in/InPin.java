@@ -30,10 +30,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.DigitalNetSimulator.api.pins.in;
-import lv.pko.DigitalNetSimulator.api.chips.Chip;
 import lv.pko.DigitalNetSimulator.api.pins.Manipulable;
 import lv.pko.DigitalNetSimulator.api.pins.Pin;
 import lv.pko.DigitalNetSimulator.api.pins.out.OutPin;
+import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPart;
 
 //FixMe make Sense Pin
 public abstract class InPin extends Pin implements Manipulable {
@@ -44,11 +44,11 @@ public abstract class InPin extends Pin implements Manipulable {
     public OutPin source;
     public byte nOffset;
 
-    public InPin(String id, Chip parent, int size, String... names) {
+    public InPin(String id, SchemaPart parent, int size, String... names) {
         super(id, parent, size, names);
     }
 
-    public InPin(String id, Chip parent) {
+    public InPin(String id, SchemaPart parent) {
         super(id, parent, 1);
     }
 

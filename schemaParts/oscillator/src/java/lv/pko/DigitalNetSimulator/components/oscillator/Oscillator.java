@@ -32,16 +32,16 @@
 package lv.pko.DigitalNetSimulator.components.oscillator;
 import lombok.Getter;
 import lv.pko.DigitalNetSimulator.api.AbstractUiComponent;
-import lv.pko.DigitalNetSimulator.api.chips.Chip;
-import lv.pko.DigitalNetSimulator.api.chips.InteractiveChip;
 import lv.pko.DigitalNetSimulator.api.pins.out.OutPin;
+import lv.pko.DigitalNetSimulator.api.schemaPart.InteractiveSchemaPart;
+import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPart;
 import lv.pko.DigitalNetSimulator.tools.Log;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class Oscillator extends Chip implements InteractiveChip {
+public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
     private final OscillatorUiComponent oscillatorUiComponent;
     public long ticks;
     ScheduledExecutorService scheduler;

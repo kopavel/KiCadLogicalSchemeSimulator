@@ -75,8 +75,11 @@ public class NetFileParser {
                     Node node = new Node();
                     net.getNode().add(node);
                     node.setRef(nodeItem.items.get("ref").getFirst().value);
-                    node.setPinfunction(nodeItem.items.get("pinfunction").getFirst().value);
+                    if (nodeItem.items.containsKey("pinfunction")) {
+                        node.setPinfunction(nodeItem.items.get("pinfunction").getFirst().value);
+                    }
                     node.setPintype(nodeItem.items.get("pintype").getFirst().value);
+                    node.setPin(nodeItem.items.get("pin").getFirst().value);
                 });
             });
             return export;
@@ -107,7 +110,7 @@ public class NetFileParser {
         if (currentChar != ')') {
             nextNoSpaceChar(reader);
         }
-        while (currentChar > 0 && currentChar != ')') {
+        while (currentChar > 0 && currentChar != ')' && retVal.value == null/*here may be many values - take only first one*/) {
             if (currentChar == '\"') {
                 retVal.value = getString(reader);
             } else if (currentChar == '(') {
@@ -117,6 +120,9 @@ public class NetFileParser {
             } else {
                 throw new Exception("Unexpected char:" + (char) currentChar);
             }
+        }
+        while (currentChar != ')' && currentChar != -1) {
+            nextChar(reader);
         }
         if (currentChar == -1) {
             throw new Exception("Unexpected end of file");

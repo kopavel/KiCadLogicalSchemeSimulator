@@ -30,17 +30,17 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.DigitalNetSimulator.components.Z80;
-import lv.pko.DigitalNetSimulator.api.chips.Chip;
-import lv.pko.DigitalNetSimulator.api.chips.ChipSpi;
+import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPart;
+import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPartSpi;
 
-public class Z80CpuSpi implements ChipSpi {
+public class Z80CpuSpi implements SchemaPartSpi {
     @Override
-    public Chip getChip(String id, String params) {
+    public SchemaPart getSchemaPart(String id, String params) {
         return new Z80Cpu(id);
     }
 
     @Override
-    public Class<? extends Chip> getChipClass() {
+    public Class<? extends SchemaPart> getSchemaPartClass() {
         return Z80Cpu.class;
     }
 }

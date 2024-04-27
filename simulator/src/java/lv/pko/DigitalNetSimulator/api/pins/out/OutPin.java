@@ -30,10 +30,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.DigitalNetSimulator.api.pins.out;
-import lv.pko.DigitalNetSimulator.api.chips.Chip;
 import lv.pko.DigitalNetSimulator.api.pins.Manipulable;
 import lv.pko.DigitalNetSimulator.api.pins.Pin;
 import lv.pko.DigitalNetSimulator.api.pins.in.InPin;
+import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPart;
 
 public class OutPin extends Pin implements Manipulable {
     public long state;
@@ -44,7 +44,7 @@ public class OutPin extends Pin implements Manipulable {
         }
     };
 
-    public OutPin(String id, Chip parent, int size, String... names) {
+    public OutPin(String id, SchemaPart parent, int size, String... names) {
         super(id, parent, size, names);
     }
 

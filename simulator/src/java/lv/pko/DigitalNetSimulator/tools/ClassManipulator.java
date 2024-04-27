@@ -31,10 +31,10 @@
  *
  */
 package lv.pko.DigitalNetSimulator.tools;
-import lv.pko.DigitalNetSimulator.api.chips.Chip;
 import lv.pko.DigitalNetSimulator.api.pins.Manipulable;
 import lv.pko.DigitalNetSimulator.api.pins.in.InPin;
 import lv.pko.DigitalNetSimulator.api.pins.out.OutPin;
+import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPart;
 import org.objectweb.asm.*;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
@@ -44,7 +44,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
-public class ClassManipulator extends Chip {
+public class ClassManipulator extends SchemaPart {
     protected ClassManipulator(String id, String sParam) {
         super(id, sParam);
     }

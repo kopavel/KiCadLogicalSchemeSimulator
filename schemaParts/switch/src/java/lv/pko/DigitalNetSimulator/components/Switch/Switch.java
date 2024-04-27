@@ -31,13 +31,13 @@
  */
 package lv.pko.DigitalNetSimulator.components.Switch;
 import lv.pko.DigitalNetSimulator.api.AbstractUiComponent;
-import lv.pko.DigitalNetSimulator.api.chips.Chip;
-import lv.pko.DigitalNetSimulator.api.chips.InteractiveChip;
 import lv.pko.DigitalNetSimulator.api.pins.PassivePin;
 import lv.pko.DigitalNetSimulator.api.pins.PassivePin.OtherState;
+import lv.pko.DigitalNetSimulator.api.schemaPart.InteractiveSchemaPart;
+import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPart;
 
 //FixME rework it completely for new model
-public class Switch extends Chip implements InteractiveChip {
+public class Switch extends SchemaPart implements InteractiveSchemaPart {
     private final PassivePin pin1;
     private final PassivePin pin2;
     boolean state;

@@ -30,14 +30,14 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.DigitalNetSimulator.components.sdram;
-import lv.pko.DigitalNetSimulator.api.chips.Chip;
 import lv.pko.DigitalNetSimulator.api.pins.in.EdgeInPin;
 import lv.pko.DigitalNetSimulator.api.pins.in.FallingEdgeInPin;
 import lv.pko.DigitalNetSimulator.api.pins.in.InPin;
 import lv.pko.DigitalNetSimulator.api.pins.in.RisingEdgeInPin;
 import lv.pko.DigitalNetSimulator.api.pins.out.TriStateOutPin;
+import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPart;
 
-public class SdRam extends Chip {
+public class SdRam extends SchemaPart {
     private final long[] bytes;
     private final InPin addrPin;
     private final InPin dIn;

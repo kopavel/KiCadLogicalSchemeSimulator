@@ -31,15 +31,15 @@
  */
 package lv.pko.DigitalNetSimulator.components.display;
 import lv.pko.DigitalNetSimulator.api.AbstractUiComponent;
-import lv.pko.DigitalNetSimulator.api.chips.Chip;
-import lv.pko.DigitalNetSimulator.api.chips.InteractiveChip;
 import lv.pko.DigitalNetSimulator.api.pins.in.FallingEdgeInPin;
 import lv.pko.DigitalNetSimulator.api.pins.in.InPin;
+import lv.pko.DigitalNetSimulator.api.schemaPart.InteractiveSchemaPart;
+import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPart;
 
 import javax.swing.*;
 import java.util.Arrays;
 
-public class Display extends Chip implements InteractiveChip {
+public class Display extends SchemaPart implements InteractiveSchemaPart {
     private final InPin vIn;
     private final DisplayUiComponent display;
     private final InPin hSync;
