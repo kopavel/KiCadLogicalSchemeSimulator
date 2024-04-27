@@ -67,7 +67,7 @@ public class Buffer extends Chip {
                 if (hiImpedance) {
                     throw new FloatingPinException(this);
                 }
-                oeState = (rawState == 0);
+                oeState = (newState == 0);
                 if (oeState) {
                     qPin.setState(isLatch ? latch : dPin.rawState);
                 } else {

@@ -52,7 +52,7 @@ public class AndGate extends Chip {
                 if (hiImpedance) {
                     throw new FloatingPinException(this);
                 }
-                if ((newState & inPin.mask) == mask) {
+                if (newState == mask) {
                     out.setState(hiState);
                 } else {
                     out.setState(loState);

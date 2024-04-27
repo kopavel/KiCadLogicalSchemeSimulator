@@ -72,7 +72,6 @@ public class TriStateOutPins extends TriStateOutPin {
     public void setHiImpedance() {
         if (!hiImpedance) {
             hiImpedance = true;
-            long state = this.state;
             for (InPin InPin : dest) {
                 InPin.transit(state, state, true);
             }

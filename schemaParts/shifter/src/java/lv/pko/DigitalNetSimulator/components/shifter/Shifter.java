@@ -56,7 +56,7 @@ public class Shifter extends Chip {
                 if (hiImpedance) {
                     throw new FloatingPinException(this);
                 }
-                wrActive = (newState & mask) > 0 ^ reverse;
+                wrActive = (newState > 0) ^ reverse;
             }
         });
         addInPin(new RisingEdgeInPin("CLK", this) {

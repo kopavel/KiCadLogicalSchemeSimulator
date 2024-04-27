@@ -109,7 +109,7 @@ public class Ram extends Chip {
                 if (hiImpedance) {
                     throw new FloatingPinException(this);
                 }
-                oeActive = (newState & mask) > 0 ^ reverse;
+                oeActive = (newState > 0) ^ reverse;
                 out();
             }
         });

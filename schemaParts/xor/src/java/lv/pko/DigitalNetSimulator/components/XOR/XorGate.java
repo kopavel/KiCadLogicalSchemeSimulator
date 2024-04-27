@@ -48,7 +48,7 @@ public class XorGate extends Chip {
                 if (hiImpedance) {
                     throw new FloatingPinException(this);
                 }
-                in1Active = (newState & mask) > 0;
+                in1Active = newState > 0;
                 out.setState((in1Active ^ in2Active) ? hiState : loState);
             }
         });
@@ -58,7 +58,7 @@ public class XorGate extends Chip {
                 if (hiImpedance) {
                     throw new FloatingPinException(this);
                 }
-                in2Active = (newState & mask) > 0;
+                in2Active = newState > 0;
                 out.setState((in1Active ^ in2Active) ? hiState : loState);
             }
         });

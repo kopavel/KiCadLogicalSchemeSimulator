@@ -97,6 +97,7 @@ public class Merger extends OutPin {
                     }
                 }
                 dest.rawState = result;
+                //FixMe what about edge pins??
                 dest.onChange(result, (strongPins | pullPins) != dest.mask);
             }
         };

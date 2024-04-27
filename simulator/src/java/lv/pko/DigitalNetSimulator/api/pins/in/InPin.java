@@ -35,6 +35,7 @@ import lv.pko.DigitalNetSimulator.api.pins.Manipulable;
 import lv.pko.DigitalNetSimulator.api.pins.Pin;
 import lv.pko.DigitalNetSimulator.api.pins.out.OutPin;
 
+//FixMe make Sense Pin
 public abstract class InPin extends Pin implements Manipulable {
     public long mask;
     //Fixme volatile??
