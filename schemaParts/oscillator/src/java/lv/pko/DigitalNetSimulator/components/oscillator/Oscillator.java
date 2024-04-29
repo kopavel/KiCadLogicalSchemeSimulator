@@ -45,7 +45,7 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
     private final OscillatorUiComponent oscillatorUiComponent;
     public long ticks;
     ScheduledExecutorService scheduler;
-    private OutPin out;
+    public OutPin out;
     @Getter
     private long clockPeriod = 1000000000;
     private Thread fullSpeedThread;
@@ -72,7 +72,7 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
         return oscillatorUiComponent;
     }
 
-    public void startClock() {
+    synchronized public void startClock() {
         if (clockPeriod == 0) {
             fullSpeedAlive = true;
             fullSpeedThread = Thread.ofPlatform().start(() -> {
@@ -92,13 +92,13 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
         }
     }
 
-    void restartClock() {
+    synchronized public void restartClock() {
         if (stopClock()) {
             startClock();
         }
     }
 
-    boolean stopClock() {
+    synchronized boolean stopClock() {
         boolean retVal = false;
         if (scheduler != null) {
             retVal = true;

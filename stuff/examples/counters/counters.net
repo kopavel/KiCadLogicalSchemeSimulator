@@ -1,778 +1,251 @@
-(export 
-  (version "E") 
-  (design 
-    (date "22/04/2024 23:24:21")
-    (tool "Eeschema 7.0.9") 
-    (sheet 
-      (number "1") 
-      (name "/") 
-      (tstamps "/") 
-      (title_block 
-        (title) 
-        (company) 
-        (rev) 
-        (date) 
-        (source "simulator.kicad_sch") 
-        (comment 
-          (number "1") 
-          (value "")) 
-        (comment 
-          (number "2") 
-          (value "")) 
-        (comment 
-          (number "3") 
-          (value "")) 
-        (comment 
-          (number "4") 
-          (value "")) 
-        (comment 
-          (number "5") 
-          (value "")) 
-        (comment 
-          (number "6") 
-          (value "")) 
-        (comment 
-          (number "7") 
-          (value "")) 
-        (comment 
-          (number "8") 
-          (value "")) 
-        (comment 
-          (number "9") 
-          (value ""))))) 
-  (components 
-    (comp 
-      (ref "Led1") 
-      (value "~") 
-      (libsource 
-        (lib "chip") 
-        (part "LED") 
-        (description "")) 
-      (property 
-        (name "Sheetname") 
-        (value "")) 
-      (property 
-        (name "Sheetfile") 
-        (value "simulator.kicad_sch")) 
-      (sheetpath 
-        (names "/") 
-        (tstamps "/")) 
-      (tstamps "9d9ed916-20d6-4839-87e1-d7e1d709e7af")) 
-    (comp 
-      (ref "Led2") 
-      (value "~") 
-      (libsource 
-        (lib "chip") 
-        (part "LED") 
-        (description "")) 
-      (property 
-        (name "Sheetname") 
-        (value "")) 
-      (property 
-        (name "Sheetfile") 
-        (value "simulator.kicad_sch")) 
-      (sheetpath 
-        (names "/") 
-        (tstamps "/")) 
-      (tstamps "af020052-d95c-4b9f-8276-fd08ebf90faf")) 
-    (comp 
-      (ref "Led3") 
-      (value "~") 
-      (libsource 
-        (lib "chip") 
-        (part "LED") 
-        (description "")) 
-      (property 
-        (name "Sheetname") 
-        (value "")) 
-      (property 
-        (name "Sheetfile") 
-        (value "simulator.kicad_sch")) 
-      (sheetpath 
-        (names "/") 
-        (tstamps "/")) 
-      (tstamps "c2dc2f12-ed17-4658-b564-88b7fd26fe0b")) 
-    (comp 
-      (ref "Led4") 
-      (value "~") 
-      (libsource 
-        (lib "chip") 
-        (part "LED") 
-        (description "")) 
-      (property 
-        (name "Sheetname") 
-        (value "")) 
-      (property 
-        (name "Sheetfile") 
-        (value "simulator.kicad_sch")) 
-      (sheetpath 
-        (names "/") 
-        (tstamps "/")) 
-      (tstamps "877a834d-13a4-42be-940e-486c5250e24e")) 
-    (comp 
-      (ref "U1") 
-      (value "74LS393") 
-      (datasheet "74xx\\74LS393.pdf") 
-      (libsource 
-        (lib "74xx") 
-        (part "74LS393") 
-        (description "Dual BCD 4-bit counter")) 
-      (property 
-        (name "Sheetname") 
-        (value "")) 
-      (property 
-        (name "Sheetfile") 
-        (value "simulator.kicad_sch")) 
-      (property 
-        (name "ki_description") 
-        (value "Dual BCD 4-bit counter")) 
-      (property 
-        (name "ki_keywords") 
-        (value "TTL CNT CNT4")) 
-      (sheetpath 
-        (names "/") 
-        (tstamps "/")) 
-      (tstamps "166ae89c-638d-46e0-9122-b80e45cfbac0")) 
-    (comp 
-      (ref "U2") 
-      (value "MAX7375AXR805") 
-      (footprint "Package_TO_SOT_SMD:SOT-323_SC-70") 
-      (datasheet "https://datasheets.maximintegrated.com/en/ds/MAX7375.pdf") 
-      (libsource 
-        (lib "Oscillator") 
-        (part "MAX7375AXR805") 
-        (description "Silicon Clock Oscillator 8MHz, SC-70-3")) 
-      (property 
-        (name "Sheetname") 
-        (value "")) 
-      (property 
-        (name "Sheetfile") 
-        (value "simulator.kicad_sch")) 
-      (property 
-        (name "ki_description") 
-        (value "Silicon Clock Oscillator 8MHz, SC-70-3")) 
-      (property 
-        (name "ki_keywords") 
-        (value "Silicon Clock Oscillator 8MHz 8000kHz")) 
-      (sheetpath 
-        (names "/") 
-        (tstamps "/")) 
-      (tstamps "6554582a-8899-4db2-a31f-688f74556005")) 
-    (comp 
-      (ref "U3") 
-      (value "74LS393") 
-      (datasheet "74xx\\74LS393.pdf") 
-      (libsource 
-        (lib "74xx") 
-        (part "74LS393") 
-        (description "Dual BCD 4-bit counter")) 
-      (property 
-        (name "Sheetname") 
-        (value "")) 
-      (property 
-        (name "Sheetfile") 
-        (value "simulator.kicad_sch")) 
-      (property 
-        (name "ki_description") 
-        (value "Dual BCD 4-bit counter")) 
-      (property 
-        (name "ki_keywords") 
-        (value "TTL CNT CNT4")) 
-      (sheetpath 
-        (names "/") 
-        (tstamps "/")) 
-      (tstamps "f73c1d22-871c-47f7-b52d-4b478d354b57")) 
-    (comp 
-      (ref "U4") 
-      (value "74LS393") 
-      (datasheet "74xx\\74LS393.pdf") 
-      (libsource 
-        (lib "74xx") 
-        (part "74LS393") 
-        (description "Dual BCD 4-bit counter")) 
-      (property 
-        (name "Sheetname") 
-        (value "")) 
-      (property 
-        (name "Sheetfile") 
-        (value "simulator.kicad_sch")) 
-      (property 
-        (name "ki_description") 
-        (value "Dual BCD 4-bit counter")) 
-      (property 
-        (name "ki_keywords") 
-        (value "TTL CNT CNT4")) 
-      (sheetpath 
-        (names "/") 
-        (tstamps "/")) 
-      (tstamps "f3d35ad7-ecad-4672-8ff7-171950409a67")) 
-    (comp 
-      (ref "U5") 
-      (value "74LS393") 
-      (datasheet "74xx\\74LS393.pdf") 
-      (libsource 
-        (lib "74xx") 
-        (part "74LS393") 
-        (description "Dual BCD 4-bit counter")) 
-      (property 
-        (name "Sheetname") 
-        (value "")) 
-      (property 
-        (name "Sheetfile") 
-        (value "simulator.kicad_sch")) 
-      (property 
-        (name "ki_description") 
-        (value "Dual BCD 4-bit counter")) 
-      (property 
-        (name "ki_keywords") 
-        (value "TTL CNT CNT4")) 
-      (sheetpath 
-        (names "/") 
-        (tstamps "/")) 
-      (tstamps "7fa41021-3f76-49e0-9632-21ab76eae21b")) 
-    (comp 
-      (ref "U6") 
-      (value "74LS393") 
-      (datasheet "74xx\\74LS393.pdf") 
-      (libsource 
-        (lib "74xx") 
-        (part "74LS393") 
-        (description "Dual BCD 4-bit counter")) 
-      (property 
-        (name "Sheetname") 
-        (value "")) 
-      (property 
-        (name "Sheetfile") 
-        (value "simulator.kicad_sch")) 
-      (property 
-        (name "ki_description") 
-        (value "Dual BCD 4-bit counter")) 
-      (property 
-        (name "ki_keywords") 
-        (value "TTL CNT CNT4")) 
-      (sheetpath 
-        (names "/") 
-        (tstamps "/")) 
-      (tstamps "4b9d0c5a-a615-4197-b2a0-4753cc4935da")) 
-    (comp 
-      (ref "U7") 
-      (value "74LS393") 
-      (datasheet "74xx\\74LS393.pdf") 
-      (libsource 
-        (lib "74xx") 
-        (part "74LS393") 
-        (description "Dual BCD 4-bit counter")) 
-      (property 
-        (name "Sheetname") 
-        (value "")) 
-      (property 
-        (name "Sheetfile") 
-        (value "simulator.kicad_sch")) 
-      (property 
-        (name "ki_description") 
-        (value "Dual BCD 4-bit counter")) 
-      (property 
-        (name "ki_keywords") 
-        (value "TTL CNT CNT4")) 
-      (sheetpath 
-        (names "/") 
-        (tstamps "/")) 
-      (tstamps "49b82a57-b47d-47a6-9a50-5d80747922fb")) 
-    (comp 
-      (ref "U8") 
-      (value "74LS393") 
-      (datasheet "74xx\\74LS393.pdf") 
-      (libsource 
-        (lib "74xx") 
-        (part "74LS393") 
-        (description "Dual BCD 4-bit counter")) 
-      (property 
-        (name "Sheetname") 
-        (value "")) 
-      (property 
-        (name "Sheetfile") 
-        (value "simulator.kicad_sch")) 
-      (property 
-        (name "ki_description") 
-        (value "Dual BCD 4-bit counter")) 
-      (property 
-        (name "ki_keywords") 
-        (value "TTL CNT CNT4")) 
-      (sheetpath 
-        (names "/") 
-        (tstamps "/")) 
-      (tstamps "aa713864-955e-4589-aeef-8252cb68575e"))) 
-  (libparts 
-    (libpart 
-      (lib "74xx") 
-      (part "74LS393") 
-      (description "Dual BCD 4-bit counter") 
-      (docs "74xx\\74LS393.pdf") 
-      (footprints 
-        (fp "DIP*W7.62mm*")) 
-      (fields 
-        (field 
-          (name "Reference") "U") 
-        (field 
-          (name "Value") "74LS393") 
-        (field 
-          (name "Datasheet") "74xx\\74LS393.pdf")) 
-      (pins 
-        (pin 
-          (num "1") 
-          (name "CP") 
-          (type "input")) 
-        (pin 
-          (num "2") 
-          (name "MR") 
-          (type "input")) 
-        (pin 
-          (num "3") 
-          (name "Q0") 
-          (type "output")) 
-        (pin 
-          (num "4") 
-          (name "Q1") 
-          (type "output")) 
-        (pin 
-          (num "5") 
-          (name "Q2") 
-          (type "output")) 
-        (pin 
-          (num "6") 
-          (name "Q3") 
-          (type "output")) 
-        (pin 
-          (num "7") 
-          (name "GND") 
-          (type "power_in")) 
-        (pin 
-          (num "8") 
-          (name "Q3") 
-          (type "output")) 
-        (pin 
-          (num "9") 
-          (name "Q2") 
-          (type "output")) 
-        (pin 
-          (num "10") 
-          (name "Q1") 
-          (type "output")) 
-        (pin 
-          (num "11") 
-          (name "Q0") 
-          (type "output")) 
-        (pin 
-          (num "12") 
-          (name "MR") 
-          (type "input")) 
-        (pin 
-          (num "13") 
-          (name "CP") 
-          (type "input")) 
-        (pin 
-          (num "14") 
-          (name "VCC") 
-          (type "power_in")))) 
-    (libpart 
-      (lib "Oscillator") 
-      (part "MAX7375AXR805") 
-      (description "Silicon Clock Oscillator 8MHz, SC-70-3") 
-      (docs "https://datasheets.maximintegrated.com/en/ds/MAX7375.pdf") 
-      (footprints 
-        (fp "*SC?70*")) 
-      (fields 
-        (field 
-          (name "Reference") "U") 
-        (field 
-          (name "Value") "MAX7375AXR805") 
-        (field 
-          (name "Footprint") "Package_TO_SOT_SMD:SOT-323_SC-70") 
-        (field 
-          (name "Datasheet") "https://datasheets.maximintegrated.com/en/ds/MAX7375.pdf")) 
-      (pins 
-        (pin 
-          (num "1") 
-          (name "V+") 
-          (type "power_in")) 
-        (pin 
-          (num "2") 
-          (name "CLOCK") 
-          (type "output")) 
-        (pin 
-          (num "3") 
-          (name "GND") 
-          (type "power_in")))) 
-    (libpart 
-      (lib "chip") 
-      (part "LED") 
-      (footprints 
-        (fp "LED*5.0mm*IRGrey*")) 
-      (fields 
-        (field 
-          (name "Reference") "Led")) 
-      (pins 
-        (pin 
-          (num "1") 
-          (name "IN") 
-          (type "input"))))) 
+(export (version "E")
+  (design
+    (date "30/04/2024 08:41:15")
+    (tool "Eeschema 7.0.9")
+    (sheet (number "1") (name "/") (tstamps "/")
+      (title_block
+        (title)
+        (company)
+        (rev)
+        (date)
+        (source "counters.kicad_sch")
+        (comment (number "1") (value ""))
+        (comment (number "2") (value ""))
+        (comment (number "3") (value ""))
+        (comment (number "4") (value ""))
+        (comment (number "5") (value ""))
+        (comment (number "6") (value ""))
+        (comment (number "7") (value ""))
+        (comment (number "8") (value ""))
+        (comment (number "9") (value "")))))
+  (components
+    (comp (ref "Led1")
+      (value "~")
+      (libsource (lib "chip") (part "LED") (description ""))
+      (property (name "Sheetname") (value ""))
+      (property (name "Sheetfile") (value "counters.kicad_sch"))
+      (sheetpath (names "/") (tstamps "/"))
+      (tstamps "2a147e25-0dc6-484c-8a07-71255a7d7a0f"))
+    (comp (ref "Led2")
+      (value "~")
+      (libsource (lib "chip") (part "LED") (description ""))
+      (property (name "Sheetname") (value ""))
+      (property (name "Sheetfile") (value "counters.kicad_sch"))
+      (sheetpath (names "/") (tstamps "/"))
+      (tstamps "4d9f2c9c-9dbb-467a-aa1e-9c67805dda31"))
+    (comp (ref "Led3")
+      (value "~")
+      (libsource (lib "chip") (part "LED") (description ""))
+      (property (name "Sheetname") (value ""))
+      (property (name "Sheetfile") (value "counters.kicad_sch"))
+      (sheetpath (names "/") (tstamps "/"))
+      (tstamps "b643ff3b-b5a5-4214-9db1-07ef9e99a780"))
+    (comp (ref "Led4")
+      (value "~")
+      (libsource (lib "chip") (part "LED") (description ""))
+      (property (name "Sheetname") (value ""))
+      (property (name "Sheetfile") (value "counters.kicad_sch"))
+      (sheetpath (names "/") (tstamps "/"))
+      (tstamps "5447d33b-a1b5-4ed0-9baf-8f1a532c8121"))
+    (comp (ref "OSC1")
+      (value "MAX7375AXR805")
+      (datasheet "https://datasheets.maximintegrated.com/en/ds/MAX7375.pdf")
+      (libsource (lib "Oscillator") (part "MAX7375AXR805") (description "Silicon Clock Oscillator 8MHz, SC-70-3"))
+      (property (name "Sheetname") (value ""))
+      (property (name "Sheetfile") (value "counters.kicad_sch"))
+      (property (name "ki_description") (value "Silicon Clock Oscillator 8MHz, SC-70-3"))
+      (property (name "ki_keywords") (value "Silicon Clock Oscillator 8MHz 8000kHz"))
+      (sheetpath (names "/") (tstamps "/"))
+      (tstamps "6554582a-8899-4db2-a31f-688f74556005"))
+    (comp (ref "U1")
+      (value "74LS393")
+      (datasheet "74xx\\74LS393.pdf")
+      (libsource (lib "74xx") (part "74LS393") (description "Dual BCD 4-bit counter"))
+      (property (name "Sheetname") (value ""))
+      (property (name "Sheetfile") (value "counters.kicad_sch"))
+      (property (name "ki_description") (value "Dual BCD 4-bit counter"))
+      (property (name "ki_keywords") (value "TTL CNT CNT4"))
+      (sheetpath (names "/") (tstamps "/"))
+      (tstamps "b9b580f4-5367-4f4b-9720-e7dd6460bc70" "4d771b60-06ff-4758-b151-f04175427a16"))
+    (comp (ref "U2")
+      (value "74LS393")
+      (datasheet "74xx\\74LS393.pdf")
+      (libsource (lib "74xx") (part "74LS393") (description "Dual BCD 4-bit counter"))
+      (property (name "Sheetname") (value ""))
+      (property (name "Sheetfile") (value "counters.kicad_sch"))
+      (property (name "ki_description") (value "Dual BCD 4-bit counter"))
+      (property (name "ki_keywords") (value "TTL CNT CNT4"))
+      (sheetpath (names "/") (tstamps "/"))
+      (tstamps "de52f046-2584-4714-8a63-49150beca1ad" "65e77dac-93dd-4d72-9797-375eacda8da0"))
+    (comp (ref "U3")
+      (value "74LS393")
+      (datasheet "74xx\\74LS393.pdf")
+      (libsource (lib "74xx") (part "74LS393") (description "Dual BCD 4-bit counter"))
+      (property (name "Sheetname") (value ""))
+      (property (name "Sheetfile") (value "counters.kicad_sch"))
+      (property (name "ki_description") (value "Dual BCD 4-bit counter"))
+      (property (name "ki_keywords") (value "TTL CNT CNT4"))
+      (sheetpath (names "/") (tstamps "/"))
+      (tstamps "95b9d913-6511-48de-a5ff-65473ce8346f" "1dbe89f1-4bc5-40f0-a44d-8ace195aded1"))
+    (comp (ref "U4")
+      (value "74LS393")
+      (datasheet "74xx\\74LS393.pdf")
+      (libsource (lib "74xx") (part "74LS393") (description "Dual BCD 4-bit counter"))
+      (property (name "Sheetname") (value ""))
+      (property (name "Sheetfile") (value "counters.kicad_sch"))
+      (property (name "ki_description") (value "Dual BCD 4-bit counter"))
+      (property (name "ki_keywords") (value "TTL CNT CNT4"))
+      (sheetpath (names "/") (tstamps "/"))
+      (tstamps "ecb33dee-39dc-4d6f-8e9e-6d8abeb2c58d" "a72fc5a6-0c66-47fc-940e-79646524ed28")))
+  (libparts
+    (libpart (lib "74xx") (part "74LS393")
+      (description "Dual BCD 4-bit counter")
+      (docs "74xx\\74LS393.pdf")
+      (footprints
+        (fp "DIP*W7.62mm*"))
+      (fields
+        (field (name "Reference") "U")
+        (field (name "Value") "74LS393")
+        (field (name "Datasheet") "74xx\\74LS393.pdf"))
+      (pins
+        (pin (num "1") (name "CP") (type "input"))
+        (pin (num "2") (name "MR") (type "input"))
+        (pin (num "3") (name "Q0") (type "output"))
+        (pin (num "4") (name "Q1") (type "output"))
+        (pin (num "5") (name "Q2") (type "output"))
+        (pin (num "6") (name "Q3") (type "output"))
+        (pin (num "7") (name "GND") (type "power_in"))
+        (pin (num "8") (name "Q3") (type "output"))
+        (pin (num "9") (name "Q2") (type "output"))
+        (pin (num "10") (name "Q1") (type "output"))
+        (pin (num "11") (name "Q0") (type "output"))
+        (pin (num "12") (name "MR") (type "input"))
+        (pin (num "13") (name "CP") (type "input"))
+        (pin (num "14") (name "VCC") (type "power_in"))))
+    (libpart (lib "Oscillator") (part "MAX7375AXR805")
+      (description "Silicon Clock Oscillator 8MHz, SC-70-3")
+      (docs "https://datasheets.maximintegrated.com/en/ds/MAX7375.pdf")
+      (footprints
+        (fp "*SC?70*"))
+      (fields
+        (field (name "Reference") "U")
+        (field (name "Value") "MAX7375AXR805")
+        (field (name "Footprint") "Package_TO_SOT_SMD:SOT-323_SC-70")
+        (field (name "Datasheet") "https://datasheets.maximintegrated.com/en/ds/MAX7375.pdf"))
+      (pins
+        (pin (num "1") (name "V+") (type "power_in"))
+        (pin (num "2") (name "CLOCK") (type "output"))
+        (pin (num "3") (name "GND") (type "power_in"))))
+    (libpart (lib "chip") (part "LED")
+      (footprints
+        (fp "LED*5.0mm*IRGrey*"))
+      (fields
+        (field (name "Reference") "Led"))
+      (pins
+        (pin (num "1") (name "IN") (type "input")))))
+  (libraries
+    (library (logical "74xx")
+      (uri "C:\\Program Files\\KiCad\\7.0\\share\\kicad\\symbols\\/74xx.kicad_sym"))
+    (library (logical "Oscillator")
+      (uri "C:\\Program Files\\KiCad\\7.0\\share\\kicad\\symbols\\/Oscillator.kicad_sym"))
+    (library (logical "chip")
+      (uri "C:/Users/kopavel/Documents/KiCad/7.0/symbols/chip.kicad_sym")))
   (nets
-    (net 
-      (code "1") 
-      (name "Net-(Led1-IN)") 
-      (node 
-        (ref "Led1") 
-        (pin "1") 
-        (pinfunction "IN") 
-        (pintype "input")) 
-      (node 
-        (ref "U3") 
-        (pin "3") 
-        (pinfunction "Q0") 
-        (pintype "output"))) 
-    (net 
-      (code "2") 
-      (name "Net-(Led2-IN)") 
-      (node 
-        (ref "Led2") 
-        (pin "1") 
-        (pinfunction "IN") 
-        (pintype "input")) 
-      (node 
-        (ref "U3") 
-        (pin "4") 
-        (pinfunction "Q1") 
-        (pintype "output"))) 
-    (net 
-      (code "3") 
-      (name "Net-(Led3-IN)") 
-      (node 
-        (ref "Led3") 
-        (pin "1") 
-        (pinfunction "IN") 
-        (pintype "input")) 
-      (node 
-        (ref "U3") 
-        (pin "5") 
-        (pinfunction "Q2") 
-        (pintype "output"))) 
-    (net 
-      (code "4") 
-      (name "Net-(Led4-IN)") 
-      (node 
-        (ref "Led4") 
-        (pin "1") 
-        (pinfunction "IN") 
-        (pintype "input")) 
-      (node 
-        (ref "U3") 
-        (pin "6") 
-        (pinfunction "Q3") 
-        (pintype "output"))) 
-    (net 
-      (code "5") 
-      (name "Net-(U1A-CP)") 
-      (node 
-        (ref "U1") 
-        (pin "1") 
-        (pinfunction "CP") 
-        (pintype "input")) 
-      (node 
-        (ref "U2") 
-        (pin "2") 
-        (pinfunction "CLOCK") 
-        (pintype "output"))) 
-    (net 
-      (code "6") 
-      (name "Net-(U1A-Q3)") 
-      (node 
-        (ref "U1") 
-        (pin "6") 
-        (pinfunction "Q3") 
-        (pintype "output")) 
-      (node 
-        (ref "U8") 
-        (pin "1") 
-        (pinfunction "CP") 
-        (pintype "input"))) 
-    (net 
-      (code "7") 
-      (name "Net-(U3A-CP)") 
-      (node 
-        (ref "U3") 
-        (pin "1") 
-        (pinfunction "CP") 
-        (pintype "input")) 
-      (node 
-        (ref "U4") 
-        (pin "6") 
-        (pinfunction "Q3") 
-        (pintype "output"))) 
-    (net 
-      (code "8") 
-      (name "Net-(U4A-CP)") 
-      (node 
-        (ref "U4") 
-        (pin "1") 
-        (pinfunction "CP") 
-        (pintype "input")) 
-      (node 
-        (ref "U5") 
-        (pin "6") 
-        (pinfunction "Q3") 
-        (pintype "output"))) 
-    (net 
-      (code "9") 
-      (name "Net-(U5A-CP)") 
-      (node 
-        (ref "U5") 
-        (pin "1") 
-        (pinfunction "CP") 
-        (pintype "input")) 
-      (node 
-        (ref "U6") 
-        (pin "6") 
-        (pinfunction "Q3") 
-        (pintype "output"))) 
-    (net 
-      (code "10") 
-      (name "Net-(U6A-CP)") 
-      (node 
-        (ref "U6") 
-        (pin "1") 
-        (pinfunction "CP") 
-        (pintype "input")) 
-      (node 
-        (ref "U7") 
-        (pin "6") 
-        (pinfunction "Q3") 
-        (pintype "output"))) 
-    (net 
-      (code "11") 
-      (name "Net-(U7A-CP)") 
-      (node 
-        (ref "U7") 
-        (pin "1") 
-        (pinfunction "CP") 
-        (pintype "input")) 
-      (node 
-        (ref "U8") 
-        (pin "6") 
-        (pinfunction "Q3") 
-        (pintype "output"))) 
-    (net 
-      (code "12") 
-      (name "unconnected-(U1A-MR-Pad2)") 
-      (node 
-        (ref "U1") 
-        (pin "2") 
-        (pinfunction "MR") 
-        (pintype "input"))) 
-    (net 
-      (code "13") 
-      (name "unconnected-(U1A-Q0-Pad3)") 
-      (node 
-        (ref "U1") 
-        (pin "3") 
-        (pinfunction "Q0") 
-        (pintype "output"))) 
-    (net 
-      (code "14") 
-      (name "unconnected-(U1A-Q1-Pad4)") 
-      (node 
-        (ref "U1") 
-        (pin "4") 
-        (pinfunction "Q1") 
-        (pintype "output"))) 
-    (net 
-      (code "15") 
-      (name "unconnected-(U1A-Q2-Pad5)") 
-      (node 
-        (ref "U1") 
-        (pin "5") 
-        (pinfunction "Q2") 
-        (pintype "output"))) 
-    (net 
-      (code "16") 
-      (name "unconnected-(U2-GND-Pad3)") 
-      (node 
-        (ref "U2") 
-        (pin "3") 
-        (pinfunction "GND") 
-        (pintype "power_in"))) 
-    (net 
-      (code "17") 
-      (name "unconnected-(U2-V+-Pad1)") 
-      (node 
-        (ref "U2") 
-        (pin "1") 
-        (pinfunction "V+") 
-        (pintype "power_in"))) 
-    (net 
-      (code "18") 
-      (name "unconnected-(U3A-MR-Pad2)") 
-      (node 
-        (ref "U3") 
-        (pin "2") 
-        (pinfunction "MR") 
-        (pintype "input"))) 
-    (net 
-      (code "19") 
-      (name "unconnected-(U4A-MR-Pad2)") 
-      (node 
-        (ref "U4") 
-        (pin "2") 
-        (pinfunction "MR") 
-        (pintype "input"))) 
-    (net 
-      (code "20") 
-      (name "unconnected-(U4A-Q0-Pad3)") 
-      (node 
-        (ref "U4") 
-        (pin "3") 
-        (pinfunction "Q0") 
-        (pintype "output"))) 
-    (net 
-      (code "21") 
-      (name "unconnected-(U4A-Q1-Pad4)") 
-      (node 
-        (ref "U4") 
-        (pin "4") 
-        (pinfunction "Q1") 
-        (pintype "output"))) 
-    (net 
-      (code "22") 
-      (name "unconnected-(U4A-Q2-Pad5)") 
-      (node 
-        (ref "U4") 
-        (pin "5") 
-        (pinfunction "Q2") 
-        (pintype "output"))) 
-    (net 
-      (code "23") 
-      (name "unconnected-(U5A-MR-Pad2)") 
-      (node 
-        (ref "U5") 
-        (pin "2") 
-        (pinfunction "MR") 
-        (pintype "input"))) 
-    (net 
-      (code "24") 
-      (name "unconnected-(U5A-Q0-Pad3)") 
-      (node 
-        (ref "U5") 
-        (pin "3") 
-        (pinfunction "Q0") 
-        (pintype "output"))) 
-    (net 
-      (code "25") 
-      (name "unconnected-(U5A-Q1-Pad4)") 
-      (node 
-        (ref "U5") 
-        (pin "4") 
-        (pinfunction "Q1") 
-        (pintype "output"))) 
-    (net 
-      (code "26") 
-      (name "unconnected-(U5A-Q2-Pad5)") 
-      (node 
-        (ref "U5") 
-        (pin "5") 
-        (pinfunction "Q2") 
-        (pintype "output"))) 
-    (net 
-      (code "27") 
-      (name "unconnected-(U6A-MR-Pad2)") 
-      (node 
-        (ref "U6") 
-        (pin "2") 
-        (pinfunction "MR") 
-        (pintype "input"))) 
-    (net 
-      (code "28") 
-      (name "unconnected-(U6A-Q0-Pad3)") 
-      (node 
-        (ref "U6") 
-        (pin "3") 
-        (pinfunction "Q0") 
-        (pintype "output"))) 
-    (net 
-      (code "29") 
-      (name "unconnected-(U6A-Q1-Pad4)") 
-      (node 
-        (ref "U6") 
-        (pin "4") 
-        (pinfunction "Q1") 
-        (pintype "output"))) 
-    (net 
-      (code "30") 
-      (name "unconnected-(U6A-Q2-Pad5)") 
-      (node 
-        (ref "U6") 
-        (pin "5") 
-        (pinfunction "Q2") 
-        (pintype "output"))) 
-    (net 
-      (code "31") 
-      (name "unconnected-(U7A-MR-Pad2)") 
-      (node 
-        (ref "U7") 
-        (pin "2") 
-        (pinfunction "MR") 
-        (pintype "input"))) 
-    (net 
-      (code "32") 
-      (name "unconnected-(U7A-Q0-Pad3)") 
-      (node 
-        (ref "U7") 
-        (pin "3") 
-        (pinfunction "Q0") 
-        (pintype "output"))) 
-    (net 
-      (code "33") 
-      (name "unconnected-(U7A-Q1-Pad4)") 
-      (node 
-        (ref "U7") 
-        (pin "4") 
-        (pinfunction "Q1") 
-        (pintype "output"))) 
-    (net 
-      (code "34") 
-      (name "unconnected-(U7A-Q2-Pad5)") 
-      (node 
-        (ref "U7") 
-        (pin "5") 
-        (pinfunction "Q2") 
-        (pintype "output"))) 
-    (net 
-      (code "35") 
-      (name "unconnected-(U8A-MR-Pad2)") 
-      (node 
-        (ref "U8") 
-        (pin "2") 
-        (pinfunction "MR") 
-        (pintype "input"))) 
-    (net 
-      (code "36") 
-      (name "unconnected-(U8A-Q0-Pad3)") 
-      (node 
-        (ref "U8") 
-        (pin "3") 
-        (pinfunction "Q0") 
-        (pintype "output"))) 
-    (net 
-      (code "37") 
-      (name "unconnected-(U8A-Q1-Pad4)") 
-      (node 
-        (ref "U8") 
-        (pin "4") 
-        (pinfunction "Q1") 
-        (pintype "output"))) 
-    (net 
-      (code "38") 
-      (name "unconnected-(U8A-Q2-Pad5)") 
-      (node 
-        (ref "U8") 
-        (pin "5") 
-        (pinfunction "Q2") 
-        (pintype "output")))))
+    (net (code "1") (name "Net-(Led1-IN)")
+      (node (ref "Led1") (pin "1") (pinfunction "IN") (pintype "input"))
+      (node (ref "U4") (pin "11") (pinfunction "Q0") (pintype "output")))
+    (net (code "2") (name "Net-(Led2-IN)")
+      (node (ref "Led2") (pin "1") (pinfunction "IN") (pintype "input"))
+      (node (ref "U4") (pin "10") (pinfunction "Q1") (pintype "output")))
+    (net (code "3") (name "Net-(Led3-IN)")
+      (node (ref "Led3") (pin "1") (pinfunction "IN") (pintype "input"))
+      (node (ref "U4") (pin "9") (pinfunction "Q2") (pintype "output")))
+    (net (code "4") (name "Net-(Led4-IN)")
+      (node (ref "Led4") (pin "1") (pinfunction "IN") (pintype "input"))
+      (node (ref "U4") (pin "8") (pinfunction "Q3") (pintype "output")))
+    (net (code "5") (name "Net-(OSC1-CLOCK)")
+      (node (ref "OSC1") (pin "2") (pinfunction "CLOCK") (pintype "output"))
+      (node (ref "U1") (pin "1") (pinfunction "CP") (pintype "input")))
+    (net (code "6") (name "Net-(U1A-Q3)")
+      (node (ref "U1") (pin "13") (pinfunction "CP") (pintype "input"))
+      (node (ref "U1") (pin "6") (pinfunction "Q3") (pintype "output")))
+    (net (code "7") (name "Net-(U1B-Q3)")
+      (node (ref "U1") (pin "8") (pinfunction "Q3") (pintype "output"))
+      (node (ref "U2") (pin "1") (pinfunction "CP") (pintype "input")))
+    (net (code "8") (name "Net-(U2A-Q3)")
+      (node (ref "U2") (pin "13") (pinfunction "CP") (pintype "input"))
+      (node (ref "U2") (pin "6") (pinfunction "Q3") (pintype "output")))
+    (net (code "9") (name "Net-(U2B-Q3)")
+      (node (ref "U2") (pin "8") (pinfunction "Q3") (pintype "output"))
+      (node (ref "U3") (pin "1") (pinfunction "CP") (pintype "input")))
+    (net (code "10") (name "Net-(U3A-Q3)")
+      (node (ref "U3") (pin "13") (pinfunction "CP") (pintype "input"))
+      (node (ref "U3") (pin "6") (pinfunction "Q3") (pintype "output")))
+    (net (code "11") (name "Net-(U3B-Q3)")
+      (node (ref "U3") (pin "8") (pinfunction "Q3") (pintype "output"))
+      (node (ref "U4") (pin "1") (pinfunction "CP") (pintype "input")))
+    (net (code "12") (name "Net-(U4A-Q3)")
+      (node (ref "U4") (pin "13") (pinfunction "CP") (pintype "input"))
+      (node (ref "U4") (pin "6") (pinfunction "Q3") (pintype "output")))
+    (net (code "13") (name "unconnected-(OSC1-GND-Pad3)")
+      (node (ref "OSC1") (pin "3") (pinfunction "GND") (pintype "power_in")))
+    (net (code "14") (name "unconnected-(OSC1-V+-Pad1)")
+      (node (ref "OSC1") (pin "1") (pinfunction "V+") (pintype "power_in")))
+    (net (code "15") (name "unconnected-(U1A-MR-Pad2)")
+      (node (ref "U1") (pin "2") (pinfunction "MR") (pintype "input")))
+    (net (code "16") (name "unconnected-(U1A-Q0-Pad3)")
+      (node (ref "U1") (pin "3") (pinfunction "Q0") (pintype "output")))
+    (net (code "17") (name "unconnected-(U1A-Q1-Pad4)")
+      (node (ref "U1") (pin "4") (pinfunction "Q1") (pintype "output")))
+    (net (code "18") (name "unconnected-(U1A-Q2-Pad5)")
+      (node (ref "U1") (pin "5") (pinfunction "Q2") (pintype "output")))
+    (net (code "19") (name "unconnected-(U1B-MR-Pad12)")
+      (node (ref "U1") (pin "12") (pinfunction "MR") (pintype "input")))
+    (net (code "20") (name "unconnected-(U1B-Q0-Pad11)")
+      (node (ref "U1") (pin "11") (pinfunction "Q0") (pintype "output")))
+    (net (code "21") (name "unconnected-(U1B-Q1-Pad10)")
+      (node (ref "U1") (pin "10") (pinfunction "Q1") (pintype "output")))
+    (net (code "22") (name "unconnected-(U1B-Q2-Pad9)")
+      (node (ref "U1") (pin "9") (pinfunction "Q2") (pintype "output")))
+    (net (code "23") (name "unconnected-(U2A-MR-Pad2)")
+      (node (ref "U2") (pin "2") (pinfunction "MR") (pintype "input")))
+    (net (code "24") (name "unconnected-(U2A-Q0-Pad3)")
+      (node (ref "U2") (pin "3") (pinfunction "Q0") (pintype "output")))
+    (net (code "25") (name "unconnected-(U2A-Q1-Pad4)")
+      (node (ref "U2") (pin "4") (pinfunction "Q1") (pintype "output")))
+    (net (code "26") (name "unconnected-(U2A-Q2-Pad5)")
+      (node (ref "U2") (pin "5") (pinfunction "Q2") (pintype "output")))
+    (net (code "27") (name "unconnected-(U2B-MR-Pad12)")
+      (node (ref "U2") (pin "12") (pinfunction "MR") (pintype "input")))
+    (net (code "28") (name "unconnected-(U2B-Q0-Pad11)")
+      (node (ref "U2") (pin "11") (pinfunction "Q0") (pintype "output")))
+    (net (code "29") (name "unconnected-(U2B-Q1-Pad10)")
+      (node (ref "U2") (pin "10") (pinfunction "Q1") (pintype "output")))
+    (net (code "30") (name "unconnected-(U2B-Q2-Pad9)")
+      (node (ref "U2") (pin "9") (pinfunction "Q2") (pintype "output")))
+    (net (code "31") (name "unconnected-(U3A-MR-Pad2)")
+      (node (ref "U3") (pin "2") (pinfunction "MR") (pintype "input")))
+    (net (code "32") (name "unconnected-(U3A-Q0-Pad3)")
+      (node (ref "U3") (pin "3") (pinfunction "Q0") (pintype "output")))
+    (net (code "33") (name "unconnected-(U3A-Q1-Pad4)")
+      (node (ref "U3") (pin "4") (pinfunction "Q1") (pintype "output")))
+    (net (code "34") (name "unconnected-(U3A-Q2-Pad5)")
+      (node (ref "U3") (pin "5") (pinfunction "Q2") (pintype "output")))
+    (net (code "35") (name "unconnected-(U3B-MR-Pad12)")
+      (node (ref "U3") (pin "12") (pinfunction "MR") (pintype "input")))
+    (net (code "36") (name "unconnected-(U3B-Q0-Pad11)")
+      (node (ref "U3") (pin "11") (pinfunction "Q0") (pintype "output")))
+    (net (code "37") (name "unconnected-(U3B-Q1-Pad10)")
+      (node (ref "U3") (pin "10") (pinfunction "Q1") (pintype "output")))
+    (net (code "38") (name "unconnected-(U3B-Q2-Pad9)")
+      (node (ref "U3") (pin "9") (pinfunction "Q2") (pintype "output")))
+    (net (code "39") (name "unconnected-(U4A-MR-Pad2)")
+      (node (ref "U4") (pin "2") (pinfunction "MR") (pintype "input")))
+    (net (code "40") (name "unconnected-(U4A-Q0-Pad3)")
+      (node (ref "U4") (pin "3") (pinfunction "Q0") (pintype "output")))
+    (net (code "41") (name "unconnected-(U4A-Q1-Pad4)")
+      (node (ref "U4") (pin "4") (pinfunction "Q1") (pintype "output")))
+    (net (code "42") (name "unconnected-(U4A-Q2-Pad5)")
+      (node (ref "U4") (pin "5") (pinfunction "Q2") (pintype "output")))
+    (net (code "43") (name "unconnected-(U4B-MR-Pad12)")
+      (node (ref "U4") (pin "12") (pinfunction "MR") (pintype "input")))))

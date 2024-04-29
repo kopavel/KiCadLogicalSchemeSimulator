@@ -41,7 +41,7 @@ import java.util.List;
 public class Counter extends SchemaPart {
     String qAlias = "Q";
     String cAlias = "C";
-    String rAlias = "";
+    String rAlias = "R";
     private OutPin outPin;
     private int count = 0;
     private int countMask;
@@ -94,15 +94,13 @@ public class Counter extends SchemaPart {
                     outPin.setState(count);
                 }
             });
-            if (!rAlias.isBlank()) {
-                addInPin(new FallingEdgeInPin(rAlias, this) {
-                    @Override
-                    public void onFallingEdge() {
-                        count = 0;
-                        outPin.setState(count);
-                    }
-                });
-            }
+            addInPin(new FallingEdgeInPin(rAlias, this) {
+                @Override
+                public void onFallingEdge() {
+                    count = 0;
+                    outPin.setState(count);
+                }
+            });
         } else {
             addInPin(new RisingEdgeInPin(cAlias, this) {
                 @Override
@@ -111,15 +109,13 @@ public class Counter extends SchemaPart {
                     outPin.setState(count);
                 }
             });
-            if (!rAlias.isBlank()) {
-                addInPin(new RisingEdgeInPin(rAlias, this) {
-                    @Override
-                    public void onRisingEdge() {
-                        count = 0;
-                        outPin.setState(count);
-                    }
-                });
-            }
+            addInPin(new RisingEdgeInPin(rAlias, this) {
+                @Override
+                public void onRisingEdge() {
+                    count = 0;
+                    outPin.setState(count);
+                }
+            });
         }
     }
 

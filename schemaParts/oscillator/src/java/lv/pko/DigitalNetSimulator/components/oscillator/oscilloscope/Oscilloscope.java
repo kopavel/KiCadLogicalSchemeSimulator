@@ -29,116 +29,72 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lv.pko.DigitalNetSimulator.ui.oscilloscope;
-import lv.pko.DigitalNetSimulator.Simulator;
+package lv.pko.DigitalNetSimulator.components.oscillator.oscilloscope;
 import lv.pko.DigitalNetSimulator.api.pins.out.OutPin;
-import lv.pko.DigitalNetSimulator.api.schemaPart.InteractiveSchemaPart;
-import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPart;
+import lv.pko.DigitalNetSimulator.components.oscillator.OscillatorUi;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.ResourceBundle;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class Oscilloscope extends JFrame {
-    public static int historySize = 100000;
-    Map<String, WatchedItem> items = new ConcurrentHashMap<>();
-    JPanel watchedItemNamesPanel;
-    JPanel watchedItemsPanel;
-    JScrollPane scrollPane;
-    ScheduledExecutorService scheduler;
+    public static final ResourceBundle localization = ResourceBundle.getBundle("i81n_clock/clock");
+    private final JPanel watchedItemNamesPanel;
+    private final ScheduledExecutorService scheduler;
+    final Diagram diagram;
 
-    public Oscilloscope() {
+
+    public Oscilloscope(OscillatorUi parent) {
+        setJMenuBar(new OutsMenu(this));
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                unloadPins();
                 scheduler.shutdown();
-                setVisible(false);
+                parent.oscilloscope = null;
+                parent.parent.parent.out = ((OscilloscopePin) parent.parent.parent.out).wrapped;
+                parent.parent.parent.restartClock();
+                dispose();
             }
         });
         setLayout(new BorderLayout());
-        setSize(new Dimension(500, 300));
+        setSize(500, 300);
         watchedItemNamesPanel = new JPanel();
         watchedItemNamesPanel.setLayout(new BoxLayout(watchedItemNamesPanel, BoxLayout.Y_AXIS));
         watchedItemNamesPanel.setBorder(BorderFactory.createCompoundBorder(new EmptyBorder(3, 0, 0, 0), watchedItemNamesPanel.getBorder()));
-        watchedItemsPanel = new JPanel();
-        watchedItemsPanel.setLayout(new BoxLayout(watchedItemsPanel, BoxLayout.Y_AXIS));
-        scrollPane = new JScrollPane(watchedItemsPanel);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+        diagram = new Diagram();
+        add(diagram, BorderLayout.CENTER);
         add(watchedItemNamesPanel, BorderLayout.WEST);
-        add(scrollPane, BorderLayout.CENTER);
-    }
-
-    public void bringUp() {
+        parent.parent.parent.out = new OscilloscopePin(parent.parent.parent.out, this);
+        parent.parent.parent.restartClock();
+        setVisible(true);
         scheduler = Executors.newSingleThreadScheduledExecutor();
-        scheduler.scheduleAtFixedRate(this::reDraw, 0, 1, TimeUnit.SECONDS);
-        Simulator.oscilloscope.setVisible(true);
-        Simulator.oscilloscope.loadPins();
-    }
-
-    public void tick() {
-        items.values().forEach(WatchedItem::tick);
-    }
-
-    public void loadPins() {
-        // Example: Load pins from Simulator
-        SwingUtilities.invokeLater(() -> {
-            for (SchemaPart component : Simulator.model.schemaParts.values()) {
-                for (OutPin pin : component.outMap.values()) {
-                    connectToPin(pin);
-                    if (component instanceof InteractiveSchemaPart) {
-//                        pin.bus = new OscilloscopePin(pin.bus);
-                    }
-                }
-/* FixMe
-                for (PassivePin pin : component.passiveMap.values()) {
-                    if (component instanceof InteractiveSchemaPart) {
-                        pin.bus = new OscilloscopeBus(pin.bus);
-                    }
-                }
-*/
-            }
-        });
-    }
-
-    public void connectToPin(OutPin pin) {
-        WatchedItem watchedItem = new WatchedItem(pin);
-        items.put(pin.getName(), watchedItem);
-        watchedItemNamesPanel.add(new FixedHeightLabel(pin.getName()));
-        watchedItemsPanel.add(watchedItem);
+        scheduler.scheduleAtFixedRate(this::reDraw, 0, 100, TimeUnit.MILLISECONDS);
+        watchedItemNamesPanel.add(new FixedHeightLabel("clock"));
         watchedItemNamesPanel.revalidate();
-        watchedItemsPanel.revalidate();
+        diagram.revalidate();
+        diagram.addPin(parent.parent.parent.out);
+
     }
 
-    public void disconnectFromPin(OutPin pin) {
-        /*
-            if (pin.bus instanceof OscilloscopePin) {
-                pin.bus = ((OscilloscopePin) pin.bus).wrapped;
-            }
-*/
-        items.remove(pin.getName());
+
+    public void addPin(OutPin pin) {
+        watchedItemNamesPanel.add(new FixedHeightLabel(pin.getName()));
+        watchedItemNamesPanel.revalidate();
+        diagram.addPin(pin);
     }
 
     public void reDraw() {
         SwingUtilities.invokeLater(() -> {
-            items.values().forEach(WatchedItem::update);
-            scrollPane.getHorizontalScrollBar().setValue(scrollPane.getHorizontalScrollBar().getMaximum());
+            diagram.revalidate();
+            diagram.repaint();
         });
-    }
-
-    private void unloadPins() {
-        items.values()
-                .stream()
-                .map(e -> e.pin).forEach(this::disconnectFromPin);
     }
 
     private static class FixedHeightLabel extends JPanel {

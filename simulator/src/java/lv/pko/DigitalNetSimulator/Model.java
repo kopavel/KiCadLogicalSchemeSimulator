@@ -30,12 +30,16 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  */
-package lv.pko.DigitalNetSimulator.model;
+package lv.pko.DigitalNetSimulator;
 import lv.pko.DigitalNetSimulator.api.pins.in.FloatingPinException;
 import lv.pko.DigitalNetSimulator.api.pins.in.InPin;
 import lv.pko.DigitalNetSimulator.api.pins.out.*;
 import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPart;
 import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPartSpi;
+import lv.pko.DigitalNetSimulator.model.InPinInterconnect;
+import lv.pko.DigitalNetSimulator.model.InPinNet;
+import lv.pko.DigitalNetSimulator.model.OutPinNet;
+import lv.pko.DigitalNetSimulator.model.ShortcutException;
 import lv.pko.DigitalNetSimulator.model.merger.Merger;
 import lv.pko.DigitalNetSimulator.parsers.pojo.Comp;
 import lv.pko.DigitalNetSimulator.parsers.pojo.Export;

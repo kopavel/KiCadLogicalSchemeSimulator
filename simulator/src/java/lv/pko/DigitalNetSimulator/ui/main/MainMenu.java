@@ -45,32 +45,13 @@ public class MainMenu extends JMenuBar {
     private static final ResourceBundle mainI81n = ResourceBundle.getBundle("i81n/main");
 
     public MainMenu() {
-        JMenu fileMenu = new JMenu(mainI81n.getString("file"));
-        add(fileMenu);
-        JMenuItem exitItem = new JMenuItem(mainI81n.getString("exit"));
-        exitItem.addActionListener(e -> {
-            Simulator.saveLayout();
-            System.exit(0);
-        });
-        fileMenu.add(exitItem);
-        JMenuItem saveItem = new JMenuItem(mainI81n.getString("saveLayout"));
-        saveItem.addActionListener(e -> Simulator.saveLayout());
-        fileMenu.add(saveItem);
-        JMenuItem loadItem = new JMenuItem(mainI81n.getString("loadLayout"));
-        loadItem.addActionListener(e -> Simulator.loadLayout());
-        fileMenu.add(loadItem);
-        JMenu simulationMenu = new JMenu(mainI81n.getString("simulation"));
-        add(simulationMenu);
-        JMenuItem oscilloscopeItem = new JMenuItem(mainI81n.getString("showOscilloscope"));
-        oscilloscopeItem.addActionListener(e -> Simulator.oscilloscope.bringUp());
-        simulationMenu.add(oscilloscopeItem);
         JMenu schemaParts = new JMenu(mainI81n.getString("schemaParts"));
+        add(schemaParts);
         for (SchemaPart schemaPart : Simulator.model.schemaParts.values()) {
             JMenuItem schemaPartItem = new JMenuItem(schemaPart.id);
             schemaPartItem.addActionListener(e -> Simulator.addMonitoringPart(schemaPart.id, null));
             schemaParts.add(schemaPartItem);
         }
-        simulationMenu.add(schemaParts);
         JMenu settings = new JMenu(mainI81n.getString("settings"));
         add(settings);
         JMenu lang = new JMenu(mainI81n.getString("langs"));

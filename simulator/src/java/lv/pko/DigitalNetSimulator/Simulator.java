@@ -34,7 +34,6 @@ import com.formdev.flatlaf.FlatIntelliJLaf;
 import lv.pko.DigitalNetSimulator.api.AbstractUiComponent;
 import lv.pko.DigitalNetSimulator.api.schemaPart.InteractiveSchemaPart;
 import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPart;
-import lv.pko.DigitalNetSimulator.model.Model;
 import lv.pko.DigitalNetSimulator.parsers.net.NetFileParser;
 import lv.pko.DigitalNetSimulator.parsers.pojo.Export;
 import lv.pko.DigitalNetSimulator.parsers.xml.XmlParser;
@@ -42,7 +41,6 @@ import lv.pko.DigitalNetSimulator.tools.Log;
 import lv.pko.DigitalNetSimulator.tools.Utils;
 import lv.pko.DigitalNetSimulator.ui.main.MainMenu;
 import lv.pko.DigitalNetSimulator.ui.main.MainUI;
-import lv.pko.DigitalNetSimulator.ui.oscilloscope.Oscilloscope;
 import lv.pko.DigitalNetSimulator.ui.schemaPartMonitor.SchemaPartMonitor;
 import picocli.CommandLine;
 
@@ -61,7 +59,6 @@ public class Simulator implements Runnable {
     private static final Map<String, SchemaPartMonitor> monitoredParts = new HashMap<>();
     public static MainUI ui;
     public static String netFilePathNoExtension;
-    public static Oscilloscope oscilloscope;
     public static Model model;
     @CommandLine.Parameters(index = "0", arity = "1", description = "Path to KiCad NET file")
     public String netFilePath;
@@ -169,7 +166,6 @@ public class Simulator implements Runnable {
                 }
                 ui = new MainUI();
                 ui.setVisible(true);
-                oscilloscope = new Oscilloscope();
             });
             if (netFilePath.endsWith("xml")) {
                 model = new Model(XmlParser.parse(netFilePath, Export.class), mapFile);

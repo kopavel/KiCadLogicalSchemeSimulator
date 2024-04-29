@@ -29,33 +29,23 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lv.pko.DigitalNetSimulator.ui.oscilloscope;
+package lv.pko.DigitalNetSimulator.components.oscillator.oscilloscope;
 import lv.pko.DigitalNetSimulator.api.pins.out.OutPin;
 
-public class OscilloscopePin {
+public class OscilloscopePin extends OutPin {
     public final OutPin wrapped;
+    private final Oscilloscope oscilloscope;
 
-    public OscilloscopePin(OutPin wrapped) {
+    public OscilloscopePin(OutPin wrapped, Oscilloscope oscilloscope) {
+        super(wrapped.id, wrapped.parent, wrapped.size, wrapped.aliases.keySet().toArray(String[]::new));
         this.wrapped = wrapped;
-    }
-
-/*
-    @Override
-    public void calculateState(long oldState, long newState, boolean hiImpedance) {
-        wrapped.calculateState(oldState, newState, hiImpedance);
-        Main.oscilloscope.tick();
+        this.oscilloscope = oscilloscope;
     }
 
     @Override
-    public void reSendState() {
-        wrapped.reSendState();
-        Main.oscilloscope.tick();
+    public void setState(long newState) {
+        wrapped.setState(newState);
+        state = newState;
+        oscilloscope.diagram.tick();
     }
-
-
-    @Override
-    public long getState() {
-        return wrapped.getState();
-    }
-*/
 }

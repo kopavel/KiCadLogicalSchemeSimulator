@@ -52,6 +52,9 @@
 		</symbol>
 	</lib>
 	<lib name="74xx">
-		<symbol name="74LS393" symPartClass="Counter" symPartParam="size=4;reverse;aliases=C:CP|R:MR"/>
+		<symbol name="74LS393" symPartClass="Counter" symPartParam="size=4;reverse">
+			<unit pinMap="1=C;2=R;3=Q0;4=Q1;5=Q2;6=Q3"/>
+			<unit pinMap="13=C;12=R;11=Q0;10=Q1;9=Q2;8=Q3"/>
+		</symbol>
 	</lib>
 </symbolMap>

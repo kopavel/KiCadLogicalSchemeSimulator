@@ -30,16 +30,44 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.DigitalNetSimulator.tools;
+import javax.imageio.ImageIO;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
+@SuppressWarnings("unused")
 public class UiTools {
+    private static final BufferedImage font;
+    private static final Map<Byte, BufferedImage> letters = new HashMap<>();
+    static {
+        try {
+            font = ImageIO.read(Objects.requireNonNull(UiTools.class.getResourceAsStream("/font.bmp")));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
     public static Color getColor(String hColor) {
         int red = Integer.parseInt(hColor.substring(1, 3), 16);
         int green = Integer.parseInt(hColor.substring(3, 5), 16);
         int blue = Integer.parseInt(hColor.substring(5, 7), 16);
         return new Color(red, green, blue);
+    }
+
+    public static void print(long value, int x, int y, int size, Graphics2D dest) {
+        size = Math.max(String.format("%x", value).length(), size);
+        x += size * 5;
+        while (size-- > 0) {
+            x -= 5;
+            long pos = value & 0xf;
+            value = value >> 4;
+            BufferedImage letter = letters.computeIfAbsent((byte) pos, c -> font.getSubimage(c * 5, 0, 4, 7));
+            dest.drawImage(letter, x, y, null);
+        }
     }
 
     public abstract static class TextChangeListener implements DocumentListener {

@@ -30,8 +30,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.DigitalNetSimulator.ui.main;
+import lv.pko.DigitalNetSimulator.Model;
 import lv.pko.DigitalNetSimulator.Simulator;
-import lv.pko.DigitalNetSimulator.model.Model;
 
 import javax.swing.*;
 import java.awt.event.WindowAdapter;

@@ -30,6 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.DigitalNetSimulator.components.oscillator;
+import lv.pko.DigitalNetSimulator.components.oscillator.oscilloscope.Oscilloscope;
 import lv.pko.DigitalNetSimulator.tools.Log;
 import lv.pko.DigitalNetSimulator.tools.UiTools;
 
@@ -42,9 +43,10 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class OscillatorUi extends JFrame {
-    private final OscillatorUiComponent parent;
-    public JTextField periodTextField;
-    public JTextField freqTextField;
+    public final OscillatorUiComponent parent;
+    public Oscilloscope oscilloscope;
+    JTextField periodTextField;
+    JTextField freqTextField;
     ScheduledExecutorService scheduler;
     DecimalFormat df = new DecimalFormat("#,###");
     private JButton startButton;
@@ -54,6 +56,7 @@ public class OscillatorUi extends JFrame {
     private JTextField tickAmount;
     private JButton doTicks;
     private JTextField totalTicks;
+    private JButton oscilloscopeButton;
     private long lastTicks;
     private double freq = 0;
 
@@ -72,6 +75,12 @@ public class OscillatorUi extends JFrame {
             @Override
             public void mouseClicked(MouseEvent e) {
                 parent.parent.stopClock();
+            }
+        });
+        oscilloscopeButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                oscilloscope = new Oscilloscope(OscillatorUi.this);
             }
         });
         periodTextField.getDocument().addDocumentListener(new UiTools.TextChangeListener() {
