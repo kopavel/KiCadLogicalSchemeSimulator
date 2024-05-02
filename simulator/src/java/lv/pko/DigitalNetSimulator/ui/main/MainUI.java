@@ -52,6 +52,7 @@ public class MainUI extends JFrame {
                 System.exit(0);
             }
 
+            @Override
             public void windowActivated(WindowEvent e) {
                 if (e.getOppositeWindow() == null) {
                     Simulator.bringToFront();

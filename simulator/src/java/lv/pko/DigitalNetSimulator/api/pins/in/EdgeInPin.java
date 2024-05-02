@@ -46,15 +46,13 @@ public abstract class EdgeInPin extends InPin {
 
     @Override
     public void transit(long oldState, long newState, boolean hiImpedance) {
-        if (hiImpedance) {
-            throw new FloatingPinException(this);
-        }
         rawState = newState & mask;
-        if (((oldState & mask) ^ rawState) > 0) {
-            if (rawState > 0) {
-                onRisingEdge();
-            } else {
+        oldState &= mask;
+        if (oldState != rawState) {
+            if (oldState > 0) {
                 onFallingEdge();
+            } else {
+                onRisingEdge();
             }
         }
     }

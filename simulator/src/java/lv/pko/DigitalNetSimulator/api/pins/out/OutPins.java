@@ -41,10 +41,12 @@ public class OutPins extends OutPin {
         aliases = oldPin.aliases;
     }
 
+    @Override
     public void addDest(InPin pin) {
         dest = Utils.addToArray(dest, pin);
     }
 
+    @Override
     public void setState(long newState) {
         long oldState = this.state;
         if (newState != oldState) {
@@ -55,9 +57,15 @@ public class OutPins extends OutPin {
         }
     }
 
+    @Override
     public void reSendState() {
         for (InPin pin : dest) {
             pin.transit(state, state, false);
         }
+    }
+
+    @Override
+    public boolean noDest() {
+        return dest.length == 0;
     }
 }

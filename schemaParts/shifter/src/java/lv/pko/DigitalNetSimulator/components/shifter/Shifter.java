@@ -83,6 +83,7 @@ public class Shifter extends SchemaPart {
         out = getOutPin("Q");
     }
 
+    @Override
     public String extraState() {
         return "latch" + "\n" + Long.toBinaryString(latch);
     }

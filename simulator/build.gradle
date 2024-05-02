@@ -89,6 +89,12 @@ run {
                  "-Dlog4j2.contextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector",
                  "-Dlog4j2.asyncLoggerWaitStrategy=Block",
                  "-XX:-OmitStackTraceInFastThrow",
+                 "-Xmx10G",
+                 "-XX:+UseG1GC",
+                 "-XX:MaxHeapFreeRatio=25",
+                 "-XX:MinHeapFreeRatio=15",
+                 "-XX:+UseStringDeduplication",
+                 "-XX:G1PeriodicGCInterval=10000",
                  "--add-opens", "java.base/java.lang=DigitalNetSimulator.simulator",
 /*
                  "-Dlog4j2.asyncLoggerRingBufferSize=10485760",

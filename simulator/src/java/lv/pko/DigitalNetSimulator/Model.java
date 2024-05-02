@@ -34,6 +34,10 @@ package lv.pko.DigitalNetSimulator;
 import lv.pko.DigitalNetSimulator.api.pins.in.FloatingPinException;
 import lv.pko.DigitalNetSimulator.api.pins.in.InPin;
 import lv.pko.DigitalNetSimulator.api.pins.out.*;
+import lv.pko.DigitalNetSimulator.api.pins.out.nc.NCOutPin;
+import lv.pko.DigitalNetSimulator.api.pins.out.nc.NCOutPins;
+import lv.pko.DigitalNetSimulator.api.pins.out.nc.NCTriStateOutPin;
+import lv.pko.DigitalNetSimulator.api.pins.out.nc.NCTriStateOutPins;
 import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPart;
 import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPartSpi;
 import lv.pko.DigitalNetSimulator.model.InPinInterconnect;
@@ -187,7 +191,7 @@ public class Model {
     private void buildBuses() {
         for (Map.Entry<OutPin, OutPinNet> outNet : outMap.entrySet()) {
             OutPin outPin = outNet.getKey();
-            //todo if ony other out are Power pin - use special OutBus without In splitter
+            //todo if ony other out are Power pin - use special OutPin without In splitter
             if (outNet.getValue().inPins.size() > 1) {
                 //out has many INs - replace instance with appropriate OutPins
                 if (outPin instanceof PullPin pullPin) {
@@ -214,14 +218,28 @@ public class Model {
                 }
                 inPin.mask = maskEntry.getValue();
             } else {
-                Merger bus = new Merger(inPin);
+                Merger merger = new Merger(inPin);
                 for (Map.Entry<OutPin, Map<Byte, Long>> outPinMap : inNet.getValue().outPins.entrySet()) {
                     for (Map.Entry<Byte, Long> offsetMap : outPinMap.getValue().entrySet()) {
-                        bus.addSource(outPinMap.getKey(), offsetMap.getValue(), offsetMap.getKey());
+                        merger.addSource(outPinMap.getKey(), offsetMap.getValue(), offsetMap.getKey());
                     }
                 }
             }
         }
+        schemaParts.values()
+                .stream()
+                .flatMap(p -> p.outMap.values()
+                        .stream())
+                .forEach(outPin -> {
+                    if (outPin.noDest()) {
+                        replaceOut(outPin, switch (outPin) {
+                            case OutPins pin -> new NCOutPins(pin);
+                            case TriStateOutPins pin -> new NCTriStateOutPins(pin);
+                            case TriStateOutPin pin -> new NCTriStateOutPin(pin);
+                            case OutPin pin -> new NCOutPin(pin);
+                        });
+                    }
+                });
     }
 
     private void createSchemaPart(Comp component, SchemaPartMap map) {

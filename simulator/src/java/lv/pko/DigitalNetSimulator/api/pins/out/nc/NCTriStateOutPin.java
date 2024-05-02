@@ -29,42 +29,30 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lv.pko.DigitalNetSimulator.api.pins.out;
+package lv.pko.DigitalNetSimulator.api.pins.out.nc;
+import lv.pko.DigitalNetSimulator.api.pins.Manipulable;
 import lv.pko.DigitalNetSimulator.api.pins.in.InPin;
-import lv.pko.DigitalNetSimulator.tools.Utils;
+import lv.pko.DigitalNetSimulator.api.pins.out.OutPin;
+import lv.pko.DigitalNetSimulator.api.pins.out.TriStateOutPin;
 
-public class PullPins extends PullPin {
-    protected InPin[] dest = new InPin[0];
-
-    public PullPins(PullPin pin) {
-        super(pin.id, pin.parent, pin.state);
+public class NCTriStateOutPin extends TriStateOutPin implements Manipulable {
+    public NCTriStateOutPin(OutPin outPin) {
+        super(outPin.id, outPin.parent, outPin.size, outPin.aliases.keySet().toArray(String[]::new));
     }
 
     @Override
     public void addDest(InPin pin) {
-        dest = Utils.addToArray(dest, pin);
+        throw new RuntimeException("Can't add dest to NC Out Pin");
     }
 
     @Override
     public void setState(long newState) {
-        long oldState = this.state;
-        if (newState != oldState) {
-            this.state = newState;
-            for (InPin InPin : dest) {
-                InPin.transit(oldState, newState, false);
-            }
-        }
     }
 
     @Override
     public void reSendState() {
-        for (InPin pin : dest) {
-            pin.transit(state, state, false);
-        }
     }
 
-    @Override
-    public boolean noDest() {
-        return dest.length == 0;
+    public void setHiImpedance() {
     }
 }

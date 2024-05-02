@@ -72,4 +72,5 @@ module DigitalNetSimulator.simulator {
     opens lv.pko.DigitalNetSimulator.parsers.pojo;
     exports lv.pko.DigitalNetSimulator.parsers.pojo.symbolMap;
     opens lv.pko.DigitalNetSimulator.parsers.pojo.symbolMap;
+    exports lv.pko.DigitalNetSimulator.api.pins.out.nc;
 }

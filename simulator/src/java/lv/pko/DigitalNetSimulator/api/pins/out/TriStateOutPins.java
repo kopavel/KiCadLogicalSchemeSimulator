@@ -30,6 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.DigitalNetSimulator.api.pins.out;
+import lv.pko.DigitalNetSimulator.api.pins.in.EdgeInPin;
 import lv.pko.DigitalNetSimulator.api.pins.in.InPin;
 import lv.pko.DigitalNetSimulator.tools.Utils;
 
@@ -41,10 +42,15 @@ public class TriStateOutPins extends TriStateOutPin {
         aliases = oldPin.aliases;
     }
 
+    @Override
     public void addDest(InPin pin) {
+        if (pin instanceof EdgeInPin) {
+            throw new RuntimeException("Edge pin on tri-state out");
+        }
         dest = Utils.addToArray(dest, pin);
     }
 
+    @Override
     public void setState(long newState) {
         long oldState = this.state;
         if (hiImpedance) {
@@ -63,12 +69,14 @@ public class TriStateOutPins extends TriStateOutPin {
         }
     }
 
+    @Override
     public void reSendState() {
         for (InPin pin : dest) {
             pin.transit(state, state, hiImpedance);
         }
     }
 
+    @Override
     public void setHiImpedance() {
         if (!hiImpedance) {
             hiImpedance = true;
@@ -76,5 +84,10 @@ public class TriStateOutPins extends TriStateOutPin {
                 InPin.transit(state, state, true);
             }
         }
+    }
+
+    @Override
+    public boolean noDest() {
+        return dest.length == 0;
     }
 }

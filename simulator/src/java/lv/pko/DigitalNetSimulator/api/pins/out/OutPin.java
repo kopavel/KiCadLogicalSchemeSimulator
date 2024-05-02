@@ -38,12 +38,7 @@ import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPart;
 public class OutPin extends Pin implements Manipulable {
     public long state;
     public long mask;
-    //ToDo replace non-connected out with specific NCOutPin
-    protected InPin dest = new InPin("NC" + getName(), parent) {
-        @Override
-        public void onChange(long newState, boolean hiImpedance) {
-        }
-    };
+    protected InPin dest;
 
     public OutPin(String id, SchemaPart parent, int size, String... names) {
         super(id, parent, size, names);
@@ -68,5 +63,9 @@ public class OutPin extends Pin implements Manipulable {
         if (dest != null) {
             dest.transit(state, state, false);
         }
+    }
+
+    public boolean noDest() {
+        return dest == null;
     }
 }
