@@ -50,7 +50,7 @@ public class Oscilloscope extends JFrame {
     private final ScheduledExecutorService scheduler;
 
     public Oscilloscope(OscillatorUi parent) {
-        setJMenuBar(new OutsMenu(this));
+        setJMenuBar(new OscilloscopeMenu(this));
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             @Override
@@ -78,13 +78,13 @@ public class Oscilloscope extends JFrame {
         watchedItemNamesPanel.add(new FixedHeightLabel("clock"));
         watchedItemNamesPanel.revalidate();
         diagram.revalidate();
-        diagram.addPin(parent.parent.parent.out);
+        diagram.addPin(parent.parent.parent.out, parent.parent.parent.out.getName());
     }
 
-    public void addPin(OutPin pin) {
-        watchedItemNamesPanel.add(new FixedHeightLabel(pin.getName()));
+    public void addPin(OutPin pin, String name) {
+        watchedItemNamesPanel.add(new FixedHeightLabel(name));
         watchedItemNamesPanel.revalidate();
-        diagram.addPin(pin);
+        diagram.addPin(pin, name);
     }
 
     public void reDraw() {

@@ -16,3 +16,4 @@
 /stuff/examples/counters/counters-backups/
 /stuff/examples/counters/counters.xml
 /**/*.lck
+/gradle.log

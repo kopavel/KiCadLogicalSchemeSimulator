@@ -33,7 +33,7 @@
 
 
 plugins {
-    alias libs.plugins.guidesigner
+//    alias libs.plugins.guidesigner
     id "application"
 }
 
@@ -84,7 +84,7 @@ application {
 
 run {
     def jvm_args = []
-    jvm_args += ["-Dlog4j.configurationFile=${sourceSets.main.resources.srcDirs.first().absolutePath}\\log4j2.xml",
+    jvm_args += ["-Dlog4j.configurationFile=${sourceSets.main.resources.srcDirs.first().absolutePath}/log4j2.xml",
                  "-Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager",
                  "-Dlog4j2.contextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector",
                  "-Dlog4j2.asyncLoggerWaitStrategy=Block",

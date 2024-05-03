@@ -6,14 +6,14 @@ import lv.pko.KiCadLogicalSchemeSimulator.tools.ringBuffers.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Set;
-import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Diagram extends JPanel {
     private static final int BAR_TOP = -4;
     private static final int BAR_MIDDLE = 4;
     private static final int BAR_BOTTOM = 12;
-    private final Set<PinItem> pins = new ConcurrentSkipListSet<>();
+    private final Queue<PinItem> pins = new ConcurrentLinkedQueue<>();
     double tickSize = 10;
     int offset = 0;
 
@@ -44,8 +44,8 @@ public class Diagram extends JPanel {
         });
     }
 
-    public void addPin(OutPin out) {
-        pins.add(new PinItem(out));
+    public void addPin(OutPin out, String name) {
+        pins.add(new PinItem(out, name));
         revalidate();
     }
 
@@ -133,10 +133,12 @@ public class Diagram extends JPanel {
 
     private static final class PinItem implements Comparable<PinItem> {
         private final OutPin pin;
+        private final String name;
         private final RingBuffer buffer;
 
-        private PinItem(OutPin pin) {
+        private PinItem(OutPin pin, String name) {
             this.pin = pin;
+            this.name = name;
             if (pin.size < 8) {
                 this.buffer = new ByteRingBuffer();
             } else if (pin.size < 16) {
@@ -150,7 +152,7 @@ public class Diagram extends JPanel {
 
         @Override
         public int compareTo(PinItem o) {
-            return this.pin.getName().compareTo(o.pin.getName());
+            return this.name.compareTo(o.name);
         }
     }
 }

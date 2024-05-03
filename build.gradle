@@ -47,7 +47,6 @@ tasks.register("cleanBuild", Delete).configure() {
 
 tasks.register("copyToLib", Copy) {
     into "$rootDir/distro/lib/"
-    dependsOn tasks.named("cleanBuild")
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 tasks.register("copyStuff", Copy) {
@@ -62,7 +61,6 @@ tasks.register("copyStuff", Copy) {
         ]
     }
     into "$rootDir/distro"
-    dependsOn tasks.named("cleanBuild")
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 

@@ -40,6 +40,7 @@ public abstract class Pin {
     public final String id;
     public final SchemaPart parent;
     public final int size;
+    public long mask;
     public Map<String, Byte> aliases = new HashMap<>();
     public boolean useBitPresentation;
 

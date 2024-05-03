@@ -77,4 +77,26 @@ dependencyResolutionManagement {
         }
     }
 }
+//hack to enable INFO log level by default
+/*
+def LoggerFactory = Class.forName("org.slf4j.LoggerFactory")
+def OutputEventListenerBackedLoggerContext = Class.forName("org.gradle.internal.logging.slf4j.OutputEventListenerBackedLoggerContext")
+def OutputEventListener = Class.forName("org.gradle.internal.logging.events.OutputEventListener")
+def StandardOutputListener = Class.forName("org.gradle.api.logging.StandardOutputListener")
+def StreamBackedStandardOutputListener = Class.forName("org.gradle.internal.logging.text.StreamBackedStandardOutputListener")
+def StyledTextOutput = Class.forName("org.gradle.internal.logging.text.StyledTextOutput")
+def StreamingStyledTextOutput = Class.forName("org.gradle.internal.logging.text.StreamingStyledTextOutput")
+def StyledTextOutputBackedRenderer = Class.forName("org.gradle.internal.logging.console.StyledTextOutputBackedRenderer")
 
+def newStreamBackedStandardOutputListener = StreamBackedStandardOutputListener.getDeclaredConstructor(OutputStream.class)
+def newStreamingStyledTextOutput = StreamingStyledTextOutput.getDeclaredConstructor(StandardOutputListener)
+def newStyledTextOutputBackedRenderer = StyledTextOutputBackedRenderer.getDeclaredConstructor(StyledTextOutput)
+
+def gradleLoggerFactory = LoggerFactory.getDeclaredMethod("getILoggerFactory").invoke(null)
+OutputEventListenerBackedLoggerContext.getDeclaredMethod("setLevel", LogLevel.class).invoke(gradleLoggerFactory, LogLevel.INFO)
+
+def streamBackedStandardOutputListener = newStreamBackedStandardOutputListener.newInstance(new FileOutputStream(new File("$rootDir/gradle.log")))
+def streamingStyledTextOutput = newStreamingStyledTextOutput.newInstance(streamBackedStandardOutputListener)
+def styledTextOutputBackedRenderer = newStyledTextOutputBackedRenderer.newInstance(streamingStyledTextOutput)
+OutputEventListenerBackedLoggerContext.getDeclaredMethod("setOutputEventListener", OutputEventListener).invoke(gradleLoggerFactory, styledTextOutputBackedRenderer)
+*/

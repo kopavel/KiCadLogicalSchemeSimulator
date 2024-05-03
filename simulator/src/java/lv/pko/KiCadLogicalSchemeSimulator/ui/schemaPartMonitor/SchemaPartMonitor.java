@@ -30,6 +30,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.KiCadLogicalSchemeSimulator.ui.schemaPartMonitor;
+import com.intellij.uiDesigner.core.GridConstraints;
+import com.intellij.uiDesigner.core.GridLayoutManager;
 import lv.pko.KiCadLogicalSchemeSimulator.Simulator;
 import lv.pko.KiCadLogicalSchemeSimulator.api.AbstractUiComponent;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
@@ -68,6 +70,7 @@ public class SchemaPartMonitor extends JFrame {
     private JPanel schemaPartBox;
 
     public SchemaPartMonitor(String id) {
+        setupUI();
         Color borderColor = UIManager.getColor("TextField.border");
         setContentPane(panel);
         setLocationRelativeTo(Simulator.ui);
@@ -220,5 +223,28 @@ public class SchemaPartMonitor extends JFrame {
         inputsValues.setLayout(new BoxLayout(inputsValues, BoxLayout.Y_AXIS));
         outputsValues = new JPanel();
         outputsValues.setLayout(new BoxLayout(outputsValues, BoxLayout.Y_AXIS));
+    }
+
+    private void setupUI() {
+        this.createUIComponents();
+        JPanel var1 = new JPanel();
+        this.panel = var1;
+        var1.setLayout(new GridLayoutManager(2, 3, new Insets(0, 0, 0, 0), 0, 0, false, false));
+        JPanel var2 = new JPanel();
+        this.schemaPartBox = var2;
+        var2.setLayout(new GridLayoutManager(1, 2, new Insets(0, 0, 0, 0), 0, 0, false, false));
+        var1.add(var2, new GridConstraints(1, 1, 1, 1, 0, 3, 7, 3, null, null, null));
+        JPanel var3 = this.inputsNames;
+        var2.add(var3, new GridConstraints(0, 0, 1, 1, 0, 3, 3, 3, null, null, null));
+        JPanel var4 = this.outputsNames;
+        var2.add(var4, new GridConstraints(0, 1, 1, 1, 0, 3, 3, 3, null, null, null));
+        JLabel var5 = new JLabel();
+        this.title = var5;
+        var5.setText("Label");
+        var1.add(var5, new GridConstraints(0, 1, 1, 1, 1, 0, 0, 0, null, null, null));
+        JPanel var6 = this.inputsValues;
+        var1.add(var6, new GridConstraints(1, 0, 1, 1, 4, 2, 3, 3, null, null, null));
+        JPanel var7 = this.outputsValues;
+        var1.add(var7, new GridConstraints(1, 2, 1, 1, 8, 2, 3, 3, null, null, null));
     }
 }

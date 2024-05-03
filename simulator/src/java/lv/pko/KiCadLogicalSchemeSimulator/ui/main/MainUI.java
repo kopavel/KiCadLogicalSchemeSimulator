@@ -34,14 +34,16 @@ import lv.pko.KiCadLogicalSchemeSimulator.Model;
 import lv.pko.KiCadLogicalSchemeSimulator.Simulator;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 public class MainUI extends JFrame {
-    private JPanel panel;
-
     public MainUI() {
-        setContentPane(panel);
+        JPanel var1 = new JPanel();
+        var1.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+        var1.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(50, 0, 0, 0), null, 0, 0, null, null));
+        setContentPane(var1);
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             @Override
