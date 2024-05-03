@@ -14,4 +14,5 @@
 /**/*.kicad_pro
 /**/*.kicad_prl
 /stuff/examples/counters/counters-backups/
+/stuff/examples/counters/counters.xml
 /**/*.lck

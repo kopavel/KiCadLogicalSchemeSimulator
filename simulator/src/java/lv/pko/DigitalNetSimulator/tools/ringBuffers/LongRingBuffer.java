@@ -1,33 +1,24 @@
-package lv.pko.DigitalNetSimulator.tools;
-import java.util.Arrays;
-import java.util.List;
+package lv.pko.DigitalNetSimulator.tools.ringBuffers;
+public class LongRingBuffer extends RingBuffer {
+    private final long[] data;
 
-public class RingBuffer<E> {
-    private static final int DEFAULT_CAPACITY = 10000000;
-    private final int capacity;
-    private final E[] data;
-    private boolean isFull;
-    private int writePos;
-
-    public RingBuffer() {
+    public LongRingBuffer() {
         this(0);
     }
 
-    public RingBuffer(int capacity) {
-        this.capacity = (capacity < 1) ? DEFAULT_CAPACITY : capacity;
-        this.data = (E[]) new Object[this.capacity];
-        this.writePos = -1;
+    public LongRingBuffer(int capacity) {
+        super((capacity < 1) ? DEFAULT_CAPACITY : capacity);
+        this.data = new long[this.capacity];
     }
 
-    public void put(E element) {
-        if (++writePos == capacity) {
-            writePos = 0;
-            isFull = true;
-        }
+    @Override
+    public void put(long element) {
+        super.put(element);
         data[writePos] = element;
     }
 
-    public List<E> take(int offset, int amount) {
+    @Override
+    public IRingBufferSlice take(int offset, int amount) {
         int snapWritePos = writePos;
         int available = isFull ? capacity : snapWritePos + 1;
         if (offset > available) {
@@ -36,7 +27,7 @@ public class RingBuffer<E> {
         if (amount > offset) {
             amount = offset;
         }
-        E[] retVal = (E[]) new Object[amount];
+        long[] retVal = new long[amount];
         offset--;
         if (offset <= snapWritePos) {
             System.arraycopy(data, snapWritePos - offset, retVal, 0, amount);
@@ -49,10 +40,6 @@ public class RingBuffer<E> {
                 System.arraycopy(data, 0, retVal, tailLength, amount - tailLength);
             }
         }
-        return Arrays.stream(retVal).toList();
-    }
-
-    public int available() {
-        return isFull ? capacity : writePos + 1;
+        return new LongBufferSlice(retVal);
     }
 }

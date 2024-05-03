@@ -1,19 +1,19 @@
 package lv.pko.DigitalNetSimulator.components.oscillator.oscilloscope;
 import lv.pko.DigitalNetSimulator.api.pins.out.OutPin;
 import lv.pko.DigitalNetSimulator.api.pins.out.TriStateOutPin;
-import lv.pko.DigitalNetSimulator.tools.RingBuffer;
 import lv.pko.DigitalNetSimulator.tools.UiTools;
+import lv.pko.DigitalNetSimulator.tools.ringBuffers.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 public class Diagram extends JPanel {
     private static final int BAR_TOP = -4;
     private static final int BAR_MIDDLE = 4;
     private static final int BAR_BOTTOM = 12;
-    private final List<PinItem> pins = new ArrayList<>();
+    private final Set<PinItem> pins = new ConcurrentSkipListSet<>();
     double tickSize = 10;
     int offset = 0;
 
@@ -45,13 +45,12 @@ public class Diagram extends JPanel {
     }
 
     public void addPin(OutPin out) {
-        pins.add(new PinItem(out, new RingBuffer<>()));
+        pins.add(new PinItem(out));
         revalidate();
     }
 
     public void tick() {
-        pins.forEach(item -> item.buffer.put(new PinState(item.pin.state & item.pin.mask,
-                item.pin instanceof TriStateOutPin triStateOutPin && triStateOutPin.hiImpedance)));
+        pins.forEach(item -> item.buffer.put(item.pin instanceof TriStateOutPin triStateOutPin && triStateOutPin.hiImpedance ? -1 : item.pin.state & item.pin.mask));
     }
 
     @Override
@@ -60,31 +59,31 @@ public class Diagram extends JPanel {
         Graphics2D g2d = (Graphics2D) g;
         int size = (int) ((getWidth() - 10) / tickSize);
         int yPos = 10;
-        int maxoffset = 0;
+        int maxOffset = 0;
         for (PinItem pinItem : pins) {
             double xPos = 10;
-            List<PinState> values = pinItem.buffer.take(offset + size + 1, size + 2);
-            maxoffset = Math.max(maxoffset, pinItem.buffer.available());
+            IRingBufferSlice values = pinItem.buffer.take(offset + size + 1, size + 2);
+            maxOffset = Math.max(maxOffset, pinItem.buffer.available());
             int start;
-            PinState prevState;
+            long prevState;
             if (values.size() <= size) {
                 start = 0;
-                prevState = null;
+                prevState = -1;
             } else {
                 start = 1;
-                prevState = values.getFirst();
+                prevState = values.next();
             }
             int end = Math.min(start + size, values.size());
             xPos += tickSize * (size - end + start);
             for (int i = start; i < end; i++) {
-                PinState curState = values.get(i);
-                if (curState.hiImpedance) {
-                    if (prevState != null && !curState.equals(prevState)) {
+                long curState = values.next();
+                if (curState == -1) {
+                    if (prevState >= 0) {
                         if (pinItem.pin.size > 1) {
                             g2d.drawLine((int) (xPos - 2), yPos + BAR_TOP, (int) (xPos - 1), yPos + BAR_MIDDLE);
                             g2d.drawLine((int) (xPos - 2), yPos + BAR_BOTTOM, (int) (xPos - 1), yPos + BAR_MIDDLE);
                         } else {
-                            int linePos = yPos + (prevState.state > 0 ? BAR_TOP : BAR_BOTTOM);
+                            int linePos = yPos + (prevState > 0 ? BAR_TOP : BAR_BOTTOM);
                             g2d.drawLine((int) xPos, linePos, (int) xPos, yPos + BAR_MIDDLE);
                         }
                     }
@@ -93,15 +92,15 @@ public class Diagram extends JPanel {
                 } else {
                     g2d.setColor(Color.green);
                     if (pinItem.pin.size == 1) {
-                        int linePos = yPos + (curState.state > 0 ? BAR_TOP : BAR_BOTTOM);
+                        int linePos = yPos + (curState > 0 ? BAR_TOP : BAR_BOTTOM);
                         g2d.drawLine((int) xPos, linePos, (int) (xPos + tickSize), linePos);
-                        if (!curState.equals(prevState)) {
-                            int begin = (prevState == null || prevState.hiImpedance) ? yPos + BAR_MIDDLE : (yPos + (prevState.state > 0 ? BAR_TOP : BAR_BOTTOM));
+                        if (curState != prevState) {
+                            int begin = (prevState == -1) ? yPos + BAR_MIDDLE : (yPos + (prevState > 0 ? BAR_TOP : BAR_BOTTOM));
                             g2d.drawLine((int) xPos, begin, (int) xPos, linePos);
                         }
                     } else {
-                        if (!curState.equals(prevState)) {
-                            if (prevState != null && !prevState.hiImpedance) {
+                        if (curState != prevState) {
+                            if (prevState != -1) {
                                 g2d.drawLine((int) (xPos - 2), yPos + BAR_TOP, (int) (xPos - 1), yPos + BAR_MIDDLE);
                                 g2d.drawLine((int) (xPos - 2), yPos + BAR_BOTTOM, (int) (xPos - 1), yPos + BAR_MIDDLE);
                             }
@@ -109,12 +108,12 @@ public class Diagram extends JPanel {
                             g2d.drawLine((int) (xPos + 2), yPos + BAR_BOTTOM, (int) (xPos + tickSize - 2), yPos + BAR_BOTTOM);
                             g2d.drawLine((int) xPos, yPos + BAR_MIDDLE, (int) (xPos + 1), yPos + BAR_TOP);
                             g2d.drawLine((int) xPos, yPos + BAR_MIDDLE, (int) (xPos + 1), yPos + BAR_BOTTOM);
-                            UiTools.print(values.get(i).state & pinItem.pin.mask, (int) (xPos + 5), yPos, (int) Math.ceil(pinItem.pin.size / 4f), g2d);
+                            UiTools.print(curState & pinItem.pin.mask, (int) (xPos + 5), yPos, (int) Math.ceil(pinItem.pin.size / 4f), g2d);
                         } else {
                             g2d.drawLine((int) (xPos - 2), yPos + BAR_TOP, (int) (xPos + tickSize - 2), yPos + BAR_TOP);
                             g2d.drawLine((int) (xPos - 2), yPos + BAR_BOTTOM, (int) (xPos + tickSize - 2), yPos + BAR_BOTTOM);
                             if (i == start) {
-                                UiTools.print(values.get(i).state & pinItem.pin.mask, (int) (xPos + 5), yPos, (int) Math.ceil(pinItem.pin.size / 4f), g2d);
+                                UiTools.print(curState & pinItem.pin.mask, (int) (xPos + 5), yPos, (int) Math.ceil(pinItem.pin.size / 4f), g2d);
                             }
                         }
                     }
@@ -124,18 +123,34 @@ public class Diagram extends JPanel {
             }
             yPos += 20;
         }
-        if (offset + size + 1 > maxoffset) {
-            offset = maxoffset - size - 1;
+        if (offset + size + 1 > maxOffset) {
+            offset = maxOffset - size - 1;
         }
         if (offset < 0) {
             offset = 0;
         }
-        UiTools.print(offset, (int) 10, 200, 6, g2d);
     }
 
-    private record PinItem(OutPin pin, RingBuffer<PinState> buffer) {
-    }
+    private static final class PinItem implements Comparable<PinItem> {
+        private final OutPin pin;
+        private final RingBuffer buffer;
 
-    private record PinState(long state, boolean hiImpedance) {
+        private PinItem(OutPin pin) {
+            this.pin = pin;
+            if (pin.size < 8) {
+                this.buffer = new ByteRingBuffer();
+            } else if (pin.size < 16) {
+                this.buffer = new ShortRingBuffer();
+            } else if (pin.size < 32) {
+                this.buffer = new IntRingBuffer();
+            } else {
+                this.buffer = new LongRingBuffer();
+            }
+        }
+
+        @Override
+        public int compareTo(PinItem o) {
+            return this.pin.getName().compareTo(o.pin.getName());
+        }
     }
 }
