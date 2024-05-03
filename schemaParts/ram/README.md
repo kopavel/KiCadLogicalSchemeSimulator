@@ -4,12 +4,12 @@ Implements static RAM with a defined number of address inputs and data outputs.
 
 **Input names**:
 
-- Ax, where x is a sequential number.
+- Ax, where x is a sequential number starting from 0.
 - CS (Chip Select)
 - WE (Write Enable)
 - OE (Output Enable)
 
-**Output names**: Dx, where x is a sequential number.
+**Output names**: Dx, where x is a sequential number starting from 0.
 
 **Mandatory parameters**:
 

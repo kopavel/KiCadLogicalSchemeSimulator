@@ -2,7 +2,7 @@
 
 Implements logical XOR gate functionality.
 
-**Input names**: IN1, IN2  
+**Input names**: IN0, IN1  
 **Output names**: OUT
 
 **Optional parameter `reverse`:** if provided, the output is reversed, resulting in a NXOR gate.

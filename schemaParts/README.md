@@ -17,7 +17,7 @@ Some of interactive part has additional interfaces/functionality if you click on
 * [Led](led%2FREADME.md) - Implement interactive LED schema part.
 * [Multiplexer](multiplexer%2FREADME.md) - Implement interactive LED schema part.
 * [OrGate](or%2FREADME.md) - Implements a logical OR gate functionality.
-* [Oscillator](oscillator%2FREADME.md) - Interactive oscillator with various modes of operation.
+* [Oscillator](oscillator%2FREADME.md) - Interactive oscillator with various modes of operation nd oscilloscope.
 * [Power](power%2FREADME.md) - Implements a static output, useful for pull-up/pull-down resistors.
 * [Ram](ram/README.md) - Implement static RAM.
 * [Rom](rom/README.md) - Implement ROM.

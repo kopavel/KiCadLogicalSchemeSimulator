@@ -2,7 +2,7 @@
 
 Implements logical OR gate functionality.
 
-**Input names**: INx, where x a sequential number  
+**Input names**: INx, where x a sequential number starting from 0
 **Output names**: OUT
 
 **Mandatory parameter `size`:** specifies the number of input pins.  

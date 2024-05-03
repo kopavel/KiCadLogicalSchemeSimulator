@@ -15,5 +15,7 @@ There are three modes:
   pause after the current tick processing is complete. In this mode, the achieved oscillator frequency is displayed.
 - **Processing a defined number of ticks:** Useful for debugging where an error occurs after a defined number of ticks, for example CPU containing schemas.
 
-![img.png](img/img.png)
+Either contain [oscilloscope](OSCILLOSCOPE.md) functionality;
+
+- ![img.png](img/img.png)
 

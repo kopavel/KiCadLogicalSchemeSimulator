@@ -22,11 +22,14 @@ The XML map file format is very simple. Each symbol contains its own map record 
 
 ```xml
 
-<symbolMap>
-  <lib name="chip">
-    <symbol name="3OR" symPartClass="OrGate" symPartParam="size=3"/>
-  </lib>
-</symbolMap>
+<lib name="4xxx">
+  <symbol name="4001" symPartClass="OrGate" symPartParam="size=2;reverse">
+    <unit pinMap="1=IN0;2=IN1;3=OUT"/>
+    <unit pinMap="5=IN0;6=IN1;4=OUT"/>
+    <unit pinMap="8=IN0;9=IN1;10=OUT"/>
+    <unit pinMap="12=IN0;13=IN1;11=OUT"/>
+  </symbol>
+</lib>
 ```
 
 see complete example in [SymbolsDescription.xml](SymbolsDescription.xml)
@@ -35,6 +38,7 @@ see complete example in [SymbolsDescription.xml](SymbolsDescription.xml)
 - `symbol` tag describe one symbol from library, where attribute name corresponde to Symbol name from a specific symbol library.
 - `symPartClass` attribute is the Java class name used for schema part behavior simulation.
 - `symPartParam` attribute is additional parameters for class instantiation.
+- `unit` optional tag describe pin mapping for multy-unit symbols
 
 Fields from the map file and declared in symbols directly are merged.
 Parameters, declared in symbol directly have higher priority. (because of 'last-win' approach)

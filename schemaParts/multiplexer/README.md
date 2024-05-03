@@ -4,8 +4,8 @@ Implements a multiplexer with a defined number of outputs and ways.
 
 **Input names**:
 
-- [Ax, Bx, ...] where x is a sequential number.
-- Nx where x is a sequential number.
+- [Ax, Bx, ...] where x is a sequential number starting from 0.
+- Nx where x is a sequential number starting from 0.
 
 **Output names**: Qc, where c is a 'way' identifier, like A, B, ... (QA, QB, ...)
 

@@ -2,7 +2,7 @@
 
 Implements logical AND gate functionality.
 
-**Input names**: INx, where x is a sequential number  
+**Input names**: INx, where x is a sequential number, starting from 0  
 **Output names**: OUT
 
 **Mandatory parameter `size`:** Specifies the number of input pins.  

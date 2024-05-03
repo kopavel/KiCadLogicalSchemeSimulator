@@ -51,6 +51,14 @@ desk. Parts can be arranged freely, and the layout is saved near the Netlist fil
 
 For a detailed description of components, see [more information](schemaParts%2FREADME.md).
 
+For schema debugging purposes, an [oscilloscope](schemaParts%2Foscillator%2FOSCILLOSCOPE.md) from the [oscillator](schemaParts%2Foscillator%2FREADME.md) component
+can be used. Alternatively, schema part monitoring is available from the main interface menu.
+
+After selecting a target schema part, its pin representation appears on the screen, showing the current signal on each pin. Optionally, for certain schema parts,
+additional information about internal status is displayed. For example, for the Z80 CPU:
+
+![Z80 CPU Image](img.png)
+
 ## Examples
 
 Here are some schema Netlist examples:

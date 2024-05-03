@@ -35,13 +35,7 @@ import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.RisingEdgeInPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Counter extends SchemaPart {
-    String qAlias = "Q";
-    String cAlias = "C";
-    String rAlias = "R";
     private OutPin outPin;
     private int count = 0;
     private int countMask;
@@ -50,19 +44,6 @@ public class Counter extends SchemaPart {
         super(id, sParam);
         if (!params.containsKey("size")) {
             throw new RuntimeException("Component " + id + " has no parameter \"size\"");
-        }
-        String sAliases = params.get("aliases");
-        if (sAliases != null) {
-            String[] aliases = sAliases.split("\\|");
-            for (String sAlias : aliases) {
-                String[] alias = sAlias.split(":");
-                switch (alias[0]) {
-                    case "Q" -> qAlias = alias[1];
-                    case "C" -> cAlias = alias[1];
-                    case "R" -> rAlias = alias[1];
-                    default -> throw new RuntimeException("Unknown pin alias" + sAlias);
-                }
-            }
         }
         int pinAmount;
         try {
@@ -76,25 +57,16 @@ public class Counter extends SchemaPart {
         for (int i = 0; i < pinAmount; i++) {
             countMask = (countMask << 1) | 1;
         }
-        if (qAlias.endsWith("1") && pinAmount > 1) {
-            qAlias = qAlias.substring(0, qAlias.length() - 1);
-            List<String> qAliases = new ArrayList<>();
-            for (byte i = 1; i <= pinAmount; i++) {
-                qAliases.add(id + i);
-            }
-            addOutPin(qAlias, pinAmount, qAliases.toArray(new String[0]));
-        } else {
-            addOutPin(qAlias, pinAmount);
-        }
+        addOutPin("Q", pinAmount);
         if (reverse) {
-            addInPin(new FallingEdgeInPin(cAlias, this) {
+            addInPin(new FallingEdgeInPin("C", this) {
                 @Override
                 public void onFallingEdge() {
                     count = (count + 1) & countMask;
                     outPin.setState(count);
                 }
             });
-            addInPin(new FallingEdgeInPin(rAlias, this) {
+            addInPin(new FallingEdgeInPin("R", this) {
                 @Override
                 public void onFallingEdge() {
                     count = 0;
@@ -102,14 +74,14 @@ public class Counter extends SchemaPart {
                 }
             });
         } else {
-            addInPin(new RisingEdgeInPin(cAlias, this) {
+            addInPin(new RisingEdgeInPin("C", this) {
                 @Override
                 public void onRisingEdge() {
                     count = (count + 1) & countMask;
                     outPin.setState(count);
                 }
             });
-            addInPin(new RisingEdgeInPin(rAlias, this) {
+            addInPin(new RisingEdgeInPin("R", this) {
                 @Override
                 public void onRisingEdge() {
                     count = 0;
@@ -121,7 +93,7 @@ public class Counter extends SchemaPart {
 
     @Override
     public void initOuts() {
-        outPin = getOutPin(qAlias);
+        outPin = getOutPin("Q");
         outPin.useBitPresentation = true;
     }
 }

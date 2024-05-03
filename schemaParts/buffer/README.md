@@ -2,8 +2,8 @@
 
 Implements BUFFER/LATCH functionality.
 
-**Input names**: Dx, where x a sequential number.  
-**Output names**: Qx, where x a sequential number.
+**Input names**: Dx, where x a sequential number starting from 0.  
+**Output names**: Qx, where x a sequential number starting from 0.
 
 **Mandatory parameter `size`:** Specifies the number of input/output pins.  
 **Optional parameter `latch`:** If provided, the schema part is a latch; otherwise, it's a buffer.

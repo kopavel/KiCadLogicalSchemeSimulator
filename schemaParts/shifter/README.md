@@ -4,7 +4,7 @@ Implements a bit shifter.
 
 **Input names**:
 
-- Dx, where x a sequential number
+- Dx, where x a sequential number starting from 0
 - WR,
 - CLK
 

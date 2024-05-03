@@ -5,8 +5,6 @@ cd "$(dirname "$0")"
 
 # Execute Java with the specified options
 java -Xms16m -Xmx2g \
--XX:+UseG1GC -XX:MaxHeapFreeRatio=25 -XX:MinHeapFreeRatio=15 -XX:G1PeriodicGCInterval=15000 \
--XX:+UseStringDeduplication \
 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager \
 -Dlog4j2.contextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector \
 -Dlog4j2.asyncLoggerWaitStrategy=Block \

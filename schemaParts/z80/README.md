@@ -2,9 +2,30 @@
 
 Implement Zilog Z80 CPU pin and timing level functionality.
 
-**Input names**: CLK, ~{RESET}, ~{NMI}, ~{INT}, ~{WAIT}, ~{BUSRQ}  
-**Output names**: Ax (where x is number in [0-15] range), ~{RD}, ~{WR}, ~{MREQ}, ~{IORQ}, ~{BUSACK}, ~{M1}, ~{RFSH}, ~{HALT}  
-**Bidirectional names**: * Dx (where x is number in [0-7] range)
+**Input names**:
+
+- CLK
+- ~{RESET}
+- ~{NMI}
+- ~{INT}
+- ~{WAIT}
+- ~{BUSRQ}
+
+**Output names**:
+
+- Ax, where x is number in [0-15] range
+- ~{RD}
+- ~{WR}
+- ~{MREQ}
+- ~{IORQ}
+- ~{BUSACK}
+- ~{M1}
+- ~{RFSH}
+- ~{HALT}
+
+**Bidirectional names**:
+
+- Dx, where x is number in [0-7] range
 
 Schema part doesn't have any additional parameters.
 
