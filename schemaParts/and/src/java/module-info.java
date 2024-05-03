@@ -29,10 +29,10 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPartSpi;
-import lv.pko.DigitalNetSimulator.components.AND.AndGateSpi;
+import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
+import lv.pko.KiCadLogicalSchemeSimulator.components.AND.AndGateSpi;
 
-module DigitalNetSimulator.components.And {
-    requires DigitalNetSimulator.simulator;
+module KiCadLogicalSchemeSimulator.components.And {
+    requires KiCadLogicalSchemeSimulator.simulator;
     provides SchemaPartSpi with AndGateSpi;
 }

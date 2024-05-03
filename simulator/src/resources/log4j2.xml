@@ -43,7 +43,7 @@
 			<AppenderRef ref="STDOUT" level="INFO"/>
 		</Root>
 		<!--
-				<logger name="lv.pko.DigitalNetSimulator.components.display" level="TRACE" additivity="false">
+				<logger name="lv.pko.KiCadLogicalSchemeSimulator.components.display" level="TRACE" additivity="false">
 					<AppenderRef ref="DFILE"/>
 				</logger>
 		-->

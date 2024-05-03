@@ -29,10 +29,10 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPartSpi;
-import lv.pko.DigitalNetSimulator.components.multiplexer.MultiplexerSpi;
+import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
+import lv.pko.KiCadLogicalSchemeSimulator.components.multiplexer.MultiplexerSpi;
 
-module DigitalNetSimulator.components.multiplexer {
-    requires DigitalNetSimulator.simulator;
+module KiCadLogicalSchemeSimulator.components.multiplexer {
+    requires KiCadLogicalSchemeSimulator.simulator;
     provides SchemaPartSpi with MultiplexerSpi;
 }

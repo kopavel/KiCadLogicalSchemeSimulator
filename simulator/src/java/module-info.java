@@ -29,9 +29,9 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPartSpi;
+import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
 
-module DigitalNetSimulator.simulator {
+module KiCadLogicalSchemeSimulator.simulator {
     uses SchemaPartSpi;
     requires static lombok;
     requires jdk.unsupported;
@@ -60,18 +60,18 @@ module DigitalNetSimulator.simulator {
     requires org.objectweb.asm.tree;
     requires java.xml.bind;
     requires info.picocli;
-    exports lv.pko.DigitalNetSimulator;
-    opens lv.pko.DigitalNetSimulator;
-    exports lv.pko.DigitalNetSimulator.tools;
-    exports lv.pko.DigitalNetSimulator.api;
-    exports lv.pko.DigitalNetSimulator.api.pins;
-    exports lv.pko.DigitalNetSimulator.api.schemaPart;
-    exports lv.pko.DigitalNetSimulator.api.pins.in;
-    exports lv.pko.DigitalNetSimulator.api.pins.out;
-    exports lv.pko.DigitalNetSimulator.parsers.pojo;
-    opens lv.pko.DigitalNetSimulator.parsers.pojo;
-    exports lv.pko.DigitalNetSimulator.parsers.pojo.symbolMap;
-    opens lv.pko.DigitalNetSimulator.parsers.pojo.symbolMap;
-    exports lv.pko.DigitalNetSimulator.api.pins.out.nc;
-    exports lv.pko.DigitalNetSimulator.tools.ringBuffers;
+    exports lv.pko.KiCadLogicalSchemeSimulator;
+    opens lv.pko.KiCadLogicalSchemeSimulator;
+    exports lv.pko.KiCadLogicalSchemeSimulator.tools;
+    exports lv.pko.KiCadLogicalSchemeSimulator.api;
+    exports lv.pko.KiCadLogicalSchemeSimulator.api.pins;
+    exports lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart;
+    exports lv.pko.KiCadLogicalSchemeSimulator.api.pins.in;
+    exports lv.pko.KiCadLogicalSchemeSimulator.api.pins.out;
+    exports lv.pko.KiCadLogicalSchemeSimulator.parsers.pojo;
+    opens lv.pko.KiCadLogicalSchemeSimulator.parsers.pojo;
+    exports lv.pko.KiCadLogicalSchemeSimulator.parsers.pojo.symbolMap;
+    opens lv.pko.KiCadLogicalSchemeSimulator.parsers.pojo.symbolMap;
+    exports lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.nc;
+    exports lv.pko.KiCadLogicalSchemeSimulator.tools.ringBuffers;
 }

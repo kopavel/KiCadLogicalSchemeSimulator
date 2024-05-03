@@ -29,11 +29,11 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPartSpi;
-import lv.pko.DigitalNetSimulator.components.Z80.Z80CpuSpi;
+import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
+import lv.pko.KiCadLogicalSchemeSimulator.components.Z80.Z80CpuSpi;
 
-module DigitalNetSimulator.components.Z80Cpu {
+module KiCadLogicalSchemeSimulator.components.Z80Cpu {
     requires Z80Processor;
-    requires DigitalNetSimulator.simulator;
+    requires KiCadLogicalSchemeSimulator.simulator;
     provides SchemaPartSpi with Z80CpuSpi;
 }

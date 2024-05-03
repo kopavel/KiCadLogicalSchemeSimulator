@@ -29,11 +29,11 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPartSpi;
-import lv.pko.DigitalNetSimulator.components.LED.LedSpi;
+import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
+import lv.pko.KiCadLogicalSchemeSimulator.components.LED.LedSpi;
 
-module DigitalNetSimulator.components.Led {
-    requires DigitalNetSimulator.simulator;
+module KiCadLogicalSchemeSimulator.components.Led {
+    requires KiCadLogicalSchemeSimulator.simulator;
     requires java.desktop;
     requires static lombok;
     provides SchemaPartSpi with LedSpi;

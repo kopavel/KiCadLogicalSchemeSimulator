@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-	<configuration default="false" name="DigitalNetSimulator [run counters]" type="GradleRunConfiguration" factoryName="Gradle">
+	<configuration default="false" name="KiCadLogicalSchemeSimulator [run counters]" type="GradleRunConfiguration" factoryName="Gradle">
 		<ExternalSystemSettings>
 			<option name="executionName"/>
 			<option name="externalProjectPath" value="$PROJECT_DIR$"/>

@@ -29,11 +29,11 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPartSpi;
-import lv.pko.DigitalNetSimulator.components.oscillator.OscillatorSpi;
+import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
+import lv.pko.KiCadLogicalSchemeSimulator.components.oscillator.OscillatorSpi;
 
-module DigitalNetSimulator.components.oscillator {
-    requires DigitalNetSimulator.simulator;
+module KiCadLogicalSchemeSimulator.components.oscillator {
+    requires KiCadLogicalSchemeSimulator.simulator;
     requires java.datatransfer;
     requires java.desktop;
     requires com.formdev.flatlaf;

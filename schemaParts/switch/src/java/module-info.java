@@ -29,11 +29,11 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPartSpi;
-import lv.pko.DigitalNetSimulator.components.Switch.SwitchSpi;
+import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
+import lv.pko.KiCadLogicalSchemeSimulator.components.Switch.SwitchSpi;
 
-module DigitalNetSimulator.components.Switch {
-    requires DigitalNetSimulator.simulator;
+module KiCadLogicalSchemeSimulator.components.Switch {
+    requires KiCadLogicalSchemeSimulator.simulator;
     requires java.desktop;
     requires static lombok;
     provides SchemaPartSpi with SwitchSpi;

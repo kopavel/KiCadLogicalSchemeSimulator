@@ -34,7 +34,7 @@
 
 import org.gradle.api.initialization.resolve.RepositoriesMode
 
-rootProject.name = 'DigitalNetSimulator'
+rootProject.name = 'KiCadLogicalSchemeSimulator'
 include ':schemaParts'
 include ':schemaParts:and'
 include ':schemaParts:buffer'

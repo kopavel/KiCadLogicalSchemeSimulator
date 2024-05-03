@@ -29,11 +29,11 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPartSpi;
-import lv.pko.DigitalNetSimulator.components.display.DisplaySpi;
+import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
+import lv.pko.KiCadLogicalSchemeSimulator.components.display.DisplaySpi;
 
-module DigitalNetSimulator.components.display {
-    requires DigitalNetSimulator.simulator;
+module KiCadLogicalSchemeSimulator.components.display {
+    requires KiCadLogicalSchemeSimulator.simulator;
     requires java.desktop;
     provides SchemaPartSpi with DisplaySpi;
 }

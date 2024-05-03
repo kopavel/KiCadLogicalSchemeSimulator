@@ -75,8 +75,8 @@ jar {
 }
 application {
     group = "_build"
-    mainModule = "DigitalNetSimulator.simulator"
-    mainClass = "lv.pko.DigitalNetSimulator.Simulator"
+    mainModule = "KiCadLogicalSchemeSimulator.simulator"
+    mainClass = "lv.pko.KiCadLogicalSchemeSimulator.Simulator"
     tasks.named("distTar") { it.enabled = false }
     tasks.named("distZip") { it.enabled = false }
     tasks.named("startScripts") { it.enabled = false }
@@ -95,7 +95,7 @@ run {
                  "-XX:MinHeapFreeRatio=15",
                  "-XX:+UseStringDeduplication",
                  "-XX:G1PeriodicGCInterval=10000",
-                 "--add-opens", "java.base/java.lang=DigitalNetSimulator.simulator",
+                 "--add-opens", "java.base/java.lang=KiCadLogicalSchemeSimulator.simulator",
 /*
                  "-Dlog4j2.asyncLoggerRingBufferSize=10485760",
 */

@@ -12,7 +12,7 @@ java -Xms16m -Xmx2g \
 -Dlog4j2.asyncLoggerWaitStrategy=Block \
 -Dlog4j2.asyncLoggerThreadNameStrategy=CACHED \
 -p "$(pwd)":"$(pwd)"/lib:"$(pwd)"/schemaParts \
--m DigitalNetSimulator.simulator/lv.pko.DigitalNetSimulator.Simulator -m="$(pwd)"/SymbolsDescription.xml "$@"
+-m KiCadLogicalSchemeSimulator.simulator/lv.pko.KiCadLogicalSchemeSimulator.Simulator -m="$(pwd)"/SymbolsDescription.xml "$@"
 
 # Check the exit code from Java application
 if [ $? -eq 0 ]; then

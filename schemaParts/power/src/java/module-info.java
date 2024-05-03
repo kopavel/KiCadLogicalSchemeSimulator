@@ -29,9 +29,9 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPartSpi;
+import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
 
-module DigitalNetSimulator.components.power {
-    requires DigitalNetSimulator.simulator;
-    provides SchemaPartSpi with lv.pko.DigitalNetSimulator.components.power.PowerSpi;
+module KiCadLogicalSchemeSimulator.components.power {
+    requires KiCadLogicalSchemeSimulator.simulator;
+    provides SchemaPartSpi with lv.pko.KiCadLogicalSchemeSimulator.components.power.PowerSpi;
 }

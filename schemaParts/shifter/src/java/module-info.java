@@ -29,10 +29,10 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-import lv.pko.DigitalNetSimulator.api.schemaPart.SchemaPartSpi;
-import lv.pko.DigitalNetSimulator.components.shifter.ShifterSpi;
+import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
+import lv.pko.KiCadLogicalSchemeSimulator.components.shifter.ShifterSpi;
 
-module DigitalNetSimulator.components.shifter {
-    requires DigitalNetSimulator.simulator;
+module KiCadLogicalSchemeSimulator.components.shifter {
+    requires KiCadLogicalSchemeSimulator.simulator;
     provides SchemaPartSpi with ShifterSpi;
 }
