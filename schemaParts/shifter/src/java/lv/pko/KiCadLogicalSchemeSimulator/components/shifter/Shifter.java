@@ -30,6 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.KiCadLogicalSchemeSimulator.components.shifter;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.FallingEdgeInPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.FloatingPinException;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.RisingEdgeInPin;
@@ -37,11 +38,14 @@ import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 
 public class Shifter extends SchemaPart {
-    private final InPin inPins;
+    private final InPin dPins;
+    private final InPin dsPins;
+    private final long hiDsMask;
     private long latch = 0;
     private OutPin out;
-    private int pos;
-    private boolean wrActive;
+    private final boolean plReverse;
+    private long outMask;
+    private boolean plInactive;
 
     protected Shifter(String id, String sParam) {
         super(id, sParam);
@@ -49,33 +53,93 @@ public class Shifter extends SchemaPart {
             throw new RuntimeException("Component " + id + " has no parameter \"size\"");
         }
         int dSize = Integer.parseInt(params.get("size"));
-        inPins = addInPin("D", dSize);
-        addInPin(new InPin("~{WR}", this) {
+        dPins = addInPin(new InPin("D", this, dSize) {
+            @Override
+            public void onChange(long newState, boolean hiImpedance) {
+                if (!plInactive) {
+                    latch = dPins.getState();
+                }
+            }
+        });
+        plReverse = params.containsKey("plReverse");
+        for (int i = 0; i < dSize; i++) {
+            outMask = outMask << 1 | 1;
+        }
+        hiDsMask = 1L << (dSize - 1);
+        dsPins = addInPin("DS", 1);
+        addInPin(new InPin("PL", this) {
             @Override
             public void onChange(long newState, boolean hiImpedance) {
                 if (hiImpedance) {
                     throw new FloatingPinException(this);
                 }
-                wrActive = (newState > 0) ^ reverse;
-            }
-        });
-        addInPin(new RisingEdgeInPin("CLK", this) {
-            @Override
-            public void onRisingEdge() {
-                if (pos < dSize) {
-                    if (wrActive) {
-                        latch = inPins.getState();
-                        pos = 0;
-                    } else {
-                        pos++;
-                    }
-                    out.setState(latch >> pos & 1);
-                } else if (pos == dSize) {
-                    out.setState(0);
+                plInactive = (newState == 0) ^ plReverse;
+                if (!plInactive) {
+                    latch = dPins.getState();
+                    out.setState(latch);
                 }
             }
         });
-        addOutPin("Q", 1);
+        if (reverse) {
+            addInPin(new FallingEdgeInPin("CP", this) {
+                @Override
+                public void onFallingEdge() {
+                    if (latch > 0) {
+                        if (plInactive) {
+                            latch = (latch << 1) & outMask;
+                            if (dsPins.rawState > 0) {
+                                latch = latch | 1;
+                            }
+                            out.setState(latch);
+                        }
+                    }
+                }
+            });
+            addInPin(new FallingEdgeInPin("CN", this) {
+                @Override
+                public void onFallingEdge() {
+                    if (latch > 0) {
+                        if (plInactive) {
+                            latch = (latch >> 1) & outMask;
+                            if (dsPins.rawState > 0) {
+                                latch = latch | hiDsMask;
+                            }
+                            out.setState(latch);
+                        }
+                    }
+                }
+            });
+        } else {
+            addInPin(new RisingEdgeInPin("CP", this) {
+                @Override
+                public void onRisingEdge() {
+                    if (latch > 0) {
+                        if (plInactive) {
+                            latch = (latch << 1) & outMask;
+                            if (dsPins.rawState > 0) {
+                                latch = latch | 1;
+                            }
+                            out.setState(latch);
+                        }
+                    }
+                }
+            });
+            addInPin(new RisingEdgeInPin("CN", this) {
+                @Override
+                public void onRisingEdge() {
+                    if (latch > 0) {
+                        if (plInactive) {
+                            latch = (latch >> 1) & outMask;
+                            if (dsPins.rawState > 0) {
+                                latch = latch | hiDsMask;
+                            }
+                            out.setState(latch);
+                        }
+                    }
+                }
+            });
+        }
+        addOutPin("Q", dSize);
     }
 
     @Override

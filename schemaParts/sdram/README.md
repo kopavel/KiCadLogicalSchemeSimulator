@@ -4,12 +4,12 @@ Implements dynamic RAM with a defined number of address inputs and data outputs.
 
 **Input names**:
 
-- Ax, where x is a sequential number starting from 0
+- Ax, where x is a sequential number, starting from 0
 - RAS (Row Address Strobe)
 - CAS (Column Address Strobe)
 - WE (Write Enable)
 
-**Output names**: Dx, where x is a sequential number starting from 0
+**Output names**: Dx, where x is a sequential number, starting from 0
 
 **Mandatory parameters**:
 

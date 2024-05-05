@@ -29,72 +29,43 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lv.pko.KiCadLogicalSchemeSimulator.components.decoder;
+package lv.pko.KiCadLogicalSchemeSimulator.components.repeater;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.FloatingPinException;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.TriStateOutPin;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 
-public class Decoder extends SchemaPart {
-    private final InPin cs;
-    private TriStateOutPin outPin;
-    private boolean csState;
-    private long outState;
+public class Repeater extends SchemaPart {
+    private OutPin out;
 
-    protected Decoder(String id, String sParam) {
+    public Repeater(String id, String sParam) {
         super(id, sParam);
-        if (!params.containsKey("size")) {
-            throw new RuntimeException("Component " + id + " has no parameter \"size\"");
-        }
-        int inSize = Integer.parseInt(params.get("size"));
-        if (params.containsKey("outReverse")) {
-            addInPin(new InPin("A", this, inSize) {
+        if (reverse) {
+            addInPin(new InPin("IN", this) {
                 @Override
                 public void onChange(long newState, boolean hiImpedance) {
-                    outState = ~(1L << correctState(newState));
-                    if (csState) {
-                        if (hiImpedance) {
-                            throw new FloatingPinException(this);
-                        }
-                        outPin.setState(outState);
-                    }
-                }
-            });
-        } else {
-            addInPin(new InPin("A", this, inSize) {
-                @Override
-                public void onChange(long newState, boolean hiImpedance) {
-                    outState = 1L << correctState(newState);
-                    if (csState) {
-                        if (hiImpedance) {
-                            throw new FloatingPinException(this);
-                        }
-                        outPin.setState(outState);
-                    }
-                }
-            });
-        }
-        cs = addInPin(new InPin("CS", this) {
-            @Override
-            public void onChange(long newState, boolean hiImpedance) {
-                csState = (cs.rawState == 1) ^ reverse;
-                if (csState) {
                     if (hiImpedance) {
                         throw new FloatingPinException(this);
                     }
-                    outPin.setState(outState);
-                } else {
-                    outPin.setHiImpedance();
+                    out.setState(~newState);
                 }
-            }
-        });
-        int outSize = (int) Math.pow(2, inSize);
-        addTriStateOutPin("Q", outSize);
+            });
+        } else {
+            addInPin(new InPin("IN", this) {
+                @Override
+                public void onChange(long newState, boolean hiImpedance) {
+                    if (hiImpedance) {
+                        throw new FloatingPinException(this);
+                    }
+                    out.setState(newState);
+                }
+            });
+        }
+        addOutPin("OUT", 1);
     }
 
     @Override
     public void initOuts() {
-        outPin = (TriStateOutPin) getOutPin("Q");
-        outPin.useBitPresentation = true;
+        out = getOutPin("OUT");
     }
 }

@@ -142,7 +142,7 @@ public class Ram extends SchemaPart {
 
     @Override
     public String extraState() {
-        return "A:" + String.format("%0" + (int) Math.ceil(size / 4d) + "X", addr) + "\nD:" + String.format("%0" + Math.ceil(size / 4d) + "X", words[addr]);
+        return "A:" + String.format("%0" + (int) Math.ceil(size / 4d) + "X", addr) + "\nD:" + String.format("%0" + (int) Math.ceil(size / 4d) + "X", words[addr]);
     }
 
     private void out() {

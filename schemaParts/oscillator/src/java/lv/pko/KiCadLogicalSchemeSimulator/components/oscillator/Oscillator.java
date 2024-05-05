@@ -54,7 +54,7 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
 
     public Oscillator(String id, String sParams) {
         super(id, sParams);
-        String sAliases = params.get("aliases");
+        String sAliases = params.get("outName");
         if (sAliases != null) {
             outAlias = sAliases;
         }

@@ -11,9 +11,10 @@ Some of interactive part has additional interfaces/functionality if you click on
 * [AndGate](and%2FREADME.md) - Implements a logical AND gate functionality.
 * [Buffer](buffer%2FREADME.md) - Implements a buffer or latch functionality.
 * [Counter](counter%2FREADME.md) - Implements a binary counter.
-* [DcTrigger](dcTrigger%2FREADME.md) - Implements a DC-trigger functionality.
+* [DcTrigger](dcTrigger%2FREADME.md) - Implements a DC-trigger functionality with R and S inputs.
 * [Decoder](decoder%2FREADME.md) - Implements binary decoder.
 * [Display](display%2FREADME.md) - Implement monochrome display.
+* [JnCounter](jnCounter%2FREADME.md) - Implement Johnson Counter.
 * [Led](led%2FREADME.md) - Implement interactive LED schema part.
 * [Multiplexer](multiplexer%2FREADME.md) - Implement interactive LED schema part.
 * [OrGate](or%2FREADME.md) - Implements a logical OR gate functionality.

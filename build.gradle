@@ -33,7 +33,7 @@
 
 plugins {
     id 'idea'
-    alias libs.plugins.guidesigner
+//    alias libs.plugins.guidesigner
 }
 
 group 'lv.pko'

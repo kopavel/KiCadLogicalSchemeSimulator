@@ -4,7 +4,7 @@ Implement oscillator.
 
 **Output names**: OUT
 
-**Optional parameter `aliases`:** If provided, define output pin name;
+**Optional parameter `outName`:** If provided, define output pin name;
 
 The schema part is interactive and opens an additional control panel on click.
 

@@ -38,12 +38,35 @@ import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 
 public class DcTrigger extends SchemaPart {
     private final InPin dPin;
+    private final InPin rPin;
+    private final InPin sPin;
     private OutPin qOut;
     private OutPin iqOut;
+    private boolean clockEnabled = true;
 
     protected DcTrigger(String id, String sParam) {
         super(id, sParam);
         dPin = addInPin("D", 1);
+        rPin = addInPin(new InPin("R", this) {
+            @Override
+            public void onChange(long newState, boolean hiImpedance) {
+                clockEnabled = (newState | sPin.rawState) == 0;
+                if (newState > 0) {
+                    iqOut.setState(hiState);
+                    qOut.setState(sPin.rawState > 0 ? hiState : loState);
+                }
+            }
+        });
+        sPin = addInPin(new InPin("S", this) {
+            @Override
+            public void onChange(long newState, boolean hiImpedance) {
+                clockEnabled = (newState | sPin.rawState) == 0;
+                if (newState > 0) {
+                    qOut.setState(hiState);
+                    iqOut.setState(rPin.rawState > 0 ? hiState : loState);
+                }
+            }
+        });
         if (reverse) {
             addInPin(new FallingEdgeInPin("C", this) {
                 @Override
@@ -72,13 +95,15 @@ public class DcTrigger extends SchemaPart {
     }
 
     private void store() {
-        long dState = dPin.rawState;
-        if (dState > 0) {
-            qOut.setState(1);
-            iqOut.setState(0);
-        } else {
-            qOut.setState(0);
-            iqOut.setState(1);
+        if (clockEnabled) {
+            long dState = dPin.rawState;
+            if (dState > 0) {
+                qOut.setState(1);
+                iqOut.setState(0);
+            } else {
+                qOut.setState(0);
+                iqOut.setState(1);
+            }
         }
     }
 }
