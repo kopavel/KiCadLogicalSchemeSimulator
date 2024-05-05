@@ -57,6 +57,7 @@ dependencies {
     runtimeOnly project(":schemaParts:dcTrigger")
     runtimeOnly project(":schemaParts:decoder")
     runtimeOnly project(":schemaParts:display")
+    runtimeOnly project(":schemaParts:jkTrigger")
     runtimeOnly project(":schemaParts:jnCounter")
     runtimeOnly project(":schemaParts:led")
     runtimeOnly project(":schemaParts:multiplexer")

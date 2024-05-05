@@ -110,6 +110,13 @@
 			<unit pinMap="3=IN0;4=IN1;5=IN2;6=OUT"/>
 			<unit pinMap="11=IN0;12=IN1;13=IN2;10=OUT"/>
 		</symbol>
+		<symbol name="4027" symPartClass="JkTrigger" symPartParam="reverse">
+			<unit pinMap="6=J;3=C;5=K;1=Q;2=~{Q};7=R;4=S"/>
+			<unit pinMap="10=J;13=C;11=K;15=Q;14=~{Q};9=R;12=S"/>
+		</symbol>
+		<symbol name="4028" symPartClass="Decoder" symPartParam="size=4">
+			<unit pinMap="10=A0;13=A1;12=A2;11=A4;3=Q0;14=Q1;1=Q2;15=Q3;1=Q4;6=Q5;7=Q6;4=Q7;9=Q8;5=Q9"/>
+		</symbol>
 	</lib>
 	<lib name="74xx">
 		<symbol name="74LS393" symPartClass="Counter" symPartParam="size=4;reverse">

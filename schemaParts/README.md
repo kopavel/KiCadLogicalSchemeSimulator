@@ -14,7 +14,8 @@ Some of interactive part has additional interfaces/functionality if you click on
 * [DcTrigger](dcTrigger%2FREADME.md) - Implements a DC-trigger functionality with R and S inputs.
 * [Decoder](decoder%2FREADME.md) - Implements binary decoder.
 * [Display](display%2FREADME.md) - Implement monochrome display.
-* [JnCounter](jnCounter%2FREADME.md) - Implement Johnson Counter.
+* [JkTrigger](jkTrigger%2FREADME.md) - Implement JK trigger.
+* [JnCounter](jnCounter%2FREADME.md) - Implement Johnson counter.
 * [Led](led%2FREADME.md) - Implement interactive LED schema part.
 * [Multiplexer](multiplexer%2FREADME.md) - Implement interactive LED schema part.
 * [OrGate](or%2FREADME.md) - Implements a logical OR gate functionality.
