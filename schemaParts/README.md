@@ -11,6 +11,7 @@ Some of interactive part has additional interfaces/functionality if you click on
 * [AndGate](and%2FREADME.md) - Implements a logical AND gate functionality.
 * [Buffer](buffer%2FREADME.md) - Implements a buffer or latch functionality.
 * [Counter](counter%2FREADME.md) - Implements a binary counter.
+* [DCounter](dCounter%2FREADME.md) - Implements a binary/decimal counter.
 * [DcTrigger](dcTrigger%2FREADME.md) - Implements a DC-trigger functionality with R and S inputs.
 * [Decoder](decoder%2FREADME.md) - Implements binary decoder.
 * [Display](display%2FREADME.md) - Implement monochrome display.
