@@ -68,6 +68,7 @@ dependencies {
     runtimeOnly project(":schemaParts:rom")
     runtimeOnly project(":schemaParts:sdram")
     runtimeOnly project(":schemaParts:shifter")
+    runtimeOnly project(":schemaParts:stateMachine")
     runtimeOnly project(":schemaParts:switch")
     runtimeOnly project(":schemaParts:xor")
     runtimeOnly project(":schemaParts:z80")

@@ -139,6 +139,63 @@
 			<unit pinMap="11=IN;12=OUT"/>
 			<unit pinMap="14=IN;15=OUT"/>
 		</symbol>
+		<symbol name="4056" symPartClass="StateMachine" symPartParam="size=4;outSize=7;states=126,48,109,121,51,91,95,112,127,123,14,55,103,119,1,0">
+			<unit pinMap="5=IN0;3=IN1;3=IN2;4=IN3;1=S;6=R;9=OUT0;10=OUT1;11=OUT2;12=OUT3;13=OUT4;14=OUT5;15=OUT6"/>
+		</symbol>
+		<symbol name="4069" symPartClass="Repeater" symPartParam="reverse">
+			<unit pinMap="1=IN;2=OUT"/>
+			<unit pinMap="3=IN;4=OUT"/>
+			<unit pinMap="5=IN;6=OUT"/>
+			<unit pinMap="9=IN;8=OUT"/>
+			<unit pinMap="11=IN;10=OUT"/>
+			<unit pinMap="13=IN;12=OUT"/>
+		</symbol>
+		<symbol name="4070" symPartClass="XorGate">
+			<unit pinMap="1=IN0;2=IN1;3=OUT"/>
+			<unit pinMap="5=IN0;6=IN1;4=OUT"/>
+			<unit pinMap="8=IN0;9=IN1;10=OUT"/>
+			<unit pinMap="12=IN0;13=IN1;11=OUT"/>
+		</symbol>
+		<symbol name="4071" symPartClass="OrGate" symPartParam="size=2">
+			<unit pinMap="1=IN0;2=IN1;3=OUT"/>
+			<unit pinMap="5=IN0;6=IN1;4=OUT"/>
+			<unit pinMap="8=IN0;9=IN1;10=OUT"/>
+			<unit pinMap="12=IN0;13=IN1;11=OUT"/>
+		</symbol>
+		<symbol name="4072" symPartClass="OrGate" symPartParam="size=4">
+			<unit pinMap="2=IN0;3=IN1;4=IN2;5=IN3;1=OUT"/>
+			<unit pinMap="9=IN0;10=IN1;11=IN2;12=IN3;13=OUT"/>
+		</symbol>
+		<symbol name="4073" symPartClass="AndGate" symPartParam="size=3">
+			<unit pinMap="1=IN0;2=IN1;8=IN2;9=OUT"/>
+			<unit pinMap="3=IN0;4=IN1;5=IN2;6=OUT"/>
+			<unit pinMap="11=IN0;12=IN1;13=IN2;10=OUT"/>
+		</symbol>
+		<symbol name="4075" symPartClass="OrGate" symPartParam="size=3">
+			<unit pinMap="1=IN0;2=IN1;8=IN2;9=OUT"/>
+			<unit pinMap="3=IN0;4=IN1;5=IN2;6=OUT"/>
+			<unit pinMap="11=IN0;12=IN1;13=IN2;10=OUT"/>
+		</symbol>
+		<symbol name="4077" symPartClass="XorGate" symPartParam="reverse">
+			<unit pinMap="1=IN0;2=IN1;3=OUT"/>
+			<unit pinMap="5=IN0;6=IN1;4=OUT"/>
+			<unit pinMap="8=IN0;9=IN1;10=OUT"/>
+			<unit pinMap="12=IN0;13=IN1;11=OUT"/>
+		</symbol>
+		<symbol name="4081" symPartClass="AndGate" symPartParam="size=2">
+			<unit pinMap="1=IN0;2=IN1;3=OUT"/>
+			<unit pinMap="5=IN0;6=IN1;4=OUT"/>
+			<unit pinMap="8=IN0;9=IN1;10=OUT"/>
+			<unit pinMap="12=IN0;13=IN1;11=OUT"/>
+		</symbol>
+		<symbol name="4504" symPartClass="Repeater">
+			<unit pinMap="2=IN;3=OUT"/>
+			<unit pinMap="5=IN;4=OUT"/>
+			<unit pinMap="7=IN;6=OUT"/>
+			<unit pinMap="9=IN;10=OUT"/>
+			<unit pinMap="11=IN;12=OUT"/>
+			<unit pinMap="14=IN;15=OUT"/>
+		</symbol>
 	</lib>
 	<lib name="74xx">
 		<symbol name="74LS393" symPartClass="Counter" symPartParam="size=4;reverse">

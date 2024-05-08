@@ -26,6 +26,7 @@ Some of interactive part has additional interfaces/functionality if you click on
 * [Rom](rom/README.md) - Implement ROM.
 * [SdRam](sdram/README.md) - Implement dynamic RAM.
 * [Shifter](shifter/README.md) - Implement bit shifter.
+* [StateMachine](stateMachine%2FREADME.md) - Implements logical state machine.
 * [XorGate](xor%2FREADME.md) - Implements a logical XOR gate functionality.
 * [Z80Cpu](z80%2FREADME.md) - Implements a Zilog Z80 CPU pin and timing level functionality.
 

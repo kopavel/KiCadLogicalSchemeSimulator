@@ -55,6 +55,7 @@ include ':schemaParts:repeater'
 include ':schemaParts:rom'
 include ':schemaParts:sdram'
 include ':schemaParts:shifter'
+include ':schemaParts:stateMachine'
 include ':schemaParts:switch'
 include ':schemaParts:xor'
 include ':schemaParts:z80'
@@ -104,3 +105,4 @@ def streamingStyledTextOutput = newStreamingStyledTextOutput.newInstance(streamB
 def styledTextOutputBackedRenderer = newStyledTextOutputBackedRenderer.newInstance(streamingStyledTextOutput)
 OutputEventListenerBackedLoggerContext.getDeclaredMethod("setOutputEventListener", OutputEventListener).invoke(gradleLoggerFactory, styledTextOutputBackedRenderer)
 */
+
