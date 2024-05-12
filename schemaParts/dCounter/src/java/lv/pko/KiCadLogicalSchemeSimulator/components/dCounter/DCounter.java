@@ -30,25 +30,33 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.KiCadLogicalSchemeSimulator.components.dCounter;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.FallingEdgeInPin;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.EdgeInPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.FloatingPinException;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.RisingEdgeInPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 
 public class DCounter extends SchemaPart {
     private final InPin jPin;
+    private final boolean carryReverse;
+    private final boolean bdReverse;
+    private final boolean eReverse;
     private OutPin outPin;
     private OutPin cOutPin;
     private boolean countUp = true;
-    private boolean clockEnabled = true;
+    private boolean ciState = true;
+    private boolean cState;
+    private boolean eState;
     private boolean presetDisabled = false;
     private long count = 0;
     private long maxCount = 15;
+    private boolean resetInactive;
 
     protected DCounter(String id, String sParam) {
         super(id, sParam);
+        carryReverse = params.containsKey("carryReverse");
+        bdReverse = params.containsKey("bdReverse");
+        eReverse = params.containsKey("eReverse");
         addOutPin("Q", 4);
         addInPin(new InPin("CI", this) {
             @Override
@@ -56,16 +64,16 @@ public class DCounter extends SchemaPart {
                 if (hiImpedance) {
                     throw new FloatingPinException(this);
                 }
-                clockEnabled = newState > 0;
+                ciState = (newState > 0) ^ carryReverse;
                 if ((countUp && (count == maxCount)) || (!countUp && (count == 0))) {
-                    cOutPin.setState(clockEnabled ? 0 : 1);
+                    cOutPin.setState(ciState ? 0 : 1);
                 }
             }
         });
         jPin = addInPin(new InPin("J", this) {
             @Override
             public void onChange(long newState, boolean hiImpedance) {
-                if (!presetDisabled) {
+                if (!presetDisabled && resetInactive) {
                     count = getState();
                     outPin.setState(count);
                 }
@@ -78,7 +86,7 @@ public class DCounter extends SchemaPart {
                     throw new FloatingPinException(this);
                 }
                 presetDisabled = newState == 0;
-                if (!presetDisabled) {
+                if (!presetDisabled && resetInactive) {
                     count = jPin.getState();
                     outPin.setState(count);
                 }
@@ -93,21 +101,78 @@ public class DCounter extends SchemaPart {
         addInPin(new InPin("BD", this) {
             @Override
             public void onChange(long newState, boolean hiImpedance) {
-                maxCount = rawState > 0 ? 15 : 9;
+                maxCount = ((rawState > 0) ^ bdReverse) ? 15 : 9;
+            }
+        });
+        addInPin(new InPin("R", this) {
+            @Override
+            public void onChange(long newState, boolean hiImpedance) {
+                resetInactive = newState == 0;
+                if (!resetInactive) {
+                    count = 0;
+                    outPin.setState(0);
+                }
             }
         });
         if (reverse) {
-            addInPin(new FallingEdgeInPin("C", this) {
+            addInPin(new EdgeInPin("C", this) {
                 @Override
                 public void onFallingEdge() {
-                    process();
+                    cState = true;
+                    if (eState) {
+                        process();
+                    }
+                }
+
+                @Override
+                public void onRisingEdge() {
+                    cState = false;
                 }
             });
         } else {
-            addInPin(new RisingEdgeInPin("C", this) {
+            addInPin(new EdgeInPin("C", this) {
+                @Override
+                public void onFallingEdge() {
+                    cState = false;
+                }
+
                 @Override
                 public void onRisingEdge() {
-                    process();
+                    cState = true;
+                    if (eState) {
+                        process();
+                    }
+                }
+            });
+        }
+        if (eReverse) {
+            addInPin(new EdgeInPin("E", this) {
+                @Override
+                public void onFallingEdge() {
+                    eState = false;
+                }
+
+                @Override
+                public void onRisingEdge() {
+                    eState = true;
+                    if (cState) {
+                        process();
+                    }
+                }
+            });
+        } else {
+            addInPin(new EdgeInPin("E", this) {
+                @Override
+                public void onFallingEdge() {
+                    eState = true;
+                    if (cState) {
+                        process();
+                    }
+                }
+
+                @Override
+                public void onRisingEdge() {
+                    eState = false;
                 }
             });
         }
@@ -121,7 +186,7 @@ public class DCounter extends SchemaPart {
     }
 
     private void process() {
-        if (clockEnabled && presetDisabled) {
+        if (ciState && presetDisabled && resetInactive) {
             if (countUp) {
                 count++;
                 if (count == maxCount) {

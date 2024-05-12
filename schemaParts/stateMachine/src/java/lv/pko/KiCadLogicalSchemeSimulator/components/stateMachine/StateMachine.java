@@ -40,6 +40,7 @@ public class StateMachine extends SchemaPart {
     private final long[] states;
     private final InPin in;
     private boolean strobeActive;
+    private boolean disabled;
     private OutPin out;
     private long latch;
     private long outMash;
@@ -82,13 +83,20 @@ public class StateMachine extends SchemaPart {
             throw new RuntimeException("Component " + id + " state must be positive number");
         }
         addOutPin("OUT", outSize);
+        addInPin(new InPin("D", this) {
+            @Override
+            public void onChange(long newState, boolean hiImpedance) {
+                disabled = newState == 1;
+                out.setState((disabled ? 0 : states[(int) latch]) ^ outMash);
+            }
+        });
         addInPin(new InPin("S", this) {
             @Override
             public void onChange(long newState, boolean hiImpedance) {
                 strobeActive = newState > 0;
                 if (strobeActive) {
                     latch = in.getState();
-                    out.setState(states[(int) latch] ^ outMash);
+                    out.setState((disabled ? 0 : states[(int) latch]) ^ outMash);
                 }
             }
         });
@@ -96,13 +104,13 @@ public class StateMachine extends SchemaPart {
             @Override
             public void onFallingEdge() {
                 outMash = 0;
-                out.setState(states[(int) latch] ^ outMash);
+                out.setState((disabled ? 0 : states[(int) latch]) ^ outMash);
             }
 
             @Override
             public void onRisingEdge() {
                 outMash = -1;
-                out.setState(states[(int) latch] ^ outMash);
+                out.setState((disabled ? 0 : states[(int) latch]) ^ outMash);
             }
         });
         in = addInPin(new InPin("IN", this, inSize) {
@@ -113,7 +121,7 @@ public class StateMachine extends SchemaPart {
                         throw new FloatingPinException(this);
                     }
                     latch = newState;
-                    out.setState(states[(int) newState] ^ outMash);
+                    out.setState((disabled ? 0 : states[(int) latch]) ^ outMash);
                 }
             }
         });

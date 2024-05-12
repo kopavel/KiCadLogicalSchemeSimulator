@@ -7,6 +7,7 @@ Implements logical state machine functionality.
 - `INx` - inputs, where x a sequential number, starting from 0
 - `S` - strobe. When `Hi`, inputs are stored to internal latch.
 - `R` - reverse. When `Hi`, output are in reversed state.
+- `D` - disabled. When `Hi`, output state are 0 (1, if R are active).
 
 **Output names**: OUT
 

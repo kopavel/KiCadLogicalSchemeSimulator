@@ -117,7 +117,7 @@
 		<symbol name="4028" symPartClass="Decoder" symPartParam="size=4">
 			<unit pinMap="10=A0;13=A1;12=A2;11=A4;3=Q0;14=Q1;1=Q2;15=Q3;1=Q4;6=Q5;7=Q6;4=Q7;9=Q8;5=Q9"/>
 		</symbol>
-		<symbol name="4029" symPartClass="DCounter" symPartParam="reverse">
+		<symbol name="4029" symPartClass="DCounter" symPartParam="reverse;eReverse">
 			<unit pinMap="15=C;4=J0;12=J1;13=J2;3=J3;5=CI;1=PE;6=Q0;11=Q1;14=Q2;2=Q3;10=UD;9=BD;7=CO"/>
 		</symbol>
 		<symbol name="4040" symPartClass="Counter" symPartParam="size=12;reverse">
@@ -195,6 +195,34 @@
 			<unit pinMap="9=IN;10=OUT"/>
 			<unit pinMap="11=IN;12=OUT"/>
 			<unit pinMap="14=IN;15=OUT"/>
+		</symbol>
+		<symbol name="4510" symPartClass="DCounter" symPartParam="carryReverse;bdReverse;eReverse">
+			<unit pinMap="4=J0;12=J1;13=J2;3=J3;5=CI;10=UD;15=C;1=PE;9=R;6=Q0;11=Q1;14=Q2;2=Q3;7=CO"/>
+		</symbol>
+		<symbol name="4518" symPartClass="DCounter" symPartParam="carryReverse;bdReverse">
+			<unit pinMap="1=C;7=R;2=E;3=Q0;4=Q1;5=Q2;6=Q3"/>
+			<unit pinMap="9=C;15=R;10=E;11=Q0;12=Q1;13;Q2;14=Q3"/>
+		</symbol>
+		<symbol name="4520" symPartClass="DCounter" symPartParam="carryReverse">
+			<unit pinMap="1=C;7=R;2=E;3=Q0;4=Q1;5=Q2;6=Q3"/>
+			<unit pinMap="9=C;15=R;10=E;11=Q0;12=Q1;13;Q2;14=Q3"/>
+		</symbol>
+		<symbol name="4543" symPartClass="StateMachine" symPartParam="size=4;outSize=7;states=126,48,109,121,51,91,95,112,127,123,0,0,0,0,0,0">
+			<unit pinMap="5=IN0;3=IN1;3=IN2;4=IN3;7=D;1=S;6=R;9=OUT0;10=OUT1;11=OUT2;12=OUT3;13=OUT4;15=OUT5;14=OUT6"/>
+		</symbol>
+		<symbol name="40106" symPartClass="Repeater" symPartParam="reverse">
+			<unit pinMap="1=IN;2=OUT"/>
+			<unit pinMap="3=IN;4=OUT"/>
+			<unit pinMap="5=IN;6=OUT"/>
+			<unit pinMap="9=IN;8=OUT"/>
+			<unit pinMap="11=IN;10=OUT"/>
+			<unit pinMap="13=IN;12=OUT"/>
+		</symbol>
+		<symbol name="HEF4093B" symPartClass="AndGate" symPartParam="size=2;reverse">
+			<unit pinMap="1=IN0;2=IN1;3=OUT"/>
+			<unit pinMap="5=IN0;6=IN1;4=OUT"/>
+			<unit pinMap="8=IN0;9=IN1;10=OUT"/>
+			<unit pinMap="12=IN0;13=IN1;11=OUT"/>
 		</symbol>
 	</lib>
 	<lib name="74xx">
