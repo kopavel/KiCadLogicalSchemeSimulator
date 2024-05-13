@@ -39,7 +39,7 @@ import lv.pko.KiCadLogicalSchemeSimulator.model.ShortcutException;
 import lv.pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 public class Merger extends OutPin {
-    private MergerInPin[] inputs = new MergerInPin[0];
+    private NoOffsetMergerInPin[] inputs = new NoOffsetMergerInPin[0];
     private long strongMask;
     private long pullState = 0;
     private long pullMask = 0;
@@ -65,7 +65,7 @@ public class Merger extends OutPin {
             }
             strongMask |= newMask;
         }
-        MergerInPin inPin;
+        NoOffsetMergerInPin inPin;
         inPin = createInput(src, offset, inMask);
         if (src instanceof PullPin) {
             pullState |= inPin.correctState(src.state);
@@ -76,32 +76,84 @@ public class Merger extends OutPin {
         src.addDest(inPin);
     }
 
-    private MergerInPin createInput(OutPin src, byte offset, long mask) {
-        MergerInPin inPin;
-        inPin = new MergerInPin(src, offset, mask) {
-            @Override
-            public void onChange(long newState, boolean hiImpedance) {
-                long strongPins = 0;
-                long pullPins = 0;
-                long result = 0;
-                for (MergerInPin input : inputs) {
-                    if (!input.hiImpedance) {
-                        if ((strongPins & input.corrMask) > 0) {
-                            throw new ShortcutException(inputs);
+    private NoOffsetMergerInPin createInput(OutPin src, byte offset, long mask) {
+        NoOffsetMergerInPin inPin;
+        if (offset == 0) {
+            inPin = new NoOffsetMergerInPin(src, offset, mask) {
+                @Override
+                public void onMerge() {
+                    long strongPins = 0;
+                    long pullPins = 0;
+                    long result = 0;
+                    for (NoOffsetMergerInPin input : inputs) {
+                        if (!input.hiImpedance) {
+                            if ((strongPins & input.corrMask) > 0) {
+                                throw new ShortcutException(inputs);
+                            }
+                            strongPins |= input.corrMask;
+                            result |= input.rawState;
+                        } else {
+                            pullPins |= pullMask & input.corrMask;
+                            result |= pullState & input.corrMask;
                         }
-                        strongPins |= input.corrMask;
-                        result |= input.rawState;
-                    } else {
-                        pullPins |= pullMask & input.corrMask;
-                        result |= pullState & input.corrMask;
                     }
+                    dest.rawState = result;
+                    state = result;
+                    //FixMe what about edge pins??
+                    dest.onChange(result, (strongPins | pullPins) != dest.mask);
                 }
-                dest.rawState = result;
-                state = result;
-                //FixMe what about edge pins??
-                dest.onChange(result, (strongPins | pullPins) != dest.mask);
-            }
-        };
+            };
+        } else if (offset > 0) {
+            inPin = new PositiveOffsetMergerInPin(src, offset, mask) {
+                @Override
+                public void onMerge() {
+                    long strongPins = 0;
+                    long pullPins = 0;
+                    long result = 0;
+                    for (NoOffsetMergerInPin input : inputs) {
+                        if (!input.hiImpedance) {
+                            if ((strongPins & input.corrMask) > 0) {
+                                throw new ShortcutException(inputs);
+                            }
+                            strongPins |= input.corrMask;
+                            result |= input.rawState;
+                        } else {
+                            pullPins |= pullMask & input.corrMask;
+                            result |= pullState & input.corrMask;
+                        }
+                    }
+                    dest.rawState = result;
+                    state = result;
+                    //FixMe what about edge pins??
+                    dest.onChange(result, (strongPins | pullPins) != dest.mask);
+                }
+            };
+        } else {
+            inPin = new NegativeOffsetMergerInPin(src, offset, mask) {
+                @Override
+                public void onMerge() {
+                    long strongPins = 0;
+                    long pullPins = 0;
+                    long result = 0;
+                    for (NoOffsetMergerInPin input : inputs) {
+                        if (!input.hiImpedance) {
+                            if ((strongPins & input.corrMask) > 0) {
+                                throw new ShortcutException(inputs);
+                            }
+                            strongPins |= input.corrMask;
+                            result |= input.rawState;
+                        } else {
+                            pullPins |= pullMask & input.corrMask;
+                            result |= pullState & input.corrMask;
+                        }
+                    }
+                    dest.rawState = result;
+                    state = result;
+                    //FixMe what about edge pins??
+                    dest.onChange(result, (strongPins | pullPins) != dest.mask);
+                }
+            };
+        }
         return inPin;
     }
 }

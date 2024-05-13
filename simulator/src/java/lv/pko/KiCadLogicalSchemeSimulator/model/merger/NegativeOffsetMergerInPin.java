@@ -31,35 +31,18 @@
  *
  */
 package lv.pko.KiCadLogicalSchemeSimulator.model.merger;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
 
-public abstract class MergerInPin extends InPin {
-    public long corrMask;
-    public boolean hiImpedance;
-
-    public MergerInPin(OutPin src, byte offset, long mask) {
-        super(src.id, src.parent);
-        this.offset = offset;
-        this.nOffset = (byte) -offset;
-        this.mask = mask;
-        this.corrMask = getCorrectedMask();
-    }
-
-    public long getCorrectedMask() {
-        if (offset == 0) {
-            return mask;
-        } else if (offset > 0) {
-            return mask >> offset;
-        } else {
-            return mask << nOffset;
-        }
+public abstract class NegativeOffsetMergerInPin extends NoOffsetMergerInPin {
+    public NegativeOffsetMergerInPin(OutPin src, byte offset, long mask) {
+        super(src, offset, mask);
+        this.corrMask = mask << nOffset;
     }
 
     @Override
     public void transit(long oldState, long newState, boolean hiImpedance) {
-        rawState = correctState(newState & mask);
+        rawState = (newState & mask) << nOffset;
         this.hiImpedance = hiImpedance;
-        onChange(newState, hiImpedance);
+        onMerge();
     }
 }
