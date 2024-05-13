@@ -83,24 +83,20 @@ public class Merger extends OutPin {
                 @Override
                 public void onMerge() {
                     long strongPins = 0;
-                    long pullPins = 0;
-                    long result = 0;
+                    state = 0;
                     for (NoOffsetMergerInPin input : inputs) {
                         if (!input.hiImpedance) {
                             if ((strongPins & input.corrMask) > 0) {
                                 throw new ShortcutException(inputs);
                             }
                             strongPins |= input.corrMask;
-                            result |= input.rawState;
-                        } else {
-                            pullPins |= pullMask & input.corrMask;
-                            result |= pullState & input.corrMask;
+                            state |= input.rawState;
                         }
                     }
-                    dest.rawState = result;
-                    state = result;
+                    state |= pullState & (~strongPins);
+                    dest.rawState = state;
                     //FixMe what about edge pins??
-                    dest.onChange(result, (strongPins | pullPins) != dest.mask);
+                    dest.onChange(state, (strongPins | pullMask) != dest.mask);
                 }
             };
         } else if (offset > 0) {
@@ -108,24 +104,20 @@ public class Merger extends OutPin {
                 @Override
                 public void onMerge() {
                     long strongPins = 0;
-                    long pullPins = 0;
-                    long result = 0;
+                    state = 0;
                     for (NoOffsetMergerInPin input : inputs) {
                         if (!input.hiImpedance) {
                             if ((strongPins & input.corrMask) > 0) {
                                 throw new ShortcutException(inputs);
                             }
                             strongPins |= input.corrMask;
-                            result |= input.rawState;
-                        } else {
-                            pullPins |= pullMask & input.corrMask;
-                            result |= pullState & input.corrMask;
+                            state |= input.rawState;
                         }
                     }
-                    dest.rawState = result;
-                    state = result;
+                    state |= pullState & (~strongPins);
+                    dest.rawState = state;
                     //FixMe what about edge pins??
-                    dest.onChange(result, (strongPins | pullPins) != dest.mask);
+                    dest.onChange(state, (strongPins | pullMask) != dest.mask);
                 }
             };
         } else {
@@ -133,24 +125,20 @@ public class Merger extends OutPin {
                 @Override
                 public void onMerge() {
                     long strongPins = 0;
-                    long pullPins = 0;
-                    long result = 0;
+                    state = 0;
                     for (NoOffsetMergerInPin input : inputs) {
                         if (!input.hiImpedance) {
                             if ((strongPins & input.corrMask) > 0) {
                                 throw new ShortcutException(inputs);
                             }
                             strongPins |= input.corrMask;
-                            result |= input.rawState;
-                        } else {
-                            pullPins |= pullMask & input.corrMask;
-                            result |= pullState & input.corrMask;
+                            state |= input.rawState;
                         }
                     }
-                    dest.rawState = result;
-                    state = result;
+                    state |= pullState & (~strongPins);
+                    dest.rawState = state;
                     //FixMe what about edge pins??
-                    dest.onChange(result, (strongPins | pullPins) != dest.mask);
+                    dest.onChange(state, (strongPins | pullMask) != dest.mask);
                 }
             };
         }

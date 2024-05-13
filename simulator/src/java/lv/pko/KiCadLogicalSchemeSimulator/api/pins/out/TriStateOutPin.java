@@ -52,29 +52,26 @@ public class TriStateOutPin extends OutPin {
 
     @Override
     public void setState(long newState) {
-        long oldState = this.state;
         if (hiImpedance) {
             hiImpedance = false;
             this.state = newState;
-            dest.transit(oldState, newState, false);
-        } else {
-            if (newState != oldState) {
-                this.state = newState;
-                dest.transit(oldState, newState, false);
-            }
+            dest.transit(newState, false);
+        } else if (newState != this.state) {
+            this.state = newState;
+            dest.transit(newState, false);
         }
     }
 
     @Override
     public void reSendState() {
-        dest.transit(state, state, hiImpedance);
+        dest.transit(state, hiImpedance);
     }
 
     public void setHiImpedance() {
         if (!hiImpedance) {
             hiImpedance = true;
             long state = this.state;
-            dest.transit(state, state, true);
+            dest.transit(state, true);
         }
     }
 }

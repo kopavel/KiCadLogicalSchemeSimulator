@@ -48,11 +48,10 @@ public class OutPins extends OutPin {
 
     @Override
     public void setState(long newState) {
-        long oldState = this.state;
-        if (newState != oldState) {
+        if (newState != this.state) {
             this.state = newState;
             for (InPin InPin : dest) {
-                InPin.transit(oldState, newState, false);
+                InPin.transit(newState, false);
             }
         }
     }
@@ -60,7 +59,7 @@ public class OutPins extends OutPin {
     @Override
     public void reSendState() {
         for (InPin pin : dest) {
-            pin.transit(state, state, false);
+            pin.transit(state, false);
         }
     }
 

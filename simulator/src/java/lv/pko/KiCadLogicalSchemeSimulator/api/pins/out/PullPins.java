@@ -47,19 +47,13 @@ public class PullPins extends PullPin {
 
     @Override
     public void setState(long newState) {
-        long oldState = this.state;
-        if (newState != oldState) {
-            this.state = newState;
-            for (InPin InPin : dest) {
-                InPin.transit(oldState, newState, false);
-            }
-        }
+        throw new RuntimeException("Can't set state on Pull pin");
     }
 
     @Override
     public void reSendState() {
         for (InPin pin : dest) {
-            pin.transit(state, state, false);
+            pin.transit(state, false);
         }
     }
 

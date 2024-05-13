@@ -37,6 +37,8 @@ public abstract class EdgeInPin extends InPin {
         super(id, parent);
     }
 
+    protected long oldState;
+
     public abstract void onFallingEdge();
     public abstract void onRisingEdge();
 
@@ -45,15 +47,15 @@ public abstract class EdgeInPin extends InPin {
     }
 
     @Override
-    public void transit(long oldState, long newState, boolean hiImpedance) {
+    public void transit(long newState, boolean hiImpedance) {
         rawState = newState & mask;
-        oldState &= mask;
-        if (oldState != rawState) {
-            if (oldState > 0) {
+        if (this.oldState != rawState) {
+            if (this.oldState > 0) {
                 onFallingEdge();
             } else {
                 onRisingEdge();
             }
+            this.oldState = rawState;
         }
     }
 }

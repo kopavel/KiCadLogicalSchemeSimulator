@@ -40,7 +40,7 @@ public abstract class PositiveOffsetMergerInPin extends NoOffsetMergerInPin {
     }
 
     @Override
-    public void transit(long oldState, long newState, boolean hiImpedance) {
+    public void transit(long newState, boolean hiImpedance) {
         rawState = (newState & mask) >> offset;
         this.hiImpedance = hiImpedance;
         onMerge();
