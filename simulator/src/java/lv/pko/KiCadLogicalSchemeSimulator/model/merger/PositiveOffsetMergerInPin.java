@@ -37,12 +37,11 @@ public abstract class PositiveOffsetMergerInPin extends NoOffsetMergerInPin {
     public PositiveOffsetMergerInPin(OutPin src, byte offset, long mask) {
         super(src, offset, mask);
         this.corrMask = mask >> offset;
+        this.nCorrMask = ~corrMask;
     }
 
     @Override
     public void transit(long newState, boolean hiImpedance) {
-        rawState = (newState & mask) >> offset;
-        this.hiImpedance = hiImpedance;
-        onMerge();
+        onMerge(newState >> offset, hiImpedance);
     }
 }

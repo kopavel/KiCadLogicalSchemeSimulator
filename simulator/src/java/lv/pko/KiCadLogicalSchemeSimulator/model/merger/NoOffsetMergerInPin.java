@@ -36,7 +36,8 @@ import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
 
 public abstract class NoOffsetMergerInPin extends InPin {
     public long corrMask;
-    public boolean hiImpedance;
+    public long nCorrMask;
+    public boolean hiImpedance = true;
 
     public NoOffsetMergerInPin(OutPin src, byte offset, long mask) {
         super(src.id, src.parent);
@@ -44,6 +45,7 @@ public abstract class NoOffsetMergerInPin extends InPin {
         this.nOffset = (byte) -offset;
         this.mask = mask;
         this.corrMask = mask;
+        this.nCorrMask = ~corrMask;
     }
 
     @Override
@@ -52,10 +54,8 @@ public abstract class NoOffsetMergerInPin extends InPin {
 
     @Override
     public void transit(long newState, boolean hiImpedance) {
-        rawState = newState & mask;
-        this.hiImpedance = hiImpedance;
-        onMerge();
+        onMerge(newState, hiImpedance);
     }
 
-    protected abstract void onMerge();
+    protected abstract void onMerge(long newState, boolean hiImpedance);
 }
