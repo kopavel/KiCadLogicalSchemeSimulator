@@ -212,11 +212,11 @@ public class Model {
                 //noinspection OptionalGetWithoutIsPresent
                 Map.Entry<Byte, Long> maskEntry = outEntry.getValue().entrySet()
                         .stream().findFirst().get();
+                inPin.mask = maskEntry.getValue();
                 inPin.addSource(outEntry.getKey());
                 if (maskEntry.getKey() > 0) {
                     inPin.setOffset(maskEntry.getKey());
                 }
-                inPin.mask = maskEntry.getValue();
             } else {
                 Merger merger = new Merger(inPin);
                 for (Map.Entry<OutPin, Map<Byte, Long>> outPinMap : inNet.getValue().outPins.entrySet()) {

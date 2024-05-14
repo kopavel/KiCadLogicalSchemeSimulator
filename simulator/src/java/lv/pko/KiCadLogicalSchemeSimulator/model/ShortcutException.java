@@ -38,9 +38,9 @@ public class ShortcutException extends RuntimeException {
     private final String message;
 
     public ShortcutException(NoOffsetMergerInPin... pins) {
-        StringBuilder message = new StringBuilder("Shortcut on");
+        StringBuilder message = new StringBuilder("Shortcut on ");
         for (NoOffsetMergerInPin pin : pins) {
-            message.append(pin.parent.id).append(":").append(pin.getState()).append(";");
+            message.append(pin.parent.id).append(":").append(pin.getState()).append("; ");
         }
         this.message = message.toString();
     }

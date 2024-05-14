@@ -76,8 +76,7 @@ public abstract class InPin extends Pin implements Manipulable {
     }
 
     public void transit(long newState, boolean hiImpedance) {
-        //todo make it on "OUT" side - it can be skipped, if OUT and IN are only one (in OutPin specifically).
-        rawState = newState & mask;
+        rawState = newState;
         onChange(rawState, hiImpedance);
     }
 

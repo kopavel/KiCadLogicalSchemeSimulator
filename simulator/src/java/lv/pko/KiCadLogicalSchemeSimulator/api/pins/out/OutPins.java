@@ -34,7 +34,7 @@ import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
 import lv.pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 public class OutPins extends OutPin {
-    protected InPin[] dest = new InPin[0];
+    protected MaskGroup[] groups = new MaskGroup[0];
 
     public OutPins(OutPin oldPin) {
         super(oldPin.id, oldPin.parent, oldPin.size);
@@ -43,28 +43,48 @@ public class OutPins extends OutPin {
 
     @Override
     public void addDest(InPin pin) {
-        dest = Utils.addToArray(dest, pin);
+        MaskGroup destGroup = null;
+        for (MaskGroup group : groups) {
+            if (group.mask == pin.mask) {
+                destGroup = group;
+                break;
+            }
+        }
+        if (destGroup == null) {
+            groups = Utils.addToArray(groups, new MaskGroup(pin));
+        } else {
+            destGroup.addDest(pin);
+        }
     }
 
     @Override
     public void setState(long newState) {
         if (newState != this.state) {
             this.state = newState;
-            for (InPin InPin : dest) {
-                InPin.transit(newState, false);
+            for (MaskGroup group : groups) {
+                long maskState = newState & group.mask;
+                if (group.oldVal != maskState) {
+                    group.oldVal = maskState;
+                    for (InPin InPin : group.dest) {
+                        InPin.transit(maskState, false);
+                    }
+                }
             }
         }
     }
 
     @Override
     public void reSendState() {
-        for (InPin pin : dest) {
-            pin.transit(state, false);
+        for (MaskGroup group : groups) {
+            group.oldVal = state & group.mask;
+            for (InPin pin : group.dest) {
+                pin.transit(group.oldVal, false);
+            }
         }
     }
 
     @Override
     public boolean noDest() {
-        return dest.length == 0;
+        return groups.length == 0;
     }
 }
