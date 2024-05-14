@@ -30,35 +30,23 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.KiCadLogicalSchemeSimulator.api.pins.out;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.EdgeInPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
-import lv.pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 public class TriStateOutPins extends TriStateOutPin {
-    protected MaskGroup[] groups = new MaskGroup[0];
+    protected InPin[] dest;
+    protected long destMask;
+    protected long oldVal;
 
-    public TriStateOutPins(TriStateOutPin oldPin) {
+    public TriStateOutPins(TriStateOutGroupedPins oldPin) {
         super(oldPin.id, oldPin.parent, oldPin.size);
         aliases = oldPin.aliases;
+        dest = oldPin.groups[0].dest;
+        destMask = oldPin.groups[0].mask;
     }
 
     @Override
     public void addDest(InPin pin) {
-        if (pin instanceof EdgeInPin) {
-            throw new RuntimeException("Edge pin on tri-state out");
-        }
-        MaskGroup destGroup = null;
-        for (MaskGroup group : groups) {
-            if (group.mask == pin.mask) {
-                destGroup = group;
-                break;
-            }
-        }
-        if (destGroup == null) {
-            groups = Utils.addToArray(groups, new MaskGroup(pin));
-        } else {
-            destGroup.addDest(pin);
-        }
+        throw new RuntimeException("Cant add dest to TriStateOutPins");
     }
 
     @Override
@@ -66,22 +54,18 @@ public class TriStateOutPins extends TriStateOutPin {
         if (hiImpedance) {
             hiImpedance = false;
             this.state = newState;
-            for (MaskGroup group : groups) {
-                group.oldVal = newState & group.mask;
-                for (InPin InPin : group.dest) {
-                    InPin.transit(group.oldVal, false);
-                }
+            oldVal = newState & destMask;
+            for (InPin InPin : dest) {
+                InPin.transit(oldVal, false);
             }
         } else {
             if (newState != this.state) {
                 this.state = newState;
-                for (MaskGroup group : groups) {
-                    long maskState = newState & group.mask;
-                    if (group.oldVal != maskState) {
-                        group.oldVal = maskState;
-                        for (InPin InPin : group.dest) {
-                            InPin.transit(maskState, false);
-                        }
+                long maskState = newState & destMask;
+                if (oldVal != maskState) {
+                    oldVal = maskState;
+                    for (InPin InPin : dest) {
+                        InPin.transit(maskState, false);
                     }
                 }
             }
@@ -90,11 +74,9 @@ public class TriStateOutPins extends TriStateOutPin {
 
     @Override
     public void reSendState() {
-        for (MaskGroup group : groups) {
-            group.oldVal = state & group.mask;
-            for (InPin pin : group.dest) {
-                pin.transit(group.oldVal, hiImpedance);
-            }
+        oldVal = state & destMask;
+        for (InPin pin : dest) {
+            pin.transit(oldVal, hiImpedance);
         }
     }
 
@@ -102,16 +84,14 @@ public class TriStateOutPins extends TriStateOutPin {
     public void setHiImpedance() {
         if (!hiImpedance) {
             hiImpedance = true;
-            for (MaskGroup group : groups) {
-                for (InPin inPin : group.dest) {
-                    inPin.transit(0, true);
-                }
+            for (InPin inPin : dest) {
+                inPin.transit(0, true);
             }
         }
     }
 
     @Override
     public boolean noDest() {
-        return groups.length == 0;
+        return dest.length == 0;
     }
 }

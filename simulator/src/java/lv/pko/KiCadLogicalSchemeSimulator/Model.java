@@ -197,9 +197,9 @@ public class Model {
                 if (outPin instanceof PullPin pullPin) {
                     replaceOut(outPin, new PullPins(pullPin));
                 } else if (outPin instanceof TriStateOutPin triStateOutPin) {
-                    replaceOut(outPin, new TriStateOutPins(triStateOutPin));
+                    replaceOut(outPin, new TriStateOutGroupedPins(triStateOutPin));
                 } else {
-                    replaceOut(outPin, new OutPins(outPin));
+                    replaceOut(outPin, new OutGroupedPins(outPin));
                 }
             }
         }
@@ -233,11 +233,15 @@ public class Model {
                 .forEach(outPin -> {
                     if (outPin.noDest()) {
                         replaceOut(outPin, switch (outPin) {
-                            case OutPins pin -> new NCOutPins(pin);
-                            case TriStateOutPins pin -> new NCTriStateOutPins(pin);
+                            case OutGroupedPins pin -> new NCOutPins(pin);
+                            case TriStateOutGroupedPins pin -> new NCTriStateOutPins(pin);
                             case TriStateOutPin pin -> new NCTriStateOutPin(pin);
                             case OutPin pin -> new NCOutPin(pin);
                         });
+                    } else if (outPin instanceof TriStateOutGroupedPins oldPin && oldPin.groups.length == 1) {
+                        replaceOut(outPin, new TriStateOutPins(oldPin));
+                    } else if (outPin instanceof OutGroupedPins oldPin && oldPin.groups.length == 1) {
+                        replaceOut(outPin, new OutPins(oldPin));
                     }
                 });
     }

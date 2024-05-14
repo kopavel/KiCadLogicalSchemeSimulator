@@ -33,11 +33,11 @@
 package lv.pko.KiCadLogicalSchemeSimulator.model;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class OutPinNet {
-    public final List<InPin> inPins = new ArrayList<>();
+    public final Set<InPin> inPins = new HashSet<>();
 
     public void addInPin(InPin pin) {
         inPins.add(pin);

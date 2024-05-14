@@ -30,34 +30,59 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.KiCadLogicalSchemeSimulator.api.pins.out;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.EdgeInPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
+import lv.pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
-public class OutPins extends OutPin {
-    protected InPin[] dest;
-    protected long destMask;
-    protected long oldVal;
+public class TriStateOutGroupedPins extends TriStateOutPin {
+    public MaskGroup[] groups = new MaskGroup[0];
 
-    public OutPins(OutGroupedPins oldPin) {
+    public TriStateOutGroupedPins(TriStateOutPin oldPin) {
         super(oldPin.id, oldPin.parent, oldPin.size);
         aliases = oldPin.aliases;
-        dest = oldPin.groups[0].dest;
-        destMask = oldPin.groups[0].mask;
     }
 
     @Override
     public void addDest(InPin pin) {
-        throw new RuntimeException("Cant add dest to OutPins");
+        if (pin instanceof EdgeInPin) {
+            throw new RuntimeException("Edge pin on tri-state out");
+        }
+        MaskGroup destGroup = null;
+        for (MaskGroup group : groups) {
+            if (group.mask == pin.mask) {
+                destGroup = group;
+                break;
+            }
+        }
+        if (destGroup == null) {
+            groups = Utils.addToArray(groups, new MaskGroup(pin));
+        } else {
+            destGroup.addDest(pin);
+        }
     }
 
     @Override
     public void setState(long newState) {
-        if (newState != this.state) {
+        if (hiImpedance) {
+            hiImpedance = false;
             this.state = newState;
-            long maskState = newState & destMask;
-            if (oldVal != maskState) {
-                oldVal = maskState;
-                for (InPin InPin : dest) {
-                    InPin.transit(maskState, false);
+            for (MaskGroup group : groups) {
+                group.oldVal = newState & group.mask;
+                for (InPin InPin : group.dest) {
+                    InPin.transit(group.oldVal, false);
+                }
+            }
+        } else {
+            if (newState != this.state) {
+                this.state = newState;
+                for (MaskGroup group : groups) {
+                    long maskState = newState & group.mask;
+                    if (group.oldVal != maskState) {
+                        group.oldVal = maskState;
+                        for (InPin InPin : group.dest) {
+                            InPin.transit(maskState, false);
+                        }
+                    }
                 }
             }
         }
@@ -65,14 +90,28 @@ public class OutPins extends OutPin {
 
     @Override
     public void reSendState() {
-        oldVal = state & destMask;
-        for (InPin pin : dest) {
-            pin.transit(oldVal, false);
+        for (MaskGroup group : groups) {
+            group.oldVal = state & group.mask;
+            for (InPin pin : group.dest) {
+                pin.transit(group.oldVal, hiImpedance);
+            }
+        }
+    }
+
+    @Override
+    public void setHiImpedance() {
+        if (!hiImpedance) {
+            hiImpedance = true;
+            for (MaskGroup group : groups) {
+                for (InPin inPin : group.dest) {
+                    inPin.transit(0, true);
+                }
+            }
         }
     }
 
     @Override
     public boolean noDest() {
-        return dest.length == 0;
+        return groups.length == 0;
     }
 }

@@ -29,30 +29,62 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.nc;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.Manipulable;
+package lv.pko.KiCadLogicalSchemeSimulator.api.pins.out;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.TriStateOutGroupedPins;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.TriStateOutPin;
+import lv.pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
-public class NCTriStateOutPins extends TriStateOutGroupedPins implements Manipulable {
-    public NCTriStateOutPins(TriStateOutPin outPin) {
-        super(outPin);
+public class OutGroupedPins extends OutPin {
+    public MaskGroup[] groups = new MaskGroup[0];
+
+    public OutGroupedPins(OutPin oldPin) {
+        super(oldPin.id, oldPin.parent, oldPin.size);
+        aliases = oldPin.aliases;
     }
 
     @Override
     public void addDest(InPin pin) {
-        throw new RuntimeException("Can't add dest to NC Out Pin");
+        MaskGroup destGroup = null;
+        for (MaskGroup group : groups) {
+            if (group.mask == pin.mask) {
+                destGroup = group;
+                break;
+            }
+        }
+        if (destGroup == null) {
+            groups = Utils.addToArray(groups, new MaskGroup(pin));
+        } else {
+            destGroup.addDest(pin);
+        }
     }
 
     @Override
     public void setState(long newState) {
+        if (newState != this.state) {
+            this.state = newState;
+            for (MaskGroup group : groups) {
+                long maskState = newState & group.mask;
+                if (group.oldVal != maskState) {
+                    group.oldVal = maskState;
+                    for (InPin InPin : group.dest) {
+                        InPin.transit(maskState, false);
+                    }
+                }
+            }
+        }
     }
 
     @Override
     public void reSendState() {
+        for (MaskGroup group : groups) {
+            group.oldVal = state & group.mask;
+            for (InPin pin : group.dest) {
+                pin.transit(group.oldVal, false);
+            }
+        }
     }
 
-    public void setHiImpedance() {
+    @Override
+    public boolean noDest() {
+        return groups.length == 0;
     }
 }

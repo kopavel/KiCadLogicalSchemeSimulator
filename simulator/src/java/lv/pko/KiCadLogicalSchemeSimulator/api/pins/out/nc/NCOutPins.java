@@ -32,10 +32,10 @@
 package lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.nc;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.Manipulable;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.OutGroupedPins;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPins;
 
-public class NCOutPins extends OutPins implements Manipulable {
+public class NCOutPins extends OutGroupedPins implements Manipulable {
     public NCOutPins(OutPin outPin) {
         super(outPin);
     }
