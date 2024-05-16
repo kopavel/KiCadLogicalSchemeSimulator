@@ -1,11 +1,11 @@
 <component name="ProjectRunConfigurationManager">
-	<configuration default="false" name="KiCadLogicalSchemeSimulator [run z80]" type="GradleRunConfiguration" factoryName="Gradle">
+	<configuration default="false" name="KiCadLogicalSchemeSimulator [counters]" type="GradleRunConfiguration" factoryName="Gradle">
 		<ExternalSystemSettings>
 			<option name="executionName"/>
 			<option name="externalProjectPath" value="$PROJECT_DIR$"/>
 			<option name="externalSystemIdString" value="GRADLE"/>
 			<option name="scriptParameters"
-			        value="-PappArgs=&quot;-m=../../kicad_symbols/SymbolsDescription.xml,z80.net&quot; -PworkDir=&quot;/stuff/examples/z80&quot;"/>
+			        value="-PappArgs=&quot;-m=../../kicad_symbols/SymbolsDescription.xml,counters.net&quot; -PworkDir=&quot;stuff/examples/counters&quot;"/>
 			<option name="taskDescriptions">
 				<list/>
 			</option>

@@ -29,25 +29,18 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lv.pko.KiCadLogicalSchemeSimulator.api.pins;
-import lombok.NoArgsConstructor;
+package lv.pko.KiCadLogicalSchemeSimulator.api.pins.in;
+import lombok.Getter;
 
-public abstract class PassivePin {
-    public final String id;
-    public final String schemaPartId;
+@Getter
+public class ShortcutException extends RuntimeException {
+    private final String message;
 
-    public PassivePin(String id, String schemaPartId) {
-        this.id = id;
-        this.schemaPartId = schemaPartId;
-    }
-
-    public abstract OtherState otherState();
-    public abstract void propagate(long state, boolean hiImpedance);
-
-    @NoArgsConstructor
-    public static class OtherState {
-        public long value;
-        public boolean weak;
+    public ShortcutException(InPin... pins) {
+        StringBuilder message = new StringBuilder("Shortcut on ");
+        for (InPin pin : pins) {
+            message.append(pin.parent.id).append(":").append(pin.getState()).append("; ");
+        }
+        this.message = message.toString();
     }
 }
-

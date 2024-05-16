@@ -44,6 +44,14 @@ public abstract class EdgeInPin extends InPin {
 
     @Override
     public void onChange(long newState, boolean hiImpedance) {
+        if (this.oldState != rawState) {
+            if (this.oldState > 0) {
+                onFallingEdge();
+            } else {
+                onRisingEdge();
+            }
+            this.oldState = rawState;
+        }
     }
 
     @Override

@@ -40,7 +40,6 @@ public class DCounter extends SchemaPart {
     private final InPin jPin;
     private final boolean carryReverse;
     private final boolean bdReverse;
-    private final boolean eReverse;
     private OutPin outPin;
     private OutPin cOutPin;
     private boolean countUp = true;
@@ -56,7 +55,7 @@ public class DCounter extends SchemaPart {
         super(id, sParam);
         carryReverse = params.containsKey("carryReverse");
         bdReverse = params.containsKey("bdReverse");
-        eReverse = params.containsKey("eReverse");
+        boolean eReverse = params.containsKey("eReverse");
         addOutPin("Q", 4);
         addInPin(new InPin("CI", this) {
             @Override

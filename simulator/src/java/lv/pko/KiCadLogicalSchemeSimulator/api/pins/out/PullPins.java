@@ -30,7 +30,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.KiCadLogicalSchemeSimulator.api.pins.out;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.FloatingPinException;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.ShortcutException;
 import lv.pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 public class PullPins extends PullPin {
@@ -52,8 +54,18 @@ public class PullPins extends PullPin {
 
     @Override
     public void reSendState() {
+        RuntimeException result = null;
         for (InPin pin : dest) {
-            pin.transit(state, false);
+            try {
+                pin.transit(state, false);//FixMe - pass new param "isPull"
+            } catch (FloatingPinException | ShortcutException e) {
+                if (result == null) {
+                    result = e;
+                }
+            }
+        }
+        if (result != null) {
+            throw result;
         }
     }
 

@@ -33,15 +33,12 @@ package lv.pko.KiCadLogicalSchemeSimulator.api.pins.out;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
 
 public class TriStateOutPins extends TriStateOutPin {
-    protected InPin[] dest;
-    protected long destMask;
-    protected long oldVal;
+    protected MaskGroupPin dest;
 
     public TriStateOutPins(TriStateOutGroupedPins oldPin) {
         super(oldPin.id, oldPin.parent, oldPin.size);
         aliases = oldPin.aliases;
-        dest = oldPin.groups[0].dest;
-        destMask = oldPin.groups[0].mask;
+        dest = oldPin.groups[0];
     }
 
     @Override
@@ -54,44 +51,30 @@ public class TriStateOutPins extends TriStateOutPin {
         if (hiImpedance) {
             hiImpedance = false;
             this.state = newState;
-            oldVal = newState & destMask;
-            for (InPin InPin : dest) {
-                InPin.transit(oldVal, false);
-            }
+            dest.transit(newState, false);
         } else {
             if (newState != this.state) {
                 this.state = newState;
-                long maskState = newState & destMask;
-                if (oldVal != maskState) {
-                    oldVal = maskState;
-                    for (InPin InPin : dest) {
-                        InPin.transit(maskState, false);
-                    }
-                }
+                dest.transit(newState, false);
             }
         }
     }
 
     @Override
     public void reSendState() {
-        oldVal = state & destMask;
-        for (InPin pin : dest) {
-            pin.transit(oldVal, hiImpedance);
-        }
+        dest.resend(state, false);
     }
 
     @Override
     public void setHiImpedance() {
         if (!hiImpedance) {
             hiImpedance = true;
-            for (InPin inPin : dest) {
-                inPin.transit(0, true);
-            }
+            dest.transit(0, true);
         }
     }
 
     @Override
     public boolean noDest() {
-        return dest.length == 0;
+        return true;
     }
 }

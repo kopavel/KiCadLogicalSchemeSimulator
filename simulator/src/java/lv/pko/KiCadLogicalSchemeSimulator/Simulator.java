@@ -120,6 +120,9 @@ public class Simulator implements Runnable {
     }
 
     public static void saveLayout() throws RuntimeException {
+        if (model == null) {
+            return;
+        }
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(netFilePathNoExtension + ".sym_layout"))) {
             bw.write("locale:" + Locale.getDefault().getLanguage());
             bw.write("\n");

@@ -30,7 +30,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.PassivePin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.PullPin;
@@ -45,7 +44,6 @@ public abstract class SchemaPart {
     public final String id;
     public final Map<String, OutPin> outMap = new LinkedHashMap<>();
     public final Map<String, InPin> inMap = new LinkedHashMap<>();
-    public final Map<String, PassivePin> passiveMap = new HashMap<>();
     protected final Map<String, String> params = new HashMap<>();
     protected final long hiState;
     protected final long loState;
@@ -97,11 +95,6 @@ public abstract class SchemaPart {
         for (String alias : pin.aliases.keySet()) {
             inAliasMap.put(alias, pin);
         }
-        return pin;
-    }
-
-    public <T extends PassivePin> T addPassivePin(T pin) {
-        passiveMap.put(pin.id, pin);
         return pin;
     }
 
@@ -165,14 +158,6 @@ public abstract class SchemaPart {
         }
         if (pin == null) {
             throw new RuntimeException("Unknown output pin " + name + " in SchemaPart " + id);
-        }
-        return pin;
-    }
-
-    public PassivePin getPassivePin(String name) {
-        PassivePin pin = passiveMap.get(name);
-        if (pin == null) {
-            throw new RuntimeException("Unknown passive pin " + name + " in SchemaPart " + id);
         }
         return pin;
     }

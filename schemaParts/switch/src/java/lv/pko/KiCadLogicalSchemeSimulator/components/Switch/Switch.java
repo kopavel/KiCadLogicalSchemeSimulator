@@ -31,46 +31,69 @@
  */
 package lv.pko.KiCadLogicalSchemeSimulator.components.Switch;
 import lv.pko.KiCadLogicalSchemeSimulator.api.AbstractUiComponent;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.PassivePin;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.PassivePin.OtherState;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.ShortcutException;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.TriStateOutPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.InteractiveSchemaPart;
 import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 
 //FixME rework it completely for new model
 public class Switch extends SchemaPart implements InteractiveSchemaPart {
-    private final PassivePin pin1;
-    private final PassivePin pin2;
-    boolean state;
+    private final InPin pin1In;
+    private final InPin pin2In;
+    private boolean state;
+    private boolean pin1HiImpedance;
+    private boolean pin2HiImpedance;
+    private TriStateOutPin pin1Out;
+    private TriStateOutPin pin2Out;
     private SwitchUiComponent switchUiComponent;
 
     protected Switch(String id, String sParams) {
         super(id, sParams);
-        pin1 = addPassivePin(new PassivePin("IN1", id) {
+        pin1In = addInPin(new InPin("IN1", this) {
             @Override
-            public OtherState otherState() {
-                return getOtherState(1);
-            }
-
-            @Override
-            public void propagate(long state, boolean hiImpedance) {
-                propagateState(state, hiImpedance, 1);
-            }
-        });
-        pin2 = addPassivePin(new PassivePin("IN2", id) {
-            @Override
-            public OtherState otherState() {
-                return getOtherState(2);
-            }
-
-            @Override
-            public void propagate(long state, boolean hiImpedance) {
-                propagateState(state, hiImpedance, 2);
+            public void onChange(long newState, boolean hiImpedance) {
+                if (!hiImpedance && !pin2HiImpedance) {
+                    throw new ShortcutException(pin1In, pin2In);
+                }
+                pin1HiImpedance = hiImpedance;
+                if (state) {
+                    if (hiImpedance) {
+                        pin2Out.setHiImpedance();
+                        //FixMe check isPull here
+                    } else if (!pin2HiImpedance) {
+                        pin2Out.setState(newState);
+                    }
+                }
             }
         });
+        pin2In = addInPin(new InPin("IN2", this) {
+            @Override
+            public void onChange(long newState, boolean hiImpedance) {
+                if (!hiImpedance && !pin1HiImpedance) {
+                    throw new ShortcutException(pin1In, pin2In);
+                }
+                pin2HiImpedance = hiImpedance;
+                if (state) {
+                    if (hiImpedance) {
+                        pin1Out.setHiImpedance();
+                        //FixMe check isPull here
+                    } else if (!pin1HiImpedance) {
+                        pin1Out.setState(newState);
+                    }
+                }
+            }
+        });
+        addTriStateOutPin("IN1", 1);
+        addTriStateOutPin("IN2", 1);
     }
 
     @Override
     public void initOuts() {
+        pin1Out = (TriStateOutPin) getOutPin("IN1");
+        pin1Out.hiImpedance = true;
+        pin2Out = (TriStateOutPin) getOutPin("IN2");
+        pin2Out.hiImpedance = true;
     }
 
     @Override
@@ -83,35 +106,19 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
 
     public void setState(boolean state) {
         this.state = state;
-/*
-        pin1.reSendState();
-        if (!state) {
-            pin2.reSendState();
+        if (state) {
+            if (!pin2HiImpedance && !pin1HiImpedance) {
+                throw new ShortcutException(pin1In, pin2In);
+            }
+            //FixMe check isPull here
+            if (!pin1HiImpedance) {
+                pin2Out.setState(pin1In.getState());
+            } else if (!pin2HiImpedance) {
+                pin1Out.setState(pin2In.getState());
+            }
+        } else {
+            pin1Out.setHiImpedance();
+            pin2Out.setHiImpedance();
         }
-*/
-    }
-
-    private OtherState getOtherState(int pinNo) {
-        OtherState retVal = new OtherState();
-        //        long otherState = pinNo == 1 ? pin1.getState() : pin2.bus.getState();
-        //retVal.weak &= ((outPin instanceof PullPin) || (outPin instanceof TriStateOutPin ts && ts.hiImpedance));
-        //retVal.value = retVal.value.merge(outPin.state.get(), pin.wire);
-        return retVal;
-    }
-
-    private void propagateState(long newState, boolean hiImpedance, int pin) {
-/*
-        Bus bus = pin == 1 ? pin1.bus : pin2.bus;
-        long oldState;
-        oldState = bus.getState();
-        if (oldState == newState) {
-            return;
-        }
-*/
-/*
-        for (InPin inPin : bus.getInPin()) {
-            inPin.onChange(oldState, newState, hiImpedance);
-        }
-*/
     }
 }

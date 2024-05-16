@@ -32,30 +32,35 @@
  */
 package lv.pko.KiCadLogicalSchemeSimulator.model.merger;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.ShortcutException;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.PullPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.TriStateOutPin;
-import lv.pko.KiCadLogicalSchemeSimulator.model.ShortcutException;
 import lv.pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 public class Merger extends OutPin {
-    long weakPins = -1;
+    long hiImpedancePins;
     private NoOffsetMergerInPin[] inputs = new NoOffsetMergerInPin[0];
     private long strongMask;
+    private long pullMask = 0;
     private long pullState = 0;
+    private long nPullMask = -1;
 
     public Merger(InPin dest) {
         super(dest.id, dest.parent, dest.size);
         for (int i = 0; i < dest.size; i++) {
             dest.mask = (dest.mask << 1) | 1;
         }
+        hiImpedancePins = dest.mask;
         dest.addSource(this);
     }
 
     public void addSource(OutPin src, long inMask, byte offset) {
         NoOffsetMergerInPin inPin = createInput(src, offset, inMask);
         if (src instanceof PullPin) {
-            pullState |= inPin.correctState(src.state);
+            pullState |= inPin.correctState(src.state) & dest.mask;
+            pullMask |= inPin.corrMask;
+            nPullMask = ~pullMask;
             state = pullState;
         } else {
             if (!(src instanceof TriStateOutPin)) {
@@ -63,6 +68,7 @@ public class Merger extends OutPin {
                     throw new RuntimeException("Non tri-state pins overlap on IN pin:" + dest.getName());
                 }
                 strongMask |= inPin.corrMask;
+                hiImpedancePins &= ~strongMask;
             }
             inputs = Utils.addToArray(inputs, inPin);
             src.addDest(inPin);
@@ -78,25 +84,23 @@ public class Merger extends OutPin {
                     if (newImpedance != hiImpedance) {
                         hiImpedance = newImpedance;
                         if (newImpedance) {
-                            weakPins |= corrMask;
+                            hiImpedancePins |= corrMask;
                             state &= nCorrMask;
-                            state |= pullState & weakPins;
                         } else {
-                            if ((weakPins | corrMask) != weakPins) {
+                            if ((hiImpedancePins | corrMask) != hiImpedancePins) {
                                 throw new ShortcutException(inputs);
                             }
-                            weakPins &= nCorrMask;
+                            hiImpedancePins &= nCorrMask;
                             state &= nCorrMask;
                             state |= newState;
-                            state |= pullState & weakPins;
                         }
+                        state |= pullState & hiImpedancePins;
                     } else if (!newImpedance) {
                         state &= nCorrMask;
                         state |= newState;
                     }
                     dest.rawState = state;
-                    //FixMe what about edge pins??
-                    dest.onChange(state, (weakPins & strongMask) > 0);
+                    dest.onChange(state, (hiImpedancePins & nPullMask) > 0);
                 }
             };
         } else if (offset > 0) {
@@ -106,25 +110,23 @@ public class Merger extends OutPin {
                     if (newImpedance != hiImpedance) {
                         hiImpedance = newImpedance;
                         if (newImpedance) {
-                            weakPins |= corrMask;
+                            hiImpedancePins |= corrMask;
                             state &= nCorrMask;
-                            state |= pullState & weakPins;
                         } else {
-                            if ((weakPins | corrMask) != weakPins) {
+                            if ((hiImpedancePins | corrMask) != hiImpedancePins) {
                                 throw new ShortcutException(inputs);
                             }
-                            weakPins &= nCorrMask;
+                            hiImpedancePins &= nCorrMask;
                             state &= nCorrMask;
                             state |= newState;
-                            state |= pullState & weakPins;
                         }
+                        state |= pullState & hiImpedancePins;
                     } else if (!newImpedance) {
                         state &= nCorrMask;
                         state |= newState;
                     }
                     dest.rawState = state;
-                    //FixMe what about edge pins??
-                    dest.onChange(state, (weakPins & strongMask) > 0);
+                    dest.onChange(state, (hiImpedancePins & nPullMask) > 0);
                 }
             };
         } else {
@@ -134,53 +136,26 @@ public class Merger extends OutPin {
                     if (newImpedance != hiImpedance) {
                         hiImpedance = newImpedance;
                         if (newImpedance) {
-                            weakPins |= corrMask;
+                            hiImpedancePins |= corrMask;
                             state &= nCorrMask;
-                            state |= pullState & weakPins;
                         } else {
-                            if ((weakPins | corrMask) != weakPins) {
+                            if ((hiImpedancePins | corrMask) != hiImpedancePins) {
                                 throw new ShortcutException(inputs);
                             }
-                            weakPins &= nCorrMask;
+                            hiImpedancePins &= nCorrMask;
                             state &= nCorrMask;
                             state |= newState;
-                            state |= pullState & weakPins;
                         }
+                        state |= pullState & hiImpedancePins;
                     } else if (!newImpedance) {
                         state &= nCorrMask;
                         state |= newState;
                     }
                     dest.rawState = state;
-                    //FixMe what about edge pins??
-                    dest.onChange(state, (weakPins & strongMask) > 0);
+                    dest.onChange(state, (hiImpedancePins & nPullMask) > 0);
                 }
             };
         }
         return inPin;
-    }
-
-    private void merge(NoOffsetMergerInPin input, long newState, boolean newImpedance) {
-        if (newImpedance != input.hiImpedance) {
-            input.hiImpedance = newImpedance;
-            if (newImpedance) {
-                weakPins |= input.corrMask;
-                state &= input.nCorrMask;
-                state |= pullState & weakPins;
-            } else {
-                if ((weakPins | input.corrMask) != weakPins) {
-                    throw new ShortcutException(inputs);
-                }
-                weakPins &= input.nCorrMask;
-                state &= input.nCorrMask;
-                state |= newState;
-                state |= pullState & weakPins;
-            }
-        } else if (!newImpedance) {
-            state &= input.nCorrMask;
-            state |= newState;
-        }
-        dest.rawState = state;
-        //FixMe what about edge pins??
-        dest.onChange(state, (weakPins & strongMask) > 0);
     }
 }

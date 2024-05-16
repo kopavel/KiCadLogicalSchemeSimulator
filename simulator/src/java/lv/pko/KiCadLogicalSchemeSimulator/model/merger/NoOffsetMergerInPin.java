@@ -33,11 +33,12 @@
 package lv.pko.KiCadLogicalSchemeSimulator.model.merger;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.TriStateOutPin;
 
 public abstract class NoOffsetMergerInPin extends InPin {
     public long corrMask;
     public long nCorrMask;
-    public boolean hiImpedance = true;
+    public boolean hiImpedance = false;
 
     public NoOffsetMergerInPin(OutPin src, byte offset, long mask) {
         super(src.id, src.parent);
@@ -46,6 +47,10 @@ public abstract class NoOffsetMergerInPin extends InPin {
         this.mask = mask;
         this.corrMask = mask;
         this.nCorrMask = ~corrMask;
+        this.source = src;
+        if (src instanceof TriStateOutPin triStateOutPin) {
+            hiImpedance = triStateOutPin.hiImpedance;
+        }
     }
 
     @Override

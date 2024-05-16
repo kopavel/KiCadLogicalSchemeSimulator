@@ -30,11 +30,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.KiCadLogicalSchemeSimulator.api.pins.out;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.FloatingPinException;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.ShortcutException;
 import lv.pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 public class OutGroupedPins extends OutPin {
-    public MaskGroup[] groups = new MaskGroup[0];
+    public MaskGroupPin[] groups = new MaskGroupPin[0];
 
     public OutGroupedPins(OutPin oldPin) {
         super(oldPin.id, oldPin.parent, oldPin.size);
@@ -43,17 +45,24 @@ public class OutGroupedPins extends OutPin {
 
     @Override
     public void addDest(InPin pin) {
-        MaskGroup destGroup = null;
-        for (MaskGroup group : groups) {
-            if (group.mask == pin.mask) {
-                destGroup = group;
+        int destGroupId = -1;
+        for (int i = 0; i < groups.length; i++) {
+            if (groups[i].mask == pin.mask) {
+                destGroupId = i;
                 break;
             }
         }
-        if (destGroup == null) {
-            groups = Utils.addToArray(groups, new MaskGroup(pin));
+        if (destGroupId == -1) {
+            groups = Utils.addToArray(groups, new MaskGroupPin(pin));
         } else {
-            destGroup.addDest(pin);
+            MaskGroupPins targetGroup;
+            if (groups[destGroupId] instanceof MaskGroupPins pins) {
+                targetGroup = pins;
+            } else {
+                targetGroup = new MaskGroupPins(groups[destGroupId]);
+                groups[destGroupId] = targetGroup;
+            }
+            targetGroup.addDest(pin);
         }
     }
 
@@ -61,25 +70,26 @@ public class OutGroupedPins extends OutPin {
     public void setState(long newState) {
         if (newState != this.state) {
             this.state = newState;
-            for (MaskGroup group : groups) {
-                long maskState = newState & group.mask;
-                if (group.oldVal != maskState) {
-                    group.oldVal = maskState;
-                    for (InPin InPin : group.dest) {
-                        InPin.transit(maskState, false);
-                    }
-                }
+            for (MaskGroupPin group : groups) {
+                group.transit(newState, false);
             }
         }
     }
 
     @Override
     public void reSendState() {
-        for (MaskGroup group : groups) {
-            group.oldVal = state & group.mask;
-            for (InPin pin : group.dest) {
-                pin.transit(group.oldVal, false);
+        RuntimeException result = null;
+        for (MaskGroupPin group : groups) {
+            try {
+                group.resend(group.oldVal, false);
+            } catch (FloatingPinException | ShortcutException e) {
+                if (result == null) {
+                    result = e;
+                }
             }
+        }
+        if (result != null) {
+            throw result;
         }
     }
 

@@ -32,16 +32,14 @@
 package lv.pko.KiCadLogicalSchemeSimulator.api.pins.out;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
 
+
 public class OutPins extends OutPin {
-    protected InPin[] dest;
-    protected long destMask;
-    protected long oldVal;
+    protected MaskGroupPin dest;
 
     public OutPins(OutGroupedPins oldPin) {
         super(oldPin.id, oldPin.parent, oldPin.size);
         aliases = oldPin.aliases;
-        dest = oldPin.groups[0].dest;
-        destMask = oldPin.groups[0].mask;
+        dest = oldPin.groups[0];
     }
 
     @Override
@@ -53,26 +51,17 @@ public class OutPins extends OutPin {
     public void setState(long newState) {
         if (newState != this.state) {
             this.state = newState;
-            long maskState = newState & destMask;
-            if (oldVal != maskState) {
-                oldVal = maskState;
-                for (InPin InPin : dest) {
-                    InPin.transit(maskState, false);
-                }
-            }
+            dest.transit(newState, false);
         }
     }
 
     @Override
     public void reSendState() {
-        oldVal = state & destMask;
-        for (InPin pin : dest) {
-            pin.transit(oldVal, false);
-        }
+        dest.resend(state, false);
     }
 
     @Override
     public boolean noDest() {
-        return dest.length == 0;
+        return true;
     }
 }

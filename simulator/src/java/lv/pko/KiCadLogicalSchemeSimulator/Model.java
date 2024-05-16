@@ -33,6 +33,7 @@
 package lv.pko.KiCadLogicalSchemeSimulator;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.FloatingPinException;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.ShortcutException;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.*;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.nc.NCOutPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.nc.NCOutPins;
@@ -43,7 +44,6 @@ import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
 import lv.pko.KiCadLogicalSchemeSimulator.model.InPinInterconnect;
 import lv.pko.KiCadLogicalSchemeSimulator.model.InPinNet;
 import lv.pko.KiCadLogicalSchemeSimulator.model.OutPinNet;
-import lv.pko.KiCadLogicalSchemeSimulator.model.ShortcutException;
 import lv.pko.KiCadLogicalSchemeSimulator.model.merger.Merger;
 import lv.pko.KiCadLogicalSchemeSimulator.parsers.pojo.Comp;
 import lv.pko.KiCadLogicalSchemeSimulator.parsers.pojo.Export;
@@ -144,11 +144,7 @@ public class Model {
                     OutPin outPin = schemaPart.getOutPin(pinName);
                     outPins.put(outPin, outPin.aliases.get(pinName));
                     break;
-/*
                 case "passive":
-                    outPins.add(schemaPart.getPassivePin(pinName));
-                    break;
-*/
                 case "bidirectional":
                     inPin = schemaPart.getInPin(pinName);
                     inPins.computeIfAbsent(inPin, p -> new ArrayList<>()).add(inPin.aliases.get(pinName));
