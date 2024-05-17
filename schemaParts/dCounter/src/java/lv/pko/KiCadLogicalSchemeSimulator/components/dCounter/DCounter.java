@@ -46,10 +46,10 @@ public class DCounter extends SchemaPart {
     private boolean ciState = true;
     private boolean cState;
     private boolean eState;
-    private boolean presetDisabled = false;
+    private boolean presetDisabled = true;
     private long count = 0;
     private long maxCount = 15;
-    private boolean resetInactive;
+    private boolean resetInactive = true;
 
     protected DCounter(String id, String sParam) {
         super(id, sParam);
@@ -57,9 +57,10 @@ public class DCounter extends SchemaPart {
         bdReverse = params.containsKey("bdReverse");
         boolean eReverse = params.containsKey("eReverse");
         addOutPin("Q", 4);
+        addOutPin("CO", 1);
         addInPin(new InPin("CI", this) {
             @Override
-            public void onChange(long newState, boolean hiImpedance) {
+            public void onChange(long newState, boolean hiImpedance, boolean weak) {
                 if (hiImpedance) {
                     throw new FloatingPinException(this);
                 }
@@ -71,7 +72,7 @@ public class DCounter extends SchemaPart {
         });
         jPin = addInPin(new InPin("J", this) {
             @Override
-            public void onChange(long newState, boolean hiImpedance) {
+            public void onChange(long newState, boolean hiImpedance, boolean weak) {
                 if (!presetDisabled && resetInactive) {
                     count = getState();
                     outPin.setState(count);
@@ -80,7 +81,7 @@ public class DCounter extends SchemaPart {
         });
         addInPin(new InPin("PE", this) {
             @Override
-            public void onChange(long newState, boolean hiImpedance) {
+            public void onChange(long newState, boolean hiImpedance, boolean weak) {
                 if (hiImpedance) {
                     throw new FloatingPinException(this);
                 }
@@ -93,19 +94,19 @@ public class DCounter extends SchemaPart {
         });
         addInPin(new InPin("UD", this) {
             @Override
-            public void onChange(long newState, boolean hiImpedance) {
+            public void onChange(long newState, boolean hiImpedance, boolean weak) {
                 countUp = rawState > 0;
             }
         });
         addInPin(new InPin("BD", this) {
             @Override
-            public void onChange(long newState, boolean hiImpedance) {
+            public void onChange(long newState, boolean hiImpedance, boolean weak) {
                 maxCount = ((rawState > 0) ^ bdReverse) ? 15 : 9;
             }
         });
         addInPin(new InPin("R", this) {
             @Override
-            public void onChange(long newState, boolean hiImpedance) {
+            public void onChange(long newState, boolean hiImpedance, boolean weak) {
                 resetInactive = newState == 0;
                 if (!resetInactive) {
                     count = 0;
@@ -147,12 +148,12 @@ public class DCounter extends SchemaPart {
         if (eReverse) {
             addInPin(new EdgeInPin("E", this) {
                 @Override
-                public void onFallingEdge() {
+                public void onRisingEdge() {
                     eState = false;
                 }
 
                 @Override
-                public void onRisingEdge() {
+                public void onFallingEdge() {
                     eState = true;
                     if (cState) {
                         process();
@@ -162,7 +163,7 @@ public class DCounter extends SchemaPart {
         } else {
             addInPin(new EdgeInPin("E", this) {
                 @Override
-                public void onFallingEdge() {
+                public void onRisingEdge() {
                     eState = true;
                     if (cState) {
                         process();
@@ -170,7 +171,7 @@ public class DCounter extends SchemaPart {
                 }
 
                 @Override
-                public void onRisingEdge() {
+                public void onFallingEdge() {
                     eState = false;
                 }
             });
@@ -207,6 +208,7 @@ public class DCounter extends SchemaPart {
                     }
                 }
             }
+            outPin.setState(count);
         }
     }
 }

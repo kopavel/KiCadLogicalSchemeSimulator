@@ -44,7 +44,7 @@ public class XorGate extends SchemaPart {
         super(id, sParam);
         addInPin(new InPin("IN0", this) {
             @Override
-            public void onChange(long newState, boolean hiImpedance) {
+            public void onChange(long newState, boolean hiImpedance, boolean weak) {
                 if (hiImpedance) {
                     throw new FloatingPinException(this);
                 }
@@ -54,7 +54,7 @@ public class XorGate extends SchemaPart {
         });
         addInPin(new InPin("IN1", this) {
             @Override
-            public void onChange(long newState, boolean hiImpedance) {
+            public void onChange(long newState, boolean hiImpedance, boolean weak) {
                 if (hiImpedance) {
                     throw new FloatingPinException(this);
                 }

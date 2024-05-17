@@ -205,7 +205,7 @@
 		</symbol>
 		<symbol name="4520" symPartClass="DCounter" symPartParam="carryReverse">
 			<unit pinMap="1=C;7=R;2=E;3=Q0;4=Q1;5=Q2;6=Q3"/>
-			<unit pinMap="9=C;15=R;10=E;11=Q0;12=Q1;13;Q2;14=Q3"/>
+			<unit pinMap="9=C;15=R;10=E;11=Q0;12=Q1;13=Q2;14=Q3"/>
 		</symbol>
 		<symbol name="4543" symPartClass="StateMachine" symPartParam="size=4;outSize=7;states=126,48,109,121,51,91,95,112,127,123,0,0,0,0,0,0">
 			<unit pinMap="5=IN0;3=IN1;3=IN2;4=IN3;7=D;1=S;6=R;9=OUT0;10=OUT1;11=OUT2;12=OUT3;13=OUT4;15=OUT5;14=OUT6"/>

@@ -57,7 +57,7 @@ public class ClassManipulator extends SchemaPart {
     public void test() throws Exception {
         InPin inPin = new InPin("1", this) {
             @Override
-            public void onChange(long newState, boolean hiImpedance) {
+            public void onChange(long newState, boolean hiImpedance, boolean weak) {
                 long correctedState = correctState(newState);
             }
         };

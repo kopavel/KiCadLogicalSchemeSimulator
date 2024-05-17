@@ -100,7 +100,7 @@ public class Merger extends OutPin {
                         state |= newState;
                     }
                     dest.rawState = state;
-                    dest.onChange(state, (hiImpedancePins & nPullMask) > 0);
+                    dest.onChange(state, (hiImpedancePins & nPullMask) > 0, (state & strongMask) == 0);
                 }
             };
         } else if (offset > 0) {
@@ -126,7 +126,7 @@ public class Merger extends OutPin {
                         state |= newState;
                     }
                     dest.rawState = state;
-                    dest.onChange(state, (hiImpedancePins & nPullMask) > 0);
+                    dest.onChange(state, (hiImpedancePins & nPullMask) > 0, (state & strongMask) == 0);
                 }
             };
         } else {
@@ -152,7 +152,7 @@ public class Merger extends OutPin {
                         state |= newState;
                     }
                     dest.rawState = state;
-                    dest.onChange(state, (hiImpedancePins & nPullMask) > 0);
+                    dest.onChange(state, (hiImpedancePins & nPullMask) > 0, (state & strongMask) == 0);
                 }
             };
         }

@@ -49,7 +49,7 @@ public class DcTrigger extends SchemaPart {
         dPin = addInPin("D", 1);
         rPin = addInPin(new InPin("R", this) {
             @Override
-            public void onChange(long newState, boolean hiImpedance) {
+            public void onChange(long newState, boolean hiImpedance, boolean weak) {
                 clockEnabled = (newState | sPin.rawState) == 0;
                 if (newState > 0) {
                     iqOut.setState(hiState);
@@ -59,7 +59,7 @@ public class DcTrigger extends SchemaPart {
         });
         sPin = addInPin(new InPin("S", this) {
             @Override
-            public void onChange(long newState, boolean hiImpedance) {
+            public void onChange(long newState, boolean hiImpedance, boolean weak) {
                 clockEnabled = (newState | sPin.rawState) == 0;
                 if (newState > 0) {
                     qOut.setState(hiState);

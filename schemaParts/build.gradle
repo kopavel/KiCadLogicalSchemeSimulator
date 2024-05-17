@@ -52,8 +52,8 @@ sourceSets {
 dependencies {
     runtimeOnly project(":schemaParts:and")
     runtimeOnly project(":schemaParts:buffer")
-    runtimeOnly project(":schemaParts:oscillator")
     runtimeOnly project(":schemaParts:counter")
+    runtimeOnly project(":schemaParts:dCounter")
     runtimeOnly project(":schemaParts:dcTrigger")
     runtimeOnly project(":schemaParts:decoder")
     runtimeOnly project(":schemaParts:display")
@@ -62,6 +62,7 @@ dependencies {
     runtimeOnly project(":schemaParts:led")
     runtimeOnly project(":schemaParts:multiplexer")
     runtimeOnly project(":schemaParts:or")
+    runtimeOnly project(":schemaParts:oscillator")
     runtimeOnly project(":schemaParts:power")
     runtimeOnly project(":schemaParts:ram")
     runtimeOnly project(":schemaParts:repeater")

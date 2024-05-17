@@ -15,13 +15,13 @@ public class InPinInterconnect extends InPin {
     }
 
     @Override
-    public void onChange(long newState, boolean hiImpedance) {
+    public void onChange(long newState, boolean hiImpedance, boolean weak) {
         if ((rawState & interconnectMask) > 0) {
             dest.rawState = newState | interconnectMask;
-            dest.onChange(newState | interconnectMask, hiImpedance);
+            dest.onChange(newState | interconnectMask, hiImpedance, weak);
         } else {
             dest.rawState = newState & inverseInterconnectMask;
-            dest.onChange(newState & inverseInterconnectMask, hiImpedance);
+            dest.onChange(newState & inverseInterconnectMask, hiImpedance, weak);
         }
     }
 }

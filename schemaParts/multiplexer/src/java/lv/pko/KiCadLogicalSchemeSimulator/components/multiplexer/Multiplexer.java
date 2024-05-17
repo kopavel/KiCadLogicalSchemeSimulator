@@ -65,7 +65,7 @@ public class Multiplexer extends SchemaPart {
             }
             inPins[inNo] = addInPin(new InPin(String.valueOf(inNo), this, partsAmount, aliases.toArray(new String[0])) {
                 @Override
-                public void onChange(long newState, boolean hiImpedance) {
+                public void onChange(long newState, boolean hiImpedance, boolean weak) {
                     if (this == inPins[nState]) {
                         if (hiImpedance) {
                             throw new FloatingPinException(this);
@@ -77,7 +77,7 @@ public class Multiplexer extends SchemaPart {
         }
         addInPin(new InPin("N", this, nSize) {
             @Override
-            public void onChange(long newState, boolean hiImpedance) {
+            public void onChange(long newState, boolean hiImpedance, boolean weak) {
                 if (hiImpedance) {
                     throw new FloatingPinException(this);
                 }

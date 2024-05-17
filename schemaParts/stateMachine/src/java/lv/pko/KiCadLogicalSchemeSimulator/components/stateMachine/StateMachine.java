@@ -85,14 +85,14 @@ public class StateMachine extends SchemaPart {
         addOutPin("OUT", outSize);
         addInPin(new InPin("D", this) {
             @Override
-            public void onChange(long newState, boolean hiImpedance) {
+            public void onChange(long newState, boolean hiImpedance, boolean weak) {
                 disabled = newState == 1;
                 out.setState((disabled ? 0 : states[(int) latch]) ^ outMash);
             }
         });
         addInPin(new InPin("S", this) {
             @Override
-            public void onChange(long newState, boolean hiImpedance) {
+            public void onChange(long newState, boolean hiImpedance, boolean weak) {
                 strobeActive = newState > 0;
                 if (strobeActive) {
                     latch = in.getState();
@@ -115,7 +115,7 @@ public class StateMachine extends SchemaPart {
         });
         in = addInPin(new InPin("IN", this, inSize) {
             @Override
-            public void onChange(long newState, boolean hiImpedance) {
+            public void onChange(long newState, boolean hiImpedance, boolean weak) {
                 if (strobeActive) {
                     if (hiImpedance) {
                         throw new FloatingPinException(this);

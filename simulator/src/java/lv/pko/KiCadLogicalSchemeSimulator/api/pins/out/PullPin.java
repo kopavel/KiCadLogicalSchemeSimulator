@@ -37,4 +37,15 @@ public class PullPin extends OutPin {
         super(id, parent, 1);
         this.state = value;
     }
+
+    @Override
+    public void setState(long newState) {
+        throw new RuntimeException("Can't set state on Pull pin");
+    }
+
+    public void reSendState() {
+        if (dest != null) {
+            dest.transit(state & dest.mask, false, true);
+        }
+    }
 }

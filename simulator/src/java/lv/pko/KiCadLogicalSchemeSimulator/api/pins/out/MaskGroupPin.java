@@ -15,7 +15,7 @@ public class MaskGroupPin {
     public void transit(long newState, boolean hiImpedance) {
         long maskState = newState & mask;
         if (oldVal != maskState || oldImpedance != hiImpedance) {
-            dest.transit(maskState, hiImpedance);
+            dest.transit(maskState, hiImpedance, false);
             oldVal = maskState;
             oldImpedance = hiImpedance;
         }
@@ -23,7 +23,7 @@ public class MaskGroupPin {
 
     public void resend(long newState, boolean hiImpedance) {
         long maskState = newState & mask;
-        dest.transit(maskState, hiImpedance);
+        dest.transit(maskState, hiImpedance, false);
         oldVal = maskState;
         oldImpedance = hiImpedance;
     }

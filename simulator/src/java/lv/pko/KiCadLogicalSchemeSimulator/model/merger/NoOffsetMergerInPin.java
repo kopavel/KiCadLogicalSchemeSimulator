@@ -54,11 +54,11 @@ public abstract class NoOffsetMergerInPin extends InPin {
     }
 
     @Override
-    public void onChange(long newState, boolean hiImpedance) {
+    public void onChange(long newState, boolean hiImpedance, boolean weak) {
     }
 
     @Override
-    public void transit(long newState, boolean hiImpedance) {
+    public void transit(long newState, boolean hiImpedance, boolean weak) {
         onMerge(newState, hiImpedance);
     }
 

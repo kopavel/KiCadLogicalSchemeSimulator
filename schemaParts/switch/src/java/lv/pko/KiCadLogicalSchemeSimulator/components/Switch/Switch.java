@@ -44,6 +44,8 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
     private boolean state;
     private boolean pin1HiImpedance;
     private boolean pin2HiImpedance;
+    private boolean pin2Weak;
+    private boolean pin1Weak;
     private TriStateOutPin pin1Out;
     private TriStateOutPin pin2Out;
     private SwitchUiComponent switchUiComponent;
@@ -52,16 +54,16 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
         super(id, sParams);
         pin1In = addInPin(new InPin("IN1", this) {
             @Override
-            public void onChange(long newState, boolean hiImpedance) {
-                if (!hiImpedance && !pin2HiImpedance) {
-                    throw new ShortcutException(pin1In, pin2In);
-                }
+            public void onChange(long newState, boolean hiImpedance, boolean weak) {
                 pin1HiImpedance = hiImpedance;
+                pin1Weak = weak;
                 if (state) {
+                    if (!hiImpedance && !pin2HiImpedance && !weak && !pin2Weak) {
+                        throw new ShortcutException(pin1In, pin2In);
+                    }
                     if (hiImpedance) {
                         pin2Out.setHiImpedance();
-                        //FixMe check isPull here
-                    } else if (!pin2HiImpedance) {
+                    } else if (!pin1Weak) {
                         pin2Out.setState(newState);
                     }
                 }
@@ -69,16 +71,16 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
         });
         pin2In = addInPin(new InPin("IN2", this) {
             @Override
-            public void onChange(long newState, boolean hiImpedance) {
-                if (!hiImpedance && !pin1HiImpedance) {
+            public void onChange(long newState, boolean hiImpedance, boolean weak) {
+                if (!hiImpedance && !pin1HiImpedance && !weak && !pin1Weak) {
                     throw new ShortcutException(pin1In, pin2In);
                 }
                 pin2HiImpedance = hiImpedance;
+                pin2Weak = weak;
                 if (state) {
                     if (hiImpedance) {
                         pin1Out.setHiImpedance();
-                        //FixMe check isPull here
-                    } else if (!pin1HiImpedance) {
+                    } else if (!pin2Weak) {
                         pin1Out.setState(newState);
                     }
                 }
@@ -107,13 +109,12 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
     public void setState(boolean state) {
         this.state = state;
         if (state) {
-            if (!pin2HiImpedance && !pin1HiImpedance) {
+            if (!pin2HiImpedance && !pin1HiImpedance && !pin1Weak && !pin2Weak) {
                 throw new ShortcutException(pin1In, pin2In);
             }
-            //FixMe check isPull here
-            if (!pin1HiImpedance) {
+            if (!pin1Weak) {
                 pin2Out.setState(pin1In.getState());
-            } else if (!pin2HiImpedance) {
+            } else if (!pin2Weak) {
                 pin1Out.setState(pin2In.getState());
             }
         } else {
