@@ -54,12 +54,16 @@ public abstract class NoOffsetMergerInPin extends InPin {
     }
 
     @Override
-    public void onChange(long newState, boolean hiImpedance, boolean weak) {
+    public void onChange(long newState, boolean hiImpedance) {
     }
 
     @Override
-    public void transit(long newState, boolean hiImpedance, boolean weak) {
+    public void transit(long newState, boolean hiImpedance) {
         onMerge(newState, hiImpedance);
+    }
+
+    public String getHash() {
+        return corrMask + ":" + offset + ":" + source.getName();
     }
 
     protected abstract void onMerge(long newState, boolean hiImpedance);

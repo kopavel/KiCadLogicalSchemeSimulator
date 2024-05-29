@@ -107,7 +107,7 @@ public class Rom extends SchemaPart {
         }
         addInPin(new InPin("A", this, aSize) {
             @Override
-            public void onChange(long newState, boolean hiImpedance, boolean weak) {
+            public void onChange(long newState, boolean hiImpedance) {
                 addr = (int) newState;
                 if (csActive) {
                     if (hiImpedance) {
@@ -152,7 +152,6 @@ public class Rom extends SchemaPart {
     @Override
     public void initOuts() {
         outPin = (TriStateOutPin) getOutPin("D");
-        outPin.hiImpedance = true;
     }
 
     @Override

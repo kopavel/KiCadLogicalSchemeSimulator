@@ -47,7 +47,7 @@ public class Led extends SchemaPart implements InteractiveSchemaPart {
         super(id, sParams);
         in = addInPin(new InPin("IN", this) {
             @Override
-            public void onChange(long newState, boolean hiImpedance, boolean weak) {
+            public void onChange(long newState, boolean hiImpedance) {
                 if (hiImpedance) {
                     throw new FloatingPinException(this);
                 }

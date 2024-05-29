@@ -43,6 +43,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+//ToDo store/load oscilloscope presets...
+//ToDo reset history
+//ToDo search by pin changes
+//ToDo navigate to start/end
 public class Oscilloscope extends JFrame {
     public static final ResourceBundle localization = ResourceBundle.getBundle("i81n_clock/clock");
     final Diagram diagram;
@@ -84,6 +88,7 @@ public class Oscilloscope extends JFrame {
     public void addPin(OutPin pin, String name) {
         watchedItemNamesPanel.add(new FixedHeightLabel(name));
         watchedItemNamesPanel.revalidate();
+        //FixMe check if diagram need to be pinBased, not busBased
         diagram.addPin(pin, name);
     }
 

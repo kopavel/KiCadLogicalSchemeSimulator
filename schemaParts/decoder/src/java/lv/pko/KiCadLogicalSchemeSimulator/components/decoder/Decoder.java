@@ -50,7 +50,7 @@ public class Decoder extends SchemaPart {
         if (params.containsKey("outReverse")) {
             addInPin(new InPin("A", this, inSize) {
                 @Override
-                public void onChange(long newState, boolean hiImpedance, boolean weak) {
+                public void onChange(long newState, boolean hiImpedance) {
                     outState = ~(1L << correctState(newState));
                     if (csState) {
                         if (hiImpedance) {
@@ -63,7 +63,7 @@ public class Decoder extends SchemaPart {
         } else {
             addInPin(new InPin("A", this, inSize) {
                 @Override
-                public void onChange(long newState, boolean hiImpedance, boolean weak) {
+                public void onChange(long newState, boolean hiImpedance) {
                     outState = 1L << correctState(newState);
                     if (csState) {
                         if (hiImpedance) {
@@ -76,7 +76,7 @@ public class Decoder extends SchemaPart {
         }
         cs = addInPin(new InPin("CS", this) {
             @Override
-            public void onChange(long newState, boolean hiImpedance, boolean weak) {
+            public void onChange(long newState, boolean hiImpedance) {
                 csState = (cs.rawState == 1) ^ reverse;
                 if (csState) {
                     if (hiImpedance) {
@@ -90,6 +90,7 @@ public class Decoder extends SchemaPart {
         });
         int outSize = (int) Math.pow(2, inSize);
         addTriStateOutPin("Q", outSize);
+        csState = reverse;
     }
 
     @Override

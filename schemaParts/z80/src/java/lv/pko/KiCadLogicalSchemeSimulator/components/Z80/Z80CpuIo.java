@@ -65,6 +65,5 @@ public class Z80CpuIo extends SchemaPart {
         haltPin = getOutPin("~{HALT}");
         addOut = (TriStateOutPin) getOutPin("A");
         dOut = (TriStateOutPin) getOutPin("D");
-        dOut.hiImpedance = true;
     }
 }

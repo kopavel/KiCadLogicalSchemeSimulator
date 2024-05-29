@@ -41,7 +41,7 @@ public abstract class NegativeOffsetMergerInPin extends NoOffsetMergerInPin {
     }
 
     @Override
-    public void transit(long newState, boolean hiImpedance, boolean weak) {
+    public void transit(long newState, boolean hiImpedance) {
         onMerge(newState << nOffset, hiImpedance);
     }
 }

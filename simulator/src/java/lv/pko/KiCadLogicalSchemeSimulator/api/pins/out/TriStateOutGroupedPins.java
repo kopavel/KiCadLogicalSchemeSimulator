@@ -42,6 +42,8 @@ public class TriStateOutGroupedPins extends TriStateOutPin {
     public TriStateOutGroupedPins(TriStateOutPin oldPin) {
         super(oldPin.id, oldPin.parent, oldPin.size);
         aliases = oldPin.aliases;
+        hiImpedance = oldPin.hiImpedance;
+        state = oldPin.state;
     }
 
     @Override

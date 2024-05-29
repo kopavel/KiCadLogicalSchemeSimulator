@@ -80,7 +80,7 @@ public abstract class SchemaPart {
     public InPin addInPin(String pinId, int size, String... names) {
         InPin pin = new InPin(pinId, this, size, names) {
             @Override
-            public void onChange(long newState, boolean hiImpedance, boolean weak) {
+            public void onChange(long newState, boolean hiImpedance) {
             }
         };
         inMap.put(pinId, pin);

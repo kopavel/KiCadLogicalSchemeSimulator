@@ -81,7 +81,7 @@ public class Ram extends SchemaPart {
         words = new long[ramSize];
         addInPin(new InPin("A", this, aSize) {
             @Override
-            public void onChange(long newState, boolean hiImpedance, boolean weak) {
+            public void onChange(long newState, boolean hiImpedance) {
                 addr = (int) newState;
                 if (csActive) {
                     if (hiImpedance) {
@@ -95,7 +95,7 @@ public class Ram extends SchemaPart {
         dIn = addInPin("D", size);
         addInPin(new InPin(reverse ? "~{CS}" : "CS", this) {
             @Override
-            public void onChange(long newState, boolean hiImpedance, boolean weak) {
+            public void onChange(long newState, boolean hiImpedance) {
                 if (hiImpedance) {
                     throw new FloatingPinException(this);
                 }
@@ -105,7 +105,7 @@ public class Ram extends SchemaPart {
         });
         addInPin(new InPin(reverse ? "~{OE}" : "OE", this) {
             @Override
-            public void onChange(long newState, boolean hiImpedance, boolean weak) {
+            public void onChange(long newState, boolean hiImpedance) {
                 if (hiImpedance) {
                     throw new FloatingPinException(this);
                 }
@@ -137,7 +137,6 @@ public class Ram extends SchemaPart {
     @Override
     public void initOuts() {
         dOut = (TriStateOutPin) getOutPin("D");
-        dOut.hiImpedance = true;
     }
 
     @Override

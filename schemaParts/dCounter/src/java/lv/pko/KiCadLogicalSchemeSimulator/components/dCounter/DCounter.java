@@ -60,7 +60,7 @@ public class DCounter extends SchemaPart {
         addOutPin("CO", 1);
         addInPin(new InPin("CI", this) {
             @Override
-            public void onChange(long newState, boolean hiImpedance, boolean weak) {
+            public void onChange(long newState, boolean hiImpedance) {
                 if (hiImpedance) {
                     throw new FloatingPinException(this);
                 }
@@ -72,7 +72,7 @@ public class DCounter extends SchemaPart {
         });
         jPin = addInPin(new InPin("J", this) {
             @Override
-            public void onChange(long newState, boolean hiImpedance, boolean weak) {
+            public void onChange(long newState, boolean hiImpedance) {
                 if (!presetDisabled && resetInactive) {
                     count = getState();
                     outPin.setState(count);
@@ -81,7 +81,7 @@ public class DCounter extends SchemaPart {
         });
         addInPin(new InPin("PE", this) {
             @Override
-            public void onChange(long newState, boolean hiImpedance, boolean weak) {
+            public void onChange(long newState, boolean hiImpedance) {
                 if (hiImpedance) {
                     throw new FloatingPinException(this);
                 }
@@ -94,19 +94,19 @@ public class DCounter extends SchemaPart {
         });
         addInPin(new InPin("UD", this) {
             @Override
-            public void onChange(long newState, boolean hiImpedance, boolean weak) {
+            public void onChange(long newState, boolean hiImpedance) {
                 countUp = rawState > 0;
             }
         });
         addInPin(new InPin("BD", this) {
             @Override
-            public void onChange(long newState, boolean hiImpedance, boolean weak) {
+            public void onChange(long newState, boolean hiImpedance) {
                 maxCount = ((rawState > 0) ^ bdReverse) ? 15 : 9;
             }
         });
         addInPin(new InPin("R", this) {
             @Override
-            public void onChange(long newState, boolean hiImpedance, boolean weak) {
+            public void onChange(long newState, boolean hiImpedance) {
                 resetInactive = newState == 0;
                 if (!resetInactive) {
                     count = 0;

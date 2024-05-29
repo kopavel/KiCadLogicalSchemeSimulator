@@ -39,11 +39,13 @@ public class TriStateOutPins extends TriStateOutPin {
         super(oldPin.id, oldPin.parent, oldPin.size);
         aliases = oldPin.aliases;
         dest = oldPin.groups[0];
+        hiImpedance = oldPin.hiImpedance;
+        state = oldPin.state;
     }
 
     @Override
     public void addDest(InPin pin) {
-        throw new RuntimeException("Cant add dest to TriStateOutPins");
+        throw new RuntimeException("Can't add dest to TriStateOutPins");
     }
 
     @Override

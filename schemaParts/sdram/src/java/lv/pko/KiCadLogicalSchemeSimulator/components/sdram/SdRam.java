@@ -122,7 +122,6 @@ public class SdRam extends SchemaPart {
     @Override
     public void initOuts() {
         dOut = (TriStateOutPin) getOutPin("D");
-        dOut.hiImpedance = true;
     }
 
     private void casOn() {

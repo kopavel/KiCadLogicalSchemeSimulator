@@ -45,7 +45,7 @@ public class PullPin extends OutPin {
 
     public void reSendState() {
         if (dest != null) {
-            dest.transit(state & dest.mask, false, true);
+            dest.transit(state & dest.mask, false);
         }
     }
 }

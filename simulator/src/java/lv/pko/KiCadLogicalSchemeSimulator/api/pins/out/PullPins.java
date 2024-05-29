@@ -57,7 +57,7 @@ public class PullPins extends PullPin {
         RuntimeException result = null;
         for (InPin pin : dest) {
             try {
-                pin.transit(state, false, true);
+                pin.transit(state, false);
             } catch (FloatingPinException | ShortcutException e) {
                 if (result == null) {
                     result = e;

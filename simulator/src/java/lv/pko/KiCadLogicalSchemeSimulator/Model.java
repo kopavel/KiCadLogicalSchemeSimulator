@@ -64,6 +64,7 @@ public class Model {
     public final Map<String, SchemaPartSpi> schemaPartSpiMap;
     private final Map<OutPin, OutPinNet> outMap = new HashMap<>();
     private final Map<InPin, InPinNet> inMap = new HashMap<>();
+    private Map<String, Merger> mergers = new HashMap<>();
 
     public Model(Export export, String mapPath) throws IOException {
         Log.info(Model.class, "Start Model building");
@@ -111,9 +112,9 @@ public class Model {
         Map<InPin, List<Byte>> inPins = new HashMap<>();
         net.getNode().forEach(node -> {
             if ("gnd".equals(net.getName())) {
-                outPins.put(schemaParts.get("gnd").getOutPin("OUT"), (byte) 1);
+                outPins.put(schemaParts.get("gnd").getOutPin("OUT"), (byte) 0);
             } else if ("pwr".equals(net.getName())) {
-                outPins.put(schemaParts.get("pwr").getOutPin("OUT"), (byte) 1);
+                outPins.put(schemaParts.get("pwr").getOutPin("OUT"), (byte) 0);
             }
             Map<String, PinMapDescriptor> pinMap = shemaPartPinMap.get(node.getRef());
             String pinName;
@@ -161,19 +162,17 @@ public class Model {
         for (Map.Entry<OutPin, Byte> outEntry : outPins.entrySet()) {
             OutPin outPin = outEntry.getKey();
             for (Map.Entry<InPin, List<Byte>> inPin : inPins.entrySet()) {
-                if (!outPin.id.equals(inPin.getKey().id) || !outPin.parent.equals(inPin.getKey().parent)) {
-                    if (inPin.getValue().size() > 1) {
-                        long interMask = 0;
-                        for (Byte b : inPin.getValue()) {
-                            interMask |= (1L << b);
-                        }
-                        InPinInterconnect interconnect = new InPinInterconnect(inPin.getKey(), interMask);
-                        outMap.computeIfAbsent(outPin, p -> new OutPinNet()).addInPin(interconnect);
-                        inMap.computeIfAbsent(interconnect, p -> new InPinNet()).addOutPin(outPin, outEntry.getValue(), inPin.getValue().getFirst());
-                    } else {
-                        outMap.computeIfAbsent(outPin, p -> new OutPinNet()).addInPin(inPin.getKey());
-                        inMap.computeIfAbsent(inPin.getKey(), p -> new InPinNet()).addOutPin(outPin, outEntry.getValue(), inPin.getValue().getFirst());
+                if (inPin.getValue().size() > 1) {
+                    long interMask = 0;
+                    for (Byte b : inPin.getValue()) {
+                        interMask |= (1L << b);
                     }
+                    InPinInterconnect interconnect = new InPinInterconnect(inPin.getKey(), interMask);
+                    outMap.computeIfAbsent(outPin, p -> new OutPinNet()).addInPin(interconnect);
+                    inMap.computeIfAbsent(interconnect, p -> new InPinNet()).addOutPin(outPin, outEntry.getValue(), inPin.getValue().getFirst());
+                } else {
+                    outMap.computeIfAbsent(outPin, p -> new OutPinNet()).addInPin(inPin.getKey());
+                    inMap.computeIfAbsent(inPin.getKey(), p -> new InPinNet()).addOutPin(outPin, outEntry.getValue(), inPin.getValue().getFirst());
                 }
             }
         }
@@ -220,7 +219,15 @@ public class Model {
                         merger.addSource(outPinMap.getKey(), offsetMap.getValue(), offsetMap.getKey());
                     }
                 }
+                if (mergers.containsKey(merger.hash)) {
+                    mergers.get(merger.hash).addDest(inPin);
+                } else {
+                    mergers.put(merger.hash, merger);
+                }
             }
+        }
+        for (Merger merger : mergers.values()) {
+            merger.bindSources();
         }
         schemaParts.values()
                 .stream()
@@ -259,7 +266,7 @@ public class Model {
             throw new RuntimeException("SchemaPart " + id + " has no parameter SymPartClass");
         }
         String parameters = "";
-        if (symbolDesc != null) {
+        if (symbolDesc != null && symbolDesc.params != null && !symbolDesc.params.isBlank()) {
             parameters += symbolDesc.params + ";";
         }
         parameters += findSchemaPartProperty(component, "SymPartParam");
@@ -269,7 +276,13 @@ public class Model {
         } else {
             for (int i = 0; i < symbolDesc.units.size(); i++) {
                 String unit = symbolDesc.units.get(i);
-                SchemaPart schemaPart = getSchemaPart(className, id + "_" + (char) (((byte) 'A') + i), parameters);
+                String name;
+                if (symbolDesc.units.size() == 1) {
+                    name = id;
+                } else {
+                    name = id + "_" + (char) (((byte) 'A') + i);
+                }
+                SchemaPart schemaPart = getSchemaPart(className, name, parameters);
                 schemaParts.put(schemaPart.id, schemaPart);
                 for (String pinMapInfo : unit.split(";")) {
                     String[] mapInfo = pinMapInfo.split("=");

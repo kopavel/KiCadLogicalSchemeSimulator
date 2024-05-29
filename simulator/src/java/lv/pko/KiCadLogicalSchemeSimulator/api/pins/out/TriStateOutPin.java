@@ -35,8 +35,7 @@ import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 
 public class TriStateOutPin extends OutPin {
-    //Fixme make here 3 states, hiImpedance/Week/Strong , use it for pull up resisters and Power pins
-    public boolean hiImpedance;
+    public boolean hiImpedance = true;
 
     public TriStateOutPin(String id, SchemaPart parent, int size, String... names) {
         super(id, parent, size, names);
@@ -55,23 +54,23 @@ public class TriStateOutPin extends OutPin {
         if (hiImpedance) {
             hiImpedance = false;
             this.state = newState;
-            dest.transit(newState & dest.mask, false, false);
+            dest.transit(newState & dest.mask, false);
         } else if (newState != this.state) {
             this.state = newState;
-            dest.transit(newState & dest.mask, false, false);
+            dest.transit(newState & dest.mask, false);
         }
     }
 
     @Override
     public void reSendState() {
-        dest.transit(state & dest.mask, hiImpedance, false);
+        dest.transit(state & dest.mask, hiImpedance);
     }
 
     public void setHiImpedance() {
         if (!hiImpedance) {
             hiImpedance = true;
             long state = this.state;
-            dest.transit(0, true, false);
+            dest.transit(0, true);
         }
     }
 }

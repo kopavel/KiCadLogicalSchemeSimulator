@@ -51,7 +51,7 @@ public class JkTrigger extends SchemaPart {
         kPin = addInPin("K", 1);
         rPin = addInPin(new InPin("R", this) {
             @Override
-            public void onChange(long newState, boolean hiImpedance, boolean weak) {
+            public void onChange(long newState, boolean hiImpedance) {
                 clockEnabled = (newState | sPin.rawState) == 0;
                 if (newState > 0) {
                     iqOut.setState(hiState);
@@ -61,7 +61,7 @@ public class JkTrigger extends SchemaPart {
         });
         sPin = addInPin(new InPin("S", this) {
             @Override
-            public void onChange(long newState, boolean hiImpedance, boolean weak) {
+            public void onChange(long newState, boolean hiImpedance) {
                 clockEnabled = (newState | sPin.rawState) == 0;
                 if (newState > 0) {
                     qOut.setState(hiState);

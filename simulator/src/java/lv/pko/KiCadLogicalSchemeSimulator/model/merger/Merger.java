@@ -38,13 +38,18 @@ import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.PullPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.TriStateOutPin;
 import lv.pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Merger extends OutPin {
+    private final Map<OutPin, NoOffsetMergerInPin> sources = new HashMap<>();
     long hiImpedancePins;
     private NoOffsetMergerInPin[] inputs = new NoOffsetMergerInPin[0];
     private long strongMask;
     private long pullMask = 0;
     private long pullState = 0;
     private long nPullMask = -1;
+    public String hash;
 
     public Merger(InPin dest) {
         super(dest.id, dest.parent, dest.size);
@@ -53,6 +58,27 @@ public class Merger extends OutPin {
         }
         hiImpedancePins = dest.mask;
         dest.addSource(this);
+        hash = getHash();
+    }
+
+    @Override
+    public void addDest(InPin pin) {
+        if (dest == null) {
+            dest = pin;
+        } else if (dest instanceof Splitter splitter) {
+            splitter.addDest(pin);
+        } else {
+            dest = new Splitter(dest, pin);
+        }
+    }
+
+    public String getHash() {
+        StringBuilder result = new StringBuilder(String.valueOf(dest.mask));
+        //FixMe do we need ordered list?
+        for (NoOffsetMergerInPin input : inputs) {
+            result.append(";").append(input.getHash());
+        }
+        return result.toString();
     }
 
     public void addSource(OutPin src, long inMask, byte offset) {
@@ -71,7 +97,15 @@ public class Merger extends OutPin {
                 hiImpedancePins &= ~strongMask;
             }
             inputs = Utils.addToArray(inputs, inPin);
-            src.addDest(inPin);
+//            src.addDest(inPin);
+            sources.put(src, inPin);
+            hash = getHash();
+        }
+    }
+
+    public void bindSources() {
+        for (Map.Entry<OutPin, NoOffsetMergerInPin> bind : sources.entrySet()) {
+            bind.getKey().addDest(bind.getValue());
         }
     }
 
@@ -100,7 +134,7 @@ public class Merger extends OutPin {
                         state |= newState;
                     }
                     dest.rawState = state;
-                    dest.onChange(state, (hiImpedancePins & nPullMask) > 0, (state & strongMask) == 0);
+                    dest.onChange(state, (hiImpedancePins & nPullMask) > 0);
                 }
             };
         } else if (offset > 0) {
@@ -126,7 +160,7 @@ public class Merger extends OutPin {
                         state |= newState;
                     }
                     dest.rawState = state;
-                    dest.onChange(state, (hiImpedancePins & nPullMask) > 0, (state & strongMask) == 0);
+                    dest.onChange(state, (hiImpedancePins & nPullMask) > 0);
                 }
             };
         } else {
@@ -152,7 +186,7 @@ public class Merger extends OutPin {
                         state |= newState;
                     }
                     dest.rawState = state;
-                    dest.onChange(state, (hiImpedancePins & nPullMask) > 0, (state & strongMask) == 0);
+                    dest.onChange(state, (hiImpedancePins & nPullMask) > 0);
                 }
             };
         }

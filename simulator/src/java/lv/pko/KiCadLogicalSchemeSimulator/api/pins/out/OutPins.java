@@ -40,11 +40,12 @@ public class OutPins extends OutPin {
         super(oldPin.id, oldPin.parent, oldPin.size);
         aliases = oldPin.aliases;
         dest = oldPin.groups[0];
+        dest.dest.source = this;
     }
 
     @Override
     public void addDest(InPin pin) {
-        throw new RuntimeException("Cant add dest to OutPins");
+        throw new RuntimeException("Can't add dest to OutPins");
     }
 
     @Override

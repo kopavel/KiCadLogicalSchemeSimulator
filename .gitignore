@@ -12,7 +12,7 @@
 /**/*.kicad_pcb
 /**/*.kicad_pro
 /**/*.kicad_prl
-/stuff/examples/counters/counters-backups/
 /stuff/examples/counters/counters.xml
+/stuff/examples/switch/switch.xml
 /**/*.lck
 /gradle.log
