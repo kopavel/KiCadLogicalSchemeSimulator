@@ -103,18 +103,18 @@ public abstract class InPin extends Pin implements Manipulable {
     //methods for using by Byte manipulation
     @SuppressWarnings("unused")
     protected long correctStateStateNoOffset(long state) {
-        return (state & mask);
+        return state;
     }
 
     //methods for using by Byte manipulation
     @SuppressWarnings("unused")
     protected long correctStateStatePositiveOffset(long state) {
-        return (state & mask) >> offset;
+        return state >> offset;
     }
 
     //methods for using by Byte manipulation
     @SuppressWarnings("unused")
     protected long correctStateStateNegativeOffset(long state) {
-        return (state & mask) << nOffset;
+        return state << nOffset;
     }
 }
