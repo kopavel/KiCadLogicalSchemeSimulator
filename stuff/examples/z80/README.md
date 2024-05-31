@@ -1,5 +1,4 @@
 ![img.png](img/z80.png)
-
 **Z80-based Schema Details:**
 
 This schema contains a total about 80 parts, including:
@@ -20,7 +19,7 @@ This schema contains a total about 80 parts, including:
 - 1 shifter
 - 1 display (providing 512x256 in monochrome)
 
-On an Intel i7-3770s processor, this schema achieved slightly more than 1.6 MHz. Internally, the oscillator frequency is divided by 4 for the CPU, but not for the
-video part and memory access, resulting in approximately 1/5 of the physical Z80's usual speed (2 MHz).
+On an Intel i7-3770s processor, this schema achieved slightly more than 1.8 MHz. Internally, the oscillator frequency is divided by 4 for the CPU, but not for the
+video part and memory access, resulting in the Z80 being clocked at 0.45 MHz.
 
 I didn't find any reasonable competitor in which I can draw this schema as easily as I can in KiCad, and with decent simulation speed.

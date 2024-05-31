@@ -61,7 +61,6 @@ include ':schemaParts:xor'
 include ':schemaParts:z80'
 include ':simulator'
 include ':unnamedModules:ideaGui'
-include ':unnamedModules:z80Processor'
 
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)

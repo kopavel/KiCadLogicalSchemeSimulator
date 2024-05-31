@@ -30,33 +30,44 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.KiCadLogicalSchemeSimulator.components.Z80;
-import com.codingrodent.microprocessor.IBaseDevice;
-import com.codingrodent.microprocessor.IMemory;
-import com.codingrodent.microprocessor.Z80.CPUConstants;
-import com.codingrodent.microprocessor.Z80.Z80Core;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.EdgeInPin;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.RisingEdgeInPin;
-import lv.pko.KiCadLogicalSchemeSimulator.tools.Log;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.TriStateOutPin;
+import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import lv.pko.KiCadLogicalSchemeSimulator.components.Z80.core.CPUConstants;
+import lv.pko.KiCadLogicalSchemeSimulator.components.Z80.core.IoRequest;
+import lv.pko.KiCadLogicalSchemeSimulator.components.Z80.core.Z80Core;
 
-public class Z80Cpu extends Z80CpuSyncLayer {
+public class Z80Cpu extends SchemaPart {
     private final Z80Core cpu;
+    protected InPin dIn;
+    protected TriStateOutPin dOut;
+    protected TriStateOutPin addOut;
+    protected InPin waitPin;
+    protected OutPin rdPin;
+    protected OutPin wrPin;
+    protected OutPin mReqPin;
+    protected OutPin ioReqPin;
+    protected OutPin m1Pin;
+    protected OutPin refreshPin;
+    protected OutPin haltPin;
+    protected int T;
+    protected int M;
     private boolean inWait;
     private boolean T1;
     private boolean T2;
     private boolean T3;
     private boolean T4;
     private boolean M1;
-    private boolean readRequestAtT1;
-    private boolean ioRequestAtT1;
-    private boolean extraWaitAtT1;
+    private boolean extraWait;
     private boolean needDataPinReset;
     private boolean needRefreshPinReset;
 
     public Z80Cpu(String id) {
         super(id, null);
-        IMemory memoryHandler = getMemoryHandler();
-        IBaseDevice portHandler = getPortHandler();
-        cpu = new Z80Core(memoryHandler, portHandler);
+        cpu = new Z80Core();
         addInPin(new EdgeInPin("CLK", this) {
             @Override
             public void onFallingEdge() {
@@ -89,42 +100,35 @@ public class Z80Cpu extends Z80CpuSyncLayer {
         addTriStateOutPin("D", 8);
         addTriStateOutPin("A", 16);
         dIn = addInPin("D", 8);
-        Thread.ofPlatform().name("CpuCalcTread").start(() -> {
-            while (true) {
-                try {
-//                    Log.trace(Z80Cpu.class, "ack calcMutex,  amount {}", calcSemaphore.getAvailableAmount());
-                    calcSemaphore.acquire();
-//                    Log.trace(Z80Cpu.class, "got calcMutex,  amount {}", calcSemaphore.getAvailableAmount());
-                    coreBusy();
-                    cpu.executeOneInstruction();
-//                    Log.trace(Z80Cpu.class, "set  cpuDone=t");
-                    haltPin.setState(cpu.getHalt() ? 0 : 1);
-                    cpuDone = true;
-                    coreFree();
-                } catch (Exception e) {
-                    Log.error(Z80Cpu.class, "CPU core error at M" + M + " T" + T, e);
-                }
-            }
-        });
-//        reset(true);
+    }
+
+    @Override
+    public void initOuts() {
+        rdPin = getOutPin("~{RD}");
+        wrPin = getOutPin("~{WR}");
+        mReqPin = getOutPin("~{MREQ}");
+        ioReqPin = getOutPin("~{IORQ}");
+        m1Pin = getOutPin("~{M1}");
+        refreshPin = getOutPin("~{RFSH}");
+        haltPin = getOutPin("~{HALT}");
+        addOut = (TriStateOutPin) getOutPin("A");
+        dOut = (TriStateOutPin) getOutPin("D");
     }
 
     public void clockRaise() {
         if (M > 0) {
             if (T4 || (!M1 && T3)) {
                 T = 1;
-                coreBusy();
+                cpu.ioQueue.poll();
 //                Log.trace(Z80Cpu.class, "cpuDone is {}", cpuDone);
-                if (cpuDone) {
-                    doCalc();
+                if (cpu.ioQueue.isEmpty()) {
                     M = 1;
                 } else {
                     M++;
                 }
-                coreFree();
             } else {
-                if (T2 && (inWait || extraWaitAtT1)) {
-                    extraWaitAtT1 = false;
+                if (T2 && (inWait || extraWait)) {
+                    extraWait = false;
                 } else {
                     T++;
                 }
@@ -168,10 +172,6 @@ public class Z80Cpu extends Z80CpuSyncLayer {
 //            Log.trace(Z80Cpu.class, "reset");
         T = 0;
         M = 0;
-        ioSemaphore.reset(false);
-        addressSemaphore.reset(false);
-        while (calcSemaphore.availableAmount > 0) {
-        }
         cpu.reset();
         mReqPin.setState(1);
         rdPin.setState(1);
@@ -184,18 +184,14 @@ public class Z80Cpu extends Z80CpuSyncLayer {
         ioReqPin.setState(1);
         m1Pin.setState(1);
         refreshPin.setState(1);
-        ioSemaphore.reset();
-        ioDoneSemaphore.reset();
-        addressSemaphore.reset();
-        addressDoneSemaphore.reset();
-        coreBusyMutex.reset();
         M = 1;
-        cpuDone = true;
 //            Log.trace(Z80Cpu.class, "reset done. {},{}", addressSemaphore.getAvailableAmount(), addressDoneSemaphore.getAvailableAmount());
     }
 
     private void setPinsOnRaise() {
 //        Log.trace(Z80Cpu.class, "Set pins at {},{}", M, T);
+        IoRequest ioRequest = cpu.ioQueue.peek();
+        assert ioRequest != null;
         if (T1) {
             if (needRefreshPinReset) {
                 refreshPin.setState(1);
@@ -206,27 +202,25 @@ public class Z80Cpu extends Z80CpuSyncLayer {
                 needDataPinReset = false;
             }
             if (M1) {
-                if (cpuDone) {
-                    doCalc();
-                }
+                cpu.executeOneInstruction();
+                ioRequest = cpu.ioQueue.peek();
+                assert ioRequest != null;
                 m1Pin.setState(0);
             }
-            permitAddress();
-            ioRequestAtT1 = ioRequest;
-            extraWaitAtT1 = ioRequestAtT1;
-            readRequestAtT1 = readRequest;
+            addOut.setState(ioRequest.address);
+            extraWait = !ioRequest.isMemory;
         } else if (T2) {
-            if (!inWait && ioRequestAtT1) {
+            if (!inWait && !ioRequest.isMemory) {
                 ioReqPin.setState(0);
-                if (readRequestAtT1) {
-                    rdPin.setState(0);
-                } else {
+                if (ioRequest.isWrite) {
                     wrPin.setState(0);
+                } else {
+                    rdPin.setState(0);
                 }
             }
         } else if (T3) {
             if (M1) {
-                permitIO();
+                ioRequest.callback.accept((int) dIn.getState());
                 rdPin.setState(1);
                 mReqPin.setState(1);
                 m1Pin.setState(1);
@@ -238,36 +232,38 @@ public class Z80Cpu extends Z80CpuSyncLayer {
 
     private void setPinsOnFall() {
 //        Log.trace(Z80Cpu.class, "Set pins at {},{}", M, T);
+        IoRequest ioRequest = cpu.ioQueue.peek();
+        assert ioRequest != null;
         if (T1) {
-            if (!ioRequestAtT1) {
+            if (ioRequest.isMemory) {
                 mReqPin.setState(0);
-                if (readRequestAtT1) {
+                if (!ioRequest.isWrite) {
                     rdPin.setState(0);
                 }
             }
-            if (!readRequestAtT1) {
-                permitIO();
+            if (ioRequest.isWrite) {
+                dOut.setState(ioRequest.payload);
                 needDataPinReset = true;
             }
         } else if (T2) {
-            if (!inWait && !ioRequestAtT1 && !readRequestAtT1) {
+            if (!inWait && ioRequest.isMemory && ioRequest.isWrite) {
                 wrPin.setState(0);
             }
             inWait = waitPin.rawState == 0;
         } else if (T3) {
             if (M1) {
                 mReqPin.setState(0);
-            } else if (!ioRequestAtT1) {
-                if (readRequestAtT1) {
-                    permitIO();
+            } else if (ioRequest.isMemory) {
+                if (!ioRequest.isWrite) {
+                    ioRequest.callback.accept((int) dIn.getState());
                     rdPin.setState(1);
                 } else {
                     wrPin.setState(1);
                 }
                 mReqPin.setState(1);
             } else {
-                if (readRequestAtT1) {
-                    permitIO();
+                if (!ioRequest.isWrite) {
+                    ioRequest.callback.accept((int) dIn.getState());
                     rdPin.setState(1);
                 } else {
                     wrPin.setState(1);

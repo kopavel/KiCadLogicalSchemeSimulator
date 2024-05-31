@@ -31,12 +31,10 @@ Schema part doesn't have any additional parameters.
 
 <hr>
 
-This component serves as a pin-level wrapper that emulates the behavior of the Z80 processor at the hardware level. It leverages
+This component serves as a pin-level wrapper that emulates the behavior of the Z80 processor at the hardware level. It based on
 the [Z80Processor](https://github.com/codesqueak/Z80Processor) project for the CPU core emulation.
 
-The emulation utilizes a BusyWait synchronization mechanism instead of traditional Java thread synchronization methods like semaphores/queues. This approach is
-necessary due to the significant latency introduced by park/un-park operations. As a result, Z80Processor consistently utilizes one CPU core at full capacity,
-ensuring decent speed despite the less-than-ideal synchronization method.
+The core reimplemented in IoQueue/callback manner for possibility postpone IO request in time for processing hardware layer.
 
 The emulation accurately represents the timing diagram of the Z80 processor, with the following exceptions:
 
