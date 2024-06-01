@@ -32,7 +32,6 @@
  */
 package lv.pko.KiCadLogicalSchemeSimulator.model.merger;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.ShortcutException;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.PullPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.TriStateOutPin;
@@ -42,14 +41,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Merger extends OutPin {
-    private final Map<OutPin, NoOffsetMergerInPin> sources = new HashMap<>();
+    private final Map<OutPin, MergerInPin> sources = new HashMap<>();
+    public String hash;
     long hiImpedancePins;
-    private NoOffsetMergerInPin[] inputs = new NoOffsetMergerInPin[0];
+    MergerInPin[] inputs = new MergerInPin[0];
+    long pullState = 0;
+    long nPullMask = -1;
     private long strongMask;
     private long pullMask = 0;
-    private long pullState = 0;
-    private long nPullMask = -1;
-    public String hash;
 
     public Merger(InPin dest) {
         super(dest.id, dest.parent, dest.size);
@@ -75,14 +74,14 @@ public class Merger extends OutPin {
     public String getHash() {
         StringBuilder result = new StringBuilder(String.valueOf(dest.mask));
         //FixMe do we need ordered list?
-        for (NoOffsetMergerInPin input : inputs) {
+        for (MergerInPin input : inputs) {
             result.append(";").append(input.getHash());
         }
         return result.toString();
     }
 
     public void addSource(OutPin src, long inMask, byte offset) {
-        NoOffsetMergerInPin inPin = createInput(src, offset, inMask);
+        MergerInPin inPin = createInput(src, offset, inMask);
         if (src instanceof PullPin) {
             pullState |= inPin.correctState(src.state) & dest.mask;
             pullMask |= inPin.corrMask;
@@ -104,91 +103,19 @@ public class Merger extends OutPin {
     }
 
     public void bindSources() {
-        for (Map.Entry<OutPin, NoOffsetMergerInPin> bind : sources.entrySet()) {
+        for (Map.Entry<OutPin, MergerInPin> bind : sources.entrySet()) {
             bind.getKey().addDest(bind.getValue());
         }
     }
 
-    private NoOffsetMergerInPin createInput(OutPin src, byte offset, long mask) {
-        NoOffsetMergerInPin inPin;
+    private MergerInPin createInput(OutPin src, byte offset, long mask) {
+        MergerInPin inPin;
         if (offset == 0) {
-            inPin = new NoOffsetMergerInPin(src, offset, mask) {
-                @Override
-                public void onMerge(long newState, boolean newImpedance) {
-                    if (newImpedance != hiImpedance) {
-                        hiImpedance = newImpedance;
-                        if (newImpedance) {
-                            hiImpedancePins |= corrMask;
-                            state &= nCorrMask;
-                        } else {
-                            if ((hiImpedancePins | corrMask) != hiImpedancePins) {
-                                throw new ShortcutException(inputs);
-                            }
-                            hiImpedancePins &= nCorrMask;
-                            state &= nCorrMask;
-                            state |= newState;
-                        }
-                        state |= pullState & hiImpedancePins;
-                    } else if (!newImpedance) {
-                        state &= nCorrMask;
-                        state |= newState;
-                    }
-                    dest.rawState = state;
-                    dest.onChange(state, (hiImpedancePins & nPullMask) > 0);
-                }
-            };
+            inPin = new MergerInPin(src, offset, mask, this);
         } else if (offset > 0) {
-            inPin = new PositiveOffsetMergerInPin(src, offset, mask) {
-                @Override
-                public void onMerge(long newState, boolean newImpedance) {
-                    if (newImpedance != hiImpedance) {
-                        hiImpedance = newImpedance;
-                        if (newImpedance) {
-                            hiImpedancePins |= corrMask;
-                            state &= nCorrMask;
-                        } else {
-                            if ((hiImpedancePins | corrMask) != hiImpedancePins) {
-                                throw new ShortcutException(inputs);
-                            }
-                            hiImpedancePins &= nCorrMask;
-                            state &= nCorrMask;
-                            state |= newState;
-                        }
-                        state |= pullState & hiImpedancePins;
-                    } else if (!newImpedance) {
-                        state &= nCorrMask;
-                        state |= newState;
-                    }
-                    dest.rawState = state;
-                    dest.onChange(state, (hiImpedancePins & nPullMask) > 0);
-                }
-            };
+            inPin = new PositiveOffsetMergerInPin(src, offset, mask, this);
         } else {
-            inPin = new NegativeOffsetMergerInPin(src, offset, mask) {
-                @Override
-                public void onMerge(long newState, boolean newImpedance) {
-                    if (newImpedance != hiImpedance) {
-                        hiImpedance = newImpedance;
-                        if (newImpedance) {
-                            hiImpedancePins |= corrMask;
-                            state &= nCorrMask;
-                        } else {
-                            if ((hiImpedancePins | corrMask) != hiImpedancePins) {
-                                throw new ShortcutException(inputs);
-                            }
-                            hiImpedancePins &= nCorrMask;
-                            state &= nCorrMask;
-                            state |= newState;
-                        }
-                        state |= pullState & hiImpedancePins;
-                    } else if (!newImpedance) {
-                        state &= nCorrMask;
-                        state |= newState;
-                    }
-                    dest.rawState = state;
-                    dest.onChange(state, (hiImpedancePins & nPullMask) > 0);
-                }
-            };
+            inPin = new NegativeOffsetMergerInPin(src, offset, mask, this);
         }
         return inPin;
     }

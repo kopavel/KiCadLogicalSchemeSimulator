@@ -37,7 +37,7 @@ import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 
 public class OutPin extends Pin implements Manipulable {
     public long state;
-    protected InPin dest;
+    public InPin dest;
 
     public OutPin(String id, SchemaPart parent, int size, String... names) {
         super(id, parent, size, names);

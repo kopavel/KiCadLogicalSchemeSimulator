@@ -32,16 +32,19 @@
  */
 package lv.pko.KiCadLogicalSchemeSimulator.model.merger;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.ShortcutException;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.TriStateOutPin;
 
-public abstract class NoOffsetMergerInPin extends InPin {
+public class MergerInPin extends InPin {
     public long corrMask;
     public long nCorrMask;
     public boolean hiImpedance = false;
+    public final Merger merger;
 
-    public NoOffsetMergerInPin(OutPin src, byte offset, long mask) {
+    public MergerInPin(OutPin src, byte offset, long mask, Merger merger) {
         super(src.id, src.parent);
+        this.merger = merger;
         this.offset = offset;
         this.nOffset = (byte) -offset;
         this.mask = mask;
@@ -54,17 +57,36 @@ public abstract class NoOffsetMergerInPin extends InPin {
     }
 
     @Override
-    public void onChange(long newState, boolean hiImpedance) {
+    public void onChange(long newState, boolean newImpedance) {
+        if (newImpedance != hiImpedance) {
+            hiImpedance = newImpedance;
+            if (newImpedance) {
+                merger.hiImpedancePins |= corrMask;
+                merger.state &= nCorrMask;
+            } else {
+                if ((merger.hiImpedancePins | corrMask) != merger.hiImpedancePins) {
+                    throw new ShortcutException(merger.inputs);
+                }
+                merger.hiImpedancePins &= nCorrMask;
+                merger.state &= nCorrMask;
+                merger.state |= newState;
+            }
+            merger.state |= merger.pullState & merger.hiImpedancePins;
+        } else if (!newImpedance) {
+            merger.state &= nCorrMask;
+            merger.state |= newState;
+        }
+        merger.dest.rawState = merger.state;
+        merger.dest.onChange(merger.state, (merger.hiImpedancePins & merger.nPullMask) > 0);
     }
 
     @Override
     public void transit(long newState, boolean hiImpedance) {
-        onMerge(newState, hiImpedance);
+        onChange(newState, hiImpedance);
     }
 
     public String getHash() {
         return corrMask + ":" + offset + ":" + source.getName();
     }
 
-    protected abstract void onMerge(long newState, boolean hiImpedance);
 }
