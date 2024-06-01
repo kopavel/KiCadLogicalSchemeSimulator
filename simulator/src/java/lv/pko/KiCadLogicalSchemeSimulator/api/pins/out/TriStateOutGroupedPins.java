@@ -78,13 +78,13 @@ public class TriStateOutGroupedPins extends TriStateOutPin {
             hiImpedance = false;
             this.state = newState;
             for (MaskGroupPin group : groups) {
-                group.transit(newState, false);
+                group.onChange(newState, false);
             }
         } else {
             if (newState != this.state) {
                 this.state = newState;
                 for (MaskGroupPin group : groups) {
-                    group.transit(newState, false);
+                    group.onChange(newState, false);
                 }
             }
         }
@@ -112,7 +112,7 @@ public class TriStateOutGroupedPins extends TriStateOutPin {
         if (!hiImpedance) {
             hiImpedance = true;
             for (MaskGroupPin group : groups) {
-                group.transit(0, true);
+                group.onChange(0, true);
             }
         }
     }

@@ -1,3 +1,4 @@
+
 /*
  * Copyright (c) 2024 Pavel Korzh
  *
@@ -41,11 +42,5 @@ public class PullPin extends OutPin {
     @Override
     public void setState(long newState) {
         throw new RuntimeException("Can't set state on Pull pin");
-    }
-
-    public void reSendState() {
-        if (dest != null) {
-            dest.transit(state & dest.mask, false);
-        }
     }
 }

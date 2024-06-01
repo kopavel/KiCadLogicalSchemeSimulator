@@ -48,16 +48,12 @@ public class PullPins extends PullPin {
     }
 
     @Override
-    public void setState(long newState) {
-        throw new RuntimeException("Can't set state on Pull pin");
-    }
-
-    @Override
     public void reSendState() {
         RuntimeException result = null;
         for (InPin pin : dest) {
             try {
-                pin.transit(state, false);
+                pin.rawState = state;
+                pin.onChange(state, false);
             } catch (FloatingPinException | ShortcutException e) {
                 if (result == null) {
                     result = e;

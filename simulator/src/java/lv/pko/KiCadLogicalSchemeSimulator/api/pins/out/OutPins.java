@@ -52,7 +52,7 @@ public class OutPins extends OutPin {
     public void setState(long newState) {
         if (newState != this.state) {
             this.state = newState;
-            dest.transit(newState, false);
+            dest.onChange(newState, false);
         }
     }
 

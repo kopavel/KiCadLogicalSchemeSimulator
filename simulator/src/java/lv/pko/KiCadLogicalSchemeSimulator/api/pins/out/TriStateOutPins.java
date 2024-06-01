@@ -53,11 +53,11 @@ public class TriStateOutPins extends TriStateOutPin {
         if (hiImpedance) {
             hiImpedance = false;
             this.state = newState;
-            dest.transit(newState, false);
+            dest.onChange(newState, false);
         } else {
             if (newState != this.state) {
                 this.state = newState;
-                dest.transit(newState, false);
+                dest.onChange(newState, false);
             }
         }
     }
@@ -71,7 +71,7 @@ public class TriStateOutPins extends TriStateOutPin {
     public void setHiImpedance() {
         if (!hiImpedance) {
             hiImpedance = true;
-            dest.transit(0, true);
+            dest.onChange(0, true);
         }
     }
 

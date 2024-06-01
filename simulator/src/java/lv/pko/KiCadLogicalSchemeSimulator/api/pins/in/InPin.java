@@ -75,11 +75,6 @@ public abstract class InPin extends Pin implements Manipulable {
         this.nOffset = (byte) -offset;
     }
 
-    public void transit(long newState, boolean hiImpedance) {
-        rawState = newState;
-        onChange(rawState, hiImpedance);
-    }
-
     abstract public void onChange(long newState, boolean hiImpedance);
 
     @Override

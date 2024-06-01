@@ -40,8 +40,7 @@ public class PositiveOffsetMergerInPin extends MergerInPin {
         this.nCorrMask = ~corrMask;
     }
 
-    @Override
-    public void transit(long newState, boolean hiImpedance) {
-        onChange(newState >> offset, hiImpedance);
+    public void onChange(long newState, boolean hiImpedance) {
+        super.onChange(newState >> offset, hiImpedance);
     }
 }

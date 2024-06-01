@@ -51,15 +51,17 @@ public class OutPin extends Pin implements Manipulable {
     }
 
     public void setState(long newState) {
-        if (newState != this.state) {
-            this.state = newState;
-            dest.transit(newState & dest.mask, false);
+        if (newState != state) {
+            state = newState;
+            dest.rawState = newState & dest.mask;
+            dest.onChange(dest.rawState, false);
         }
     }
 
     public void reSendState() {
         if (dest != null) {
-            dest.transit(state & dest.mask, false);
+            dest.rawState = state & dest.mask;
+            dest.onChange(dest.rawState, false);
         }
     }
 

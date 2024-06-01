@@ -80,11 +80,6 @@ public class MergerInPin extends InPin {
         merger.dest.onChange(merger.state, (merger.hiImpedancePins & merger.nPullMask) > 0);
     }
 
-    @Override
-    public void transit(long newState, boolean hiImpedance) {
-        onChange(newState, hiImpedance);
-    }
-
     public String getHash() {
         return corrMask + ":" + offset + ":" + source.getName();
     }

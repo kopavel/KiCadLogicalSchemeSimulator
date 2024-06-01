@@ -48,10 +48,4 @@ public abstract class FallingEdgeInPin extends EdgeInPin {
         }
     }
 
-    @Override
-    public void transit(long newState, boolean hiImpedance) {
-        if (newState == 0) {
-            onFallingEdge();
-        }
-    }
 }
