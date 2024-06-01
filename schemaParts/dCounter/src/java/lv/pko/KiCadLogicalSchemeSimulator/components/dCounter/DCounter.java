@@ -211,4 +211,10 @@ public class DCounter extends SchemaPart {
             outPin.setState(count);
         }
     }
+
+    @Override
+    public void reset() {
+        count = 0;
+        outPin.setState(0);
+    }
 }

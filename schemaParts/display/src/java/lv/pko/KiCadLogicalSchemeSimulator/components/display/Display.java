@@ -128,4 +128,12 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
     public AbstractUiComponent getComponent() {
         return display;
     }
+
+    @Override
+    public void reset() {
+        hPos = 0;
+        vPos = 0;
+        lastVSync = true;
+        lastHSync = true;
+    }
 }

@@ -142,4 +142,10 @@ public class JnCounter extends SchemaPart {
         outPin.useBitPresentation = true;
         carryOutPin = getOutPin("CO");
     }
+
+    @Override
+    public void reset() {
+        count = 0;
+        outPin.setState(0);
+    }
 }

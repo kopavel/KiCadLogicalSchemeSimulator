@@ -174,4 +174,7 @@ public abstract class SchemaPart {
         }
         outMap.put(outPin.id, newOutPin);
     }
+
+    public void reset() {
+    }
 }

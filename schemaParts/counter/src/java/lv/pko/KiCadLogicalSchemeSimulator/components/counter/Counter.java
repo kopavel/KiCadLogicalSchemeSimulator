@@ -96,4 +96,10 @@ public class Counter extends SchemaPart {
         outPin = getOutPin("Q");
         outPin.useBitPresentation = true;
     }
+
+    @Override
+    public void reset() {
+        count = 0;
+        outPin.setState(0);
+    }
 }

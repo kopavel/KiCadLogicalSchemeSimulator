@@ -64,7 +64,7 @@ public class Model {
     public final Map<String, SchemaPartSpi> schemaPartSpiMap;
     private final Map<OutPin, OutPinNet> outMap = new HashMap<>();
     private final Map<InPin, InPinNet> inMap = new HashMap<>();
-    private Map<String, Merger> mergers = new HashMap<>();
+    private final Map<String, Merger> mergers = new HashMap<>();
 
     public Model(Export export, String mapPath) throws IOException {
         Log.info(Model.class, "Start Model building");
@@ -330,6 +330,11 @@ public class Model {
                     stabilizing = true;
                 }
             });
+            try {
+                schemaParts.values().forEach(SchemaPart::reset);
+            } catch (FloatingPinException | ShortcutException e) {
+                stabilizing = true;
+            }
         }
     }
 

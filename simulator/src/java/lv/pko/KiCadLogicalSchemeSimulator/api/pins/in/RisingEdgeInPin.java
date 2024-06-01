@@ -40,4 +40,18 @@ public abstract class RisingEdgeInPin extends EdgeInPin {
     @Override
     public void onFallingEdge() {
     }
+
+    @Override
+    public void onChange(long newState, boolean hiImpedance) {
+        if (newState != 0) {
+            onRisingEdge();
+        }
+    }
+
+    @Override
+    public void transit(long newState, boolean hiImpedance) {
+        if (newState != 0) {
+            onRisingEdge();
+        }
+    }
 }

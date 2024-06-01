@@ -71,12 +71,115 @@ public class Z80Cpu extends SchemaPart {
         addInPin(new EdgeInPin("CLK", this) {
             @Override
             public void onFallingEdge() {
-                clockFall();
+                if (M > 0) {
+                    IoRequest ioRequest = cpu.ioQueue.peek();
+                    assert ioRequest != null;
+                    if (T1) {
+                        if (ioRequest.isMemory) {
+                            mReqPin.setState(0);
+                            if (!ioRequest.isWrite) {
+                                rdPin.setState(0);
+                            }
+                        }
+                        if (ioRequest.isWrite) {
+                            dOut.setState(ioRequest.payload);
+                            needDataPinReset = true;
+                        }
+                    } else if (T2) {
+                        if (!inWait && ioRequest.isMemory && ioRequest.isWrite) {
+                            wrPin.setState(0);
+                        }
+                        inWait = waitPin.rawState == 0;
+                    } else if (T3) {
+                        if (M1) {
+                            mReqPin.setState(0);
+                        } else if (ioRequest.isMemory) {
+                            if (!ioRequest.isWrite) {
+                                ioRequest.callback.accept((int) dIn.getState());
+                                rdPin.setState(1);
+                            } else {
+                                wrPin.setState(1);
+                            }
+                            mReqPin.setState(1);
+                        } else {
+                            if (!ioRequest.isWrite) {
+                                ioRequest.callback.accept((int) dIn.getState());
+                                rdPin.setState(1);
+                            } else {
+                                wrPin.setState(1);
+                            }
+                            ioReqPin.setState(1);
+                        }
+                    } else {
+                        mReqPin.setState(1);
+                    }
+                }
             }
 
             @Override
             public void onRisingEdge() {
-                clockRaise();
+                if (M > 0) {
+                    if (T4 || (!M1 && T3)) {
+                        T = 1;
+                        cpu.ioQueue.poll();
+//                Log.trace(Z80Cpu.class, "cpuDone is {}", cpuDone);
+                        if (cpu.ioQueue.isEmpty()) {
+                            M = 1;
+                        } else {
+                            M++;
+                        }
+                    } else {
+                        if (T2 && (inWait || extraWait)) {
+                            extraWait = false;
+                        } else {
+                            T++;
+                        }
+                    }
+                    T1 = T == 1;
+                    T2 = T == 2;
+                    T3 = T == 3;
+                    T4 = T == 4;
+                    M1 = M == 1;
+//        Log.trace(Z80Cpu.class, "Set pins at {},{}", M, T);
+                    IoRequest ioRequest = cpu.ioQueue.peek();
+                    assert ioRequest != null;
+                    if (T1) {
+                        if (needRefreshPinReset) {
+                            refreshPin.setState(1);
+                            needRefreshPinReset = false;
+                        }
+                        if (needDataPinReset) {
+                            dOut.setHiImpedance();
+                            needDataPinReset = false;
+                        }
+                        if (M1) {
+                            cpu.executeOneInstruction();
+                            ioRequest = cpu.ioQueue.peek();
+                            assert ioRequest != null;
+                            m1Pin.setState(0);
+                        }
+                        addOut.setState(ioRequest.address);
+                        extraWait = !ioRequest.isMemory;
+                    } else if (T2) {
+                        if (!inWait && !ioRequest.isMemory) {
+                            ioReqPin.setState(0);
+                            if (ioRequest.isWrite) {
+                                wrPin.setState(0);
+                            } else {
+                                rdPin.setState(0);
+                            }
+                        }
+                    } else if (T3) {
+                        if (M1) {
+                            ioRequest.callback.accept((int) dIn.getState());
+                            rdPin.setState(1);
+                            mReqPin.setState(1);
+                            m1Pin.setState(1);
+                            refreshPin.setState(0);
+                            needRefreshPinReset = true;
+                        }
+                    }
+                }
             }
         });
         addInPin(new RisingEdgeInPin("~{RESET}", this) {
@@ -115,39 +218,6 @@ public class Z80Cpu extends SchemaPart {
         dOut = (TriStateOutPin) getOutPin("D");
     }
 
-    public void clockRaise() {
-        if (M > 0) {
-            if (T4 || (!M1 && T3)) {
-                T = 1;
-                cpu.ioQueue.poll();
-//                Log.trace(Z80Cpu.class, "cpuDone is {}", cpuDone);
-                if (cpu.ioQueue.isEmpty()) {
-                    M = 1;
-                } else {
-                    M++;
-                }
-            } else {
-                if (T2 && (inWait || extraWait)) {
-                    extraWait = false;
-                } else {
-                    T++;
-                }
-            }
-            T1 = T == 1;
-            T2 = T == 2;
-            T3 = T == 3;
-            T4 = T == 4;
-            M1 = M == 1;
-            setPinsOnRaise();
-        }
-    }
-
-    public void clockFall() {
-        if (M > 0) {
-            setPinsOnFall();
-        }
-    }
-
     @Override
     public String extraState() {
         return "Adr :" + String.format("%04x", addOut.state) +//
@@ -168,7 +238,7 @@ public class Z80Cpu extends SchemaPart {
                 "\nI   :" + String.format("%02x", cpu.getRegisterValue(CPUConstants.RegisterNames.I));
     }
 
-    private void reset() {
+    public void reset() {
 //            Log.trace(Z80Cpu.class, "reset");
         T = 0;
         M = 0;
@@ -186,92 +256,5 @@ public class Z80Cpu extends SchemaPart {
         refreshPin.setState(1);
         M = 1;
 //            Log.trace(Z80Cpu.class, "reset done. {},{}", addressSemaphore.getAvailableAmount(), addressDoneSemaphore.getAvailableAmount());
-    }
-
-    private void setPinsOnRaise() {
-//        Log.trace(Z80Cpu.class, "Set pins at {},{}", M, T);
-        IoRequest ioRequest = cpu.ioQueue.peek();
-        assert ioRequest != null;
-        if (T1) {
-            if (needRefreshPinReset) {
-                refreshPin.setState(1);
-                needRefreshPinReset = false;
-            }
-            if (needDataPinReset) {
-                dOut.setHiImpedance();
-                needDataPinReset = false;
-            }
-            if (M1) {
-                cpu.executeOneInstruction();
-                ioRequest = cpu.ioQueue.peek();
-                assert ioRequest != null;
-                m1Pin.setState(0);
-            }
-            addOut.setState(ioRequest.address);
-            extraWait = !ioRequest.isMemory;
-        } else if (T2) {
-            if (!inWait && !ioRequest.isMemory) {
-                ioReqPin.setState(0);
-                if (ioRequest.isWrite) {
-                    wrPin.setState(0);
-                } else {
-                    rdPin.setState(0);
-                }
-            }
-        } else if (T3) {
-            if (M1) {
-                ioRequest.callback.accept((int) dIn.getState());
-                rdPin.setState(1);
-                mReqPin.setState(1);
-                m1Pin.setState(1);
-                refreshPin.setState(0);
-                needRefreshPinReset = true;
-            }
-        }
-    }
-
-    private void setPinsOnFall() {
-//        Log.trace(Z80Cpu.class, "Set pins at {},{}", M, T);
-        IoRequest ioRequest = cpu.ioQueue.peek();
-        assert ioRequest != null;
-        if (T1) {
-            if (ioRequest.isMemory) {
-                mReqPin.setState(0);
-                if (!ioRequest.isWrite) {
-                    rdPin.setState(0);
-                }
-            }
-            if (ioRequest.isWrite) {
-                dOut.setState(ioRequest.payload);
-                needDataPinReset = true;
-            }
-        } else if (T2) {
-            if (!inWait && ioRequest.isMemory && ioRequest.isWrite) {
-                wrPin.setState(0);
-            }
-            inWait = waitPin.rawState == 0;
-        } else if (T3) {
-            if (M1) {
-                mReqPin.setState(0);
-            } else if (ioRequest.isMemory) {
-                if (!ioRequest.isWrite) {
-                    ioRequest.callback.accept((int) dIn.getState());
-                    rdPin.setState(1);
-                } else {
-                    wrPin.setState(1);
-                }
-                mReqPin.setState(1);
-            } else {
-                if (!ioRequest.isWrite) {
-                    ioRequest.callback.accept((int) dIn.getState());
-                    rdPin.setState(1);
-                } else {
-                    wrPin.setState(1);
-                }
-                ioReqPin.setState(1);
-            }
-        } else {
-            mReqPin.setState(1);
-        }
     }
 }

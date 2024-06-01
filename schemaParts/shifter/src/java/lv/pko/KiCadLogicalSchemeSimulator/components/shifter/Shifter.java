@@ -41,9 +41,9 @@ public class Shifter extends SchemaPart {
     private final InPin dPins;
     private final InPin dsPins;
     private final long hiDsMask;
+    private final boolean plReverse;
     private long latch = 0;
     private OutPin out;
-    private final boolean plReverse;
     private long outMask;
     private boolean plInactive;
 
@@ -150,5 +150,11 @@ public class Shifter extends SchemaPart {
     @Override
     public String extraState() {
         return "latch" + "\n" + Long.toBinaryString(latch);
+    }
+
+    @Override
+    public void reset() {
+        latch = 0;
+        out.setState(0);
     }
 }
