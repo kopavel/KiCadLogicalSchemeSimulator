@@ -71,7 +71,7 @@ public class OutGroupedPins extends OutPin {
         if (newState != this.state) {
             this.state = newState;
             for (MaskGroupPin group : groups) {
-                group.onChange(newState, false);
+                group.onChange(newState);
             }
         }
     }

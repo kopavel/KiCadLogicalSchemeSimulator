@@ -28,6 +28,17 @@ public class MaskGroupPins extends MaskGroupPin {
         }
     }
 
+    public void onChange(long newState) {
+        long maskState = newState & mask;
+        if (oldVal != maskState) {
+            for (InPin inPin : dest) {
+                inPin.state = maskState;
+                inPin.onChange(maskState, false);
+            }
+            oldVal = maskState;
+        }
+    }
+
     @Override
     public void resend(long newState, boolean hiImpedance) {
         RuntimeException result = null;
