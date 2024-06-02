@@ -69,7 +69,7 @@ public class Buffer extends SchemaPart {
                 }
                 oeState = (newState == 0);
                 if (oeState) {
-                    qPin.setState(isLatch ? latch : dPin.rawState);
+                    qPin.setState(isLatch ? latch : dPin.state);
                 } else {
                     qPin.setHiImpedance();
                 }
@@ -91,7 +91,7 @@ public class Buffer extends SchemaPart {
             addInPin(new FallingEdgeInPin("~{WR}", this) {
                 @Override
                 public void onFallingEdge() {
-                    latch = dPin.rawState;
+                    latch = dPin.state;
                     if (oeState) {
                         qPin.setState(latch);
                     }
@@ -102,7 +102,7 @@ public class Buffer extends SchemaPart {
 
     @Override
     public String extraState() {
-        return "D:" + String.format("%" + (int) Math.ceil(pinAmount / 4d) + "X", dPin.rawState) + "\nQ:" +
+        return "D:" + String.format("%" + (int) Math.ceil(pinAmount / 4d) + "X", dPin.state) + "\nQ:" +
                 String.format("%" + (int) Math.ceil(pinAmount / 4d) + "X", qPin.state);
     }
 

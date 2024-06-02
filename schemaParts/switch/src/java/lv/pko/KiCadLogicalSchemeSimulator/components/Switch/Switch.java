@@ -41,7 +41,7 @@ import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 public class Switch extends SchemaPart implements InteractiveSchemaPart {
     private final InPin pin1In;
     private final InPin pin2In;
-    private boolean state;
+    private boolean toggled;
     private boolean pin1HiImpedance;
     private boolean pin2HiImpedance;
     private TriStateOutPin pin1Out;
@@ -54,7 +54,7 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
             @Override
             public void onChange(long newState, boolean hiImpedance) {
                 pin1HiImpedance = hiImpedance;
-                if (state) {
+                if (toggled) {
                     if (!hiImpedance && !pin2HiImpedance) {
                         throw new ShortcutException(pin1In, pin2In);
                     }
@@ -77,13 +77,13 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
                     throw new ShortcutException(pin1In, pin2In);
                 }
                 pin2HiImpedance = hiImpedance;
-                if (state) {
+                if (toggled) {
                     if (hiImpedance) {
                         pin1Out.setHiImpedance();
 /*
                     } else if (!pin2Weak) {
                         synchronized (pin1Out) {
-                            pin1Out.setState(newState);
+                            pin1Out.setState(state);
                         }
 */
                     }
@@ -108,9 +108,9 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
         return switchUiComponent;
     }
 
-    public void setState(boolean state) {
-        this.state = state;
-        if (state) {
+    public void toggle(boolean toggled) {
+        this.toggled = toggled;
+        if (toggled) {
             if (!pin2HiImpedance && !pin1HiImpedance) {
                 throw new ShortcutException(pin1In, pin2In);
             }

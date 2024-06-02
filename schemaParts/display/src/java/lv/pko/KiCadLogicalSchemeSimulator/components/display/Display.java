@@ -70,8 +70,8 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
         addInPin(new FallingEdgeInPin("Clock", this) {
             @Override
             public void onFallingEdge() {
-                boolean currHSync = (hSync.rawState > 0) ^ reverse;
-                boolean currVSync = (vSync.rawState > 0) ^ reverse;
+                boolean currHSync = (hSync.state > 0) ^ reverse;
+                boolean currVSync = (vSync.state > 0) ^ reverse;
                 if (currVSync && !lastVSync) {
 //                    Log.trace(Display.class, "vsync on {},{}", hPos, vPos);
                     if (vSize == 0) {
@@ -97,7 +97,7 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                     rows++;
                 }
                 hPos++;
-                byte data = (byte) (vIn.rawState > 0 ? 0xff : 0x0);
+                byte data = (byte) (vIn.state > 0 ? 0xff : 0x0);
 //                Log.trace(Display.class, "tick on {},{} -> {}", hPos, vPos, data);
                 if (hSize == 0) {
                     firstRow[hPos] = data;

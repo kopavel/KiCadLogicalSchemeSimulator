@@ -99,7 +99,7 @@ public class Ram extends SchemaPart {
                 if (hiImpedance) {
                     throw new FloatingPinException(this);
                 }
-                csActive = (rawState > 0) ^ reverse;
+                csActive = (state > 0) ^ reverse;
                 out();
             }
         });

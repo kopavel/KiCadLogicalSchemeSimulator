@@ -20,7 +20,7 @@ public class MaskGroupPins extends MaskGroupPin {
         long maskState = newState & mask;
         if (oldVal != maskState || oldImpedance != hiImpedance) {
             for (InPin inPin : dest) {
-                inPin.rawState = maskState;
+                inPin.state = maskState;
                 inPin.onChange(maskState, hiImpedance);
             }
             oldVal = maskState;
@@ -34,7 +34,7 @@ public class MaskGroupPins extends MaskGroupPin {
         long maskState = newState & mask;
         for (InPin inPin : dest) {
             try {
-                inPin.rawState = maskState;
+                inPin.state = maskState;
                 inPin.onChange(maskState, hiImpedance);
             } catch (FloatingPinException | ShortcutException e) {
                 if (result == null) {

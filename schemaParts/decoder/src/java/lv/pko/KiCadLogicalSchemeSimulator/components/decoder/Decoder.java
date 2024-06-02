@@ -77,7 +77,7 @@ public class Decoder extends SchemaPart {
         cs = addInPin(new InPin("CS", this) {
             @Override
             public void onChange(long newState, boolean hiImpedance) {
-                csState = (cs.rawState == 1) ^ reverse;
+                csState = (cs.state == 1) ^ reverse;
                 if (csState) {
                     if (hiImpedance) {
                         throw new FloatingPinException(this);

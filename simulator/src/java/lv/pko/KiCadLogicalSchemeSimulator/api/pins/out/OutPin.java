@@ -36,7 +36,6 @@ import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 
 public class OutPin extends Pin implements Manipulable {
-    public long state;
     public InPin dest;
 
     public OutPin(String id, SchemaPart parent, int size, String... names) {
@@ -53,15 +52,15 @@ public class OutPin extends Pin implements Manipulable {
     public void setState(long newState) {
         if (newState != state) {
             state = newState;
-            dest.rawState = newState & dest.mask;
-            dest.onChange(dest.rawState, false);
+            dest.state = newState & dest.mask;
+            dest.onChange(dest.state, false);
         }
     }
 
     public void reSendState() {
         if (dest != null) {
-            dest.rawState = state & dest.mask;
-            dest.onChange(dest.rawState, false);
+            dest.state = state & dest.mask;
+            dest.onChange(dest.state, false);
         }
     }
 

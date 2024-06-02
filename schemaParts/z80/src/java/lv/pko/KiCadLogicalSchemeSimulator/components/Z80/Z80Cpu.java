@@ -89,7 +89,7 @@ public class Z80Cpu extends SchemaPart {
                         if (!inWait && ioRequest.isMemory && ioRequest.isWrite) {
                             wrPin.setState(0);
                         }
-                        inWait = waitPin.rawState == 0;
+                        inWait = waitPin.state == 0;
                     } else if (T3) {
                         if (M1) {
                             mReqPin.setState(0);

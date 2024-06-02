@@ -95,13 +95,13 @@ public class DCounter extends SchemaPart {
         addInPin(new InPin("UD", this) {
             @Override
             public void onChange(long newState, boolean hiImpedance) {
-                countUp = rawState > 0;
+                countUp = state > 0;
             }
         });
         addInPin(new InPin("BD", this) {
             @Override
             public void onChange(long newState, boolean hiImpedance) {
-                maxCount = ((rawState > 0) ^ bdReverse) ? 15 : 9;
+                maxCount = ((state > 0) ^ bdReverse) ? 15 : 9;
             }
         });
         addInPin(new InPin("R", this) {

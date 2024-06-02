@@ -52,20 +52,20 @@ public class JkTrigger extends SchemaPart {
         rPin = addInPin(new InPin("R", this) {
             @Override
             public void onChange(long newState, boolean hiImpedance) {
-                clockEnabled = (newState | sPin.rawState) == 0;
+                clockEnabled = (newState | sPin.state) == 0;
                 if (newState > 0) {
                     iqOut.setState(hiState);
-                    qOut.setState(sPin.rawState > 0 ? hiState : loState);
+                    qOut.setState(sPin.state > 0 ? hiState : loState);
                 }
             }
         });
         sPin = addInPin(new InPin("S", this) {
             @Override
             public void onChange(long newState, boolean hiImpedance) {
-                clockEnabled = (newState | sPin.rawState) == 0;
+                clockEnabled = (newState | sPin.state) == 0;
                 if (newState > 0) {
                     qOut.setState(hiState);
-                    iqOut.setState(rPin.rawState > 0 ? hiState : loState);
+                    iqOut.setState(rPin.state > 0 ? hiState : loState);
                 }
             }
         });
@@ -74,8 +74,8 @@ public class JkTrigger extends SchemaPart {
                 @Override
                 public void onFallingEdge() {
                     if (clockEnabled) {
-                        boolean jState = jPin.rawState > 0;
-                        boolean kState = kPin.rawState > 0;
+                        boolean jState = jPin.state > 0;
+                        boolean kState = kPin.state > 0;
                         if (jState || kState) {
                             if (jState && !kState) {
                                 qOut.setState(1);
@@ -96,8 +96,8 @@ public class JkTrigger extends SchemaPart {
                 @Override
                 public void onRisingEdge() {
                     if (clockEnabled) {
-                        boolean jState = jPin.rawState > 0;
-                        boolean kState = kPin.rawState > 0;
+                        boolean jState = jPin.state > 0;
+                        boolean kState = kPin.state > 0;
                         if (jState || kState) {
                             if (jState && !kState) {
                                 qOut.setState(1);

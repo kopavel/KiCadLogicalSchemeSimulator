@@ -51,7 +51,7 @@ public class SwitchUiComponent extends AbstractUiComponent {
                 // Toggle the color of inner square on mouse click
                 innerColor = (innerColor == GRAY) ? GREEN : GRAY;
                 repaint(); // Repaint the panel to reflect the color change
-                parent.setState(innerColor == GREEN);
+                parent.toggle(innerColor == GREEN);
             }
         });
     }

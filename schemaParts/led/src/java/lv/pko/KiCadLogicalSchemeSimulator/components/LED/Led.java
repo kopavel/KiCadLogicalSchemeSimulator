@@ -51,7 +51,7 @@ public class Led extends SchemaPart implements InteractiveSchemaPart {
                 if (hiImpedance) {
                     throw new FloatingPinException(this);
                 }
-                ledUiComponent.setState(rawState > 0);
+                ledUiComponent.setState(state > 0);
             }
         });
         int size = Integer.parseInt(params.getOrDefault("size", "20"));

@@ -37,8 +37,6 @@ import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 
 //FixMe make Sense Pin
 public abstract class InPin extends Pin implements Manipulable {
-    //Fixme volatile??
-    public long rawState;
     public byte offset;
     public OutPin source;
     public byte nOffset;
@@ -57,7 +55,7 @@ public abstract class InPin extends Pin implements Manipulable {
     }
 
     public long getState() {
-        return correctState(rawState);
+        return correctState(state);
     }
 
     public long correctState(long state) {

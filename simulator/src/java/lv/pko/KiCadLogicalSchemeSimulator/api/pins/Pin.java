@@ -37,6 +37,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public abstract class Pin {
+    //Fixme volatile??
+    public long state;
     public final String id;
     public final SchemaPart parent;
     public final int size;

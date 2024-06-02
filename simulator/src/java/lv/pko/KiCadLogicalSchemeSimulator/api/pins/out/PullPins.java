@@ -52,7 +52,7 @@ public class PullPins extends PullPin {
         RuntimeException result = null;
         for (InPin pin : dest) {
             try {
-                pin.rawState = state;
+                pin.state = state;
                 pin.onChange(state, false);
             } catch (FloatingPinException | ShortcutException e) {
                 if (result == null) {

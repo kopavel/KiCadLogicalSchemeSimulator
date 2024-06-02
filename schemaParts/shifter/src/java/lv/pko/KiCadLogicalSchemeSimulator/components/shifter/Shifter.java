@@ -87,7 +87,7 @@ public class Shifter extends SchemaPart {
                     if (latch > 0) {
                         if (plInactive) {
                             latch = (latch << 1) & outMask;
-                            if (dsPins.rawState > 0) {
+                            if (dsPins.state > 0) {
                                 latch = latch | 1;
                             }
                             out.setState(latch);
@@ -101,7 +101,7 @@ public class Shifter extends SchemaPart {
                     if (latch > 0) {
                         if (plInactive) {
                             latch = (latch >> 1) & outMask;
-                            if (dsPins.rawState > 0) {
+                            if (dsPins.state > 0) {
                                 latch = latch | hiDsMask;
                             }
                             out.setState(latch);
@@ -116,7 +116,7 @@ public class Shifter extends SchemaPart {
                     if (latch > 0) {
                         if (plInactive) {
                             latch = (latch << 1) & outMask;
-                            if (dsPins.rawState > 0) {
+                            if (dsPins.state > 0) {
                                 latch = latch | 1;
                             }
                             out.setState(latch);
@@ -130,7 +130,7 @@ public class Shifter extends SchemaPart {
                     if (latch > 0) {
                         if (plInactive) {
                             latch = (latch >> 1) & outMask;
-                            if (dsPins.rawState > 0) {
+                            if (dsPins.state > 0) {
                                 latch = latch | hiDsMask;
                             }
                             out.setState(latch);

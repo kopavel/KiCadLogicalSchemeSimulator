@@ -76,7 +76,7 @@ public class MergerInPin extends InPin {
             merger.state &= nCorrMask;
             merger.state |= newState;
         }
-        merger.dest.rawState = merger.state;
+        merger.dest.state = merger.state;
         merger.dest.onChange(merger.state, (merger.hiImpedancePins & merger.nPullMask) > 0);
     }
 
