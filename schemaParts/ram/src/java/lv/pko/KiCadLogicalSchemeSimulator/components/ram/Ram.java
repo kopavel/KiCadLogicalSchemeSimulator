@@ -118,7 +118,7 @@ public class Ram extends SchemaPart {
                 @Override
                 public void onFallingEdge() {
                     if (csActive) {
-                        words[addr] = (byte) dIn.getState();
+                        words[addr] = dIn.getState();
                     }
                 }
             });
@@ -127,7 +127,7 @@ public class Ram extends SchemaPart {
                 @Override
                 public void onRisingEdge() {
                     if (csActive) {
-                        words[addr] = (byte) dIn.getState();
+                        words[addr] = dIn.getState();
                     }
                 }
             });

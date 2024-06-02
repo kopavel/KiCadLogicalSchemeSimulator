@@ -35,6 +35,8 @@ import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.FloatingPinException;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.ShortcutException;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.*;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.groups.TriStateOutGroupedPins;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.groups.TriStateOutPins;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.nc.NCOutPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.nc.NCOutPins;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.nc.NCTriStateOutPin;

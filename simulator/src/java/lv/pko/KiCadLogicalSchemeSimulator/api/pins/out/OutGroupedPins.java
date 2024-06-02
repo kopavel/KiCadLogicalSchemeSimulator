@@ -33,6 +33,10 @@ package lv.pko.KiCadLogicalSchemeSimulator.api.pins.out;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.FloatingPinException;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.ShortcutException;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.groups.MaskGroupPin;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.groups.MaskGroupPins;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.groups.SameMaskGroupPin;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.groups.SameMaskGroupPins;
 import lv.pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 public class OutGroupedPins extends OutPin {
@@ -41,6 +45,7 @@ public class OutGroupedPins extends OutPin {
     public OutGroupedPins(OutPin oldPin) {
         super(oldPin.id, oldPin.parent, oldPin.size);
         aliases = oldPin.aliases;
+        mask = oldPin.mask;
     }
 
     @Override
@@ -53,13 +58,13 @@ public class OutGroupedPins extends OutPin {
             }
         }
         if (destGroupId == -1) {
-            groups = Utils.addToArray(groups, new MaskGroupPin(pin));
+            groups = Utils.addToArray(groups, (mask == pin.mask) ? new SameMaskGroupPin(pin) : new MaskGroupPin(pin));
         } else {
             MaskGroupPins targetGroup;
             if (groups[destGroupId] instanceof MaskGroupPins pins) {
                 targetGroup = pins;
             } else {
-                targetGroup = new MaskGroupPins(groups[destGroupId]);
+                targetGroup = (mask == groups[destGroupId].mask) ? new SameMaskGroupPins(groups[destGroupId]) : new MaskGroupPins(groups[destGroupId]);
                 groups[destGroupId] = targetGroup;
             }
             targetGroup.addDest(pin);

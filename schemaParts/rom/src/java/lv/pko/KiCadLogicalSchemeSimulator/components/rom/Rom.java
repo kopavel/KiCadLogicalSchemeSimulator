@@ -48,6 +48,7 @@ public class Rom extends SchemaPart {
     private boolean csActive;
     private int size;
     private int aSize;
+    private int mask;
 
     protected Rom(String id, String sParam) {
         super(id, sParam);
@@ -63,6 +64,9 @@ public class Rom extends SchemaPart {
         try {
             size = Integer.parseInt(params.get("size"));
         } catch (NumberFormatException ignore) {
+        }
+        for (int i = 0; i < size; i++) {
+            mask = mask << 1 | 1;
         }
         if (size < 1) {
             throw new RuntimeException("Component " + id + " size must be positive number");
@@ -90,7 +94,7 @@ public class Rom extends SchemaPart {
             byte[] fileBytes = is.readAllBytes();
             if (size < 9) {
                 for (int i = 0; i < fileBytes.length; i++) {
-                    words[i] = fileBytes[i];
+                    words[i] = fileBytes[i] & mask;
                 }
             } else {
                 int wordSize = size / 8;
@@ -99,7 +103,7 @@ public class Rom extends SchemaPart {
                     for (int j = 0; j < wordSize; j++) {
                         word = word << 8 | fileBytes[pos * wordSize + j];
                     }
-                    words[pos] = word;
+                    words[pos] = word & mask;
                 }
             }
         } catch (IOException e) {

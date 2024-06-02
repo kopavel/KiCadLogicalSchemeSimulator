@@ -72,6 +72,5 @@ module KiCadLogicalSchemeSimulator.simulator {
     opens lv.pko.KiCadLogicalSchemeSimulator.parsers.pojo;
     exports lv.pko.KiCadLogicalSchemeSimulator.parsers.pojo.symbolMap;
     opens lv.pko.KiCadLogicalSchemeSimulator.parsers.pojo.symbolMap;
-    exports lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.nc;
     exports lv.pko.KiCadLogicalSchemeSimulator.tools.ringBuffers;
 }

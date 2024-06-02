@@ -44,14 +44,14 @@ public class DirectOutPin extends OutPin implements Manipulable {
     public void setState(long newState) {
         if (newState != dest.state) {
             dest.state = newState;
-            dest.onChange(dest.state, false);
+            dest.onChange(newState, false);
         }
     }
 
     public void reSendState() {
         if (dest != null) {
             dest.state = state;
-            dest.onChange(dest.state, false);
+            dest.onChange(state, false);
         }
     }
 

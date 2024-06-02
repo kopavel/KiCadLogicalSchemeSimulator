@@ -53,7 +53,7 @@ public class OutPin extends Pin implements Manipulable {
         state = newState & dest.mask;
         if (dest.state != state) {
             dest.state = state;
-            dest.onChange(dest.state, false);
+            dest.onChange(state, false);
         }
     }
 

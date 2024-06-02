@@ -128,8 +128,7 @@ public class SdRam extends SchemaPart {
         int addr;
         addr = (int) (hiPart + addrPin.getState());
         if (we.state > 0 ^ reverse) {
-            byte data = (byte) dIn.getState();
-            bytes[addr] = data;
+            bytes[addr] = dIn.getState();
         } else if (we.state == 0 ^ reverse) {
             dOut.setState(bytes[addr]);
         }

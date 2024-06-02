@@ -53,11 +53,11 @@ public class TriStateOutPin extends OutPin {
     public void setState(long newState) {
         if (hiImpedance) {
             hiImpedance = false;
-            this.state = newState;
+            state = newState;
             dest.state = newState & dest.mask;
             dest.onChange(dest.state, false);
         } else if (newState != this.state) {
-            this.state = newState;
+            state = newState;
             dest.state = newState & dest.mask;
             dest.onChange(dest.state, false);
         }

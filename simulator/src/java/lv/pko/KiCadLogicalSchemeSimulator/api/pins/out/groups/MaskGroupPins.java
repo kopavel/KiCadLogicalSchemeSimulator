@@ -1,4 +1,4 @@
-package lv.pko.KiCadLogicalSchemeSimulator.api.pins.out;
+package lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.groups;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.FloatingPinException;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.ShortcutException;
@@ -19,23 +19,23 @@ public class MaskGroupPins extends MaskGroupPin {
     public void onChange(long newState, boolean hiImpedance) {
         long maskState = newState & mask;
         if (oldVal != maskState || oldImpedance != hiImpedance) {
+            oldVal = maskState;
+            oldImpedance = hiImpedance;
             for (InPin inPin : dest) {
                 inPin.state = maskState;
                 inPin.onChange(maskState, hiImpedance);
             }
-            oldVal = maskState;
-            oldImpedance = hiImpedance;
         }
     }
 
     public void onChange(long newState) {
         long maskState = newState & mask;
         if (oldVal != maskState) {
+            oldVal = maskState;
             for (InPin inPin : dest) {
                 inPin.state = maskState;
                 inPin.onChange(maskState, false);
             }
-            oldVal = maskState;
         }
     }
 

@@ -37,10 +37,10 @@ import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.TriStateOutPin;
 
 public class MergerInPin extends InPin {
-    public long corrMask;
-    public long nCorrMask;
-    public boolean hiImpedance = false;
+    public final long corrMask;
+    public final long nCorrMask;
     public final Merger merger;
+    public boolean hiImpedance = false;
 
     public MergerInPin(OutPin src, byte offset, long mask, Merger merger) {
         super(src.id, src.parent);
@@ -48,7 +48,11 @@ public class MergerInPin extends InPin {
         this.offset = offset;
         this.nOffset = (byte) -offset;
         this.mask = mask;
-        this.corrMask = mask;
+        if (offset < 0) {
+            this.corrMask = mask << nOffset;
+        } else {
+            this.corrMask = mask >> offset;
+        }
         this.nCorrMask = ~corrMask;
         this.source = src;
         if (src instanceof TriStateOutPin triStateOutPin) {
@@ -83,5 +87,4 @@ public class MergerInPin extends InPin {
     public String getHash() {
         return corrMask + ":" + offset + ":" + source.getName();
     }
-
 }

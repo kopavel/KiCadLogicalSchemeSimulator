@@ -36,8 +36,6 @@ import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
 public class NegativeOffsetMergerInPin extends MergerInPin {
     public NegativeOffsetMergerInPin(OutPin src, byte offset, long mask, Merger merger) {
         super(src, offset, mask, merger);
-        this.corrMask = mask << nOffset;
-        this.nCorrMask = ~corrMask;
     }
 
     public void onChange(long newState, boolean hiImpedance) {

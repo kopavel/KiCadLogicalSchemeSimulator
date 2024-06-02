@@ -32,8 +32,8 @@
 package lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.nc;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.Manipulable;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.TriStateOutGroupedPins;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.TriStateOutPin;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.groups.TriStateOutGroupedPins;
 
 public class NCTriStateOutPins extends TriStateOutGroupedPins implements Manipulable {
     public NCTriStateOutPins(TriStateOutPin outPin) {
