@@ -90,28 +90,24 @@ public class Shifter extends SchemaPart {
             addInPin(new FallingEdgeInPin("CP", this) {
                 @Override
                 public void onFallingEdge() {
-                    if (latch > 0) {
-                        if (plInactive) {
-                            latch = (latch << 1) & outMask;
-                            if (dsPins.state > 0) {
-                                latch = latch | 1;
-                            }
-                            out.setState(latch & out.mask);
+                    if (plInactive && latch > 0) {
+                        latch = (latch << 1) & outMask;
+                        if (dsPins.state > 0) {
+                            latch = latch | 1;
                         }
+                        out.setState(latch & out.mask);
                     }
                 }
             });
             addInPin(new FallingEdgeInPin("CN", this) {
                 @Override
                 public void onFallingEdge() {
-                    if (latch > 0) {
-                        if (plInactive) {
-                            latch = (latch >> 1) & outMask;
-                            if (dsPins.state > 0) {
-                                latch = latch | hiDsMask;
-                            }
-                            out.setState(latch & out.mask);
+                    if (plInactive && latch > 0) {
+                        latch = latch >> 1;
+                        if (dsPins.state > 0) {
+                            latch = latch | hiDsMask;
                         }
+                        out.setState(latch & out.mask);
                     }
                 }
             });
@@ -119,28 +115,24 @@ public class Shifter extends SchemaPart {
             addInPin(new RisingEdgeInPin("CP", this) {
                 @Override
                 public void onRisingEdge() {
-                    if (latch > 0) {
-                        if (plInactive) {
-                            latch = (latch << 1) & outMask;
-                            if (dsPins.state > 0) {
-                                latch = latch | 1;
-                            }
-                            out.setState(latch & out.mask);
+                    if (plInactive && latch > 0) {
+                        latch = (latch << 1) & outMask;
+                        if (dsPins.state > 0) {
+                            latch = latch | 1;
                         }
+                        out.setState(latch & out.mask);
                     }
                 }
             });
             addInPin(new RisingEdgeInPin("CN", this) {
                 @Override
                 public void onRisingEdge() {
-                    if (latch > 0) {
-                        if (plInactive) {
-                            latch = (latch >> 1) & outMask;
-                            if (dsPins.state > 0) {
-                                latch = latch | hiDsMask;
-                            }
-                            out.setState(latch & out.mask);
+                    if (plInactive && latch > 0) {
+                        latch = latch >> 1;
+                        if (dsPins.state > 0) {
+                            latch = latch | hiDsMask;
                         }
+                        out.setState(latch & out.mask);
                     }
                 }
             });

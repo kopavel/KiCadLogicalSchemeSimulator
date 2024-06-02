@@ -98,8 +98,7 @@ public class DcTrigger extends SchemaPart {
 
     private void store() {
         if (clockEnabled) {
-            long dState = dPin.state;
-            if (dState > 0) {
+            if (dPin.state > 0) {
                 //ToDo why no hi/loState?
                 qOut.setState(1);
                 iqOut.setState(0);
