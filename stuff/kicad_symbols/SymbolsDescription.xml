@@ -34,8 +34,8 @@
 		<symbol name="RAM256" symPartClass="Ram" symPartParam="aSize=8;size=8;reverse"/>
 		<symbol name="ROM4K" symPartClass="Rom" symPartParam="aSize=12;size=8;reverse"/>
 		<symbol name="SDRAM64K" symPartClass="SdRam" symPartParam="aSize=8;size=8;reverse"/>
-		<symbol name="SHIFT" symPartClass="Shifter" symPartParam="size=8;plReverse">
-			<unit pinMap="1=D0;2=D1;3=D2;4=D3;5=D4;6=D5;7=D6;8=D7;9=Q0;17=CN;18=PL"/>
+		<symbol name="SHIFT" symPartClass="Shifter" symPartParam="size=8;plReverse;qSize=1">
+			<unit pinMap="1=D0;2=D1;3=D2;4=D3;5=D4;6=D5;7=D6;8=D7;9=Q;17=CN;18=PL"/>
 		</symbol>
 		<symbol name="SWITCH" symPartClass="Switch"/>
 		<symbol name="XOR" symPartClass="XorGate"/>

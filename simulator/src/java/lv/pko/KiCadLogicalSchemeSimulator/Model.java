@@ -245,6 +245,8 @@ public class Model {
                         replaceOut(outPin, new TriStateOutPins(oldPin));
                     } else if (outPin instanceof OutGroupedPins oldPin && oldPin.groups.length == 1) {
                         replaceOut(outPin, new OutPins(oldPin));
+                    } else if (outPin.getClass() == OutPin.class && outPin.dest.mask == outPin.mask) {
+                        replaceOut(outPin, new DirectOutPin(outPin));
                     }
                 });
     }

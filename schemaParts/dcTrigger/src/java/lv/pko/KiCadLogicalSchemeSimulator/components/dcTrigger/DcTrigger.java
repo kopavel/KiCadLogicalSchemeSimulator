@@ -92,12 +92,15 @@ public class DcTrigger extends SchemaPart {
         qOut.state = 0;
         iqOut = getOutPin("~{Q}");
         iqOut.state = 1;
+        hiState = hiState & qOut.mask;
+        loState = loState & qOut.mask;
     }
 
     private void store() {
         if (clockEnabled) {
             long dState = dPin.state;
             if (dState > 0) {
+                //ToDo why no hi/loState?
                 qOut.setState(1);
                 iqOut.setState(0);
             } else {

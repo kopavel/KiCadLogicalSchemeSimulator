@@ -29,43 +29,33 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lv.pko.KiCadLogicalSchemeSimulator.components.repeater;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.FloatingPinException;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
-import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+package lv.pko.KiCadLogicalSchemeSimulator.api.pins.out;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.Manipulable;
 
-public class Repeater extends SchemaPart {
-    private OutPin out;
-
-    public Repeater(String id, String sParam) {
-        super(id, sParam);
-        if (reverse) {
-            addInPin(new InPin("IN", this) {
-                @Override
-                public void onChange(long newState, boolean hiImpedance) {
-                    if (hiImpedance) {
-                        throw new FloatingPinException(this);
-                    }
-                    out.setState(~newState & out.mask);
-                }
-            });
-        } else {
-            addInPin(new InPin("IN", this) {
-                @Override
-                public void onChange(long newState, boolean hiImpedance) {
-                    if (hiImpedance) {
-                        throw new FloatingPinException(this);
-                    }
-                    out.setState(newState);
-                }
-            });
-        }
-        addOutPin("OUT", 1);
+public class DirectOutPin extends OutPin implements Manipulable {
+    public DirectOutPin(OutPin oldPin) {
+        super(oldPin.id, oldPin.parent, oldPin.size);
+        aliases = oldPin.aliases;
+        mask = oldPin.mask;
+        dest = oldPin.dest;
+        state = oldPin.state;
     }
 
-    @Override
-    public void initOuts() {
-        out = getOutPin("OUT");
+    public void setState(long newState) {
+        if (newState != dest.state) {
+            dest.state = newState;
+            dest.onChange(dest.state, false);
+        }
+    }
+
+    public void reSendState() {
+        if (dest != null) {
+            dest.state = state;
+            dest.onChange(dest.state, false);
+        }
+    }
+
+    public boolean noDest() {
+        return dest == null;
     }
 }

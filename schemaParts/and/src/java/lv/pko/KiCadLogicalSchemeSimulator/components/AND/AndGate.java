@@ -65,5 +65,7 @@ public class AndGate extends SchemaPart {
         out = getOutPin("OUT");
         out.state = loState;
         out.useBitPresentation = true;
+        hiState = hiState & out.mask;
+        loState = loState & out.mask;
     }
 }

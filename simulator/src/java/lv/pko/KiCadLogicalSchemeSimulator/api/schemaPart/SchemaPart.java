@@ -45,8 +45,8 @@ public abstract class SchemaPart {
     public final Map<String, OutPin> outMap = new LinkedHashMap<>();
     public final Map<String, InPin> inMap = new LinkedHashMap<>();
     protected final Map<String, String> params = new HashMap<>();
-    protected final long hiState;
-    protected final long loState;
+    protected long hiState;
+    protected long loState;
     protected final boolean reverse;
     private final Map<String, InPin> inAliasMap = new HashMap<>();
     private final Map<String, OutPin> outAliasMap = new HashMap<>();

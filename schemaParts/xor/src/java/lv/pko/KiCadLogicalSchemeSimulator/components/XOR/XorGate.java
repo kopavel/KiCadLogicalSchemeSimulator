@@ -70,5 +70,7 @@ public class XorGate extends SchemaPart {
         out = getOutPin("OUT");
         out.state = hiState;
         out.useBitPresentation = true;
+        hiState = hiState & out.mask;
+        loState = loState & out.mask;
     }
 }

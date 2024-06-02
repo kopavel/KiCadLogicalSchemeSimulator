@@ -61,7 +61,7 @@ public abstract class Pin {
         } else if (names.length != size) {
             throw new RuntimeException("Pin definition Error, Names amount not equal size, pin" + getName());
         } else if (size == 1) {
-            aliases = Collections.singletonMap(id, (byte) 1);
+            aliases = Collections.singletonMap(id, (byte) 0);
         } else {
             for (byte i = 0; i < names.length; i++) {
                 aliases.put(names[i], i);

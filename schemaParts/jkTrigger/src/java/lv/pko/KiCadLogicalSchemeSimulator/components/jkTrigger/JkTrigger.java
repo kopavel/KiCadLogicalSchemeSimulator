@@ -124,5 +124,7 @@ public class JkTrigger extends SchemaPart {
         qOut.state = 0;
         iqOut = getOutPin("~{Q}");
         iqOut.state = 1;
+        hiState = hiState & qOut.mask;
+        loState = loState & qOut.mask;
     }
 }

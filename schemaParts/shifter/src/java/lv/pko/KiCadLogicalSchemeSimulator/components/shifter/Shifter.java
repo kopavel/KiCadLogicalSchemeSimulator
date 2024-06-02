@@ -37,6 +37,8 @@ import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.RisingEdgeInPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 
+import java.util.stream.IntStream;
+
 public class Shifter extends SchemaPart {
     private final InPin dPins;
     private final InPin dsPins;
@@ -53,6 +55,10 @@ public class Shifter extends SchemaPart {
             throw new RuntimeException("Component " + id + " has no parameter \"size\"");
         }
         int dSize = Integer.parseInt(params.get("size"));
+        int qSize = dSize;
+        if (params.containsKey("qSize")) {
+            qSize = Integer.parseInt(params.get("qSize"));
+        }
         dPins = addInPin(new InPin("D", this, dSize) {
             @Override
             public void onChange(long newState, boolean hiImpedance) {
@@ -76,7 +82,7 @@ public class Shifter extends SchemaPart {
                 plInactive = (newState == 0) ^ plReverse;
                 if (!plInactive) {
                     latch = dPins.getState();
-                    out.setState(latch);
+                    out.setState(latch & out.mask);
                 }
             }
         });
@@ -90,7 +96,7 @@ public class Shifter extends SchemaPart {
                             if (dsPins.state > 0) {
                                 latch = latch | 1;
                             }
-                            out.setState(latch);
+                            out.setState(latch & out.mask);
                         }
                     }
                 }
@@ -104,7 +110,7 @@ public class Shifter extends SchemaPart {
                             if (dsPins.state > 0) {
                                 latch = latch | hiDsMask;
                             }
-                            out.setState(latch);
+                            out.setState(latch & out.mask);
                         }
                     }
                 }
@@ -119,7 +125,7 @@ public class Shifter extends SchemaPart {
                             if (dsPins.state > 0) {
                                 latch = latch | 1;
                             }
-                            out.setState(latch);
+                            out.setState(latch & out.mask);
                         }
                     }
                 }
@@ -133,13 +139,16 @@ public class Shifter extends SchemaPart {
                             if (dsPins.state > 0) {
                                 latch = latch | hiDsMask;
                             }
-                            out.setState(latch);
+                            out.setState(latch & out.mask);
                         }
                     }
                 }
             });
         }
-        addOutPin("Q", dSize);
+        addOutPin("Q",
+                qSize,
+                IntStream.range(0, qSize).mapToObj(String::valueOf)
+                        .map(pos -> "Q" + pos).toArray(String[]::new));
     }
 
     @Override
