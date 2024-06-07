@@ -1,7 +1,7 @@
 package lv.pko.KiCadLogicalSchemeSimulator.tools.ringBuffers;
 public class IntBufferSlice implements IRingBufferSlice {
     private final int[] slice;
-    private int pos;
+    private int pos = -1;
 
     public IntBufferSlice(int[] slice) {
         this.slice = slice;
@@ -14,6 +14,16 @@ public class IntBufferSlice implements IRingBufferSlice {
 
     @Override
     public long next() {
-        return slice[pos++];
+        return slice[++pos];
+    }
+
+    @Override
+    public void skip() {
+        pos++;
+    }
+
+    @Override
+    public long peek() {
+        return slice[pos];
     }
 }

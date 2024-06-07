@@ -1,6 +1,6 @@
 package lv.pko.KiCadLogicalSchemeSimulator.tools.ringBuffers;
 public abstract class RingBuffer {
-    protected static final int DEFAULT_CAPACITY = 10000000;
+    public static final int DEFAULT_CAPACITY = 10000000;
     protected final int capacity;
     protected boolean isFull;
     protected int writePos;

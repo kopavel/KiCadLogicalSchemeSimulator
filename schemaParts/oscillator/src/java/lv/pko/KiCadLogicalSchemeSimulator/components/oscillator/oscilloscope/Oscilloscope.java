@@ -47,6 +47,7 @@ import java.util.concurrent.TimeUnit;
 //ToDo reset history
 //ToDo search by pin changes
 //ToDo navigate to start/end
+//ToDo add 'time' tags
 public class Oscilloscope extends JFrame {
     public static final ResourceBundle localization = ResourceBundle.getBundle("i81n_clock/clock");
     final Diagram diagram;
@@ -78,7 +79,7 @@ public class Oscilloscope extends JFrame {
         parent.parent.parent.restartClock();
         setVisible(true);
         scheduler = Executors.newSingleThreadScheduledExecutor();
-        scheduler.scheduleAtFixedRate(this::reDraw, 0, 100, TimeUnit.MILLISECONDS);
+        scheduler.scheduleAtFixedRate(this::reDraw, 0, 250, TimeUnit.MILLISECONDS);
         watchedItemNamesPanel.add(new FixedHeightLabel("clock"));
         watchedItemNamesPanel.revalidate();
         diagram.revalidate();
