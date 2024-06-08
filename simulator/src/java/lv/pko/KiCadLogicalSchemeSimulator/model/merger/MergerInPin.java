@@ -36,6 +36,7 @@ import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.ShortcutException;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.TriStateOutPin;
 
+//ToDo No-TriState Merger in pin  (simpler onChange)
 public class MergerInPin extends InPin {
     public final long corrMask;
     public final long nCorrMask;
@@ -76,12 +77,14 @@ public class MergerInPin extends InPin {
                 merger.state |= newState;
             }
             merger.state |= merger.pullState & merger.hiImpedancePins;
+            merger.dest.state = merger.state;
+            merger.dest.onChange(merger.state, (merger.hiImpedancePins & merger.nPullMask) > 0);
         } else if (!newImpedance) {
             merger.state &= nCorrMask;
             merger.state |= newState;
+            merger.dest.state = merger.state;
+            merger.dest.onChange(merger.state, (merger.hiImpedancePins & merger.nPullMask) > 0);
         }
-        merger.dest.state = merger.state;
-        merger.dest.onChange(merger.state, (merger.hiImpedancePins & merger.nPullMask) > 0);
     }
 
     public String getHash() {
