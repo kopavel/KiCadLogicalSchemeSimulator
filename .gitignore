@@ -6,7 +6,7 @@
 /**/*.iws
 /distro/
 /stuff/work/
-/stuff/examples/*/logs/
+/**/logs/
 /**/*.sym_layout
 /**/fp-info-cache
 /**/*.kicad_pcb

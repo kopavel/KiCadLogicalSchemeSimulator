@@ -54,8 +54,4 @@ public class DirectOutPin extends OutPin implements Manipulable {
             dest.onChange(state, false);
         }
     }
-
-    public boolean noDest() {
-        return dest == null;
-    }
 }

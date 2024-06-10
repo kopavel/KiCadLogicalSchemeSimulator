@@ -88,12 +88,12 @@ configure(subprojects) {
         }
     }
 
-    compileTestJava {
-        onlyIf { false }
-    }
     dependencies {
         compileOnly libs.lombok
         annotationProcessor libs.lombok
+        testImplementation platform(libs.bom.junit)
+        testImplementation libs.junit.jupiter
+        testRuntimeOnly libs.junit.launcher
     }
     java {
         sourceCompatibility = JavaVersion.VERSION_21
@@ -130,18 +130,5 @@ idea {
     module {
         excludeDirs += file('distro')
         excludeDirs += file('stuff/work')
-    }
-}
-
-allprojects {
-    tasks.withType(Test).tap {
-        configureEach {
-            enabled = false
-        }
-    }
-    idea {
-        module {
-            testSourceDirs = []
-        }
     }
 }

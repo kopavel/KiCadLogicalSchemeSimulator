@@ -2,8 +2,13 @@
 lombok = '1.18.32'
 log4j2 = '2.23.1'
 jackson = '2.17.0'
+jUnit = '5.10.2'
 
 [libraries]
+
+bom-junit = { module = 'org.junit:junit-bom', version.ref = 'jUnit' }
+junit-jupiter = { module = 'org.junit.jupiter:junit-jupiter' }
+junit-launcher = { module = 'org.junit.platform:junit-platform-launcher' }
 idea-gui = 'com.jetbrains.intellij.java:java-gui-forms-rt:+'
 swing-flatlaf = 'com.formdev:flatlaf:3.4.1'
 lombok = { module = 'org.projectlombok:lombok', version.ref = 'lombok' }

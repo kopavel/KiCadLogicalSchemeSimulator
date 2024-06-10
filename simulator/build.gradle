@@ -66,12 +66,6 @@ dependencies {
 jar {
     destinationDirectory = file("$rootDir/distro")
     exclude 'classpath.index'
-    manifest {
-        attributes(
-                'Main-Class': 'lv.pko.simulator.Main',
-                'Class-Path': configurations.runtimeClasspath.collect { 'lib/' + it.getName() }.join(' ')
-        )
-    }
 }
 application {
     group = "_build"

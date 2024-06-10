@@ -83,7 +83,7 @@ configure(subprojects) { subproject ->
     sourceSets {
         test {
             java {
-                srcDirs = []
+                srcDirs = ["test/java"]
             }
             resources {
                 srcDirs = []
@@ -95,6 +95,12 @@ configure(subprojects) { subproject ->
     }
     tasks.named("jar") {
         destinationDirectory = file("$rootDir/distro/schemaParts")
-
     }
+    test {
+        useJUnitPlatform()
+        testLogging {
+            events "passed", "skipped", "failed"
+        }
+    }
+
 }

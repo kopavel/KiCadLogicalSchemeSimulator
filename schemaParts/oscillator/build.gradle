@@ -42,13 +42,3 @@ dependencies {
     implementation(project(":unnamedModules:ideaGui"))
     implementation libs.swing.flatlaf
 }
-sourceSets {
-    test {
-        java {
-            srcDirs = [] // Empty source directories list to disable Java source directory
-        }
-        resources {
-            srcDirs = [] // Empty source directories list to disable resources directory
-        }
-    }
-}
