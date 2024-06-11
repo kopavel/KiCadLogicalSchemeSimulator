@@ -40,15 +40,17 @@ public class DCounter extends SchemaPart {
     private final InPin jPin;
     private final boolean carryReverse;
     private final boolean bdReverse;
+    private final long carryHi;
+    private final long carryLo;
+    public long maxCount;
     private OutPin outPin;
     private OutPin cOutPin;
     private boolean countUp = true;
-    private boolean ciState = true;
-    private boolean cState;
+    private boolean ciState;
+    private boolean cState = true;
     private boolean eState;
     private boolean presetDisabled = true;
     private long count = 0;
-    private long maxCount = 15;
     private boolean resetInactive = true;
 
     protected DCounter(String id, String sParam) {
@@ -65,9 +67,6 @@ public class DCounter extends SchemaPart {
                     throw new FloatingPinException(this);
                 }
                 ciState = (newState > 0) ^ carryReverse;
-                if ((countUp && (count == maxCount)) || (!countUp && (count == 0))) {
-                    cOutPin.setState(ciState ? 0 : 1);
-                }
             }
         });
         jPin = addInPin(new InPin("J", this) {
@@ -95,13 +94,14 @@ public class DCounter extends SchemaPart {
         addInPin(new InPin("UD", this) {
             @Override
             public void onChange(long newState, boolean hiImpedance) {
-                countUp = state > 0;
+                countUp = newState > 0;
+                cOutPin.setState(((countUp && (count == maxCount)) || (!countUp && (count == 0)) ? carryHi : carryLo));
             }
         });
         addInPin(new InPin("BD", this) {
             @Override
             public void onChange(long newState, boolean hiImpedance) {
-                maxCount = ((state > 0) ^ bdReverse) ? 15 : 9;
+                maxCount = ((newState > 0) ^ bdReverse) ? 15 : 9;
             }
         });
         addInPin(new InPin("R", this) {
@@ -111,6 +111,7 @@ public class DCounter extends SchemaPart {
                 if (!resetInactive) {
                     count = 0;
                     outPin.setState(0);
+                    cOutPin.setState(carryLo);
                 }
             }
         });
@@ -176,6 +177,10 @@ public class DCounter extends SchemaPart {
                 }
             });
         }
+        carryHi = carryReverse ? 0 : 1;
+        carryLo = carryReverse ? 1 : 0;
+        maxCount = bdReverse ? 9 : 15;
+        eState = !eReverse;
     }
 
     @Override
@@ -183,6 +188,14 @@ public class DCounter extends SchemaPart {
         outPin = getOutPin("Q");
         outPin.useBitPresentation = true;
         cOutPin = getOutPin("CO");
+        cOutPin.state = carryLo;
+    }
+
+    @Override
+    public void reset() {
+        count = 0;
+        outPin.setState(0);
+        cOutPin.setState(carryLo);
     }
 
     private void process() {
@@ -190,9 +203,9 @@ public class DCounter extends SchemaPart {
             if (countUp) {
                 count++;
                 if (count == maxCount) {
-                    cOutPin.setState(0);
+                    cOutPin.setState(carryHi);
                 } else {
-                    cOutPin.setState(1);
+                    cOutPin.setState(carryLo);
                     if (count > maxCount) {
                         count = 0;
                     }
@@ -200,9 +213,9 @@ public class DCounter extends SchemaPart {
             } else {
                 count--;
                 if (count == 0) {
-                    cOutPin.setState(0);
+                    cOutPin.setState(carryHi);
                 } else {
-                    cOutPin.setState(1);
+                    cOutPin.setState(carryLo);
                     if (count < 0) {
                         count = maxCount;
                     }
@@ -210,11 +223,5 @@ public class DCounter extends SchemaPart {
             }
             outPin.setState(count);
         }
-    }
-
-    @Override
-    public void reset() {
-        count = 0;
-        outPin.setState(0);
     }
 }

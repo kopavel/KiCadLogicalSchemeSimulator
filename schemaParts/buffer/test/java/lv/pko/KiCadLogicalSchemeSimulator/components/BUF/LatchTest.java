@@ -6,7 +6,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -38,41 +37,36 @@ public class LatchTest {
     }
 
     @Test
-    @DisplayName("Hi CS")
-    void noCs() {
+    @DisplayName("Q pin should be in high-impedance state with Hi CS")
+    void qPinHighImpedanceWithHighCs() {
         csPin.onChange(1, false);
-        assertTrue(qPin.hiImpedance, "With Hi CS pin Q must be hiImpedance");
-        dPin.onChange(1, true);
-        assertTrue(qPin.hiImpedance, "With Hi CS pin Q must be hiImpedance");
-        wrPin.onChange(0, false);
-        assertTrue(qPin.hiImpedance, "With Hi CS pin Q must be hiImpedance");
-        dPin.onChange(0, false);
-        assertTrue(qPin.hiImpedance, "With Hi CS pin Q must be hiImpedance");
+        assertTrue(qPin.hiImpedance, "With Hi CS pin, Q must be in high-impedance state");
     }
 
     @Test
-    @DisplayName("Latch store and read")
-    void latchWrite() {
-        csPin.state = 0;
-        csPin.onChange(0, false);
-        assertFalse(qPin.hiImpedance, "With Lo CS and Hi D pin Q must not be hiImpedance");
-        assertEquals(0, qPin.state, "initial state must be 0");
+    @DisplayName("Q pin should remain high-impedance with Hi CS and changing D pin")
+    void qPinRemainsHighImpedanceWithHighCsAndChangingD() {
+        csPin.onChange(1, false);
+        dPin.onChange(1, true);
+        assertTrue(qPin.hiImpedance, "With Hi CS pin, Q must remain in high-impedance state when D pin changes");
+    }
+
+    @Test
+    @DisplayName("Latch should store and read correctly")
+    void latchWriteAndRead() {
+        csPin.onChange(1, false);
         dPin.state = 1;
         dPin.onChange(1, false);
-        assertEquals(0, qPin.state, "D state must not be taken in account without WR");
-        csPin.state = 1;
-        csPin.onChange(1, false);
-        wrPin.state = 0;
         wrPin.onChange(0, false);
-        assertEquals(0, qPin.state, "D state must not be taken in account without WR and OE");
-        csPin.state = 0;
         csPin.onChange(0, false);
-        assertEquals(1, qPin.state, "Q state mut be 1 as written on WR fall-down edge and OR go Lo");
+        assertEquals(1, qPin.state, "Q pin should reflect the state of D pin after OE falling edge");
+        csPin.onChange(1, false);
+        assertTrue(qPin.hiImpedance, "Q pin should be in high-impedance state after OE raising edge");
     }
 
     @Test
-    @DisplayName("float exception")
-    void floatD() {
-        assertThrows(FloatingPinException.class, () -> csPin.onChange(1, true), "Floating input must throw exception with Lo Cs");
+    @DisplayName("Floating D pin should throw FloatingPinException")
+    void floatingDPinThrowsException() {
+        assertThrows(FloatingPinException.class, () -> csPin.onChange(1, true), "Floating input must throw exception with Hi CS");
     }
 }

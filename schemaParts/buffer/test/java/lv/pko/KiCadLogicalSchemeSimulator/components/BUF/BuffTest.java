@@ -14,7 +14,11 @@ public class BuffTest {
     InPin csPin;
 
     public BuffTest() {
-        buffer = new Buffer("buf", "size=1");
+        initializeBuffer(1);
+    }
+
+    private void initializeBuffer(int size) {
+        buffer = new Buffer("buf", "size=" + size);
         dPin = buffer.inMap.get("D");
         qPin = (TriStateOutPin) buffer.outMap.get("Q");
         csPin = buffer.inMap.get("~{CS}");
@@ -24,7 +28,10 @@ public class BuffTest {
             }
         };
         qPin.addDest(dest);
-        dPin.mask = 1;
+        dPin.mask = 0;
+        for (int i = 0; i < size; i++) {
+            dPin.mask = dPin.mask << 1 | 1;
+        }
         dest.mask = 1;
         buffer.initOuts();
     }
@@ -41,30 +48,91 @@ public class BuffTest {
     }
 
     @Test
-    @DisplayName("Lo CS ans Hi D")
+    @DisplayName("Lo CS and Hi D")
     void trueInput() {
         csPin.onChange(0, false);
-        assertFalse(qPin.hiImpedance, "With Lo CS and Hi D pin Q must not be hiImpedance");
+        assertFalse(qPin.hiImpedance, "With Lo CS pin Q must not be hiImpedance");
         dPin.onChange(1, false);
-        assertEquals(1, qPin.state, "With Lo CS and Hi D pin Q must Hi");
+        assertEquals(1, qPin.state, "With Lo CS and Hi D pin Q must be Hi");
     }
 
     @Test
-    @DisplayName("Lo CS ans Lo D")
+    @DisplayName("Lo CS and Lo D")
     void falseInput() {
         csPin.onChange(0, false);
         dPin.onChange(0, false);
-        assertFalse(qPin.hiImpedance, "With Lo CS and Hi D pin Q must not be hiImpedance");
-        dPin.onChange(1, false);
-        assertEquals(1, qPin.state, "With Lo CS and Hi D pin Q must Hi");
+        assertFalse(qPin.hiImpedance, "With Lo CS pin Q must not be hiImpedance");
+        assertEquals(0, qPin.state, "With Lo CS and Lo D pin Q must be Lo");
     }
 
     @Test
-    @DisplayName("float exception")
+    @DisplayName("Float D pin exception")
     void floatD() {
         csPin.onChange(1, false);
-        assertDoesNotThrow(() -> dPin.onChange(1, true), "Floating input must not throw exception with Hi Cs");
+        assertDoesNotThrow(() -> dPin.onChange(1, true), "Floating input must not throw exception with Hi CS");
         csPin.onChange(0, false);
-        assertThrows(FloatingPinException.class, () -> dPin.onChange(1, true), "Floating input must throw exception with Lo Cs");
+        assertThrows(FloatingPinException.class, () -> dPin.onChange(1, true), "Floating input must throw exception with Lo CS");
+    }
+
+    @Test
+    @DisplayName("Multiple input sizes")
+    void multipleInputSizes() {
+        for (int size = 1; size <= 8; size++) {
+            initializeBuffer(size);
+            long allHi = 0;
+            for (int i = 0; i < size; i++) {
+                allHi = allHi << 1 | 1;
+            }
+            csPin.onChange(0, false);
+            dPin.onChange(allHi, false);
+            assertEquals(allHi, qPin.state, "With Lo CS and Hi D pin Q must match D for size " + size);
+        }
+    }
+
+    @Test
+    @DisplayName("Boundary condition: Minimum inputs")
+    void boundaryMinInputs() {
+        initializeBuffer(1);
+        csPin.onChange(0, false);
+        dPin.onChange(0, false);
+        assertEquals(0, qPin.state, "With Lo CS and Lo D pin Q must be Lo");
+        dPin.onChange(1, false);
+        assertEquals(1, qPin.state, "With Lo CS and Hi D pin Q must be Hi");
+    }
+
+    @Test
+    @DisplayName("Boundary condition: Maximum inputs")
+    void boundaryMaxInputs() {
+        initializeBuffer(64);
+        long allHi = 0;
+        for (int i = 0; i < 64; i++) {
+            allHi = allHi << 1 | 1;
+        }
+        csPin.onChange(0, false);
+        dPin.onChange(allHi, false);
+        assertEquals(allHi, qPin.state, "With Lo CS and Hi D pin Q must match D for max size");
+    }
+
+    @Test
+    @DisplayName("Partial Hi D with Lo CS")
+    void partialHiD() {
+        initializeBuffer(4);
+        csPin.onChange(0, false);
+        dPin.onChange(0b1010, false);
+        assertEquals(0b1010, qPin.state, "With Lo CS and partial Hi D pin Q must match D");
+    }
+
+    @Test
+    @DisplayName("Toggle CS")
+    void toggleCs() {
+        initializeBuffer(2);
+        dPin.state = 3;
+        dPin.onChange(3, false);
+        csPin.onChange(0, false);
+        assertEquals(3, qPin.state, "With Lo CS and Hi D pin Q must be Hi");
+        csPin.onChange(1, false);
+        assertTrue(qPin.hiImpedance, "With Hi CS pin Q must be hiImpedance");
+        csPin.onChange(0, false);
+        assertEquals(3, qPin.state, "With Lo CS again pin Q must be Hi");
     }
 }

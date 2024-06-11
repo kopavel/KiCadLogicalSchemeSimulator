@@ -13,8 +13,8 @@ public class AndTest {
     InPin inPin;
     OutPin out;
 
-    public AndTest() {
-        gate = new AndGate("AndGate", "size=2");
+    public void initializeGate(int size) {
+        gate = new AndGate("AndGate", "size=" + size);
         gate.initOuts();
         inPin = gate.inMap.get("IN");
         out = gate.outMap.get("OUT");
@@ -23,7 +23,9 @@ public class AndTest {
             public void onChange(long newState, boolean hiImpedance) {
             }
         };
-        inPin.mask = 3;
+        for (int i = 0; i < size; i++) {
+            inPin.mask = inPin.mask << 1 | 1;
+        }
         dest.mask = 1;
         out.addDest(dest);
     }
@@ -31,27 +33,69 @@ public class AndTest {
     @Test
     @DisplayName("Both input Lo - out Lo")
     public void bothLo() {
+        initializeGate(2);
         inPin.onChange(0, false);
-        assertEquals(0, out.state, "With no input output need to be Lo");
+        assertEquals(0, out.state, "With no input output needs to be Lo");
     }
 
     @Test
     @DisplayName("Only one input Hi - out Lo")
     public void oneHi() {
+        initializeGate(2);
         inPin.onChange(1, false);
-        assertEquals(0, out.state, "With Hi on only one input output need to be Lo");
+        assertEquals(0, out.state, "With Hi on only one input output needs to be Lo");
     }
 
     @Test
     @DisplayName("Both input Hi - out Hi")
     public void bothHi() {
+        initializeGate(2);
         inPin.onChange(3, false);
-        assertEquals(1, out.state, "With Hi on both inputs output need to be Hi");
+        assertEquals(1, out.state, "With Hi on both inputs output needs to be Hi");
     }
 
     @Test
-    @DisplayName("float exception")
-    void floatPin() {
+    @DisplayName("Floating pin exception")
+    public void floatPin() {
+        initializeGate(2);
         assertThrows(FloatingPinException.class, () -> inPin.onChange(1, true), "Floating input must throw FloatingPinException");
+    }
+
+    @Test
+    @DisplayName("Multiple input sizes")
+    public void multipleInputSizes() {
+        for (int size = 1; size <= 5; size++) {
+            initializeGate(size);
+            long allHi = (1 << size) - 1;
+            inPin.onChange(allHi, false);
+            assertEquals(1, out.state, "With Hi on all inputs output needs to be Hi for size " + size);
+        }
+    }
+
+    @Test
+    @DisplayName("Boundary condition: Minimum inputs")
+    public void boundaryMinInputs() {
+        initializeGate(1);
+        inPin.onChange(0, false);
+        assertEquals(0, out.state, "With single Lo input output needs to be Lo");
+        inPin.onChange(1, false);
+        assertEquals(1, out.state, "With single Hi input output needs to be Hi");
+    }
+
+    @Test
+    @DisplayName("Boundary condition: Maximum inputs")
+    public void boundaryMaxInputs() {
+        initializeGate(64);
+        long allHi = -1;
+        inPin.onChange(allHi, false);
+        assertEquals(1, out.state, "With Hi on all inputs output needs to be Hi for max size");
+    }
+
+    @Test
+    @DisplayName("All but one input Hi - out Lo")
+    public void allButOneHi() {
+        initializeGate(2);
+        inPin.onChange(2, false);
+        assertEquals(0, out.state, "With Hi on all but one input output needs to be Lo");
     }
 }
