@@ -117,7 +117,7 @@
 		<symbol name="4028" symPartClass="Decoder" symPartParam="size=4;reverse">
 			<unit pinMap="10=A0;13=A1;12=A2;11=A3;3=Q0;14=Q1;2=Q2;15=Q3;1=Q4;6=Q5;7=Q6;4=Q7;9=Q8;5=Q9"/>
 		</symbol>
-		<symbol name="4029" symPartClass="DCounter" symPartParam="reverse;eReverse">
+		<symbol name="4029" symPartClass="DCounter" symPartParam="reverse;eReverse;carryReverse">
 			<unit pinMap="15=C;4=J0;12=J1;13=J2;3=J3;5=CI;1=PE;6=Q0;11=Q1;14=Q2;2=Q3;10=UD;9=BD;7=CO"/>
 		</symbol>
 		<symbol name="4040" symPartClass="Counter" symPartParam="size=12;reverse">
