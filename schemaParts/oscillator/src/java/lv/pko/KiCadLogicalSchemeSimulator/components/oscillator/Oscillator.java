@@ -49,7 +49,7 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
     @Getter
     private long clockPeriod = 1000000000;
     private Thread fullSpeedThread;
-    private boolean fullSpeedAlive;
+    private volatile boolean fullSpeedAlive;
     private String outAlias = "OUT";
 
     public Oscillator(String id, String sParams) {
@@ -78,9 +78,11 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
             fullSpeedThread = Thread.ofPlatform().start(() -> {
                 try {
                     while (fullSpeedAlive) {
-                        ticks += 2;
-                        out.setState(0);
-                        out.setState(1);
+                        for (int i = 0; i < 1000; i++) {
+                            ticks += 2;
+                            out.setState(0);
+                            out.setState(1);
+                        }
                     }
                 } catch (Throwable e) {
                     Log.error(Oscillator.class, "TickError", e);

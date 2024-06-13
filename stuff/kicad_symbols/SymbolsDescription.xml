@@ -201,7 +201,7 @@
 		</symbol>
 		<symbol name="4518" symPartClass="DCounter" symPartParam="carryReverse;bdReverse">
 			<unit pinMap="1=C;7=R;2=E;3=Q0;4=Q1;5=Q2;6=Q3"/>
-			<unit pinMap="9=C;15=R;10=E;11=Q0;12=Q1;13;Q2;14=Q3"/>
+			<unit pinMap="9=C;15=R;10=E;11=Q0;12=Q1;13=Q2;14=Q3"/>
 		</symbol>
 		<symbol name="4520" symPartClass="DCounter" symPartParam="carryReverse">
 			<unit pinMap="1=C;7=R;2=E;3=Q0;4=Q1;5=Q2;6=Q3"/>

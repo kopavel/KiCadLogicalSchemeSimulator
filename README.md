@@ -12,7 +12,7 @@ Focuses on performance and simplicity of the model schema part API, allowing eas
 To build the project, execute the Gradle assemble task:
 
 ```
-gradlew clean assemble
+./gradlew clean assemble
 ```
 
 If the build is successful, you will find the output in the 'distro' folder.
@@ -25,7 +25,7 @@ your operating system from the 'distro' directory.
 For Unix-like systems:
 
 ```bash
-run.sh mySchema.net
+./run.sh mySchema.net
 ```
 
 For Windows systems:
