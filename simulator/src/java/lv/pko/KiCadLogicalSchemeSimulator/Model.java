@@ -113,9 +113,9 @@ public class Model {
         Map<OutPin, Byte> outPins = new HashMap<>();
         Map<InPin, List<Byte>> inPins = new HashMap<>();
         net.getNode().forEach(node -> {
-            if ("gnd".equals(net.getName())) {
+            if ("gnd".equalsIgnoreCase(net.getName())) {
                 outPins.put(schemaParts.get("gnd").getOutPin("OUT"), (byte) 0);
-            } else if ("pwr".equals(net.getName())) {
+            } else if ("pwr".equalsIgnoreCase(net.getName())) {
                 outPins.put(schemaParts.get("pwr").getOutPin("OUT"), (byte) 0);
             }
             Map<String, PinMapDescriptor> pinMap = shemaPartPinMap.get(node.getRef());

@@ -40,9 +40,10 @@ These scripts initiate the simulator with the specified `.net` file as the first
 
 KiCad currently supports plugins only in the PCB editor, not in the Schematic Editor (Eeschema). However, a workaround exists using BOM (Bill Of Material) scripts,
 which are custom [Python](https://www.python.org) scripts that receive the path to an XML variant of the "PCB Netlist" as the first parameter. This mechanism can be
-used to launch the simulator directly from the schematic editor. Simply add the custom BOM generation script `simulate.py` from the 'distro' directory. Then, when
-you run "BOM
-generation" using that script, the simulator will be started instantly with the schema currently open in the editor.
+used to launch the simulator directly from the schematic editor. Add the custom BOM generation script `simulate.py` from the 'distro' directory. Then, when
+you run "BOM generation" using that script, the simulator will be started instantly with the schema currently open in the editor.  
+On KiCad prior version 8 BOM generations are accessed directly in the toolbar. In version 8 BOM generation has been changed and generation from a python script now
+located under the menu Tools->"Generate Legacy Bill of Materials...". That can be assigned to your preferred hotkey for quick access.
 
 ## Usage
 
