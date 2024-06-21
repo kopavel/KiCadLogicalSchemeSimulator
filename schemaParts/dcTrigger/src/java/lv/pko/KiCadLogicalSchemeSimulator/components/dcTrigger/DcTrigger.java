@@ -52,18 +52,24 @@ public class DcTrigger extends SchemaPart {
             public void onChange(long newState, boolean hiImpedance) {
                 clockEnabled = (newState | sPin.state) == 0;
                 if (newState > 0) {
-                    iqOut.setState(hiState);
-                    qOut.setState(sPin.state > 0 ? hiState : loState);
+                    iqOut.setState(1);
+                    qOut.setState(sPin.state);
+                } else if (sPin.state > 0) {
+                    qOut.setState(1);
+                    iqOut.setState(0);
                 }
             }
         });
         sPin = addInPin(new InPin("S", this) {
             @Override
             public void onChange(long newState, boolean hiImpedance) {
-                clockEnabled = (newState | sPin.state) == 0;
+                clockEnabled = (newState | rPin.state) == 0;
                 if (newState > 0) {
-                    qOut.setState(hiState);
-                    iqOut.setState(rPin.state > 0 ? hiState : loState);
+                    qOut.setState(1);
+                    iqOut.setState(rPin.state);
+                } else if (rPin.state > 0) {
+                    qOut.setState(0);
+                    iqOut.setState(1);
                 }
             }
         });
@@ -92,14 +98,11 @@ public class DcTrigger extends SchemaPart {
         qOut.state = 0;
         iqOut = getOutPin("~{Q}");
         iqOut.state = 1;
-        hiState = hiState & qOut.mask;
-        loState = loState & qOut.mask;
     }
 
     private void store() {
         if (clockEnabled) {
             if (dPin.state > 0) {
-                //ToDo why no hi/loState?
                 qOut.setState(1);
                 iqOut.setState(0);
             } else {
