@@ -3344,12 +3344,10 @@ public class Z80Core {
         int reg_index = getIndexReg();
         switch (reg) {
             case 4 -> {
-                setIndexReg(reg_index & lsb);
-                setIndexReg(reg_index | (value << 8));
+                setIndexReg((reg_index & lsb) | (value << 8));
             } // IXH
             case 5 -> {
-                setIndexReg(reg_index & msb);
-                setIndexReg(reg_index | value);
+                setIndexReg((reg_index & msb) | value);
             } // IXL
             default -> getIndexAddress(address -> writeByte(address, value)); // (index+dd)
         }
