@@ -54,18 +54,24 @@ public class JkTrigger extends SchemaPart {
             public void onChange(long newState, boolean hiImpedance) {
                 clockEnabled = (newState | sPin.state) == 0;
                 if (newState > 0) {
-                    iqOut.setState(hiState);
-                    qOut.setState(sPin.state > 0 ? hiState : loState);
+                    iqOut.setState(1);
+                    qOut.setState(sPin.state > 0 ? 1 : 0);
+                } else if (sPin.state > 0) {
+                    qOut.setState(1);
+                    iqOut.setState(0);
                 }
             }
         });
         sPin = addInPin(new InPin("S", this) {
             @Override
             public void onChange(long newState, boolean hiImpedance) {
-                clockEnabled = (newState | sPin.state) == 0;
+                clockEnabled = (newState | rPin.state) == 0;
                 if (newState > 0) {
-                    qOut.setState(hiState);
-                    iqOut.setState(rPin.state > 0 ? hiState : loState);
+                    qOut.setState(1);
+                    iqOut.setState(rPin.state > 0 ? 1 : 0);
+                } else if (rPin.state > 0) {
+                    qOut.setState(0);
+                    iqOut.setState(1);
                 }
             }
         });
@@ -99,13 +105,13 @@ public class JkTrigger extends SchemaPart {
                         boolean jState = jPin.state > 0;
                         boolean kState = kPin.state > 0;
                         if (jState || kState) {
-                            if (jState && !kState) {
+                            if (jState && !kState) { //set
                                 qOut.setState(1);
                                 iqOut.setState(0);
-                            } else if (!jState) {
-                                qOut.setState(1);
-                                iqOut.setState(0);
-                            } else {
+                            } else if (!jState) { //reset
+                                qOut.setState(0);
+                                iqOut.setState(1);
+                            } else { //toggle
                                 qOut.setState(qOut.state ^ 1);
                                 iqOut.setState(iqOut.state ^ 1);
                             }

@@ -53,7 +53,7 @@ public class DcTrigger extends SchemaPart {
                 clockEnabled = (newState | sPin.state) == 0;
                 if (newState > 0) {
                     iqOut.setState(1);
-                    qOut.setState(sPin.state);
+                    qOut.setState(sPin.state > 0 ? 1 : 0);
                 } else if (sPin.state > 0) {
                     qOut.setState(1);
                     iqOut.setState(0);
@@ -66,7 +66,7 @@ public class DcTrigger extends SchemaPart {
                 clockEnabled = (newState | rPin.state) == 0;
                 if (newState > 0) {
                     qOut.setState(1);
-                    iqOut.setState(rPin.state);
+                    iqOut.setState(rPin.state > 0 ? 1 : 0);
                 } else if (rPin.state > 0) {
                     qOut.setState(0);
                     iqOut.setState(1);
