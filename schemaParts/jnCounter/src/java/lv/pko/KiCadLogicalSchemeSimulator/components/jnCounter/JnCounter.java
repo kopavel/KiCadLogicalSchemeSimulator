@@ -37,9 +37,9 @@ import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 
 public class JnCounter extends SchemaPart {
+    private final int coMax;
     private OutPin outPin;
     private OutPin carryOutPin;
-    private final int coMax;
     private int countMax = 1;
     private int count = 1;
     private boolean clockEnabled = true;

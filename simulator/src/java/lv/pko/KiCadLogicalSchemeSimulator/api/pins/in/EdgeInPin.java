@@ -48,5 +48,4 @@ public abstract class EdgeInPin extends InPin {
             onRisingEdge();
         }
     }
-
 }

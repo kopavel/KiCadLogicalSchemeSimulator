@@ -49,11 +49,11 @@ import java.util.concurrent.TimeUnit;
 
 public class OscillatorUi extends JFrame {
     public final OscillatorUiComponent parent;
+    final ScheduledExecutorService scheduler;
+    final DecimalFormat df = new DecimalFormat("#,###");
     public Oscilloscope oscilloscope;
     JTextField periodTextField;
     JTextField freqTextField;
-    final ScheduledExecutorService scheduler;
-    final DecimalFormat df = new DecimalFormat("#,###");
     private JButton startButton;
     private JButton stopButton;
     private JPanel panel;
