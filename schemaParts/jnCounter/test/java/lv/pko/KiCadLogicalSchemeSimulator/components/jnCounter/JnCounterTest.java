@@ -94,4 +94,15 @@ public class JnCounterTest {
         cPin.onChange(0, false);
         assertEquals(2, qPin.state, "Count should not increment on falling edge of clock signal");
     }
+
+    @Test
+    @DisplayName("Count does not increment on Hi CarryIn")
+    void countDoesNotIncrementOnHiCi() {
+        cPin.onChange(1, false);
+        assertEquals(2, qPin.state, "Count should be 2 before test");
+        ciPin.state = 1;
+        ciPin.onChange(1, false);
+        cPin.onChange(1, false);
+        assertEquals(2, qPin.state, "Count should not increment on falling edge of clock signal");
+    }
 }
