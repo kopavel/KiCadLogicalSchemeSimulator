@@ -51,7 +51,7 @@ public class OrGate extends SchemaPart {
                 if (hiImpedance) {
                     throw new FloatingPinException(this);
                 }
-                if (newState > 0) {
+                if (newState != 0) {
                     out.setState(hiState);
                 } else {
                     out.setState(loState);
