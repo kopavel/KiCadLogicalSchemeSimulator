@@ -46,7 +46,7 @@ public class Multiplexer extends SchemaPart {
     protected Multiplexer(String id, String sParam) {
         super(id, sParam);
         if (!params.containsKey("nSize")) {
-            throw new RuntimeException("Component " + id + " has no parameter \"nPins\"");
+            throw new RuntimeException("Component " + id + " has no parameter \"nSize\"");
         }
         if (!params.containsKey("size")) {
             throw new RuntimeException("Component " + id + " has no parameter \"size\"");
