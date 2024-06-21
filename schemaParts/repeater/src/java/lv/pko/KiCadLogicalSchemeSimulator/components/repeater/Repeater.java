@@ -67,5 +67,6 @@ public class Repeater extends SchemaPart {
     @Override
     public void initOuts() {
         out = getOutPin("OUT");
+        out.state = reverse ? 1 : 0;
     }
 }
