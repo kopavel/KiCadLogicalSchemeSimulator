@@ -70,6 +70,7 @@ dependencyResolutionManagement {
     }
     repositories {
         mavenCentral()
+        maven { url 'https://jitpack.io' }
         maven {
             name "instrumentFormsRepository-third-party"
             url "https://cache-redirector.jetbrains.com/intellij-dependencies"

@@ -35,5 +35,6 @@ import lv.pko.KiCadLogicalSchemeSimulator.components.Z80.Z80CpuSpi;
 module KiCadLogicalSchemeSimulator.components.Z80Cpu {
     requires KiCadLogicalSchemeSimulator.simulator;
     requires static lombok;
+    requires Z80Processor;
     provides SchemaPartSpi with Z80CpuSpi;
 }

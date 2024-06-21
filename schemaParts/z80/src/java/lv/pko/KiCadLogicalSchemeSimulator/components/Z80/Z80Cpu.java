@@ -30,18 +30,20 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.KiCadLogicalSchemeSimulator.components.Z80;
+import com.codingrodent.microprocessor.Io.AsyncIoQueue;
+import com.codingrodent.microprocessor.Io.IoRequest;
+import com.codingrodent.microprocessor.Z80.CPUConstants;
+import com.codingrodent.microprocessor.Z80.Z80Core;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.EdgeInPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.RisingEdgeInPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.TriStateOutPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import lv.pko.KiCadLogicalSchemeSimulator.components.Z80.core.CPUConstants;
-import lv.pko.KiCadLogicalSchemeSimulator.components.Z80.core.IoRequest;
-import lv.pko.KiCadLogicalSchemeSimulator.components.Z80.core.Z80Core;
 
 public class Z80Cpu extends SchemaPart {
     private final Z80Core cpu;
+    private final AsyncIoQueue ioQueue = new AsyncIoQueue();
     protected InPin dIn;
     protected TriStateOutPin dOut;
     protected TriStateOutPin addOut;
@@ -67,12 +69,12 @@ public class Z80Cpu extends SchemaPart {
 
     public Z80Cpu(String id) {
         super(id, null);
-        cpu = new Z80Core();
+        cpu = new Z80Core(ioQueue);
         addInPin(new EdgeInPin("CLK", this) {
             @Override
             public void onFallingEdge() {
                 if (M > 0) {
-                    IoRequest ioRequest = cpu.ioQueue.peek();
+                    IoRequest ioRequest = ioQueue.requests.peek();
                     assert ioRequest != null;
                     if (T1) {
                         if (ioRequest.isMemory) {
@@ -121,9 +123,9 @@ public class Z80Cpu extends SchemaPart {
                 if (M > 0) {
                     if (T4 || (!M1 && T3)) {
                         T = 1;
-                        cpu.ioQueue.poll();
+                        ioQueue.requests.poll();
 //                Log.trace(Z80Cpu.class, "cpuDone is {}", cpuDone);
-                        if (cpu.ioQueue.isEmpty()) {
+                        if (ioQueue.requests.isEmpty()) {
                             M = 1;
                         } else {
                             M++;
@@ -141,7 +143,7 @@ public class Z80Cpu extends SchemaPart {
                     T4 = T == 4;
                     M1 = M == 1;
 //        Log.trace(Z80Cpu.class, "Set pins at {},{}", M, T);
-                    IoRequest ioRequest = cpu.ioQueue.peek();
+                    IoRequest ioRequest = ioQueue.requests.peek();
                     assert ioRequest != null;
                     if (T1) {
                         if (needRefreshPinReset) {
@@ -154,7 +156,7 @@ public class Z80Cpu extends SchemaPart {
                         }
                         if (M1) {
                             cpu.executeOneInstruction();
-                            ioRequest = cpu.ioQueue.peek();
+                            ioRequest = ioQueue.requests.peek();
                             assert ioRequest != null;
                             m1Pin.setState(0);
                         }
