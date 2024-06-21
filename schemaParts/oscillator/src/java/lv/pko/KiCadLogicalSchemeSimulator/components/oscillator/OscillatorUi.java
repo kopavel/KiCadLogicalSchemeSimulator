@@ -52,8 +52,8 @@ public class OscillatorUi extends JFrame {
     public Oscilloscope oscilloscope;
     JTextField periodTextField;
     JTextField freqTextField;
-    ScheduledExecutorService scheduler;
-    DecimalFormat df = new DecimalFormat("#,###");
+    final ScheduledExecutorService scheduler;
+    final DecimalFormat df = new DecimalFormat("#,###");
     private JButton startButton;
     private JButton stopButton;
     private JPanel panel;
@@ -220,7 +220,7 @@ public class OscillatorUi extends JFrame {
     }
 
     private void $$$loadLabelText$$$(JLabel var1, String var2) {
-        StringBuffer var3 = new StringBuffer();
+        StringBuilder var3 = new StringBuilder();
         boolean var4 = false;
         char var5 = 0;
         int var6 = -1;
@@ -247,7 +247,7 @@ public class OscillatorUi extends JFrame {
 
     // $FF: synthetic method
     private void $$$loadButtonText$$$(AbstractButton var1, String var2) {
-        StringBuffer var3 = new StringBuffer();
+        StringBuilder var3 = new StringBuilder();
         boolean var4 = false;
         char var5 = 0;
         int var6 = -1;

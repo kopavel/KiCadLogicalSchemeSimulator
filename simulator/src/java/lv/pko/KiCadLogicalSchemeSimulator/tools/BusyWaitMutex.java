@@ -54,6 +54,7 @@ public class BusyWaitMutex {
 
     public synchronized void acquire() {
         if (enabled) {
+            //noinspection WhileLoopSpinsOnField,StatementWithEmptyBody
             while (acquired) {
             }
             acquired = true;

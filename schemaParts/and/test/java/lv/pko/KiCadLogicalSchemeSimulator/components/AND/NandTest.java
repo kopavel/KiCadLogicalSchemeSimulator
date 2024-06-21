@@ -7,9 +7,9 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class NandTest {
-    AndGate gate;
-    InPin inPin;
-    OutPin out;
+    final AndGate gate;
+    final InPin inPin;
+    final OutPin out;
 
     public NandTest() {
         gate = new AndGate("AndGate", "size=2;reverse");

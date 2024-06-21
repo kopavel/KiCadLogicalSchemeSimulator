@@ -2,8 +2,8 @@ package lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.groups;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
 
 public class MaskGroupPin {
-    public InPin dest;
-    public long mask;
+    public final InPin dest;
+    public final long mask;
     public long oldVal;
     public boolean oldImpedance = true;
 

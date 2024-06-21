@@ -50,6 +50,7 @@ public class LedUiComponent extends AbstractUiComponent {
         this.on = on;
         this.off = off;
         setBackground(new Color(0, 0, 0, 0));
+        //noinspection resource
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this::repaint, 0, redrawPeriod, TimeUnit.MILLISECONDS);
     }
 

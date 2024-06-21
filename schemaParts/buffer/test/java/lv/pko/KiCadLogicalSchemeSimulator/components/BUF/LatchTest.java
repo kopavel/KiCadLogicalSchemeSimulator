@@ -10,11 +10,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class LatchTest {
-    Buffer buffer;
-    InPin dPin;
-    TriStateOutPin qPin;
-    InPin csPin;
-    InPin wrPin;
+    final Buffer buffer;
+    final InPin dPin;
+    final TriStateOutPin qPin;
+    final InPin csPin;
+    final InPin wrPin;
 
     public LatchTest() {
         buffer = new Buffer("buf", "size=1;latch");

@@ -114,17 +114,6 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
             if (!pin2HiImpedance && !pin1HiImpedance) {
                 throw new ShortcutException(pin1In, pin2In);
             }
-/*
-            if (!pin1Weak) {
-                synchronized (pin2Out) {
-                    pin2Out.setState(pin1In.getState());
-                }
-            } else if (!pin2Weak) {
-                synchronized (pin1Out) {
-                    pin1Out.setState(pin2In.getState());
-                }
-            }
-*/
         } else {
             pin1Out.setHiImpedance();
             pin2Out.setHiImpedance();

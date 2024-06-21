@@ -53,6 +53,7 @@ public class BusyWaitSemaphore {
 
     public synchronized void acquire() {
         if (enabled) {
+            //noinspection WhileLoopSpinsOnField,StatementWithEmptyBody
             while (availableAmount == 0) {
             }
             availableAmount--;
@@ -62,6 +63,7 @@ public class BusyWaitSemaphore {
     public void release() {
         if (enabled) {
             if (availableAmount < maxAmount) {
+                //noinspection NonAtomicOperationOnVolatileField
                 availableAmount++;
             } else {
                 throw new RuntimeException("Semaphore reach max size");

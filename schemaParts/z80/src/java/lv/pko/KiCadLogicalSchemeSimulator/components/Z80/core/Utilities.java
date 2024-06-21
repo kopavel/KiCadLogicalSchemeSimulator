@@ -23,6 +23,7 @@ import java.util.HexFormat;
 /**
  * Various utility functions, mainly useful for debug
  */
+@SuppressWarnings("unused")
 public class Utilities {
     private final static String flagChar = "SZ5H3PNC";
     private final static HexFormat hexFormat = HexFormat.of().withUpperCase();

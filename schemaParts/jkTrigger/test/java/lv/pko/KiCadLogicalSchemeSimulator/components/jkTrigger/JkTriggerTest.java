@@ -14,7 +14,7 @@ public class JkTriggerTest {
     private final InPin cPin;
     private final OutPin qOut;
     private final OutPin iqOut;
-    JkTrigger trigger;
+    final JkTrigger trigger;
 
     public JkTriggerTest() {
         trigger = new JkTrigger("jkt", "");

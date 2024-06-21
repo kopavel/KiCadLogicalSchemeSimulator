@@ -29,11 +29,11 @@ import static lv.pko.KiCadLogicalSchemeSimulator.components.Z80.core.CPUConstant
 /**
  * The ZiLOG Z80 processor core
  */
-@SuppressWarnings("DuplicateBranchesInSwitch")
+@SuppressWarnings({"DuplicateBranchesInSwitch", "unused"})
 public class Z80Core {
     // maximum address size
     private final static int MAX_ADDRESS = 0xFFFF;
-    public Queue<IoRequest> ioQueue = new LinkedList<>();
+    public final Queue<IoRequest> ioQueue = new LinkedList<>();
     private int instruction;
     @Getter
     private boolean halt;
@@ -3264,6 +3264,7 @@ public class Z80Core {
     //
 
     private void IM(int mode) {
+        //FixMe where is implementation??
         // interruptMode = mode;
     }
 

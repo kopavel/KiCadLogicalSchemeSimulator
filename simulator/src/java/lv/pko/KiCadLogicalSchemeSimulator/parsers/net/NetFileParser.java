@@ -131,17 +131,15 @@ public class NetFileParser {
     }
 
     private void nextNoSpaceChar(BufferedReader reader) throws IOException {
-        nextChar(reader);
-        while (currentChar == ' ' || currentChar == '\r' || currentChar == '\n') {
+        do {
             nextChar(reader);
-        }
+        } while (currentChar == ' ' || currentChar == '\r' || currentChar == '\n');
     }
 
     private void nextChar(BufferedReader reader) throws IOException {
-        currentChar = reader.read();
-        while (currentChar == '\r' || currentChar == '\n') {
+        do {
             currentChar = reader.read();
-        }
+        } while (currentChar == '\r' || currentChar == '\n');
     }
 
     private String getString(BufferedReader reader) throws IOException {

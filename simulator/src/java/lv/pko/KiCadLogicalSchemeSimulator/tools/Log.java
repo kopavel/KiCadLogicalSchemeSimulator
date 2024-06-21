@@ -39,6 +39,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
+@SuppressWarnings("unused")
 public class Log {
     private static final Map<Class<?>, org.apache.logging.log4j.Logger> loggers = new ConcurrentHashMap<>();
 

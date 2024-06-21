@@ -34,7 +34,7 @@ import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.groups.MaskGroupPin;
 
 public class OutPins extends OutPin {
-    protected MaskGroupPin dest;
+    protected final MaskGroupPin dest;
 
     public OutPins(OutGroupedPins oldPin) {
         super(oldPin.id, oldPin.parent, oldPin.size);

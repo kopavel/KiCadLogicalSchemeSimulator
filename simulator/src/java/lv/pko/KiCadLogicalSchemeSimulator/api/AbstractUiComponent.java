@@ -45,7 +45,6 @@ public abstract class AbstractUiComponent extends Component {
     public boolean hasStoredLayout;
     protected int titleHeight;
     protected Graphics2D g2d;
-    protected Graphics g;
     protected boolean sized;
     private int mouseX, mouseY;
 
@@ -80,7 +79,6 @@ public abstract class AbstractUiComponent extends Component {
     @Override
     public void paint(Graphics g) {
         super.paint(g);
-        this.g = g;
         g2d = (Graphics2D) g.create();
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setFont(arialFont);

@@ -20,4 +20,4 @@ This schema part has two modes, both with `<size>` number of inputs and outputs:
         - At `Lo` state, transfers latch stored states to outputs.
         - At `Hi` state, outputs are in "High impedance" mode.
 
-For example, to create a 8-input latch, you would provide the following parameters: `size=8;latch`.
+For example, to create an 8-input latch, you would provide the following parameters: `size=8;latch`.

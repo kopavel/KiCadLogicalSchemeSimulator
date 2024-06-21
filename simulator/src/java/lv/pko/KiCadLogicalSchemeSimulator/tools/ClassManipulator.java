@@ -115,8 +115,7 @@ public class ClassManipulator extends SchemaPart {
 
     private <T extends Manipulable, R extends T> Constructor<R> getConstructor(T instance,
             String methodForReplace,
-            String replacingMethod,
-            byte[] originalClassBytes) throws ClassNotFoundException, NoSuchMethodException {
+            String replacingMethod, byte[] originalClassBytes) throws ClassNotFoundException {
         // Get the ClassLoader of the original instance
         ClassLoader loader = instance.getClass().getClassLoader();
         if (loader == null) {

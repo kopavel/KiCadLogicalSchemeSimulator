@@ -34,7 +34,7 @@ import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.TriStateOutPin;
 
 public class TriStateOutPins extends TriStateOutPin {
-    protected MaskGroupPin group;
+    protected final MaskGroupPin group;
 
     public TriStateOutPins(TriStateOutGroupedPins oldPin) {
         super(oldPin.id, oldPin.parent, oldPin.size);

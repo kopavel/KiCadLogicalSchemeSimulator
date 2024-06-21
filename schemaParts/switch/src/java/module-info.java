@@ -35,6 +35,5 @@ import lv.pko.KiCadLogicalSchemeSimulator.components.Switch.SwitchSpi;
 module KiCadLogicalSchemeSimulator.components.Switch {
     requires KiCadLogicalSchemeSimulator.simulator;
     requires java.desktop;
-    requires static lombok;
     provides SchemaPartSpi with SwitchSpi;
 }

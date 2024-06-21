@@ -13,7 +13,7 @@ public class DcTriggerTest {
     private final InPin cPin;
     private final OutPin qOut;
     private final OutPin iqOut;
-    DcTrigger trigger;
+    final DcTrigger trigger;
 
     public DcTriggerTest() {
         trigger = new DcTrigger("dct", "");

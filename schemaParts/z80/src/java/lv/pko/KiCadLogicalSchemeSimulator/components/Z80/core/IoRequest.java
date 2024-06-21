@@ -34,7 +34,7 @@ import java.util.function.Consumer;
 
 public class IoRequest {
     public final int address;
-    public boolean isMemory;
+    public final boolean isMemory;
     public boolean isWrite;
     public int payload;
     public Consumer<Integer> callback;

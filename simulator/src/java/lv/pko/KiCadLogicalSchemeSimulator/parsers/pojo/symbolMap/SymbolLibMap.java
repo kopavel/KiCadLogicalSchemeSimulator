@@ -3,5 +3,5 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SymbolLibMap {
-    public Map<String, SymbolDesc> symbols = new HashMap<>();
+    public final Map<String, SymbolDesc> symbols = new HashMap<>();
 }

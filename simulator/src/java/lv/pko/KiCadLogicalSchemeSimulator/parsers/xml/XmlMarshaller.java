@@ -39,8 +39,9 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.module.jakarta.xmlbind.JakartaXmlBindAnnotationModule;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 
+@SuppressWarnings("unused")
 public class XmlMarshaller {
-    private static XmlMapper xmlMapper;
+    private static volatile XmlMapper xmlMapper;
 
     public static String toXml(Object o) throws JsonProcessingException {
         return getMapper().writeValueAsString(o);

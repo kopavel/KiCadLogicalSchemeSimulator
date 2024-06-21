@@ -40,12 +40,11 @@ import lv.pko.KiCadLogicalSchemeSimulator.tools.UiTools;
 import java.awt.*;
 
 public class Led extends SchemaPart implements InteractiveSchemaPart {
-    final InPin in;
     private final LedUiComponent ledUiComponent;
 
     protected Led(String id, String sParams) {
         super(id, sParams);
-        in = addInPin(new InPin("IN", this) {
+        addInPin(new InPin("IN", this) {
             @Override
             public void onChange(long newState, boolean hiImpedance) {
                 if (hiImpedance) {
