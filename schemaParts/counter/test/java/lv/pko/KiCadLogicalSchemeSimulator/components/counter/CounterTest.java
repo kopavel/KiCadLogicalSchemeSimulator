@@ -13,25 +13,22 @@ public class CounterTest {
     OutPin qPin;
 
     public CounterTest() {
-        initializeCounter(2);
+        initializeCounter();
     }
 
-    private void initializeCounter(int size) {
-        counter = new Counter("cnt", "size=" + size);
+    private void initializeCounter() {
+        counter = new Counter("cnt", "size=2");
+        counter.initOuts();
         cPin = counter.inMap.get("C");
         rPin = counter.inMap.get("R");
         qPin = counter.outMap.get("Q");
-        InPin dest = new InPin("dest", counter, size) {
+        InPin dest = new InPin("dest", counter, 2) {
             @Override
             public void onChange(long newState, boolean hiImpedance) {
             }
         };
-        dest.mask = 0;
-        for (int i = 0; i < size; i++) {
-            dest.mask = (dest.mask << 1) | 1;
-        }
+        dest.mask = 3;
         qPin.addDest(dest);
-        counter.initOuts();
         counter.reset();
     }
 

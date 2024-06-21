@@ -39,9 +39,9 @@ import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 public class JnCounter extends SchemaPart {
     private OutPin outPin;
     private OutPin carryOutPin;
-    private int count = 0;
+    private final int coMax;
     private int countMax = 1;
-    private int coCount = 1;
+    private int count = 1;
     private boolean clockEnabled = true;
 
     protected JnCounter(String id, String sParam) {
@@ -53,17 +53,15 @@ public class JnCounter extends SchemaPart {
         try {
             pinAmount = Integer.parseInt(params.get("size"));
         } catch (NumberFormatException r) {
-            throw new RuntimeException("Component " + id + " size must be module 2 positive number");
+            throw new RuntimeException("Component " + id + " size must positive >=2 number");
         }
-        if (pinAmount < 1 || pinAmount % 2 != 0) {
-            throw new RuntimeException("Component " + id + " size must be module 2 number");
+        if (pinAmount < 2) {
+            throw new RuntimeException("Component " + id + " size must positive >=2 number");
         }
-        for (int i = 0; i < pinAmount - 1; i++) {
+        for (int i = 1; i < pinAmount; i++) {
             countMax = countMax << 1;
         }
-        for (int i = 0; i < (pinAmount - 2) / 2; i++) {
-            coCount = coCount << 1;
-        }
+        coMax = countMax / 2;
         addOutPin("Q", pinAmount);
         addOutPin("CO", pinAmount);
         addInPin(new EdgeInPin("CI", this) {
@@ -82,12 +80,13 @@ public class JnCounter extends SchemaPart {
                 @Override
                 public void onFallingEdge() {
                     if (clockEnabled) {
-                        if (count == countMax) {
+                        if (count >= countMax) {
                             count = 1;
+                            carryOutPin.setState(0);
                         } else {
                             count = count << 1;
+                            carryOutPin.setState(count >= coMax ? 1 : 0);
                         }
-                        carryOutPin.setState(count > coCount ? 1 : 0);
                         outPin.setState(count);
                     }
                 }
@@ -110,12 +109,13 @@ public class JnCounter extends SchemaPart {
                 @Override
                 public void onRisingEdge() {
                     if (clockEnabled) {
-                        if (count == countMax) {
+                        if (count >= countMax) {
                             count = 1;
+                            carryOutPin.setState(0);
                         } else {
                             count = count << 1;
+                            carryOutPin.setState(count >= coMax ? 1 : 0);
                         }
-                        carryOutPin.setState(count > coCount ? 1 : 0);
                         outPin.setState(count);
                     }
                 }
@@ -145,7 +145,7 @@ public class JnCounter extends SchemaPart {
 
     @Override
     public void reset() {
-        count = 0;
-        outPin.setState(0);
+        count = 1;
+        outPin.setState(1);
     }
 }
