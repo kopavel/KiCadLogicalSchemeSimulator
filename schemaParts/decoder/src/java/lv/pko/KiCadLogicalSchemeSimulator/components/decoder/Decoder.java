@@ -51,7 +51,7 @@ public class Decoder extends SchemaPart {
             addInPin(new InPin("A", this, inSize) {
                 @Override
                 public void onChange(long newState, boolean hiImpedance) {
-                    outState = ~(1L << correctState(newState));
+                    outState = ~(1L << getState());
                     if (csState) {
                         if (hiImpedance) {
                             throw new FloatingPinException(this);
@@ -64,7 +64,7 @@ public class Decoder extends SchemaPart {
             addInPin(new InPin("A", this, inSize) {
                 @Override
                 public void onChange(long newState, boolean hiImpedance) {
-                    outState = 1L << correctState(newState);
+                    outState = 1L << getState();
                     if (csState) {
                         if (hiImpedance) {
                             throw new FloatingPinException(this);
@@ -77,7 +77,7 @@ public class Decoder extends SchemaPart {
         cs = addInPin(new InPin("CS", this) {
             @Override
             public void onChange(long newState, boolean hiImpedance) {
-                csState = (cs.state == 1) ^ reverse;
+                csState = (cs.state > 0) ^ reverse;
                 if (csState) {
                     if (hiImpedance) {
                         throw new FloatingPinException(this);
