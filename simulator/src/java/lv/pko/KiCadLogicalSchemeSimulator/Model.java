@@ -36,10 +36,6 @@ import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.ShortcutException;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.*;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.groups.TriStateOutGroupedPins;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.groups.TriStateOutPins;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.nc.NCOutPin;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.nc.NCOutPins;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.nc.NCTriStateOutPin;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.nc.NCTriStateOutPins;
 import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
 import lv.pko.KiCadLogicalSchemeSimulator.model.InPinInterconnect;
@@ -236,12 +232,7 @@ public class Model {
                         .stream())
                 .forEach(outPin -> {
                     if (outPin.noDest()) {
-                        replaceOut(outPin, switch (outPin) {
-                            case OutGroupedPins pin -> new NCOutPins(pin);
-                            case TriStateOutGroupedPins pin -> new NCTriStateOutPins(pin);
-                            case TriStateOutPin pin -> new NCTriStateOutPin(pin);
-                            case OutPin pin -> new NCOutPin(pin);
-                        });
+                        replaceOut(outPin, new NCOutPin(outPin));
                     } else if (outPin instanceof TriStateOutGroupedPins oldPin && oldPin.groups.length == 1) {
                         replaceOut(outPin, new TriStateOutPins(oldPin));
                     } else if (outPin instanceof OutGroupedPins oldPin && oldPin.groups.length == 1) {
