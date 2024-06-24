@@ -84,4 +84,12 @@ public class Utils {
         newArray[array.length] = item;
         return newArray;
     }
+
+    public static long getMaskForSize(int size) {
+        long retVal = 0;
+        for (int i = 0; i < size; i++) {
+            retVal = (retVal << 1) | 1;
+        }
+        return retVal;
+    }
 }

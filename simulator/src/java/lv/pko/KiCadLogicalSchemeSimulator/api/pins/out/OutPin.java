@@ -34,15 +34,14 @@ import lv.pko.KiCadLogicalSchemeSimulator.api.pins.Manipulable;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.Pin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import lv.pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 public class OutPin extends Pin implements Manipulable {
     public InPin dest;
 
     public OutPin(String id, SchemaPart parent, int size, String... names) {
         super(id, parent, size, names);
-        for (int i = 0; i < size; i++) {
-            mask = mask << 1 | 1;
-        }
+        mask = Utils.getMaskForSize(size);
     }
 
     public void addDest(InPin pin) {

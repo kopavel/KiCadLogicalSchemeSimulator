@@ -34,11 +34,12 @@ import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.FallingEdgeInPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.RisingEdgeInPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import lv.pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 public class Counter extends SchemaPart {
     private OutPin outPin;
-    private int count = 0;
-    private int countMask;
+    private final long countMask;
+    private long count = 0;
 
     protected Counter(String id, String sParam) {
         super(id, sParam);
@@ -54,9 +55,7 @@ public class Counter extends SchemaPart {
         if (pinAmount < 1) {
             throw new RuntimeException("Component " + id + " size must be positive number");
         }
-        for (int i = 0; i < pinAmount; i++) {
-            countMask = (countMask << 1) | 1;
-        }
+        countMask = Utils.getMaskForSize(pinAmount);
         addOutPin("Q", pinAmount);
         if (reverse) {
             addInPin(new FallingEdgeInPin("C", this) {

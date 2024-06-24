@@ -35,6 +35,7 @@ import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.FloatingPinException;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.TriStateOutPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import lv.pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
@@ -48,7 +49,6 @@ public class Rom extends SchemaPart {
     private boolean csActive;
     private int size;
     private int aSize;
-    private int mask;
 
     protected Rom(String id, String sParam) {
         super(id, sParam);
@@ -65,9 +65,7 @@ public class Rom extends SchemaPart {
             size = Integer.parseInt(params.get("size"));
         } catch (NumberFormatException ignore) {
         }
-        for (int i = 0; i < size; i++) {
-            mask = mask << 1 | 1;
-        }
+        long mask = Utils.getMaskForSize(size);
         if (size < 1) {
             throw new RuntimeException("Component " + id + " size must be positive number");
         }

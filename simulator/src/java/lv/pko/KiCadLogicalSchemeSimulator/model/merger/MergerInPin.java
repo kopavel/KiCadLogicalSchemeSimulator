@@ -75,14 +75,14 @@ public class MergerInPin extends InPin {
                 merger.state &= nCorrMask;
                 merger.state |= newState;
             }
+            merger.hiImpedance = (merger.hiImpedancePins & merger.nPullMask) > 0;
             merger.state |= merger.pullState & merger.hiImpedancePins;
             merger.dest.state = merger.state;
-            merger.dest.onChange(merger.state, (merger.hiImpedancePins & merger.nPullMask) > 0);
+            merger.dest.onChange(merger.state, merger.hiImpedance);
         } else if (!newImpedance) {
-            merger.state &= nCorrMask;
-            merger.state |= newState;
+            merger.state = merger.state & nCorrMask | newState;
             merger.dest.state = merger.state;
-            merger.dest.onChange(merger.state, (merger.hiImpedancePins & merger.nPullMask) > 0);
+            merger.dest.onChange(merger.state, merger.hiImpedance);
         }
     }
 

@@ -36,6 +36,7 @@ import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.RisingEdgeInPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import lv.pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 import java.util.stream.IntStream;
 
@@ -68,9 +69,7 @@ public class Shifter extends SchemaPart {
             }
         });
         plReverse = params.containsKey("plReverse");
-        for (int i = 0; i < dSize; i++) {
-            outMask = outMask << 1 | 1;
-        }
+        outMask = Utils.getMaskForSize(dSize);
         hiDsMask = 1L << (dSize - 1);
         dsPins = addInPin("DS", 1);
         addInPin(new InPin("PL", this) {

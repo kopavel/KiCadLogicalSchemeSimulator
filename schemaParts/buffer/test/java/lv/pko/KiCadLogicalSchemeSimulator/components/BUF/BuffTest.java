@@ -33,6 +33,7 @@ package lv.pko.KiCadLogicalSchemeSimulator.components.BUF;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.FloatingPinException;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.TriStateOutPin;
+import lv.pko.KiCadLogicalSchemeSimulator.tools.Utils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -59,10 +60,7 @@ public class BuffTest {
             }
         };
         qPin.addDest(dest);
-        dPin.mask = 0;
-        for (int i = 0; i < size; i++) {
-            dPin.mask = dPin.mask << 1 | 1;
-        }
+        dPin.mask = Utils.getMaskForSize(size);
         dest.mask = 1;
         buffer.initOuts();
     }
@@ -110,10 +108,7 @@ public class BuffTest {
     void multipleInputSizes() {
         for (int size = 1; size <= 8; size++) {
             initializeBuffer(size);
-            long allHi = 0;
-            for (int i = 0; i < size; i++) {
-                allHi = allHi << 1 | 1;
-            }
+            long allHi = Utils.getMaskForSize(size);
             csPin.onChange(0, false);
             dPin.onChange(allHi, false);
             assertEquals(allHi, qPin.state, "With Lo CS and Hi D pin Q must match D for size " + size);
@@ -136,9 +131,7 @@ public class BuffTest {
     void boundaryMaxInputs() {
         initializeBuffer(64);
         long allHi = 0;
-        for (int i = 0; i < 64; i++) {
-            allHi = allHi << 1 | 1;
-        }
+        allHi = Utils.getMaskForSize(64);
         csPin.onChange(0, false);
         dPin.onChange(allHi, false);
         assertEquals(allHi, qPin.state, "With Lo CS and Hi D pin Q must match D for max size");

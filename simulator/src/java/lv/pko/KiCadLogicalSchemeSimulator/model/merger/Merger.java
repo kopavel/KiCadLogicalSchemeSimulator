@@ -30,16 +30,19 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.KiCadLogicalSchemeSimulator.model.merger;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.Pin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.PullPins;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.TriStateOutPin;
 import lv.pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Merger extends OutPin {
+public class Merger extends TriStateOutPin {
     private final Map<OutPin, MergerInPin> sources = new HashMap<>();
     public String hash;
     long hiImpedancePins;
@@ -51,12 +54,10 @@ public class Merger extends OutPin {
 
     public Merger(InPin dest) {
         super(dest.id, dest.parent, dest.size);
-        for (int i = 0; i < dest.size; i++) {
-            dest.mask = (dest.mask << 1) | 1;
-        }
+        dest.mask = Utils.getMaskForSize(dest.size);
         hiImpedancePins = dest.mask;
         dest.addSource(this);
-        hash = getHash();
+        hiImpedance = false;
     }
 
     @Override
@@ -72,7 +73,6 @@ public class Merger extends OutPin {
 
     public String getHash() {
         StringBuilder result = new StringBuilder(String.valueOf(dest.mask));
-        //FixMe do we need ordered list?
         for (MergerInPin input : inputs) {
             result.append(";").append(input.getHash());
         }
@@ -95,7 +95,8 @@ public class Merger extends OutPin {
                 hiImpedancePins &= ~strongMask;
             }
             inputs = Utils.addToArray(inputs, inPin);
-//            src.addDest(inPin);
+            Arrays.sort(inputs, Comparator.comparing(Pin::getName));
+            //            src.addDest(inPin);
             sources.put(src, inPin);
             hash = getHash();
         }

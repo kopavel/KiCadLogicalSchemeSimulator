@@ -33,6 +33,7 @@ package lv.pko.KiCadLogicalSchemeSimulator.components.OR;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.FloatingPinException;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
+import lv.pko.KiCadLogicalSchemeSimulator.tools.Utils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -54,9 +55,7 @@ public class OrTest {
             public void onChange(long newState, boolean hiImpedance) {
             }
         };
-        for (int i = 0; i < size; i++) {
-            inPin.mask = inPin.mask << 1 | 1;
-        }
+        inPin.mask = Utils.getMaskForSize(size);
         dest.mask = 1;
         out.addDest(dest);
     }
