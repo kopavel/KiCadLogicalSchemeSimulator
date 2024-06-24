@@ -1,3 +1,4 @@
+
 /*
  * Copyright (c) 2024 Pavel Korzh
  *
@@ -33,13 +34,15 @@ package lv.pko.KiCadLogicalSchemeSimulator.api.pins.out;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.FloatingPinException;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.ShortcutException;
+import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import lv.pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
-public class PullPins extends PullPin {
+public class PullPins extends OutPin {
     protected InPin[] dest = new InPin[0];
 
-    public PullPins(PullPin pin) {
-        super(pin.id, pin.parent, pin.state);
+    public PullPins(String id, SchemaPart parent, long value) {
+        super(id, parent, 1);
+        this.state = value;
     }
 
     @Override
@@ -69,4 +72,10 @@ public class PullPins extends PullPin {
     public boolean noDest() {
         return dest.length == 0;
     }
+
+    @Override
+    public void setState(long newState) {
+        throw new RuntimeException("Can't set state on Pull pin");
+    }
+
 }

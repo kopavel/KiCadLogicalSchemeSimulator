@@ -186,11 +186,9 @@ public class Model {
             //todo if ony other out are Power pin - use special OutPin without In splitter
             if (outNet.getValue().inPins.size() > 1) {
                 //out has many INs - replace instance with appropriate OutPins
-                if (outPin instanceof PullPin pullPin) {
-                    replaceOut(outPin, new PullPins(pullPin));
-                } else if (outPin instanceof TriStateOutPin triStateOutPin) {
+                if (outPin instanceof TriStateOutPin triStateOutPin) {
                     replaceOut(outPin, new TriStateOutGroupedPins(triStateOutPin));
-                } else {
+                } else if (!(outPin instanceof PullPins)) {
                     replaceOut(outPin, new OutGroupedPins(outPin));
                 }
             }
