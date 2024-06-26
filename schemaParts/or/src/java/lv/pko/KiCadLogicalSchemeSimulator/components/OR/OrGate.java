@@ -37,6 +37,7 @@ import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 
 public class OrGate extends SchemaPart {
     private OutPin out;
+    private boolean oldState;
 
     public OrGate(String id, String sParam) {
         super(id, sParam);
@@ -51,10 +52,13 @@ public class OrGate extends SchemaPart {
                 if (hiImpedance) {
                     throw new FloatingPinException(this);
                 }
-                if (newState != 0) {
-                    out.setState(hiState);
-                } else {
-                    out.setState(loState);
+                if (oldState == (newState == 0)) {
+                    oldState=newState!=0;
+                    if (newState != 0) {
+                        out.setState(hiState);
+                    } else {
+                        out.setState(loState);
+                    }
                 }
             }
         }).useBitPresentation = true;

@@ -37,6 +37,7 @@ import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 
 public class AndGate extends SchemaPart {
     private OutPin out;
+    private boolean oldState;
 
     public AndGate(String id, String sParam) {
         super(id, sParam);
@@ -51,10 +52,13 @@ public class AndGate extends SchemaPart {
                 if (hiImpedance) {
                     throw new FloatingPinException(this);
                 }
-                if (newState == mask) {
-                    out.setState(hiState);
-                } else {
-                    out.setState(loState);
+                if (oldState != (newState == mask)) {
+                    oldState = (newState == mask);
+                    if (newState == mask) {
+                        out.setState(hiState);
+                    } else {
+                        out.setState(loState);
+                    }
                 }
             }
         }).useBitPresentation = true;

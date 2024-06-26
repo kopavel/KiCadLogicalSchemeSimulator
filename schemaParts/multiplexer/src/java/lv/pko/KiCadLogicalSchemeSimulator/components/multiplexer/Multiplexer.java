@@ -42,6 +42,7 @@ public class Multiplexer extends SchemaPart {
     private final InPin[] inPins;
     private OutPin outPin;
     private int nState;
+    private long oldState;
 
     protected Multiplexer(String id, String sParam) {
         super(id, sParam);
@@ -98,6 +99,10 @@ public class Multiplexer extends SchemaPart {
     }
 
     private void update() {
-        outPin.setState(inPins[nState].getState());
+        long newState = inPins[nState].getState();
+        if (oldState != newState) {
+            oldState = newState;
+            outPin.setState(newState);
+        }
     }
 }
