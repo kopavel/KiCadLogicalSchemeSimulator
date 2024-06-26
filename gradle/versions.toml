@@ -12,7 +12,7 @@ junit-launcher = { module = 'org.junit.platform:junit-platform-launcher' }
 idea-gui = 'com.jetbrains.intellij.java:java-gui-forms-rt:+'
 swing-flatlaf = 'com.formdev:flatlaf:3.4.1'
 lombok = { module = 'org.projectlombok:lombok', version.ref = 'lombok' }
-z80 = 'com.github.kopavel:Z80Processor:async_IO'
+z80 = 'com.github.kopavel:Z80Processor:async_IO_v1.1'
 jackson-databind = { module = 'com.fasterxml.jackson.core:jackson-databind', version.ref = 'jackson' }
 jackson-jakarta-annotations = { module = 'com.fasterxml.jackson.module:jackson-module-jakarta-xmlbind-annotations', version.ref = 'jackson' }
 jackson-dataformat-xml = { module = 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml', version.ref = 'jackson' }
@@ -33,8 +33,6 @@ api-log4j = { version.ref = 'log4j2', module = 'org.apache.logging.log4j:log4j-a
 xz = 'org.tukaani:xz:1.9'
 commons-compress = 'org.apache.commons:commons-compress:1.26.1'
 disruptor = 'com.lmax:disruptor:4.0.0'
-asm = 'org.ow2.asm:asm:9.7'
-asm-tree = 'org.ow2.asm:asm-tree:9.7'
 [bundles]
 
 [plugins]

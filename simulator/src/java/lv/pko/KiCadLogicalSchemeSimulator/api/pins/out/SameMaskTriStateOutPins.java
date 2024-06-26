@@ -30,28 +30,54 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.KiCadLogicalSchemeSimulator.api.pins.out;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.Manipulable;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.maskGroups.MaskGroupPin;
 
-public class DirectOutPin extends OutPin implements Manipulable {
-    public DirectOutPin(OutPin oldPin) {
+public class SameMaskTriStateOutPins extends TriStateOutPin {
+    protected final MaskGroupPin group;
+
+    public SameMaskTriStateOutPins(MasksTriStateOutPins oldPin) {
         super(oldPin.id, oldPin.parent, oldPin.size);
         aliases = oldPin.aliases;
-        mask = oldPin.mask;
-        dest = oldPin.dest;
+        group = oldPin.groups[0];
+        hiImpedance = oldPin.hiImpedance;
         state = oldPin.state;
     }
 
+    @Override
+    public void addDest(InPin pin) {
+        throw new RuntimeException("Can't add dest to TriStateOutPins");
+    }
+
+    @Override
     public void setState(long newState) {
-        if (newState != dest.state) {
+        if (hiImpedance) {
+            hiImpedance = false;
             state = newState;
-            dest.state = newState;
-            dest.onChange(newState, false);
+            group.onChange(newState, false);
+        } else {
+            if (newState != state) {
+                state = newState;
+                group.onChange(newState, false);
+            }
         }
     }
 
+    @Override
     public void reSendState() {
-        if (dest != null) {
-            dest.onChange(state, false);
+        group.resend(state, false);
+    }
+
+    @Override
+    public void setHiImpedance() {
+        if (!hiImpedance) {
+            hiImpedance = true;
+            group.onChange(0, true);
         }
+    }
+
+    @Override
+    public boolean noDest() {
+        return true;
     }
 }

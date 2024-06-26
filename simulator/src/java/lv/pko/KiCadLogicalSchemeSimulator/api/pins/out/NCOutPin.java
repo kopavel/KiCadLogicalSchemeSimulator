@@ -30,10 +30,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.KiCadLogicalSchemeSimulator.api.pins.out;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.Manipulable;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
 
-public class NCOutPin extends OutPin implements Manipulable {
+public class NCOutPin extends OutPin {
     public NCOutPin(OutPin outPin) {
         super(outPin.id, outPin.parent, outPin.size, outPin.aliases.keySet().toArray(String[]::new));
     }

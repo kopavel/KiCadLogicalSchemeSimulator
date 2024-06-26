@@ -29,24 +29,17 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.groups;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.TriStateOutPin;
+package lv.pko.KiCadLogicalSchemeSimulator.api.pins.out;
+public class SameMaskTriStateOutPin extends TriStateOutPin {
+    public boolean hiImpedance;
 
-public class TriStateOutPins extends TriStateOutPin {
-    protected final MaskGroupPin group;
-
-    public TriStateOutPins(TriStateOutGroupedPins oldPin) {
+    public SameMaskTriStateOutPin(MasksTriStateOutPins oldPin) {
         super(oldPin.id, oldPin.parent, oldPin.size);
         aliases = oldPin.aliases;
-        group = oldPin.groups[0];
+        dest = oldPin.groups[0].dest;
+        dest.mask = oldPin.groups[0].mask;
         hiImpedance = oldPin.hiImpedance;
         state = oldPin.state;
-    }
-
-    @Override
-    public void addDest(InPin pin) {
-        throw new RuntimeException("Can't add dest to TriStateOutPins");
     }
 
     @Override
@@ -54,30 +47,26 @@ public class TriStateOutPins extends TriStateOutPin {
         if (hiImpedance) {
             hiImpedance = false;
             state = newState;
-            group.onChange(newState, false);
-        } else {
-            if (newState != state) {
-                state = newState;
-                group.onChange(newState, false);
-            }
+            dest.state = newState;
+            dest.onChange(state, false);
+        } else if (state != newState) {
+            state = newState;
+            dest.state = newState;
+            dest.onChange(state, false);
         }
     }
 
     @Override
     public void reSendState() {
-        group.resend(state, false);
+        dest.state = state;
+        dest.onChange(state, false);
     }
 
-    @Override
     public void setHiImpedance() {
         if (!hiImpedance) {
             hiImpedance = true;
-            group.onChange(0, true);
+            dest.state = 0;
+            dest.onChange(0, false);
         }
-    }
-
-    @Override
-    public boolean noDest() {
-        return true;
     }
 }

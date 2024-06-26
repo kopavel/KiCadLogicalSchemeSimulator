@@ -29,44 +29,34 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.groups;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
-
-public class MaskGroupPin {
-    public final InPin dest;
-    public final long mask;
-    public long oldVal;
-    public boolean oldImpedance = true;
-
-    public MaskGroupPin(InPin dest) {
-        this.mask = dest.mask;
-        this.dest = dest;
+package lv.pko.KiCadLogicalSchemeSimulator.api.pins.out;
+public class SameMaskOutPin extends OutPin {
+    public SameMaskOutPin(MasksOutPins oldPin) {
+        super(oldPin.id, oldPin.parent, oldPin.size);
+        aliases = oldPin.aliases;
+        dest = oldPin.groups[0].dest;
+        dest.mask = oldPin.groups[0].mask;
+        state = oldPin.state;
     }
 
-    public void onChange(long newState, boolean hiImpedance) {
-        long maskState = newState & mask;
-        if (oldVal != maskState || oldImpedance != hiImpedance) {
-            oldVal = maskState;
-            oldImpedance = hiImpedance;
-            dest.state = maskState;
-            dest.onChange(maskState, hiImpedance);
+    public SameMaskOutPin(OutPin oldPin) {
+        super(oldPin.id, oldPin.parent, oldPin.size);
+        aliases = oldPin.aliases;
+        dest = oldPin.dest;
+        state = oldPin.state;
+    }
+
+    public void setState(long newState) {
+        if (newState != state) {
+            state = newState;
+            dest.state = newState;
+            dest.onChange(newState, false);
         }
     }
 
-    public void onChange(long newState) {
-        long maskState = newState & mask;
-        if (oldVal != maskState) {
-            oldVal = maskState;
-            dest.state = maskState;
-            dest.onChange(maskState, false);
+    public void reSendState() {
+        if (dest != null) {
+            dest.onChange(state, false);
         }
-    }
-
-    public void resend(long newState, boolean hiImpedance) {
-        long maskState = newState & mask;
-        dest.state = maskState;
-        dest.onChange(maskState, hiImpedance);
-        oldVal = maskState;
-        oldImpedance = hiImpedance;
     }
 }

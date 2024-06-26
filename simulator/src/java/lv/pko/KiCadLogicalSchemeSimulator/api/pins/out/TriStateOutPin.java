@@ -41,6 +41,15 @@ public class TriStateOutPin extends OutPin {
         super(id, parent, size, names);
     }
 
+    public TriStateOutPin(MasksTriStateOutPins oldPin) {
+        super(oldPin.id, oldPin.parent, oldPin.size);
+        aliases = oldPin.aliases;
+        dest = oldPin.groups[0].dest;
+        dest.mask = oldPin.groups[0].mask;
+        hiImpedance = oldPin.hiImpedance;
+        state = oldPin.state;
+    }
+
     @Override
     public void addDest(InPin pin) {
         if (pin instanceof EdgeInPin) {

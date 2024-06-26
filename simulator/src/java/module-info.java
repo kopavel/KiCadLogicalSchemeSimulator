@@ -34,7 +34,6 @@ import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
 module KiCadLogicalSchemeSimulator.simulator {
     uses SchemaPartSpi;
     requires static lombok;
-    requires jdk.unsupported;
     requires java.desktop;
     requires com.formdev.flatlaf;
     requires java.gui.forms.rt;
@@ -56,8 +55,6 @@ module KiCadLogicalSchemeSimulator.simulator {
     requires com.fasterxml.jackson.dataformat.xml;
     requires com.fasterxml.jackson.module.jaxb;
     requires org.apache.commons.lang3;
-    requires org.objectweb.asm;
-    requires org.objectweb.asm.tree;
     requires java.xml.bind;
     requires info.picocli;
     exports lv.pko.KiCadLogicalSchemeSimulator;

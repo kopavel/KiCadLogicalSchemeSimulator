@@ -56,8 +56,6 @@ dependencies {
     implementation libs.jackson.dataformat.xml
     implementation libs.jackson.datatype.jsr310
     implementation libs.jackson.jaxb.annotations
-    implementation libs.asm
-    implementation libs.asm.tree
     implementation libs.picocli
 
 }
@@ -82,6 +80,10 @@ run {
                  "-Dlog4j2.contextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector",
                  "-Dlog4j2.asyncLoggerWaitStrategy=Block",
                  "-XX:-OmitStackTraceInFastThrow",
+                 "-XX:CompileThreshold=10",
+                 "-XX:MaxInlineSize=65536",
+                 "-XX:ParallelGCThreads=1",
+                 "-XX:FlightRecorderOptions=stackdepth=512",
                  "-Xmx2G",
                  "-Dlog4j2.asyncLoggerThreadNameStrategy=CACHED"]
     jvmArgs(jvm_args)

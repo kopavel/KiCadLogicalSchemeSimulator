@@ -29,18 +29,21 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.groups;
+package lv.pko.KiCadLogicalSchemeSimulator.api.pins.out;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.EdgeInPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.FloatingPinException;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.ShortcutException;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.TriStateOutPin;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.maskGroups.MaskGroupPin;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.maskGroups.MaskGroupPins;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.maskGroups.SameMaskGroupPin;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.maskGroups.SameMaskGroupPins;
 import lv.pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
-public class TriStateOutGroupedPins extends TriStateOutPin {
+public class MasksTriStateOutPins extends TriStateOutPin {
     public MaskGroupPin[] groups = new MaskGroupPin[0];
 
-    public TriStateOutGroupedPins(TriStateOutPin oldPin) {
+    public MasksTriStateOutPins(TriStateOutPin oldPin) {
         super(oldPin.id, oldPin.parent, oldPin.size);
         aliases = oldPin.aliases;
         hiImpedance = oldPin.hiImpedance;

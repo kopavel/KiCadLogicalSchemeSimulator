@@ -34,8 +34,7 @@ import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.FloatingPinException;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.ShortcutException;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.*;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.groups.TriStateOutGroupedPins;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.groups.TriStateOutPins;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.maskGroups.MaskGroupPins;
 import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
 import lv.pko.KiCadLogicalSchemeSimulator.model.InPinInterconnect;
@@ -187,9 +186,9 @@ public class Model {
             if (outNet.getValue().inPins.size() > 1) {
                 //out has many INs - replace instances with appropriate OutPins
                 if (outPin instanceof TriStateOutPin triStateOutPin) {
-                    replaceOut(outPin, new TriStateOutGroupedPins(triStateOutPin));
+                    replaceOut(outPin, new MasksTriStateOutPins(triStateOutPin));
                 } else if (!(outPin instanceof PullPins)) {
-                    replaceOut(outPin, new OutGroupedPins(outPin));
+                    replaceOut(outPin, new MasksOutPins(outPin));
                 }
             }
         }
@@ -231,12 +230,21 @@ public class Model {
                 .forEach(outPin -> {
                     if (outPin.noDest()) {
                         replaceOut(outPin, new NCOutPin(outPin));
-                    } else if (outPin instanceof TriStateOutGroupedPins oldPin && oldPin.groups.length == 1) {
-                        replaceOut(outPin, new TriStateOutPins(oldPin));
-                    } else if (outPin instanceof OutGroupedPins oldPin && oldPin.groups.length == 1) {
-                        replaceOut(outPin, new OutPins(oldPin));
+                    } else if (outPin instanceof MasksTriStateOutPins oldPin && oldPin.groups.length == 1) {
+                        if (oldPin.groups[0] instanceof MaskGroupPins) {
+                            replaceOut(outPin, new SameMaskTriStateOutPins(oldPin));
+                        } else {
+                            //FixMe SameMaskTriStatePin??
+                            replaceOut(outPin, new SameMaskTriStateOutPin(oldPin));
+                        }
+                    } else if (outPin instanceof MasksOutPins oldPin && oldPin.groups.length == 1) {
+                        if (oldPin.groups[0] instanceof MaskGroupPins) {
+                            replaceOut(outPin, new SameMaskOutPins(oldPin));
+                        } else {
+                            replaceOut(outPin, new SameMaskOutPin(oldPin));
+                        }
                     } else if (outPin.getClass() == OutPin.class && outPin.dest.mask == outPin.mask) {
-                        replaceOut(outPin, new DirectOutPin(outPin));
+                        replaceOut(outPin, new SameMaskOutPin(outPin));
                     }
                 });
     }

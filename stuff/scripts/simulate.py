@@ -58,25 +58,9 @@ command = shellCmd + [scriptFilePath, netXml]
 print("command is:"+' '.join(command))
 
 try:
-    process = subprocess.Popen(command, cwd=workingFolder, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False)
+    process = subprocess.Popen(command, cwd=workingFolder, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL , shell=False)
     print("Process started successfully with PID:", process.pid)
 except Exception as e:
     print("Failed to start process:", str(e))
     sys.exit(1)
-
-# Wait a bit to ensure process starts properly
-import time
-time.sleep(0.1)
-
-# Check if the process is still running
-retcode = process.poll()
-if retcode is None:
-    print("Process is running in the background.")
-else:
-    print("Process terminated with return code:", retcode)
-    stdout, stderr = process.communicate()
-    print("STDOUT:", stdout.decode())
-    print("STDERR:", stderr.decode())
-
-# Exit the Python script immediately
 sys.exit()

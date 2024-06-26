@@ -30,18 +30,25 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.KiCadLogicalSchemeSimulator.api.pins.out;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.Manipulable;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.Pin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import lv.pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
-public class OutPin extends Pin implements Manipulable {
+public class OutPin extends Pin {
     public InPin dest;
 
     public OutPin(String id, SchemaPart parent, int size, String... names) {
         super(id, parent, size, names);
         mask = Utils.getMaskForSize(size);
+    }
+
+    public OutPin(MasksOutPins oldPin) {
+        super(oldPin.id, oldPin.parent, oldPin.size);
+        aliases = oldPin.aliases;
+        dest = oldPin.groups[0].dest;
+        dest.mask = oldPin.groups[0].mask;
+        state = oldPin.state;
     }
 
     public void addDest(InPin pin) {

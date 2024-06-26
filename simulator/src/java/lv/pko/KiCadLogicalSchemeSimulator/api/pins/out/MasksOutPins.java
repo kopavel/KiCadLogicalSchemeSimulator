@@ -29,55 +29,64 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.groups;
+package lv.pko.KiCadLogicalSchemeSimulator.api.pins.out;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.FloatingPinException;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.ShortcutException;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.maskGroups.MaskGroupPin;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.maskGroups.MaskGroupPins;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.maskGroups.SameMaskGroupPin;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.maskGroups.SameMaskGroupPins;
 import lv.pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
-public class MaskGroupPins extends MaskGroupPin {
-    public InPin[] dest;
+public class MasksOutPins extends OutPin {
+    public MaskGroupPin[] groups = new MaskGroupPin[0];
 
-    public MaskGroupPins(MaskGroupPin oldItem) {
-        super(oldItem.dest);
-        this.dest = new InPin[]{oldItem.dest};
+    public MasksOutPins(OutPin oldPin) {
+        super(oldPin.id, oldPin.parent, oldPin.size);
+        aliases = oldPin.aliases;
+        mask = oldPin.mask;
     }
 
+    @Override
     public void addDest(InPin pin) {
-        dest = Utils.addToArray(dest, pin);
-    }
-
-    public void onChange(long newState, boolean hiImpedance) {
-        long maskState = newState & mask;
-        if (oldVal != maskState || oldImpedance != hiImpedance) {
-            oldVal = maskState;
-            oldImpedance = hiImpedance;
-            for (InPin inPin : dest) {
-                inPin.state = maskState;
-                inPin.onChange(maskState, hiImpedance);
+        int destGroupId = -1;
+        for (int i = 0; i < groups.length; i++) {
+            if (groups[i].mask == pin.mask) {
+                destGroupId = i;
+                break;
             }
+        }
+        if (destGroupId == -1) {
+            groups = Utils.addToArray(groups, (mask == pin.mask) ? new SameMaskGroupPin(pin) : new MaskGroupPin(pin));
+        } else {
+            MaskGroupPins targetGroup;
+            if (groups[destGroupId] instanceof MaskGroupPins pins) {
+                targetGroup = pins;
+            } else {
+                targetGroup = (mask == groups[destGroupId].mask) ? new SameMaskGroupPins(groups[destGroupId]) : new MaskGroupPins(groups[destGroupId]);
+                groups[destGroupId] = targetGroup;
+            }
+            targetGroup.addDest(pin);
         }
     }
 
-    public void onChange(long newState) {
-        long maskState = newState & mask;
-        if (oldVal != maskState) {
-            oldVal = maskState;
-            for (InPin inPin : dest) {
-                inPin.state = maskState;
-                inPin.onChange(maskState, false);
+    @Override
+    public void setState(long newState) {
+        if (newState != this.state) {
+            this.state = newState;
+            for (MaskGroupPin group : groups) {
+                group.onChange(newState);
             }
         }
     }
 
     @Override
-    public void resend(long newState, boolean hiImpedance) {
+    public void reSendState() {
         RuntimeException result = null;
-        long maskState = newState & mask;
-        for (InPin inPin : dest) {
+        for (MaskGroupPin group : groups) {
             try {
-                inPin.state = maskState;
-                inPin.onChange(maskState, hiImpedance);
+                group.resend(group.oldVal, false);
             } catch (FloatingPinException | ShortcutException e) {
                 if (result == null) {
                     result = e;
@@ -87,7 +96,10 @@ public class MaskGroupPins extends MaskGroupPin {
         if (result != null) {
             throw result;
         }
-        oldVal = maskState;
-        oldImpedance = hiImpedance;
+    }
+
+    @Override
+    public boolean noDest() {
+        return groups.length == 0;
     }
 }

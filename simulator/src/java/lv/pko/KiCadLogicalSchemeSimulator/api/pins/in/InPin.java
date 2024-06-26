@@ -30,13 +30,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.KiCadLogicalSchemeSimulator.api.pins.in;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.Manipulable;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.Pin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 
 //FixMe make Sense Pin
-public abstract class InPin extends Pin implements Manipulable {
+public abstract class InPin extends Pin {
     public byte offset;
     public OutPin source;
     public byte nOffset;
@@ -74,40 +73,4 @@ public abstract class InPin extends Pin implements Manipulable {
     }
 
     abstract public void onChange(long newState, boolean hiImpedance);
-
-    @Override
-    public Object[] getConstructorParameters(Class<?>[] paramTypes) {
-        if (paramTypes[0].isAssignableFrom(String.class)) {
-            if (paramTypes.length == 4) {
-                return new Object[]{id, parent, size, aliases.keySet().toArray(new String[0])};
-            } else {
-                return new Object[]{id, parent};
-            }
-        } else {
-            //anonymous class
-            if (paramTypes.length == 5) {
-                return new Object[]{parent, id, parent, size, aliases.keySet().toArray(new String[0])};
-            } else {
-                return new Object[]{parent, id, parent};
-            }
-        }
-    }
-
-    //methods for using by Byte manipulation
-    @SuppressWarnings("unused")
-    protected long correctStateStateNoOffset(long state) {
-        return state;
-    }
-
-    //methods for using by Byte manipulation
-    @SuppressWarnings("unused")
-    protected long correctStateStatePositiveOffset(long state) {
-        return state >> offset;
-    }
-
-    //methods for using by Byte manipulation
-    @SuppressWarnings("unused")
-    protected long correctStateStateNegativeOffset(long state) {
-        return state << nOffset;
-    }
 }

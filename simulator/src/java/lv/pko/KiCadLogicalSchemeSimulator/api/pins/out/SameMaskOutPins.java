@@ -30,76 +30,39 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.KiCadLogicalSchemeSimulator.api.pins.out;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.FloatingPinException;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.ShortcutException;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.groups.MaskGroupPin;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.groups.MaskGroupPins;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.groups.SameMaskGroupPin;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.groups.SameMaskGroupPins;
-import lv.pko.KiCadLogicalSchemeSimulator.tools.Utils;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.maskGroups.MaskGroupPin;
 
-public class OutGroupedPins extends OutPin {
-    public MaskGroupPin[] groups = new MaskGroupPin[0];
+public class SameMaskOutPins extends OutPin {
+    protected final MaskGroupPin dest;
 
-    public OutGroupedPins(OutPin oldPin) {
+    public SameMaskOutPins(MasksOutPins oldPin) {
         super(oldPin.id, oldPin.parent, oldPin.size);
         aliases = oldPin.aliases;
-        mask = oldPin.mask;
+        dest = oldPin.groups[0];
+        dest.dest.source = this;
     }
 
     @Override
     public void addDest(InPin pin) {
-        int destGroupId = -1;
-        for (int i = 0; i < groups.length; i++) {
-            if (groups[i].mask == pin.mask) {
-                destGroupId = i;
-                break;
-            }
-        }
-        if (destGroupId == -1) {
-            groups = Utils.addToArray(groups, (mask == pin.mask) ? new SameMaskGroupPin(pin) : new MaskGroupPin(pin));
-        } else {
-            MaskGroupPins targetGroup;
-            if (groups[destGroupId] instanceof MaskGroupPins pins) {
-                targetGroup = pins;
-            } else {
-                targetGroup = (mask == groups[destGroupId].mask) ? new SameMaskGroupPins(groups[destGroupId]) : new MaskGroupPins(groups[destGroupId]);
-                groups[destGroupId] = targetGroup;
-            }
-            targetGroup.addDest(pin);
-        }
+        throw new RuntimeException("Can't add dest to OutPins");
     }
 
     @Override
     public void setState(long newState) {
         if (newState != this.state) {
             this.state = newState;
-            for (MaskGroupPin group : groups) {
-                group.onChange(newState);
-            }
+            dest.onChange(newState);
         }
     }
 
     @Override
     public void reSendState() {
-        RuntimeException result = null;
-        for (MaskGroupPin group : groups) {
-            try {
-                group.resend(group.oldVal, false);
-            } catch (FloatingPinException | ShortcutException e) {
-                if (result == null) {
-                    result = e;
-                }
-            }
-        }
-        if (result != null) {
-            throw result;
-        }
+        dest.resend(state, false);
     }
 
     @Override
     public boolean noDest() {
-        return groups.length == 0;
+        return true;
     }
 }
