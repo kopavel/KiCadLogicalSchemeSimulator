@@ -83,7 +83,6 @@ run {
                  "-XX:CompileThreshold=10",
                  "-XX:MaxInlineSize=65536",
                  "-XX:ParallelGCThreads=1",
-                 "-XX:FlightRecorderOptions=stackdepth=512",
                  "-Xmx2G",
                  "-Dlog4j2.asyncLoggerThreadNameStrategy=CACHED"]
     jvmArgs(jvm_args)

@@ -74,20 +74,37 @@ public class Decoder extends SchemaPart {
                 }
             });
         }
-        cs = addInPin(new InPin("CS", this) {
-            @Override
-            public void onChange(long newState, boolean hiImpedance) {
-                csState = (cs.state > 0) ^ reverse;
-                if (csState) {
-                    if (hiImpedance) {
-                        throw new FloatingPinException(this);
+        if (reverse) {
+            cs = addInPin(new InPin("CS", this) {
+                @Override
+                public void onChange(long newState, boolean hiImpedance) {
+                    csState = cs.state == 0;
+                    if (csState) {
+                        if (hiImpedance) {
+                            throw new FloatingPinException(this);
+                        }
+                        outPin.setState(outState);
+                    } else {
+                        outPin.setHiImpedance();
                     }
-                    outPin.setState(outState);
-                } else {
-                    outPin.setHiImpedance();
                 }
-            }
-        });
+            });
+        } else {
+            cs = addInPin(new InPin("CS", this) {
+                @Override
+                public void onChange(long newState, boolean hiImpedance) {
+                    csState = cs.state > 0;
+                    if (csState) {
+                        if (hiImpedance) {
+                            throw new FloatingPinException(this);
+                        }
+                        outPin.setState(outState);
+                    } else {
+                        outPin.setHiImpedance();
+                    }
+                }
+            });
+        }
         int outSize = (int) Math.pow(2, inSize);
         addTriStateOutPin("Q", outSize);
         csState = reverse;

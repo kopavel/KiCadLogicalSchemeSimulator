@@ -71,7 +71,11 @@ public class Multiplexer extends SchemaPart {
                         if (hiImpedance) {
                             throw new FloatingPinException(this);
                         }
-                        update();
+                        newState = correctState(newState);
+                        if (oldState != newState) {
+                            oldState = newState;
+                            outPin.setState(newState);
+                        }
                     }
                 }
             });
@@ -83,7 +87,11 @@ public class Multiplexer extends SchemaPart {
                     throw new FloatingPinException(this);
                 }
                 nState = (int) correctState(newState);
-                update();
+                newState = inPins[nState].getState();
+                if (oldState != newState) {
+                    oldState = newState;
+                    outPin.setState(newState);
+                }
             }
         });
         String[] aliases = new String[partsAmount];
@@ -96,13 +104,6 @@ public class Multiplexer extends SchemaPart {
     @Override
     public void initOuts() {
         outPin = getOutPin("Q");
-    }
-
-    private void update() {
-        long newState = inPins[nState].getState();
-        if (oldState != newState) {
-            oldState = newState;
-            outPin.setState(newState);
-        }
+        oldState = outPin.state;
     }
 }

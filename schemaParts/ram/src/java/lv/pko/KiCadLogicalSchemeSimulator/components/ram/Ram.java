@@ -93,27 +93,27 @@ public class Ram extends SchemaPart {
         });
         addTriStateOutPin("D", size);
         dIn = addInPin("D", size);
-        addInPin(new InPin(reverse ? "~{CS}" : "CS", this) {
-            @Override
-            public void onChange(long newState, boolean hiImpedance) {
-                if (hiImpedance) {
-                    throw new FloatingPinException(this);
-                }
-                csActive = (state > 0) ^ reverse;
-                out();
-            }
-        });
-        addInPin(new InPin(reverse ? "~{OE}" : "OE", this) {
-            @Override
-            public void onChange(long newState, boolean hiImpedance) {
-                if (hiImpedance) {
-                    throw new FloatingPinException(this);
-                }
-                oeActive = (newState > 0) ^ reverse;
-                out();
-            }
-        });
         if (reverse) {
+            addInPin(new InPin("~{CS}", this) {
+                @Override
+                public void onChange(long newState, boolean hiImpedance) {
+                    if (hiImpedance) {
+                        throw new FloatingPinException(this);
+                    }
+                    csActive = state == 0;
+                    out();
+                }
+            });
+            addInPin(new InPin("~{OE}", this) {
+                @Override
+                public void onChange(long newState, boolean hiImpedance) {
+                    if (hiImpedance) {
+                        throw new FloatingPinException(this);
+                    }
+                    oeActive = newState == 0;
+                    out();
+                }
+            });
             addInPin(new FallingEdgeInPin("~{WE}", this) {
                 @Override
                 public void onFallingEdge() {
@@ -123,6 +123,26 @@ public class Ram extends SchemaPart {
                 }
             });
         } else {
+            addInPin(new InPin("CS", this) {
+                @Override
+                public void onChange(long newState, boolean hiImpedance) {
+                    if (hiImpedance) {
+                        throw new FloatingPinException(this);
+                    }
+                    csActive = state > 0;
+                    out();
+                }
+            });
+            addInPin(new InPin("OE", this) {
+                @Override
+                public void onChange(long newState, boolean hiImpedance) {
+                    if (hiImpedance) {
+                        throw new FloatingPinException(this);
+                    }
+                    oeActive = newState > 0;
+                    out();
+                }
+            });
             addInPin(new RisingEdgeInPin("WE", this) {
                 @Override
                 public void onRisingEdge() {

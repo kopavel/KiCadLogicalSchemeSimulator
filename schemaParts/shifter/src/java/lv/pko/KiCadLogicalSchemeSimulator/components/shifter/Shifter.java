@@ -44,10 +44,9 @@ public class Shifter extends SchemaPart {
     private final InPin dPins;
     private final InPin dsPins;
     private final long hiDsMask;
-    private final boolean plReverse;
+    private final long outMask;
     private long latch = 0;
     private OutPin out;
-    private long outMask;
     private boolean plInactive;
 
     protected Shifter(String id, String sParam) {
@@ -68,23 +67,39 @@ public class Shifter extends SchemaPart {
                 }
             }
         });
-        plReverse = params.containsKey("plReverse");
+        boolean plReverse = params.containsKey("plReverse");
         outMask = Utils.getMaskForSize(dSize);
         hiDsMask = 1L << (dSize - 1);
         dsPins = addInPin("DS", 1);
-        addInPin(new InPin("PL", this) {
-            @Override
-            public void onChange(long newState, boolean hiImpedance) {
-                if (hiImpedance) {
-                    throw new FloatingPinException(this);
+        if (plReverse) {
+            addInPin(new InPin("PL", this) {
+                @Override
+                public void onChange(long newState, boolean hiImpedance) {
+                    if (hiImpedance) {
+                        throw new FloatingPinException(this);
+                    }
+                    plInactive = newState > 0;
+                    if (!plInactive) {
+                        latch = dPins.getState();
+                        out.setState(latch & out.mask);
+                    }
                 }
-                plInactive = (newState == 0) ^ plReverse;
-                if (!plInactive) {
-                    latch = dPins.getState();
-                    out.setState(latch & out.mask);
+            });
+        } else {
+            addInPin(new InPin("PL", this) {
+                @Override
+                public void onChange(long newState, boolean hiImpedance) {
+                    if (hiImpedance) {
+                        throw new FloatingPinException(this);
+                    }
+                    plInactive = newState == 0;
+                    if (!plInactive) {
+                        latch = dPins.getState();
+                        out.setState(latch & out.mask);
+                    }
                 }
-            }
-        });
+            });
+        }
         if (reverse) {
             addInPin(new FallingEdgeInPin("CP", this) {
                 @Override

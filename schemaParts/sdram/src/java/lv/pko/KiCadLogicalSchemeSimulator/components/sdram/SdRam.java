@@ -83,7 +83,13 @@ public class SdRam extends SchemaPart {
             addInPin(new EdgeInPin("~{CAS}", this) {
                 @Override
                 public void onFallingEdge() {
-                    casOn();
+                    int addr;
+                    addr = (int) (hiPart + addrPin.getState());
+                    if (we.state == 0) {
+                        bytes[addr] = dIn.getState();
+                    } else {
+                        dOut.setState(bytes[addr]);
+                    }
                 }
 
                 @Override
@@ -106,7 +112,13 @@ public class SdRam extends SchemaPart {
 
                 @Override
                 public void onRisingEdge() {
-                    casOn();
+                    int addr;
+                    addr = (int) (hiPart + addrPin.getState());
+                    if (we.state > 0) {
+                        bytes[addr] = dIn.getState();
+                    } else {
+                        dOut.setState(bytes[addr]);
+                    }
                 }
             });
         }
@@ -122,15 +134,5 @@ public class SdRam extends SchemaPart {
     @Override
     public void initOuts() {
         dOut = (TriStateOutPin) getOutPin("D");
-    }
-
-    private void casOn() {
-        int addr;
-        addr = (int) (hiPart + addrPin.getState());
-        if (we.state > 0 ^ reverse) {
-            bytes[addr] = dIn.getState();
-        } else if (we.state == 0 ^ reverse) {
-            dOut.setState(bytes[addr]);
-        }
     }
 }

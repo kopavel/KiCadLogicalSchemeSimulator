@@ -67,47 +67,91 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
         } catch (NumberFormatException r) {
             throw new RuntimeException("Component " + id + " size must be positive number");
         }
-        addInPin(new FallingEdgeInPin("Clock", this) {
-            @Override
-            public void onFallingEdge() {
-                boolean currHSync = (hSync.state > 0) ^ reverse;
-                boolean currVSync = (vSync.state > 0) ^ reverse;
-                if (currVSync && !lastVSync) {
+        if (reverse) {
+            addInPin(new FallingEdgeInPin("Clock", this) {
+                @Override
+                public void onFallingEdge() {
+                    boolean currHSync = hSync.state == 0;
+                    boolean currVSync = vSync.state == 0;
+                    if (currVSync && !lastVSync) {
 //                    Log.trace(Display.class, "vsync on {},{}", hPos, vPos);
-                    if (vSize == 0) {
-                        vSize = vPos + 2;
-                        SwingUtilities.invokeLater(() -> {
-                            //noinspection deprecation
-                            display.reshape(display.currentX, display.currentY, hSize * display.scaleFactor, vSize * display.scaleFactor);
-                        });
-                        ram = Arrays.copyOf(ram, vSize);
-                    }
-                    hPos = 0;
-                    vPos = 0;
-                } else if (currHSync && !lastHSync) {
+                        if (vSize == 0) {
+                            vSize = vPos + 2;
+                            SwingUtilities.invokeLater(() -> {
+                                //noinspection deprecation
+                                display.reshape(display.currentX, display.currentY, hSize * display.scaleFactor, vSize * display.scaleFactor);
+                            });
+                            ram = Arrays.copyOf(ram, vSize);
+                        }
+                        hPos = 0;
+                        vPos = 0;
+                    } else if (currHSync && !lastHSync) {
 //                    Log.trace(Display.class, "hsync on {},{}", hPos, vPos);
-                    if (hSize == 0) {
-                        hSize = hPos + 2;
-                        ram = new byte[2048][hSize];
-                        ram[vPos] = Arrays.copyOf(firstRow, hSize);
-                        firstRow = null;
+                        if (hSize == 0) {
+                            hSize = hPos + 2;
+                            ram = new byte[2048][hSize];
+                            ram[vPos] = Arrays.copyOf(firstRow, hSize);
+                            firstRow = null;
+                        }
+                        hPos = 0;
+                        vPos++;
+                        rows++;
                     }
-                    hPos = 0;
-                    vPos++;
-                    rows++;
-                }
-                hPos++;
-                byte data = (byte) (vIn.state > 0 ? 0xff : 0x0);
+                    hPos++;
+                    byte data = (byte) (vIn.state > 0 ? 0xff : 0x0);
 //                Log.trace(Display.class, "tick on {},{} -> {}", hPos, vPos, data);
-                if (hSize == 0) {
-                    firstRow[hPos] = data;
-                } else {
-                    ram[vPos][hPos] = data;
+                    if (hSize == 0) {
+                        firstRow[hPos] = data;
+                    } else {
+                        ram[vPos][hPos] = data;
+                    }
+                    lastHSync = currHSync;
+                    lastVSync = currVSync;
                 }
-                lastHSync = currHSync;
-                lastVSync = currVSync;
-            }
-        });
+            });
+        } else {
+            addInPin(new FallingEdgeInPin("Clock", this) {
+                @Override
+                public void onFallingEdge() {
+                    boolean currHSync = hSync.state > 0;
+                    boolean currVSync = vSync.state > 0;
+                    if (currVSync && !lastVSync) {
+//                    Log.trace(Display.class, "vsync on {},{}", hPos, vPos);
+                        if (vSize == 0) {
+                            vSize = vPos + 2;
+                            SwingUtilities.invokeLater(() -> {
+                                //noinspection deprecation
+                                display.reshape(display.currentX, display.currentY, hSize * display.scaleFactor, vSize * display.scaleFactor);
+                            });
+                            ram = Arrays.copyOf(ram, vSize);
+                        }
+                        hPos = 0;
+                        vPos = 0;
+                    } else if (currHSync && !lastHSync) {
+//                    Log.trace(Display.class, "hsync on {},{}", hPos, vPos);
+                        if (hSize == 0) {
+                            hSize = hPos + 2;
+                            ram = new byte[2048][hSize];
+                            ram[vPos] = Arrays.copyOf(firstRow, hSize);
+                            firstRow = null;
+                        }
+                        hPos = 0;
+                        vPos++;
+                        rows++;
+                    }
+                    hPos++;
+                    byte data = (byte) (vIn.state > 0 ? 0xff : 0x0);
+//                Log.trace(Display.class, "tick on {},{} -> {}", hPos, vPos, data);
+                    if (hSize == 0) {
+                        firstRow[hPos] = data;
+                    } else {
+                        ram[vPos][hPos] = data;
+                    }
+                    lastHSync = currHSync;
+                    lastVSync = currVSync;
+                }
+            });
+        }
         vIn = addInPin("Vin", 1);
         hSync = addInPin("HSync");
         vSync = addInPin("VSync");
