@@ -103,9 +103,10 @@ public class Merger extends TriStateOutPin {
     }
 
     public void bindSources() {
-        for (Map.Entry<OutPin, MergerInPin> bind : sources.entrySet()) {
-            bind.getKey().addDest(bind.getValue());
-        }
+        sources.forEach((source, inPin) -> {
+            source.addDest(inPin);
+            inPin.init();
+        });
     }
 
     private MergerInPin createInput(OutPin src, byte offset, long mask) {

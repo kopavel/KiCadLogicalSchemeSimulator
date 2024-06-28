@@ -41,6 +41,7 @@ public class MergerInPin extends InPin {
     public final long nCorrMask;
     public final Merger merger;
     public boolean hiImpedance = false;
+    public boolean setHiImpedance = false;
 
     public MergerInPin(OutPin src, byte offset, long mask, Merger merger) {
         super(src.id, src.parent);
@@ -64,19 +65,19 @@ public class MergerInPin extends InPin {
     public void onChange(long newState, boolean newImpedance) {
         if (newImpedance != hiImpedance) {
             hiImpedance = newImpedance;
+            merger.state &= nCorrMask;
             if (newImpedance) {
                 merger.hiImpedancePins |= corrMask;
-                merger.state &= nCorrMask;
+                merger.hiImpedance |= setHiImpedance;
+                merger.state |= merger.pullState & corrMask;
             } else {
-                if ((merger.hiImpedancePins | corrMask) != merger.hiImpedancePins) {
+                if ((merger.hiImpedancePins & corrMask) != corrMask) {
                     throw new ShortcutException(merger.inputs);
                 }
                 merger.hiImpedancePins &= nCorrMask;
-                merger.state &= nCorrMask;
+                merger.hiImpedance &= (merger.hiImpedancePins & merger.nPullMask) > 0;
                 merger.state |= newState;
             }
-            merger.hiImpedance = (merger.hiImpedancePins & merger.nPullMask) > 0;
-            merger.state |= merger.pullState & merger.hiImpedancePins;
             merger.dest.state = merger.state;
             merger.dest.onChange(merger.state, merger.hiImpedance);
         } else if (!newImpedance) {
@@ -88,5 +89,9 @@ public class MergerInPin extends InPin {
 
     public String getHash() {
         return corrMask + ":" + offset + ":" + source.getName();
+    }
+
+    public void init() {
+        setHiImpedance = (corrMask & merger.nPullMask) > 0;
     }
 }
