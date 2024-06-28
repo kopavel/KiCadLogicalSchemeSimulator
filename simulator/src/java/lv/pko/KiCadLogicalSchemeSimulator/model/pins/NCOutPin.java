@@ -29,40 +29,25 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lv.pko.KiCadLogicalSchemeSimulator.api.pins.out;
+package lv.pko.KiCadLogicalSchemeSimulator.model.pins;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.maskGroups.MaskGroupPin;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
 
-public class SameMaskOutPins extends OutPin {
-    protected final MaskGroupPin dest;
-
-    public SameMaskOutPins(MasksOutPins oldPin) {
-        super(oldPin.id, oldPin.parent, oldPin.size);
-        aliases = oldPin.aliases;
-        dest = oldPin.groups[0];
-        dest.dest.source = this;
+public class NCOutPin extends OutPin {
+    public NCOutPin(OutPin outPin) {
+        super(outPin.id, outPin.parent, outPin.size, outPin.aliases.keySet().toArray(String[]::new));
     }
 
     @Override
     public void addDest(InPin pin) {
-        throw new RuntimeException("Can't add dest to OutPins");
+        throw new RuntimeException("Can't add dest to NC Out Pin");
     }
 
     @Override
     public void setState(long newState) {
-        if (newState != this.state) {
-            this.state = newState;
-            dest.onChange(newState);
-        }
     }
 
     @Override
     public void reSendState() {
-        dest.resend(state, false);
-    }
-
-    @Override
-    public boolean noDest() {
-        return true;
     }
 }

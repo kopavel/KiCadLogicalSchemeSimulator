@@ -29,7 +29,9 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lv.pko.KiCadLogicalSchemeSimulator.api.pins.out;
+package lv.pko.KiCadLogicalSchemeSimulator.model.pins.strong;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
+
 public class SameMaskOutPin extends OutPin {
     public SameMaskOutPin(MasksOutPins oldPin) {
         super(oldPin.id, oldPin.parent, oldPin.size);

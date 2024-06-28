@@ -29,64 +29,60 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lv.pko.KiCadLogicalSchemeSimulator.api.pins.out;
+package lv.pko.KiCadLogicalSchemeSimulator.model.pins.maskGroups;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.FloatingPinException;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.ShortcutException;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.maskGroups.MaskGroupPin;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.maskGroups.MaskGroupPins;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.maskGroups.SameMaskGroupPin;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.maskGroups.SameMaskGroupPins;
 import lv.pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
-public class MasksOutPins extends OutPin {
-    public MaskGroupPin[] groups = new MaskGroupPin[0];
+public class MaskGroupPins extends MaskGroupPin {
+    public InPin[] dest;
 
-    public MasksOutPins(OutPin oldPin) {
-        super(oldPin.id, oldPin.parent, oldPin.size);
-        aliases = oldPin.aliases;
-        mask = oldPin.mask;
+    public MaskGroupPins(MaskGroupPin oldItem) {
+        super(oldItem.dest);
+        this.dest = new InPin[]{oldItem.dest};
     }
 
-    @Override
     public void addDest(InPin pin) {
-        int destGroupId = -1;
-        for (int i = 0; i < groups.length; i++) {
-            if (groups[i].mask == pin.mask) {
-                destGroupId = i;
-                break;
-            }
-        }
-        if (destGroupId == -1) {
-            groups = Utils.addToArray(groups, (mask == pin.mask) ? new SameMaskGroupPin(pin) : new MaskGroupPin(pin));
-        } else {
-            MaskGroupPins targetGroup;
-            if (groups[destGroupId] instanceof MaskGroupPins pins) {
-                targetGroup = pins;
-            } else {
-                targetGroup = (mask == groups[destGroupId].mask) ? new SameMaskGroupPins(groups[destGroupId]) : new MaskGroupPins(groups[destGroupId]);
-                groups[destGroupId] = targetGroup;
-            }
-            targetGroup.addDest(pin);
+        dest = Utils.addToArray(dest, pin);
+    }
+
+    public void setHiImpedance() {
+        state = 0;
+        for (InPin inPin : dest) {
+            inPin.state = 0;
+            inPin.onChange(0, true);
         }
     }
 
-    @Override
-    public void setState(long newState) {
-        if (newState != this.state) {
-            this.state = newState;
-            for (MaskGroupPin group : groups) {
-                group.onChange(newState);
+    public void onChange(long newState) {
+        long maskState = newState & mask;
+        if (state != maskState) {
+            state = maskState;
+            for (InPin inPin : dest) {
+                inPin.state = maskState;
+                inPin.onChange(maskState, false);
             }
         }
     }
 
+    public void onChangeForce(long newState) {
+        long maskState = newState & mask;
+        state = maskState;
+        for (InPin inPin : dest) {
+            inPin.state = maskState;
+            inPin.onChange(maskState, false);
+        }
+    }
+
     @Override
-    public void reSendState() {
+    public void resend(long newState, boolean hiImpedance) {
         RuntimeException result = null;
-        for (MaskGroupPin group : groups) {
+        long maskState = newState & mask;
+        for (InPin inPin : dest) {
             try {
-                group.resend(group.oldVal, false);
+                inPin.state = maskState;
+                inPin.onChange(maskState, hiImpedance);
             } catch (FloatingPinException | ShortcutException e) {
                 if (result == null) {
                     result = e;
@@ -96,10 +92,6 @@ public class MasksOutPins extends OutPin {
         if (result != null) {
             throw result;
         }
-    }
-
-    @Override
-    public boolean noDest() {
-        return groups.length == 0;
+        state = maskState;
     }
 }

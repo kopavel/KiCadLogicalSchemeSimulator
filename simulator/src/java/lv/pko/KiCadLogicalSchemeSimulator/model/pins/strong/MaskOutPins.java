@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2024 Pavel Korzh
  *
@@ -30,52 +29,41 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lv.pko.KiCadLogicalSchemeSimulator.api.pins.out;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.FloatingPinException;
+package lv.pko.KiCadLogicalSchemeSimulator.model.pins.strong;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.ShortcutException;
-import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import lv.pko.KiCadLogicalSchemeSimulator.tools.Utils;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
+import lv.pko.KiCadLogicalSchemeSimulator.model.pins.maskGroups.MaskGroupPin;
 
-public class PullPins extends OutPin {
-    protected InPin[] dest = new InPin[0];
+public class MaskOutPins extends OutPin {
+    protected final MaskGroupPin dest;
 
-    public PullPins(String id, SchemaPart parent, long value) {
-        super(id, parent, 1);
-        this.state = value;
+    public MaskOutPins(MasksOutPins oldPin) {
+        super(oldPin.id, oldPin.parent, oldPin.size);
+        aliases = oldPin.aliases;
+        dest = oldPin.groups[0];
+        dest.dest.source = this;
     }
 
     @Override
     public void addDest(InPin pin) {
-        dest = Utils.addToArray(dest, pin);
-    }
-
-    @Override
-    public void reSendState() {
-        RuntimeException result = null;
-        for (InPin pin : dest) {
-            try {
-                pin.state = state;
-                pin.onChange(state, false);
-            } catch (FloatingPinException | ShortcutException e) {
-                if (result == null) {
-                    result = e;
-                }
-            }
-        }
-        if (result != null) {
-            throw result;
-        }
-    }
-
-    @Override
-    public boolean noDest() {
-        return dest.length == 0;
+        throw new RuntimeException("Can't add dest to OutPins");
     }
 
     @Override
     public void setState(long newState) {
-        throw new RuntimeException("Can't set state on Pull pin");
+        if (newState != this.state) {
+            this.state = newState;
+            dest.onChange(newState);
+        }
     }
 
+    @Override
+    public void reSendState() {
+        dest.resend(state, false);
+    }
+
+    @Override
+    public boolean noDest() {
+        return true;
+    }
 }

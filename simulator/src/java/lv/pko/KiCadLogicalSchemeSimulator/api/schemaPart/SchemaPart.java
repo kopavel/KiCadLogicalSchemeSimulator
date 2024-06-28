@@ -32,7 +32,7 @@
 package lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.PullPins;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.PullPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.TriStateOutPin;
 
 import java.util.HashMap;
@@ -45,12 +45,12 @@ public abstract class SchemaPart {
     public final Map<String, OutPin> outMap = new LinkedHashMap<>();
     public final Map<String, InPin> inMap = new LinkedHashMap<>();
     protected final Map<String, String> params = new HashMap<>();
-    protected long hiState;
-    protected long loState;
     protected final boolean reverse;
     private final Map<String, InPin> inAliasMap = new HashMap<>();
     private final Map<String, OutPin> outAliasMap = new HashMap<>();
     public Map<Integer, String> pinNumberMap;
+    protected long hiState;
+    protected long loState;
 
     protected SchemaPart(String id, String sParam) {
         this.id = id;
@@ -133,7 +133,7 @@ public abstract class SchemaPart {
     }
 
     public void addPullPin(String pinId, long state) {
-        OutPin pin = new PullPins(pinId, this, state);
+        OutPin pin = new PullPin(pinId, this, state);
         for (String alias : pin.aliases.keySet()) {
             outAliasMap.put(alias, pin);
         }

@@ -29,32 +29,45 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.maskGroups;
+package lv.pko.KiCadLogicalSchemeSimulator.model.pins.maskGroups;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
 
-public class SameMaskGroupPins extends MaskGroupPins {
-    public SameMaskGroupPins(MaskGroupPin oldItem) {
-        super(oldItem);
+public class MaskGroupPin {
+    public final InPin dest;
+    public final long mask;
+    public long state;
+
+    public MaskGroupPin(InPin dest) {
+        this.mask = dest.mask;
+        this.dest = dest;
     }
 
-    public void onChange(long newState, boolean hiImpedance) {
-        if (oldVal != newState || oldImpedance != hiImpedance) {
-            oldVal = newState;
-            oldImpedance = hiImpedance;
-            for (InPin inPin : dest) {
-                inPin.state = newState;
-                inPin.onChange(newState, hiImpedance);
-            }
-        }
+    public void setHiImpedance() {
+        state = 0;
+        dest.state = 0;
+        dest.onChange(0, true);
     }
 
     public void onChange(long newState) {
-        if (oldVal != newState) {
-            oldVal = newState;
-            for (InPin inPin : dest) {
-                inPin.state = newState;
-                inPin.onChange(newState, false);
-            }
+        long maskState = newState & mask;
+        if (state != maskState) {
+            state = maskState;
+            dest.state = maskState;
+            dest.onChange(maskState, false);
         }
+    }
+
+    public void onChangeForce(long newState) {
+        long maskState = newState & mask;
+        state = maskState;
+        dest.state = maskState;
+        dest.onChange(maskState, false);
+    }
+
+    public void resend(long newState, boolean hiImpedance) {
+        long maskState = newState & mask;
+        dest.state = maskState;
+        dest.onChange(maskState, hiImpedance);
+        state = maskState;
     }
 }

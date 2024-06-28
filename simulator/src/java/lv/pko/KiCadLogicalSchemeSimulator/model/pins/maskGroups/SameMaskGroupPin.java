@@ -29,44 +29,25 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lv.pko.KiCadLogicalSchemeSimulator.api.pins.out;
-public class SameMaskTriStateOutPin extends TriStateOutPin {
-    public boolean hiImpedance;
+package lv.pko.KiCadLogicalSchemeSimulator.model.pins.maskGroups;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
 
-    public SameMaskTriStateOutPin(MasksTriStateOutPins oldPin) {
-        super(oldPin.id, oldPin.parent, oldPin.size);
-        aliases = oldPin.aliases;
-        dest = oldPin.groups[0].dest;
-        dest.mask = oldPin.groups[0].mask;
-        hiImpedance = oldPin.hiImpedance;
-        state = oldPin.state;
+public class SameMaskGroupPin extends MaskGroupPin {
+    public SameMaskGroupPin(InPin dest) {
+        super(dest);
     }
 
-    @Override
-    public void setState(long newState) {
-        if (hiImpedance) {
-            hiImpedance = false;
+    public void onChange(long newState) {
+        if (state != newState) {
             state = newState;
             dest.state = newState;
-            dest.onChange(state, false);
-        } else if (state != newState) {
-            state = newState;
-            dest.state = newState;
-            dest.onChange(state, false);
+            dest.onChange(newState, false);
         }
     }
 
-    @Override
-    public void reSendState() {
-        dest.state = state;
-        dest.onChange(state, false);
-    }
-
-    public void setHiImpedance() {
-        if (!hiImpedance) {
-            hiImpedance = true;
-            dest.state = 0;
-            dest.onChange(0, false);
-        }
+    public void onChangeForce(long newState) {
+        state = newState;
+        dest.state = newState;
+        dest.onChange(newState, false);
     }
 }

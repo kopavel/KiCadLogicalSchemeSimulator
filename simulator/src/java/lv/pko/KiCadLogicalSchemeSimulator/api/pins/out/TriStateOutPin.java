@@ -41,15 +41,6 @@ public class TriStateOutPin extends OutPin {
         super(id, parent, size, names);
     }
 
-    public TriStateOutPin(MasksTriStateOutPins oldPin) {
-        super(oldPin.id, oldPin.parent, oldPin.size);
-        aliases = oldPin.aliases;
-        dest = oldPin.groups[0].dest;
-        dest.mask = oldPin.groups[0].mask;
-        hiImpedance = oldPin.hiImpedance;
-        state = oldPin.state;
-    }
-
     @Override
     public void addDest(InPin pin) {
         if (pin instanceof EdgeInPin) {
@@ -60,12 +51,8 @@ public class TriStateOutPin extends OutPin {
 
     @Override
     public void setState(long newState) {
-        if (hiImpedance) {
+        if (newState != this.state || hiImpedance) {
             hiImpedance = false;
-            state = newState;
-            dest.state = newState & dest.mask;
-            dest.onChange(dest.state, false);
-        } else if (newState != this.state) {
             state = newState;
             dest.state = newState & dest.mask;
             dest.onChange(dest.state, false);

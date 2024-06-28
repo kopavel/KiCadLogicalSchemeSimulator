@@ -33,14 +33,23 @@ package lv.pko.KiCadLogicalSchemeSimulator;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.FloatingPinException;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.ShortcutException;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.*;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.maskGroups.MaskGroupPins;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.PullPin;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.TriStateOutPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
 import lv.pko.KiCadLogicalSchemeSimulator.model.InPinInterconnect;
 import lv.pko.KiCadLogicalSchemeSimulator.model.InPinNet;
 import lv.pko.KiCadLogicalSchemeSimulator.model.OutPinNet;
 import lv.pko.KiCadLogicalSchemeSimulator.model.merger.Merger;
+import lv.pko.KiCadLogicalSchemeSimulator.model.pins.NCOutPin;
+import lv.pko.KiCadLogicalSchemeSimulator.model.pins.maskGroups.MaskGroupPins;
+import lv.pko.KiCadLogicalSchemeSimulator.model.pins.strong.MaskOutPins;
+import lv.pko.KiCadLogicalSchemeSimulator.model.pins.strong.MasksOutPins;
+import lv.pko.KiCadLogicalSchemeSimulator.model.pins.strong.SameMaskOutPin;
+import lv.pko.KiCadLogicalSchemeSimulator.model.pins.triState.MaskTriStateOutPins;
+import lv.pko.KiCadLogicalSchemeSimulator.model.pins.triState.MasksTriStateOutPins;
+import lv.pko.KiCadLogicalSchemeSimulator.model.pins.triState.SameMaskTriStateOutPin;
 import lv.pko.KiCadLogicalSchemeSimulator.parsers.pojo.Comp;
 import lv.pko.KiCadLogicalSchemeSimulator.parsers.pojo.Export;
 import lv.pko.KiCadLogicalSchemeSimulator.parsers.pojo.Net;
@@ -187,7 +196,7 @@ public class Model {
                 //out has many INs - replace instances with appropriate OutPins
                 if (outPin instanceof TriStateOutPin triStateOutPin) {
                     replaceOut(outPin, new MasksTriStateOutPins(triStateOutPin));
-                } else if (!(outPin instanceof PullPins)) {
+                } else if (!(outPin instanceof PullPin)) {
                     replaceOut(outPin, new MasksOutPins(outPin));
                 }
             }
@@ -232,14 +241,13 @@ public class Model {
                         replaceOut(outPin, new NCOutPin(outPin));
                     } else if (outPin instanceof MasksTriStateOutPins oldPin && oldPin.groups.length == 1) {
                         if (oldPin.groups[0] instanceof MaskGroupPins) {
-                            replaceOut(outPin, new SameMaskTriStateOutPins(oldPin));
+                            replaceOut(outPin, new MaskTriStateOutPins(oldPin));
                         } else {
-                            //FixMe SameMaskTriStatePin??
                             replaceOut(outPin, new SameMaskTriStateOutPin(oldPin));
                         }
                     } else if (outPin instanceof MasksOutPins oldPin && oldPin.groups.length == 1) {
                         if (oldPin.groups[0] instanceof MaskGroupPins) {
-                            replaceOut(outPin, new SameMaskOutPins(oldPin));
+                            replaceOut(outPin, new MaskOutPins(oldPin));
                         } else {
                             replaceOut(outPin, new SameMaskOutPin(oldPin));
                         }

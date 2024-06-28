@@ -29,28 +29,29 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.maskGroups;
+package lv.pko.KiCadLogicalSchemeSimulator.model.pins.maskGroups;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
 
-public class SameMaskGroupPin extends MaskGroupPin {
-    public SameMaskGroupPin(InPin dest) {
-        super(dest);
-    }
-
-    public void onChange(long newState, boolean hiImpedance) {
-        if (oldVal != newState || oldImpedance != hiImpedance) {
-            oldVal = newState;
-            oldImpedance = hiImpedance;
-            dest.state = newState;
-            dest.onChange(newState, hiImpedance);
-        }
+public class SameMaskGroupPins extends MaskGroupPins {
+    public SameMaskGroupPins(MaskGroupPin oldItem) {
+        super(oldItem);
     }
 
     public void onChange(long newState) {
-        if (oldVal != newState) {
-            oldVal = newState;
-            dest.state = newState;
-            dest.onChange(newState, false);
+        if (state != newState) {
+            state = newState;
+            for (InPin inPin : dest) {
+                inPin.state = newState;
+                inPin.onChange(newState, false);
+            }
+        }
+    }
+
+    public void onChangeForce(long newState) {
+        state = newState;
+        for (InPin inPin : dest) {
+            inPin.state = newState;
+            inPin.onChange(newState, false);
         }
     }
 }

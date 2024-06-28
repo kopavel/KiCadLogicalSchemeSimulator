@@ -29,15 +29,16 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lv.pko.KiCadLogicalSchemeSimulator.api.pins.out;
+package lv.pko.KiCadLogicalSchemeSimulator.model.pins.triState;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.EdgeInPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.FloatingPinException;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.ShortcutException;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.maskGroups.MaskGroupPin;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.maskGroups.MaskGroupPins;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.maskGroups.SameMaskGroupPin;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.maskGroups.SameMaskGroupPins;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.TriStateOutPin;
+import lv.pko.KiCadLogicalSchemeSimulator.model.pins.maskGroups.MaskGroupPin;
+import lv.pko.KiCadLogicalSchemeSimulator.model.pins.maskGroups.MaskGroupPins;
+import lv.pko.KiCadLogicalSchemeSimulator.model.pins.maskGroups.SameMaskGroupPin;
+import lv.pko.KiCadLogicalSchemeSimulator.model.pins.maskGroups.SameMaskGroupPins;
 import lv.pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 public class MasksTriStateOutPins extends TriStateOutPin {
@@ -83,14 +84,12 @@ public class MasksTriStateOutPins extends TriStateOutPin {
             hiImpedance = false;
             this.state = newState;
             for (MaskGroupPin group : groups) {
-                group.onChange(newState, false);
+                group.onChangeForce(newState);
             }
-        } else {
-            if (newState != this.state) {
-                this.state = newState;
-                for (MaskGroupPin group : groups) {
-                    group.onChange(newState, false);
-                }
+        } else if (newState != this.state) {
+            this.state = newState;
+            for (MaskGroupPin group : groups) {
+                group.onChange(newState);
             }
         }
     }
@@ -117,7 +116,7 @@ public class MasksTriStateOutPins extends TriStateOutPin {
         if (!hiImpedance) {
             hiImpedance = true;
             for (MaskGroupPin group : groups) {
-                group.onChange(0, true);
+                group.setHiImpedance();
             }
         }
     }

@@ -43,14 +43,6 @@ public class OutPin extends Pin {
         mask = Utils.getMaskForSize(size);
     }
 
-    public OutPin(MasksOutPins oldPin) {
-        super(oldPin.id, oldPin.parent, oldPin.size);
-        aliases = oldPin.aliases;
-        dest = oldPin.groups[0].dest;
-        dest.mask = oldPin.groups[0].mask;
-        state = oldPin.state;
-    }
-
     public void addDest(InPin pin) {
         dest = pin;
     }

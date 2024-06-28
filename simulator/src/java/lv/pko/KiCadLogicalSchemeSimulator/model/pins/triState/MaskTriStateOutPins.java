@@ -29,44 +29,54 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.maskGroups;
+package lv.pko.KiCadLogicalSchemeSimulator.model.pins.triState;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.TriStateOutPin;
+import lv.pko.KiCadLogicalSchemeSimulator.model.pins.maskGroups.MaskGroupPin;
 
-public class MaskGroupPin {
-    public final InPin dest;
-    public final long mask;
-    public long oldVal;
-    public boolean oldImpedance = true;
+public class MaskTriStateOutPins extends TriStateOutPin {
+    protected final MaskGroupPin group;
 
-    public MaskGroupPin(InPin dest) {
-        this.mask = dest.mask;
-        this.dest = dest;
+    public MaskTriStateOutPins(MasksTriStateOutPins oldPin) {
+        super(oldPin.id, oldPin.parent, oldPin.size);
+        aliases = oldPin.aliases;
+        group = oldPin.groups[0];
+        hiImpedance = oldPin.hiImpedance;
+        state = oldPin.state;
     }
 
-    public void onChange(long newState, boolean hiImpedance) {
-        long maskState = newState & mask;
-        if (oldVal != maskState || oldImpedance != hiImpedance) {
-            oldVal = maskState;
-            oldImpedance = hiImpedance;
-            dest.state = maskState;
-            dest.onChange(maskState, hiImpedance);
+    @Override
+    public void addDest(InPin pin) {
+        throw new RuntimeException("Can't add dest to TriStateOutPins");
+    }
+
+    @Override
+    public void setState(long newState) {
+        if (hiImpedance) {
+            hiImpedance = false;
+            state = newState;
+            group.onChangeForce(newState);
+        } else if (newState != state) {
+            state = newState;
+            group.onChange(newState);
         }
     }
 
-    public void onChange(long newState) {
-        long maskState = newState & mask;
-        if (oldVal != maskState) {
-            oldVal = maskState;
-            dest.state = maskState;
-            dest.onChange(maskState, false);
+    @Override
+    public void reSendState() {
+        group.resend(state, false);
+    }
+
+    @Override
+    public void setHiImpedance() {
+        if (!hiImpedance) {
+            hiImpedance = true;
+            group.setHiImpedance();
         }
     }
 
-    public void resend(long newState, boolean hiImpedance) {
-        long maskState = newState & mask;
-        dest.state = maskState;
-        dest.onChange(maskState, hiImpedance);
-        oldVal = maskState;
-        oldImpedance = hiImpedance;
+    @Override
+    public boolean noDest() {
+        return true;
     }
 }

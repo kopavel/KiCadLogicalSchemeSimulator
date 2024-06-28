@@ -33,7 +33,7 @@ package lv.pko.KiCadLogicalSchemeSimulator.model.merger;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.Pin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.PullPins;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.PullPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.TriStateOutPin;
 import lv.pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
@@ -81,7 +81,7 @@ public class Merger extends TriStateOutPin {
 
     public void addSource(OutPin src, long inMask, byte offset) {
         MergerInPin inPin = createInput(src, offset, inMask);
-        if (src instanceof PullPins) {
+        if (src instanceof PullPin) {
             pullState |= inPin.correctState(src.state) & dest.mask;
             pullMask |= inPin.corrMask;
             nPullMask = ~pullMask;
