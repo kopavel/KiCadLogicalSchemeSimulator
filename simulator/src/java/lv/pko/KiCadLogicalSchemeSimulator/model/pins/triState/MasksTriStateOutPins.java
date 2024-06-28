@@ -82,15 +82,24 @@ public class MasksTriStateOutPins extends TriStateOutPin {
     public void setState(long newState) {
         if (hiImpedance) {
             hiImpedance = false;
-            this.state = newState;
+            state = newState;
             for (MaskGroupPin group : groups) {
                 group.onChangeForce(newState);
             }
-        } else if (newState != this.state) {
-            this.state = newState;
+        } else if (newState != state) {
+            state = newState;
             for (MaskGroupPin group : groups) {
                 group.onChange(newState);
             }
+        }
+    }
+
+    @Override
+    public void setStateForce(long newState) {
+        hiImpedance = false;
+        state = newState;
+        for (MaskGroupPin group : groups) {
+            group.onChange(newState);
         }
     }
 

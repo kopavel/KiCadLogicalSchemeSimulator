@@ -55,9 +55,9 @@ public class OrGate extends SchemaPart {
                 if (oldState == (newState == 0)) {
                     oldState=newState!=0;
                     if (newState != 0) {
-                        out.setState(hiState);
+                        out.setStateForce(hiState);
                     } else {
-                        out.setState(loState);
+                        out.setStateForce(loState);
                     }
                 }
             }

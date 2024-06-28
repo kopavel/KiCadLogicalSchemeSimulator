@@ -63,6 +63,13 @@ public class MaskTriStateOutPins extends TriStateOutPin {
     }
 
     @Override
+    public void setStateForce(long newState) {
+        hiImpedance = false;
+        state = newState;
+        group.onChangeForce(newState);
+    }
+
+    @Override
     public void reSendState() {
         group.resend(state, false);
     }

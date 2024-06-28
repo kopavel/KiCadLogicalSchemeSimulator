@@ -48,6 +48,10 @@ public class NCOutPin extends OutPin {
     }
 
     @Override
+    public void setStateForce(long newState) {
+    }
+
+    @Override
     public void reSendState() {
     }
 }

@@ -83,6 +83,14 @@ public class MasksOutPins extends OutPin {
     }
 
     @Override
+    public void setStateForce(long newState) {
+        this.state = newState;
+        for (MaskGroupPin group : groups) {
+            group.onChange(newState);
+        }
+    }
+
+    @Override
     public void reSendState() {
         RuntimeException result = null;
         for (MaskGroupPin group : groups) {

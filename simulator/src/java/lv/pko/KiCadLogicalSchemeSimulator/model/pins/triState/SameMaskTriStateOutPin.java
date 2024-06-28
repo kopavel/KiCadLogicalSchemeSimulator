@@ -57,6 +57,14 @@ public class SameMaskTriStateOutPin extends TriStateOutPin {
     }
 
     @Override
+    public void setStateForce(long newState) {
+        hiImpedance = false;
+        state = newState;
+        dest.state = newState;
+        dest.onChange(state, false);
+    }
+
+    @Override
     public void reSendState() {
         dest.state = state;
         dest.onChange(state, false);

@@ -58,6 +58,12 @@ public class MaskOutPins extends OutPin {
     }
 
     @Override
+    public void setStateForce(long newState) {
+        this.state = newState;
+        dest.onChange(newState);
+    }
+
+    @Override
     public void reSendState() {
         dest.resend(state, false);
     }

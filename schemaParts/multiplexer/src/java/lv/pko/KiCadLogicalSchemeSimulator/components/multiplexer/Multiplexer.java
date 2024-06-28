@@ -74,7 +74,7 @@ public class Multiplexer extends SchemaPart {
                         newState = correctState(newState);
                         if (oldState != newState) {
                             oldState = newState;
-                            outPin.setState(newState);
+                            outPin.setStateForce(newState);
                         }
                     }
                 }
@@ -90,7 +90,7 @@ public class Multiplexer extends SchemaPart {
                 newState = inPins[nState].getState();
                 if (oldState != newState) {
                     oldState = newState;
-                    outPin.setState(newState);
+                    outPin.setStateForce(newState);
                 }
             }
         });

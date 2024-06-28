@@ -55,6 +55,12 @@ public class OutPin extends Pin {
         }
     }
 
+    public void setStateForce(long newState) {
+        state = newState & dest.mask;
+        dest.state = state;
+        dest.onChange(state, false);
+    }
+
     public void reSendState() {
         if (dest != null) {
             dest.state = state & dest.mask;

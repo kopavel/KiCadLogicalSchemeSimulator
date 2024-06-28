@@ -55,9 +55,9 @@ public class AndGate extends SchemaPart {
                 if (oldState != (newState == mask)) {
                     oldState = (newState == mask);
                     if (newState == mask) {
-                        out.setState(hiState);
+                        out.setStateForce(hiState);
                     } else {
-                        out.setState(loState);
+                        out.setStateForce(loState);
                     }
                 }
             }

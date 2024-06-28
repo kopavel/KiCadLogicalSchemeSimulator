@@ -77,4 +77,9 @@ public class PullPin extends OutPin {
     public void setState(long newState) {
         throw new RuntimeException("Can't set state on Pull pin");
     }
+
+    @Override
+    public void setStateForce(long newState) {
+        throw new RuntimeException("Can't set state on Pull pin");
+    }
 }
