@@ -36,8 +36,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.util.Arrays;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 public class DisplayUiComponent extends AbstractUiComponent {
     public final int scaleFactor;
@@ -47,8 +45,6 @@ public class DisplayUiComponent extends AbstractUiComponent {
         super(title, size);
         this.scaleFactor = scaleFactor;
         this.parent = parent;
-        //noinspection resource
-        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this::repaint, 0, redrawPeriod, TimeUnit.MILLISECONDS);
     }
 
     @Override

@@ -74,7 +74,6 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                     boolean currHSync = hSync.state == 0;
                     boolean currVSync = vSync.state == 0;
                     if (currVSync && !lastVSync) {
-//                    Log.trace(Display.class, "vsync on {},{}", hPos, vPos);
                         if (vSize == 0) {
                             vSize = vPos + 2;
                             SwingUtilities.invokeLater(() -> {
@@ -82,11 +81,12 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                                 display.reshape(display.currentX, display.currentY, hSize * display.scaleFactor, vSize * display.scaleFactor);
                             });
                             ram = Arrays.copyOf(ram, vSize);
+                        } else {
+                            SwingUtilities.invokeLater(display::repaint);
                         }
                         hPos = 0;
                         vPos = 0;
                     } else if (currHSync && !lastHSync) {
-//                    Log.trace(Display.class, "hsync on {},{}", hPos, vPos);
                         if (hSize == 0) {
                             hSize = hPos + 2;
                             ram = new byte[2048][hSize];
@@ -99,8 +99,8 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                     }
                     hPos++;
                     byte data = (byte) (vIn.state > 0 ? 0xff : 0x0);
-//                Log.trace(Display.class, "tick on {},{} -> {}", hPos, vPos, data);
                     if (hSize == 0) {
+                        //noinspection DataFlowIssue
                         firstRow[hPos] = data;
                     } else {
                         ram[vPos][hPos] = data;
@@ -116,7 +116,6 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                     boolean currHSync = hSync.state > 0;
                     boolean currVSync = vSync.state > 0;
                     if (currVSync && !lastVSync) {
-//                    Log.trace(Display.class, "vsync on {},{}", hPos, vPos);
                         if (vSize == 0) {
                             vSize = vPos + 2;
                             SwingUtilities.invokeLater(() -> {
@@ -124,11 +123,12 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                                 display.reshape(display.currentX, display.currentY, hSize * display.scaleFactor, vSize * display.scaleFactor);
                             });
                             ram = Arrays.copyOf(ram, vSize);
+                        } else {
+                            SwingUtilities.invokeLater(display::repaint);
                         }
                         hPos = 0;
                         vPos = 0;
                     } else if (currHSync && !lastHSync) {
-//                    Log.trace(Display.class, "hsync on {},{}", hPos, vPos);
                         if (hSize == 0) {
                             hSize = hPos + 2;
                             ram = new byte[2048][hSize];
@@ -141,8 +141,8 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                     }
                     hPos++;
                     byte data = (byte) (vIn.state > 0 ? 0xff : 0x0);
-//                Log.trace(Display.class, "tick on {},{} -> {}", hPos, vPos, data);
                     if (hSize == 0) {
+                        //noinspection DataFlowIssue
                         firstRow[hPos] = data;
                     } else {
                         ram[vPos][hPos] = data;
