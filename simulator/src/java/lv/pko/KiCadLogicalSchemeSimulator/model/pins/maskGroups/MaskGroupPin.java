@@ -45,7 +45,7 @@ public class MaskGroupPin {
     public void setHiImpedance() {
         state = 0;
         dest.state = 0;
-        dest.onChange(0, true);
+        dest.onChange(0, true, true);
     }
 
     public void onChange(long newState) {
@@ -53,7 +53,7 @@ public class MaskGroupPin {
         if (state != maskState) {
             state = maskState;
             dest.state = maskState;
-            dest.onChange(maskState, false);
+            dest.onChange(maskState, false, true);
         }
     }
 
@@ -61,13 +61,13 @@ public class MaskGroupPin {
         long maskState = newState & mask;
         state = maskState;
         dest.state = maskState;
-        dest.onChange(maskState, false);
+        dest.onChange(maskState, false, true);
     }
 
     public void resend(long newState, boolean hiImpedance) {
         long maskState = newState & mask;
         dest.state = maskState;
-        dest.onChange(maskState, hiImpedance);
+        dest.onChange(maskState, hiImpedance, true);
         state = maskState;
     }
 }

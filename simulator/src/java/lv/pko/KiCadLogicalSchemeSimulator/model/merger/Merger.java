@@ -81,11 +81,17 @@ public class Merger extends TriStateOutPin {
 
     public void addSource(OutPin src, long inMask, byte offset) {
         MergerInPin inPin = createInput(src, offset, inMask);
-        if (src instanceof PullPin) {
-            pullState |= inPin.correctState(src.state) & dest.mask;
-            pullMask |= inPin.corrMask;
-            nPullMask = ~pullMask;
-            state = pullState;
+        if (src instanceof PullPin pullPin) {
+            if (pullPin.strong) {
+                strongMask |= inPin.corrMask;
+                hiImpedancePins &= ~strongMask;
+                state |= inPin.correctState(src.state) & dest.mask;
+            } else {
+                pullState |= inPin.correctState(src.state) & dest.mask;
+                pullMask |= inPin.corrMask;
+                nPullMask = ~pullMask;
+                state = pullState;
+            }
         } else {
             if (!(src instanceof TriStateOutPin)) {
                 if ((strongMask & inPin.corrMask) > 0) {
@@ -107,6 +113,13 @@ public class Merger extends TriStateOutPin {
             source.addDest(inPin);
             inPin.init();
         });
+    }
+
+    @Override
+    public void reSendState() {
+        state |= hiImpedancePins & pullState;
+        dest.state = state;
+        dest.onChange(state, hiImpedance, hiImpedancePins != mask);
     }
 
     private MergerInPin createInput(OutPin src, byte offset, long mask) {

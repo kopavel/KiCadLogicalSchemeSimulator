@@ -32,8 +32,9 @@
 package lv.pko.KiCadLogicalSchemeSimulator.model.pins;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
+import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.TriStateOutPin;
 
-public class NCOutPin extends OutPin {
+public class NCOutPin extends TriStateOutPin {
     public NCOutPin(OutPin outPin) {
         super(outPin.id, outPin.parent, outPin.size, outPin.aliases.keySet().toArray(String[]::new));
     }

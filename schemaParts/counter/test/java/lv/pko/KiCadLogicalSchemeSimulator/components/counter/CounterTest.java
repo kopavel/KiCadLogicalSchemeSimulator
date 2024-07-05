@@ -55,7 +55,7 @@ public class CounterTest {
         qPin = counter.outMap.get("Q");
         InPin dest = new InPin("dest", counter, 2) {
             @Override
-            public void onChange(long newState, boolean hiImpedance) {
+            public void onChange(long newState, boolean hiImpedance, boolean strong) {
             }
         };
         dest.mask = 3;
@@ -73,10 +73,10 @@ public class CounterTest {
     @DisplayName("Count increments on clock signal")
     void countIncrementsOnClock() {
         for (int i = 1; i <= 3; i++) {
-            cPin.onChange(1, false);
+            cPin.onChange(1, false, true);
             assertEquals(i & 3, qPin.state, "Count should increment on clock signal");
         }
-        cPin.onChange(1, false);
+        cPin.onChange(1, false, true);
         assertEquals(0, qPin.state, "Count should reset after reaching maximum");
     }
 
@@ -84,27 +84,27 @@ public class CounterTest {
     @DisplayName("Reset pin resets the counter")
     void resetPinResetsCounter() {
         for (int i = 0; i < 3; i++) {
-            cPin.onChange(1, false);
+            cPin.onChange(1, false, true);
         }
         assertEquals(3, qPin.state, "Count should be 3 before reset");
-        rPin.onChange(1, false);
+        rPin.onChange(1, false, true);
         assertEquals(0, qPin.state, "Count should reset on rising edge of reset pin");
     }
 
     @Test
     @DisplayName("Count does not change on reset pin falling edge")
     void countDoesNotChangeOnResetFallingEdge() {
-        cPin.onChange(1, false);
+        cPin.onChange(1, false, true);
         assertEquals(1, qPin.state, "Count should be 1 before reset");
-        rPin.onChange(0, false);
+        rPin.onChange(0, false, true);
         assertEquals(1, qPin.state, "Count should not change on falling edge of reset pin");
     }
 
     @Test
     @DisplayName("Count does not increment on clock falling edge")
     void countDoesNotIncrementOnClockFallingEdge() {
-        cPin.onChange(1, false);
-        cPin.onChange(0, false);
+        cPin.onChange(1, false, true);
+        cPin.onChange(0, false, true);
         assertEquals(1, qPin.state, "Count should not increment on falling edge of clock signal");
     }
 }

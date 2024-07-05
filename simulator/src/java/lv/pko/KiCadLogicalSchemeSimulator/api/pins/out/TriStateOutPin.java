@@ -55,11 +55,11 @@ public class TriStateOutPin extends OutPin {
             hiImpedance = false;
             state = newState;
             dest.state = newState & dest.mask;
-            dest.onChange(dest.state, false);
+            dest.onChange(dest.state, false, true);
         } else if (newState != this.state) {
             state = newState;
             dest.state = newState & dest.mask;
-            dest.onChange(dest.state, false);
+            dest.onChange(dest.state, false, true);
         }
     }
 
@@ -68,20 +68,20 @@ public class TriStateOutPin extends OutPin {
         hiImpedance = false;
         state = newState;
         dest.state = newState & dest.mask;
-        dest.onChange(dest.state, false);
+        dest.onChange(dest.state, false, true);
     }
 
     @Override
     public void reSendState() {
         dest.state = state & dest.mask;
-        dest.onChange(dest.state, false);
+        dest.onChange(dest.state, hiImpedance, true);
     }
 
     public void setHiImpedance() {
         if (!hiImpedance) {
             hiImpedance = true;
             dest.state = 0;
-            dest.onChange(dest.state, false);
+            dest.onChange(dest.state, true, true);
         }
     }
 }

@@ -41,13 +41,13 @@ public class SameMaskGroupPin extends MaskGroupPin {
         if (state != newState) {
             state = newState;
             dest.state = newState;
-            dest.onChange(newState, false);
+            dest.onChange(newState, false, true);
         }
     }
 
     public void onChangeForce(long newState) {
         state = newState;
         dest.state = newState;
-        dest.onChange(newState, false);
+        dest.onChange(newState, false, true);
     }
 }

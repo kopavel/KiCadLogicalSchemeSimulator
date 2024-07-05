@@ -52,7 +52,7 @@ public class OrTest {
         out = gate.outMap.get("OUT");
         InPin dest = new InPin("dest", gate) {
             @Override
-            public void onChange(long newState, boolean hiImpedance) {
+            public void onChange(long newState, boolean hiImpedance, boolean strong) {
             }
         };
         inPin.mask = Utils.getMaskForSize(size);
@@ -64,7 +64,7 @@ public class OrTest {
     @DisplayName("Both input Lo - out Lo")
     public void bothLo() {
         initializeGate(2);
-        inPin.onChange(0, false);
+        inPin.onChange(0, false, true);
         assertEquals(0, out.state, "With no input output needs to be Lo");
     }
 
@@ -72,7 +72,7 @@ public class OrTest {
     @DisplayName("Only one input Hi - out Hi")
     public void oneHi() {
         initializeGate(2);
-        inPin.onChange(1, false);
+        inPin.onChange(1, false, true);
         assertEquals(1, out.state, "With Hi on only one input output needs to be Hi");
     }
 
@@ -80,7 +80,7 @@ public class OrTest {
     @DisplayName("Both input Hi - out Hi")
     public void bothHi() {
         initializeGate(2);
-        inPin.onChange(3, false);
+        inPin.onChange(3, false, true);
         assertEquals(1, out.state, "With Hi on both inputs output needs to be Hi");
     }
 
@@ -88,7 +88,7 @@ public class OrTest {
     @DisplayName("Floating pin exception")
     public void floatPin() {
         initializeGate(2);
-        assertThrows(FloatingPinException.class, () -> inPin.onChange(1, true), "Floating input must throw FloatingPinException");
+        assertThrows(FloatingPinException.class, () -> inPin.onChange(1, true, true), "Floating input must throw FloatingPinException");
     }
 
     @Test
@@ -97,7 +97,7 @@ public class OrTest {
         for (int size = 1; size <= 5; size++) {
             initializeGate(size);
             long allHi = (1 << size) - 1;
-            inPin.onChange(allHi, false);
+            inPin.onChange(allHi, false, true);
             assertEquals(1, out.state, "With Hi on all inputs output needs to be Hi for size " + size);
         }
     }
@@ -106,9 +106,9 @@ public class OrTest {
     @DisplayName("Boundary condition: Minimum inputs")
     public void boundaryMinInputs() {
         initializeGate(1);
-        inPin.onChange(0, false);
+        inPin.onChange(0, false, true);
         assertEquals(0, out.state, "With single Lo input output needs to be Lo");
-        inPin.onChange(1, false);
+        inPin.onChange(1, false, true);
         assertEquals(1, out.state, "With single Hi input output needs to be Hi");
     }
 
@@ -117,7 +117,7 @@ public class OrTest {
     public void boundaryMaxInputs() {
         initializeGate(64);
         long allHi = -1;
-        inPin.onChange(allHi, false);
+        inPin.onChange(allHi, false, true);
         assertEquals(1, out.state, "With Hi on all inputs output needs to be Hi for max size");
     }
 
@@ -125,7 +125,7 @@ public class OrTest {
     @DisplayName("All but one input Lo - out Hi")
     public void allButOneHi() {
         initializeGate(5);
-        inPin.onChange(2, false);
+        inPin.onChange(2, false, true);
         assertEquals(1, out.state, "With Hi on all but one input output needs to be Lo");
     }
 }

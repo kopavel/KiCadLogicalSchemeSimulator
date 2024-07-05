@@ -61,7 +61,7 @@ public class Shifter extends SchemaPart {
         }
         dPins = addInPin(new InPin("D", this, dSize) {
             @Override
-            public void onChange(long newState, boolean hiImpedance) {
+            public void onChange(long newState, boolean hiImpedance, boolean strong) {
                 if (!plInactive) {
                     latch = dPins.getState();
                 }
@@ -74,7 +74,7 @@ public class Shifter extends SchemaPart {
         if (plReverse) {
             addInPin(new InPin("PL", this) {
                 @Override
-                public void onChange(long newState, boolean hiImpedance) {
+                public void onChange(long newState, boolean hiImpedance, boolean strong) {
                     if (hiImpedance) {
                         throw new FloatingPinException(this);
                     }
@@ -88,7 +88,7 @@ public class Shifter extends SchemaPart {
         } else {
             addInPin(new InPin("PL", this) {
                 @Override
-                public void onChange(long newState, boolean hiImpedance) {
+                public void onChange(long newState, boolean hiImpedance, boolean strong) {
                     if (hiImpedance) {
                         throw new FloatingPinException(this);
                     }

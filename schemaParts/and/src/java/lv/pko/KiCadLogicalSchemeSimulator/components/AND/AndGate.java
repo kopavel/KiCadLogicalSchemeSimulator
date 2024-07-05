@@ -48,7 +48,7 @@ public class AndGate extends SchemaPart {
         int pinAmount = Integer.parseInt(params.get("size"));
         addInPin(new InPin("IN", this, pinAmount) {
             @Override
-            public void onChange(long newState, boolean hiImpedance) {
+            public void onChange(long newState, boolean hiImpedance, boolean strong) {
                 if (hiImpedance) {
                     throw new FloatingPinException(this);
                 }

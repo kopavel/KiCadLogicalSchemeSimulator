@@ -63,7 +63,7 @@ public class Buffer extends SchemaPart {
         }
         addInPin(new InPin(isLatch ? "~{OE}" : "~{CS}", this) {
             @Override
-            public void onChange(long newState, boolean hiImpedance) {
+            public void onChange(long newState, boolean hiImpedance, boolean strong) {
                 if (hiImpedance) {
                     throw new FloatingPinException(this);
                 }
@@ -77,7 +77,7 @@ public class Buffer extends SchemaPart {
         });
         dPin = addInPin(new InPin("D", this, pinAmount) {
             @Override
-            public void onChange(long newState, boolean hiImpedance) {
+            public void onChange(long newState, boolean hiImpedance, boolean strong) {
                 if (!isLatch && oeState) {
                     if (hiImpedance) {
                         throw new FloatingPinException(this);

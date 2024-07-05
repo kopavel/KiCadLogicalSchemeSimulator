@@ -52,7 +52,7 @@ public class DecoderTest {
         qPin = (TriStateOutPin) decoder.outMap.get("Q");
         InPin dest = new InPin("dest", decoder) {
             @Override
-            public void onChange(long newState, boolean hiImpedance) {
+            public void onChange(long newState, boolean hiImpedance, boolean strong) {
             }
         };
         dest.mask = 1;
@@ -69,27 +69,27 @@ public class DecoderTest {
     @DisplayName("value decode")
     public void valueDecode() {
         csPin.state = 1;
-        csPin.onChange(1, false);
+        csPin.onChange(1, false, true);
         aPin.state = 0;
-        aPin.onChange(0, false);
+        aPin.onChange(0, false, true);
         assertEquals(1, qPin.state, "with 0 on A input Q out be 1");
         aPin.state = 1;
-        aPin.onChange(1, false);
+        aPin.onChange(1, false, true);
         assertEquals(2, qPin.state, "with 1 on A input Q out be 2");
         aPin.state = 2;
-        aPin.onChange(2, false);
+        aPin.onChange(2, false, true);
         assertEquals(4, qPin.state, "with 2 on A input Q out be 4");
         aPin.state = 3;
-        aPin.onChange(3, false);
+        aPin.onChange(3, false, true);
         assertEquals(8, qPin.state, "with 3 on A input Q out be 8");
         csPin.state = 0;
-        csPin.onChange(0, false);
+        csPin.onChange(0, false, true);
         assertTrue(qPin.hiImpedance, "with Lo CS Q impedance must be Hi");
         aPin.state = 2;
-        aPin.onChange(2, false);
+        aPin.onChange(2, false, true);
         assertTrue(qPin.hiImpedance, "with Lo CS Q impedance must be Hi");
         csPin.state = 1;
-        csPin.onChange(1, false);
+        csPin.onChange(1, false, true);
         assertEquals(4, qPin.state, "with Lo CS A state must be stored internally");
     }
 }

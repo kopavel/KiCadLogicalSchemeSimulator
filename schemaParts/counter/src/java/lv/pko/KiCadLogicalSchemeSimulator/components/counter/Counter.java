@@ -37,8 +37,8 @@ import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import lv.pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 public class Counter extends SchemaPart {
-    private OutPin outPin;
     private final long countMask;
+    private OutPin outPin;
     private long count = 0;
 
     protected Counter(String id, String sParam) {

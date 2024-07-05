@@ -43,10 +43,10 @@ public class Splitter extends InPin {
     }
 
     @Override
-    public void onChange(long newState, boolean hiImpedance) {
+    public void onChange(long newState, boolean hiImpedance, boolean strong) {
         for (InPin inPin : dest) {
             inPin.state = newState;
-            inPin.onChange(newState, hiImpedance);
+            inPin.onChange(newState, hiImpedance, strong);
         }
     }
 

@@ -62,7 +62,7 @@ public class MergerInPin extends InPin {
     }
 
     @Override
-    public void onChange(long newState, boolean newImpedance) {
+    public void onChange(long newState, boolean newImpedance, boolean strong) {
         if (newImpedance != hiImpedance) {
             hiImpedance = newImpedance;
             merger.state &= nCorrMask;
@@ -79,11 +79,11 @@ public class MergerInPin extends InPin {
                 merger.state |= newState;
             }
             merger.dest.state = merger.state;
-            merger.dest.onChange(merger.state, merger.hiImpedance);
+            merger.dest.onChange(merger.state, merger.hiImpedance, merger.hiImpedancePins == 0);
         } else if (!newImpedance) {
             merger.state = merger.state & nCorrMask | newState;
             merger.dest.state = merger.state;
-            merger.dest.onChange(merger.state, merger.hiImpedance);
+            merger.dest.onChange(merger.state, merger.hiImpedance, merger.hiImpedancePins == 0);
         }
     }
 

@@ -71,7 +71,7 @@ public class MaskTriStateOutPins extends TriStateOutPin {
 
     @Override
     public void reSendState() {
-        group.resend(state, false);
+        group.resend(state, hiImpedance);
     }
 
     @Override

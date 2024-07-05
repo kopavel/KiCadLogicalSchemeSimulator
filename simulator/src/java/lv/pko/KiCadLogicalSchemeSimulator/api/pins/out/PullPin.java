@@ -38,10 +38,12 @@ import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import lv.pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 public class PullPin extends OutPin {
+    public final boolean strong;
     protected InPin[] dest = new InPin[0];
 
-    public PullPin(String id, SchemaPart parent, long value) {
+    public PullPin(String id, SchemaPart parent, long value, boolean strong) {
         super(id, parent, 1);
+        this.strong = strong;
         this.state = value;
     }
 
@@ -56,7 +58,7 @@ public class PullPin extends OutPin {
         for (InPin pin : dest) {
             try {
                 pin.state = state;
-                pin.onChange(state, false);
+                pin.onChange(state, false, true);
             } catch (FloatingPinException | ShortcutException e) {
                 if (result == null) {
                     result = e;

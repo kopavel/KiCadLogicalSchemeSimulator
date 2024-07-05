@@ -62,7 +62,7 @@ public class DCounter extends SchemaPart {
         addOutPin("CO", 1);
         addInPin(new InPin("CI", this) {
             @Override
-            public void onChange(long newState, boolean hiImpedance) {
+            public void onChange(long newState, boolean hiImpedance, boolean strong) {
                 if (hiImpedance) {
                     throw new FloatingPinException(this);
                 }
@@ -71,7 +71,7 @@ public class DCounter extends SchemaPart {
         });
         jPin = addInPin(new InPin("J", this) {
             @Override
-            public void onChange(long newState, boolean hiImpedance) {
+            public void onChange(long newState, boolean hiImpedance, boolean strong) {
                 if (!presetDisabled && resetInactive) {
                     count = getState();
                     outPin.setState(count);
@@ -80,7 +80,7 @@ public class DCounter extends SchemaPart {
         });
         addInPin(new InPin("PE", this) {
             @Override
-            public void onChange(long newState, boolean hiImpedance) {
+            public void onChange(long newState, boolean hiImpedance, boolean strong) {
                 if (hiImpedance) {
                     throw new FloatingPinException(this);
                 }
@@ -93,20 +93,20 @@ public class DCounter extends SchemaPart {
         });
         addInPin(new InPin("UD", this) {
             @Override
-            public void onChange(long newState, boolean hiImpedance) {
+            public void onChange(long newState, boolean hiImpedance, boolean strong) {
                 countUp = newState > 0;
                 cOutPin.setState(((countUp && (count == maxCount)) || (!countUp && (count == 0)) ? carryHi : carryLo));
             }
         });
         addInPin(new InPin("BD", this) {
             @Override
-            public void onChange(long newState, boolean hiImpedance) {
+            public void onChange(long newState, boolean hiImpedance, boolean strong) {
                 maxCount = ((newState > 0) ^ bdReverse) ? 15 : 9;
             }
         });
         addInPin(new InPin("R", this) {
             @Override
-            public void onChange(long newState, boolean hiImpedance) {
+            public void onChange(long newState, boolean hiImpedance, boolean strong) {
                 resetInactive = newState == 0;
                 if (!resetInactive) {
                     count = 0;

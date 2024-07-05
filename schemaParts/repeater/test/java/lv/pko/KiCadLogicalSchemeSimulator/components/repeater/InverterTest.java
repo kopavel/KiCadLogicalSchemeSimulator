@@ -49,7 +49,7 @@ public class InverterTest {
         inPin = repeater.inMap.get("IN");
         InPin dest = new InPin("dest", repeater) {
             @Override
-            public void onChange(long newState, boolean hiImpedance) {
+            public void onChange(long newState, boolean hiImpedance, boolean strong) {
             }
         };
         dest.mask = 1;
@@ -61,7 +61,7 @@ public class InverterTest {
     void repeater() {
         assertEquals(1, outPin.state, "with Lo in out must be Hi");
         inPin.state = 1;
-        inPin.onChange(1, false);
+        inPin.onChange(1, false, true);
         assertEquals(0, outPin.state, "with Hi in out must be Lo");
     }
 }

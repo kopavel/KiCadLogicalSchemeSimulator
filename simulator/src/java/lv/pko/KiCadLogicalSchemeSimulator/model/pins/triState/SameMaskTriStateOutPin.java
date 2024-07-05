@@ -48,11 +48,11 @@ public class SameMaskTriStateOutPin extends TriStateOutPin {
             hiImpedance = false;
             state = newState;
             dest.state = newState;
-            dest.onChange(state, false);
+            dest.onChange(state, false, true);
         } else if (state != newState) {
             state = newState;
             dest.state = newState;
-            dest.onChange(state, false);
+            dest.onChange(state, false, true);
         }
     }
 
@@ -61,20 +61,20 @@ public class SameMaskTriStateOutPin extends TriStateOutPin {
         hiImpedance = false;
         state = newState;
         dest.state = newState;
-        dest.onChange(state, false);
+        dest.onChange(state, false, true);
     }
 
     @Override
     public void reSendState() {
         dest.state = state;
-        dest.onChange(state, false);
+        dest.onChange(state, hiImpedance, hiImpedance);
     }
 
     public void setHiImpedance() {
         if (!hiImpedance) {
             hiImpedance = true;
             dest.state = 0;
-            dest.onChange(0, false);
+            dest.onChange(0, true, true);
         }
     }
 }

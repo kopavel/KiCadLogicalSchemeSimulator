@@ -72,5 +72,5 @@ public abstract class InPin extends Pin {
         this.nOffset = (byte) -offset;
     }
 
-    abstract public void onChange(long newState, boolean hiImpedance);
+    abstract public void onChange(long newState, boolean hiImpedance, boolean strong);
 }

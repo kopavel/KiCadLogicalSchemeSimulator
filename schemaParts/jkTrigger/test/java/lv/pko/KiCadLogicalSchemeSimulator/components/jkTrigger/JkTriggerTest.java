@@ -59,7 +59,7 @@ public class JkTriggerTest {
         iqOut = trigger.outMap.get("~{Q}");
         InPin dest = new InPin("dest", trigger) {
             @Override
-            public void onChange(long newState, boolean hiImpedance) {
+            public void onChange(long newState, boolean hiImpedance, boolean strong) {
             }
         };
         dest.mask = 1;
@@ -74,37 +74,37 @@ public class JkTriggerTest {
         assertEquals(0, qOut.state, "Default Q state must be 0");
         assertEquals(1, iqOut.state, "Default ~{Q} state must be 1;");
         cPin.state = 1;
-        cPin.onChange(1, false);
+        cPin.onChange(1, false, true);
         assertEquals(0, qOut.state, "after C pin raise  with Lo on 'J' and 'K' Q state must remain 0");
         assertEquals(1, iqOut.state, "after C pin raise with Lo on 'J' and 'K' ~{Q} state must remain 1");
-        cPin.onChange(1, false);
+        cPin.onChange(1, false, true);
         assertEquals(0, qOut.state, "after C pin raise  with Lo on 'J' and 'K' Q state must remain 0");
         assertEquals(1, iqOut.state, "after C pin raise with Lo on 'J' and 'K' ~{Q} state must remain 1");
         //Hi j Lo k - set
         jPin.state = 1;
-        jPin.onChange(1, false);
-        cPin.onChange(1, false);
+        jPin.onChange(1, false, true);
+        cPin.onChange(1, false, true);
         assertEquals(1, qOut.state, "after C pin raise  with Hi on 'J' and Lo on 'K' Q state must be 1");
         assertEquals(0, iqOut.state, "after C pin raise with Hi on 'J' and Lo on 'K' ~{Q} state must be 0");
-        cPin.onChange(1, false);
+        cPin.onChange(1, false, true);
         assertEquals(1, qOut.state, "after C pin raise  with Hi on 'J' and Lo on 'K' Q state must be 1");
         assertEquals(0, iqOut.state, "after C pin raise with Hi on 'J' and Lo on 'K' ~{Q} state must be 0");
         //Hi j and k - toggle
         kPin.state = 1;
-        kPin.onChange(1, false);
-        cPin.onChange(1, false);
+        kPin.onChange(1, false, true);
+        cPin.onChange(1, false, true);
         assertEquals(0, qOut.state, "after C pin raise  with Hi on 'J' and Lo on 'K' Q state must be toggled");
         assertEquals(1, iqOut.state, "after C pin raise with Hi on 'J' and Lo on 'K' ~{Q} state must be toggled");
-        cPin.onChange(1, false);
+        cPin.onChange(1, false, true);
         assertEquals(1, qOut.state, "after C pin raise  with Hi on 'J' and Lo on 'K' Q state must be toggled");
         assertEquals(0, iqOut.state, "after C pin raise with Hi on 'J' and Lo on 'K' ~{Q} state must be toggled");
         //Lo j Hi k - reset
         jPin.state = 0;
-        jPin.onChange(0, false);
-        cPin.onChange(1, false);
+        jPin.onChange(0, false, true);
+        cPin.onChange(1, false, true);
         assertEquals(0, qOut.state, "after C pin raise  with Lo on 'J' and Hi on 'K' Q state must be resetted");
         assertEquals(1, iqOut.state, "after C pin raise with Lo on 'J' and Hi on 'K' ~{Q} state must be toggled");
-        cPin.onChange(1, false);
+        cPin.onChange(1, false, true);
         assertEquals(0, qOut.state, "after C pin raise  with Lo on 'J' and Hi on 'K' Q state must be resetted");
         assertEquals(1, iqOut.state, "after C pin raise with Lo on 'J' and Hi on 'K' ~{Q} state must be toggled");
     }
@@ -113,25 +113,25 @@ public class JkTriggerTest {
     @DisplayName("RS states")
     public void rsStates() {
         sPin.state = 1;
-        sPin.onChange(1, false);
+        sPin.onChange(1, false, true);
         assertEquals(1, qOut.state, "after S pin set to Hi Q state must be 1");
         assertEquals(0, iqOut.state, "after S pin set to Hi 'D' ~{Q} state must be 0");
         jPin.state = 1;
-        jPin.onChange(1, false);
+        jPin.onChange(1, false, true);
         kPin.state = 1;
-        kPin.onChange(1, false);
-        cPin.onChange(1, false);
+        kPin.onChange(1, false, true);
+        cPin.onChange(1, false, true);
         assertEquals(1, qOut.state, "with Hi S pin C pin state change must be ignored");
         assertEquals(0, iqOut.state, "with Hi S pin C pin state change must be ignored");
         rPin.state = 1;
-        rPin.onChange(1, false);
+        rPin.onChange(1, false, true);
         assertEquals(1, qOut.state, "after R pin set to Hi with S pin Hi too Q state must be 1");
         assertEquals(1, iqOut.state, "after R pin set to Hi with S pin Hi too ~{Q] state must be 1");
         sPin.state = 0;
-        sPin.onChange(0, false);
+        sPin.onChange(0, false, true);
         assertEquals(0, qOut.state, "after S pin set to Lo with Hi R  Q state must be 0");
         assertEquals(1, iqOut.state, "after S pin set to Lo with Hi R  ~{Q} state must be 0");
-        cPin.onChange(1, false);
+        cPin.onChange(1, false, true);
         assertEquals(0, qOut.state, "with Hi R pin C pin state change must be ignored");
         assertEquals(1, iqOut.state, "with Hi R pin C pin state change must be ignored");
     }

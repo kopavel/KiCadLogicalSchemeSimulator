@@ -42,7 +42,7 @@ public class SameMaskGroupPins extends MaskGroupPins {
             state = newState;
             for (InPin inPin : dest) {
                 inPin.state = newState;
-                inPin.onChange(newState, false);
+                inPin.onChange(newState, false, true);
             }
         }
     }
@@ -51,7 +51,7 @@ public class SameMaskGroupPins extends MaskGroupPins {
         state = newState;
         for (InPin inPin : dest) {
             inPin.state = newState;
-            inPin.onChange(newState, false);
+            inPin.onChange(newState, false, true);
         }
     }
 }

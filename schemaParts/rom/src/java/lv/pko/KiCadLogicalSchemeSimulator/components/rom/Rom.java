@@ -109,7 +109,7 @@ public class Rom extends SchemaPart {
         }
         addInPin(new InPin("A", this, aSize) {
             @Override
-            public void onChange(long newState, boolean hiImpedance) {
+            public void onChange(long newState, boolean hiImpedance, boolean strong) {
                 addr = (int) newState;
                 if (csActive) {
                     if (hiImpedance) {

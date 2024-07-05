@@ -42,7 +42,7 @@ public abstract class RisingEdgeInPin extends EdgeInPin {
     }
 
     @Override
-    public void onChange(long newState, boolean hiImpedance) {
+    public void onChange(long newState, boolean hiImpedance, boolean strong) {
         if (newState != 0) {
             onRisingEdge();
         }

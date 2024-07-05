@@ -99,9 +99,9 @@ public class Model {
             schemaPartMap = null;
         }
         export.getComponents().getComp().forEach((Comp component) -> createSchemaPart(component, schemaPartMap));
-        SchemaPart gnd = getSchemaPart("Power", "gnd", "state=0");
+        SchemaPart gnd = getSchemaPart("Power", "gnd", "state=0;strong");
         schemaParts.put(gnd.id, gnd);
-        SchemaPart pwr = getSchemaPart("Power", "pwr", "state=1");
+        SchemaPart pwr = getSchemaPart("Power", "pwr", "state=1;strong");
         schemaParts.put(pwr.id, pwr);
         export.getNets().getNet().forEach(this::processNet);
         buildBuses();
@@ -334,6 +334,13 @@ public class Model {
             pins.forEach(pin -> {
                 try {
                     pin.reSendState();
+                } catch (FloatingPinException | ShortcutException e) {
+                    stabilizing = true;
+                }
+            });
+            mergers.values().forEach(merger -> {
+                try {
+                    merger.reSendState();
                 } catch (FloatingPinException | ShortcutException e) {
                     stabilizing = true;
                 }

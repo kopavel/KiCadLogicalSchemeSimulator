@@ -37,7 +37,7 @@ public class NegativeOffsetMergerInPin extends MergerInPin {
         super(src, offset, mask, merger);
     }
 
-    public void onChange(long newState, boolean hiImpedance) {
-        super.onChange(newState << nOffset, hiImpedance);
+    public void onChange(long newState, boolean hiImpedance, boolean strong) {
+        super.onChange(newState << nOffset, hiImpedance, strong);
     }
 }

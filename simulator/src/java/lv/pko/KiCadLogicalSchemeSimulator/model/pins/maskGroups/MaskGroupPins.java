@@ -51,7 +51,7 @@ public class MaskGroupPins extends MaskGroupPin {
         state = 0;
         for (InPin inPin : dest) {
             inPin.state = 0;
-            inPin.onChange(0, true);
+            inPin.onChange(0, true, true);
         }
     }
 
@@ -61,7 +61,7 @@ public class MaskGroupPins extends MaskGroupPin {
             state = maskState;
             for (InPin inPin : dest) {
                 inPin.state = maskState;
-                inPin.onChange(maskState, false);
+                inPin.onChange(maskState, false, true);
             }
         }
     }
@@ -71,7 +71,7 @@ public class MaskGroupPins extends MaskGroupPin {
         state = maskState;
         for (InPin inPin : dest) {
             inPin.state = maskState;
-            inPin.onChange(maskState, false);
+            inPin.onChange(maskState, false, true);
         }
     }
 
@@ -82,7 +82,7 @@ public class MaskGroupPins extends MaskGroupPin {
         for (InPin inPin : dest) {
             try {
                 inPin.state = maskState;
-                inPin.onChange(maskState, hiImpedance);
+                inPin.onChange(maskState, hiImpedance, true);
             } catch (FloatingPinException | ShortcutException e) {
                 if (result == null) {
                     result = e;

@@ -80,7 +80,7 @@ public abstract class SchemaPart {
     public InPin addInPin(String pinId, int size, String... names) {
         InPin pin = new InPin(pinId, this, size, names) {
             @Override
-            public void onChange(long newState, boolean hiImpedance) {
+            public void onChange(long newState, boolean hiImpedance, boolean strong) {
             }
         };
         inMap.put(pinId, pin);
@@ -132,8 +132,8 @@ public abstract class SchemaPart {
         outMap.put(pinId, pin);
     }
 
-    public void addPullPin(String pinId, long state) {
-        OutPin pin = new PullPin(pinId, this, state);
+    public void addPullPin(String pinId, long state, boolean strong) {
+        OutPin pin = new PullPin(pinId, this, state, strong);
         for (String alias : pin.aliases.keySet()) {
             outAliasMap.put(alias, pin);
         }

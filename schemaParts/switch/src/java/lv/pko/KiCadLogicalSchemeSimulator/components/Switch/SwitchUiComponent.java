@@ -40,10 +40,11 @@ import static java.awt.Color.GRAY;
 import static java.awt.Color.GREEN;
 
 public class SwitchUiComponent extends AbstractUiComponent {
-    private Color innerColor = GRAY;
+    private Color innerColor;
 
-    public SwitchUiComponent(Switch parent, String title) {
+    public SwitchUiComponent(Switch parent, String title, boolean toggled) {
         super(title, 30);
+        innerColor = toggled ? GREEN : GRAY;
         setBackground(new Color(0, 0, 0, 0));
         addMouseListener(new MouseAdapter() {
             @Override

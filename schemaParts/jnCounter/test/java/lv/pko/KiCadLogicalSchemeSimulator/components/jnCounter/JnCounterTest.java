@@ -59,14 +59,14 @@ public class JnCounterTest {
         coPin = counter.outMap.get("CO");
         InPin dest = new InPin("dest", counter, 4) {
             @Override
-            public void onChange(long newState, boolean hiImpedance) {
+            public void onChange(long newState, boolean hiImpedance, boolean strong) {
             }
         };
         dest.mask = 0xf;
         qPin.addDest(dest);
         InPin coDest = new InPin("coDest", counter, 4) {
             @Override
-            public void onChange(long newState, boolean hiImpedance) {
+            public void onChange(long newState, boolean hiImpedance, boolean strong) {
             }
         };
         coDest.mask = 1;
@@ -85,7 +85,7 @@ public class JnCounterTest {
     void countIncrementsOnClock() {
         assertEquals(0, coPin.state, "Carry out must be 0 when count are 1");
         for (int i = 1; i <= 3; i++) {
-            cPin.onChange(1, false);
+            cPin.onChange(1, false, true);
             assertEquals(Math.pow(2, i), qPin.state, "Count should increment on clock signal");
             if (i == 1) {
                 assertEquals(0, coPin.state, "Carry out must be 0 when count are " + Math.pow(2, i));
@@ -93,7 +93,7 @@ public class JnCounterTest {
                 assertEquals(1, coPin.state, "Carry out must be 1 when count are " + Math.pow(2, i));
             }
         }
-        cPin.onChange(1, false);
+        cPin.onChange(1, false, true);
         assertEquals(1, qPin.state, "Count should reset after reaching maximum");
     }
 
@@ -101,39 +101,39 @@ public class JnCounterTest {
     @DisplayName("Reset pin resets the counter")
     void resetPinResetsCounter() {
         for (int i = 1; i <= 3; i++) {
-            cPin.onChange(1, false);
+            cPin.onChange(1, false, true);
         }
         assertEquals(8, qPin.state, "Count should be 8 before reset");
-        rPin.onChange(1, false);
+        rPin.onChange(1, false, true);
         assertEquals(1, qPin.state, "Count should reset on rising edge of reset pin");
     }
 
     @Test
     @DisplayName("Count does not change on reset pin falling edge")
     void countDoesNotChangeOnResetFallingEdge() {
-        cPin.onChange(1, false);
+        cPin.onChange(1, false, true);
         assertEquals(2, qPin.state, "Count should be 2 before reset");
-        rPin.onChange(0, false);
+        rPin.onChange(0, false, true);
         assertEquals(2, qPin.state, "Count should not change on falling edge of reset pin");
     }
 
     @Test
     @DisplayName("Count does not increment on clock falling edge")
     void countDoesNotIncrementOnClockFallingEdge() {
-        cPin.onChange(1, false);
+        cPin.onChange(1, false, true);
         assertEquals(2, qPin.state, "Count should be 2 before test");
-        cPin.onChange(0, false);
+        cPin.onChange(0, false, true);
         assertEquals(2, qPin.state, "Count should not increment on falling edge of clock signal");
     }
 
     @Test
     @DisplayName("Count does not increment on Hi CarryIn")
     void countDoesNotIncrementOnHiCi() {
-        cPin.onChange(1, false);
+        cPin.onChange(1, false, true);
         assertEquals(2, qPin.state, "Count should be 2 before test");
         ciPin.state = 1;
-        ciPin.onChange(1, false);
-        cPin.onChange(1, false);
+        ciPin.onChange(1, false, true);
+        cPin.onChange(1, false, true);
         assertEquals(2, qPin.state, "Count should not increment on falling edge of clock signal");
     }
 }

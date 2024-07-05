@@ -48,12 +48,12 @@ public class OrGate extends SchemaPart {
         int pinAmount = Integer.parseInt(params.get("size"));
         addInPin(new InPin("IN", this, pinAmount) {
             @Override
-            public void onChange(long newState, boolean hiImpedance) {
+            public void onChange(long newState, boolean hiImpedance, boolean strong) {
                 if (hiImpedance) {
                     throw new FloatingPinException(this);
                 }
                 if (oldState == (newState == 0)) {
-                    oldState=newState!=0;
+                    oldState = newState != 0;
                     if (newState != 0) {
                         out.setStateForce(hiState);
                     } else {

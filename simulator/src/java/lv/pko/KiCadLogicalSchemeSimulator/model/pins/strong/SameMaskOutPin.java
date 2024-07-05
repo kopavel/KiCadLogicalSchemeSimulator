@@ -52,19 +52,19 @@ public class SameMaskOutPin extends OutPin {
         if (newState != state) {
             state = newState;
             dest.state = newState;
-            dest.onChange(newState, false);
+            dest.onChange(newState, false, true);
         }
     }
 
     public void setStateForce(long newState) {
         state = newState;
         dest.state = newState;
-        dest.onChange(newState, false);
+        dest.onChange(newState, false, true);
     }
 
     public void reSendState() {
         if (dest != null) {
-            dest.onChange(state, false);
+            dest.onChange(state, false, true);
         }
     }
 }

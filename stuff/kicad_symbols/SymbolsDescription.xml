@@ -231,4 +231,12 @@
 			<unit pinMap="13=C;12=R;11=Q0;10=Q1;9=Q2;8=Q3"/>
 		</symbol>
 	</lib>
+	<lib name="Switch">
+		<symbol name="SW_Push" symPartClass="Switch">
+			<unit pinMap="1=IN1;2=IN2"/>
+		</symbol>
+		<symbol name="SW_Push_Open" symPartClass="Switch" symPartParam="reverse">
+			<unit pinMap="1=IN1;2=IN2"/>
+		</symbol>
+	</lib>
 </symbolMap>

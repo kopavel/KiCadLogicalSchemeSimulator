@@ -39,13 +39,14 @@ public class Power extends SchemaPart {
         if (state == null || state.isBlank()) {
             throw new RuntimeException("Component " + id + " with type Power must have parameter state (1/0)");
         }
+        boolean strong = params.containsKey("strong");
         int val;
         try {
             val = Integer.parseInt(state);
         } catch (NumberFormatException e) {
             throw new RuntimeException("Component " + id + " with type Power  parameter state must be a 1/0 ");
         }
-        addPullPin("OUT", val);
+        addPullPin("OUT", val, strong);
     }
 
     @Override

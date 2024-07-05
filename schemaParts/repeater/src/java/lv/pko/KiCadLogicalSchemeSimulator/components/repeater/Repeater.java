@@ -43,7 +43,7 @@ public class Repeater extends SchemaPart {
         if (reverse) {
             addInPin(new InPin("IN", this) {
                 @Override
-                public void onChange(long newState, boolean hiImpedance) {
+                public void onChange(long newState, boolean hiImpedance, boolean strong) {
                     if (hiImpedance) {
                         throw new FloatingPinException(this);
                     }
@@ -53,7 +53,7 @@ public class Repeater extends SchemaPart {
         } else {
             addInPin(new InPin("IN", this) {
                 @Override
-                public void onChange(long newState, boolean hiImpedance) {
+                public void onChange(long newState, boolean hiImpedance, boolean strong) {
                     if (hiImpedance) {
                         throw new FloatingPinException(this);
                     }

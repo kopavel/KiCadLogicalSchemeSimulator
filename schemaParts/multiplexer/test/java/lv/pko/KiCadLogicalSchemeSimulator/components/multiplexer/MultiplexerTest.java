@@ -53,7 +53,7 @@ public class MultiplexerTest {
         qPin = multiplexer.outMap.get("Q");
         InPin qDest = new InPin("qDest", multiplexer) {
             @Override
-            public void onChange(long newState, boolean hiImpedance) {
+            public void onChange(long newState, boolean hiImpedance, boolean strong) {
             }
         };
         qDest.mask = 0xff;
@@ -70,12 +70,12 @@ public class MultiplexerTest {
     @DisplayName("mutilex test")
     public void multiplexTest() {
         aPin.state = 0x24;
-        aPin.onChange(aPin.state, false);
+        aPin.onChange(aPin.state, false, true);
         bPin.state = 0xAC;
-        bPin.onChange(bPin.state, false);
+        bPin.onChange(bPin.state, false, true);
         assertEquals(aPin.state, qPin.state, "with n=0 Q state must be equal with A pin state");
         nPin.state = 1;
-        nPin.onChange(nPin.state, false);
+        nPin.onChange(nPin.state, false, true);
         assertEquals(bPin.state, qPin.state, "with n=1 Q state must be equal with B pin state");
     }
 }

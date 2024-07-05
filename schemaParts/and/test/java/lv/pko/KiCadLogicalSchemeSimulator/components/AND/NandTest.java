@@ -49,7 +49,7 @@ public class NandTest {
         out = gate.outMap.get("OUT");
         InPin dest = new InPin("dest", gate) {
             @Override
-            public void onChange(long newState, boolean hiImpedance) {
+            public void onChange(long newState, boolean hiImpedance, boolean strong) {
             }
         };
         inPin.mask = 3;
@@ -60,21 +60,21 @@ public class NandTest {
     @Test
     @DisplayName("Both input Lo - out Hi")
     public void bothLo() {
-        inPin.onChange(0, false);
+        inPin.onChange(0, false, true);
         assertEquals(1, out.state, "With no input output need to be Lo");
     }
 
     @Test
     @DisplayName("Only one input Hi - out Hi")
     public void oneHi() {
-        inPin.onChange(1, false);
+        inPin.onChange(1, false, true);
         assertEquals(1, out.state, "With Hi on only one input output need to be Lo");
     }
 
     @Test
     @DisplayName("Both input Hi - out Lo")
     public void bothHi() {
-        inPin.onChange(3, false);
+        inPin.onChange(3, false, true);
         assertEquals(0, out.state, "With Hi on both inputs output need to be Hi");
     }
 }

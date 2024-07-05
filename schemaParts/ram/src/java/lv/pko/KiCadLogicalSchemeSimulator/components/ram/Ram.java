@@ -81,7 +81,7 @@ public class Ram extends SchemaPart {
         words = new long[ramSize];
         addInPin(new InPin("A", this, aSize) {
             @Override
-            public void onChange(long newState, boolean hiImpedance) {
+            public void onChange(long newState, boolean hiImpedance, boolean strong) {
                 addr = (int) newState;
                 if (csActive) {
                     if (hiImpedance) {
@@ -96,7 +96,7 @@ public class Ram extends SchemaPart {
         if (reverse) {
             addInPin(new InPin("~{CS}", this) {
                 @Override
-                public void onChange(long newState, boolean hiImpedance) {
+                public void onChange(long newState, boolean hiImpedance, boolean strong) {
                     if (hiImpedance) {
                         throw new FloatingPinException(this);
                     }
@@ -106,7 +106,7 @@ public class Ram extends SchemaPart {
             });
             addInPin(new InPin("~{OE}", this) {
                 @Override
-                public void onChange(long newState, boolean hiImpedance) {
+                public void onChange(long newState, boolean hiImpedance, boolean strong) {
                     if (hiImpedance) {
                         throw new FloatingPinException(this);
                     }
@@ -125,7 +125,7 @@ public class Ram extends SchemaPart {
         } else {
             addInPin(new InPin("CS", this) {
                 @Override
-                public void onChange(long newState, boolean hiImpedance) {
+                public void onChange(long newState, boolean hiImpedance, boolean strong) {
                     if (hiImpedance) {
                         throw new FloatingPinException(this);
                     }
@@ -135,7 +135,7 @@ public class Ram extends SchemaPart {
             });
             addInPin(new InPin("OE", this) {
                 @Override
-                public void onChange(long newState, boolean hiImpedance) {
+                public void onChange(long newState, boolean hiImpedance, boolean strong) {
                     if (hiImpedance) {
                         throw new FloatingPinException(this);
                     }
