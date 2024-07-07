@@ -29,16 +29,23 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lv.pko.KiCadLogicalSchemeSimulator.model;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
+package lv.pko.KiCadLogicalSchemeSimulator.v2.pins;
+import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 
-import java.util.HashSet;
-import java.util.Set;
+public abstract class EdgeInPin extends NoFloatingInPin {
+    public EdgeInPin(String id, SchemaPart parent) {
+        super(id, parent);
+    }
 
-public class OutPinNet {
-    public final Set<InPin> inPins = new HashSet<>();
+    public abstract void onFallingEdge();
+    public abstract void onRisingEdge();
 
-    public void addInPin(InPin pin) {
-        inPins.add(pin);
+    @Override
+    public void setState(long newState, boolean strong) {
+        if (newState == 0) {
+            onFallingEdge();
+        } else {
+            onRisingEdge();
+        }
     }
 }

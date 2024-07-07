@@ -59,7 +59,7 @@ public class CounterTest {
             }
         };
         dest.mask = 3;
-        qPin.addDest(dest);
+        qPin.addDestination(dest);
         counter.reset();
     }
 

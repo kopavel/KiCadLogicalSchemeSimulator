@@ -84,7 +84,7 @@ public abstract class SchemaPart {
             }
         };
         inMap.put(pinId, pin);
-        for (String alias : pin.aliases.keySet()) {
+        for (String alias : pin.aliasOffsets.keySet()) {
             inAliasMap.put(alias, pin);
         }
         return pin;
@@ -92,7 +92,7 @@ public abstract class SchemaPart {
 
     public <T extends InPin> T addInPin(T pin) {
         inMap.put(pin.id, pin);
-        for (String alias : pin.aliases.keySet()) {
+        for (String alias : pin.aliasOffsets.keySet()) {
             inAliasMap.put(alias, pin);
         }
         return pin;
@@ -100,7 +100,7 @@ public abstract class SchemaPart {
 
     public void addOutPin(String pinId, int size, String... names) {
         OutPin pin = new OutPin(pinId, this, size, names);
-        for (String alias : pin.aliases.keySet()) {
+        for (String alias : pin.aliasOffsets.keySet()) {
             outAliasMap.put(alias, pin);
         }
         outMap.put(pinId, pin);
@@ -109,7 +109,7 @@ public abstract class SchemaPart {
     public void addOutPin(String pinId, int size, long state, String... names) {
         OutPin pin = new OutPin(pinId, this, size, names);
         pin.state = state;
-        for (String alias : pin.aliases.keySet()) {
+        for (String alias : pin.aliasOffsets.keySet()) {
             outAliasMap.put(alias, pin);
         }
         outMap.put(pinId, pin);
@@ -117,7 +117,7 @@ public abstract class SchemaPart {
 
     public void addTriStateOutPin(String pinId, int size, String... names) {
         OutPin pin = new TriStateOutPin(pinId, this, size, names);
-        for (String alias : pin.aliases.keySet()) {
+        for (String alias : pin.aliasOffsets.keySet()) {
             outAliasMap.put(alias, pin);
         }
         outMap.put(pinId, pin);
@@ -126,7 +126,7 @@ public abstract class SchemaPart {
     public void addTriStateOutPin(String pinId, int size, long state, String... names) {
         OutPin pin = new TriStateOutPin(pinId, this, size, names);
         pin.state = state;
-        for (String alias : pin.aliases.keySet()) {
+        for (String alias : pin.aliasOffsets.keySet()) {
             outAliasMap.put(alias, pin);
         }
         outMap.put(pinId, pin);
@@ -134,7 +134,7 @@ public abstract class SchemaPart {
 
     public void addPullPin(String pinId, long state, boolean strong) {
         OutPin pin = new PullPin(pinId, this, state, strong);
-        for (String alias : pin.aliases.keySet()) {
+        for (String alias : pin.aliasOffsets.keySet()) {
             outAliasMap.put(alias, pin);
         }
         outMap.put(pinId, pin);
@@ -169,7 +169,7 @@ public abstract class SchemaPart {
     public abstract void initOuts();
 
     public void replaceOut(OutPin outPin, OutPin newOutPin) {
-        for (String alias : outPin.aliases.keySet()) {
+        for (String alias : outPin.aliasOffsets.keySet()) {
             outAliasMap.put(alias, newOutPin);
         }
         outMap.put(outPin.id, newOutPin);

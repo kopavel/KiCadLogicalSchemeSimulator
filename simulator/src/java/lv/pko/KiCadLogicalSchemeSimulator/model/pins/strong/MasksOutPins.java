@@ -45,12 +45,12 @@ public class MasksOutPins extends OutPin {
 
     public MasksOutPins(OutPin oldPin) {
         super(oldPin.id, oldPin.parent, oldPin.size);
-        aliases = oldPin.aliases;
+        aliasOffsets = oldPin.aliasOffsets;
         mask = oldPin.mask;
     }
 
     @Override
-    public void addDest(InPin pin) {
+    public void addDestination(InPin pin) {
         int destGroupId = -1;
         for (int i = 0; i < groups.length; i++) {
             if (groups[i].mask == pin.mask) {

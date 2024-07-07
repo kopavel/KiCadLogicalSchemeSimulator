@@ -43,7 +43,7 @@ public abstract class Pin {
     //Fixme volatile??
     public long state;
     public long mask;
-    public Map<String, Byte> aliases = new HashMap<>();
+    public Map<String, Byte> aliasOffsets = new HashMap<>();
     public boolean useBitPresentation;
 
     public Pin(String id, SchemaPart parent, int size, String... names) {
@@ -52,33 +52,24 @@ public abstract class Pin {
         this.size = size;
         if (names == null || names.length == 0) {
             if (size == 1) {
-                aliases.put(id, (byte) 0);
+                aliasOffsets.put(id, (byte) 0);
             } else {
                 for (byte i = 0; i < size; i++) {
-                    aliases.put(id + i, i);
+                    aliasOffsets.put(id + i, i);
                 }
             }
         } else if (names.length != size) {
             throw new RuntimeException("Pin definition Error, Names amount not equal size, pin" + getName());
         } else if (size == 1) {
-            aliases = Collections.singletonMap(id, (byte) 0);
+            aliasOffsets = Collections.singletonMap(id, (byte) 0);
         } else {
             for (byte i = 0; i < names.length; i++) {
-                aliases.put(names[i], i);
+                aliasOffsets.put(names[i], i);
             }
         }
     }
 
     public String getName() {
         return parent.id + "_" + id;
-    }
-
-    public Object[] getConstructorParameters(Class<?>[] paramTypes) {
-        if (paramTypes[0].isAssignableFrom(String.class)) {
-            return new Object[]{id, parent, size, aliases.keySet().toArray(new String[0])};
-        } else {
-            //anonymous class
-            return new Object[]{parent, id, parent, size, aliases.keySet().toArray(new String[0])};
-        }
     }
 }

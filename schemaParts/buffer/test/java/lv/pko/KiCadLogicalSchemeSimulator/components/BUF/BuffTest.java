@@ -59,7 +59,7 @@ public class BuffTest {
             public void onChange(long newState, boolean hiImpedance, boolean strong) {
             }
         };
-        qPin.addDest(dest);
+        qPin.addDestination(dest);
         dPin.mask = Utils.getMaskForSize(size);
         dest.mask = 1;
         buffer.initOuts();

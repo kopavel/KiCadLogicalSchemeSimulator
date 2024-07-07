@@ -39,8 +39,6 @@ import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.TriStateOutPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
 import lv.pko.KiCadLogicalSchemeSimulator.model.InPinInterconnect;
-import lv.pko.KiCadLogicalSchemeSimulator.model.InPinNet;
-import lv.pko.KiCadLogicalSchemeSimulator.model.OutPinNet;
 import lv.pko.KiCadLogicalSchemeSimulator.model.merger.Merger;
 import lv.pko.KiCadLogicalSchemeSimulator.model.pins.NCOutPin;
 import lv.pko.KiCadLogicalSchemeSimulator.model.pins.maskGroups.MaskGroupPins;
@@ -65,10 +63,11 @@ import java.util.stream.Collectors;
 public class Model {
     public static boolean stabilizing;
     public final Map<String, SchemaPart> schemaParts = new TreeMap<>();
-    public final Map<String, Map<String, PinMapDescriptor>> shemaPartPinMap = new TreeMap<>();
+    public final Map<String, Map<String, PinMapDescriptor>> schemaPartPinMap = new TreeMap<>();
     public final Map<String, SchemaPartSpi> schemaPartSpiMap;
-    private final Map<OutPin, OutPinNet> outMap = new HashMap<>();
-    private final Map<InPin, InPinNet> inMap = new HashMap<>();
+    //Simple map from OutPin to InPin
+    private final Map<OutPin, Set<InPin>> outMap = new HashMap<>();
+    private final Map<InPin, OutPinDescriptor> inMap = new HashMap<>();
     private final Map<String, Merger> mergers = new HashMap<>();
 
     public Model(Export export, String mapPath) throws IOException {
@@ -113,86 +112,81 @@ public class Model {
 
     @SuppressWarnings("LocalVariableUsedAndDeclaredInDifferentSwitchBranches")
     private void processNet(Net net) {
-        Map<OutPin, Byte> outPins = new HashMap<>();
-        Map<InPin, List<Byte>> inPins = new HashMap<>();
+        Map<OutPin, Byte> outPinsOffset = new HashMap<>();
+        Map<InPin, SortedSet<Byte>> inPinsOffsets = new HashMap<>();
         net.getNode().forEach(node -> {
             if ("gnd".equalsIgnoreCase(net.getName())) {
-                outPins.put(schemaParts.get("gnd").getOutPin("OUT"), (byte) 0);
+                outPinsOffset.put(schemaParts.get("gnd").getOutPin("OUT"), (byte) 0);
             } else if ("pwr".equalsIgnoreCase(net.getName())) {
-                outPins.put(schemaParts.get("pwr").getOutPin("OUT"), (byte) 0);
-            }
-            Map<String, PinMapDescriptor> pinMap = shemaPartPinMap.get(node.getRef());
-            String pinName;
-            SchemaPart schemaPart;
-            if (pinMap != null) {
-                PinMapDescriptor pinMapDescriptor = pinMap.get(node.getPin());
-                if (pinMapDescriptor == null) {
-                    //ignore unmapped pins (power one?)
-                    return;
-                }
-                pinName = pinMapDescriptor.pinName;
-                schemaPart = pinMapDescriptor.schemaPart;
+                outPinsOffset.put(schemaParts.get("pwr").getOutPin("OUT"), (byte) 0);
             } else {
-                pinName = node.getPinfunction();
-                schemaPart = this.schemaParts.get(node.getRef());
-            }
-            String pinType = node.getPintype();
-            if (pinType.contains("+")) {
-                pinType = pinType.substring(0, pinType.indexOf('+'));
-            }
-            switch (pinType) {
-                case "input":
-                    InPin inPin = schemaPart.getInPin(pinName);
-                    inPins.computeIfAbsent(inPin, p -> new ArrayList<>()).add(inPin.aliases.get(pinName));
-                    break;
-                case "tri_state":
-                case "output":
-                    OutPin outPin = schemaPart.getOutPin(pinName);
-                    outPins.put(outPin, outPin.aliases.get(pinName));
-                    break;
-                case "passive":
-                case "bidirectional":
-                    inPin = schemaPart.getInPin(pinName);
-                    inPins.computeIfAbsent(inPin, p -> new ArrayList<>()).add(inPin.aliases.get(pinName));
-                    outPin = schemaPart.getOutPin(pinName);
-                    outPins.put(outPin, outPin.aliases.get(pinName));
-                    break;
-                case "power_in":
-                    //just ignore that
-                    break;
-                default:
-                    throw new RuntimeException("Unsupported pin type " + pinType);
+                Map<String, PinMapDescriptor> pinMap = schemaPartPinMap.get(node.getRef());
+                String pinName;
+                SchemaPart schemaPart;
+                if (pinMap != null) {
+                    PinMapDescriptor pinMapDescriptor = pinMap.get(node.getPin());
+                    if (pinMapDescriptor == null) {
+                        //ignore unmapped pins (power one?)
+                        return;
+                    }
+                    pinName = pinMapDescriptor.pinName;
+                    schemaPart = pinMapDescriptor.schemaPart;
+                } else {
+                    pinName = node.getPinfunction();
+                    schemaPart = this.schemaParts.get(node.getRef());
+                }
+                String pinType = node.getPintype();
+                if (pinType.contains("+")) {
+                    pinType = pinType.substring(0, pinType.indexOf('+'));
+                }
+                switch (pinType) {
+                    case "input":
+                        InPin inPin = schemaPart.getInPin(pinName);
+                        inPinsOffsets.computeIfAbsent(inPin, p -> new TreeSet<>()).add(inPin.aliasOffsets.get(pinName));
+                        break;
+                    case "tri_state":
+                    case "output":
+                        OutPin outPin = schemaPart.getOutPin(pinName);
+                        outPinsOffset.put(outPin, outPin.aliasOffsets.get(pinName));
+                        break;
+                    case "passive":
+                    case "bidirectional":
+                        inPin = schemaPart.getInPin(pinName);
+                        inPinsOffsets.computeIfAbsent(inPin, p -> new TreeSet<>()).add(inPin.aliasOffsets.get(pinName));
+                        outPin = schemaPart.getOutPin(pinName);
+                        outPinsOffset.put(outPin, outPin.aliasOffsets.get(pinName));
+                        break;
+                    case "power_in":
+                        //ignore
+                        break;
+                    default:
+                        throw new RuntimeException("Unsupported pin type " + pinType);
+                }
             }
         });
-        for (Map.Entry<OutPin, Byte> outEntry : outPins.entrySet()) {
-            OutPin outPin = outEntry.getKey();
-            for (Map.Entry<InPin, List<Byte>> inPin : inPins.entrySet()) {
-                if (inPin.getValue().size() > 1) {
-                    long interMask = 0;
-                    for (Byte b : inPin.getValue()) {
-                        interMask |= (1L << b);
+        outPinsOffset.forEach((outPin, outPinOffset) -> //
+                inPinsOffsets.forEach((inPin, inPinOffsets) -> {
+                    if (inPinOffsets.size() > 1) {
+                        // interconnected input pins
+                        long interconnectMask = 0;
+                        for (Byte offset : inPinOffsets) {
+                            interconnectMask |= (1L << offset);
+                        }
+                        InPinInterconnect interconnect = new InPinInterconnect(inPin, interconnectMask);
+                        outMap.computeIfAbsent(outPin, p -> new HashSet<>()).add(interconnect);
+                        inMap.computeIfAbsent(interconnect, p -> new OutPinDescriptor()).addOutPin(outPin, outPinOffset, inPinOffsets.getFirst());
+                    } else {
+                        outMap.computeIfAbsent(outPin, p -> new HashSet<>()).add(inPin);
+                        inMap.computeIfAbsent(inPin, p -> new OutPinDescriptor()).addOutPin(outPin, outPinOffset, inPinOffsets.getFirst());
                     }
-                    InPinInterconnect interconnect = new InPinInterconnect(inPin.getKey(), interMask);
-                    outMap.computeIfAbsent(outPin, p -> new OutPinNet()).addInPin(interconnect);
-                    inMap.computeIfAbsent(interconnect, p -> new InPinNet()).addOutPin(outPin, outEntry.getValue(), inPin.getValue().getFirst());
-                } else {
-                    outMap.computeIfAbsent(outPin, p -> new OutPinNet()).addInPin(inPin.getKey());
-                    inMap.computeIfAbsent(inPin.getKey(), p -> new InPinNet()).addOutPin(outPin, outEntry.getValue(), inPin.getValue().getFirst());
-                }
-            }
-        }
-    }
-
-    private void replaceOut(OutPin outPin, OutPin newOutPin) {
-        outPin.parent.replaceOut(outPin, newOutPin);
-        inMap.values().forEach(inNet -> inNet.replaceOutPin(outPin, newOutPin));
+                }));
     }
 
     private void buildBuses() {
-        for (Map.Entry<OutPin, OutPinNet> outNet : outMap.entrySet()) {
+        for (Map.Entry<OutPin, Set<InPin>> outNet : outMap.entrySet()) {
             OutPin outPin = outNet.getKey();
             //todo if ony other out are Power pin - use special OutPin without In splitter
-            if (outNet.getValue().inPins.size() > 1) {
+            if (outNet.getValue().size() > 1) {
                 //out has many INs - replace instances with appropriate OutPins
                 if (outPin instanceof TriStateOutPin triStateOutPin) {
                     replaceOut(outPin, new MasksTriStateOutPins(triStateOutPin));
@@ -201,34 +195,35 @@ public class Model {
                 }
             }
         }
-        for (Map.Entry<InPin, InPinNet> inNet : inMap.entrySet()) {
-            InPin inPin = inNet.getKey();
-            if (inNet.getValue().getOutCount() == 1) {
+        inMap.forEach((inPin, outPinDescriptor) -> {
+            if (outPinDescriptor.getPermutationCount() == 1) {
+                //pin-to-pin connection
                 //noinspection OptionalGetWithoutIsPresent
-                Map.Entry<OutPin, Map<Byte, Long>> outEntry = inNet.getValue().outPins.entrySet()
+                Map.Entry<OutPin, Map<Byte, Long>> outEntry = outPinDescriptor.entrySet()
                         .stream().findFirst().get();
                 //noinspection OptionalGetWithoutIsPresent
                 Map.Entry<Byte, Long> maskEntry = outEntry.getValue().entrySet()
                         .stream().findFirst().get();
                 inPin.mask = maskEntry.getValue();
                 inPin.addSource(outEntry.getKey());
-                if (maskEntry.getKey() > 0) {
-                    inPin.setOffset(maskEntry.getKey());
-                }
+                inPin.setOffset(maskEntry.getKey());
             } else {
+                //connect InPin to multiple OutPins throe Merger
                 Merger merger = new Merger(inPin);
-                for (Map.Entry<OutPin, Map<Byte, Long>> outPinMap : inNet.getValue().outPins.entrySet()) {
+                for (Map.Entry<OutPin, Map<Byte, Long>> outPinMap : outPinDescriptor.entrySet()) {
                     for (Map.Entry<Byte, Long> offsetMap : outPinMap.getValue().entrySet()) {
                         merger.addSource(outPinMap.getKey(), offsetMap.getValue(), offsetMap.getKey());
                     }
                 }
+                //Use only one merger with splitter for a similar in-out connections
+                //Hash calculated from destination mask and all sources (OutPins) name/mask/offset
                 if (mergers.containsKey(merger.hash)) {
-                    mergers.get(merger.hash).addDest(inPin);
+                    mergers.get(merger.hash).addDestination(inPin);
                 } else {
                     mergers.put(merger.hash, merger);
                 }
             }
-        }
+        });
         for (Merger merger : mergers.values()) {
             merger.bindSources();
         }
@@ -251,10 +246,15 @@ public class Model {
                         } else {
                             replaceOut(outPin, new SameMaskOutPin(oldPin));
                         }
-                    } else if (outPin.getClass() == OutPin.class && outPin.dest.mask == outPin.mask) {
+                    } else if (outPin.getClass() == OutPin.class && outPin.destination.mask == outPin.mask) {
                         replaceOut(outPin, new SameMaskOutPin(outPin));
                     }
                 });
+    }
+
+    private void replaceOut(OutPin outPin, OutPin newOutPin) {
+        outPin.parent.replaceOut(outPin, newOutPin);
+        inMap.values().forEach(inNet -> inNet.replaceOutPin(outPin, newOutPin));
     }
 
     private void createSchemaPart(Comp component, SchemaPartMap map) {
@@ -294,7 +294,7 @@ public class Model {
                 schemaParts.put(schemaPart.id, schemaPart);
                 for (String pinMapInfo : unit.split(";")) {
                     String[] mapInfo = pinMapInfo.split("=");
-                    shemaPartPinMap.computeIfAbsent(id, s -> new HashMap<>()).put(mapInfo[0], new PinMapDescriptor(mapInfo[1], schemaPart));
+                    schemaPartPinMap.computeIfAbsent(id, s -> new HashMap<>()).put(mapInfo[0], new PinMapDescriptor(mapInfo[1], schemaPart));
                 }
             }
         }
@@ -354,5 +354,25 @@ public class Model {
     }
 
     public record PinMapDescriptor(String pinName, SchemaPart schemaPart) {
+    }
+
+    //OutPin, offset, outMask
+    public static class OutPinDescriptor extends HashMap<OutPin, Map<Byte, Long>> {
+        public long getPermutationCount() {
+            return values().stream().mapToLong(Map::size).sum();
+        }
+
+        public void addOutPin(OutPin pin, byte outOffset, byte inOffset) {
+            byte offset = (byte) (outOffset - inOffset);
+            long newMask = computeIfAbsent(pin, p -> new HashMap<>()).computeIfAbsent(offset, p -> 0L) | (1L << outOffset);
+            get(pin).put(offset, newMask);
+        }
+
+        public void replaceOutPin(OutPin oldPin, OutPin newPin) {
+            Map<Byte, Long> pinDescriptor = remove(oldPin);
+            if (pinDescriptor != null) {
+                put(newPin, pinDescriptor);
+            }
+        }
     }
 }

@@ -29,30 +29,20 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lv.pko.KiCadLogicalSchemeSimulator.model;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
+package lv.pko.KiCadLogicalSchemeSimulator.v2.pins;
+import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 
-import java.util.HashMap;
-import java.util.Map;
-
-public class InPinNet {
-    public final Map<OutPin, Map<Byte, Long>> outPins = new HashMap<>();
-
-    public long getOutCount() {
-        return outPins.values()
-                .stream().mapToLong(Map::size).sum();
+public abstract class NoFloatingInPin extends InPin {
+    public NoFloatingInPin(String id, SchemaPart parent, int size, String... names) {
+        super(id, parent, size, names);
     }
 
-    public void addOutPin(OutPin pin, byte outOffset, byte inOffset) {
-        byte offset = (byte) (outOffset - inOffset);
-        long newMask = outPins.computeIfAbsent(pin, p -> new HashMap<>()).computeIfAbsent(offset, p -> 0L) | (1L << (outOffset));
-        outPins.get(pin).put(offset, newMask);
+    public NoFloatingInPin(String id, SchemaPart parent) {
+        super(id, parent);
     }
 
-    public void replaceOutPin(OutPin oldPin, OutPin newPin) {
-        Map<Byte, Long> pinDescriptor = outPins.remove(oldPin);
-        if (pinDescriptor != null) {
-            outPins.put(newPin, pinDescriptor);
-        }
+    @Override
+    void setHiImpedance() {
+        throw new FloatingPinException(this);
     }
 }

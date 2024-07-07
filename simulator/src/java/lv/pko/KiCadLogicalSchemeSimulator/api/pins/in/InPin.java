@@ -50,7 +50,7 @@ public abstract class InPin extends Pin {
 
     public void addSource(OutPin source) {
         this.source = source;
-        source.addDest(this);
+        source.addDestination(this);
     }
 
     public long getState() {

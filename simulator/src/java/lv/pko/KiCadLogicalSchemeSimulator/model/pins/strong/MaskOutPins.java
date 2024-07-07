@@ -39,13 +39,13 @@ public class MaskOutPins extends OutPin {
 
     public MaskOutPins(MasksOutPins oldPin) {
         super(oldPin.id, oldPin.parent, oldPin.size);
-        aliases = oldPin.aliases;
+        aliasOffsets = oldPin.aliasOffsets;
         dest = oldPin.groups[0];
         dest.dest.source = this;
     }
 
     @Override
-    public void addDest(InPin pin) {
+    public void addDestination(InPin pin) {
         throw new RuntimeException("Can't add dest to OutPins");
     }
 

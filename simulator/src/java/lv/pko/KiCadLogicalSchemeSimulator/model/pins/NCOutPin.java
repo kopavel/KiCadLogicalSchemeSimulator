@@ -36,11 +36,11 @@ import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.TriStateOutPin;
 
 public class NCOutPin extends TriStateOutPin {
     public NCOutPin(OutPin outPin) {
-        super(outPin.id, outPin.parent, outPin.size, outPin.aliases.keySet().toArray(String[]::new));
+        super(outPin.id, outPin.parent, outPin.size, outPin.aliasOffsets.keySet().toArray(String[]::new));
     }
 
     @Override
-    public void addDest(InPin pin) {
+    public void addDestination(InPin pin) {
         throw new RuntimeException("Can't add dest to NC Out Pin");
     }
 

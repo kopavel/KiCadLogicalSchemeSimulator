@@ -48,7 +48,7 @@ public class PullPin extends OutPin {
     }
 
     @Override
-    public void addDest(InPin pin) {
+    public void addDestination(InPin pin) {
         dest = Utils.addToArray(dest, pin);
     }
 

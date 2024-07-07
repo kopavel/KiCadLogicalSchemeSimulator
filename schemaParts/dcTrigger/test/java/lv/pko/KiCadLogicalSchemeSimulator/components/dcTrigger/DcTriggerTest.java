@@ -61,8 +61,8 @@ public class DcTriggerTest {
             }
         };
         dest.mask = 1;
-        qOut.addDest(dest);
-        iqOut.addDest(dest);
+        qOut.addDestination(dest);
+        iqOut.addDestination(dest);
     }
 
     @Test

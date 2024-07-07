@@ -57,7 +57,7 @@ public class MultiplexerTest {
             }
         };
         qDest.mask = 0xff;
-        qPin.addDest(qDest);
+        qPin.addDestination(qDest);
     }
 
     @Test

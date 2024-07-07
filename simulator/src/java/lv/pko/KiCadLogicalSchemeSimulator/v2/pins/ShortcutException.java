@@ -29,46 +29,25 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lv.pko.KiCadLogicalSchemeSimulator.api.pins.out;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.Pin;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
-import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import lv.pko.KiCadLogicalSchemeSimulator.tools.Utils;
+package lv.pko.KiCadLogicalSchemeSimulator.v2.pins;
+import lombok.Getter;
+import lv.pko.KiCadLogicalSchemeSimulator.model.merger.MergerInPin;
 
-public class OutPin extends Pin {
-    public InPin destination;
+@Getter
+public class ShortcutException extends RuntimeException {
+    private final String message;
 
-    public OutPin(String id, SchemaPart parent, int size, String... names) {
-        super(id, parent, size, names);
-        mask = Utils.getMaskForSize(size);
-    }
-
-    public void addDestination(InPin pin) {
-        destination = pin;
-    }
-
-    public void setState(long newState) {
-        state = newState & destination.mask;
-        if (destination.state != state) {
-            destination.state = state;
-            destination.onChange(state, false, true);
+    public ShortcutException(InPin... pins) {
+        StringBuilder message = new StringBuilder("Shortcut on ");
+        for (InPin pin : pins) {
+            message.append(pin.getName()).append(":");
+            if (pin instanceof MergerInPin out && out.hiImpedance) {
+                message.append("H");
+            } else {
+                message.append(pin.getState());
+            }
+            message.append("; ");
         }
-    }
-
-    public void setStateForce(long newState) {
-        state = newState & destination.mask;
-        destination.state = state;
-        destination.onChange(state, false, true);
-    }
-
-    public void reSendState() {
-        if (destination != null) {
-            destination.state = state & destination.mask;
-            destination.onChange(destination.state, false, true);
-        }
-    }
-
-    public boolean noDest() {
-        return destination == null;
+        this.message = message.toString();
     }
 }

@@ -61,18 +61,18 @@ public class Merger extends TriStateOutPin {
     }
 
     @Override
-    public void addDest(InPin pin) {
-        if (dest == null) {
-            dest = pin;
-        } else if (dest instanceof Splitter splitter) {
+    public void addDestination(InPin pin) {
+        if (destination == null) {
+            destination = pin;
+        } else if (destination instanceof Splitter splitter) {
             splitter.addDest(pin);
         } else {
-            dest = new Splitter(dest, pin);
+            destination = new Splitter(destination, pin);
         }
     }
 
     public String getHash() {
-        StringBuilder result = new StringBuilder(String.valueOf(dest.mask));
+        StringBuilder result = new StringBuilder(String.valueOf(destination.mask));
         for (MergerInPin input : inputs) {
             result.append(";").append(input.getHash());
         }
@@ -85,9 +85,9 @@ public class Merger extends TriStateOutPin {
             if (pullPin.strong) {
                 strongMask |= inPin.corrMask;
                 hiImpedancePins &= ~strongMask;
-                state |= inPin.correctState(src.state) & dest.mask;
+                state |= inPin.correctState(src.state) & destination.mask;
             } else {
-                pullState |= inPin.correctState(src.state) & dest.mask;
+                pullState |= inPin.correctState(src.state) & destination.mask;
                 pullMask |= inPin.corrMask;
                 nPullMask = ~pullMask;
                 state = pullState;
@@ -95,14 +95,14 @@ public class Merger extends TriStateOutPin {
         } else {
             if (!(src instanceof TriStateOutPin)) {
                 if ((strongMask & inPin.corrMask) > 0) {
-                    throw new RuntimeException("Non tri-state pins overlap on IN pin:" + dest.getName());
+                    throw new RuntimeException("Non tri-state pins overlap on IN pin:" + destination.getName());
                 }
                 strongMask |= inPin.corrMask;
                 hiImpedancePins &= ~strongMask;
             }
             inputs = Utils.addToArray(inputs, inPin);
             Arrays.sort(inputs, Comparator.comparing(Pin::getName));
-            //            src.addDest(inPin);
+            //            src.addDestination(inPin);
             sources.put(src, inPin);
             hash = getHash();
         }
@@ -110,7 +110,7 @@ public class Merger extends TriStateOutPin {
 
     public void bindSources() {
         sources.forEach((source, inPin) -> {
-            source.addDest(inPin);
+            source.addDestination(inPin);
             inPin.init();
         });
     }
@@ -118,8 +118,8 @@ public class Merger extends TriStateOutPin {
     @Override
     public void reSendState() {
         state |= hiImpedancePins & pullState;
-        dest.state = state;
-        dest.onChange(state, hiImpedance, hiImpedancePins != mask);
+        destination.state = state;
+        destination.onChange(state, hiImpedance, hiImpedancePins != destination.mask);
     }
 
     private MergerInPin createInput(OutPin src, byte offset, long mask) {

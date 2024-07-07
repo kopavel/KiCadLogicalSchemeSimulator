@@ -29,46 +29,22 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lv.pko.KiCadLogicalSchemeSimulator.api.pins.out;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.Pin;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
+package lv.pko.KiCadLogicalSchemeSimulator.v2.pins;
 import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import lv.pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
-public class OutPin extends Pin {
-    public InPin destination;
-
-    public OutPin(String id, SchemaPart parent, int size, String... names) {
-        super(id, parent, size, names);
-        mask = Utils.getMaskForSize(size);
+public abstract class FallingEdgeInPin extends EdgeInPin {
+    public FallingEdgeInPin(String id, SchemaPart parent) {
+        super(id, parent);
     }
 
-    public void addDestination(InPin pin) {
-        destination = pin;
+    @Override
+    public void onRisingEdge() {
     }
 
-    public void setState(long newState) {
-        state = newState & destination.mask;
-        if (destination.state != state) {
-            destination.state = state;
-            destination.onChange(state, false, true);
+    @Override
+    public void setState(long newState, boolean strong) {
+        if (newState == 0) {
+            onFallingEdge();
         }
-    }
-
-    public void setStateForce(long newState) {
-        state = newState & destination.mask;
-        destination.state = state;
-        destination.onChange(state, false, true);
-    }
-
-    public void reSendState() {
-        if (destination != null) {
-            destination.state = state & destination.mask;
-            destination.onChange(destination.state, false, true);
-        }
-    }
-
-    public boolean noDest() {
-        return destination == null;
     }
 }

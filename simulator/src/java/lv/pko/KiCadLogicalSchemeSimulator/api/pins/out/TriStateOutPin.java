@@ -42,11 +42,11 @@ public class TriStateOutPin extends OutPin {
     }
 
     @Override
-    public void addDest(InPin pin) {
+    public void addDestination(InPin pin) {
         if (pin instanceof EdgeInPin) {
             throw new RuntimeException("Edge pin on tri-state out");
         }
-        dest = pin;
+        destination = pin;
     }
 
     @Override
@@ -54,12 +54,12 @@ public class TriStateOutPin extends OutPin {
         if (hiImpedance) {
             hiImpedance = false;
             state = newState;
-            dest.state = newState & dest.mask;
-            dest.onChange(dest.state, false, true);
+            destination.state = newState & destination.mask;
+            destination.onChange(destination.state, false, true);
         } else if (newState != this.state) {
             state = newState;
-            dest.state = newState & dest.mask;
-            dest.onChange(dest.state, false, true);
+            destination.state = newState & destination.mask;
+            destination.onChange(destination.state, false, true);
         }
     }
 
@@ -67,21 +67,21 @@ public class TriStateOutPin extends OutPin {
     public void setStateForce(long newState) {
         hiImpedance = false;
         state = newState;
-        dest.state = newState & dest.mask;
-        dest.onChange(dest.state, false, true);
+        destination.state = newState & destination.mask;
+        destination.onChange(destination.state, false, true);
     }
 
     @Override
     public void reSendState() {
-        dest.state = state & dest.mask;
-        dest.onChange(dest.state, hiImpedance, true);
+        destination.state = state & destination.mask;
+        destination.onChange(destination.state, hiImpedance, true);
     }
 
     public void setHiImpedance() {
         if (!hiImpedance) {
             hiImpedance = true;
-            dest.state = 0;
-            dest.onChange(dest.state, true, true);
+            destination.state = 0;
+            destination.onChange(destination.state, true, true);
         }
     }
 }

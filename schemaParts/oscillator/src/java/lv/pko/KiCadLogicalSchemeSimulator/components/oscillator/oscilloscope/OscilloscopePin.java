@@ -37,7 +37,7 @@ public class OscilloscopePin extends OutPin {
     private final Oscilloscope oscilloscope;
 
     public OscilloscopePin(OutPin wrapped, Oscilloscope oscilloscope) {
-        super(wrapped.id, wrapped.parent, wrapped.size, wrapped.aliases.keySet().toArray(String[]::new));
+        super(wrapped.id, wrapped.parent, wrapped.size, wrapped.aliasOffsets.keySet().toArray(String[]::new));
         this.wrapped = wrapped;
         this.oscilloscope = oscilloscope;
     }

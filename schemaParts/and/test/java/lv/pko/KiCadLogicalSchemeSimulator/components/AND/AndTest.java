@@ -57,7 +57,7 @@ public class AndTest {
         };
         inPin.mask = Utils.getMaskForSize(size);
         dest.mask = 1;
-        out.addDest(dest);
+        out.addDestination(dest);
     }
 
     @Test

@@ -52,9 +52,10 @@ public class AndGate extends SchemaPart {
                 if (hiImpedance) {
                     throw new FloatingPinException(this);
                 }
-                if (oldState != (newState == mask)) {
-                    oldState = (newState == mask);
-                    if (newState == mask) {
+                boolean isHi = newState == mask;
+                if (oldState != isHi) {
+                    oldState = isHi;
+                    if (isHi) {
                         out.setStateForce(hiState);
                     } else {
                         out.setStateForce(loState);

@@ -58,7 +58,7 @@ public class LatchTest {
             public void onChange(long newState, boolean hiImpedance, boolean strong) {
             }
         };
-        qPin.addDest(dest);
+        qPin.addDestination(dest);
         dPin.mask = 1;
         dest.mask = 1;
         buffer.initOuts();

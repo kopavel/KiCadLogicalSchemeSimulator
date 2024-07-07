@@ -29,46 +29,47 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lv.pko.KiCadLogicalSchemeSimulator.api.pins.out;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.Pin;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
+package lv.pko.KiCadLogicalSchemeSimulator.v2.pins;
 import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import lv.pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
-public class OutPin extends Pin {
-    public InPin destination;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
-    public OutPin(String id, SchemaPart parent, int size, String... names) {
-        super(id, parent, size, names);
-        mask = Utils.getMaskForSize(size);
-    }
+public abstract class Pin {
+    public final String id;
+    public final SchemaPart parent;
+    public final int size;
+    public Map<String, Byte> aliasOffsets = new HashMap<>();
+    public boolean useBitPresentation;
 
-    public void addDestination(InPin pin) {
-        destination = pin;
-    }
-
-    public void setState(long newState) {
-        state = newState & destination.mask;
-        if (destination.state != state) {
-            destination.state = state;
-            destination.onChange(state, false, true);
+    public Pin(String id, SchemaPart parent, int size, String... aliases) {
+        this.id = id;
+        this.parent = parent;
+        this.size = size;
+        if (aliases == null || aliases.length == 0) {
+            if (size == 1) {
+                aliasOffsets.put(id, (byte) 0);
+            } else {
+                for (byte i = 0; i < size; i++) {
+                    aliasOffsets.put(id + i, i);
+                }
+            }
+        } else if (aliases.length != size) {
+            throw new RuntimeException("Pin definition Error, Names amount not equal size, pin" + getName());
+        } else if (size == 1) {
+            aliasOffsets = Collections.singletonMap(id, (byte) 0);
+        } else {
+            for (byte i = 0; i < aliases.length; i++) {
+                aliasOffsets.put(aliases[i], i);
+            }
         }
     }
 
-    public void setStateForce(long newState) {
-        state = newState & destination.mask;
-        destination.state = state;
-        destination.onChange(state, false, true);
+    public String getName() {
+        return parent.id + "_" + id;
     }
 
-    public void reSendState() {
-        if (destination != null) {
-            destination.state = state & destination.mask;
-            destination.onChange(destination.state, false, true);
-        }
-    }
-
-    public boolean noDest() {
-        return destination == null;
-    }
+    abstract void setState(long newState, boolean strong);
+    abstract void setHiImpedance();
 }

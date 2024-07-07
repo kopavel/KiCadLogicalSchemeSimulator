@@ -56,7 +56,7 @@ public class DecoderTest {
             }
         };
         dest.mask = 1;
-        qPin.addDest(dest);
+        qPin.addDestination(dest);
     }
 
     @Test

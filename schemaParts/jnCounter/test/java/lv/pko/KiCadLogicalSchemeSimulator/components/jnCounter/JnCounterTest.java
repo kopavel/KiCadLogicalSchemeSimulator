@@ -63,14 +63,14 @@ public class JnCounterTest {
             }
         };
         dest.mask = 0xf;
-        qPin.addDest(dest);
+        qPin.addDestination(dest);
         InPin coDest = new InPin("coDest", counter, 4) {
             @Override
             public void onChange(long newState, boolean hiImpedance, boolean strong) {
             }
         };
         coDest.mask = 1;
-        coPin.addDest(coDest);
+        coPin.addDestination(coDest);
         counter.reset();
     }
 

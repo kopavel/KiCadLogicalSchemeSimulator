@@ -53,7 +53,7 @@ public class RepeaterTest {
             }
         };
         dest.mask = 1;
-        outPin.addDest(dest);
+        outPin.addDestination(dest);
     }
 
     @Test

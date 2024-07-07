@@ -35,9 +35,9 @@ import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.TriStateOutPin;
 public class SameMaskTriStateOutPin extends TriStateOutPin {
     public SameMaskTriStateOutPin(MasksTriStateOutPins oldPin) {
         super(oldPin.id, oldPin.parent, oldPin.size);
-        aliases = oldPin.aliases;
-        dest = oldPin.groups[0].dest;
-        dest.mask = oldPin.groups[0].mask;
+        aliasOffsets = oldPin.aliasOffsets;
+        destination = oldPin.groups[0].dest;
+        destination.mask = oldPin.groups[0].mask;
         hiImpedance = oldPin.hiImpedance;
         state = oldPin.state;
     }
@@ -47,12 +47,12 @@ public class SameMaskTriStateOutPin extends TriStateOutPin {
         if (hiImpedance) {
             hiImpedance = false;
             state = newState;
-            dest.state = newState;
-            dest.onChange(state, false, true);
+            destination.state = newState;
+            destination.onChange(state, false, true);
         } else if (state != newState) {
             state = newState;
-            dest.state = newState;
-            dest.onChange(state, false, true);
+            destination.state = newState;
+            destination.onChange(state, false, true);
         }
     }
 
@@ -60,21 +60,21 @@ public class SameMaskTriStateOutPin extends TriStateOutPin {
     public void setStateForce(long newState) {
         hiImpedance = false;
         state = newState;
-        dest.state = newState;
-        dest.onChange(state, false, true);
+        destination.state = newState;
+        destination.onChange(state, false, true);
     }
 
     @Override
     public void reSendState() {
-        dest.state = state;
-        dest.onChange(state, hiImpedance, hiImpedance);
+        destination.state = state;
+        destination.onChange(state, hiImpedance, hiImpedance);
     }
 
     public void setHiImpedance() {
         if (!hiImpedance) {
             hiImpedance = true;
-            dest.state = 0;
-            dest.onChange(0, true, true);
+            destination.state = 0;
+            destination.onChange(0, true, true);
         }
     }
 }

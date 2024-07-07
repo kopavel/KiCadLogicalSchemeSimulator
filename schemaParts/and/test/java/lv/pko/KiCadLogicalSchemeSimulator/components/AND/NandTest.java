@@ -54,7 +54,7 @@ public class NandTest {
         };
         inPin.mask = 3;
         dest.mask = 1;
-        out.addDest(dest);
+        out.addDestination(dest);
     }
 
     @Test

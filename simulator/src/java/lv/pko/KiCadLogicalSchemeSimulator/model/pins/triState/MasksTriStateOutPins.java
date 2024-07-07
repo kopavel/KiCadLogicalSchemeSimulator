@@ -46,14 +46,14 @@ public class MasksTriStateOutPins extends TriStateOutPin {
 
     public MasksTriStateOutPins(TriStateOutPin oldPin) {
         super(oldPin.id, oldPin.parent, oldPin.size);
-        aliases = oldPin.aliases;
+        aliasOffsets = oldPin.aliasOffsets;
         hiImpedance = oldPin.hiImpedance;
         state = oldPin.state;
         mask = oldPin.mask;
     }
 
     @Override
-    public void addDest(InPin pin) {
+    public void addDestination(InPin pin) {
         if (pin instanceof EdgeInPin) {
             throw new RuntimeException("Edge pin on tri-state out");
         }

@@ -39,14 +39,14 @@ public class MaskTriStateOutPins extends TriStateOutPin {
 
     public MaskTriStateOutPins(MasksTriStateOutPins oldPin) {
         super(oldPin.id, oldPin.parent, oldPin.size);
-        aliases = oldPin.aliases;
+        aliasOffsets = oldPin.aliasOffsets;
         group = oldPin.groups[0];
         hiImpedance = oldPin.hiImpedance;
         state = oldPin.state;
     }
 
     @Override
-    public void addDest(InPin pin) {
+    public void addDestination(InPin pin) {
         throw new RuntimeException("Can't add dest to TriStateOutPins");
     }
 

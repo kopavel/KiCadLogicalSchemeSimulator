@@ -75,8 +75,8 @@ public class DCounterTest {
             }
         };
         coDest.mask = 1;
-        qPin.addDest(qDest);
-        coPin.addDest(coDest);
+        qPin.addDestination(qDest);
+        coPin.addDestination(coDest);
     }
 
     @Test

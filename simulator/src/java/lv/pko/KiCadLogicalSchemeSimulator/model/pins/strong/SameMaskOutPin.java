@@ -35,36 +35,36 @@ import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
 public class SameMaskOutPin extends OutPin {
     public SameMaskOutPin(MasksOutPins oldPin) {
         super(oldPin.id, oldPin.parent, oldPin.size);
-        aliases = oldPin.aliases;
-        dest = oldPin.groups[0].dest;
-        dest.mask = oldPin.groups[0].mask;
+        aliasOffsets = oldPin.aliasOffsets;
+        destination = oldPin.groups[0].dest;
+        destination.mask = oldPin.groups[0].mask;
         state = oldPin.state;
     }
 
     public SameMaskOutPin(OutPin oldPin) {
         super(oldPin.id, oldPin.parent, oldPin.size);
-        aliases = oldPin.aliases;
-        dest = oldPin.dest;
+        aliasOffsets = oldPin.aliasOffsets;
+        destination = oldPin.destination;
         state = oldPin.state;
     }
 
     public void setState(long newState) {
         if (newState != state) {
             state = newState;
-            dest.state = newState;
-            dest.onChange(newState, false, true);
+            destination.state = newState;
+            destination.onChange(newState, false, true);
         }
     }
 
     public void setStateForce(long newState) {
         state = newState;
-        dest.state = newState;
-        dest.onChange(newState, false, true);
+        destination.state = newState;
+        destination.onChange(newState, false, true);
     }
 
     public void reSendState() {
-        if (dest != null) {
-            dest.onChange(state, false, true);
+        if (destination != null) {
+            destination.onChange(state, false, true);
         }
     }
 }
