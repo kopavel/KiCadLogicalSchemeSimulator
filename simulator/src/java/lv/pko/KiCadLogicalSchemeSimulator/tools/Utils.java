@@ -80,8 +80,14 @@ public class Utils {
     }
 
     public static <T> T[] addToArray(T[] array, T item) {
-        T[] newArray = Arrays.copyOf(array, array.length + 1);
-        newArray[array.length] = item;
+        T[] newArray;
+        if (array == null) {
+            //noinspection unchecked
+            newArray = (T[]) new Object[]{item};
+        } else {
+            newArray = Arrays.copyOf(array, array.length + 1);
+            newArray[array.length] = item;
+        }
         return newArray;
     }
 

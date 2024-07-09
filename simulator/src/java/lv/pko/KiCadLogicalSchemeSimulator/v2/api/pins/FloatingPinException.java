@@ -29,25 +29,11 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lv.pko.KiCadLogicalSchemeSimulator.v2.pins;
-import lombok.Getter;
-import lv.pko.KiCadLogicalSchemeSimulator.model.merger.MergerInPin;
+package lv.pko.KiCadLogicalSchemeSimulator.v2.api.pins;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pins.in.InPin;
 
-@Getter
-public class ShortcutException extends RuntimeException {
-    private final String message;
-
-    public ShortcutException(InPin... pins) {
-        StringBuilder message = new StringBuilder("Shortcut on ");
-        for (InPin pin : pins) {
-            message.append(pin.getName()).append(":");
-            if (pin instanceof MergerInPin out && out.hiImpedance) {
-                message.append("H");
-            } else {
-                message.append(pin.getState());
-            }
-            message.append("; ");
-        }
-        this.message = message.toString();
+public class FloatingPinException extends RuntimeException {
+    public FloatingPinException(InPin pin) {
+        super("Floating pin " + pin.getName());
     }
 }

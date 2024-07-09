@@ -29,22 +29,20 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lv.pko.KiCadLogicalSchemeSimulator.v2.pins;
+package lv.pko.KiCadLogicalSchemeSimulator.v2.api.pins.in;
 import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pins.Pin;
 
-public abstract class FallingEdgeInPin extends EdgeInPin {
-    public FallingEdgeInPin(String id, SchemaPart parent) {
-        super(id, parent);
+public abstract class InPin extends Pin {
+    public InPin(String id, SchemaPart parent, int size, String... names) {
+        super(id, parent, size, names);
     }
 
-    @Override
-    public void onRisingEdge() {
+    public InPin(String id, SchemaPart parent) {
+        super(id, parent, 1);
     }
 
-    @Override
-    public void setState(long newState, boolean strong) {
-        if (newState == 0) {
-            onFallingEdge();
-        }
+    public InPin(Pin source) {
+        super(source);
     }
 }

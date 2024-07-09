@@ -29,9 +29,20 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lv.pko.KiCadLogicalSchemeSimulator.v2.pins;
-public class FloatingPinException extends RuntimeException {
-    public FloatingPinException(InPin pin) {
-        super("Floating pin " + pin.getName());
+package lv.pko.KiCadLogicalSchemeSimulator.v2.model.merger;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pins.Pin;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pins.in.InPin;
+
+public class MergerInPin extends InPin {
+    public MergerInPin(Pin source) {
+        super(source);
+    }
+
+    @Override
+    public void setState(long newState, boolean strong) {
+    }
+
+    @Override
+    public void setHiImpedance() {
     }
 }

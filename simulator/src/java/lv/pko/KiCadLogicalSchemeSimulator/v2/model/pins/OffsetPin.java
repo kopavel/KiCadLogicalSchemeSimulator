@@ -29,23 +29,52 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lv.pko.KiCadLogicalSchemeSimulator.v2.pins;
-import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+package lv.pko.KiCadLogicalSchemeSimulator.v2.model.pins;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pins.Pin;
 
-public abstract class EdgeInPin extends NoFloatingInPin {
-    public EdgeInPin(String id, SchemaPart parent) {
-        super(id, parent);
+public class OffsetPin extends Pin {
+    private final Pin destination;
+    private final byte offset;
+    private final byte nOffset;
+
+    public OffsetPin(Pin destination, byte offset) {
+        super(destination);
+        this.destination = destination;
+        this.offset = offset;
+        nOffset = (byte) -offset;
     }
-
-    public abstract void onFallingEdge();
-    public abstract void onRisingEdge();
 
     @Override
     public void setState(long newState, boolean strong) {
-        if (newState == 0) {
-            onFallingEdge();
+        if (offset > 0) {
+            newState = newState >> offset;
         } else {
-            onRisingEdge();
+            newState = newState << nOffset;
+        }
+        destination.setState(newState, strong);
+    }
+
+    @Override
+    public void setHiImpedance() {
+        destination.setHiImpedance();
+    }
+
+    @Override
+    public Pin getOptimised() {
+        if (offset > 0) {
+            return new OffsetPin(this, offset) {
+                @Override
+                public void setState(long newState, boolean strong) {
+                    destination.setState(newState >> offset, strong);
+                }
+            };
+        } else {
+            return new OffsetPin(this, offset) {
+                @Override
+                public void setState(long newState, boolean strong) {
+                    destination.setState(newState << nOffset, strong);
+                }
+            };
         }
     }
 }

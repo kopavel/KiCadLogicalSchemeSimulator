@@ -29,47 +29,26 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lv.pko.KiCadLogicalSchemeSimulator.v2.pins;
-import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+package lv.pko.KiCadLogicalSchemeSimulator.v2.api.pins;
+import lombok.Getter;
+import lv.pko.KiCadLogicalSchemeSimulator.model.merger.MergerInPin;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pins.in.InPin;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+@Getter
+public class ShortcutException extends RuntimeException {
+    private final String message;
 
-public abstract class Pin {
-    public final String id;
-    public final SchemaPart parent;
-    public final int size;
-    public Map<String, Byte> aliasOffsets = new HashMap<>();
-    public boolean useBitPresentation;
-
-    public Pin(String id, SchemaPart parent, int size, String... aliases) {
-        this.id = id;
-        this.parent = parent;
-        this.size = size;
-        if (aliases == null || aliases.length == 0) {
-            if (size == 1) {
-                aliasOffsets.put(id, (byte) 0);
+    public ShortcutException(InPin... pins) {
+        StringBuilder message = new StringBuilder("Shortcut on ");
+        for (InPin pin : pins) {
+            message.append(pin.getName()).append(":");
+            if (pin instanceof MergerInPin out && out.hiImpedance) {
+                message.append("H");
             } else {
-                for (byte i = 0; i < size; i++) {
-                    aliasOffsets.put(id + i, i);
-                }
+                message.append(pin.getState());
             }
-        } else if (aliases.length != size) {
-            throw new RuntimeException("Pin definition Error, Names amount not equal size, pin" + getName());
-        } else if (size == 1) {
-            aliasOffsets = Collections.singletonMap(id, (byte) 0);
-        } else {
-            for (byte i = 0; i < aliases.length; i++) {
-                aliasOffsets.put(aliases[i], i);
-            }
+            message.append("; ");
         }
+        this.message = message.toString();
     }
-
-    public String getName() {
-        return parent.id + "_" + id;
-    }
-
-    abstract void setState(long newState, boolean strong);
-    abstract void setHiImpedance();
 }
