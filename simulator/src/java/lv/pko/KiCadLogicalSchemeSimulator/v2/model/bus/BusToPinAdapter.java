@@ -29,26 +29,27 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lv.pko.KiCadLogicalSchemeSimulator.v2.api.pins;
-import lombok.Getter;
-import lv.pko.KiCadLogicalSchemeSimulator.model.merger.MergerInPin;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pins.in.InPin;
+package lv.pko.KiCadLogicalSchemeSimulator.v2.model.bus;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus.Bus;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin.Pin;
 
-@Getter
-public class ShortcutException extends RuntimeException {
-    private final String message;
+public class BusToPinAdapter extends Bus {
+    public final Pin destination;
+    public final long mask;
 
-    public ShortcutException(InPin... pins) {
-        StringBuilder message = new StringBuilder("Shortcut on ");
-        for (InPin pin : pins) {
-            message.append(pin.getName()).append(":");
-            if (pin instanceof MergerInPin out && out.hiImpedance) {
-                message.append("H");
-            } else {
-                message.append(pin.getState());
-            }
-            message.append("; ");
-        }
-        this.message = message.toString();
+    public BusToPinAdapter(Pin destination, byte offset) {
+        super(destination.id, destination.parent, 1);
+        this.destination = destination;
+        mask = 1L << offset;
+    }
+
+    @Override
+    public void setState(long newState) {
+        destination.setState((newState & mask) > 0, true);
+    }
+
+    @Override
+    public void setHiImpedance() {
+        destination.setHiImpedance();
     }
 }

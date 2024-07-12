@@ -29,11 +29,29 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lv.pko.KiCadLogicalSchemeSimulator.v2.api.pins;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pins.in.InPin;
+package lv.pko.KiCadLogicalSchemeSimulator.v2.model.pin;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin.OutPin;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin.Pin;
 
-public class FloatingPinException extends RuntimeException {
-    public FloatingPinException(InPin pin) {
-        super("Floating pin " + pin.getName());
+public class NCOutPin extends OutPin {
+    public NCOutPin(OutPin outPin) {
+        super(outPin.id, outPin.parent, outPin.strong);
+    }
+
+    @Override
+    public void addDestination(Pin pin) {
+        throw new RuntimeException("Can't add destination to NC Out Pin");
+    }
+
+    @Override
+    public void setState(boolean newState, boolean strong) {
+    }
+
+    @Override
+    public void setHiImpedance() {
+    }
+
+    @Override
+    public void resend() {
     }
 }

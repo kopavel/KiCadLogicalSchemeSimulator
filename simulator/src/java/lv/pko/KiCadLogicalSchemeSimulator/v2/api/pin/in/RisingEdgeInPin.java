@@ -29,7 +29,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lv.pko.KiCadLogicalSchemeSimulator.v2.api.pins.in;
+package lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin.in;
 import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 
 public abstract class RisingEdgeInPin extends EdgeInPin {
@@ -42,9 +42,8 @@ public abstract class RisingEdgeInPin extends EdgeInPin {
     }
 
     @Override
-    public void setState(long newState, boolean strong) {
-        state = newState;
-        if (newState != 0) {
+    public void setState(boolean newState, boolean strong) {
+        if (newState) {
             onRisingEdge();
         }
     }

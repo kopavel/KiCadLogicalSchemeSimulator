@@ -29,20 +29,17 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lv.pko.KiCadLogicalSchemeSimulator.v2.api.pins.in;
+package lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin.in;
 import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pins.Pin;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.FloatingInException;
 
-public abstract class InPin extends Pin {
-    public InPin(String id, SchemaPart parent, int size, String... names) {
-        super(id, parent, size, names);
+public abstract class NoFloatingInPin extends InPin {
+    public NoFloatingInPin(String id, SchemaPart parent) {
+        super(id, parent);
     }
 
-    public InPin(String id, SchemaPart parent) {
-        super(id, parent, 1);
-    }
-
-    public InPin(Pin source) {
-        super(source);
+    @Override
+    public void setHiImpedance() {
+        throw new FloatingInException(this);
     }
 }

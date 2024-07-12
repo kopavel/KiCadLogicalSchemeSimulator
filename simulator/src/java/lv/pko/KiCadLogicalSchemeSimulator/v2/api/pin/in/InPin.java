@@ -29,10 +29,16 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lv.pko.KiCadLogicalSchemeSimulator.v2.api.pins;
-public abstract class PassivePin {
-    abstract public PassivePinState transform(long newState, boolean strong);
+package lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin.in;
+import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin.Pin;
 
-    public record PassivePinState(long state, boolean strong) {
+public abstract class InPin extends Pin {
+    public InPin(String id, SchemaPart parent) {
+        super(id, parent);
+    }
+
+    public InPin(Pin oldPin) {
+        super(oldPin);
     }
 }

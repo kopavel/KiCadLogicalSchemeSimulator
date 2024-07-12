@@ -29,61 +29,70 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lv.pko.KiCadLogicalSchemeSimulator.v2.model.pins;
+package lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin;
+import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import lv.pko.KiCadLogicalSchemeSimulator.tools.Utils;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pins.FloatingPinException;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pins.OutPin;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pins.Pin;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pins.ShortcutException;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.IModelItem;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.ModelOutItem;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus.Bus;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.model.pin.NCOutPin;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.model.pin.PinToBusAdapter;
 
-public class MaskGroupPins extends OutPin {
-    public MaskGroupPins(OutPin source, long mask) {
-        super(source);
-        this.mask = mask;
+public class OutPin extends Pin implements ModelOutItem {
+    public Pin[] destinations;
+
+    public OutPin(String id, SchemaPart parent, boolean strong) {
+        super(id, parent);
+        this.strong = strong;
     }
 
-    public MaskGroupPins(MaskGroupPins oldPin) {
+    public OutPin(OutPin oldPin) {
         super(oldPin);
-        mask = oldPin.mask;
+        strong = oldPin.strong;
     }
 
-    public void addDestination(Pin pin) {
-        destinations = Utils.addToArray(destinations, pin);
-    }
-
-    public void setState(long newState, boolean strong) {
-        long maskState = newState & mask;
-        if (state != maskState) {
-            state = maskState;
-            for (Pin destination : destinations) {
-                destination.setState(maskState, strong);
+    public void addDestination(IModelItem item, long mask, byte offset) {
+        switch (item) {
+            case Pin pin -> {
+                destinations = Utils.addToArray(destinations, pin);
             }
+            case Bus bus -> {
+                destinations = Utils.addToArray(destinations, new PinToBusAdapter(bus, offset));
+            }
+            default -> throw new RuntimeException("Unsupported destination " + item.getClass().getName());
         }
     }
 
-    public void resend(long newState, boolean strong) {
-        RuntimeException result = null;
-        long maskState = newState & mask;
+    @Override
+    public void setState(boolean newState, boolean strong) {
         for (Pin destination : destinations) {
-            try {
-                destination.setState(maskState, strong);
-            } catch (FloatingPinException | ShortcutException e) {
-                if (result == null) {
-                    result = e;
-                }
-            }
+            destination.setState(newState, strong);
         }
-        if (result != null) {
-            throw result;
+    }
+
+    @Override
+    public void setHiImpedance() {
+        for (Pin destination : destinations) {
+            destination.setHiImpedance();
         }
-        state = maskState;
+    }
+
+    public void resend() {
+        for (Pin destination : destinations) {
+            destination.resend(state, strong);
+        }
     }
 
     @Override
     public Pin getOptimised() {
         if (destinations == null) {
             return new NCOutPin(this);
+        } else if (destinations.length == 1) {
+            return destinations[0].getOptimised();
         } else {
+            for (int i = 0; i < destinations.length; i++) {
+                destinations[i] = destinations[i].getOptimised();
+            }
             return this;
         }
     }

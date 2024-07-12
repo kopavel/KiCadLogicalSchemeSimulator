@@ -29,63 +29,29 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lv.pko.KiCadLogicalSchemeSimulator.v2.api.pins;
+package lv.pko.KiCadLogicalSchemeSimulator.v2.api;
+import lombok.Getter;
 import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
-public abstract class Pin {
+public abstract class ModelItem implements IModelItem {
     public final String id;
     public final SchemaPart parent;
-    public final int size;
-    public long state;
-    public Map<String, Byte> aliasOffsets = new HashMap<>();
-    public boolean useBitPresentation;
+    @Getter
+    public boolean hiImpedance;
 
-    public Pin(Pin oldPin) {
-        this(oldPin.id, oldPin.parent, oldPin.size);
-        aliasOffsets = oldPin.aliasOffsets;
-        useBitPresentation = oldPin.useBitPresentation;
-        state = oldPin.state;
-    }
-
-    public Pin(String id, SchemaPart parent, int size, String... aliases) {
+    protected ModelItem(String id, SchemaPart parent) {
         this.id = id;
         this.parent = parent;
-        this.size = size;
-        if (aliases == null || aliases.length == 0) {
-            if (size == 1) {
-                aliasOffsets.put(id, (byte) 0);
-            } else {
-                for (byte i = 0; i < size; i++) {
-                    aliasOffsets.put(id + i, i);
-                }
-            }
-        } else if (aliases.length != size) {
-            throw new RuntimeException("Pin definition Error, Names amount not equal size, pin" + getName());
-        } else if (size == 1) {
-            aliasOffsets = Collections.singletonMap(id, (byte) 0);
-        } else {
-            for (byte i = 0; i < aliases.length; i++) {
-                aliasOffsets.put(aliases[i], i);
-            }
-        }
+    }
+
+    public ModelItem getOptimised() {
+        return this;
     }
 
     public String getName() {
         return parent.id + "_" + id;
     }
 
-    abstract public void setState(long newState, boolean strong);
-    abstract public void setHiImpedance();
-
-    public Pin getOptimised() {
-        return this;
-    }
-
-    public void resend(long state, boolean strong) {
-        setState(state, strong);
-    }
+    public abstract void setHiImpedance();
+    public abstract String getStringState();
 }

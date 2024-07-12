@@ -29,70 +29,82 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lv.pko.KiCadLogicalSchemeSimulator.v2.api.pins;
+package lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus;
 import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import lv.pko.KiCadLogicalSchemeSimulator.tools.Utils;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.model.pins.MaskGroupPins;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.model.pins.NCOutPin;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.model.pins.OffsetPin;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.IModelItem;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.ModelOutItem;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin.Pin;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.model.bus.BusToPinAdapter;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.model.bus.MaskGroupBus;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.model.bus.NCOutBus;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.model.bus.OffsetBus;
 
 import java.util.Arrays;
 
-public class OutPin extends Pin {
-    public Pin[] destinations;
-    public boolean strong;
+public class OutBus extends Bus implements ModelOutItem {
+    public Bus[] destinations;
     public long mask;
 
-    public OutPin(String id, SchemaPart parent, int size, boolean strong, String... names) {
+    public OutBus(String id, SchemaPart parent, int size, String... names) {
         super(id, parent, size, names);
-        this.strong = strong;
         mask = Utils.getMaskForSize(size);
     }
 
-    public OutPin(OutPin oldPin) {
+    public OutBus(OutBus oldPin) {
         super(oldPin);
-        strong = oldPin.strong;
     }
 
-    public void addDestination(Pin pin, long mask, byte offset) {
-        if (offset != 0) {
-            pin = new OffsetPin(pin, offset);
-        }
-        if (mask != this.mask) {
-            Arrays.stream(destinations)
-                    .filter(d -> d instanceof MaskGroupPins)
-                    .map(d -> ((MaskGroupPins) d))
-                    .filter(d -> d.mask == mask).findFirst().orElse(new MaskGroupPins(this, mask)).addDestination(pin);
-        } else {
-            destinations = Utils.addToArray(destinations, pin);
+    public void addDestination(IModelItem item, long mask, byte offset) {
+        switch (item) {
+            case Pin pin -> {
+                BusToPinAdapter bus = new BusToPinAdapter(pin, offset);
+                Arrays.stream(destinations)
+                        .filter(d -> d instanceof MaskGroupBus)
+                        .map(d -> ((MaskGroupBus) d))
+                        .filter(d -> d.mask == bus.mask).findFirst().orElse(new MaskGroupBus(this, bus.mask)).addDestination(bus);
+            }
+            case Bus bus -> {
+                if (offset != 0) {
+                    bus = new OffsetBus(bus, offset);
+                }
+                if (mask != this.mask) {
+                    Arrays.stream(destinations)
+                            .filter(d -> d instanceof MaskGroupBus)
+                            .map(d -> ((MaskGroupBus) d))
+                            .filter(d -> d.mask == mask).findFirst().orElse(new MaskGroupBus(this, mask)).addDestination(bus);
+                } else {
+                    destinations = Utils.addToArray(destinations, bus);
+                }
+            }
+            default -> throw new RuntimeException("Unsupported destination " + item.getClass().getName());
         }
     }
 
     @Override
-    public void setState(long newState, boolean strong) {
-        state = newState;
-        for (Pin destination : destinations) {
-            destination.setState(newState, strong);
+    public void setState(long newState) {
+        for (Bus destination : destinations) {
+            destination.setState(newState);
         }
     }
 
     @Override
     public void setHiImpedance() {
-        for (Pin destination : destinations) {
+        for (Bus destination : destinations) {
             destination.setHiImpedance();
         }
     }
 
     public void resend() {
-        for (Pin destination : destinations) {
-            destination.resend(state, strong);
+        for (Bus destination : destinations) {
+            destination.resend(state);
         }
     }
 
     @Override
-    public Pin getOptimised() {
+    public Bus getOptimised() {
         if (destinations == null) {
-            return new NCOutPin(this);
+            return new NCOutBus(this);
         } else if (destinations.length == 1) {
             return destinations[0].getOptimised();
         } else {

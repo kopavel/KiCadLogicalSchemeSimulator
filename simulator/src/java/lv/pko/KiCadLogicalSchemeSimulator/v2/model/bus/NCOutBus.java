@@ -29,20 +29,30 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lv.pko.KiCadLogicalSchemeSimulator.v2.model.merger;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pins.Pin;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pins.in.InPin;
+package lv.pko.KiCadLogicalSchemeSimulator.v2.model.bus;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus.Bus;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus.OutBus;
 
-public class MergerInPin extends InPin {
-    public MergerInPin(Pin source) {
-        super(source);
+public class NCOutBus extends OutBus {
+    public NCOutBus(OutBus outPin) {
+        super(outPin.id, outPin.parent, outPin.size);
+        aliasOffsets = outPin.aliasOffsets;
     }
 
     @Override
-    public void setState(long newState, boolean strong) {
+    public void addDestination(Bus bus, long mask, byte offset) {
+        throw new RuntimeException("Can't add destination to NC Out Pin");
+    }
+
+    @Override
+    public void setState(long newState) {
     }
 
     @Override
     public void setHiImpedance() {
+    }
+
+    @Override
+    public void resend() {
     }
 }

@@ -29,23 +29,22 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lv.pko.KiCadLogicalSchemeSimulator.v2.model.pins;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pins.OutPin;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pins.Pin;
+package lv.pko.KiCadLogicalSchemeSimulator.v2.model.merger;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus.Bus;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus.in.InBus;
 
-public class NCOutPin extends OutPin {
-    public NCOutPin(OutPin outPin) {
-        super(outPin.id, outPin.parent, outPin.size, outPin.strong);
-        aliasOffsets = outPin.aliasOffsets;
+public class BusMergerInBus extends InBus implements MergerInput {
+    public final long mask;
+    private final BusMerger merger;
+
+    public BusMergerInBus(Bus source, long mask, BusMerger merger) {
+        super(source);
+        this.mask = mask;
+        this.merger = merger;
     }
 
     @Override
-    public void addDestination(Pin pin, long mask, byte offset) {
-        throw new RuntimeException("Can't add destination to NC Out Pin");
-    }
-
-    @Override
-    public void setState(long newState, boolean strong) {
+    public void setState(long newState) {
     }
 
     @Override
@@ -53,6 +52,7 @@ public class NCOutPin extends OutPin {
     }
 
     @Override
-    public void resend() {
+    public String getHash() {
+        return mask + ":" + getName();
     }
 }
