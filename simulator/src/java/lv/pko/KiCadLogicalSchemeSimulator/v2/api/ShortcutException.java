@@ -46,7 +46,7 @@ public class ShortcutException extends RuntimeException {
                 if (!pin.isStrong()) {
                     message.append("W");
                 }
-                message.append(pin.getStringState());
+                message.append(pin.getState());
             }
             message.append("; ");
         }

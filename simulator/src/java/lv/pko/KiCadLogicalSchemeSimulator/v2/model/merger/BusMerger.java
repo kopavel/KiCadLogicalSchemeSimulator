@@ -36,6 +36,7 @@ import lv.pko.KiCadLogicalSchemeSimulator.v2.api.ModelOutItem;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.ShortcutException;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus.Bus;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus.OutBus;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin.OutPin;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin.Pin;
 
 import java.util.Arrays;
@@ -43,12 +44,12 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BusMerger extends OutBus {
+public class BusMerger extends OutBus implements IMerger {
     private final Map<ModelOutItem, DestinationDescriptor> sources = new HashMap<>();
     public long hiImpedancePins;
     public long weakState;
     public String hash;
-    public MergerInput[] inputs;
+    public MergerInput[] inputs = new MergerInput[0];
     public byte[] weakStates = new byte[256];
 
     public BusMerger(Bus dest) {
@@ -60,8 +61,8 @@ public class BusMerger extends OutBus {
     @Override
     public void addDestination(IModelItem item, long mask, byte offset) {
         switch (item) {
-            case Pin ignored -> throw new RuntimeException("Use PinMerger for pin destination");
-            case Bus bus -> destinations = Utils.addToArray(destinations, bus);
+            case OutPin ignored -> throw new RuntimeException("Use PinMerger for pin destination");
+            case OutBus bus -> destinations = Utils.addToArray(destinations, bus);
             default -> throw new RuntimeException("Unsupported destination " + item.getClass().getName());
         }
     }

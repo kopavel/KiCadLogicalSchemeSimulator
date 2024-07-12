@@ -32,10 +32,10 @@
 package lv.pko.KiCadLogicalSchemeSimulator.components.oscillator;
 import lombok.Getter;
 import lv.pko.KiCadLogicalSchemeSimulator.api.AbstractUiComponent;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
-import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.InteractiveSchemaPart;
-import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import lv.pko.KiCadLogicalSchemeSimulator.tools.Log;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin.Pin;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.schemaPart.InteractiveSchemaPart;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.schemaPart.SchemaPart;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -44,7 +44,7 @@ import java.util.concurrent.TimeUnit;
 public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
     private final OscillatorUiComponent oscillatorUiComponent;
     public long ticks;
-    public OutPin out;
+    public Pin out;
     ScheduledExecutorService scheduler;
     @Getter
     private long clockPeriod = 1000000000;
@@ -58,7 +58,7 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
         if (sAliases != null) {
             outAlias = sAliases;
         }
-        addOutPin(outAlias, 1);
+        addOutPin(outAlias, true);
         oscillatorUiComponent = new OscillatorUiComponent(20, id, this);
     }
 
@@ -79,9 +79,27 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
                 try {
                     while (fullSpeedAlive) {
                         for (int i = 0; i < 1000; i++) {
-                            ticks += 2;
-                            out.setState(0);
-                            out.setState(1);
+                            ticks += 20;
+                            out.setState(false, true);
+                            out.setState(true, true);
+                            out.setState(false, true);
+                            out.setState(true, true);
+                            out.setState(false, true);
+                            out.setState(true, true);
+                            out.setState(false, true);
+                            out.setState(true, true);
+                            out.setState(false, true);
+                            out.setState(true, true);
+                            out.setState(false, true);
+                            out.setState(true, true);
+                            out.setState(false, true);
+                            out.setState(true, true);
+                            out.setState(false, true);
+                            out.setState(true, true);
+                            out.setState(false, true);
+                            out.setState(true, true);
+                            out.setState(false, true);
+                            out.setState(true, true);
                         }
                     }
                 } catch (Throwable e) {
@@ -132,7 +150,8 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
 
     void tick() {
         try {
-            out.setState(++ticks & 1);
+            out.state = !out.state;
+            out.setState(out.state, true);
         } catch (Throwable e) {
             Log.error(Oscillator.class, "TickError", e);
         }

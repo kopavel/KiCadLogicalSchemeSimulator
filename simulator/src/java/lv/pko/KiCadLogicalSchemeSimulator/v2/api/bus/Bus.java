@@ -30,21 +30,25 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus;
-import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import lombok.Getter;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.ModelItem;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.schemaPart.SchemaPart;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.model.bus.BusToPinAdapter;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public abstract class Bus extends ModelItem {
+    @Getter
     public final int size;
     public long state;
     public Map<String, Byte> aliasOffsets = new HashMap<>();
     public boolean useBitPresentation;
 
-    public Bus(Bus oldBus) {
-        this(oldBus.id, oldBus.parent, oldBus.size);
+    public Bus(Bus oldBus, String id) {
+        this(id + ":" + oldBus.id, oldBus.parent, oldBus.size);
         aliasOffsets = oldBus.aliasOffsets;
         useBitPresentation = oldBus.useBitPresentation;
         state = oldBus.state;
@@ -54,7 +58,7 @@ public abstract class Bus extends ModelItem {
         super(id, parent);
         this.size = size;
         if (aliases == null || aliases.length == 0) {
-            if (size == 1) {
+            if (size == 1 && !(this instanceof BusToPinAdapter)) {
                 throw new RuntimeException("Use Pin for Bus with size 1");
             } else {
                 for (byte i = 0; i < size; i++) {
@@ -73,8 +77,18 @@ public abstract class Bus extends ModelItem {
     }
 
     @Override
-    public String getStringState() {
-        return String.valueOf(state);
+    public Byte getAliasOffset(String pinName) {
+        return aliasOffsets.get(pinName);
+    }
+
+    @Override
+    public Set<String> getAliases() {
+        return aliasOffsets.keySet();
+    }
+
+    @Override
+    public long getState() {
+        return state;
     }
 
     abstract public void setState(long newState);
@@ -84,8 +98,13 @@ public abstract class Bus extends ModelItem {
         return this;
     }
 
-    public void resend(long state) {
-        setState(state);
+    @Override
+    public void resend() {
+        if (hiImpedance) {
+            setHiImpedance();
+        } else {
+            setState(state);
+        }
     }
 
     @Override

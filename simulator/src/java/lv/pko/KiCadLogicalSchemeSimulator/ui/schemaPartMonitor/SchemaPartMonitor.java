@@ -34,10 +34,11 @@ import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import lv.pko.KiCadLogicalSchemeSimulator.Simulator;
 import lv.pko.KiCadLogicalSchemeSimulator.api.AbstractUiComponent;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.TriStateOutPin;
-import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.IModelItem;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.ModelInItem;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus.Bus;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.schemaPart.SchemaPart;
 
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
@@ -55,8 +56,8 @@ public class SchemaPartMonitor extends JFrame {
     public final SchemaPart schemaPart;
     private final ScheduledExecutorService scheduler;
     private final JTextArea extraPanel;
-    InPin[] ins = new InPin[0];
-    OutPin[] outs = new OutPin[0];
+    ModelInItem[] ins = new ModelInItem[0];
+    IModelItem[] outs = new IModelItem[0];
     JLabel[] insLabels = new JLabel[0];
     JLabel[] outsLabels = new JLabel[0];
     Long[] insMask = new Long[0];
@@ -87,12 +88,12 @@ public class SchemaPartMonitor extends JFrame {
         schemaPart = Simulator.model.schemaParts.get(id);
         title.setText(id);
         schemaPartBox.setBorder(BorderFactory.createLineBorder(borderColor));
-        for (InPin inPin : schemaPart.inMap.values()) {
+        for (ModelInItem inItem : schemaPart.inMap.values()) {
             JLabel label;
-            if (inPin.useBitPresentation) {
-                char[] bits = leftPad(Long.toBinaryString(inPin.getState()), inPin.size, '0').toCharArray();
-                for (int j = 0; j < inPin.size; j++) {
-                    label = new JLabel(inPin.id + j);
+            if (inItem instanceof Bus bus && bus.useBitPresentation) {
+                char[] bits = leftPad(Long.toBinaryString(bus.state), bus.size, '0').toCharArray();
+                for (int j = 0; j < bus.size; j++) {
+                    label = new JLabel(bus.id + j);
                     label.setBorder(BorderFactory.createEmptyBorder(3, 2, 4, 0));
                     label.setAlignmentX(Component.LEFT_ALIGNMENT);
                     label.setFont(AbstractUiComponent.monospacedFont);
@@ -102,33 +103,33 @@ public class SchemaPartMonitor extends JFrame {
                     label.setAlignmentX(RIGHT_ALIGNMENT);
                     label.setBorder(new CompoundBorder(BorderFactory.createEmptyBorder(2, 2, 1, 0),
                             new CompoundBorder(BorderFactory.createLineBorder(borderColor), BorderFactory.createEmptyBorder(1, 5, 1, 5))));
-                    ins = addToArray(ins, inPin);
+                    ins = addToArray(ins, inItem);
                     insLabels = addToArray(insLabels, label);
                     inputsValues.add(label);
                     insMask = addToArray(insMask, 1L << j);
                 }
             } else {
-                label = new JLabel(inPin.id);
+                label = new JLabel(inItem.getId());
                 label.setBorder(BorderFactory.createEmptyBorder(3, 2, 4, 0));
                 label.setAlignmentX(Component.LEFT_ALIGNMENT);
                 label.setFont(AbstractUiComponent.monospacedFont);
                 inputsNames.add(label);
-                label = new JLabel(String.format("%" + (int) Math.ceil(inPin.size / 4d) + "X", inPin.getState()));
+                label = new JLabel(String.format("%" + (int) Math.ceil(inItem.getSize() / 4d) + "X", inItem.getState()));
                 label.setFont(AbstractUiComponent.monospacedFont);
                 label.setAlignmentX(RIGHT_ALIGNMENT);
                 label.setBorder(new CompoundBorder(BorderFactory.createEmptyBorder(2, 2, 1, 0),
                         new CompoundBorder(BorderFactory.createLineBorder(borderColor), BorderFactory.createEmptyBorder(1, 5, 1, 5))));
-                ins = addToArray(ins, inPin);
+                ins = addToArray(ins, inItem);
                 insLabels = addToArray(insLabels, label);
                 inputsValues.add(label);
             }
         }
-        for (OutPin pin : schemaPart.outMap.values()) {
+        for (IModelItem outItem : schemaPart.outMap.values()) {
             JLabel label;
-            if (pin.useBitPresentation) {
-                char[] bits = leftPad(Long.toBinaryString(pin.state), pin.size, '0').toCharArray();
-                for (int j = 0; j < pin.size; j++) {
-                    label = new JLabel(pin.id + j);
+            if (outItem instanceof Bus bus && bus.useBitPresentation) {
+                char[] bits = leftPad(Long.toBinaryString(bus.state), bus.size, '0').toCharArray();
+                for (int j = 0; j < bus.size; j++) {
+                    label = new JLabel(bus.id + j);
                     label.setBorder(BorderFactory.createEmptyBorder(3, 0, 4, 2));
                     label.setAlignmentX(Component.RIGHT_ALIGNMENT);
                     label.setFont(AbstractUiComponent.monospacedFont);
@@ -139,23 +140,23 @@ public class SchemaPartMonitor extends JFrame {
                     label.setBorder(new CompoundBorder(BorderFactory.createEmptyBorder(2, 0, 1, 2),
                             new CompoundBorder(BorderFactory.createLineBorder(borderColor), BorderFactory.createEmptyBorder(1, 5, 1, 5))));
                     outputsValues.add(label);
-                    outs = addToArray(outs, pin);
+                    outs = addToArray(outs, outItem);
                     outsLabels = addToArray(outsLabels, label);
                     outsMask = addToArray(outsMask, 1L << j);
                 }
             } else {
-                label = new JLabel(pin.id);
+                label = new JLabel(outItem.getId());
                 label.setBorder(BorderFactory.createEmptyBorder(3, 0, 4, 2));
                 label.setAlignmentX(Component.RIGHT_ALIGNMENT);
                 label.setFont(AbstractUiComponent.monospacedFont);
                 outputsNames.add(label);
-                label = new JLabel(String.format("%" + (int) Math.ceil(pin.size / 4d) + "X", pin.state));
+                label = new JLabel(String.format("%" + (int) Math.ceil(outItem.getSize() / 4d) + "X", outItem.getState()));
                 label.setFont(AbstractUiComponent.monospacedFont);
                 label.setAlignmentX(LEFT_ALIGNMENT);
                 label.setBorder(new CompoundBorder(BorderFactory.createEmptyBorder(2, 0, 1, 2),
                         new CompoundBorder(BorderFactory.createLineBorder(borderColor), BorderFactory.createEmptyBorder(1, 5, 1, 5))));
                 outputsValues.add(label);
-                outs = addToArray(outs, pin);
+                outs = addToArray(outs, outItem);
                 outsLabels = addToArray(outsLabels, label);
             }
         }
@@ -188,20 +189,20 @@ public class SchemaPartMonitor extends JFrame {
     private void reDraw() {
         SwingUtilities.invokeLater(() -> {
             for (int i = 0; i < ins.length; i++) {
-                if (ins[i].useBitPresentation) {
-                    insLabels[i].setText((ins[i].getState() & insMask[i]) > 0 ? "1" : "0");
+                if (ins[i] instanceof Bus bus && bus.useBitPresentation) {
+                    insLabels[i].setText((bus.state & insMask[i]) > 0 ? "1" : "0");
                 } else {
-                    insLabels[i].setText(String.format("%" + (int) Math.ceil(ins[i].size / 4d) + "X", ins[i].getState()));
+                    insLabels[i].setText(String.format("%" + (int) Math.ceil(ins[i].getSize() / 4d) + "X", ins[i].getState()));
                 }
             }
             for (int i = 0; i < outs.length; i++) {
-                OutPin out = outs[i];
+                IModelItem out = outs[i];
                 if (out instanceof TriStateOutPin triStateOutPin && triStateOutPin.hiImpedance) {
                     outsLabels[i].setText("Hi");
-                } else if (out.useBitPresentation) {
-                    outsLabels[i].setText((out.state & outsMask[i]) > 0 ? "1" : "0");
+                } else if (out instanceof Bus bus && bus.useBitPresentation) {
+                    outsLabels[i].setText((bus.state & outsMask[i]) > 0 ? "1" : "0");
                 } else {
-                    outsLabels[i].setText(String.format("%" + (int) Math.ceil(out.size / 4d) + "X", out.state));
+                    outsLabels[i].setText(String.format("%" + (int) Math.ceil(out.getSize() / 4d) + "X", out.getState()));
                 }
             }
             String extraState = schemaPart.extraState();

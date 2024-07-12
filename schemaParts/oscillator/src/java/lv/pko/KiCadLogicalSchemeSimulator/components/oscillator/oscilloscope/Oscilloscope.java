@@ -30,8 +30,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.KiCadLogicalSchemeSimulator.components.oscillator.oscilloscope;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
 import lv.pko.KiCadLogicalSchemeSimulator.components.oscillator.OscillatorUi;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.IModelItem;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -86,7 +86,7 @@ public class Oscilloscope extends JFrame {
         diagram.addPin(parent.parent.parent.out, parent.parent.parent.out.getName());
     }
 
-    public void addPin(OutPin pin, String name) {
+    public void addPin(IModelItem pin, String name) {
         watchedItemNamesPanel.add(new FixedHeightLabel(name));
         watchedItemNamesPanel.revalidate();
         //FixMe check if diagram need to be pinBased, not busBased

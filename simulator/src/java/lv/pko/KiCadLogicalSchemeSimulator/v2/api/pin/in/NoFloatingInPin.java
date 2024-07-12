@@ -30,12 +30,17 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin.in;
-import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.FloatingInException;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin.Pin;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.schemaPart.SchemaPart;
 
 public abstract class NoFloatingInPin extends InPin {
     public NoFloatingInPin(String id, SchemaPart parent) {
         super(id, parent);
+    }
+
+    public NoFloatingInPin(Pin oldPin) {
+        super(oldPin);
     }
 
     @Override

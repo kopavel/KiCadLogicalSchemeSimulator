@@ -30,15 +30,15 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.KiCadLogicalSchemeSimulator.components.counter;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.FallingEdgeInPin;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.RisingEdgeInPin;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
-import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import lv.pko.KiCadLogicalSchemeSimulator.tools.Utils;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus.Bus;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin.in.FallingEdgeInPin;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin.in.RisingEdgeInPin;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.schemaPart.SchemaPart;
 
 public class Counter extends SchemaPart {
     private final long countMask;
-    private OutPin outPin;
+    private Bus outBus;
     private long count = 0;
 
     protected Counter(String id, String sParam) {
@@ -56,20 +56,22 @@ public class Counter extends SchemaPart {
             throw new RuntimeException("Component " + id + " size must be positive number");
         }
         countMask = Utils.getMaskForSize(pinAmount);
-        addOutPin("Q", pinAmount);
+        addOutBus("Q", pinAmount);
         if (reverse) {
             addInPin(new FallingEdgeInPin("C", this) {
                 @Override
                 public void onFallingEdge() {
                     count = (count + 1) & countMask;
-                    outPin.setState(count);
+                    outBus.state = count;
+                    outBus.setState(count);
                 }
             });
             addInPin(new FallingEdgeInPin("R", this) {
                 @Override
                 public void onFallingEdge() {
                     count = 0;
-                    outPin.setState(count);
+                    outBus.state = 0;
+                    outBus.setState(count);
                 }
             });
         } else {
@@ -77,14 +79,16 @@ public class Counter extends SchemaPart {
                 @Override
                 public void onRisingEdge() {
                     count = (count + 1) & countMask;
-                    outPin.setState(count);
+                    outBus.state = count;
+                    outBus.setState(count);
                 }
             });
             addInPin(new RisingEdgeInPin("R", this) {
                 @Override
                 public void onRisingEdge() {
                     count = 0;
-                    outPin.setState(count);
+                    outBus.state = 0;
+                    outBus.setState(count);
                 }
             });
         }
@@ -92,13 +96,14 @@ public class Counter extends SchemaPart {
 
     @Override
     public void initOuts() {
-        outPin = getOutPin("Q");
-        outPin.useBitPresentation = true;
+        outBus = getOutBus("Q");
+        outBus.useBitPresentation = true;
     }
 
     @Override
     public void reset() {
         count = 0;
-        outPin.setState(0);
+        outBus.state = 0;
+        outBus.setState(0);
     }
 }

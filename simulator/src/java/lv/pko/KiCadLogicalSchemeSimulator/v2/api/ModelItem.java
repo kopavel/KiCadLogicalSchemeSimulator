@@ -31,12 +31,12 @@
  */
 package lv.pko.KiCadLogicalSchemeSimulator.v2.api;
 import lombok.Getter;
-import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.schemaPart.SchemaPart;
 
+@Getter
 public abstract class ModelItem implements IModelItem {
     public final String id;
     public final SchemaPart parent;
-    @Getter
     public boolean hiImpedance;
 
     protected ModelItem(String id, SchemaPart parent) {
@@ -53,5 +53,4 @@ public abstract class ModelItem implements IModelItem {
     }
 
     public abstract void setHiImpedance();
-    public abstract String getStringState();
 }

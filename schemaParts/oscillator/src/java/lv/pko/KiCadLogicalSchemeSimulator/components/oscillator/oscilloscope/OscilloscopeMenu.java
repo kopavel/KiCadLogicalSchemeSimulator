@@ -31,8 +31,8 @@
  */
 package lv.pko.KiCadLogicalSchemeSimulator.components.oscillator.oscilloscope;
 import lv.pko.KiCadLogicalSchemeSimulator.Simulator;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.IModelItem;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.ModelInItem;
 
 import javax.swing.*;
 import java.util.List;
@@ -46,24 +46,24 @@ public class OscilloscopeMenu extends JMenuBar {
         add(outPinMenu);
         JMenu inPinMenu = new JMenu(Oscilloscope.localization.getString("InPins"));
         add(inPinMenu);
-        List<OutPin> outPins = Simulator.model.schemaParts.values()
+        List<IModelItem> outPins = Simulator.model.schemaParts.values()
                 .stream()
                 .flatMap(p -> p.outMap.values()
                         .stream())
                 .toList();
-        for (OutPin pin : outPins) {
+        for (IModelItem pin : outPins) {
             JMenuItem outPinItem = new JMenuItem(pin.getName());
             outPinItem.addActionListener(e -> oscilloscope.addPin(pin, pin.getName()));
             outPinMenu.add(outPinItem);
         }
-        List<InPin> inPins = Simulator.model.schemaParts.values()
+        List<ModelInItem> inPins = Simulator.model.schemaParts.values()
                 .stream()
                 .flatMap(p -> p.inMap.values()
                         .stream())
                 .toList();
-        for (InPin pin : inPins) {
+        for (ModelInItem pin : inPins) {
             JMenuItem inPinItem = new JMenuItem(pin.getName());
-            inPinItem.addActionListener(e -> oscilloscope.addPin(pin.source, pin.getName()));
+            inPinItem.addActionListener(e -> oscilloscope.addPin(pin, pin.getName()));
             inPinMenu.add(inPinItem);
         }
     }

@@ -30,6 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.KiCadLogicalSchemeSimulator.v2.api;
-public interface ModelOutItem {
+public interface ModelOutItem extends IModelItem {
     void addDestination(IModelItem pin, long mask, byte offset);
+    IModelItem getOptimised();
 }

@@ -29,21 +29,9 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lv.pko.KiCadLogicalSchemeSimulator.v2.api;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.schemaPart.SchemaPart;
+package lv.pko.KiCadLogicalSchemeSimulator.v2.api.schemaPart;
+import lv.pko.KiCadLogicalSchemeSimulator.api.AbstractUiComponent;
 
-import java.util.Set;
-
-public interface IModelItem {
-    String getName();
-    int getSize();
-    long getState();
-    boolean isHiImpedance();
-    boolean isStrong();
-    Byte getAliasOffset(String pinName);
-    Set<String> getAliases();
-    SchemaPart getParent();
-    String getId();
-    IModelItem getOptimised();
-    void resend();
+public interface InteractiveSchemaPart {
+    AbstractUiComponent getComponent();
 }

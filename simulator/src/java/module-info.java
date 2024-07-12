@@ -33,6 +33,7 @@ import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
 
 module KiCadLogicalSchemeSimulator.simulator {
     uses SchemaPartSpi;
+    uses lv.pko.KiCadLogicalSchemeSimulator.v2.api.schemaPart.SchemaPartSpi;
     requires static lombok;
     requires java.desktop;
     requires com.formdev.flatlaf;
@@ -66,6 +67,13 @@ module KiCadLogicalSchemeSimulator.simulator {
     exports lv.pko.KiCadLogicalSchemeSimulator.api.pins.in;
     exports lv.pko.KiCadLogicalSchemeSimulator.api.pins.out;
     exports lv.pko.KiCadLogicalSchemeSimulator.parsers.pojo;
+    exports lv.pko.KiCadLogicalSchemeSimulator.v2.api;
+    exports lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus;
+    exports lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus.in;
+    exports lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin;
+    exports lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin.in;
+    exports lv.pko.KiCadLogicalSchemeSimulator.v2.api.schemaPart;
+    exports lv.pko.KiCadLogicalSchemeSimulator.v2;
     opens lv.pko.KiCadLogicalSchemeSimulator.parsers.pojo;
     exports lv.pko.KiCadLogicalSchemeSimulator.parsers.pojo.symbolMap;
     opens lv.pko.KiCadLogicalSchemeSimulator.parsers.pojo.symbolMap;

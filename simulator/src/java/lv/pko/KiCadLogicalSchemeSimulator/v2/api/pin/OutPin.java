@@ -30,16 +30,16 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin;
-import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import lv.pko.KiCadLogicalSchemeSimulator.tools.Utils;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.IModelItem;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.ModelOutItem;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus.Bus;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.schemaPart.SchemaPart;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.model.pin.NCOutPin;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.model.pin.PinToBusAdapter;
 
 public class OutPin extends Pin implements ModelOutItem {
-    public Pin[] destinations;
+    public Pin[] destinations = new Pin[0];
 
     public OutPin(String id, SchemaPart parent, boolean strong) {
         super(id, parent);
@@ -53,12 +53,8 @@ public class OutPin extends Pin implements ModelOutItem {
 
     public void addDestination(IModelItem item, long mask, byte offset) {
         switch (item) {
-            case Pin pin -> {
-                destinations = Utils.addToArray(destinations, pin);
-            }
-            case Bus bus -> {
-                destinations = Utils.addToArray(destinations, new PinToBusAdapter(bus, offset));
-            }
+            case Pin pin -> destinations = Utils.addToArray(destinations, pin);
+            case Bus bus -> destinations = Utils.addToArray(destinations, new PinToBusAdapter(bus, offset));
             default -> throw new RuntimeException("Unsupported destination " + item.getClass().getName());
         }
     }
@@ -79,7 +75,9 @@ public class OutPin extends Pin implements ModelOutItem {
 
     public void resend() {
         for (Pin destination : destinations) {
-            destination.resend(state, strong);
+            destination.state = state;
+            destination.strong = strong;
+            destination.resend();
         }
     }
 

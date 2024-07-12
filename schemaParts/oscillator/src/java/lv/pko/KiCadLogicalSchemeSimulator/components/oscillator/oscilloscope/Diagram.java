@@ -30,10 +30,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.KiCadLogicalSchemeSimulator.components.oscillator.oscilloscope;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.TriStateOutPin;
 import lv.pko.KiCadLogicalSchemeSimulator.tools.UiTools;
 import lv.pko.KiCadLogicalSchemeSimulator.tools.ringBuffers.*;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.IModelItem;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus.Bus;
 
 import javax.swing.*;
 import java.awt.*;
@@ -82,13 +82,13 @@ public class Diagram extends JPanel {
         });
     }
 
-    public void addPin(OutPin out, String name) {
+    public void addPin(IModelItem out, String name) {
         pins.add(new PinItem(out, name));
         revalidate();
     }
 
     public void tick() {
-        pins.forEach(item -> item.buffer.put(item.pin instanceof TriStateOutPin triStateOutPin && triStateOutPin.hiImpedance ? -1 : item.pin.state & item.pin.mask));
+        pins.forEach(item -> item.buffer.put(item.pin instanceof Bus bus && bus.hiImpedance ? -1 : item.pin.getState()));
     }
 
     @Override
@@ -100,7 +100,7 @@ public class Diagram extends JPanel {
         int yPos = 10;
         int maxOffset = 0;
         for (PinItem pinItem : pins) {
-            boolean singlePin = pinItem.pin.size == 1;
+            boolean singlePin = pinItem.pin.getSize() == 1;
             DiagramState prevDiagramState = HiImpedance;
             DiagramState currDiagramState = null;
             IRingBufferSlice values = pinItem.buffer.take(offset + ticksInDiagramm + 1, ticksInDiagramm + 2);
@@ -177,7 +177,7 @@ public class Diagram extends JPanel {
                             linePos = yPos + BAR_BOTTOM;
                             g2d.drawLine((int) previousX, linePos, (int) xPos, linePos);
                             if (prevDiagramState == MultiChange) {
-                                UiTools.print(curState & pinItem.pin.mask, (int) previousX + 5, yPos, (int) Math.ceil(pinItem.pin.size / 4f), g2d);
+                                UiTools.print(curState, (int) previousX + 5, yPos, (int) Math.ceil(pinItem.pin.getSize() / 4f), g2d);
                             }
                             break;
                         case BusChange:
@@ -195,7 +195,7 @@ public class Diagram extends JPanel {
                                 g2d.drawLine((int) previousX, linePos2, (int) previousX + 2, linePos);
                                 g2d.drawLine((int) previousX, linePos, (int) previousX + 2, linePos2);
                             }
-                            UiTools.print(curState & pinItem.pin.mask, (int) previousX + 5, yPos, (int) Math.ceil(pinItem.pin.size / 4f), g2d);
+                            UiTools.print(curState, (int) previousX + 5, yPos, (int) Math.ceil(pinItem.pin.getSize() / 4f), g2d);
                             break;
                         case MultiChange:
                             setColor(g2d, Color.green);
@@ -226,18 +226,18 @@ public class Diagram extends JPanel {
     }
 
     private static final class PinItem implements Comparable<PinItem> {
-        private final OutPin pin;
+        private final IModelItem pin;
         private final String name;
         private final RingBuffer buffer;
 
-        private PinItem(OutPin pin, String name) {
+        private PinItem(IModelItem pin, String name) {
             this.pin = pin;
             this.name = name;
-            if (pin.size < 8) {
+            if (pin.getSize() < 8) {
                 this.buffer = new ByteRingBuffer();
-            } else if (pin.size < 16) {
+            } else if (pin.getSize() < 16) {
                 this.buffer = new ShortRingBuffer();
-            } else if (pin.size < 32) {
+            } else if (pin.getSize() < 32) {
                 this.buffer = new IntRingBuffer();
             } else {
                 this.buffer = new LongRingBuffer();

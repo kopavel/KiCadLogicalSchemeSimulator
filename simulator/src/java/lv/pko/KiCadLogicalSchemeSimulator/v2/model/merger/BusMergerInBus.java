@@ -38,7 +38,7 @@ public class BusMergerInBus extends InBus implements MergerInput {
     private final BusMerger merger;
 
     public BusMergerInBus(Bus source, long mask, BusMerger merger) {
-        super(source);
+        super(source, "BMergeBIn");
         this.mask = mask;
         this.merger = merger;
     }

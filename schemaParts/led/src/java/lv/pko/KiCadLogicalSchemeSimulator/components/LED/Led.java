@@ -31,11 +31,10 @@
  */
 package lv.pko.KiCadLogicalSchemeSimulator.components.LED;
 import lv.pko.KiCadLogicalSchemeSimulator.api.AbstractUiComponent;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.FloatingPinException;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
-import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.InteractiveSchemaPart;
-import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import lv.pko.KiCadLogicalSchemeSimulator.tools.UiTools;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin.in.NoFloatingInPin;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.schemaPart.InteractiveSchemaPart;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.schemaPart.SchemaPart;
 
 import java.awt.*;
 
@@ -44,13 +43,11 @@ public class Led extends SchemaPart implements InteractiveSchemaPart {
 
     protected Led(String id, String sParams) {
         super(id, sParams);
-        addInPin(new InPin("IN", this) {
+        addInPin(new NoFloatingInPin("IN", this) {
             @Override
-            public void onChange(long newState, boolean hiImpedance, boolean strong) {
-                if (hiImpedance) {
-                    throw new FloatingPinException(this);
-                }
-                ledUiComponent.setState(state > 0);
+            public void setState(boolean newState, boolean strong) {
+                state = newState;
+                ledUiComponent.setState(state);
             }
         });
         int size = Integer.parseInt(params.getOrDefault("size", "20"));

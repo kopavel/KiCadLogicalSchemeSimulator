@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.KiCadLogicalSchemeSimulator.v2.model.bus;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus.Bus;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.IModelItem;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus.OutBus;
 
 public class NCOutBus extends OutBus {
@@ -40,7 +40,7 @@ public class NCOutBus extends OutBus {
     }
 
     @Override
-    public void addDestination(Bus bus, long mask, byte offset) {
+    public void addDestination(IModelItem bus, long mask, byte offset) {
         throw new RuntimeException("Can't add destination to NC Out Pin");
     }
 

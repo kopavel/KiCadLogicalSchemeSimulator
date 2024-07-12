@@ -30,11 +30,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus;
-import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import lv.pko.KiCadLogicalSchemeSimulator.tools.Utils;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.IModelItem;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.ModelOutItem;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin.Pin;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.schemaPart.SchemaPart;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.model.bus.BusToPinAdapter;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.model.bus.MaskGroupBus;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.model.bus.NCOutBus;
@@ -43,7 +43,7 @@ import lv.pko.KiCadLogicalSchemeSimulator.v2.model.bus.OffsetBus;
 import java.util.Arrays;
 
 public class OutBus extends Bus implements ModelOutItem {
-    public Bus[] destinations;
+    public Bus[] destinations = new Bus[0];
     public long mask;
 
     public OutBus(String id, SchemaPart parent, int size, String... names) {
@@ -51,18 +51,23 @@ public class OutBus extends Bus implements ModelOutItem {
         mask = Utils.getMaskForSize(size);
     }
 
-    public OutBus(OutBus oldPin) {
-        super(oldPin);
+    public OutBus(OutBus oldPin, String id) {
+        super(oldPin, id);
+        mask = oldPin.mask;
     }
 
     public void addDestination(IModelItem item, long mask, byte offset) {
         switch (item) {
             case Pin pin -> {
-                BusToPinAdapter bus = new BusToPinAdapter(pin, offset);
+                BusToPinAdapter bus = new BusToPinAdapter(pin, mask);
                 Arrays.stream(destinations)
                         .filter(d -> d instanceof MaskGroupBus)
                         .map(d -> ((MaskGroupBus) d))
-                        .filter(d -> d.mask == bus.mask).findFirst().orElse(new MaskGroupBus(this, bus.mask)).addDestination(bus);
+                        .filter(d -> d.mask == bus.mask).findFirst().orElseGet(() -> {
+                          MaskGroupBus groupBus = new MaskGroupBus(this, bus.mask, "Mask" + mask);
+                          destinations = Utils.addToArray(destinations, groupBus);
+                          return groupBus;
+                      }).addDestination(bus);
             }
             case Bus bus -> {
                 if (offset != 0) {
@@ -72,7 +77,11 @@ public class OutBus extends Bus implements ModelOutItem {
                     Arrays.stream(destinations)
                             .filter(d -> d instanceof MaskGroupBus)
                             .map(d -> ((MaskGroupBus) d))
-                            .filter(d -> d.mask == mask).findFirst().orElse(new MaskGroupBus(this, mask)).addDestination(bus);
+                            .filter(d -> d.mask == mask).findFirst().orElseGet(() -> {
+                              MaskGroupBus groupBus = new MaskGroupBus(this, mask, "Mask" + mask);
+                              destinations = Utils.addToArray(destinations, groupBus);
+                              return groupBus;
+                          }).addDestination(bus);
                 } else {
                     destinations = Utils.addToArray(destinations, bus);
                 }
@@ -97,7 +106,8 @@ public class OutBus extends Bus implements ModelOutItem {
 
     public void resend() {
         for (Bus destination : destinations) {
-            destination.resend(state);
+            destination.state = state;
+            destination.resend();
         }
     }
 

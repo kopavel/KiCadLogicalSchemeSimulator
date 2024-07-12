@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin.in;
-import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.schemaPart.SchemaPart;
 
 public abstract class FallingEdgeInPin extends EdgeInPin {
     public FallingEdgeInPin(String id, SchemaPart parent) {
@@ -43,6 +43,7 @@ public abstract class FallingEdgeInPin extends EdgeInPin {
 
     @Override
     public void setState(boolean newState, boolean strong) {
+        state = newState;
         if (!newState) {
             onFallingEdge();
         }

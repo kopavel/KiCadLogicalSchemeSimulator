@@ -30,8 +30,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.KiCadLogicalSchemeSimulator.v2.model.pin;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.IModelItem;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin.OutPin;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin.Pin;
 
 public class NCOutPin extends OutPin {
     public NCOutPin(OutPin outPin) {
@@ -39,7 +39,7 @@ public class NCOutPin extends OutPin {
     }
 
     @Override
-    public void addDestination(Pin pin) {
+    public void addDestination(IModelItem item, long mask, byte offset) {
         throw new RuntimeException("Can't add destination to NC Out Pin");
     }
 

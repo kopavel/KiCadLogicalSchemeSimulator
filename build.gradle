@@ -121,6 +121,7 @@ configure(subprojects) {
     }
     tasks.named('assemble') {
         group '_build'
+        dependsOn(rootProject.tasks.named('cleanBuild'))
     }
 
 }

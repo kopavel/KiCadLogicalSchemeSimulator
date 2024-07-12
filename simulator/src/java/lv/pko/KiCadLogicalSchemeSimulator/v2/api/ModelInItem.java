@@ -30,20 +30,5 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.KiCadLogicalSchemeSimulator.v2.api;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.schemaPart.SchemaPart;
-
-import java.util.Set;
-
-public interface IModelItem {
-    String getName();
-    int getSize();
-    long getState();
-    boolean isHiImpedance();
-    boolean isStrong();
-    Byte getAliasOffset(String pinName);
-    Set<String> getAliases();
-    SchemaPart getParent();
-    String getId();
-    IModelItem getOptimised();
-    void resend();
+public interface ModelInItem extends IModelItem {
 }

@@ -30,23 +30,14 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.KiCadLogicalSchemeSimulator.components.power;
-import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.schemaPart.SchemaPart;
 
 public class Power extends SchemaPart {
     protected Power(String id, String sParams) {
         super(id, sParams);
-        String state = params.get("state");
-        if (state == null || state.isBlank()) {
-            throw new RuntimeException("Component " + id + " with type Power must have parameter state (1/0)");
-        }
+        boolean state = params.containsKey("hi");
         boolean strong = params.containsKey("strong");
-        int val;
-        try {
-            val = Integer.parseInt(state);
-        } catch (NumberFormatException e) {
-            throw new RuntimeException("Component " + id + " with type Power  parameter state must be a 1/0 ");
-        }
-        addPullPin("OUT", val, strong);
+        addOutPin("OUT", state, strong);
     }
 
     @Override

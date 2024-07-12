@@ -30,15 +30,16 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus.in;
-import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.ModelInItem;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus.Bus;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.schemaPart.SchemaPart;
 
-public abstract class InBus extends Bus {
+public abstract class InBus extends Bus implements ModelInItem {
     public InBus(String id, SchemaPart parent, int size, String... names) {
         super(id, parent, size, names);
     }
 
-    public InBus(Bus source) {
-        super(source);
+    public InBus(Bus source, String id) {
+        super(source, id);
     }
 }

@@ -36,16 +36,21 @@ import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin.Pin;
 public class BusToPinAdapter extends Bus {
     public final Pin destination;
     public final long mask;
+    private boolean pinState;
 
-    public BusToPinAdapter(Pin destination, byte offset) {
+    public BusToPinAdapter(Pin destination, long mask) {
         super(destination.id, destination.parent, 1);
         this.destination = destination;
-        mask = 1L << offset;
+        this.mask = mask;
     }
 
     @Override
     public void setState(long newState) {
-        destination.setState((newState & mask) > 0, true);
+        boolean newPinState = (newState & mask) > 0;
+        if (pinState != newPinState) {
+            pinState = newPinState;
+            destination.setState(newPinState, true);
+        }
     }
 
     @Override

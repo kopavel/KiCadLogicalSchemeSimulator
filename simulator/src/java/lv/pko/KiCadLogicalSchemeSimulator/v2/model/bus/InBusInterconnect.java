@@ -29,21 +29,35 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lv.pko.KiCadLogicalSchemeSimulator.v2.api;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.schemaPart.SchemaPart;
+package lv.pko.KiCadLogicalSchemeSimulator.v2.model.bus;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus.in.InBus;
 
-import java.util.Set;
+public class InBusInterconnect extends InBus {
+    private final InBus destination;
+    private final long interconnectMask;
+    private final long inverseInterconnectMask;
 
-public interface IModelItem {
-    String getName();
-    int getSize();
-    long getState();
-    boolean isHiImpedance();
-    boolean isStrong();
-    Byte getAliasOffset(String pinName);
-    Set<String> getAliases();
-    SchemaPart getParent();
-    String getId();
-    IModelItem getOptimised();
-    void resend();
+    public InBusInterconnect(InBus destination, long interconnectMask) {
+        super(destination.id, destination.parent, destination.size, destination.aliasOffsets.keySet().toArray(String[]::new));
+        this.destination = destination;
+        this.interconnectMask = interconnectMask;
+        this.inverseInterconnectMask = ~interconnectMask;
+        //FixMe check if shortcut multiple out pins.
+    }
+
+    @Override
+    public void setState(long newState) {
+        if ((newState & interconnectMask) > 0) {
+            destination.state = newState | interconnectMask;
+            destination.setState(destination.state);
+        } else {
+            destination.state = newState & inverseInterconnectMask;
+            destination.setState(destination.state);
+        }
+    }
+
+    @Override
+    public void setHiImpedance() {
+        destination.setHiImpedance();
+    }
 }

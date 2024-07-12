@@ -31,8 +31,10 @@
  */
 package lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin;
 import lombok.Getter;
-import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.ModelItem;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.schemaPart.SchemaPart;
+
+import java.util.Set;
 
 public abstract class Pin extends ModelItem {
     public boolean state;
@@ -52,8 +54,13 @@ public abstract class Pin extends ModelItem {
     abstract public void setState(boolean newState, boolean strong);
 
     @Override
-    public String getStringState() {
-        return state ? "1" : "0";
+    public int getSize() {
+        return 1;
+    }
+
+    @Override
+    public long getState() {
+        return state ? 1L : 0L;
     }
 
     @Override
@@ -61,7 +68,21 @@ public abstract class Pin extends ModelItem {
         return this;
     }
 
-    public void resend(boolean state, boolean strong) {
-        setState(state, strong);
+    @Override
+    public Byte getAliasOffset(String pinName) {
+        return 0;
+    }
+
+    @Override
+    public Set<String> getAliases() {
+        return Set.of(id);
+    }
+
+    public void resend() {
+        if (hiImpedance) {
+            setHiImpedance();
+        } else {
+            setState(state, strong);
+        }
     }
 }

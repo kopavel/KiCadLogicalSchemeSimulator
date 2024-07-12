@@ -31,58 +31,60 @@
  */
 package lv.pko.KiCadLogicalSchemeSimulator.v2.model.bus;
 import lv.pko.KiCadLogicalSchemeSimulator.tools.Utils;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.FloatingInException;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.ShortcutException;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus.Bus;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus.OutBus;
 
 public class MaskGroupBus extends OutBus {
-    public MaskGroupBus(OutBus source, long mask) {
-        super(source);
+    private long maskState;
+
+    public MaskGroupBus(OutBus source, long mask, String id) {
+        super(source, id);
         this.mask = mask;
     }
 
-    public MaskGroupBus(MaskGroupBus oldPin) {
-        super(oldPin);
-        mask = oldPin.mask;
+    public MaskGroupBus(MaskGroupBus source, String id) {
+        super(source, id);
     }
 
     public void addDestination(Bus bus) {
+        if (bus instanceof BusToPinAdapter adapter) {
+            bus = new BusToPinAdapter(adapter.destination, 0) {
+                @Override
+                public void setState(long newState) {
+                    destination.setState(newState != 0, true);
+                }
+            };
+        }
         destinations = Utils.addToArray(destinations, bus);
     }
 
+    @Override
     public void setState(long newState) {
         long maskState = newState & mask;
-        if (state != maskState) {
-            state = maskState;
+        if (this.maskState != maskState) {
+            this.maskState = maskState;
             for (Bus destination : destinations) {
                 destination.setState(maskState);
             }
         }
     }
 
-    public void resend(long newState, boolean strong) {
-        RuntimeException result = null;
-        long maskState = newState & mask;
-        for (Bus destination : destinations) {
-            try {
-                destination.setState(maskState);
-            } catch (FloatingInException | ShortcutException e) {
-                if (result == null) {
-                    result = e;
-                }
-            }
-        }
-        if (result != null) {
-            throw result;
-        }
-        state = maskState;
-    }
-
     @Override
     public Bus getOptimised() {
         if (destinations == null) {
             return new NCOutBus(this);
+        } else if (destinations.length == 1) {
+            Bus destination = destinations[0];
+            return new MaskGroupBus(MaskGroupBus.this, "SingleDestination") {
+                @Override
+                public void setState(long newState) {
+                    long newMaskState = newState & mask;
+                    if (maskState != newMaskState) {
+                        maskState = newMaskState;
+                        destination.setState(newMaskState);
+                    }
+                }
+            };
         } else {
             return this;
         }

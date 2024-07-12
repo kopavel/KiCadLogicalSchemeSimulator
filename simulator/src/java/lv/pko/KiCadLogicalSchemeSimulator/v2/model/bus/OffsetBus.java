@@ -38,7 +38,7 @@ public class OffsetBus extends Bus {
     private final byte nOffset;
 
     public OffsetBus(Bus destination, byte offset) {
-        super(destination);
+        super(destination, "offset" + offset);
         if (offset == 0) {
             throw new RuntimeException("Offset must not be 0");
         }

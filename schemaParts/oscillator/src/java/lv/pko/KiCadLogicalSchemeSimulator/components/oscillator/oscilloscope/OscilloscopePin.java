@@ -30,22 +30,23 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.KiCadLogicalSchemeSimulator.components.oscillator.oscilloscope;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin.Pin;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin.in.NoFloatingInPin;
 
-public class OscilloscopePin extends OutPin {
-    public final OutPin wrapped;
+public class OscilloscopePin extends NoFloatingInPin {
+    public final Pin wrapped;
     private final Oscilloscope oscilloscope;
 
-    public OscilloscopePin(OutPin wrapped, Oscilloscope oscilloscope) {
-        super(wrapped.id, wrapped.parent, wrapped.size, wrapped.aliasOffsets.keySet().toArray(String[]::new));
+    public OscilloscopePin(Pin wrapped, Oscilloscope oscilloscope) {
+        super(wrapped);
         this.wrapped = wrapped;
         this.oscilloscope = oscilloscope;
     }
 
     @Override
-    public void setState(long newState) {
-        wrapped.setState(newState);
-        state = newState;
+    public void setState(boolean newState, boolean strong) {
+        wrapped.setState(newState, strong);
+        wrapped.state = newState;
         oscilloscope.diagram.tick();
     }
 }
