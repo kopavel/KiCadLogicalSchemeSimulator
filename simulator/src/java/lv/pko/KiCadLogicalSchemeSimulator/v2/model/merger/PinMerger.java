@@ -45,35 +45,31 @@ import java.util.HashMap;
 import java.util.Map;
 
 //FixMe use one destination with splitter
-//FixMe create pure base (no pin/strength) implementation
-public class BusMerger extends OutBus implements IMerger {
+public class PinMerger extends OutPin implements IMerger {
     private final Map<ModelOutItem, DestinationDescriptor> sources = new HashMap<>();
     public MergerInput[] mergerInputs = new MergerInput[0];
-    public long weakPins;
-    public long strongPins;
-    public long weakState;
-    public byte[] weakStates = new byte[256];
+    public byte weakState;
     public String hash;
 
-    public BusMerger(Bus destination) {
-        super(destination.id, destination.parent, destination.size);
-        destinations = new Bus[]{destination};
+    public PinMerger(Pin dest) {
+        super(dest.id, dest.parent);
+        destinations = new Pin[]{dest};
         hiImpedance = true;
     }
 
     @Override
     public void addDestination(IModelItem item, long mask, byte offset) {
         switch (item) {
-            case OutPin ignored -> throw new RuntimeException("Use PinMerger for pin destination");
-            case OutBus bus -> destinations = Utils.addToArray(destinations, bus);
+            case OutPin pin -> destinations = Utils.addToArray(destinations, pin);
+            case OutBus ignored -> throw new RuntimeException("Use BusMerger for bus destination");
             default -> throw new RuntimeException("Unsupported destination " + item.getClass().getName());
         }
     }
 
     public String getHash() {
         StringBuilder result = new StringBuilder();
-        for (MergerInput mergerInput : mergerInputs) {
-            result.append(";").append(mergerInput.getHash());
+        for (MergerInput input : mergerInputs) {
+            result.append(";").append(input.getHash());
         }
         return result.toString();
     }
@@ -82,37 +78,34 @@ public class BusMerger extends OutBus implements IMerger {
         MergerInput input;
         switch (src) {
             case Pin pin -> {
-                long destinationMask = 1L << offset;
-                input = new BusMergerPinIn(pin, destinationMask, offset, this);
+                input = new PinMergerPinIn(pin, this);
                 if (!pin.hiImpedance) {
-                    if (pin.strong) {
-                        if ((strongPins & destinationMask) != 0) {
-                            throw new ShortcutException(this);
-                        }
-                        strongPins |= destinationMask;
-                        if (pin.state) {
-                            state |= destinationMask;
-                        }
-                    } else {
-                        if ((weakStates[offset] > 0 && !pin.state) || (weakStates[offset] < 0 && pin.state)) {
+                    hiImpedance = false;
+                    if (!pin.strong) {
+                        if ((weakState > 0 && !pin.state) || (weakState < 0 && pin.state)) {
                             throw new ShortcutException(pin);
                         }
-                        weakPins |= destinationMask;
-                        weakStates[offset] += (byte) (pin.state ? 1 : -1);
-                        weakState |= pin.state ? destinationMask : 0;
-                        if (pin.state && (strongPins & destinationMask) == 0) {
-                            state |= destinationMask;
+                        weakState += (byte) (pin.state ? 1 : -1);
+                        if (!strong) {
+                            state = pin.state;
                         }
+                    } else {
+                        if (strong) {
+                            throw new ShortcutException(pin);
+                        }
+                        strong = true;
+                        state = pin.state;
                     }
                 }
             }
             case Bus bus -> {
-                long destinationMask = offset == 0 ? mask : (offset > 0 ? mask << offset : mask >> -offset);
-                input = new BusMergerBusIn(bus, destinationMask, this);
-                if (!bus.hiImpedance) {
-                    state |= bus.state;
-                    strongPins |= destinationMask;
+                input = new PinMergerBusIn(bus, mask, this);
+                hiImpedance = false;
+                if (strong) {
+                    throw new ShortcutException(bus);
                 }
+                strong = true;
+                state = (bus.state & mask) > 0;
             }
             default -> throw new RuntimeException("Unsupported item " + src.getClass().getName());
         }
@@ -120,7 +113,6 @@ public class BusMerger extends OutBus implements IMerger {
         hash = getHash();
         mergerInputs = Utils.addToArray(mergerInputs, input);
         Arrays.sort(mergerInputs, Comparator.comparing(MergerInput::getName));
-        hiImpedance = (strongPins | weakPins) != mask;
     }
 
     public void bindSources() {
@@ -129,10 +121,10 @@ public class BusMerger extends OutBus implements IMerger {
 
     @Override
     public void resend() {
-        if ((strongPins | weakPins) != mask) {
+        if (hiImpedance) {
             setHiImpedance();
         } else {
-            setState(state);
+            setState(state, strong);
         }
     }
 

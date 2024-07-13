@@ -47,14 +47,6 @@ public class MaskGroupBus extends OutBus {
     }
 
     public void addDestination(Bus bus) {
-        if (bus instanceof BusToPinAdapter adapter) {
-            bus = new BusToPinAdapter(adapter.destination, 0) {
-                @Override
-                public void setState(long newState) {
-                    destination.setState(newState != 0, true);
-                }
-            };
-        }
         destinations = Utils.addToArray(destinations, bus);
     }
 
@@ -75,17 +67,31 @@ public class MaskGroupBus extends OutBus {
             return new NCOutBus(this);
         } else if (destinations.length == 1) {
             Bus destination = destinations[0];
-            return new MaskGroupBus(MaskGroupBus.this, "SingleDestination") {
-                @Override
-                public void setState(long newState) {
-                    long newMaskState = newState & mask;
-                    if (maskState != newMaskState) {
-                        maskState = newMaskState;
-                        destination.setState(newMaskState);
+            if (destination instanceof BusToPinAdapter) {
+                return destination;
+            } else {
+                return new MaskGroupBus(MaskGroupBus.this, "SingleDestination") {
+                    @Override
+                    public void setState(long newState) {
+                        long newMaskState = newState & mask;
+                        if (maskState != newMaskState) {
+                            maskState = newMaskState;
+                            destination.setState(newMaskState);
+                        }
                     }
-                }
-            };
+                };
+            }
         } else {
+            for (int i = 0; i < destinations.length; i++) {
+                if (destinations[i] instanceof BusToPinAdapter adapter) {
+                    destinations[i] = new BusToPinAdapter(adapter.destination, 0) {
+                        @Override
+                        public void setState(long newState) {
+                            destination.setState(newState != 0, true);
+                        }
+                    };
+                }
+            }
             return this;
         }
     }

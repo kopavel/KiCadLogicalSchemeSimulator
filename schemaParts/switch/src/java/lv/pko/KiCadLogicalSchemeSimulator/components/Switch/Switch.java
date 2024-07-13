@@ -38,6 +38,7 @@ import lv.pko.KiCadLogicalSchemeSimulator.v2.api.schemaPart.InteractiveSchemaPar
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.schemaPart.SchemaPart;
 
 public class Switch extends SchemaPart implements InteractiveSchemaPart {
+    //FixMe using passive pins?
     private final InPin pin1In;
     private final InPin pin2In;
     private boolean toggled;
