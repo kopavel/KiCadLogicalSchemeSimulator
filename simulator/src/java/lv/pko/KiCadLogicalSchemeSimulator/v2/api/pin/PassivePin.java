@@ -34,7 +34,7 @@ import lv.pko.KiCadLogicalSchemeSimulator.v2.api.schemaPart.SchemaPart;
 
 public abstract class PassivePin extends OutPin {
     public PassivePin(String id, SchemaPart parent) {
-        super(id, parent, false);
+        super(id, parent);
         hiImpedance = true;
     }
 

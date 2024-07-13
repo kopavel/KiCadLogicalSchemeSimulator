@@ -47,8 +47,9 @@ public abstract class Bus extends ModelItem {
     public Map<String, Byte> aliasOffsets = new HashMap<>();
     public boolean useBitPresentation;
 
-    public Bus(Bus oldBus, String id) {
-        this(id + ":" + oldBus.id, oldBus.parent, oldBus.size);
+    public Bus(Bus oldBus, String variantId) {
+        this(oldBus.id, oldBus.parent, oldBus.size);
+        this.variantId = variantId + ":" + oldBus.variantId;
         aliasOffsets = oldBus.aliasOffsets;
         useBitPresentation = oldBus.useBitPresentation;
         state = oldBus.state;

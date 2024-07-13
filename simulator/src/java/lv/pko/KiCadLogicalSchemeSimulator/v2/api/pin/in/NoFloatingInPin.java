@@ -39,8 +39,8 @@ public abstract class NoFloatingInPin extends InPin {
         super(id, parent);
     }
 
-    public NoFloatingInPin(Pin oldPin) {
-        super(oldPin);
+    public NoFloatingInPin(Pin oldPin, String variantId) {
+        super(oldPin, variantId);
     }
 
     @Override

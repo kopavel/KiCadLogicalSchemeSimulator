@@ -33,6 +33,7 @@ package lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus;
 import lv.pko.KiCadLogicalSchemeSimulator.tools.Utils;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.IModelItem;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.ModelOutItem;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus.in.CorrectedInBus;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin.Pin;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.schemaPart.SchemaPart;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.model.bus.BusToPinAdapter;
@@ -51,8 +52,8 @@ public class OutBus extends Bus implements ModelOutItem {
         mask = Utils.getMaskForSize(size);
     }
 
-    public OutBus(OutBus oldPin, String id) {
-        super(oldPin, id);
+    public OutBus(OutBus oldPin, String variantId) {
+        super(oldPin, variantId);
         mask = oldPin.mask;
     }
 
@@ -70,7 +71,8 @@ public class OutBus extends Bus implements ModelOutItem {
                       }).addDestination(bus);
             }
             case Bus bus -> {
-                if (offset != 0) {
+                //FixMe group by offset
+                if (bus instanceof CorrectedInBus && offset != 0) {
                     bus = new OffsetBus(bus, offset);
                 }
                 if (mask != this.mask) {

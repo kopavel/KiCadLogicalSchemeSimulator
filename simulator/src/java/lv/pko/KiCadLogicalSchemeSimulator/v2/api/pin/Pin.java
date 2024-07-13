@@ -41,8 +41,9 @@ public abstract class Pin extends ModelItem {
     @Getter
     public boolean strong;
 
-    public Pin(Pin oldPin) {
+    public Pin(Pin oldPin, String variantId) {
         this(oldPin.id, oldPin.parent);
+        this.variantId = variantId + ":" + oldPin.variantId;
         state = oldPin.state;
         strong = oldPin.strong;
     }

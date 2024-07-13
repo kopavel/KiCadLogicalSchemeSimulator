@@ -58,7 +58,7 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
         if (sAliases != null) {
             outAlias = sAliases;
         }
-        addOutPin(outAlias, true);
+        addOutPin(outAlias);
         oscillatorUiComponent = new OscillatorUiComponent(20, id, this);
     }
 

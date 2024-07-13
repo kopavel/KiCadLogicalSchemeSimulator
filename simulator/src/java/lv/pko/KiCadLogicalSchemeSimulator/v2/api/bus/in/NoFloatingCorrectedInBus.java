@@ -29,30 +29,17 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lv.pko.KiCadLogicalSchemeSimulator.v2.model.merger;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus.Bus;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus.in.CorrectedInBus;
+package lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus.in;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.FloatingInException;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.schemaPart.SchemaPart;
 
-public class BusMergerInBus extends CorrectedInBus implements MergerInput {
-    public final long mask;
-    private final BusMerger merger;
-
-    public BusMergerInBus(Bus source, long mask, BusMerger merger) {
-        super(source, "BMergeBIn");
-        this.mask = mask;
-        this.merger = merger;
-    }
-
-    @Override
-    public void setState(long newState) {
+public abstract class NoFloatingCorrectedInBus extends InBus {
+    public NoFloatingCorrectedInBus(String id, SchemaPart parent, int size, String... names) {
+        super(id, parent, size, names);
     }
 
     @Override
     public void setHiImpedance() {
-    }
-
-    @Override
-    public String getHash() {
-        return mask + ":" + getName();
+        throw new FloatingInException(this);
     }
 }

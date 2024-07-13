@@ -43,7 +43,7 @@ public class BusMergerInPin extends InPin implements MergerInput {
     private boolean strong;
 
     public BusMergerInPin(Pin source, long mask, byte offset, BusMerger merger) {
-        super(source);
+        super(source, "BMergerPIn");
         this.mask = mask;
         nMask = ~mask;
         this.offset = offset;

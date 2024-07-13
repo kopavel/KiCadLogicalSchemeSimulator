@@ -38,7 +38,7 @@ public class OscilloscopePin extends NoFloatingInPin {
     private final Oscilloscope oscilloscope;
 
     public OscilloscopePin(Pin wrapped, Oscilloscope oscilloscope) {
-        super(wrapped);
+        super(wrapped, "oscilloscopeWrapper");
         this.wrapped = wrapped;
         this.oscilloscope = oscilloscope;
     }

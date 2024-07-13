@@ -30,10 +30,15 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus.in;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus.Bus;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.schemaPart.SchemaPart;
 
 public abstract class CorrectedInBus extends InBus {
     public CorrectedInBus(String id, SchemaPart parent, int size, String... names) {
         super(id, parent, size, names);
+    }
+
+    public CorrectedInBus(Bus oldBus, String variantId) {
+        super(oldBus, variantId);
     }
 }

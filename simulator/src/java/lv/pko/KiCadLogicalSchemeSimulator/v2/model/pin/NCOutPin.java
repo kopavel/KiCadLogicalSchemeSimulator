@@ -35,7 +35,7 @@ import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin.OutPin;
 
 public class NCOutPin extends OutPin {
     public NCOutPin(OutPin outPin) {
-        super(outPin.id, outPin.parent, outPin.strong);
+        super(outPin.id, outPin.parent);
     }
 
     @Override

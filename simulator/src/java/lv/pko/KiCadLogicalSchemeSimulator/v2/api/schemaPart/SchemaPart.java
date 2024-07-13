@@ -105,14 +105,14 @@ public abstract class SchemaPart {
         return pin;
     }
 
-    public void addOutPin(String pinId, boolean strong) {
-        OutPin pin = new OutPin(pinId, this, strong);
+    public void addOutPin(String pinId) {
+        OutPin pin = new OutPin(pinId, this);
         outAliasMap.put(pinId, pin);
         outMap.put(pinId, pin);
     }
 
     public void addOutPin(String pinId, boolean state, boolean strong) {
-        addOutPin(pinId, strong);
+        addOutPin(pinId);
         OutPin pin = (OutPin) outMap.get(pinId);
         pin.state = state;
     }

@@ -39,7 +39,7 @@ public abstract class InPin extends Pin implements ModelInItem {
         super(id, parent);
     }
 
-    public InPin(Pin oldPin) {
-        super(oldPin);
+    public InPin(Pin oldPin, String variantId) {
+        super(oldPin, variantId);
     }
 }

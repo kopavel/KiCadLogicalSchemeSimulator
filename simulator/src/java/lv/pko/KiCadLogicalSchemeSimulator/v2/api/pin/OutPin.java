@@ -41,13 +41,12 @@ import lv.pko.KiCadLogicalSchemeSimulator.v2.model.pin.PinToBusAdapter;
 public class OutPin extends Pin implements ModelOutItem {
     public Pin[] destinations = new Pin[0];
 
-    public OutPin(String id, SchemaPart parent, boolean strong) {
+    public OutPin(String id, SchemaPart parent) {
         super(id, parent);
-        this.strong = strong;
     }
 
-    public OutPin(OutPin oldPin) {
-        super(oldPin);
+    public OutPin(OutPin oldPin, String variantId) {
+        super(oldPin, variantId);
         strong = oldPin.strong;
     }
 
