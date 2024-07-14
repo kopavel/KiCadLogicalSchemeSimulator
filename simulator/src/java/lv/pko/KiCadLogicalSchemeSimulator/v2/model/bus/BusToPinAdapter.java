@@ -46,10 +46,9 @@ public class BusToPinAdapter extends Bus {
 
     @Override
     public void setState(long newState) {
-        long newMaskState = newState & mask;
-        if (maskState != newMaskState) {
-            maskState = newMaskState;
-            destination.setState(newMaskState > 0, true);
+        if (maskState != (newState & mask)) {
+            maskState = newState & mask;
+            destination.setState(maskState > 0, true);
         }
     }
 

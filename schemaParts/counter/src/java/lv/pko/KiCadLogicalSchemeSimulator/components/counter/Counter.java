@@ -39,7 +39,6 @@ import lv.pko.KiCadLogicalSchemeSimulator.v2.api.schemaPart.SchemaPart;
 public class Counter extends SchemaPart {
     private final long countMask;
     private Bus outBus;
-    private long count = 0;
 
     protected Counter(String id, String sParam) {
         super(id, sParam);
@@ -61,34 +60,30 @@ public class Counter extends SchemaPart {
             addInPin(new FallingEdgeInPin("C", this) {
                 @Override
                 public void onFallingEdge() {
-                    count = (count + 1) & countMask;
-                    outBus.state = count;
-                    outBus.setState(count);
+                    outBus.state = (outBus.state + 1) & countMask;
+                    outBus.setState(outBus.state);
                 }
             });
             addInPin(new FallingEdgeInPin("R", this) {
                 @Override
                 public void onFallingEdge() {
-                    count = 0;
                     outBus.state = 0;
-                    outBus.setState(count);
+                    outBus.setState(outBus.state);
                 }
             });
         } else {
             addInPin(new RisingEdgeInPin("C", this) {
                 @Override
                 public void onRisingEdge() {
-                    count = (count + 1) & countMask;
-                    outBus.state = count;
-                    outBus.setState(count);
+                    outBus.state = (outBus.state + 1) & countMask;
+                    outBus.setState(outBus.state);
                 }
             });
             addInPin(new RisingEdgeInPin("R", this) {
                 @Override
                 public void onRisingEdge() {
-                    count = 0;
                     outBus.state = 0;
-                    outBus.setState(count);
+                    outBus.setState(outBus.state);
                 }
             });
         }
@@ -102,7 +97,6 @@ public class Counter extends SchemaPart {
 
     @Override
     public void reset() {
-        count = 0;
         outBus.state = 0;
         outBus.setState(0);
     }
