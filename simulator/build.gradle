@@ -84,6 +84,8 @@ run {
                  "-XX:MaxInlineSize=65536",
                  "-XX:ParallelGCThreads=1",
                  "-Xmx2G",
+                 "-XX:+UnlockDiagnosticVMOptions",
+                 "-XX:+DebugNonSafepoints",
                  "-Dlog4j2.asyncLoggerThreadNameStrategy=CACHED"]
     jvmArgs(jvm_args)
     if (project.hasProperty('appArgs')) {

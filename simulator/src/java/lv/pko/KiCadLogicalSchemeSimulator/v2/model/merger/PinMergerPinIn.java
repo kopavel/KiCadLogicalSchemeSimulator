@@ -36,7 +36,6 @@ import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin.in.InPin;
 
 public class PinMergerPinIn extends InPin implements MergerInput {
     private final PinMerger merger;
-    private boolean strong;
 
     public PinMergerPinIn(Pin source, PinMerger merger) {
         super(source, "PMergePIn");
@@ -46,73 +45,67 @@ public class PinMergerPinIn extends InPin implements MergerInput {
     @Override
     public void setState(boolean newState, boolean newStrong) {
         boolean oldState = merger.state;
-        boolean oldHiImpedance = merger.hiImpedance;
         boolean oldStrong = merger.strong;
-        if (newStrong) {
-            if (merger.strong) {
-                throw new ShortcutException(this);
-            }
-            if (!strong && !hiImpedance) {
-                merger.weakState -= (byte) (merger.weakState > 0 ? 1 : -1);
+        if (newStrong) { //to strong
+            if (!strong) {
+                if (merger.strong) {
+                    throw new ShortcutException(merger.mergerInputs);
+                }
+                if (!hiImpedance) {
+                    merger.weakState -= (byte) (merger.weakState > 0 ? 1 : -1);
+                }
+            } else {
+                if (hiImpedance && merger.strong) {
+                    throw new ShortcutException(merger.mergerInputs);
+                }
             }
             merger.state = newState;
             merger.strong = true;
-        } else {
-            final byte oldWeakState = merger.weakState;
-            if (oldWeakState != 0 && (oldWeakState > 0 ^ newState)) {
+        } else { //to weak
+            if (merger.weakState != 0 && (merger.weakState > 0 ^ newState)) {
                 throw new ShortcutException(merger.mergerInputs);
             }
-            merger.weakState += (byte) (newState ? 1 : -1);
             if (strong) {
+                merger.weakState += (byte) (newState ? 1 : -1);
                 merger.state = newState;
                 merger.strong = false;
-            } else if (merger.hiImpedance) {
-                merger.state = newState;
+            } else if (hiImpedance) {
+                merger.weakState += (byte) (newState ? 1 : -1);
             }
         }
-        merger.hiImpedance = false;
-        strong = newStrong;
-        if (oldState != merger.state || oldStrong != merger.strong || oldHiImpedance) {
+        if (merger.hiImpedance) {
+            merger.state = newState;
+            merger.hiImpedance = false;
+            for (Pin destination : merger.destinations) {
+                destination.setState(merger.state, merger.strong);
+            }
+        } else if (oldState != merger.state || oldStrong != merger.strong) {
             for (Pin destination : merger.destinations) {
                 destination.setState(merger.state, merger.strong);
             }
         }
+        hiImpedance = false;
+        strong = newStrong;
     }
 
     @Override
     public void setHiImpedance() {
-/*
-        boolean oldState = merger.state;
-        boolean oldHiImpedance = merger.hiImpedance;
-        boolean oldStrong = merger.strong;
-        if (strong) {
-            merger.hiImpedance=true;
-            if (merger.weakState > 0) {
-                merger.state |= mask;
-            } else if (merger.weakState < 0) {
-                merger.state &= nMask;
-            }
-        } else {
+        if (!strong) {
             merger.weakState -= (byte) (merger.weakState > 0 ? 1 : -1);
-            merger.weakState &= nMask;
-            if (merger.weakState == 0) {
-                merger.state &= nMask;
-                merger.hiImpedancePins |= mask;
-            }
+        } else {
+            merger.strong = false;
         }
-        hiImpedance = true;
-        if (merger.hiImpedancePins > 0) {
-            if (!oldHiImpedance) {
-                for (Bus destination : merger.destinations) {
+        if (!merger.strong) {
+            if (merger.weakState == 0) {
+                for (Pin destination : merger.destinations) {
                     destination.setHiImpedance();
                 }
-            }
-        } else if (oldState != merger.state || oldHiImpedance) {
-            for (Bus destination : merger.destinations) {
-                destination.setState(merger.state);
+            } else {
+                for (Pin destination : merger.destinations) {
+                    destination.setState(merger.weakState > 0, merger.strong);
+                }
             }
         }
-*/
     }
 
     @Override

@@ -35,14 +35,12 @@ import lv.pko.KiCadLogicalSchemeSimulator.v2.api.IModelItem;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.ModelOutItem;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.ShortcutException;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus.Bus;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus.OutBus;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus.in.InBus;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin.OutPin;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin.Pin;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin.in.InPin;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 //FixMe use one destination with splitter
 public class PinMerger extends OutPin implements IMerger {
@@ -60,8 +58,8 @@ public class PinMerger extends OutPin implements IMerger {
     @Override
     public void addDestination(IModelItem item, long mask, byte offset) {
         switch (item) {
-            case OutPin pin -> destinations = Utils.addToArray(destinations, pin);
-            case OutBus ignored -> throw new RuntimeException("Use BusMerger for bus destination");
+            case InPin pin -> destinations = Utils.addToArray(destinations, pin);
+            case InBus ignored -> throw new RuntimeException("Use BusMerger for bus destination");
             default -> throw new RuntimeException("Unsupported destination " + item.getClass().getName());
         }
     }
@@ -81,20 +79,24 @@ public class PinMerger extends OutPin implements IMerger {
                 input = new PinMergerPinIn(pin, this);
                 if (!pin.hiImpedance) {
                     hiImpedance = false;
-                    if (!pin.strong) {
+                    if (pin.strong) {
+                        if (strong) {
+                            Set<ModelOutItem> items = sources.keySet();
+                            items.add(src);
+                            throw new ShortcutException(items.toArray(new ModelOutItem[0]));
+                        }
+                        strong = true;
+                        state = pin.state;
+                    } else {
                         if ((weakState > 0 && !pin.state) || (weakState < 0 && pin.state)) {
-                            throw new ShortcutException(pin);
+                            Set<ModelOutItem> items = sources.keySet();
+                            items.add(src);
+                            throw new ShortcutException(items.toArray(new ModelOutItem[0]));
                         }
                         weakState += (byte) (pin.state ? 1 : -1);
                         if (!strong) {
                             state = pin.state;
                         }
-                    } else {
-                        if (strong) {
-                            throw new ShortcutException(pin);
-                        }
-                        strong = true;
-                        state = pin.state;
                     }
                 }
             }
@@ -102,7 +104,9 @@ public class PinMerger extends OutPin implements IMerger {
                 input = new PinMergerBusIn(bus, mask, this);
                 hiImpedance = false;
                 if (strong) {
-                    throw new ShortcutException(bus);
+                    Set<ModelOutItem> items = sources.keySet();
+                    items.add(src);
+                    throw new ShortcutException(items.toArray(new ModelOutItem[0]));
                 }
                 strong = true;
                 state = (bus.state & mask) > 0;
@@ -110,9 +114,9 @@ public class PinMerger extends OutPin implements IMerger {
             default -> throw new RuntimeException("Unsupported item " + src.getClass().getName());
         }
         sources.put(src, new DestinationDescriptor(input, mask, offset));
-        hash = getHash();
         mergerInputs = Utils.addToArray(mergerInputs, input);
         Arrays.sort(mergerInputs, Comparator.comparing(MergerInput::getName));
+        hash = getHash();
     }
 
     public void bindSources() {

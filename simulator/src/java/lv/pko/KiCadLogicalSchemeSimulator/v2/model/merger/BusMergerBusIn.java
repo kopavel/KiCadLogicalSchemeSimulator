@@ -48,8 +48,8 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput {
 
     @Override
     public void setState(long newState) {
-        if ((merger.strongPins & mask) != 0) {
-            throw new ShortcutException(this);
+        if (hiImpedance && (merger.strongPins & mask) != 0) {
+            throw new ShortcutException(merger.mergerInputs);
         }
         long oldState = merger.state;
         if (hiImpedance) {

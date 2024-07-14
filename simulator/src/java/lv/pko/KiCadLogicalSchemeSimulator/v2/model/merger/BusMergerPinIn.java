@@ -53,8 +53,8 @@ public class BusMergerPinIn extends InPin implements MergerInput {
     public void setState(boolean newState, boolean newStrong) {
         long oldState = merger.state;
         if (newStrong) { //to strong
-            if ((merger.strongPins & mask) != 0) {
-                throw new ShortcutException(this);
+            if (hiImpedance && (merger.strongPins & mask) != 0) {
+                throw new ShortcutException(merger.mergerInputs);
             }
             if (!strong) { //from non-strong
                 merger.strongPins |= mask;
@@ -71,15 +71,18 @@ public class BusMergerPinIn extends InPin implements MergerInput {
                 merger.state &= nMask;
             }
         } else { //to weak
-            if (strong) {
-                merger.strongPins &= nMask;
-            }
             final byte oldWeakState = merger.weakStates[offset];
             if (oldWeakState != 0 && (oldWeakState > 0 ^ newState)) {
                 throw new ShortcutException(merger.mergerInputs);
             }
-            merger.weakStates[offset] += (byte) (newState ? 1 : -1);
-            merger.weakPins |= mask;
+            if (hiImpedance) {
+                merger.weakStates[offset] += (byte) (newState ? 1 : -1);
+                merger.weakPins |= mask;
+            } else if (strong) {
+                merger.strongPins &= nMask;
+                merger.weakStates[offset] += (byte) (newState ? 1 : -1);
+                merger.weakPins |= mask;
+            }
             if ((merger.strongPins & mask) == 0) {
                 if (newState) {
                     merger.state |= mask;

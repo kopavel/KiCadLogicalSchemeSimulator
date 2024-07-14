@@ -30,7 +30,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.KiCadLogicalSchemeSimulator.v2;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.in.FloatingPinException;
 import lv.pko.KiCadLogicalSchemeSimulator.parsers.pojo.Comp;
 import lv.pko.KiCadLogicalSchemeSimulator.parsers.pojo.Export;
 import lv.pko.KiCadLogicalSchemeSimulator.parsers.pojo.Net;
@@ -38,10 +37,7 @@ import lv.pko.KiCadLogicalSchemeSimulator.parsers.pojo.Property;
 import lv.pko.KiCadLogicalSchemeSimulator.parsers.pojo.symbolMap.*;
 import lv.pko.KiCadLogicalSchemeSimulator.parsers.xml.XmlParser;
 import lv.pko.KiCadLogicalSchemeSimulator.tools.Log;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.IModelItem;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.ModelInItem;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.ModelOutItem;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.ShortcutException;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.*;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus.in.InBus;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin.in.InPin;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.schemaPart.SchemaPart;
@@ -49,6 +45,7 @@ import lv.pko.KiCadLogicalSchemeSimulator.v2.api.schemaPart.SchemaPartSpi;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.model.bus.InBusInterconnect;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.model.merger.BusMerger;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.model.merger.IMerger;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.model.merger.PinMerger;
 
 import java.io.IOException;
 import java.util.*;
@@ -199,17 +196,19 @@ public class Model {
                 switch (inItem) {
                     case InBus bus -> {
                         merger = new BusMerger(bus);
-                        for (Map.Entry<ModelOutItem, Map<Byte, Long>> outItemEntry : inDescriptor.entrySet()) {
-                            for (Map.Entry<Byte, Long> offsetMap : outItemEntry.getValue().entrySet()) {
-                                merger.addSource(outItemEntry.getKey(), offsetMap.getValue(), offsetMap.getKey());
-                            }
-                        }
                     }
-                    case InPin pin -> throw new RuntimeException("ToDo: unimplemented");
+                    case InPin pin -> {
+                        merger = new PinMerger(pin);
+                    }
                     default -> throw new RuntimeException("Unsupported inItem: " + inItem.getClass().getName());
                 }
+                for (Map.Entry<ModelOutItem, Map<Byte, Long>> outItemEntry : inDescriptor.entrySet()) {
+                    for (Map.Entry<Byte, Long> offsetMap : outItemEntry.getValue().entrySet()) {
+                        merger.addSource(outItemEntry.getKey(), offsetMap.getValue(), offsetMap.getKey());
+                    }
+                }
                 //Use only one merger with splitter for a similar in-out connections
-                //Hash calculated from destination mask and all sources (OutPins) name/mask/offset
+                //Hash calculated from sources (OutItems) name/mask/offset
                 if (mergers.containsKey(merger.getHash())) {
                     mergers.get(merger.getHash()).addDestination(inItem, 0L, (byte) 0);
                 } else {
@@ -314,20 +313,20 @@ public class Model {
             items.forEach(item -> {
                 try {
                     item.resend();
-                } catch (FloatingPinException | ShortcutException e) {
+                } catch (FloatingInException | ShortcutException e) {
                     stabilizing = true;
                 }
             });
             mergers.values().forEach(merger -> {
                 try {
                     merger.resend();
-                } catch (FloatingPinException | ShortcutException e) {
+                } catch (FloatingInException | ShortcutException e) {
                     stabilizing = true;
                 }
             });
             try {
                 schemaParts.values().forEach(SchemaPart::reset);
-            } catch (FloatingPinException | ShortcutException e) {
+            } catch (FloatingInException | ShortcutException e) {
                 stabilizing = true;
             }
         }

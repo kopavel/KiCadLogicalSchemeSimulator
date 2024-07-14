@@ -30,8 +30,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.KiCadLogicalSchemeSimulator.v2.model.merger;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.ShortcutException;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus.Bus;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus.in.CorrectedInBus;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin.Pin;
 
 public class PinMergerBusIn extends CorrectedInBus implements MergerInput {
     public final long mask;
@@ -45,49 +47,35 @@ public class PinMergerBusIn extends CorrectedInBus implements MergerInput {
 
     @Override
     public void setState(long newState) {
-/*
-        long oldState = merger.state;
-        boolean oldHiImpedance = merger.hiImpedancePins > 0;
-        if ((merger.hiImpedancePins & mask) != mask) {
-            throw new ShortcutException(this);
+        if (hiImpedance && merger.strong) {
+            throw new ShortcutException(merger.mergerInputs);
         }
-        merger.state &= nMask;
-        merger.state |= newState;//FixMe do we need &mask here?
-        merger.hiImpedancePins &= nMask;
-        if (merger.hiImpedancePins > 0) {
-            if (!oldHiImpedance) {
-                for (Bus destination : merger.destinations) {
-                    destination.setHiImpedance();
-                }
+        if (merger.state != (newState > 0)) {
+            merger.state = newState > 0;
+            for (Pin destination : merger.destinations) {
+                destination.setState(merger.state, true);
             }
-        } else if (oldState != merger.state || oldHiImpedance) {
-            for (Bus destination : merger.destinations) {
-                destination.setState(merger.state);
+        } else if (!merger.strong || merger.hiImpedance) {
+            for (Pin destination : merger.destinations) {
+                destination.setState(merger.state, true);
             }
         }
-*/
+        merger.strong = true;
+        merger.hiImpedance = false;
     }
 
     @Override
     public void setHiImpedance() {
-/*
-        long oldState = merger.state;
-        boolean oldHiImpedance = merger.hiImpedancePins > 0;
-        merger.hiImpedancePins |= mask;
-        merger.state |= merger.weakState & mask;
-        hiImpedance = true;
-        if (merger.hiImpedancePins > 0) {
-            if (!oldHiImpedance) {
-                for (Bus destination : merger.destinations) {
-                    destination.setHiImpedance();
-                }
+        if (merger.weakState == 0) {
+            merger.hiImpedance = true;
+            for (Pin destination : merger.destinations) {
+                destination.setHiImpedance();
             }
-        } else if (oldState != merger.state || oldHiImpedance) {
-            for (Bus destination : merger.destinations) {
-                destination.setState(merger.state);
+        } else if (merger.state != (merger.weakState > 0)) {
+            for (Pin destination : merger.destinations) {
+                destination.setState((merger.weakState > 0), false);
             }
         }
-*/
     }
 
     @Override

@@ -107,6 +107,7 @@ public abstract class SchemaPart {
 
     public void addOutPin(String pinId) {
         OutPin pin = new OutPin(pinId, this);
+        pin.hiImpedance = true;
         outAliasMap.put(pinId, pin);
         outMap.put(pinId, pin);
     }

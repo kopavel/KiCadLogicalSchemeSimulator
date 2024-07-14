@@ -103,10 +103,6 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
     public void initOuts() {
         pin1Out = getOutPin("IN1");
         pin2Out = getOutPin("IN2");
-        pin1Out.setHiImpedance();
-        pin1Out.hiImpedance = true;
-        pin2Out.setHiImpedance();
-        pin2Out.hiImpedance = true;
     }
 
     @Override

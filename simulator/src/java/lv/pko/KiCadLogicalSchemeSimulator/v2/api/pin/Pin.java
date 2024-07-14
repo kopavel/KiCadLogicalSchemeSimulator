@@ -46,6 +46,7 @@ public abstract class Pin extends ModelItem {
         this.variantId = variantId + ":" + oldPin.variantId;
         state = oldPin.state;
         strong = oldPin.strong;
+        hiImpedance = oldPin.hiImpedance;
     }
 
     public Pin(String id, SchemaPart parent) {

@@ -36,8 +36,8 @@ import lv.pko.KiCadLogicalSchemeSimulator.v2.api.schemaPart.SchemaPart;
 @Getter
 public abstract class ModelItem implements IModelItem {
     public final String id;
-    public String variantId;
     public final SchemaPart parent;
+    public String variantId;
     public boolean hiImpedance;
 
     protected ModelItem(String id, SchemaPart parent) {
@@ -55,7 +55,7 @@ public abstract class ModelItem implements IModelItem {
 
     @Override
     public String toString() {
-        return variantId + ":" + getName() + ":" + super.toString();
+        return getName() + (variantId == null ? "" : ":" + variantId) + ":" + super.toString();
     }
 
     public abstract void setHiImpedance();
