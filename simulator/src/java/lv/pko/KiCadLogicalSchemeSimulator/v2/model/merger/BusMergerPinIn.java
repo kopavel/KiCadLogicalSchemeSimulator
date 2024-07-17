@@ -109,6 +109,7 @@ public class BusMergerPinIn extends InPin implements MergerInput {
 
     @Override
     public void setHiImpedance() {
+        assert !hiImpedance : "Already in hiImpedance:" + this;
         long oldState = merger.state;
         if (strong) {
             merger.strongPins &= nMask;

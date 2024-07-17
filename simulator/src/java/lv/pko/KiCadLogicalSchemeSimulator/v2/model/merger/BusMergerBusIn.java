@@ -75,6 +75,7 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput {
 
     @Override
     public void setHiImpedance() {
+        assert !hiImpedance : "Already in hiImpedance:" + this;
         long oldState = merger.state;
         merger.strongPins &= nMask;
         merger.state &= nMask;

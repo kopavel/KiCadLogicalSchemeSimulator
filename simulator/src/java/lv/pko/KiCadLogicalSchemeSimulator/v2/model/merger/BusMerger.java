@@ -39,8 +39,10 @@ import lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus.OutBus;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus.in.InBus;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin.Pin;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin.in.InPin;
+import lv.pko.KiCadLogicalSchemeSimulator.v2.model.bus.InBusInterconnect;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 //FixMe use one destination with splitter
 //FixMe create pure base (no pin/strength) implementation
@@ -55,25 +57,33 @@ public class BusMerger extends OutBus implements IMerger {
 
     public BusMerger(Bus destination) {
         super(destination.id, destination.parent, destination.size);
+        variantId = destination.variantId == null ? "" : destination.variantId + ":";
+        variantId += "merger";
+        if (destination instanceof InBusInterconnect interconnect) {
+            this.mask &= interconnect.inverseInterconnectMask;
+            this.mask |= interconnect.senseMask;
+        }
         destinations = new Bus[]{destination};
-        hiImpedance = true;
     }
 
     @Override
     public void addDestination(IModelItem item, long mask, byte offset) {
         switch (item) {
             case InPin ignored -> throw new RuntimeException("Use PinMerger for pin destination");
+            case InBusInterconnect interconnect -> {
+                this.mask &= interconnect.inverseInterconnectMask;
+                this.mask |= mask;
+                destinations = Utils.addToArray(destinations, interconnect);
+            }
             case InBus bus -> destinations = Utils.addToArray(destinations, bus);
             default -> throw new RuntimeException("Unsupported destination " + item.getClass().getName());
         }
     }
 
     public String getHash() {
-        StringBuilder result = new StringBuilder();
-        for (MergerInput mergerInput : mergerInputs) {
-            result.append(";").append(mergerInput.getHash());
-        }
-        return result.toString();
+        return Arrays.stream(mergerInputs)
+                .map(MergerInput::getHash)
+                .collect(Collectors.joining(";"));
     }
 
     public void addSource(ModelOutItem src, long mask, byte offset) {
@@ -109,14 +119,14 @@ public class BusMerger extends OutBus implements IMerger {
                 }
             }
             case Bus bus -> {
-                if ((strongPins & mask) != 0) {
-                    Set<ModelOutItem> items = sources.keySet();
-                    items.add(src);
-                    throw new ShortcutException(items.toArray(new ModelOutItem[0]));
-                }
                 long destinationMask = offset == 0 ? mask : (offset > 0 ? mask << offset : mask >> -offset);
                 input = new BusMergerBusIn(bus, destinationMask, this);
                 if (!bus.hiImpedance) {
+                    if ((strongPins & mask) != 0) {
+                        Set<ModelOutItem> items = sources.keySet();
+                        items.add(src);
+                        throw new ShortcutException(items.toArray(new ModelOutItem[0]));
+                    }
                     state |= bus.state;
                     strongPins |= destinationMask;
                 }
@@ -136,9 +146,7 @@ public class BusMerger extends OutBus implements IMerger {
 
     @Override
     public void resend() {
-        if ((strongPins | weakPins) != mask) {
-            setHiImpedance();
-        } else {
+        if ((strongPins | weakPins) == mask) {
             setState(state);
         }
     }

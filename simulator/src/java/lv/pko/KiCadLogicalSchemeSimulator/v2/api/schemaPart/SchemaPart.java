@@ -82,6 +82,7 @@ public abstract class SchemaPart {
         InPin inPin = addInPin(pinId);
         inPin.state = value;
         inPin.strong = strong;
+        inPin.hiImpedance = false;
         return inPin;
     }
 
@@ -89,11 +90,13 @@ public abstract class SchemaPart {
         return addInPin(new InPin(pinId, this) {
             @Override
             public void setHiImpedance() {
+                assert !hiImpedance : "Already in hiImpedance:" + this;
                 hiImpedance = true;
             }
 
             @Override
             public void setState(boolean newState, boolean strong) {
+                hiImpedance = false;
                 state = newState;
             }
         });
@@ -107,7 +110,6 @@ public abstract class SchemaPart {
 
     public void addOutPin(String pinId) {
         OutPin pin = new OutPin(pinId, this);
-        pin.hiImpedance = true;
         outAliasMap.put(pinId, pin);
         outMap.put(pinId, pin);
     }
@@ -116,18 +118,22 @@ public abstract class SchemaPart {
         addOutPin(pinId);
         OutPin pin = (OutPin) outMap.get(pinId);
         pin.state = state;
+        pin.strong = strong;
+        pin.hiImpedance = false;
     }
 
     public InBus addInBus(String pinId, int size, String... names) {
         return addInBus(new InBus(pinId, this, size, names) {
             @Override
             public void setHiImpedance() {
+                assert !hiImpedance : "Already in hiImpedance:" + this;
                 hiImpedance = true;
             }
 
             @Override
             public void setState(long newState) {
                 state = newState;
+                hiImpedance = false;
             }
         });
     }
@@ -161,6 +167,7 @@ public abstract class SchemaPart {
         addOutBus(pinId, size, names);
         OutBus pin = (OutBus) outMap.get(pinId);
         pin.state = state;
+        pin.hiImpedance = false;
     }
 
     public ModelInItem getInItem(String name) {
@@ -231,7 +238,7 @@ public abstract class SchemaPart {
                     outAliasMap.put(alias, newOutPin);
                 }
             }
-            default -> throw new RuntimeException("usuppoerted ModelOutItem: " + outPin.getClass().getName());
+            default -> throw new RuntimeException("Unsupported ModelOutItem: " + outPin.getClass().getName());
         }
         outMap.put(outPin.getId(), newOutPin);
     }

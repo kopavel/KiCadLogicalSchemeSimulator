@@ -66,6 +66,7 @@ public class PinMergerBusIn extends CorrectedInBus implements MergerInput {
 
     @Override
     public void setHiImpedance() {
+        assert !hiImpedance : "Already in hiImpedance:" + this;
         if (merger.weakState == 0) {
             merger.hiImpedance = true;
             for (Pin destination : merger.destinations) {

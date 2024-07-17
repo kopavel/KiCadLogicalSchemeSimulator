@@ -67,22 +67,25 @@ public class OutPin extends Pin implements ModelOutItem {
 
     @Override
     public void setHiImpedance() {
+        assert !hiImpedance : "Already in hiImpedance:" + this;
         for (Pin destination : destinations) {
             destination.setHiImpedance();
         }
     }
 
     public void resend() {
-        for (Pin destination : destinations) {
-            destination.state = state;
-            destination.strong = strong;
-            destination.resend();
+        if (!hiImpedance) {
+            for (Pin destination : destinations) {
+                destination.state = state;
+                destination.strong = strong;
+                destination.setState(state, strong);
+            }
         }
     }
 
     @Override
     public Pin getOptimised() {
-        if (destinations == null) {
+        if (destinations.length == 0) {
             return new NCOutPin(this);
         } else if (destinations.length == 1) {
             return destinations[0].getOptimised();

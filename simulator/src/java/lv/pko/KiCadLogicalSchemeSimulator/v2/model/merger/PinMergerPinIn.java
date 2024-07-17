@@ -90,6 +90,7 @@ public class PinMergerPinIn extends InPin implements MergerInput {
 
     @Override
     public void setHiImpedance() {
+        assert !hiImpedance : "Already in hiImpedance:" + this;
         if (!strong) {
             merger.weakState -= (byte) (merger.weakState > 0 ? 1 : -1);
         } else {

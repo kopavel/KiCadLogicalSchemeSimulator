@@ -51,22 +51,27 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
         pin1In = addInPin(new InPin("IN1", this) {
             @Override
             public void setHiImpedance() {
+                assert !hiImpedance : "Already in hiImpedance:" + this;
                 hiImpedance = true;
                 if (!pin2Out.hiImpedance) {
+                    pin2Out.hiImpedance = true;
                     pin2Out.setHiImpedance();
                 }
             }
 
             @Override
-            public void setState(boolean newState, boolean strong) {
+            public void setState(boolean newState, boolean newStrong) {
                 hiImpedance = false;
-                this.strong = strong;
                 state = newState;
+                strong = newStrong;
                 if (toggled) {
-                    if (!pin2In.hiImpedance && pin2In.strong) {
+                    if (!pin2In.hiImpedance && pin2In.strong && pin2In.state != newState) {
                         throw new ShortcutException(pin1In, pin2In);
-                    } else if (pin2Out.state != newState || pin2Out.hiImpedance) {
-                        pin2Out.setState(newState, strong);
+                    } else if (pin2Out.state != newState || pin2Out.hiImpedance || pin2Out.strong != newStrong) {
+                        pin2Out.state = state;
+                        pin2Out.strong = strong;
+                        pin2Out.hiImpedance = false;
+                        pin2Out.setState(newState, newStrong);
                     }
                 }
             }
@@ -74,22 +79,27 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
         pin2In = addInPin(new InPin("IN2", this) {
             @Override
             public void setHiImpedance() {
+                assert !hiImpedance : "Already in hiImpedance:" + this;
                 hiImpedance = true;
                 if (!pin1Out.hiImpedance) {
+                    pin1Out.hiImpedance = true;
                     pin1Out.setHiImpedance();
                 }
             }
 
             @Override
-            public void setState(boolean newState, boolean strong) {
+            public void setState(boolean newState, boolean newStrong) {
                 hiImpedance = false;
-                this.strong = strong;
                 state = newState;
+                strong = newStrong;
                 if (toggled) {
-                    if (!pin1In.hiImpedance && pin1In.strong) {
+                    if (!pin1In.hiImpedance && pin1In.strong && pin1In.state != newState) {
                         throw new ShortcutException(pin1In, pin2In);
-                    } else if (pin1Out.state != newState || pin1Out.hiImpedance) {
-                        pin1Out.setState(newState, strong);
+                    } else if (pin1Out.state != newState || pin1Out.hiImpedance || pin1Out.strong != newStrong) {
+                        pin1Out.state = state;
+                        pin1Out.strong = strong;
+                        pin1Out.hiImpedance = false;
+                        pin1Out.setState(newState, newStrong);
                     }
                 }
             }
@@ -118,23 +128,33 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
         if (toggled) {
             if (pin1In.hiImpedance) {
                 if (!pin2Out.hiImpedance) {
+                    pin2Out.hiImpedance = true;
                     pin2Out.setHiImpedance();
                 }
             } else if (pin1In.strong != pin2Out.strong || pin1In.state != pin2Out.state) {
+                pin2Out.state = pin1In.state;
+                pin2Out.strong = pin1In.strong;
+                pin2Out.hiImpedance = false;
                 pin2Out.setState(pin1In.state, pin1In.strong);
             }
             if (pin2In.hiImpedance) {
                 if (!pin1Out.hiImpedance) {
+                    pin1Out.hiImpedance = true;
                     pin1Out.setHiImpedance();
                 }
-            } else if (pin1In.strong != pin2Out.strong || pin1In.state != pin2Out.state) {
-                pin2Out.setState(pin1In.state, pin1In.strong);
+            } else if (pin2In.strong != pin1Out.strong || pin2In.state != pin1Out.state) {
+                pin1Out.state = pin2In.state;
+                pin1Out.strong = pin2In.strong;
+                pin1Out.hiImpedance = false;
+                pin1Out.setState(pin2In.state, pin2In.strong);
             }
         } else {
             if (!pin1Out.hiImpedance) {
+                pin1Out.hiImpedance = true;
                 pin1Out.setHiImpedance();
             }
             if (!pin1Out.hiImpedance) {
+                pin2Out.hiImpedance = true;
                 pin2Out.setHiImpedance();
             }
         }

@@ -63,7 +63,7 @@ public class MaskGroupBus extends OutBus {
 
     @Override
     public Bus getOptimised() {
-        if (destinations == null) {
+        if (destinations.length == 0) {
             return new NCOutBus(this);
         } else if (destinations.length == 1) {
             Bus destination = destinations[0];

@@ -49,6 +49,7 @@ public class NCOutPin extends OutPin {
 
     @Override
     public void setHiImpedance() {
+        assert !hiImpedance : "Already in hiImpedance:" + this;
     }
 
     @Override

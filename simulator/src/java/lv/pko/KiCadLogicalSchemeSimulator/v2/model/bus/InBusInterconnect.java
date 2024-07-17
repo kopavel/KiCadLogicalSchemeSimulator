@@ -33,15 +33,17 @@ package lv.pko.KiCadLogicalSchemeSimulator.v2.model.bus;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus.in.InBus;
 
 public class InBusInterconnect extends InBus {
-    private final InBus destination;
-    private final long interconnectMask;
-    private final long inverseInterconnectMask;
+    public final InBus destination;
+    public final long interconnectMask;
+    public final long senseMask;
+    public final long inverseInterconnectMask;
 
-    public InBusInterconnect(InBus destination, long interconnectMask) {
-        super(destination.id, destination.parent, destination.size, destination.aliasOffsets.keySet().toArray(String[]::new));
+    public InBusInterconnect(InBus destination, long interconnectMask, Byte offset) {
+        super(destination, "interconnect" + interconnectMask);
         this.destination = destination;
         this.interconnectMask = interconnectMask;
         this.inverseInterconnectMask = ~interconnectMask;
+        this.senseMask = 1L << offset;
         //FixMe check if shortcut multiple out pins.
     }
 

@@ -105,78 +105,85 @@ public class Model {
     private void processNet(Net net) {
         Map<ModelOutItem, Byte> outsOffset = new HashMap<>();
         Map<ModelInItem, SortedSet<Byte>> insOffsets = new HashMap<>();
+        if ("gnd".equalsIgnoreCase(net.getName())) {
+            outsOffset.put((ModelOutItem) schemaParts.get("gnd").getOutItem("OUT"), (byte) 0);
+        } else if ("pwr".equalsIgnoreCase(net.getName())) {
+            outsOffset.put((ModelOutItem) schemaParts.get("pwr").getOutItem("OUT"), (byte) 0);
+        }
         net.getNode().forEach(node -> {
-            if ("gnd".equalsIgnoreCase(net.getName())) {
-                outsOffset.put((ModelOutItem) schemaParts.get("gnd").getOutItem("OUT"), (byte) 0);
-            } else if ("pwr".equalsIgnoreCase(net.getName())) {
-                outsOffset.put((ModelOutItem) schemaParts.get("pwr").getOutItem("OUT"), (byte) 0);
+            Map<String, PinMapDescriptor> pinMap = schemaPartPinMap.get(node.getRef());
+            String pinName;
+            SchemaPart schemaPart;
+            if (pinMap != null) {
+                PinMapDescriptor pinMapDescriptor = pinMap.get(node.getPin());
+                if (pinMapDescriptor == null) {
+                    //ignore unmapped pins (power one?)
+                    return;
+                }
+                pinName = pinMapDescriptor.pinName;
+                schemaPart = pinMapDescriptor.schemaPart;
             } else {
-                Map<String, PinMapDescriptor> pinMap = schemaPartPinMap.get(node.getRef());
-                String pinName;
-                SchemaPart schemaPart;
-                if (pinMap != null) {
-                    PinMapDescriptor pinMapDescriptor = pinMap.get(node.getPin());
-                    if (pinMapDescriptor == null) {
-                        //ignore unmapped pins (power one?)
-                        return;
+                pinName = node.getPinfunction();
+                schemaPart = this.schemaParts.get(node.getRef());
+            }
+            String pinType = node.getPintype();
+            if (pinType.contains("+")) {
+                pinType = pinType.substring(0, pinType.indexOf('+'));
+            }
+            switch (pinType) {
+                case "input":
+                    ModelInItem inItem = schemaPart.getInItem(pinName);
+                    insOffsets.computeIfAbsent(inItem, p -> new TreeSet<>()).add(inItem.getAliasOffset(pinName));
+                    break;
+                case "tri_state":
+                case "output":
+                    ModelOutItem outItem = (ModelOutItem) schemaPart.getOutItem(pinName);
+                    outsOffset.put(outItem, outItem.getAliasOffset(pinName));
+                    break;
+                case "passive":
+                case "bidirectional":
+                    inItem = schemaPart.getInItem(pinName);
+                    insOffsets.computeIfAbsent(inItem, p -> new TreeSet<>()).add(inItem.getAliasOffset(pinName));
+                    outItem = (ModelOutItem) schemaPart.getOutItem(pinName);
+                    outsOffset.put(outItem, outItem.getAliasOffset(pinName));
+                    break;
+                case "power_in":
+                    //ignore
+                    break;
+                default:
+                    throw new RuntimeException("Unsupported pin type " + pinType);
+            }
+        });
+        insOffsets.forEach((inItem, inOffsets) -> {
+            ModelInItem currentInItem = inItem;
+            for (Map.Entry<ModelOutItem, Byte> entry : outsOffset.entrySet()) {
+                ModelOutItem outItem = entry.getKey();
+                Byte outOffset = entry.getValue();
+                if (inOffsets.size() > 1) {
+                    switch (currentInItem) {
+                        case InPin ignored -> throw new RuntimeException("Pin can't be interconnected");
+                        case InBus bus -> {
+                            // interconnected Bus pins
+                            long interconnectMask = 0;
+                            for (Byte offset : inOffsets) {
+                                interconnectMask |= (1L << offset);
+                            }
+                            InBusInterconnect interconnect = new InBusInterconnect(bus, interconnectMask, inOffsets.getFirst());
+                            currentInItem = interconnect;
+                            Byte offset = inOffsets.getFirst();
+                            inOffsets.clear();
+                            inOffsets.add(offset);
+                            outMap.computeIfAbsent(outItem, p -> new HashSet<>()).add(interconnect);
+                            inMap.computeIfAbsent(interconnect, p -> new InItemDescriptor()).addInItem(outItem, outOffset, offset);
+                        }
+                        default -> throw new RuntimeException("Unsupported inItem: " + currentInItem.getClass().getName());
                     }
-                    pinName = pinMapDescriptor.pinName;
-                    schemaPart = pinMapDescriptor.schemaPart;
                 } else {
-                    pinName = node.getPinfunction();
-                    schemaPart = this.schemaParts.get(node.getRef());
-                }
-                String pinType = node.getPintype();
-                if (pinType.contains("+")) {
-                    pinType = pinType.substring(0, pinType.indexOf('+'));
-                }
-                switch (pinType) {
-                    case "input":
-                        ModelInItem inItem = schemaPart.getInItem(pinName);
-                        insOffsets.computeIfAbsent(inItem, p -> new TreeSet<>()).add(inItem.getAliasOffset(pinName));
-                        break;
-                    case "tri_state":
-                    case "output":
-                        ModelOutItem outItem = (ModelOutItem) schemaPart.getOutItem(pinName);
-                        outsOffset.put(outItem, outItem.getAliasOffset(pinName));
-                        break;
-                    case "passive":
-                    case "bidirectional":
-                        inItem = schemaPart.getInItem(pinName);
-                        insOffsets.computeIfAbsent(inItem, p -> new TreeSet<>()).add(inItem.getAliasOffset(pinName));
-                        outItem = (ModelOutItem) schemaPart.getOutItem(pinName);
-                        outsOffset.put(outItem, outItem.getAliasOffset(pinName));
-                        break;
-                    case "power_in":
-                        //ignore
-                        break;
-                    default:
-                        throw new RuntimeException("Unsupported pin type " + pinType);
+                    outMap.computeIfAbsent(outItem, p -> new HashSet<>()).add(currentInItem);
+                    inMap.computeIfAbsent(currentInItem, p -> new InItemDescriptor()).addInItem(outItem, outOffset, inOffsets.getFirst());
                 }
             }
         });
-        outsOffset.forEach((outItem, outOffset) -> //
-                insOffsets.forEach((inItem, inOffsets) -> {
-                    if (inOffsets.size() > 1) {
-                        switch (inItem) {
-                            case InPin ignored -> throw new RuntimeException("Pin can't be interconnected");
-                            case InBus bus -> {
-                                // interconnected Bus pins
-                                long interconnectMask = 0;
-                                for (Byte offset : inOffsets) {
-                                    interconnectMask |= (1L << offset);
-                                }
-                                InBusInterconnect interconnect = new InBusInterconnect(bus, interconnectMask);
-                                outMap.computeIfAbsent(outItem, p -> new HashSet<>()).add(interconnect);
-                                inMap.computeIfAbsent(interconnect, p -> new InItemDescriptor()).addInItem(outItem, outOffset, inOffsets.getFirst());
-                            }
-                            default -> throw new RuntimeException("Unsupported inItem: " + inItem.getClass().getName());
-                        }
-                    } else {
-                        outMap.computeIfAbsent(outItem, p -> new HashSet<>()).add(inItem);
-                        inMap.computeIfAbsent(inItem, p -> new InItemDescriptor()).addInItem(outItem, outOffset, inOffsets.getFirst());
-                    }
-                }));
     }
 
     private void buildBuses() {
@@ -194,12 +201,8 @@ public class Model {
                 //connect InPin to multiple OutPins throe Merger
                 IMerger merger;
                 switch (inItem) {
-                    case InBus bus -> {
-                        merger = new BusMerger(bus);
-                    }
-                    case InPin pin -> {
-                        merger = new PinMerger(pin);
-                    }
+                    case InBus bus -> merger = new BusMerger(bus);
+                    case InPin pin -> merger = new PinMerger(pin);
                     default -> throw new RuntimeException("Unsupported inItem: " + inItem.getClass().getName());
                 }
                 for (Map.Entry<ModelOutItem, Map<Byte, Long>> outItemEntry : inDescriptor.entrySet()) {
@@ -233,7 +236,6 @@ public class Model {
 
     private void replaceOut(IModelItem outItem, IModelItem newOutItem) {
         outItem.getParent().replaceOut(outItem, newOutItem);
-//        outMap.put(newOutItem, outMap.remove(outItem));
     }
 
     private void createSchemaPart(Comp component, SchemaPartMap map) {

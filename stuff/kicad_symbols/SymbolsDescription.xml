@@ -27,8 +27,8 @@
 		<symbol name="NXOR" symPartClass="XorGate" symPartParam="reverse"/>
 		<symbol name="OR" symPartClass="OrGate" symPartParam="size=2"/>
 		<symbol name="OSCILLATOR" symPartClass="Oscillator"/>
-		<symbol name="PULLDOWN" symPartClass="Power" symPartParam="state=0"/>
-		<symbol name="PULLUP" symPartClass="Power" symPartParam="state=1"/>
+		<symbol name="PULLDOWN" symPartClass="Power" symPartParam=""/>
+		<symbol name="PULLUP" symPartClass="Power" symPartParam="hi"/>
 		<symbol name="RAM1MB" symPartClass="Ram" symPartParam="aSize=20;size=8;reverse"/>
 		<symbol name="RAM64K" symPartClass="Ram" symPartParam="aSize=16;size=8;reverse"/>
 		<symbol name="RAM256" symPartClass="Ram" symPartParam="aSize=8;size=8;reverse"/>

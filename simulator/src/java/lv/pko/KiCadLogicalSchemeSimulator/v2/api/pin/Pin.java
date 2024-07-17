@@ -43,7 +43,7 @@ public abstract class Pin extends ModelItem {
 
     public Pin(Pin oldPin, String variantId) {
         this(oldPin.id, oldPin.parent);
-        this.variantId = variantId + ":" + oldPin.variantId;
+        this.variantId = variantId + (oldPin.variantId == null ? "" : ":" + oldPin.variantId);
         state = oldPin.state;
         strong = oldPin.strong;
         hiImpedance = oldPin.hiImpedance;
@@ -81,9 +81,7 @@ public abstract class Pin extends ModelItem {
     }
 
     public void resend() {
-        if (hiImpedance) {
-            setHiImpedance();
-        } else {
+        if (!hiImpedance) {
             setState(state, strong);
         }
     }

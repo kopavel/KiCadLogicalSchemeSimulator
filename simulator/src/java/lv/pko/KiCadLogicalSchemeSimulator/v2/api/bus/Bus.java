@@ -49,7 +49,7 @@ public abstract class Bus extends ModelItem {
 
     public Bus(Bus oldBus, String variantId) {
         this(oldBus.id, oldBus.parent, oldBus.size);
-        this.variantId = variantId + ":" + oldBus.variantId;
+        this.variantId = variantId + (oldBus.variantId == null ? "" : ":" + oldBus.variantId);
         aliasOffsets = oldBus.aliasOffsets;
         useBitPresentation = oldBus.useBitPresentation;
         state = oldBus.state;
@@ -101,9 +101,7 @@ public abstract class Bus extends ModelItem {
 
     @Override
     public void resend() {
-        if (hiImpedance) {
-            setHiImpedance();
-        } else {
+        if (!hiImpedance) {
             setState(state);
         }
     }

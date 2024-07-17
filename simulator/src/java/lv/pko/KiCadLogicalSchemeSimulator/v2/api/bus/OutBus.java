@@ -101,21 +101,24 @@ public class OutBus extends Bus implements ModelOutItem {
 
     @Override
     public void setHiImpedance() {
+        assert !hiImpedance : "Already in hiImpedance:" + this;
         for (Bus destination : destinations) {
             destination.setHiImpedance();
         }
     }
 
     public void resend() {
-        for (Bus destination : destinations) {
-            destination.state = state;
-            destination.resend();
+        if (!hiImpedance) {
+            for (Bus destination : destinations) {
+                destination.state = state;
+                destination.setState(state);
+            }
         }
     }
 
     @Override
     public Bus getOptimised() {
-        if (destinations == null) {
+        if (destinations.length == 0) {
             return new NCOutBus(this);
         } else if (destinations.length == 1) {
             return destinations[0].getOptimised();

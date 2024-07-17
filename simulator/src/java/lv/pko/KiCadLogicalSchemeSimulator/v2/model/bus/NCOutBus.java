@@ -50,6 +50,7 @@ public class NCOutBus extends OutBus {
 
     @Override
     public void setHiImpedance() {
+        assert !hiImpedance : "Already in hiImpedance:" + this;
     }
 
     @Override

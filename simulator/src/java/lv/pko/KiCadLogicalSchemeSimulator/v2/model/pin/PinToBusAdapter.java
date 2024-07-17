@@ -50,6 +50,7 @@ public class PinToBusAdapter extends Pin {
 
     @Override
     public void setHiImpedance() {
+        assert !hiImpedance : "Already in hiImpedance:" + this;
         destination.setHiImpedance();
     }
 }

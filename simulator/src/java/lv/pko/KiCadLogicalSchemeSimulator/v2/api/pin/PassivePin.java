@@ -32,10 +32,10 @@
 package lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.schemaPart.SchemaPart;
 
+//FixMe not supported by model yet.
 public abstract class PassivePin extends OutPin {
     public PassivePin(String id, SchemaPart parent) {
         super(id, parent);
-        hiImpedance = true;
     }
 
     @Override

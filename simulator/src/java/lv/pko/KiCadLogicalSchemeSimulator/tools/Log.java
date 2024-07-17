@@ -39,91 +39,111 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "UnusedReturnValue"})
 public class Log {
     private static final Map<Class<?>, org.apache.logging.log4j.Logger> loggers = new ConcurrentHashMap<>();
 
     private Log() {
     }
 
-    public static void error(Class<?> clazz, String message, Object... o) {
+    public static boolean error(Class<?> clazz, String message, Object... o) {
         getLogger(clazz).error(message, o);
+        return true;
     }
 
-    public static void error(Class<?> clazz, String message, Supplier<?>... o) {
+    public static boolean error(Class<?> clazz, String message, Supplier<?>... o) {
         getLogger(clazz).error(message, t(o));
+        return true;
     }
 
-    public static void error(Class<?> clazz, String message) {
+    public static boolean error(Class<?> clazz, String message) {
         getLogger(clazz).error(message);
+        return true;
     }
 
-    public static void error(Class<?> clazz, String message, Throwable t) {
+    public static boolean error(Class<?> clazz, String message, Throwable t) {
         getLogger(clazz).error(message, t);
+        return true;
     }
 
-    public static void warn(Class<?> clazz, String message, Object... o) {
+    public static boolean warn(Class<?> clazz, String message, Object... o) {
         getLogger(clazz).warn(message, o);
+        return true;
     }
 
-    public static void warn(Class<?> clazz, String message, Supplier<?>... o) {
+    public static boolean warn(Class<?> clazz, String message, Supplier<?>... o) {
         getLogger(clazz).warn(message, t(o));
+        return true;
     }
 
-    public static void warn(Class<?> clazz, String message) {
+    public static boolean warn(Class<?> clazz, String message) {
         getLogger(clazz).warn(message);
+        return true;
     }
 
-    public static void warn(Class<?> clazz, String message, Throwable t) {
+    public static boolean warn(Class<?> clazz, String message, Throwable t) {
         getLogger(clazz).warn(message, t);
+        return true;
     }
 
-    public static void info(Class<?> clazz, String message, Object... o) {
+    public static boolean info(Class<?> clazz, String message, Object... o) {
         getLogger(clazz).info(message, o);
+        return true;
     }
 
-    public static void info(Class<?> clazz, String message, Supplier<?>... o) {
+    public static boolean info(Class<?> clazz, String message, Supplier<?>... o) {
         getLogger(clazz).info(message, 0, t(o));
+        return true;
     }
 
-    public static void info(Class<?> clazz, String message) {
+    public static boolean info(Class<?> clazz, String message) {
         getLogger(clazz).info(message);
+        return true;
     }
 
-    public static void info(Class<?> clazz, String message, Throwable t) {
+    public static boolean info(Class<?> clazz, String message, Throwable t) {
         getLogger(clazz).info(message, t);
+        return true;
     }
 
-    public static void debug(Class<?> clazz, String message, Object... o) {
+    public static boolean debug(Class<?> clazz, String message, Object... o) {
         getLogger(clazz).debug(message, o);
+        return true;
     }
 
-    public static void debug(Class<?> clazz, String message, Supplier<?>... o) {
+    public static boolean debug(Class<?> clazz, String message, Supplier<?>... o) {
         getLogger(clazz).debug(message, t(o));
+        return true;
     }
 
-    public static void debug(Class<?> clazz, String message) {
+    public static boolean debug(Class<?> clazz, String message) {
         getLogger(clazz).debug(message);
+        return true;
     }
 
-    public static void debug(Class<?> clazz, String message, Throwable t) {
+    public static boolean debug(Class<?> clazz, String message, Throwable t) {
         getLogger(clazz).debug(message, t);
+        return true;
     }
 
-    public static void trace(Class<?> clazz, String message, Object... o) {
+    public static boolean trace(Class<?> clazz, String message, Object... o) {
         getLogger(clazz).trace(message, o);
+        return true;
     }
 
-    public static void trace(Class<?> clazz, String message, Supplier<?>... o) {
+    public static boolean trace(Class<?> clazz, String message, Supplier<?>... o) {
         getLogger(clazz).trace(message, t(o));
+        return true;
     }
 
-    public static void trace(Class<?> clazz, String message) {
+    public static boolean trace(Class<?> clazz, String message) {
         getLogger(clazz).trace(message);
+        return true;
     }
 
-    public static void trace(Class<?> clazz, String message, Throwable t) {
+    public static boolean trace(Class<?> clazz, String message, Throwable t) {
         getLogger(clazz).trace(message, t);
+        return true;
     }
 
     public static boolean isDebugEnabled(Class<?> clazz) {

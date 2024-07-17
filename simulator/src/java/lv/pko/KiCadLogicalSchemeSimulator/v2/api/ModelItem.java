@@ -38,7 +38,7 @@ public abstract class ModelItem implements IModelItem {
     public final String id;
     public final SchemaPart parent;
     public String variantId;
-    public boolean hiImpedance;
+    public boolean hiImpedance = true;
 
     protected ModelItem(String id, SchemaPart parent) {
         this.id = id;

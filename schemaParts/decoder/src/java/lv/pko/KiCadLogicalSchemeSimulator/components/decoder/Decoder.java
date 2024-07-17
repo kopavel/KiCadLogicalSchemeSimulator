@@ -63,6 +63,7 @@ public class Decoder extends SchemaPart {
 
                 @Override
                 public void setHiImpedance() {
+                    assert !hiImpedance : "Already in hiImpedance:" + this;
                     hiImpedance = true;
                     if (csState) {
                         throw new FloatingInException(this);
@@ -86,6 +87,7 @@ public class Decoder extends SchemaPart {
 
                 @Override
                 public void setHiImpedance() {
+                    assert !hiImpedance : "Already in hiImpedance:" + this;
                     hiImpedance = true;
                     if (csState) {
                         throw new FloatingInException(this);
@@ -101,7 +103,7 @@ public class Decoder extends SchemaPart {
                     csState = !newState;
                     if (csState) {
                         if (aBus.hiImpedance) {
-                            throw new FloatingInException(outBus);
+                            throw new FloatingInException(aBus);
                         } else if (outBus.state != outState) {
                             outBus.state = outState;
                             outBus.setState(outState);
@@ -120,7 +122,7 @@ public class Decoder extends SchemaPart {
                     csState = newState;
                     if (csState) {
                         if (aBus.hiImpedance) {
-                            throw new FloatingInException(outBus);
+                            throw new FloatingInException(aBus);
                         } else if (outBus.state != outState) {
                             outBus.state = outState;
                             outBus.setState(outState);

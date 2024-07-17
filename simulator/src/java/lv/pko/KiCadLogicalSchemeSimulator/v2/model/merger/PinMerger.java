@@ -41,6 +41,7 @@ import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin.Pin;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin.in.InPin;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 //FixMe use one destination with splitter
 public class PinMerger extends OutPin implements IMerger {
@@ -52,7 +53,6 @@ public class PinMerger extends OutPin implements IMerger {
     public PinMerger(Pin dest) {
         super(dest.id, dest.parent);
         destinations = new Pin[]{dest};
-        hiImpedance = true;
     }
 
     @Override
@@ -65,11 +65,9 @@ public class PinMerger extends OutPin implements IMerger {
     }
 
     public String getHash() {
-        StringBuilder result = new StringBuilder();
-        for (MergerInput input : mergerInputs) {
-            result.append(";").append(input.getHash());
-        }
-        return result.toString();
+        return Arrays.stream(mergerInputs)
+                .map(MergerInput::getHash)
+                .collect(Collectors.joining(";"));
     }
 
     public void addSource(ModelOutItem src, long mask, byte offset) {
@@ -102,14 +100,15 @@ public class PinMerger extends OutPin implements IMerger {
             }
             case Bus bus -> {
                 input = new PinMergerBusIn(bus, mask, this);
-                hiImpedance = false;
-                if (strong) {
-                    Set<ModelOutItem> items = sources.keySet();
-                    items.add(src);
-                    throw new ShortcutException(items.toArray(new ModelOutItem[0]));
+                if (!bus.hiImpedance) {
+                    if (strong) {
+                        Set<ModelOutItem> items = sources.keySet();
+                        items.add(src);
+                        throw new ShortcutException(items.toArray(new ModelOutItem[0]));
+                    }
+                    strong = true;
+                    state = (bus.state & mask) > 0;
                 }
-                strong = true;
-                state = (bus.state & mask) > 0;
             }
             default -> throw new RuntimeException("Unsupported item " + src.getClass().getName());
         }
@@ -125,9 +124,7 @@ public class PinMerger extends OutPin implements IMerger {
 
     @Override
     public void resend() {
-        if (hiImpedance) {
-            setHiImpedance();
-        } else {
+        if (!hiImpedance) {
             setState(state, strong);
         }
     }
