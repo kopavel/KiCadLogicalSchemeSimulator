@@ -37,6 +37,7 @@ import lv.pko.KiCadLogicalSchemeSimulator.v2.api.schemaPart.SchemaPart;
 public abstract class NoFloatingInPin extends InPin {
     public NoFloatingInPin(String id, SchemaPart parent) {
         super(id, parent);
+        hiImpedance = false;
     }
 
     public NoFloatingInPin(Pin oldPin, String variantId) {

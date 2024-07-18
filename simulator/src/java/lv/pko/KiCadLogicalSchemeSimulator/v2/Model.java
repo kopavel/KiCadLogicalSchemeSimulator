@@ -56,8 +56,6 @@ public class Model {
     public final Map<String, SchemaPart> schemaParts = new TreeMap<>();
     public final Map<String, Map<String, PinMapDescriptor>> schemaPartPinMap = new TreeMap<>();
     public final Map<String, SchemaPartSpi> schemaPartSpiMap;
-    //Simple map from OutPin to InPin
-    private final Map<ModelOutItem, Set<ModelInItem>> outMap = new HashMap<>();
     private final Map<ModelInItem, InItemDescriptor> inMap = new HashMap<>();
     private final Map<String, IMerger> mergers = new HashMap<>();
 
@@ -154,13 +152,14 @@ public class Model {
                     throw new RuntimeException("Unsupported pin type " + pinType);
             }
         });
+        Map<ModelInItem, ModelInItem> wrappers = new HashMap<>();
         insOffsets.forEach((inItem, inOffsets) -> {
-            ModelInItem currentInItem = inItem;
             for (Map.Entry<ModelOutItem, Byte> entry : outsOffset.entrySet()) {
                 ModelOutItem outItem = entry.getKey();
                 Byte outOffset = entry.getValue();
+                InItemDescriptor inItemDescriptor = inMap.computeIfAbsent(wrappers.getOrDefault(inItem, inItem), p -> new InItemDescriptor());
                 if (inOffsets.size() > 1) {
-                    switch (currentInItem) {
+                    switch (inItem) {
                         case InPin ignored -> throw new RuntimeException("Pin can't be interconnected");
                         case InBus bus -> {
                             // interconnected Bus pins
@@ -169,19 +168,17 @@ public class Model {
                                 interconnectMask |= (1L << offset);
                             }
                             InBusInterconnect interconnect = new InBusInterconnect(bus, interconnectMask, inOffsets.getFirst());
-                            currentInItem = interconnect;
+                            inMap.remove(inItem);
+                            inMap.put(interconnect, inItemDescriptor);
+                            wrappers.put(inItem, interconnect);
                             Byte offset = inOffsets.getFirst();
                             inOffsets.clear();
                             inOffsets.add(offset);
-                            outMap.computeIfAbsent(outItem, p -> new HashSet<>()).add(interconnect);
-                            inMap.computeIfAbsent(interconnect, p -> new InItemDescriptor()).addInItem(outItem, outOffset, offset);
                         }
-                        default -> throw new RuntimeException("Unsupported inItem: " + currentInItem.getClass().getName());
+                        default -> throw new RuntimeException("Unsupported inItem: " + inItem.getClass().getName());
                     }
-                } else {
-                    outMap.computeIfAbsent(outItem, p -> new HashSet<>()).add(currentInItem);
-                    inMap.computeIfAbsent(currentInItem, p -> new InItemDescriptor()).addInItem(outItem, outOffset, inOffsets.getFirst());
                 }
+                inItemDescriptor.addInItem(outItem, outOffset, inOffsets.getFirst());
             }
         });
     }

@@ -181,22 +181,6 @@ public abstract class SchemaPart {
         return item;
     }
 
-    public Bus getInBus(String name) {
-        ModelInItem item = getInItem(name);
-        if (item instanceof Bus bus) {
-            return bus;
-        }
-        throw new RuntimeException("Input item " + name + " in not a bus");
-    }
-
-    public Pin getInPin(String name) {
-        ModelInItem item = getInItem(name);
-        if (item instanceof Pin pin) {
-            return pin;
-        }
-        throw new RuntimeException("Input item " + name + " in not a pin");
-    }
-
     public IModelItem getOutItem(String name) {
         IModelItem pin = outMap.get(name);
         if (pin == null) {

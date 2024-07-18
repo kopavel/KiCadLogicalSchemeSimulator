@@ -30,6 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.KiCadLogicalSchemeSimulator.v2.model.merger;
+import lv.pko.KiCadLogicalSchemeSimulator.tools.Log;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.ShortcutException;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus.Bus;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus.in.CorrectedInBus;
@@ -47,6 +48,16 @@ public class PinMergerBusIn extends CorrectedInBus implements MergerInput {
 
     @Override
     public void setState(long newState) {
+        assert Log.debug(PinMergerPinIn.class,
+                "Pin merger change. before: newState:{}, Source:{} (state:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{}, hiImpedance:{})",
+                newState,
+                getName(),
+                state,
+                hiImpedance,
+                merger.getName(),
+                merger.state,
+                merger.strong,
+                merger.hiImpedance);
         if (hiImpedance && merger.strong) {
             throw new ShortcutException(merger.mergerInputs);
         }
@@ -60,23 +71,35 @@ public class PinMergerBusIn extends CorrectedInBus implements MergerInput {
                 destination.setState(merger.state, true);
             }
         }
+        hiImpedance = false;
         merger.strong = true;
         merger.hiImpedance = false;
+        assert Log.debug(PinMergerPinIn.class,
+                "Pin merger change. after: newState:{}, Source:{} (state:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{}, hiImpedance:{})",
+                newState,
+                getName(),
+                state,
+                hiImpedance,
+                merger.getName(),
+                merger.state,
+                merger.strong,
+                merger.hiImpedance);
     }
 
     @Override
     public void setHiImpedance() {
         assert !hiImpedance : "Already in hiImpedance:" + this;
         if (merger.weakState == 0) {
-            merger.hiImpedance = true;
             for (Pin destination : merger.destinations) {
                 destination.setHiImpedance();
             }
+            merger.hiImpedance = true;
         } else if (merger.state != (merger.weakState > 0)) {
             for (Pin destination : merger.destinations) {
                 destination.setState((merger.weakState > 0), false);
             }
         }
+        hiImpedance = true;
     }
 
     @Override

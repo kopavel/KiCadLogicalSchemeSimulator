@@ -59,7 +59,6 @@ public class OffsetBus extends Bus {
 
     @Override
     public void setHiImpedance() {
-        assert !hiImpedance : "Already in hiImpedance:" + this;
         destination.setHiImpedance();
     }
 

@@ -30,6 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.KiCadLogicalSchemeSimulator.v2.model.merger;
+import lv.pko.KiCadLogicalSchemeSimulator.tools.Log;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.ShortcutException;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin.Pin;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin.in.InPin;
@@ -44,6 +45,19 @@ public class PinMergerPinIn extends InPin implements MergerInput {
 
     @Override
     public void setState(boolean newState, boolean newStrong) {
+        assert Log.debug(PinMergerPinIn.class,
+                "Pin merger change. before: newState:{}, newStrong:{}, Source:{} (state:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{}, " +
+                        "hiImpedance:{})",
+                newState,
+                newStrong,
+                getName(),
+                state,
+                strong,
+                hiImpedance,
+                merger.getName(),
+                merger.state,
+                merger.strong,
+                merger.hiImpedance);
         boolean oldState = merger.state;
         boolean oldStrong = merger.strong;
         if (newStrong) { //to strong
@@ -86,6 +100,19 @@ public class PinMergerPinIn extends InPin implements MergerInput {
         }
         hiImpedance = false;
         strong = newStrong;
+        assert Log.debug(PinMergerPinIn.class,
+                "Pin merger change. after: newState:{}, newStrong:{}, Source:{} (state:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{}, " +
+                        "hiImpedance:{})",
+                newState,
+                newStrong,
+                getName(),
+                state,
+                strong,
+                hiImpedance,
+                merger.getName(),
+                merger.state,
+                merger.strong,
+                merger.hiImpedance);
     }
 
     @Override
@@ -107,6 +134,7 @@ public class PinMergerPinIn extends InPin implements MergerInput {
                 }
             }
         }
+        hiImpedance = true;
     }
 
     @Override

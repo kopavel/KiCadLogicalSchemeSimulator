@@ -34,7 +34,6 @@ import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import lv.pko.KiCadLogicalSchemeSimulator.Simulator;
 import lv.pko.KiCadLogicalSchemeSimulator.api.AbstractUiComponent;
-import lv.pko.KiCadLogicalSchemeSimulator.api.pins.out.TriStateOutPin;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.IModelItem;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.ModelInItem;
 import lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus.Bus;
@@ -56,12 +55,8 @@ public class SchemaPartMonitor extends JFrame {
     public final SchemaPart schemaPart;
     private final ScheduledExecutorService scheduler;
     private final JTextArea extraPanel;
-    ModelInItem[] ins = new ModelInItem[0];
-    IModelItem[] outs = new IModelItem[0];
-    JLabel[] insLabels = new JLabel[0];
-    JLabel[] outsLabels = new JLabel[0];
-    Long[] insMask = new Long[0];
-    Long[] outsMask = new Long[0];
+    In[] ins = new In[0];
+    Out[] outs = new Out[0];
     private JPanel inputsNames;
     private JPanel inputsValues;
     private JPanel outputsNames;
@@ -103,10 +98,8 @@ public class SchemaPartMonitor extends JFrame {
                     label.setAlignmentX(RIGHT_ALIGNMENT);
                     label.setBorder(new CompoundBorder(BorderFactory.createEmptyBorder(2, 2, 1, 0),
                             new CompoundBorder(BorderFactory.createLineBorder(borderColor), BorderFactory.createEmptyBorder(1, 5, 1, 5))));
-                    ins = addToArray(ins, inItem);
-                    insLabels = addToArray(insLabels, label);
+                    ins = addToArray(ins, new In(inItem, label, 1L << j));
                     inputsValues.add(label);
-                    insMask = addToArray(insMask, 1L << j);
                 }
             } else {
                 label = new JLabel(inItem.getId());
@@ -119,8 +112,7 @@ public class SchemaPartMonitor extends JFrame {
                 label.setAlignmentX(RIGHT_ALIGNMENT);
                 label.setBorder(new CompoundBorder(BorderFactory.createEmptyBorder(2, 2, 1, 0),
                         new CompoundBorder(BorderFactory.createLineBorder(borderColor), BorderFactory.createEmptyBorder(1, 5, 1, 5))));
-                ins = addToArray(ins, inItem);
-                insLabels = addToArray(insLabels, label);
+                ins = addToArray(ins, new In(inItem, label, 1L));
                 inputsValues.add(label);
             }
         }
@@ -140,9 +132,7 @@ public class SchemaPartMonitor extends JFrame {
                     label.setBorder(new CompoundBorder(BorderFactory.createEmptyBorder(2, 0, 1, 2),
                             new CompoundBorder(BorderFactory.createLineBorder(borderColor), BorderFactory.createEmptyBorder(1, 5, 1, 5))));
                     outputsValues.add(label);
-                    outs = addToArray(outs, outItem);
-                    outsLabels = addToArray(outsLabels, label);
-                    outsMask = addToArray(outsMask, 1L << j);
+                    outs = addToArray(outs, new Out(outItem, label, 1L << j));
                 }
             } else {
                 label = new JLabel(outItem.getId());
@@ -156,8 +146,7 @@ public class SchemaPartMonitor extends JFrame {
                 label.setBorder(new CompoundBorder(BorderFactory.createEmptyBorder(2, 0, 1, 2),
                         new CompoundBorder(BorderFactory.createLineBorder(borderColor), BorderFactory.createEmptyBorder(1, 5, 1, 5))));
                 outputsValues.add(label);
-                outs = addToArray(outs, outItem);
-                outsLabels = addToArray(outsLabels, label);
+                outs = addToArray(outs, new Out(outItem, label, 1L));
             }
         }
         extraPanel = new JTextArea();
@@ -188,21 +177,22 @@ public class SchemaPartMonitor extends JFrame {
 
     private void reDraw() {
         SwingUtilities.invokeLater(() -> {
-            for (int i = 0; i < ins.length; i++) {
-                if (ins[i] instanceof Bus bus && bus.useBitPresentation) {
-                    insLabels[i].setText((bus.state & insMask[i]) > 0 ? "1" : "0");
+            for (In in : ins) {
+                if (in.in.isHiImpedance()) {
+                    in.label.setText("Hi");
+                } else if (in.in instanceof Bus bus && bus.useBitPresentation) {
+                    in.label.setText((bus.state & in.mask) > 0 ? "1" : "0");
                 } else {
-                    insLabels[i].setText(String.format("%" + (int) Math.ceil(ins[i].getSize() / 4d) + "X", ins[i].getState()));
+                    in.label.setText(String.format("%" + (int) Math.ceil(in.in.getSize() / 4d) + "X", in.in.getState()));
                 }
             }
-            for (int i = 0; i < outs.length; i++) {
-                IModelItem out = outs[i];
-                if (out instanceof TriStateOutPin triStateOutPin && triStateOutPin.hiImpedance) {
-                    outsLabels[i].setText("Hi");
-                } else if (out instanceof Bus bus && bus.useBitPresentation) {
-                    outsLabels[i].setText((bus.state & outsMask[i]) > 0 ? "1" : "0");
+            for (Out out : outs) {
+                if (out.out.isHiImpedance()) {
+                    out.label.setText("Hi");
+                } else if (out.out instanceof Bus bus && bus.useBitPresentation) {
+                    out.label.setText((bus.state & out.mask) > 0 ? "1" : "0");
                 } else {
-                    outsLabels[i].setText(String.format("%" + (int) Math.ceil(out.getSize() / 4d) + "X", out.getState()));
+                    out.label.setText(String.format("%" + (int) Math.ceil(out.out.getSize() / 4d) + "X", out.out.getState()));
                 }
             }
             String extraState = schemaPart.extraState();
@@ -247,5 +237,11 @@ public class SchemaPartMonitor extends JFrame {
         var1.add(var6, new GridConstraints(1, 0, 1, 1, 4, 2, 3, 3, null, null, null));
         JPanel var7 = this.outputsValues;
         var1.add(var7, new GridConstraints(1, 2, 1, 1, 8, 2, 3, 3, null, null, null));
+    }
+
+    private record In(ModelInItem in, JLabel label, Long mask) {
+    }
+
+    private record Out(IModelItem out, JLabel label, Long mask) {
     }
 }

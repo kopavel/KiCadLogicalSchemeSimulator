@@ -55,8 +55,9 @@ public class Decoder extends SchemaPart {
                     state = newState;
                     hiImpedance = false;
                     outState = ~(1L << newState);
-                    if (csState && outBus.state != outState) {
+                    if (csState && (outBus.state != outState || outBus.hiImpedance)) {
                         outBus.state = outState;
+                        outBus.hiImpedance = false;
                         outBus.setState(outState);
                     }
                 }
@@ -78,8 +79,9 @@ public class Decoder extends SchemaPart {
                     hiImpedance = false;
                     outState = 1L << getState();
                     if (csState) {
-                        if (outBus.state != outState) {
+                        if (outBus.state != outState || outBus.hiImpedance) {
                             outBus.state = outState;
+                            outBus.hiImpedance = false;
                             outBus.setState(outState);
                         }
                     }
@@ -104,13 +106,14 @@ public class Decoder extends SchemaPart {
                     if (csState) {
                         if (aBus.hiImpedance) {
                             throw new FloatingInException(aBus);
-                        } else if (outBus.state != outState) {
+                        } else if (outBus.state != outState || outBus.hiImpedance) {
                             outBus.state = outState;
+                            outBus.hiImpedance = false;
                             outBus.setState(outState);
                         }
-                    } else {
-                        outBus.hiImpedance = true;
+                    } else if (!outBus.hiImpedance) {
                         outBus.setHiImpedance();
+                        outBus.hiImpedance = true;
                     }
                 }
             });
@@ -123,13 +126,14 @@ public class Decoder extends SchemaPart {
                     if (csState) {
                         if (aBus.hiImpedance) {
                             throw new FloatingInException(aBus);
-                        } else if (outBus.state != outState) {
+                        } else if (outBus.state != outState || outBus.hiImpedance) {
                             outBus.state = outState;
+                            outBus.hiImpedance = false;
                             outBus.setState(outState);
                         }
-                    } else {
-                        outBus.hiImpedance = true;
+                    } else if (!outBus.hiImpedance) {
                         outBus.setHiImpedance();
+                        outBus.hiImpedance = true;
                     }
                 }
             });
