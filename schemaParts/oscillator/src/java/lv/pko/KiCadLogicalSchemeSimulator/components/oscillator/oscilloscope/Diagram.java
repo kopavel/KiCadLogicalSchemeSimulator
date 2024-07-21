@@ -30,10 +30,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.KiCadLogicalSchemeSimulator.components.oscillator.oscilloscope;
+import lv.pko.KiCadLogicalSchemeSimulator.api_v2.IModelItem;
+import lv.pko.KiCadLogicalSchemeSimulator.api_v2.bus.Bus;
 import lv.pko.KiCadLogicalSchemeSimulator.tools.UiTools;
 import lv.pko.KiCadLogicalSchemeSimulator.tools.ringBuffers.*;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.IModelItem;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus.Bus;
 
 import javax.swing.*;
 import java.awt.*;

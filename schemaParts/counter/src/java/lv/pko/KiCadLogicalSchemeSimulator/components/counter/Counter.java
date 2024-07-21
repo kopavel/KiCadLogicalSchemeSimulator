@@ -30,11 +30,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.KiCadLogicalSchemeSimulator.components.counter;
+import lv.pko.KiCadLogicalSchemeSimulator.api_v2.bus.Bus;
+import lv.pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
+import lv.pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.FallingEdgeInPin;
+import lv.pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.RisingEdgeInPin;
 import lv.pko.KiCadLogicalSchemeSimulator.tools.Utils;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus.Bus;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin.in.FallingEdgeInPin;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin.in.RisingEdgeInPin;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.schemaPart.SchemaPart;
 
 public class Counter extends SchemaPart {
     private final long countMask;

@@ -31,7 +31,6 @@
  */
 package lv.pko.KiCadLogicalSchemeSimulator.api.pins.in;
 import lombok.Getter;
-import lv.pko.KiCadLogicalSchemeSimulator.model.merger.MergerInPin;
 
 @Getter
 public class ShortcutException extends RuntimeException {
@@ -41,11 +40,7 @@ public class ShortcutException extends RuntimeException {
         StringBuilder message = new StringBuilder("Shortcut on ");
         for (InPin pin : pins) {
             message.append(pin.getName()).append(":");
-            if (pin instanceof MergerInPin out && out.hiImpedance) {
-                message.append("H");
-            } else {
-                message.append(pin.getState());
-            }
+            message.append(pin.getState());
             message.append("; ");
         }
         this.message = message.toString();

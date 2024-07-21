@@ -32,15 +32,16 @@
 package lv.pko.KiCadLogicalSchemeSimulator.components.oscillator;
 import lombok.Getter;
 import lv.pko.KiCadLogicalSchemeSimulator.api.AbstractUiComponent;
+import lv.pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.InteractiveSchemaPart;
+import lv.pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
+import lv.pko.KiCadLogicalSchemeSimulator.api_v2.wire.Pin;
 import lv.pko.KiCadLogicalSchemeSimulator.tools.Log;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin.Pin;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.schemaPart.InteractiveSchemaPart;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.schemaPart.SchemaPart;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+//FixMe sometimes multiple thread started - need make some methods as synchronized. 
 public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
     private final OscillatorUiComponent oscillatorUiComponent;
     public long ticks;

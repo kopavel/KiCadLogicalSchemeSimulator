@@ -31,10 +31,10 @@
  */
 package lv.pko.KiCadLogicalSchemeSimulator.components.Switch;
 import lv.pko.KiCadLogicalSchemeSimulator.api.AbstractUiComponent;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin.Pin;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin.in.InPin;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.schemaPart.InteractiveSchemaPart;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.schemaPart.SchemaPart;
+import lv.pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.InteractiveSchemaPart;
+import lv.pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
+import lv.pko.KiCadLogicalSchemeSimulator.api_v2.wire.Pin;
+import lv.pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.InPin;
 
 public class Switch extends SchemaPart implements InteractiveSchemaPart {
     //FixMe using passive pins?
@@ -44,6 +44,7 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
     private Pin pin1Out;
     private Pin pin2Out;
     private SwitchUiComponent switchUiComponent;
+    private volatile Thread transitTread;
 
     protected Switch(String id, String sParams) {
         super(id, sParams);
@@ -51,24 +52,37 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
             @Override
             public void setHiImpedance() {
                 assert !hiImpedance : "Already in hiImpedance:" + this;
-                hiImpedance = true;
-                if (!pin2Out.hiImpedance) {
-                    pin2Out.setHiImpedance();
-                    pin2Out.hiImpedance = true;
+                boolean newTread = lockThread();
+                try {
+                    hiImpedance = true;
+                    if (!pin2Out.hiImpedance) {
+                        pin2Out.setHiImpedance();
+                        pin2Out.hiImpedance = true;
+                    }
+                } finally {
+                    if (newTread) {
+                        transitTread = null;
+                    }
                 }
             }
 
             @Override
             public void setState(boolean newState, boolean newStrong) {
-                hiImpedance = false;
-                state = newState;
-                strong = newStrong;
-                if (toggled && (pin2In.state != newState || pin2In.strong != newStrong || pin2In.hiImpedance) &&
-                        (pin2Out.state != newState || pin2Out.hiImpedance || pin2Out.strong != newStrong)) {
-                    pin2Out.setState(newState, newStrong);
-                    pin2Out.state = state;
-                    pin2Out.strong = strong;
-                    pin2Out.hiImpedance = false;
+                boolean newTread = lockThread();
+                try {
+                    hiImpedance = false;
+                    state = newState;
+                    strong = newStrong;
+                    if (toggled && newTread) {
+                        pin2Out.state = state;
+                        pin2Out.strong = strong;
+                        pin2Out.hiImpedance = false;
+                        pin2Out.setState(newState, newStrong);
+                    }
+                } finally {
+                    if (newTread) {
+                        transitTread = null;
+                    }
                 }
             }
         });
@@ -76,24 +90,37 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
             @Override
             public void setHiImpedance() {
                 assert !hiImpedance : "Already in hiImpedance:" + this;
-                hiImpedance = true;
-                if (!pin1Out.hiImpedance) {
-                    pin1Out.setHiImpedance();
-                    pin1Out.hiImpedance = true;
+                boolean newTread = lockThread();
+                try {
+                    hiImpedance = true;
+                    if (!pin1Out.hiImpedance) {
+                        pin1Out.setHiImpedance();
+                        pin1Out.hiImpedance = true;
+                    }
+                } finally {
+                    if (newTread) {
+                        transitTread = null;
+                    }
                 }
             }
 
             @Override
             public void setState(boolean newState, boolean newStrong) {
-                hiImpedance = false;
-                state = newState;
-                strong = newStrong;
-                if (toggled && (pin1In.state != newState || pin1In.strong != newStrong || pin1In.hiImpedance) &&
-                        (pin1Out.state != newState || pin1Out.hiImpedance || pin1Out.strong != newStrong)) {
-                    pin1Out.setState(newState, newStrong);
-                    pin1Out.state = state;
-                    pin1Out.strong = strong;
-                    pin1Out.hiImpedance = false;
+                boolean newTread = lockThread();
+                try {
+                    hiImpedance = false;
+                    state = newState;
+                    strong = newStrong;
+                    if (toggled && newTread) {
+                        pin1Out.state = state;
+                        pin1Out.strong = strong;
+                        pin1Out.hiImpedance = false;
+                        pin1Out.setState(newState, newStrong);
+                    }
+                } finally {
+                    if (newTread) {
+                        transitTread = null;
+                    }
                 }
             }
         });
@@ -117,19 +144,20 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
     }
 
     public void toggle(boolean toggled) {
-        this.toggled = toggled;
-        if (toggled) {
-            if (pin1In.state != pin2In.state || pin1In.strong != pin2In.strong || pin1In.hiImpedance != pin2In.hiImpedance) {
+        lockThread();
+        try {
+            this.toggled = toggled;
+            if (toggled) {
                 if (pin1In.hiImpedance) {
                     if (!pin2Out.hiImpedance) {
                         pin2Out.setHiImpedance();
                         pin2Out.hiImpedance = true;
                     }
                 } else if (pin1In.strong != pin2Out.strong || pin1In.state != pin2Out.state || pin2Out.hiImpedance) {
-                    pin2Out.setState(pin1In.state, pin1In.strong);
                     pin2Out.state = pin1In.state;
                     pin2Out.strong = pin1In.strong;
                     pin2Out.hiImpedance = false;
+                    pin2Out.setState(pin1In.state, pin1In.strong);
                 }
                 if (pin2In.hiImpedance) {
                     if (!pin1Out.hiImpedance) {
@@ -137,21 +165,35 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
                         pin1Out.hiImpedance = true;
                     }
                 } else if (pin2In.strong != pin1Out.strong || pin2In.state != pin1Out.state || pin2Out.hiImpedance) {
-                    pin1Out.setState(pin2In.state, pin2In.strong);
                     pin1Out.state = pin2In.state;
                     pin1Out.strong = pin2In.strong;
                     pin1Out.hiImpedance = false;
+                    pin1Out.setState(pin2In.state, pin2In.strong);
+                }
+            } else {
+                if (!pin1Out.hiImpedance) {
+                    pin1Out.setHiImpedance();
+                    pin1Out.hiImpedance = true;
+                }
+                if (!pin2Out.hiImpedance) {
+                    pin2Out.setHiImpedance();
+                    pin2Out.hiImpedance = true;
                 }
             }
-        } else {
-            if (!pin1Out.hiImpedance) {
-                pin1Out.setHiImpedance();
-                pin1Out.hiImpedance = true;
-            }
-            if (!pin2Out.hiImpedance) {
-                pin2Out.setHiImpedance();
-                pin2Out.hiImpedance = true;
-            }
+        } finally {
+            transitTread = null;
         }
+    }
+
+    private synchronized boolean lockThread() {
+        Thread currentThread = Thread.currentThread();
+        if (transitTread == currentThread) {
+            return false;
+        }
+        while (transitTread != null) {
+            Thread.onSpinWait();
+        }
+        transitTread = currentThread;
+        return true;
     }
 }

@@ -31,10 +31,10 @@
  */
 package lv.pko.KiCadLogicalSchemeSimulator.components.LED;
 import lv.pko.KiCadLogicalSchemeSimulator.api.AbstractUiComponent;
+import lv.pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.InteractiveSchemaPart;
+import lv.pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
+import lv.pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.NoFloatingInPin;
 import lv.pko.KiCadLogicalSchemeSimulator.tools.UiTools;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin.in.NoFloatingInPin;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.schemaPart.InteractiveSchemaPart;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.schemaPart.SchemaPart;
 
 import java.awt.*;
 

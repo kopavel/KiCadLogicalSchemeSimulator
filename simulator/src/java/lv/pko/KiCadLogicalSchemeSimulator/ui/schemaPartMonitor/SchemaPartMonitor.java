@@ -34,10 +34,10 @@ import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import lv.pko.KiCadLogicalSchemeSimulator.Simulator;
 import lv.pko.KiCadLogicalSchemeSimulator.api.AbstractUiComponent;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.IModelItem;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.ModelInItem;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus.Bus;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.schemaPart.SchemaPart;
+import lv.pko.KiCadLogicalSchemeSimulator.api_v2.IModelItem;
+import lv.pko.KiCadLogicalSchemeSimulator.api_v2.ModelInItem;
+import lv.pko.KiCadLogicalSchemeSimulator.api_v2.bus.Bus;
+import lv.pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
 
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;

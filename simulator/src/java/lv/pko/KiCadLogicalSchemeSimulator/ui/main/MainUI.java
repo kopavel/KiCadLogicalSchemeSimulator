@@ -30,8 +30,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.KiCadLogicalSchemeSimulator.ui.main;
-import lv.pko.KiCadLogicalSchemeSimulator.Model;
 import lv.pko.KiCadLogicalSchemeSimulator.Simulator;
+import lv.pko.KiCadLogicalSchemeSimulator.model.Model;
 
 import javax.swing.*;
 import java.awt.*;

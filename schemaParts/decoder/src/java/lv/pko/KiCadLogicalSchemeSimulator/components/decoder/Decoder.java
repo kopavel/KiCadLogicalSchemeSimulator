@@ -30,11 +30,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lv.pko.KiCadLogicalSchemeSimulator.components.decoder;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.FloatingInException;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus.Bus;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.bus.in.CorrectedInBus;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.pin.in.NoFloatingInPin;
-import lv.pko.KiCadLogicalSchemeSimulator.v2.api.schemaPart.SchemaPart;
+import lv.pko.KiCadLogicalSchemeSimulator.api_v2.FloatingInException;
+import lv.pko.KiCadLogicalSchemeSimulator.api_v2.bus.Bus;
+import lv.pko.KiCadLogicalSchemeSimulator.api_v2.bus.in.CorrectedInBus;
+import lv.pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
+import lv.pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.NoFloatingInPin;
 
 public class Decoder extends SchemaPart {
     private Bus outBus;
