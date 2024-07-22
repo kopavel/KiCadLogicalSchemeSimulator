@@ -98,9 +98,10 @@ public abstract class SchemaPart {
             }
 
             @Override
-            public void setState(boolean newState, boolean strong) {
+            public void setState(boolean newState, boolean newStrong) {
                 hiImpedance = false;
                 state = newState;
+                strong = newStrong;
             }
         });
     }

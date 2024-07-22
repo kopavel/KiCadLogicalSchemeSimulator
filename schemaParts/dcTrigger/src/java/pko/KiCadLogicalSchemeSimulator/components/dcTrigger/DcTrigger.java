@@ -30,46 +30,69 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.dcTrigger;
-import pko.KiCadLogicalSchemeSimulator.api.pins.in.FallingEdgeInPin;
-import pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
-import pko.KiCadLogicalSchemeSimulator.api.pins.in.RisingEdgeInPin;
-import pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
-import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.Pin;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.FallingEdgeInPin;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.InPin;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.RisingEdgeInPin;
 
 public class DcTrigger extends SchemaPart {
     private final InPin dPin;
     private final InPin rPin;
     private final InPin sPin;
-    private OutPin qOut;
-    private OutPin iqOut;
+    private Pin qOut;
+    private Pin iqOut;
     private boolean clockEnabled = true;
 
     protected DcTrigger(String id, String sParam) {
         super(id, sParam);
-        dPin = addInPin("D", 1);
+        dPin = addInPin("D");
         rPin = addInPin(new InPin("R", this) {
             @Override
-            public void onChange(long newState, boolean hiImpedance, boolean strong) {
-                clockEnabled = (newState | sPin.state) == 0;
-                if (newState > 0) {
-                    iqOut.setState(1);
-                    qOut.setState(sPin.state > 0 ? 1 : 0);
-                } else if (sPin.state > 0) {
-                    qOut.setState(1);
-                    iqOut.setState(0);
+            public void setHiImpedance() {
+                hiImpedance = true;
+            }
+
+            @Override
+            public void setState(boolean newState, boolean newStrong) {
+                hiImpedance = false;
+                state = newState;
+                strong = newStrong;
+                clockEnabled = !(newState | sPin.state);
+                if (!newState) {
+                    iqOut.state = true;
+                    iqOut.setState(true, true);
+                    qOut.state = sPin.state;
+                    qOut.setState(qOut.state, true);
+                } else if (!sPin.state) {
+                    qOut.state = true;
+                    qOut.setState(true, true);
+                    iqOut.state = false;
+                    iqOut.setState(false, true);
                 }
             }
         });
         sPin = addInPin(new InPin("S", this) {
             @Override
-            public void onChange(long newState, boolean hiImpedance, boolean strong) {
-                clockEnabled = (newState | rPin.state) == 0;
-                if (newState > 0) {
-                    qOut.setState(1);
-                    iqOut.setState(rPin.state > 0 ? 1 : 0);
-                } else if (rPin.state > 0) {
-                    qOut.setState(0);
-                    iqOut.setState(1);
+            public void setHiImpedance() {
+                hiImpedance = true;
+            }
+
+            @Override
+            public void setState(boolean newState, boolean strong) {
+                state = newState;
+                hiImpedance = false;
+                clockEnabled = !(newState | rPin.state);
+                if (!newState) {
+                    qOut.state = true;
+                    qOut.setState(true, true);
+                    iqOut.state = rPin.state;
+                    iqOut.setState(rPin.state, true);
+                } else if (rPin.state) {
+                    qOut.state = true;
+                    qOut.setState(false, true);
+                    iqOut.state = true;
+                    iqOut.setState(true, true);
                 }
             }
         });
@@ -88,26 +111,30 @@ public class DcTrigger extends SchemaPart {
                 }
             });
         }
-        addOutPin("Q", 1);
-        addOutPin("~{Q}", 1);
+        addOutPin("Q");
+        addOutPin("~{Q}");
     }
 
     @Override
     public void initOuts() {
         qOut = getOutPin("Q");
-        qOut.state = 0;
+        qOut.state = false;
         iqOut = getOutPin("~{Q}");
-        iqOut.state = 1;
+        iqOut.state = true;
     }
 
     private void store() {
         if (clockEnabled) {
-            if (dPin.state > 0) {
-                qOut.setState(1);
-                iqOut.setState(0);
+            if (dPin.state) {
+                qOut.state = true;
+                qOut.setState(true, true);
+                iqOut.state = false;
+                iqOut.setState(false, true);
             } else {
-                qOut.setState(0);
-                iqOut.setState(1);
+                qOut.state = false;
+                qOut.setState(false, true);
+                iqOut.state = true;
+                iqOut.setState(true, true);
             }
         }
     }

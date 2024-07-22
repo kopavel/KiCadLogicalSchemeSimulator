@@ -50,6 +50,7 @@ public class AndGate extends SchemaPart {
         addInBus(new NoFloatingInBus("IN", this, pinAmount) {
             @Override
             public void setState(long newState) {
+                state = newState;
                 if (oldState != (newState == mask)) {
                     oldState = newState == mask;
                     if (oldState) {

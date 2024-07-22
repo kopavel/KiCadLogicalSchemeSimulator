@@ -43,7 +43,6 @@ public class Buffer extends SchemaPart {
     private final InBus dBus;
     private Bus qBus;
     private long latch;
-    private boolean oeState;
 
     public Buffer(String id, String sParam) {
         super(id, sParam);
@@ -62,32 +61,16 @@ public class Buffer extends SchemaPart {
         if (busSize > 64) {
             throw new RuntimeException("Component " + id + " size  must be less then 64");
         }
-        addInPin(new NoFloatingInPin(isLatch ? "~{OE}" : "~{CS}", this) {
+        NoFloatingInPin oePin = addInPin(new NoFloatingInPin(isLatch ? "~{OE}" : "~{CS}", this) {
             @Override
             public void setState(boolean newState, boolean newStrong) {
-                oeState = !newState;
-                if (oeState) {
+                state = newState;
+                if (!state) {
                     qBus.state = isLatch ? latch : dBus.state;
                     qBus.setState(qBus.state);
                 } else {
                     qBus.setHiImpedance();
                     qBus.hiImpedance = true;
-                }
-            }
-        });
-        dBus = addInBus(new InBus("D", this, busSize) {
-            @Override
-            public void setHiImpedance() {
-                if (!isLatch && oeState) {
-                    throw new FloatingInException(this);
-                }
-            }
-
-            @Override
-            public void setState(long newState) {
-                if (!isLatch && oeState) {
-                    qBus.state = newState;
-                    qBus.setState(newState);
                 }
             }
         });
@@ -97,9 +80,30 @@ public class Buffer extends SchemaPart {
                 @Override
                 public void onFallingEdge() {
                     latch = dBus.state;
-                    if (oeState) {
+                    if (!oePin.state) {
                         qBus.state = latch;
                         qBus.setState(latch);
+                    }
+                }
+            });
+            dBus = addInBus("D", busSize);
+        } else {
+            dBus = addInBus(new InBus("D", this, busSize) {
+                @Override
+                public void setHiImpedance() {
+                    hiImpedance = true;
+                    if (!oePin.state) {
+                        throw new FloatingInException(this);
+                    }
+                }
+
+                @Override
+                public void setState(long newState) {
+                    state = newState;
+                    hiImpedance = false;
+                    if (!oePin.state) {
+                        qBus.state = newState;
+                        qBus.setState(newState);
                     }
                 }
             });

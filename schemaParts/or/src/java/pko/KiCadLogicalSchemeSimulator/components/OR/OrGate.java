@@ -48,6 +48,7 @@ public class OrGate extends SchemaPart {
         addInBus(new NoFloatingInBus("IN", this, pinAmount) {
             @Override
             public void setState(long newState) {
+                state = newState;
                 if (oldState == (newState == 0)) {
                     oldState = newState != 0;
                     if (newState != 0) {
