@@ -30,43 +30,44 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.repeater;
-import pko.KiCadLogicalSchemeSimulator.api.pins.in.FloatingPinException;
-import pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
-import pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
-import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.Pin;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.NoFloatingInPin;
 
 public class Repeater extends SchemaPart {
-    private OutPin out;
+    private Pin out;
 
     public Repeater(String id, String sParam) {
         super(id, sParam);
         if (reverse) {
-            addInPin(new InPin("IN", this) {
+            addInPin(new NoFloatingInPin("IN", this) {
                 @Override
-                public void onChange(long newState, boolean hiImpedance, boolean strong) {
-                    if (hiImpedance) {
-                        throw new FloatingPinException(this);
+                public void setState(boolean newState, boolean newStrong) {
+                    state = newState;
+                    if (out.state == newState) {
+                        out.state = !newState;
+                        out.setState(out.state, true);
                     }
-                    out.setState(~newState & out.mask);
                 }
             });
         } else {
-            addInPin(new InPin("IN", this) {
+            addInPin(new NoFloatingInPin("IN", this) {
                 @Override
-                public void onChange(long newState, boolean hiImpedance, boolean strong) {
-                    if (hiImpedance) {
-                        throw new FloatingPinException(this);
+                public void setState(boolean newState, boolean strong) {
+                    state = newState;
+                    if (out.state != newState) {
+                        out.state = newState;
+                        out.setState(newState, true);
                     }
-                    out.setState(newState);
                 }
             });
         }
-        addOutPin("OUT", 1);
+        addOutPin("OUT");
     }
 
     @Override
     public void initOuts() {
         out = getOutPin("OUT");
-        out.state = reverse ? 1 : 0;
+        out.state = nReverse;
     }
 }
