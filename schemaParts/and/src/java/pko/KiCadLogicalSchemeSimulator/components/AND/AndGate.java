@@ -30,35 +30,34 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.AND;
-import pko.KiCadLogicalSchemeSimulator.api.pins.in.FloatingPinException;
-import pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
-import pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
-import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api_v2.bus.in.NoFloatingInBus;
+import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.Pin;
+import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 public class AndGate extends SchemaPart {
-    private OutPin out;
+    private Pin out;
     private boolean oldState;
 
     public AndGate(String id, String sParam) {
         super(id, sParam);
-        addOutPin("OUT", 1);
+        addOutPin("OUT");
         if (!params.containsKey("size")) {
             throw new RuntimeException("Component " + id + " has no parameter \"size\"");
         }
         int pinAmount = Integer.parseInt(params.get("size"));
-        addInPin(new InPin("IN", this, pinAmount) {
+        long mask = Utils.getMaskForSize(pinAmount);
+        addInBus(new NoFloatingInBus("IN", this, pinAmount) {
             @Override
-            public void onChange(long newState, boolean hiImpedance, boolean strong) {
-                if (hiImpedance) {
-                    throw new FloatingPinException(this);
-                }
-                boolean isHi = newState == mask;
-                if (oldState != isHi) {
-                    oldState = isHi;
-                    if (isHi) {
-                        out.setStateForce(hiState);
+            public void setState(long newState) {
+                if (oldState != (newState == mask)) {
+                    oldState = newState == mask;
+                    if (oldState) {
+                        out.state = nReverse;
+                        out.setState(nReverse, true);
                     } else {
-                        out.setStateForce(loState);
+                        out.state = reverse;
+                        out.setState(reverse, true);
                     }
                 }
             }
@@ -68,9 +67,6 @@ public class AndGate extends SchemaPart {
     @Override
     public void initOuts() {
         out = getOutPin("OUT");
-        out.state = loState;
-        out.useBitPresentation = true;
-        hiState = hiState & out.mask;
-        loState = loState & out.mask;
+        out.state = reverse;
     }
 }

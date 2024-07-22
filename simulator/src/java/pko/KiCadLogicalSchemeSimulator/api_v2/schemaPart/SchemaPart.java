@@ -52,6 +52,7 @@ public abstract class SchemaPart {
     public final Map<String, ModelInItem> inMap = new LinkedHashMap<>();
     protected final Map<String, String> params = new HashMap<>();
     protected final boolean reverse;
+    protected final boolean nReverse;
     private final Map<String, ModelInItem> inAliasMap = new HashMap<>();
     private final Map<String, IModelItem> outAliasMap = new HashMap<>();
     public Map<Integer, String> pinNumberMap;
@@ -77,6 +78,7 @@ public abstract class SchemaPart {
             loState = 0;
             reverse = false;
         }
+        nReverse = !reverse;
     }
 
     public InPin addInPin(String pinId, boolean value, boolean strong) {

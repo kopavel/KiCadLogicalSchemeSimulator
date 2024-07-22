@@ -30,17 +30,18 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.BUF;
-import pko.KiCadLogicalSchemeSimulator.api.pins.in.FallingEdgeInPin;
-import pko.KiCadLogicalSchemeSimulator.api.pins.in.FloatingPinException;
-import pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
-import pko.KiCadLogicalSchemeSimulator.api.pins.out.TriStateOutPin;
-import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api_v2.FloatingInException;
+import pko.KiCadLogicalSchemeSimulator.api_v2.bus.Bus;
+import pko.KiCadLogicalSchemeSimulator.api_v2.bus.in.InBus;
+import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.FallingEdgeInPin;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.NoFloatingInPin;
 
 public class Buffer extends SchemaPart {
-    private final int pinAmount;
+    private final int busSize;
     private final boolean isLatch;
-    private final InPin dPin;
-    private TriStateOutPin qPin;
+    private final InBus dBus;
+    private Bus qBus;
     private long latch;
     private boolean oeState;
 
@@ -51,49 +52,54 @@ public class Buffer extends SchemaPart {
             throw new RuntimeException("Component " + id + " has no parameter \"size\"");
         }
         try {
-            pinAmount = Integer.parseInt(params.get("size"));
+            busSize = Integer.parseInt(params.get("size"));
         } catch (NumberFormatException r) {
             throw new RuntimeException("Component " + id + " size must be positive number");
         }
-        if (pinAmount < 1) {
+        if (busSize < 1) {
             throw new RuntimeException("Component " + id + " size  must be positive number");
         }
-        if (pinAmount > 64) {
+        if (busSize > 64) {
             throw new RuntimeException("Component " + id + " size  must be less then 64");
         }
-        addInPin(new InPin(isLatch ? "~{OE}" : "~{CS}", this) {
+        addInPin(new NoFloatingInPin(isLatch ? "~{OE}" : "~{CS}", this) {
             @Override
-            public void onChange(long newState, boolean hiImpedance, boolean strong) {
-                if (hiImpedance) {
-                    throw new FloatingPinException(this);
-                }
-                oeState = (newState == 0);
+            public void setState(boolean newState, boolean newStrong) {
+                oeState = !newState;
                 if (oeState) {
-                    qPin.setState(isLatch ? latch : dPin.state);
+                    qBus.state = isLatch ? latch : dBus.state;
+                    qBus.setState(qBus.state);
                 } else {
-                    qPin.setHiImpedance();
+                    qBus.setHiImpedance();
+                    qBus.hiImpedance = true;
                 }
             }
         });
-        dPin = addInPin(new InPin("D", this, pinAmount) {
+        dBus = addInBus(new InBus("D", this, busSize) {
             @Override
-            public void onChange(long newState, boolean hiImpedance, boolean strong) {
+            public void setHiImpedance() {
                 if (!isLatch && oeState) {
-                    if (hiImpedance) {
-                        throw new FloatingPinException(this);
-                    }
-                    qPin.setState(newState);
+                    throw new FloatingInException(this);
+                }
+            }
+
+            @Override
+            public void setState(long newState) {
+                if (!isLatch && oeState) {
+                    qBus.state = newState;
+                    qBus.setState(newState);
                 }
             }
         });
-        addTriStateOutPin("Q", pinAmount);
+        addOutBus("Q", busSize);
         if (isLatch) {
             addInPin(new FallingEdgeInPin("~{WR}", this) {
                 @Override
                 public void onFallingEdge() {
-                    latch = dPin.state;
+                    latch = dBus.state;
                     if (oeState) {
-                        qPin.setState(latch);
+                        qBus.state = latch;
+                        qBus.setState(latch);
                     }
                 }
             });
@@ -102,12 +108,12 @@ public class Buffer extends SchemaPart {
 
     @Override
     public String extraState() {
-        return "D:" + String.format("%" + (int) Math.ceil(pinAmount / 4d) + "X", dPin.state) + "\nQ:" +
-                String.format("%" + (int) Math.ceil(pinAmount / 4d) + "X", qPin.state);
+        return "D:" + String.format("%" + (int) Math.ceil(busSize / 4d) + "X", dBus.state) + "\nQ:" +
+                String.format("%" + (int) Math.ceil(busSize / 4d) + "X", qBus.state);
     }
 
     @Override
     public void initOuts() {
-        qPin = (TriStateOutPin) getOutPin("Q");
+        qBus = getOutBus("Q");
     }
 }
