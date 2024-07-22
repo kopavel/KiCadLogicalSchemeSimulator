@@ -30,22 +30,25 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.ram;
-import pko.KiCadLogicalSchemeSimulator.api.pins.in.FallingEdgeInPin;
-import pko.KiCadLogicalSchemeSimulator.api.pins.in.FloatingPinException;
-import pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
-import pko.KiCadLogicalSchemeSimulator.api.pins.in.RisingEdgeInPin;
-import pko.KiCadLogicalSchemeSimulator.api.pins.out.TriStateOutPin;
-import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api_v2.FloatingInException;
+import pko.KiCadLogicalSchemeSimulator.api_v2.bus.Bus;
+import pko.KiCadLogicalSchemeSimulator.api_v2.bus.in.CorrectedInBus;
+import pko.KiCadLogicalSchemeSimulator.api_v2.bus.in.InBus;
+import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.FallingEdgeInPin;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.InPin;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.NoFloatingInPin;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.RisingEdgeInPin;
 
 public class Ram extends SchemaPart {
     private final long[] words;
-    private final InPin dIn;
+    private final InBus dIn;
     private final int size;
     private final int aSize;
-    private TriStateOutPin dOut;
-    private int addr;
-    private boolean csActive;
-    private boolean oeActive;
+    private final InPin csPin;
+    private final InPin oePin;
+    private final Bus aBus;
+    private Bus dOut;
 
     protected Ram(String id, String sParam) {
         super(id, sParam);
@@ -79,75 +82,69 @@ public class Ram extends SchemaPart {
         }
         int ramSize = (int) Math.pow(2, aSize);
         words = new long[ramSize];
-        addInPin(new InPin("A", this, aSize) {
+        aBus = addInBus(new CorrectedInBus("A", this, aSize) {
             @Override
-            public void onChange(long newState, boolean hiImpedance, boolean strong) {
-                addr = (int) newState;
-                if (csActive) {
-                    if (hiImpedance) {
-                        throw new FloatingPinException(this);
-                    }
+            public void setHiImpedance() {
+                hiImpedance = true;
+                if (!csPin.state) {
+                    throw new FloatingInException(this);
+                }
+            }
+
+            @Override
+            public void setState(long newState) {
+                state = newState;
+                hiImpedance = false;
+                if (!csPin.state) {
                     out();
                 }
             }
         });
-        addTriStateOutPin("D", size);
-        dIn = addInPin("D", size);
+        addOutBus("D", size);
+        dIn = addInBus("D", size);
         if (reverse) {
-            addInPin(new InPin("~{CS}", this) {
+            csPin = addInPin(new NoFloatingInPin("~{CS}", this) {
                 @Override
-                public void onChange(long newState, boolean hiImpedance, boolean strong) {
-                    if (hiImpedance) {
-                        throw new FloatingPinException(this);
-                    }
-                    csActive = state == 0;
-                    out();
+                public void setState(boolean newState, boolean strong) {
+                    state = newState;
+                    rOut();
                 }
             });
-            addInPin(new InPin("~{OE}", this) {
+            oePin = addInPin(new NoFloatingInPin("~{OE}", this) {
                 @Override
-                public void onChange(long newState, boolean hiImpedance, boolean strong) {
-                    if (hiImpedance) {
-                        throw new FloatingPinException(this);
-                    }
-                    oeActive = newState == 0;
-                    out();
+                public void setState(boolean newState, boolean strong) {
+                    state = newState;
+                    rOut();
                 }
             });
             addInPin(new FallingEdgeInPin("~{WE}", this) {
                 @Override
                 public void onFallingEdge() {
-                    if (csActive) {
-                        words[addr] = dIn.getState();
+                    if (!csPin.state) {
+                        words[(int) aBus.state] = dIn.getState();
                     }
                 }
             });
         } else {
-            addInPin(new InPin("CS", this) {
+            csPin = addInPin(new NoFloatingInPin("CS", this) {
                 @Override
-                public void onChange(long newState, boolean hiImpedance, boolean strong) {
-                    if (hiImpedance) {
-                        throw new FloatingPinException(this);
-                    }
-                    csActive = state > 0;
+                public void setState(boolean newState, boolean strong) {
+                    state = newState;
                     out();
                 }
             });
-            addInPin(new InPin("OE", this) {
+            oePin = addInPin(new NoFloatingInPin("OE", this) {
                 @Override
-                public void onChange(long newState, boolean hiImpedance, boolean strong) {
-                    if (hiImpedance) {
-                        throw new FloatingPinException(this);
-                    }
-                    oeActive = newState > 0;
+                public void setState(boolean newState, boolean strong) {
+                    state = newState;
                     out();
                 }
             });
             addInPin(new RisingEdgeInPin("WE", this) {
                 @Override
                 public void onRisingEdge() {
-                    if (csActive) {
-                        words[addr] = dIn.getState();
+                    if (csPin.state) {
+                        words[(int) aBus.state] = dIn.getState();
                     }
                 }
             });
@@ -156,19 +153,42 @@ public class Ram extends SchemaPart {
 
     @Override
     public void initOuts() {
-        dOut = (TriStateOutPin) getOutPin("D");
+        dOut = getOutBus("D");
     }
 
     @Override
     public String extraState() {
-        return "A:" + String.format("%0" + (int) Math.ceil(size / 4d) + "X", addr) + "\nD:" + String.format("%0" + (int) Math.ceil(size / 4d) + "X", words[addr]);
+        return "A:" + String.format("%0" + (int) Math.ceil(size / 4d) + "X", (int) aBus.state) + "\nD:" +
+                String.format("%0" + (int) Math.ceil(size / 4d) + "X", words[(int) aBus.state]);
     }
 
     private void out() {
-        if (oeActive && csActive) {
-            dOut.setState(words[addr]);
+        if (oePin.state && csPin.state) {
+            if (dOut.state != words[(int) aBus.state]) {
+                dOut.state = words[(int) aBus.state];
+                dOut.hiImpedance = false;
+                dOut.setState(dOut.state);
+            }
         } else {
-            dOut.setHiImpedance();
+            if (!dOut.hiImpedance) {
+                dOut.setHiImpedance();
+                dOut.hiImpedance = true;
+            }
+        }
+    }
+
+    private void rOut() {
+        if (oePin.state | csPin.state) {
+            if (!dOut.hiImpedance) {
+                dOut.setHiImpedance();
+                dOut.hiImpedance = true;
+            }
+        } else {
+            if (dOut.state != words[(int) aBus.state]) {
+                dOut.state = words[(int) aBus.state];
+                dOut.hiImpedance = false;
+                dOut.setState(dOut.state);
+            }
         }
     }
 }

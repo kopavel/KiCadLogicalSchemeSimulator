@@ -34,6 +34,7 @@ import pko.KiCadLogicalSchemeSimulator.api_v2.IModelItem;
 import pko.KiCadLogicalSchemeSimulator.api_v2.ModelInItem;
 import pko.KiCadLogicalSchemeSimulator.api_v2.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api_v2.bus.OutBus;
+import pko.KiCadLogicalSchemeSimulator.api_v2.bus.in.CorrectedInBus;
 import pko.KiCadLogicalSchemeSimulator.api_v2.bus.in.InBus;
 import pko.KiCadLogicalSchemeSimulator.api_v2.bus.in.NoFloatingInBus;
 import pko.KiCadLogicalSchemeSimulator.api_v2.wire.OutPin;
@@ -135,7 +136,7 @@ public abstract class SchemaPart {
     }
 
     public InBus addInBus(String pinId, int size, String... names) {
-        return addInBus(new InBus(pinId, this, size, names) {
+        return addInBus(new CorrectedInBus(pinId, this, size, names) {
             @Override
             public void setHiImpedance() {
                 assert !hiImpedance : "Already in hiImpedance:" + this;
