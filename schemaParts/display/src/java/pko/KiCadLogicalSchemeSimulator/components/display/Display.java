@@ -31,10 +31,10 @@
  */
 package pko.KiCadLogicalSchemeSimulator.components.display;
 import pko.KiCadLogicalSchemeSimulator.api.AbstractUiComponent;
-import pko.KiCadLogicalSchemeSimulator.api.pins.in.FallingEdgeInPin;
-import pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
-import pko.KiCadLogicalSchemeSimulator.api.schemaPart.InteractiveSchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.InteractiveSchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.FallingEdgeInPin;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.InPin;
 
 import javax.swing.*;
 import java.util.Arrays;
@@ -71,8 +71,8 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
             addInPin(new FallingEdgeInPin("Clock", this) {
                 @Override
                 public void onFallingEdge() {
-                    boolean currHSync = hSync.state == 0;
-                    boolean currVSync = vSync.state == 0;
+                    boolean currHSync = !hSync.state;
+                    boolean currVSync = !vSync.state;
                     if (currVSync && !lastVSync) {
                         if (vSize == 0) {
                             vSize = vPos + 2;
@@ -98,7 +98,7 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                         rows++;
                     }
                     hPos++;
-                    byte data = (byte) (vIn.state > 0 ? 0xff : 0x0);
+                    byte data = (byte) (vIn.state ? 0xff : 0x0);
                     if (hSize == 0) {
                         //noinspection DataFlowIssue
                         firstRow[hPos] = data;
@@ -113,8 +113,8 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
             addInPin(new FallingEdgeInPin("Clock", this) {
                 @Override
                 public void onFallingEdge() {
-                    boolean currHSync = hSync.state > 0;
-                    boolean currVSync = vSync.state > 0;
+                    boolean currHSync = hSync.state;
+                    boolean currVSync = vSync.state;
                     if (currVSync && !lastVSync) {
                         if (vSize == 0) {
                             vSize = vPos + 2;
@@ -140,7 +140,7 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                         rows++;
                     }
                     hPos++;
-                    byte data = (byte) (vIn.state > 0 ? 0xff : 0x0);
+                    byte data = (byte) (vIn.state ? 0xff : 0x0);
                     if (hSize == 0) {
                         //noinspection DataFlowIssue
                         firstRow[hPos] = data;
@@ -152,7 +152,7 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                 }
             });
         }
-        vIn = addInPin("Vin", 1);
+        vIn = addInPin("Vin");
         hSync = addInPin("HSync");
         vSync = addInPin("VSync");
     }

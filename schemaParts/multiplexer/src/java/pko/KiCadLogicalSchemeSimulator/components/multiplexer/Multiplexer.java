@@ -30,19 +30,18 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.multiplexer;
-import pko.KiCadLogicalSchemeSimulator.api.pins.in.FloatingPinException;
-import pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
-import pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
-import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api_v2.bus.Bus;
+import pko.KiCadLogicalSchemeSimulator.api_v2.bus.in.InBus;
+import pko.KiCadLogicalSchemeSimulator.api_v2.bus.in.NoFloatingCorrectedInBus;
+import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Multiplexer extends SchemaPart {
-    private final InPin[] inPins;
-    private OutPin outPin;
-    private int nState;
-    private long oldState;
+    private final InBus[] inBuses;
+    private final InBus nBus;
+    private Bus outBus;
 
     protected Multiplexer(String id, String sParam) {
         super(id, sParam);
@@ -58,39 +57,32 @@ public class Multiplexer extends SchemaPart {
             throw new RuntimeException("Component " + id + " max nSize is 30");
         }
         int partSize = (int) Math.pow(2, nSize);
-        inPins = new InPin[partSize];
+        inBuses = new InBus[partSize];
         for (int inNo = 0; inNo < partSize; inNo++) {
             List<String> aliases = new ArrayList<>();
             for (int part = 0; part < partsAmount; part++) {
                 aliases.add(String.valueOf((char) (((byte) 'A') + part)) + inNo);
             }
-            inPins[inNo] = addInPin(new InPin(String.valueOf(inNo), this, partsAmount, aliases.toArray(new String[0])) {
+            inBuses[inNo] = addInBus(new NoFloatingCorrectedInBus(String.valueOf(inNo), this, partsAmount, aliases.toArray(new String[0])) {
                 @Override
-                public void onChange(long newState, boolean hiImpedance, boolean strong) {
-                    if (this == inPins[nState]) {
-                        if (hiImpedance) {
-                            throw new FloatingPinException(this);
-                        }
-                        newState = correctState(newState);
-                        if (oldState != newState) {
-                            oldState = newState;
-                            outPin.setStateForce(newState);
+                public void setState(long newState) {
+                    state = newState;
+                    if (this == inBuses[(int) nBus.state]) {
+                        if (outBus.state != newState) {
+                            outBus.state = newState;
+                            outBus.setState(newState);
                         }
                     }
                 }
             });
         }
-        addInPin(new InPin("N", this, nSize) {
+        nBus = addInBus(new NoFloatingCorrectedInBus("N", this, nSize) {
             @Override
-            public void onChange(long newState, boolean hiImpedance, boolean strong) {
-                if (hiImpedance) {
-                    throw new FloatingPinException(this);
-                }
-                nState = (int) correctState(newState);
-                newState = inPins[nState].getState();
-                if (oldState != newState) {
-                    oldState = newState;
-                    outPin.setStateForce(newState);
+            public void setState(long newState) {
+                newState = inBuses[(int) newState].getState();
+                if (state != newState) {
+                    state = newState;
+                    outBus.setState(newState);
                 }
             }
         });
@@ -98,12 +90,11 @@ public class Multiplexer extends SchemaPart {
         for (byte i = 0; i < partsAmount; i++) {
             aliases[i] = 'Q' + String.valueOf((char) (((byte) 'A') + i));
         }
-        addOutPin("Q", partsAmount, aliases);
+        addOutBus("Q", partsAmount, aliases);
     }
 
     @Override
     public void initOuts() {
-        outPin = getOutPin("Q");
-        oldState = outPin.state;
+        outBus = getOutBus("Q");
     }
 }

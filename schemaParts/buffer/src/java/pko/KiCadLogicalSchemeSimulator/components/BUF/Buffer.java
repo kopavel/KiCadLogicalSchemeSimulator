@@ -35,18 +35,18 @@ import pko.KiCadLogicalSchemeSimulator.api_v2.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api_v2.bus.in.InBus;
 import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.FallingEdgeInPin;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.InPin;
 import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.NoFloatingInPin;
 
 public class Buffer extends SchemaPart {
     private final int busSize;
-    private final boolean isLatch;
     private final InBus dBus;
+    private final InPin oePin;
     private Bus qBus;
     private long latch;
 
     public Buffer(String id, String sParam) {
         super(id, sParam);
-        isLatch = params.containsKey("latch");
         if (!params.containsKey("size")) {
             throw new RuntimeException("Component " + id + " has no parameter \"size\"");
         }
@@ -61,33 +61,53 @@ public class Buffer extends SchemaPart {
         if (busSize > 64) {
             throw new RuntimeException("Component " + id + " size  must be less then 64");
         }
-        NoFloatingInPin oePin = addInPin(new NoFloatingInPin(isLatch ? "~{OE}" : "~{CS}", this) {
-            @Override
-            public void setState(boolean newState, boolean newStrong) {
-                state = newState;
-                if (!state) {
-                    qBus.state = isLatch ? latch : dBus.state;
-                    qBus.setState(qBus.state);
-                } else {
-                    qBus.setHiImpedance();
-                    qBus.hiImpedance = true;
-                }
-            }
-        });
         addOutBus("Q", busSize);
-        if (isLatch) {
+        if (params.containsKey("latch")) {
+            oePin = addInPin(new NoFloatingInPin("~{OE}", this) {
+                @Override
+                public void setState(boolean newState, boolean newStrong) {
+                    state = newState;
+                    if (!state) {
+                        if (qBus.state != latch || qBus.hiImpedance) {
+                            qBus.state = latch;
+                            qBus.hiImpedance = false;
+                            qBus.setState(qBus.state);
+                        }
+                    } else if (!qBus.hiImpedance) {
+                        qBus.setHiImpedance();
+                        qBus.hiImpedance = true;
+                    }
+                }
+            });
             addInPin(new FallingEdgeInPin("~{WR}", this) {
                 @Override
                 public void onFallingEdge() {
                     latch = dBus.state;
-                    if (!oePin.state) {
+                    if (!oePin.state && (qBus.state != latch || qBus.hiImpedance)) {
                         qBus.state = latch;
+                        qBus.hiImpedance = false;
                         qBus.setState(latch);
                     }
                 }
             });
             dBus = addInBus("D", busSize);
         } else {
+            oePin = addInPin(new NoFloatingInPin("~{CS}", this) {
+                @Override
+                public void setState(boolean newState, boolean newStrong) {
+                    state = newState;
+                    if (!state) {
+                        if (qBus.state != dBus.state || qBus.hiImpedance) {
+                            qBus.state = dBus.state;
+                            qBus.hiImpedance = false;
+                            qBus.setState(qBus.state);
+                        }
+                    } else if (!qBus.hiImpedance) {
+                        qBus.setHiImpedance();
+                        qBus.hiImpedance = true;
+                    }
+                }
+            });
             dBus = addInBus(new InBus("D", this, busSize) {
                 @Override
                 public void setHiImpedance() {
@@ -101,8 +121,9 @@ public class Buffer extends SchemaPart {
                 public void setState(long newState) {
                     state = newState;
                     hiImpedance = false;
-                    if (!oePin.state) {
+                    if (!oePin.state && (qBus.state != latch || qBus.hiImpedance)) {
                         qBus.state = newState;
+                        qBus.hiImpedance = false;
                         qBus.setState(newState);
                     }
                 }

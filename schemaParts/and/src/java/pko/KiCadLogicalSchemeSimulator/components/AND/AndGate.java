@@ -37,7 +37,7 @@ import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 public class AndGate extends SchemaPart {
     private Pin out;
-    private boolean oldState;
+    private boolean outState;
 
     public AndGate(String id, String sParam) {
         super(id, sParam);
@@ -51,9 +51,9 @@ public class AndGate extends SchemaPart {
             @Override
             public void setState(long newState) {
                 state = newState;
-                if (oldState != (newState == mask)) {
-                    oldState = newState == mask;
-                    if (oldState) {
+                if (outState != (newState == mask)) {
+                    outState = newState == mask;
+                    if (outState) {
                         out.state = nReverse;
                         out.setState(nReverse, true);
                     } else {

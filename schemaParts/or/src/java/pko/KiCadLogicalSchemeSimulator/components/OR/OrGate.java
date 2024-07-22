@@ -36,7 +36,7 @@ import pko.KiCadLogicalSchemeSimulator.api_v2.wire.Pin;
 
 public class OrGate extends SchemaPart {
     private Pin out;
-    private boolean oldState;
+    private boolean outState;
 
     public OrGate(String id, String sParam) {
         super(id, sParam);
@@ -49,8 +49,8 @@ public class OrGate extends SchemaPart {
             @Override
             public void setState(long newState) {
                 state = newState;
-                if (oldState == (newState == 0)) {
-                    oldState = newState != 0;
+                if (outState == (newState == 0)) {
+                    outState = newState != 0;
                     if (newState != 0) {
                         out.state = nReverse;
                         out.setState(nReverse, true);
