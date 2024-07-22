@@ -105,7 +105,7 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput {
 
     @Override
     public void setHiImpedance() {
-        assert !hiImpedance : "Already in hiImpedance:" + this;
+        assert !hiImpedance : "Already in hiImpedance:" + this + "; merger=" + merger.getName();
         assert Log.debug(WireMergerWireIn.class,
                 "Bus merger setImpedance. before: Source:{} (state:{},  hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{}, " +
                         "hiImpedance:{})\",",

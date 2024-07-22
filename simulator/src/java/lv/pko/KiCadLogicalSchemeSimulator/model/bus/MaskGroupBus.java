@@ -63,6 +63,12 @@ public class MaskGroupBus extends OutBus {
     }
 
     @Override
+    public void setHiImpedance() {
+        super.setHiImpedance();
+        hiImpedance = true;
+    }
+
+    @Override
     public Bus getOptimised() {
         if (destinations.length == 0) {
             return new NCBus(this);
@@ -72,6 +78,13 @@ public class MaskGroupBus extends OutBus {
                 return destination;
             } else {
                 return new MaskGroupBus(MaskGroupBus.this, "SingleDestination") {
+                    @Override
+                    public void setHiImpedance() {
+                        assert !hiImpedance : "Already in hiImpedance:" + this;
+                        destination.setHiImpedance();
+                        hiImpedance = true;
+                    }
+
                     @Override
                     public void setState(long newState) {
                         long newMaskState = newState & mask;

@@ -34,6 +34,7 @@ import lv.pko.KiCadLogicalSchemeSimulator.api_v2.*;
 import lv.pko.KiCadLogicalSchemeSimulator.api_v2.bus.in.InBus;
 import lv.pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
 import lv.pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPartSpi;
+import lv.pko.KiCadLogicalSchemeSimulator.api_v2.wire.Pin;
 import lv.pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.InPin;
 import lv.pko.KiCadLogicalSchemeSimulator.model.bus.BusInInterconnect;
 import lv.pko.KiCadLogicalSchemeSimulator.model.merger.IMerger;
@@ -100,7 +101,6 @@ public class Model {
         Log.info(Model.class, "Model build complete");
     }
 
-    @SuppressWarnings("LocalVariableUsedAndDeclaredInDifferentSwitchBranches")
     private void processNet(Net net) {
         Map<ModelOutItem, Byte> outsOffset = new HashMap<>();
         Map<ModelInItem, SortedSet<Byte>> insOffsets = new HashMap<>();
@@ -134,11 +134,12 @@ public class Model {
                     ModelInItem inItem = schemaPart.getInItem(pinName);
                     insOffsets.computeIfAbsent(inItem, p -> new TreeSet<>()).add(inItem.getAliasOffset(pinName));
                 }
-                case "tri_state", "output", "passive" -> {
+                case "tri_state", "output" -> {
+//FixMe interconnect are added 2 times??
                     ModelOutItem outItem = (ModelOutItem) schemaPart.getOutItem(pinName);
                     outsOffset.put(outItem, outItem.getAliasOffset(pinName));
                 }
-                case "bidirectional" -> {
+                case "bidirectional", "passive" -> {
                     ModelInItem inItem;
                     ModelOutItem outItem;
                     inItem = schemaPart.getInItem(pinName);
@@ -181,6 +182,8 @@ public class Model {
     }
 
     private void buildBuses() {
+        //FixMe if passive pin are not only one input - remove it (we need it only once in ideal case and it is added as output to mergers)
+        //FixMe don't do interconnect throe power rails
         inMap.forEach((inItem, inDescriptor) -> {
             if (inDescriptor.getPermutationCount() == 1) {
                 //pin-to-pin connection
@@ -196,7 +199,7 @@ public class Model {
                 IMerger merger;
                 switch (inItem) {
                     case InBus bus -> merger = new BusMerger(bus);
-                    case InPin pin -> merger = new WireMerger(pin);
+                    case Pin pin -> merger = new WireMerger(pin);
                     default -> throw new RuntimeException("Unsupported inItem: " + inItem.getClass().getName());
                 }
                 for (Map.Entry<ModelOutItem, Map<Byte, Long>> outItemEntry : inDescriptor.entrySet()) {
@@ -319,6 +322,7 @@ public class Model {
             stabilizing = false;
             items.forEach(item -> {
                 try {
+                    assert Log.debug(Model.class, "Resend {}", item);
                     item.resend();
                 } catch (FloatingInException | ShortcutException e) {
                     stabilizing = true;
@@ -326,6 +330,7 @@ public class Model {
             });
             mergers.values().forEach(merger -> {
                 try {
+                    assert Log.debug(Model.class, "Resend {}", merger);
                     merger.resend();
                 } catch (FloatingInException | ShortcutException e) {
                     stabilizing = true;

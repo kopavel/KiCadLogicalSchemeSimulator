@@ -89,7 +89,7 @@ public class WireMergerBusIn extends CorrectedInBus implements MergerInput {
 
     @Override
     public void setHiImpedance() {
-        assert !hiImpedance : "Already in hiImpedance:" + this;
+        assert !hiImpedance : "Already in hiImpedance:" + this + "; merger=" + merger.getName();
         if (merger.weakState == 0) { //no weak state - go to hiImpedance.
             for (Pin destination : merger.destinations) {
                 destination.setHiImpedance();
@@ -102,6 +102,7 @@ public class WireMergerBusIn extends CorrectedInBus implements MergerInput {
             }
         }
         hiImpedance = true;
+        merger.strong = false;
     }
 
     @Override

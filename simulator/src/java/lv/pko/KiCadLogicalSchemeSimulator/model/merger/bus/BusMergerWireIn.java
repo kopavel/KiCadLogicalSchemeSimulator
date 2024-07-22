@@ -57,6 +57,7 @@ public class BusMergerWireIn extends InPin implements MergerInput {
         this.offset = offset;
         this.merger = merger;
         this.input = new WireMerger(this);
+        this.input.addSource(source, mask, offset);
     }
 
     @Override
@@ -94,7 +95,7 @@ public class BusMergerWireIn extends InPin implements MergerInput {
                 merger.state &= nMask;
             }
         } else { //to weak
-            if (((merger.weakState & mask) > 0) != newState) {
+            if ((merger.weakPins & mask) > 0 && ((merger.weakState & mask) > 0) != newState) {
                 throw new ShortcutException(merger.inputs);
             }
             if (hiImpedance) {
@@ -145,6 +146,7 @@ public class BusMergerWireIn extends InPin implements MergerInput {
 
     @Override
     public void setHiImpedance() {
+        assert !hiImpedance : "Already in hiImpedance:" + this + "; merger=" + merger.getName();
         assert Log.debug(WireMergerWireIn.class,
                 "Bus merger setImpedance. before: Source:{} (state:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{}, " +
                         "hiImpedance:{})",
@@ -158,7 +160,6 @@ public class BusMergerWireIn extends InPin implements MergerInput {
                 merger.weakState,
                 merger.weakPins,
                 merger.hiImpedance);
-        assert !hiImpedance : "Already in hiImpedance:" + this;
         long oldState = merger.state;
         if (strong) {
             merger.strongPins &= nMask;

@@ -40,7 +40,7 @@ import lv.pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 //FixMe use one destination with splitter
 public class OutPin extends Pin implements ModelOutItem {
-    public Pin[] destinations;
+    public Pin[] destinations = new Pin[0];
 
     public OutPin(String id, SchemaPart parent) {
         super(id, parent);
@@ -52,10 +52,20 @@ public class OutPin extends Pin implements ModelOutItem {
     }
 
     public void addDestination(IModelItem item, long mask, byte offset) {
-        switch (item) {
-            case Pin pin -> destinations = Utils.addToArray(destinations, pin);
-            case Bus bus -> destinations = Utils.addToArray(destinations, new WireToBusAdapter(this, bus, offset));
-            default -> throw new RuntimeException("Unsupported destination " + item.getClass().getName());
+        if (destinations.length == 1 && destinations[0] instanceof PassivePin passivePin) {
+            passivePin.addDestination(item, mask, offset);
+        } else {
+            switch (item) {
+                case PassivePin passivePin -> {
+                    passivePin.destinations = destinations;
+                    destinations = new Pin[]{passivePin};
+                }
+                case Pin pin -> {
+                    destinations = Utils.addToArray(destinations, pin);
+                }
+                case Bus bus -> destinations = Utils.addToArray(destinations, new WireToBusAdapter(this, bus, offset));
+                default -> throw new RuntimeException("Unsupported destination " + item.getClass().getName());
+            }
         }
     }
 

@@ -31,19 +31,20 @@
  */
 package lv.pko.KiCadLogicalSchemeSimulator.api_v2.wire;
 import lv.pko.KiCadLogicalSchemeSimulator.api_v2.IModelItem;
-import lv.pko.KiCadLogicalSchemeSimulator.api_v2.ModelOutItem;
+import lv.pko.KiCadLogicalSchemeSimulator.api_v2.ModelInItem;
 import lv.pko.KiCadLogicalSchemeSimulator.api_v2.bus.Bus;
 import lv.pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
 import lv.pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
-public abstract class PassivePin extends Pin implements ModelOutItem {
-    public Pin[] destinations = new Pin[0];
-
+public abstract class PassivePin extends OutPin implements ModelInItem {
     public PassivePin(String id, SchemaPart parent) {
         super(id, parent);
     }
 
     public void addDestination(IModelItem item, long mask, byte offset) {
+        if (item == this) {
+            return;
+        }
         switch (item) {
             case Pin pin -> destinations = Utils.addToArray(destinations, pin);
             case Bus bus -> throw new RuntimeException("Can't add bus as destination for PassivePin" + this + "; bus:" + bus);
@@ -56,9 +57,9 @@ public abstract class PassivePin extends Pin implements ModelOutItem {
     @Override
     abstract public void setHiImpedance();
 
-    public void wrap(OutPin source) {
-        destinations = source.destinations;
-        source.destinations = new Pin[]{this};
+    @Override
+    public Pin getOptimised() {
+        return this;
     }
 
     @Override

@@ -37,6 +37,7 @@ import lv.pko.KiCadLogicalSchemeSimulator.api_v2.bus.OutBus;
 import lv.pko.KiCadLogicalSchemeSimulator.api_v2.bus.in.InBus;
 import lv.pko.KiCadLogicalSchemeSimulator.api_v2.bus.in.NoFloatingInBus;
 import lv.pko.KiCadLogicalSchemeSimulator.api_v2.wire.OutPin;
+import lv.pko.KiCadLogicalSchemeSimulator.api_v2.wire.PassivePin;
 import lv.pko.KiCadLogicalSchemeSimulator.api_v2.wire.Pin;
 import lv.pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.InPin;
 
@@ -103,6 +104,14 @@ public abstract class SchemaPart {
     }
 
     public <T extends InPin> T addInPin(T pin) {
+        inMap.put(pin.id, pin);
+        inAliasMap.put(pin.id, pin);
+        return pin;
+    }
+
+    public PassivePin addPassivePin(PassivePin pin) {
+        outMap.put(pin.id, pin);
+        outAliasMap.put(pin.id, pin);
         inMap.put(pin.id, pin);
         inAliasMap.put(pin.id, pin);
         return pin;

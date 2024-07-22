@@ -38,7 +38,6 @@ import lv.pko.KiCadLogicalSchemeSimulator.api_v2.bus.in.InBus;
 import lv.pko.KiCadLogicalSchemeSimulator.api_v2.wire.OutPin;
 import lv.pko.KiCadLogicalSchemeSimulator.api_v2.wire.PassivePin;
 import lv.pko.KiCadLogicalSchemeSimulator.api_v2.wire.Pin;
-import lv.pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.InPin;
 import lv.pko.KiCadLogicalSchemeSimulator.model.merger.DestinationDescriptor;
 import lv.pko.KiCadLogicalSchemeSimulator.model.merger.IMerger;
 import lv.pko.KiCadLogicalSchemeSimulator.model.merger.MergerInput;
@@ -61,7 +60,7 @@ public class WireMerger extends OutPin implements IMerger {
     @Override
     public void addDestination(IModelItem item, long mask, byte offset) {
         switch (item) {
-            case InPin pin -> {
+            case Pin pin -> {
                 if (destinations.length == 1 && destinations[0] instanceof PassivePin passivePin) {
                     passivePin.addDestination(item, mask, offset);
                 } else {
@@ -92,7 +91,7 @@ public class WireMerger extends OutPin implements IMerger {
                         hiImpedance = false;
                         if (pin.strong) {
                             if (strong) {
-                                Set<ModelOutItem> items = sources.keySet();
+                                Set<ModelOutItem> items = new HashSet<>(sources.keySet());
                                 items.add(src);
                                 throw new ShortcutException(items.toArray(new ModelOutItem[0]));
                             }
@@ -100,7 +99,7 @@ public class WireMerger extends OutPin implements IMerger {
                             state = pin.state;
                         } else {
                             if ((weakState > 0 && !pin.state) || (weakState < 0 && pin.state)) {
-                                Set<ModelOutItem> items = sources.keySet();
+                                Set<ModelOutItem> items = new HashSet<>(sources.keySet());
                                 items.add(src);
                                 throw new ShortcutException(items.toArray(new ModelOutItem[0]));
                             }
@@ -115,7 +114,7 @@ public class WireMerger extends OutPin implements IMerger {
                     input = new WireMergerBusIn(bus, mask, this);
                     if (!bus.hiImpedance) {
                         if (strong) {
-                            Set<ModelOutItem> items = sources.keySet();
+                            Set<ModelOutItem> items = new HashSet<>(sources.keySet());
                             items.add(src);
                             throw new ShortcutException(items.toArray(new ModelOutItem[0]));
                         }

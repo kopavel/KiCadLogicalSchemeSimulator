@@ -84,19 +84,18 @@ public class BusMerger extends OutBus implements IMerger {
     }
 
     public String getHash() {
-        return mask + "mask:" + Arrays.stream(inputs)
+        return "mask" + mask + ":" + Arrays.stream(inputs)
                 .map(MergerInput::getHash)
                 .collect(Collectors.joining(";"));
     }
 
     public void addSource(ModelOutItem src, long mask, byte offset) {
-        MergerInput input;
+        MergerInput input = null;
         switch (src) {
             case OutPin pin -> {
                 long destinationMask = 1L << offset;
                 if (wires.containsKey(offset)) {
-                    input = wires.get(offset);
-                    ((BusMergerWireIn) input).addSource(pin);
+                    wires.get(offset).addSource(pin);
                 } else {
                     input = new BusMergerWireIn(pin, destinationMask, offset, this);
                     wires.put(offset, (BusMergerWireIn) input);
@@ -104,7 +103,7 @@ public class BusMerger extends OutBus implements IMerger {
                 if (!pin.hiImpedance) {
                     if (pin.strong) {
                         if ((strongPins & destinationMask) != 0) {
-                            Set<ModelOutItem> items = sources.keySet();
+                            Set<ModelOutItem> items = new HashSet<>(sources.keySet());
                             items.add(src);
                             throw new ShortcutException(items.toArray(new ModelOutItem[0]));
                         }
@@ -113,8 +112,8 @@ public class BusMerger extends OutBus implements IMerger {
                             state |= destinationMask;
                         }
                     } else {
-                        if (((weakState & destinationMask) > 0) != pin.state) {
-                            Set<ModelOutItem> items = sources.keySet();
+                        if ((weakPins & destinationMask) > 0 && ((weakState & destinationMask) > 0) != pin.state) {
+                            Set<ModelOutItem> items = new HashSet<>(sources.keySet());
                             items.add(src);
                             throw new ShortcutException(items.toArray(new ModelOutItem[0]));
                         }
@@ -131,7 +130,7 @@ public class BusMerger extends OutBus implements IMerger {
                 input = new BusMergerBusIn(bus, destinationMask, this);
                 if (!bus.hiImpedance) {
                     if ((strongPins & mask) != 0) {
-                        Set<ModelOutItem> items = sources.keySet();
+                        Set<ModelOutItem> items = new HashSet<>(sources.keySet());
                         items.add(src);
                         throw new ShortcutException(items.toArray(new ModelOutItem[0]));
                     }
@@ -142,15 +141,16 @@ public class BusMerger extends OutBus implements IMerger {
             }
             default -> throw new RuntimeException("Unsupported item " + src.getClass().getName());
         }
-        inputs = Utils.addToArray(inputs, input);
+        if (input != null) {
+            inputs = Utils.addToArray(inputs, input);
+            Arrays.sort(inputs, Comparator.comparing(MergerInput::getName));
+        }
         hiImpedance = (strongPins | weakPins) != mask;
-        Arrays.sort(inputs, Comparator.comparing(MergerInput::getName));
         hash = getHash();
     }
 
     public void bindSources() {
         sources.forEach((source, descriptor) -> source.addDestination(descriptor.item, descriptor.mask, descriptor.offset));
-        wires.values().forEach(BusMergerWireIn::bindSources);
     }
 
     @Override

@@ -116,7 +116,7 @@ public class WireMergerWireIn extends InPin implements MergerInput {
 
     @Override
     public void setHiImpedance() {
-        assert !hiImpedance : "Already in hiImpedance:" + this;
+        assert !hiImpedance : "Already in hiImpedance:" + this + "; merger=" + merger.getName();
         if (!strong) { //from weak
             merger.weakState -= (byte) (merger.weakState > 0 ? 1 : -1); //count down weak states
         } else {

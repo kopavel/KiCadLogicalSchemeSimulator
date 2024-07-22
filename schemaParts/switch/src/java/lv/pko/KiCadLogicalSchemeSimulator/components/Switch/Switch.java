@@ -31,108 +31,161 @@
  */
 package lv.pko.KiCadLogicalSchemeSimulator.components.Switch;
 import lv.pko.KiCadLogicalSchemeSimulator.api.AbstractUiComponent;
+import lv.pko.KiCadLogicalSchemeSimulator.api_v2.ShortcutException;
 import lv.pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.InteractiveSchemaPart;
 import lv.pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
+import lv.pko.KiCadLogicalSchemeSimulator.api_v2.wire.PassivePin;
 import lv.pko.KiCadLogicalSchemeSimulator.api_v2.wire.Pin;
-import lv.pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.InPin;
 
 public class Switch extends SchemaPart implements InteractiveSchemaPart {
-    //FixMe using passive pins?
-    private final InPin pin1In;
-    private final InPin pin2In;
+    private final PassivePin pin1;
+    private final PassivePin pin2;
     private boolean toggled;
-    private Pin pin1Out;
-    private Pin pin2Out;
     private SwitchUiComponent switchUiComponent;
-    private volatile Thread transitTread;
 
     protected Switch(String id, String sParams) {
         super(id, sParams);
-        pin1In = addInPin(new InPin("IN1", this) {
+        pin1 = addPassivePin(new PassivePin("IN1", this) {
             @Override
             public void setHiImpedance() {
                 assert !hiImpedance : "Already in hiImpedance:" + this;
-                boolean newTread = lockThread();
-                try {
-                    hiImpedance = true;
-                    if (!pin2Out.hiImpedance) {
-                        pin2Out.setHiImpedance();
-                        pin2Out.hiImpedance = true;
+                hiImpedance = true;
+                if (toggled && !pin2.hiImpedance) {
+                    for (Pin destination : destinations) {
+                        if (destination.state != pin2.state || destination.strong != pin2.strong) {
+                            destination.state = pin2.state;
+                            destination.strong = pin2.strong;
+                            destination.setState(pin2.state, pin2.strong);
+                        }
                     }
-                } finally {
-                    if (newTread) {
-                        transitTread = null;
+                } else {
+                    for (Pin destination : destinations) {
+                        if (!destination.hiImpedance) {
+                            destination.hiImpedance = true;
+                            destination.setHiImpedance();
+                        }
                     }
                 }
             }
 
             @Override
-            public void setState(boolean newState, boolean newStrong) {
-                boolean newTread = lockThread();
-                try {
-                    hiImpedance = false;
-                    state = newState;
-                    strong = newStrong;
-                    if (toggled && newTread) {
-                        pin2Out.state = state;
-                        pin2Out.strong = strong;
-                        pin2Out.hiImpedance = false;
-                        pin2Out.setState(newState, newStrong);
-                    }
-                } finally {
-                    if (newTread) {
-                        transitTread = null;
-                    }
-                }
-            }
-        });
-        pin2In = addInPin(new InPin("IN2", this) {
-            @Override
-            public void setHiImpedance() {
-                assert !hiImpedance : "Already in hiImpedance:" + this;
-                boolean newTread = lockThread();
-                try {
-                    hiImpedance = true;
-                    if (!pin1Out.hiImpedance) {
-                        pin1Out.setHiImpedance();
-                        pin1Out.hiImpedance = true;
-                    }
-                } finally {
-                    if (newTread) {
-                        transitTread = null;
-                    }
+            public void resend() {
+                if (!hiImpedance) {
+                    setState(state, strong);
                 }
             }
 
             @Override
             public void setState(boolean newState, boolean newStrong) {
-                boolean newTread = lockThread();
-                try {
-                    hiImpedance = false;
-                    state = newState;
-                    strong = newStrong;
-                    if (toggled && newTread) {
-                        pin1Out.state = state;
-                        pin1Out.strong = strong;
-                        pin1Out.hiImpedance = false;
-                        pin1Out.setState(newState, newStrong);
+                hiImpedance = false;
+                state = newState;
+                strong = newStrong;
+                if (toggled && !pin2.hiImpedance) {
+                    if (pin2.strong) {
+                        if (newStrong) {
+                            throw new ShortcutException(pin1, pin2);
+                        } else {
+                            for (Pin destination : destinations) {
+                                if (destination.state != pin2.state || destination.strong != pin2.strong) {
+                                    destination.state = pin2.state;
+                                    destination.strong = pin2.strong;
+                                    destination.setState(pin2.state, pin2.strong);
+                                }
+                            }
+                        }
+                    } else if (newStrong) {
+                        for (Pin destination : destinations) {
+                            if (destination.state != newState || !destination.strong) {
+                                destination.state = newState;
+                                destination.strong = true;
+                                destination.setState(newState, true);
+                            }
+                        }
                     }
-                } finally {
-                    if (newTread) {
-                        transitTread = null;
+                } else {
+                    for (Pin destination : destinations) {
+                        if (destination.state != newState || destination.strong != newStrong) {
+                            destination.state = newState;
+                            destination.strong = newStrong;
+                            destination.setState(newState, newStrong);
+                        }
                     }
                 }
             }
         });
-        addOutPin("IN1");
-        addOutPin("IN2");
+        pin2 = addPassivePin(new PassivePin("IN2", this) {
+            @Override
+            public void setHiImpedance() {
+                assert !hiImpedance : "Already in hiImpedance:" + this;
+                hiImpedance = true;
+                if (toggled && !pin1.hiImpedance) {
+                    for (Pin destination : destinations) {
+                        if (destination.state != pin1.state || destination.strong != pin1.strong) {
+                            destination.state = pin1.state;
+                            destination.strong = pin1.strong;
+                            destination.setState(pin1.state, pin1.strong);
+                        }
+                    }
+                } else {
+                    for (Pin destination : destinations) {
+                        if (!destination.hiImpedance) {
+                            destination.hiImpedance = true;
+                            destination.setHiImpedance();
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void resend() {
+                if (!hiImpedance) {
+                    setState(state, strong);
+                }
+            }
+
+            @Override
+            public void setState(boolean newState, boolean newStrong) {
+                hiImpedance = false;
+                state = newState;
+                strong = newStrong;
+                if (toggled && !pin1.hiImpedance) {
+                    if (pin1.strong) {
+                        if (newStrong) {
+                            throw new ShortcutException(pin1, pin2);
+                        } else {
+                            for (Pin destination : destinations) {
+                                if (destination.state != pin1.state || destination.strong != pin1.strong) {
+                                    destination.state = pin1.state;
+                                    destination.strong = pin1.strong;
+                                    destination.setState(pin1.state, pin1.strong);
+                                }
+                            }
+                        }
+                    } else if (newStrong) {
+                        for (Pin destination : destinations) {
+                            if (destination.state != newState || !destination.strong) {
+                                destination.state = newState;
+                                destination.strong = true;
+                                destination.setState(newState, true);
+                            }
+                        }
+                    }
+                } else {
+                    for (Pin destination : destinations) {
+                        if (destination.state != newState || destination.strong != newStrong) {
+                            destination.state = newState;
+                            destination.strong = newStrong;
+                            destination.setState(newState, newStrong);
+                        }
+                    }
+                }
+            }
+        });
         toggled = reverse;
     }
 
     @Override
     public void initOuts() {
-        pin1Out = getOutPin("IN1");
-        pin2Out = getOutPin("IN2");
     }
 
     @Override
@@ -144,56 +197,8 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
     }
 
     public void toggle(boolean toggled) {
-        lockThread();
-        try {
-            this.toggled = toggled;
-            if (toggled) {
-                if (pin1In.hiImpedance) {
-                    if (!pin2Out.hiImpedance) {
-                        pin2Out.setHiImpedance();
-                        pin2Out.hiImpedance = true;
-                    }
-                } else if (pin1In.strong != pin2Out.strong || pin1In.state != pin2Out.state || pin2Out.hiImpedance) {
-                    pin2Out.state = pin1In.state;
-                    pin2Out.strong = pin1In.strong;
-                    pin2Out.hiImpedance = false;
-                    pin2Out.setState(pin1In.state, pin1In.strong);
-                }
-                if (pin2In.hiImpedance) {
-                    if (!pin1Out.hiImpedance) {
-                        pin1Out.setHiImpedance();
-                        pin1Out.hiImpedance = true;
-                    }
-                } else if (pin2In.strong != pin1Out.strong || pin2In.state != pin1Out.state || pin2Out.hiImpedance) {
-                    pin1Out.state = pin2In.state;
-                    pin1Out.strong = pin2In.strong;
-                    pin1Out.hiImpedance = false;
-                    pin1Out.setState(pin2In.state, pin2In.strong);
-                }
-            } else {
-                if (!pin1Out.hiImpedance) {
-                    pin1Out.setHiImpedance();
-                    pin1Out.hiImpedance = true;
-                }
-                if (!pin2Out.hiImpedance) {
-                    pin2Out.setHiImpedance();
-                    pin2Out.hiImpedance = true;
-                }
-            }
-        } finally {
-            transitTread = null;
-        }
-    }
-
-    private synchronized boolean lockThread() {
-        Thread currentThread = Thread.currentThread();
-        if (transitTread == currentThread) {
-            return false;
-        }
-        while (transitTread != null) {
-            Thread.onSpinWait();
-        }
-        transitTread = currentThread;
-        return true;
+        this.toggled = toggled;
+        pin1.resend();
+        pin2.resend();
     }
 }
