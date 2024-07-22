@@ -34,7 +34,7 @@
 plugins {
     id 'java'
 }
-group 'lv.pko'
+group 'pko'
 configurations {
     origa
 }

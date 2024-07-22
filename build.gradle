@@ -35,7 +35,7 @@ plugins {
 //    alias libs.plugins.guidesigner
 }
 
-group 'lv.pko'
+group 'pko'
 version '0.1'
 tasks.register("cleanBuild", Delete).configure() {
     delete fileTree(dir: "$rootDir/distro/")

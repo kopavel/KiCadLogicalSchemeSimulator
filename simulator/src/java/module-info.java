@@ -29,28 +29,30 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPartSpi;
+
 module KiCadLogicalSchemeSimulator.simulator {
-    exports lv.pko.KiCadLogicalSchemeSimulator.api.pins.in;
-    exports lv.pko.KiCadLogicalSchemeSimulator.api.pins.out;
-    exports lv.pko.KiCadLogicalSchemeSimulator.api.pins;
-    exports lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart;
-    exports lv.pko.KiCadLogicalSchemeSimulator.api;
-    exports lv.pko.KiCadLogicalSchemeSimulator.api_v2;
-    exports lv.pko.KiCadLogicalSchemeSimulator.api_v2.bus.in;
-    exports lv.pko.KiCadLogicalSchemeSimulator.api_v2.bus;
-    exports lv.pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart;
-    exports lv.pko.KiCadLogicalSchemeSimulator.api_v2.wire.in;
-    exports lv.pko.KiCadLogicalSchemeSimulator.api_v2.wire;
-    exports lv.pko.KiCadLogicalSchemeSimulator.model;
-    exports lv.pko.KiCadLogicalSchemeSimulator.parsers.pojo.symbolMap;
-    exports lv.pko.KiCadLogicalSchemeSimulator.parsers.pojo;
-    exports lv.pko.KiCadLogicalSchemeSimulator.tools.ringBuffers;
-    exports lv.pko.KiCadLogicalSchemeSimulator.tools;
-    exports lv.pko.KiCadLogicalSchemeSimulator;
-    opens lv.pko.KiCadLogicalSchemeSimulator.model;
-    opens lv.pko.KiCadLogicalSchemeSimulator.parsers.pojo.symbolMap;
-    opens lv.pko.KiCadLogicalSchemeSimulator.parsers.pojo;
-    opens lv.pko.KiCadLogicalSchemeSimulator;
+    exports pko.KiCadLogicalSchemeSimulator.api.pins.in;
+    exports pko.KiCadLogicalSchemeSimulator.api.pins.out;
+    exports pko.KiCadLogicalSchemeSimulator.api.pins;
+    exports pko.KiCadLogicalSchemeSimulator.api.schemaPart;
+    exports pko.KiCadLogicalSchemeSimulator.api;
+    exports pko.KiCadLogicalSchemeSimulator.api_v2;
+    exports pko.KiCadLogicalSchemeSimulator.api_v2.bus.in;
+    exports pko.KiCadLogicalSchemeSimulator.api_v2.bus;
+    exports pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart;
+    exports pko.KiCadLogicalSchemeSimulator.api_v2.wire.in;
+    exports pko.KiCadLogicalSchemeSimulator.api_v2.wire;
+    exports pko.KiCadLogicalSchemeSimulator.model;
+    exports pko.KiCadLogicalSchemeSimulator.parsers.pojo.symbolMap;
+    exports pko.KiCadLogicalSchemeSimulator.parsers.pojo;
+    exports pko.KiCadLogicalSchemeSimulator.tools.ringBuffers;
+    exports pko.KiCadLogicalSchemeSimulator.tools;
+    exports pko.KiCadLogicalSchemeSimulator;
+    opens pko.KiCadLogicalSchemeSimulator.model;
+    opens pko.KiCadLogicalSchemeSimulator.parsers.pojo.symbolMap;
+    opens pko.KiCadLogicalSchemeSimulator.parsers.pojo;
+    opens pko.KiCadLogicalSchemeSimulator;
     requires com.fasterxml.jackson.annotation;
     requires com.fasterxml.jackson.core;
     requires com.fasterxml.jackson.databind;
@@ -75,5 +77,5 @@ module KiCadLogicalSchemeSimulator.simulator {
     requires org.apache.logging.log4j;
     requires org.tukaani.xz;
     requires static lombok;
-    uses lv.pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPartSpi;
+    uses SchemaPartSpi;
 }

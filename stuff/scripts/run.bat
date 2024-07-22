@@ -8,7 +8,7 @@ java -Xms16m -Xmx2g ^
 -Dlog4j2.asyncLoggerWaitStrategy=Block ^
 -Dlog4j2.asyncLoggerThreadNameStrategy=CACHED ^
 -p %~dp0;%~dp0lib;%~dp0schemaParts; ^
--m KiCadLogicalSchemeSimulator.simulator/lv.pko.KiCadLogicalSchemeSimulator.Simulator -m=%~dp0SymbolsDescription.xml %*
+-m KiCadLogicalSchemeSimulator.simulator/pko.KiCadLogicalSchemeSimulator.Simulator -m=%~dp0SymbolsDescription.xml %*
 :: Check the exit code from Java application
 if %ERRORLEVEL% equ 0 (
     exit

@@ -67,7 +67,7 @@ jar {
 application {
     group = "_build"
     mainModule = "KiCadLogicalSchemeSimulator.simulator"
-    mainClass = "lv.pko.KiCadLogicalSchemeSimulator.Simulator"
+    mainClass = "pko.KiCadLogicalSchemeSimulator.Simulator"
     tasks.named("distTar") { it.enabled = false }
     tasks.named("distZip") { it.enabled = false }
     tasks.named("startScripts") { it.enabled = false }

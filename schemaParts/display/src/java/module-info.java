@@ -29,8 +29,8 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
-import lv.pko.KiCadLogicalSchemeSimulator.components.display.DisplaySpi;
+import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
+import pko.KiCadLogicalSchemeSimulator.components.display.DisplaySpi;
 
 module KiCadLogicalSchemeSimulator.components.display {
     requires KiCadLogicalSchemeSimulator.simulator;

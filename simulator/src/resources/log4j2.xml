@@ -43,11 +43,11 @@
 			<AppenderRef ref="STDOUT" level="INFO"/>
 		</Root>
 		<!--
-				<logger name="lv.pko.KiCadLogicalSchemeSimulator.components.display" level="TRACE" additivity="false">
+				<logger name="pko.KiCadLogicalSchemeSimulator.components.display" level="TRACE" additivity="false">
 					<AppenderRef ref="DFILE"/>
 				</logger>
 		-->
-		<logger name="lv.pko" level="TRACE" additivity="false">
+		<logger name="pko" level="TRACE" additivity="false">
 			<AppenderRef ref="FILE"/>
 			<AppenderRef ref="STDOUT" level="DEBUG"/>
 		</logger>

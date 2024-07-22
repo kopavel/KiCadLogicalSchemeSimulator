@@ -29,8 +29,8 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-import lv.pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
-import lv.pko.KiCadLogicalSchemeSimulator.components.BUF.BufferSpi;
+import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
+import pko.KiCadLogicalSchemeSimulator.components.BUF.BufferSpi;
 
 module KiCadLogicalSchemeSimulator.components.BUF {
     requires KiCadLogicalSchemeSimulator.simulator;
