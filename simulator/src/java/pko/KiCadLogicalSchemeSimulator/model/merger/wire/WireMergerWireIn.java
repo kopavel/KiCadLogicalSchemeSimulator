@@ -59,6 +59,7 @@ public class WireMergerWireIn extends InPin implements MergerInput {
                 merger.state,
                 merger.strong,
                 merger.hiImpedance);
+        state = newState;
         boolean oldState = merger.state;
         boolean oldStrong = merger.strong;
         if (newStrong) { // to strong
@@ -72,22 +73,22 @@ public class WireMergerWireIn extends InPin implements MergerInput {
             } else if (hiImpedance && merger.strong) { //from hiImpedance but merger already strong
                 throw new ShortcutException(merger.mergerInputs);
             }
-            merger.state = newState;
+            merger.state = state;
             merger.strong = true;
         } else { //to weak
-            if (merger.weakState != 0 && (merger.weakState > 0 ^ newState)) {
+            if (merger.weakState != 0 && (merger.weakState > 0 ^ state)) {
                 throw new ShortcutException(merger.mergerInputs); // merger in opposite weak state
             }
             if (strong) { // from string
-                merger.weakState += (byte) (newState ? 1 : -1); // count up weak state
-                merger.state = newState;
+                merger.weakState += (byte) (state ? 1 : -1); // count up weak state
+                merger.state = state;
                 merger.strong = false;
             } else if (hiImpedance) { // from hiImpedance
-                merger.weakState += (byte) (newState ? 1 : -1);// count up weak state
+                merger.weakState += (byte) (state ? 1 : -1);// count up weak state
             }
         }
         if (merger.hiImpedance) { // from merger hiImpedance
-            merger.state = newState;
+            merger.state = state;
             merger.hiImpedance = false;
             for (Pin destination : merger.destinations) {
                 destination.setState(merger.state, merger.strong);

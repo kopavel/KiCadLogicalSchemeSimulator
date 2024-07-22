@@ -70,9 +70,9 @@ public class OutPin extends Pin implements ModelOutItem {
     }
 
     @Override
-    public void setState(boolean newState, boolean strong) {
+    public void setState(boolean newState, boolean newStrong) {
         for (Pin destination : destinations) {
-            destination.setState(newState, strong);
+            destination.setState(state, strong);
         }
     }
 

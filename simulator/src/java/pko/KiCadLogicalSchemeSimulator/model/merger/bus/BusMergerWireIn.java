@@ -78,6 +78,7 @@ public class BusMergerWireIn extends InPin implements MergerInput {
                 merger.weakPins,
                 merger.hiImpedance);
         long oldState = merger.state;
+        state = newState;
         if (newStrong) { //to strong
             if (hiImpedance && (merger.strongPins & mask) != 0) {
                 throw new ShortcutException(merger.inputs);
@@ -89,13 +90,13 @@ public class BusMergerWireIn extends InPin implements MergerInput {
                     merger.weakPins &= nMask;
                 }
             }
-            if (newState) {
+            if (state) {
                 merger.state |= mask;
             } else {
                 merger.state &= nMask;
             }
         } else { //to weak
-            if ((merger.weakPins & mask) > 0 && ((merger.weakState & mask) > 0) != newState) {
+            if ((merger.weakPins & mask) > 0 && ((merger.weakState & mask) > 0) != state) {
                 throw new ShortcutException(merger.inputs);
             }
             if (hiImpedance) {
@@ -105,7 +106,7 @@ public class BusMergerWireIn extends InPin implements MergerInput {
                 merger.weakPins |= mask;
             }
             if ((merger.strongPins & mask) == 0) {
-                if (newState) {
+                if (state) {
                     merger.state |= mask;
                 } else {
                     merger.state &= nMask;

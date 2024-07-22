@@ -65,6 +65,7 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput {
                 merger.weakState,
                 merger.weakPins,
                 merger.hiImpedance);
+        state = newState;
         if (hiImpedance && (merger.strongPins & mask) != 0) {
             throw new ShortcutException(merger.inputs);
         }
@@ -74,7 +75,7 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput {
             merger.strongPins |= mask;
         }
         merger.state &= nMask;
-        merger.state |= newState;
+        merger.state |= state;
         if ((merger.strongPins | merger.weakPins) != merger.mask) {
             if (!merger.hiImpedance) {
                 for (Bus destination : merger.destinations) {

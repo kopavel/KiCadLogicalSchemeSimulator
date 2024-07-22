@@ -95,7 +95,7 @@ public class OutBus extends Bus implements ModelOutItem {
     @Override
     public void setState(long newState) {
         for (Bus destination : destinations) {
-            destination.setState(newState);
+            destination.setState(state);
         }
     }
 

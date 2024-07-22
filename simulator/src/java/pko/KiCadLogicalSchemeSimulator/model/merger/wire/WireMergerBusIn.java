@@ -59,11 +59,12 @@ public class WireMergerBusIn extends CorrectedInBus implements MergerInput {
                 merger.state,
                 merger.strong,
                 merger.hiImpedance);
+        state = newState;
         if (hiImpedance && merger.strong) { //merger already in strong
             throw new ShortcutException(merger.mergerInputs);
         }
-        if (merger.state != (newState > 0)) { //merger state changes
-            merger.state = newState > 0;
+        if (merger.state != (state > 0)) { //merger state changes
+            merger.state = state > 0;
             for (Pin destination : merger.destinations) {
                 destination.setState(merger.state, true);
             }
