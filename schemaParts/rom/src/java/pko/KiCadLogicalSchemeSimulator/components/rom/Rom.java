@@ -30,11 +30,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.rom;
-import pko.KiCadLogicalSchemeSimulator.api.pins.in.EdgeInPin;
-import pko.KiCadLogicalSchemeSimulator.api.pins.in.FloatingPinException;
-import pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
-import pko.KiCadLogicalSchemeSimulator.api.pins.out.TriStateOutPin;
-import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api_v2.FloatingInException;
+import pko.KiCadLogicalSchemeSimulator.api_v2.bus.Bus;
+import pko.KiCadLogicalSchemeSimulator.api_v2.bus.in.InBus;
+import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.EdgeInPin;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 import java.io.BufferedInputStream;
@@ -44,7 +44,7 @@ import java.io.InputStream;
 
 public class Rom extends SchemaPart {
     private final long[] words;
-    private TriStateOutPin outPin;
+    private Bus outPin;
     private int addr;
     private boolean csActive;
     private int size;
@@ -107,19 +107,28 @@ public class Rom extends SchemaPart {
         } catch (IOException e) {
             throw new RuntimeException("Can't load file " + file, e);
         }
-        addInPin(new InPin("A", this, aSize) {
+        addInBus(new InBus("A", this, aSize) {
             @Override
-            public void onChange(long newState, boolean hiImpedance, boolean strong) {
-                addr = (int) newState;
+            public void setHiImpedance() {
                 if (csActive) {
                     if (hiImpedance) {
-                        throw new FloatingPinException(this);
+                        throw new FloatingInException(this);
                     }
-                    outPin.setState(words[addr]);
+                }
+            }
+
+            @Override
+            public void setState(long newState) {
+                addr = (int) newState;
+                if (csActive) {
+                    if (outPin.state != words[addr]) {
+                        outPin.state = words[addr];
+                        outPin.setState(outPin.state);
+                    }
                 }
             }
         });
-        addTriStateOutPin("D", size);
+        addOutBus("D", size);
         if (reverse) {
             addInPin(new EdgeInPin("~{CS}", this) {
                 @Override
@@ -153,7 +162,7 @@ public class Rom extends SchemaPart {
 
     @Override
     public void initOuts() {
-        outPin = (TriStateOutPin) getOutPin("D");
+        outPin = getOutBus("D");
     }
 
     @Override
