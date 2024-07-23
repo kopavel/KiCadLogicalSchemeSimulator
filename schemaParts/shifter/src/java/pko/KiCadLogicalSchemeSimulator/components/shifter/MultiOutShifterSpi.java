@@ -29,60 +29,18 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.api_v2.wire;
-import lombok.Getter;
-import pko.KiCadLogicalSchemeSimulator.api_v2.ModelItem;
+package pko.KiCadLogicalSchemeSimulator.components.shifter;
 import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPartSpi;
 
-import java.util.Set;
-
-public abstract class Pin extends ModelItem {
-    public boolean state;
-    @Getter
-    public boolean strong = true;
-
-    public Pin(Pin oldPin, String variantId) {
-        this(oldPin.id, oldPin.parent);
-        this.variantId = variantId + (oldPin.variantId == null ? "" : ":" + oldPin.variantId);
-        state = oldPin.state;
-        strong = oldPin.strong;
-        hiImpedance = oldPin.hiImpedance;
-    }
-
-    public Pin(String id, SchemaPart parent) {
-        super(id, parent);
-    }
-
-    abstract public void setState(boolean newState, boolean strong);
-
+public class MultiOutShifterSpi implements SchemaPartSpi {
     @Override
-    public int getSize() {
-        return 1;
+    public SchemaPart getSchemaPart(String id, String params) {
+        return new MultiOutShifter(id, params);
     }
 
     @Override
-    public long getState() {
-        return state ? 1L : 0L;
-    }
-
-    @Override
-    public Pin getOptimised() {
-        return this;
-    }
-
-    @Override
-    public Byte getAliasOffset(String pinName) {
-        return 0;
-    }
-
-    @Override
-    public Set<String> getAliases() {
-        return Set.of(id);
-    }
-
-    public void resend() {
-        if (!hiImpedance) {
-            setState(state, strong);
-        }
+    public Class<? extends SchemaPart> getSchemaPartClass() {
+        return MultiOutShifter.class;
     }
 }

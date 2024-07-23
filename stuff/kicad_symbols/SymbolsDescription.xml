@@ -34,7 +34,7 @@
 		<symbol name="RAM256" symPartClass="Ram" symPartParam="aSize=8;size=8;reverse"/>
 		<symbol name="ROM4K" symPartClass="Rom" symPartParam="aSize=12;size=8;reverse"/>
 		<symbol name="SDRAM64K" symPartClass="SdRam" symPartParam="aSize=8;size=8;reverse"/>
-		<symbol name="SHIFT" symPartClass="Shifter" symPartParam="size=8;plReverse;qSize=1">
+		<symbol name="SHIFT" symPartClass="Shifter" symPartParam="size=8;plReverse">
 			<unit pinMap="1=D0;2=D1;3=D2;4=D3;5=D4;6=D5;7=D6;8=D7;9=Q;17=CN;18=PL"/>
 		</symbol>
 		<symbol name="SWITCH" symPartClass="Switch"/>
@@ -94,7 +94,7 @@
 		<symbol name="4020" symPartClass="Counter" symPartParam="size=14;reverse">
 			<unit pinMap="10=C;11=R;9=Q0;7=Q3;5=Q4;4=Q5;6=Q6;13=Q7;12=Q8;14=Q9;15=Q10;1=Q11;2=Q12;3=Q13"/>
 		</symbol>
-		<symbol name="4021" symPartClass="Shifter" symPartParam="size=8">
+		<symbol name="4021" symPartClass="MultiOutShifter" symPartParam="size=8">
 			<unit pinMap="10=CP;9=PL;11=DS;7=D0;6=D1;5=D2;4=D3;13=D4;14=D5;15=D6;1=D7;2=Q5;12=Q6;3=Q7"/>
 		</symbol>
 		<symbol name="4022" symPartClass="JnCounter" symPartParam="size=8">

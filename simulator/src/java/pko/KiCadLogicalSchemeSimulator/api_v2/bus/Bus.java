@@ -60,7 +60,7 @@ public abstract class Bus extends ModelItem {
         this.size = size;
         if (aliases == null || aliases.length == 0) {
             if (size == 1 && !(this instanceof BusToWireAdapter)) {
-                throw new RuntimeException("Use Pin for Bus with size 1");
+                throw new RuntimeException("Use Pin for Bus with size 1:" + getName());
             } else {
                 for (byte i = 0; i < size; i++) {
                     aliasOffsets.put(id + i, i);

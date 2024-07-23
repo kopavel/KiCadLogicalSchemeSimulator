@@ -90,9 +90,9 @@ public class MaskGroupBus extends OutBus {
                         long newMaskState = newState & mask;
                         if (maskState != newMaskState || hiImpedance) {
                             maskState = newMaskState;
+                            hiImpedance = false;
                             destination.setState(newMaskState);
                         }
-                        hiImpedance = false;
                     }
                 };
             }

@@ -135,13 +135,20 @@ public class Rom extends SchemaPart {
                 @Override
                 public void onFallingEdge() {
                     csActive = true;
-                    outPin.setState(words[addr]);
+                    if (outPin.hiImpedance || outPin.state != words[addr]) {
+                        outPin.hiImpedance = false;
+                        outPin.state = words[addr];
+                        outPin.setState(outPin.state);
+                    }
                 }
 
                 @Override
                 public void onRisingEdge() {
                     csActive = false;
-                    outPin.setHiImpedance();
+                    if (!outPin.hiImpedance) {
+                        outPin.setHiImpedance();
+                        outPin.hiImpedance = true;
+                    }
                 }
             });
         } else {
@@ -149,13 +156,20 @@ public class Rom extends SchemaPart {
                 @Override
                 public void onFallingEdge() {
                     csActive = false;
-                    outPin.setHiImpedance();
+                    if (!outPin.hiImpedance) {
+                        outPin.setHiImpedance();
+                        outPin.hiImpedance = true;
+                    }
                 }
 
                 @Override
                 public void onRisingEdge() {
                     csActive = true;
-                    outPin.setState(words[addr]);
+                    if (outPin.hiImpedance || outPin.state != words[addr]) {
+                        outPin.hiImpedance = false;
+                        outPin.state = words[addr];
+                        outPin.setState(outPin.state);
+                    }
                 }
             });
         }

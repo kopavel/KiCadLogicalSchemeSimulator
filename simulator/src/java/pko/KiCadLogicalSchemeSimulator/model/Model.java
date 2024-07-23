@@ -325,6 +325,7 @@ public class Model {
                     assert Log.debug(Model.class, "Resend {}", item);
                     item.resend();
                 } catch (FloatingInException | ShortcutException e) {
+                    assert Log.debug(Model.class, "Item stabilising exception", e);
                     stabilizing = true;
                 }
             });
@@ -333,12 +334,14 @@ public class Model {
                     assert Log.debug(Model.class, "Resend {}", merger);
                     merger.resend();
                 } catch (FloatingInException | ShortcutException e) {
+                    assert Log.debug(Model.class, "Merger stabilising exception", e);
                     stabilizing = true;
                 }
             });
             try {
                 schemaParts.values().forEach(SchemaPart::reset);
             } catch (FloatingInException | ShortcutException e) {
+                assert Log.debug(Model.class, "Reset stabilising exception", e);
                 stabilizing = true;
             }
         }

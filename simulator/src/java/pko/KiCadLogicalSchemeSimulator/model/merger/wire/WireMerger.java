@@ -55,6 +55,7 @@ public class WireMerger extends OutPin implements IMerger {
     public WireMerger(Pin destination) {
         super(destination.id, destination.parent);
         destinations = new Pin[]{destination};
+        strong = false;
     }
 
     @Override

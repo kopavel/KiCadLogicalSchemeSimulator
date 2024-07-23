@@ -30,31 +30,37 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.shifter;
+import pko.KiCadLogicalSchemeSimulator.api_v2.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api_v2.bus.in.CorrectedInBus;
 import pko.KiCadLogicalSchemeSimulator.api_v2.bus.in.InBus;
 import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api_v2.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.FallingEdgeInPin;
 import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.InPin;
 import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.NoFloatingInPin;
 import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.RisingEdgeInPin;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
-public class Shifter extends SchemaPart {
+import java.util.stream.IntStream;
+
+public class MultiOutShifter extends SchemaPart {
     private final InBus dBus;
     private final InPin dsPins;
     private final long hiDsMask;
     private final long outMask;
     private long latch = 0;
-    private Pin out;
+    private Bus out;
     private boolean plInactive;
 
-    protected Shifter(String id, String sParam) {
+    protected MultiOutShifter(String id, String sParam) {
         super(id, sParam);
         if (!params.containsKey("size")) {
             throw new RuntimeException("Component " + id + " has no parameter \"size\"");
         }
         int dSize = Integer.parseInt(params.get("size"));
+        int qSize = dSize;
+        if (params.containsKey("qSize")) {
+            qSize = Integer.parseInt(params.get("qSize"));
+        }
         dBus = addInBus(new CorrectedInBus("D", this, dSize) {
             @Override
             public void setHiImpedance() {
@@ -81,10 +87,10 @@ public class Shifter extends SchemaPart {
                     state = newState;
                     plInactive = newState;
                     if (!plInactive) {
-                        latch = dBus.state;
-                        if (out.state != ((latch & 1) > 0)) {
-                            out.state = ((latch & 1) > 0);
-                            out.setState(out.state, true);
+                        latch = dBus.getState();
+                        if (out.state != latch) {
+                            out.state = latch;
+                            out.setState(latch);
                         }
                     }
                 }
@@ -93,13 +99,12 @@ public class Shifter extends SchemaPart {
             addInPin(new NoFloatingInPin("PL", this) {
                 @Override
                 public void setState(boolean newState, boolean strong) {
-                    state = newState;
                     plInactive = !newState;
                     if (!plInactive) {
-                        latch = dBus.state;
-                        if (out.state != ((latch & 1) > 0)) {
-                            out.state = ((latch & 1) > 0);
-                            out.setState(out.state, true);
+                        latch = dBus.getState();
+                        if (out.state != latch) {
+                            out.state = latch;
+                            out.setState(latch);
                         }
                     }
                 }
@@ -114,9 +119,9 @@ public class Shifter extends SchemaPart {
                         if (dsPins.state) {
                             latch = latch | 1;
                         }
-                        if (out.state != ((latch & 1) > 0)) {
-                            out.state = ((latch & 1) > 0);
-                            out.setState(out.state, true);
+                        if (out.state != latch) {
+                            out.state = latch;
+                            out.setState(latch);
                         }
                     }
                 }
@@ -129,9 +134,9 @@ public class Shifter extends SchemaPart {
                         if (dsPins.state) {
                             latch = latch | hiDsMask;
                         }
-                        if (out.state != ((latch & 1) > 0)) {
-                            out.state = ((latch & 1) > 0);
-                            out.setState(out.state, true);
+                        if (out.state != latch) {
+                            out.state = latch;
+                            out.setState(latch);
                         }
                     }
                 }
@@ -145,9 +150,9 @@ public class Shifter extends SchemaPart {
                         if (dsPins.state) {
                             latch = latch | 1;
                         }
-                        if (out.state != ((latch & 1) > 0)) {
-                            out.state = ((latch & 1) > 0);
-                            out.setState(out.state, true);
+                        if (out.state != latch) {
+                            out.state = latch;
+                            out.setState(latch);
                         }
                     }
                 }
@@ -160,20 +165,23 @@ public class Shifter extends SchemaPart {
                         if (dsPins.state) {
                             latch = latch | hiDsMask;
                         }
-                        if (out.state != ((latch & 1) > 0)) {
-                            out.state = ((latch & 1) > 0);
-                            out.setState(out.state, true);
+                        if (out.state != latch) {
+                            out.state = latch;
+                            out.setState(latch);
                         }
                     }
                 }
             });
         }
-        addOutPin("Q");
+        addOutBus("Q",
+                qSize,
+                IntStream.range(0, qSize).mapToObj(String::valueOf)
+                        .map(pos -> "Q" + pos).toArray(String[]::new));
     }
 
     @Override
     public void initOuts() {
-        out = getOutPin("Q");
+        out = getOutBus("Q");
     }
 
     @Override
@@ -184,6 +192,6 @@ public class Shifter extends SchemaPart {
     @Override
     public void reset() {
         latch = 0;
-        out.setState(false, true);
+        out.setState(0);
     }
 }

@@ -29,10 +29,11 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
+import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPartSpi;
+import pko.KiCadLogicalSchemeSimulator.components.shifter.MultiOutShifterSpi;
 import pko.KiCadLogicalSchemeSimulator.components.shifter.ShifterSpi;
 
 module KiCadLogicalSchemeSimulator.components.shifter {
     requires KiCadLogicalSchemeSimulator.simulator;
-    provides SchemaPartSpi with ShifterSpi;
+    provides SchemaPartSpi with ShifterSpi, MultiOutShifterSpi;
 }
