@@ -121,7 +121,7 @@ public class Ram extends SchemaPart {
                 @Override
                 public void onFallingEdge() {
                     if (!csPin.state) {
-                        words[(int) aBus.state] = dIn.getState();
+                        words[(int) aBus.state] = dIn.state;
                     }
                 }
             });
@@ -144,7 +144,7 @@ public class Ram extends SchemaPart {
                 @Override
                 public void onRisingEdge() {
                     if (csPin.state) {
-                        words[(int) aBus.state] = dIn.getState();
+                        words[(int) aBus.state] = dIn.state;
                     }
                 }
             });

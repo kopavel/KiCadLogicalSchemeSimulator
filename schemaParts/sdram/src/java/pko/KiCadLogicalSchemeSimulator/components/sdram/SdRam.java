@@ -30,22 +30,23 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.sdram;
-import pko.KiCadLogicalSchemeSimulator.api.pins.in.EdgeInPin;
-import pko.KiCadLogicalSchemeSimulator.api.pins.in.FallingEdgeInPin;
-import pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
-import pko.KiCadLogicalSchemeSimulator.api.pins.in.RisingEdgeInPin;
-import pko.KiCadLogicalSchemeSimulator.api.pins.out.TriStateOutPin;
-import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api_v2.bus.Bus;
+import pko.KiCadLogicalSchemeSimulator.api_v2.bus.in.InBus;
+import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.EdgeInPin;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.FallingEdgeInPin;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.InPin;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.RisingEdgeInPin;
 
 public class SdRam extends SchemaPart {
     private final long[] bytes;
-    private final InPin addrPin;
-    private final InPin dIn;
+    private final InBus addrPin;
+    private final InBus dIn;
     private final InPin we;
     private final int module;
     private final int size;
     private final int aSize;
-    private TriStateOutPin dOut;
+    private Bus dOut;
     private int hiPart;
 
     protected SdRam(String id, String sParam) {
@@ -70,25 +71,25 @@ public class SdRam extends SchemaPart {
         module = (int) Math.pow(2, aSize);
         int ramSize = (int) Math.pow(2, aSize * 2);
         bytes = new long[ramSize];
-        addrPin = addInPin("A", aSize);
-        addTriStateOutPin("D", size);
-        dIn = addInPin("D", size);
+        addrPin = addInBus("A", aSize);
+        addOutBus("D", size);
+        dIn = addInBus("D", size);
         if (reverse) {
             addInPin(new FallingEdgeInPin("~{RAS}", this) {
                 @Override
                 public void onFallingEdge() {
-                    hiPart = (int) (addrPin.getState() * module);
+                    hiPart = (int) (addrPin.state * module);
                 }
             });
             addInPin(new EdgeInPin("~{CAS}", this) {
                 @Override
                 public void onFallingEdge() {
                     int addr;
-                    addr = (int) (hiPart + addrPin.getState());
-                    if (we.state == 0) {
-                        bytes[addr] = dIn.getState();
-                    } else {
+                    addr = (int) (hiPart + addrPin.state);
+                    if (we.state) {
                         dOut.setState(bytes[addr]);
+                    } else {
+                        bytes[addr] = dIn.state;
                     }
                 }
 
@@ -101,7 +102,7 @@ public class SdRam extends SchemaPart {
             addInPin(new RisingEdgeInPin("RAS", this) {
                 @Override
                 public void onRisingEdge() {
-                    hiPart = (int) (addrPin.getState() * module);
+                    hiPart = (int) (addrPin.state * module);
                 }
             });
             addInPin(new EdgeInPin("CAS", this) {
@@ -113,26 +114,26 @@ public class SdRam extends SchemaPart {
                 @Override
                 public void onRisingEdge() {
                     int addr;
-                    addr = (int) (hiPart + addrPin.getState());
-                    if (we.state > 0) {
-                        bytes[addr] = dIn.getState();
+                    addr = (int) (hiPart + addrPin.state);
+                    if (we.state) {
+                        bytes[addr] = dIn.state;
                     } else {
                         dOut.setState(bytes[addr]);
                     }
                 }
             });
         }
-        we = addInPin(reverse ? "~{WE}" : "WE", 1);
+        we = addInPin(reverse ? "~{WE}" : "WE");
     }
 
     @Override
     public String extraState() {
-        return "A:" + String.format("%" + (int) Math.ceil(aSize / 4d) + "X", hiPart + addrPin.getState()) + "\nD:" +
-                String.format("%" + (int) Math.ceil(size / 4d) + "X", dIn.getState());
+        return "A:" + String.format("%" + (int) Math.ceil(aSize / 4d) + "X", hiPart + addrPin.state) + "\nD:" +
+                String.format("%" + (int) Math.ceil(size / 4d) + "X", dIn.state);
     }
 
     @Override
     public void initOuts() {
-        dOut = (TriStateOutPin) getOutPin("D");
+        dOut = getOutBus("D");
     }
 }

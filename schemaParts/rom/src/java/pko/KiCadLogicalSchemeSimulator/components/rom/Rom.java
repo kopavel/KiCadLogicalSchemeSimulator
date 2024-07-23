@@ -110,16 +110,17 @@ public class Rom extends SchemaPart {
         addInBus(new InBus("A", this, aSize) {
             @Override
             public void setHiImpedance() {
+                hiImpedance = true;
                 if (csActive) {
-                    if (hiImpedance) {
-                        throw new FloatingInException(this);
-                    }
+                    throw new FloatingInException(this);
                 }
             }
 
             @Override
             public void setState(long newState) {
                 addr = (int) newState;
+                state = newState;
+                hiImpedance = false;
                 if (csActive) {
                     if (outPin.state != words[addr]) {
                         outPin.state = words[addr];

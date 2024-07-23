@@ -77,7 +77,7 @@ public class Decoder extends SchemaPart {
                 public void setState(long newState) {
                     state = newState;
                     hiImpedance = false;
-                    outState = 1L << getState();
+                    outState = 1L << state;
                     if (csState) {
                         if (outBus.state != outState || outBus.hiImpedance) {
                             outBus.state = outState;

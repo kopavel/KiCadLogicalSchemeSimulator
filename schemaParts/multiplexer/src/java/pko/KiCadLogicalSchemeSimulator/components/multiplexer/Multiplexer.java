@@ -79,7 +79,7 @@ public class Multiplexer extends SchemaPart {
         nBus = addInBus(new NoFloatingCorrectedInBus("N", this, nSize) {
             @Override
             public void setState(long newState) {
-                newState = inBuses[(int) newState].getState();
+                newState = inBuses[(int) newState].state;
                 if (state != newState) {
                     state = newState;
                     outBus.setState(newState);
