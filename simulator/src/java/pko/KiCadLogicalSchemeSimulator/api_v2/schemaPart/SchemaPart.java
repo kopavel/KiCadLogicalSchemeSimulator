@@ -82,14 +82,6 @@ public abstract class SchemaPart {
         nReverse = !reverse;
     }
 
-    public InPin addInPin(String pinId, boolean value, boolean strong) {
-        InPin inPin = addInPin(pinId);
-        inPin.state = value;
-        inPin.strong = strong;
-        inPin.hiImpedance = false;
-        return inPin;
-    }
-
     public InPin addInPin(String pinId) {
         return addInPin(new InPin(pinId, this) {
             @Override

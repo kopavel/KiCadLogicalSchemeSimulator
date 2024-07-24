@@ -85,4 +85,9 @@ public abstract class Pin extends ModelItem {
             setState(state, strong);
         }
     }
+
+    @Override
+    public String toString() {
+        return state + ":" + strong + ":" + super.toString();
+    }
 }

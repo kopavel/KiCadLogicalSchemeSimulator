@@ -174,7 +174,7 @@ public class MultiOutShifter extends SchemaPart {
             });
         }
         addOutBus("Q",
-                qSize,
+                qSize, 0,
                 IntStream.range(0, qSize).mapToObj(String::valueOf)
                         .map(pos -> "Q" + pos).toArray(String[]::new));
     }

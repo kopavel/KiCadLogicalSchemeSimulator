@@ -127,8 +127,8 @@ public class DcTrigger extends SchemaPart {
                 }
             });
         }
-        addOutPin("Q");
-        addOutPin("~{Q}");
+        addOutPin("Q", true, true);
+        addOutPin("~{Q}", false, true);
     }
 
     @Override

@@ -55,11 +55,11 @@ public class MaskGroupBus extends OutBus {
         long maskState = newState & mask;
         if (this.maskState != maskState || hiImpedance) {
             this.maskState = maskState;
+            hiImpedance = false;
             for (Bus destination : destinations) {
                 destination.setState(maskState);
             }
         }
-        hiImpedance = false;
     }
 
     @Override

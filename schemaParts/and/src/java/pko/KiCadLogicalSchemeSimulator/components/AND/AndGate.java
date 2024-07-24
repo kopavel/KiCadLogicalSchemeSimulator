@@ -41,7 +41,7 @@ public class AndGate extends SchemaPart {
 
     public AndGate(String id, String sParam) {
         super(id, sParam);
-        addOutPin("OUT");
+        addOutPin("OUT", false, true);
         if (!params.containsKey("size")) {
             throw new RuntimeException("Component " + id + " has no parameter \"size\"");
         }

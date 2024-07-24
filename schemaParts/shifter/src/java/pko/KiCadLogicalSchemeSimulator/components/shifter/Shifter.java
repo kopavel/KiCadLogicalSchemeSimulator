@@ -168,7 +168,7 @@ public class Shifter extends SchemaPart {
                 }
             });
         }
-        addOutPin("Q");
+        addOutPin("Q", false, true);
     }
 
     @Override

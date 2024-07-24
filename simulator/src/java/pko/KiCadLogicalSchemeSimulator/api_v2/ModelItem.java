@@ -56,7 +56,7 @@ public abstract class ModelItem implements IModelItem {
 
     @Override
     public String toString() {
-        return getName() + (variantId == null ? "" : ":" + variantId) + ":" + super.toString();
+        return hiImpedance + ":" + getName() + (variantId == null ? "" : ":" + variantId) + ":" + super.toString();
     }
 
     public abstract void setHiImpedance();

@@ -62,7 +62,7 @@ public class Repeater extends SchemaPart {
                 }
             });
         }
-        addOutPin("OUT");
+        addOutPin("OUT", false, true);
     }
 
     @Override

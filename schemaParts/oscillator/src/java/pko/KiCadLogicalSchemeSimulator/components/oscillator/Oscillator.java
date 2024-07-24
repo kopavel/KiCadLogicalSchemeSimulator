@@ -59,7 +59,7 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
         if (sAliases != null) {
             outAlias = sAliases;
         }
-        addOutPin(outAlias);
+        addOutPin(outAlias, false, true);
         oscillatorUiComponent = new OscillatorUiComponent(20, id, this);
     }
 
@@ -81,7 +81,6 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
                     while (fullSpeedAlive) {
                         ticks += 20000;
                         for (int i = 0; i < 1000; i++) {
-                            out.setState(false, true);
                             out.setState(true, true);
                             out.setState(false, true);
                             out.setState(true, true);
@@ -101,6 +100,7 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
                             out.setState(true, true);
                             out.setState(false, true);
                             out.setState(true, true);
+                            out.setState(false, true);
                         }
                     }
                 } catch (Throwable e) {
@@ -151,6 +151,7 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
 
     void tick() {
         try {
+            ticks++;
             out.state = !out.state;
             out.setState(out.state, true);
         } catch (Throwable e) {

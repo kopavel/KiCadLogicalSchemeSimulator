@@ -53,6 +53,7 @@ public abstract class Bus extends ModelItem {
         aliasOffsets = oldBus.aliasOffsets;
         useBitPresentation = oldBus.useBitPresentation;
         state = oldBus.state;
+        hiImpedance = oldBus.hiImpedance;
     }
 
     public Bus(String id, SchemaPart parent, int size, String... aliases) {
@@ -109,5 +110,10 @@ public abstract class Bus extends ModelItem {
     @Override
     public boolean isStrong() {
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return state + ":" + super.toString();
     }
 }

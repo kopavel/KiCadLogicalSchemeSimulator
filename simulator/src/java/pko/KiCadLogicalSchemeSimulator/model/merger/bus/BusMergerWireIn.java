@@ -83,12 +83,12 @@ public class BusMergerWireIn extends InPin implements MergerInput {
             if (hiImpedance && (merger.strongPins & mask) != 0) {
                 throw new ShortcutException(merger.inputs);
             }
-            if (!strong) { //from non-strong
+            if (hiImpedance) {
                 merger.strongPins |= mask;
-                if (!hiImpedance) { //from weak specifically
-                    merger.weakState &= nMask;
-                    merger.weakPins &= nMask;
-                }
+            } else if (!strong) { //from weak
+                merger.strongPins |= mask;
+                merger.weakState &= nMask;
+                merger.weakPins &= nMask;
             }
             if (state) {
                 merger.state |= mask;

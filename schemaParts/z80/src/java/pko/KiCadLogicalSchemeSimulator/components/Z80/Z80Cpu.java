@@ -157,7 +157,7 @@ public class Z80Cpu extends SchemaPart {
                     M1 = M == 1;
 //        Log.trace(Z80Cpu.class, "Set pins at {},{}", M, T);
                     IoRequest ioRequest = ioQueue.requests.peek();
-                    assert ioRequest != null;
+                    assert T1 || ioRequest != null;
                     if (T1) {
                         if (needRefreshPinReset) {
                             refreshPin.state = true;
@@ -170,12 +170,12 @@ public class Z80Cpu extends SchemaPart {
                             needDataPinReset = false;
                         }
                         if (M1) {
-                            cpu.executeOneInstruction();
-                            ioRequest = ioQueue.requests.peek();
-                            assert ioRequest != null;
                             m1Pin.state = false;
                             m1Pin.setState(false, true);
+                            cpu.executeOneInstruction();
+                            ioRequest = ioQueue.requests.peek();
                         }
+                        assert ioRequest != null : "Cpu core ioQueue is empty on T" + T + ":M" + M;
                         aOut.state = ioRequest.address;
                         aOut.setState(ioRequest.address);
                         extraWait = !ioRequest.isMemory;
@@ -226,8 +226,8 @@ public class Z80Cpu extends SchemaPart {
         addOutPin("~{M1}", true, true);
         addOutPin("~{RFSH}", true, true);
         addOutPin("~{HALT}", true, true);
-        addOutBus("D", 8);
-        addOutBus("A", 16);
+        addOutBus("D", 8, 0);
+        addOutBus("A", 16, 0);
         dIn = addInBus("D", 8);
     }
 

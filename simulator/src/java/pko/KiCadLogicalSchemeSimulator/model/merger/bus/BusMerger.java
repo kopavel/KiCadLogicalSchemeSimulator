@@ -129,7 +129,7 @@ public class BusMerger extends OutBus implements IMerger {
                 long destinationMask = offset == 0 ? mask : (offset > 0 ? mask << offset : mask >> -offset);
                 input = new BusMergerBusIn(bus, destinationMask, this);
                 if (!bus.hiImpedance) {
-                    if ((strongPins & mask) != 0) {
+                    if ((strongPins & destinationMask) != 0) {
                         Set<ModelOutItem> items = new HashSet<>(sources.keySet());
                         items.add(src);
                         throw new ShortcutException(items.toArray(new ModelOutItem[0]));
