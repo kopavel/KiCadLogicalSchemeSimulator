@@ -136,9 +136,9 @@ public class Rom extends SchemaPart {
                 public void onFallingEdge() {
                     csActive = true;
                     if (outPin.hiImpedance || outPin.state != words[addr]) {
-                        outPin.hiImpedance = false;
                         outPin.state = words[addr];
                         outPin.setState(outPin.state);
+                        outPin.hiImpedance = false;
                     }
                 }
 
@@ -166,9 +166,9 @@ public class Rom extends SchemaPart {
                 public void onRisingEdge() {
                     csActive = true;
                     if (outPin.hiImpedance || outPin.state != words[addr]) {
-                        outPin.hiImpedance = false;
                         outPin.state = words[addr];
                         outPin.setState(outPin.state);
+                        outPin.hiImpedance = false;
                     }
                 }
             });

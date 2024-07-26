@@ -134,9 +134,7 @@ public class DcTrigger extends SchemaPart {
     @Override
     public void initOuts() {
         qOut = getOutPin("Q");
-        qOut.state = false;
         iqOut = getOutPin("~{Q}");
-        iqOut.state = true;
     }
 
     private void store() {

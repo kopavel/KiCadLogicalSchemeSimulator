@@ -161,6 +161,8 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput {
         if (merger.inputs.length == 1) {
             OutBus optimised = new OutBus(merger, "Optimised");
             optimised.destinations = merger.destinations;
+            optimised.state = state;
+            optimised.hiImpedance = hiImpedance;
             return optimised;
         } else {
             return this;

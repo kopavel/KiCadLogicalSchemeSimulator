@@ -81,25 +81,45 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
                     while (fullSpeedAlive) {
                         ticks += 20000;
                         for (int i = 0; i < 1000; i++) {
+                            out.state = true;
                             out.setState(true, true);
+                            out.state = false;
                             out.setState(false, true);
+                            out.state = true;
                             out.setState(true, true);
+                            out.state = false;
                             out.setState(false, true);
+                            out.state = true;
                             out.setState(true, true);
+                            out.state = false;
                             out.setState(false, true);
+                            out.state = true;
                             out.setState(true, true);
+                            out.state = false;
                             out.setState(false, true);
+                            out.state = true;
                             out.setState(true, true);
+                            out.state = false;
                             out.setState(false, true);
+                            out.state = true;
                             out.setState(true, true);
+                            out.state = false;
                             out.setState(false, true);
+                            out.state = true;
                             out.setState(true, true);
+                            out.state = false;
                             out.setState(false, true);
+                            out.state = true;
                             out.setState(true, true);
+                            out.state = false;
                             out.setState(false, true);
+                            out.state = true;
                             out.setState(true, true);
+                            out.state = false;
                             out.setState(false, true);
+                            out.state = true;
                             out.setState(true, true);
+                            out.state = false;
                             out.setState(false, true);
                         }
                     }

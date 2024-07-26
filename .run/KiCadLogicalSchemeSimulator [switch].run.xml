@@ -14,7 +14,7 @@
 					<option value="run"/>
 				</list>
 			</option>
-			<option name="vmOptions" value="-ea"/>
+			<option name="vmOptions" value=""/>
 		</ExternalSystemSettings>
 		<ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
 		<ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>

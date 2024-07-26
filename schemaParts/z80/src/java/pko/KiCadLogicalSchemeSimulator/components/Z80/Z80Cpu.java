@@ -88,6 +88,7 @@ public class Z80Cpu extends SchemaPart {
                         }
                         if (ioRequest.isWrite) {
                             dOut.state = ioRequest.payload;
+                            dOut.hiImpedance = false;
                             dOut.setState(ioRequest.payload);
                             needDataPinReset = true;
                         }
@@ -165,8 +166,10 @@ public class Z80Cpu extends SchemaPart {
                             needRefreshPinReset = false;
                         }
                         if (needDataPinReset) {
-                            dOut.setHiImpedance();
-                            dOut.hiImpedance = true;
+                            if (!dOut.hiImpedance) {
+                                dOut.setHiImpedance();
+                                dOut.hiImpedance = true;
+                            }
                             needDataPinReset = false;
                         }
                         if (M1) {
@@ -177,6 +180,7 @@ public class Z80Cpu extends SchemaPart {
                         }
                         assert ioRequest != null : "Cpu core ioQueue is empty on T" + T + ":M" + M;
                         aOut.state = ioRequest.address;
+                        aOut.hiImpedance = false;
                         aOut.setState(ioRequest.address);
                         extraWait = !ioRequest.isMemory;
                     } else if (T2) {
@@ -226,8 +230,8 @@ public class Z80Cpu extends SchemaPart {
         addOutPin("~{M1}", true, true);
         addOutPin("~{RFSH}", true, true);
         addOutPin("~{HALT}", true, true);
-        addOutBus("D", 8, 0);
-        addOutBus("A", 16, 0);
+        addOutBus("D", 8);
+        addOutBus("A", 16);
         dIn = addInBus("D", 8);
     }
 
@@ -269,36 +273,59 @@ public class Z80Cpu extends SchemaPart {
         T = 0;
         M = 0;
         cpu.reset();
-        mReqPin.state = true;
-        mReqPin.hiImpedance = false;
-        mReqPin.setState(true, true);
-        rdPin.state = true;
-        rdPin.hiImpedance = false;
-        rdPin.setState(true, true);
-        wrPin.state = true;
-        wrPin.hiImpedance = false;
-        wrPin.setState(true, true);
-        aOut.state = 0;
-        aOut.hiImpedance = false;
-        aOut.setState(0);
-        rdPin.state = true;
-        rdPin.hiImpedance = false;
-        rdPin.setState(true, true);
-        wrPin.state = true;
-        wrPin.hiImpedance = false;
-        wrPin.setState(true, true);
-        mReqPin.state = true;
-        mReqPin.hiImpedance = false;
-        mReqPin.setState(true, true);
-        ioReqPin.state = true;
-        ioReqPin.hiImpedance = false;
-        ioReqPin.setState(true, true);
-        m1Pin.state = true;
-        m1Pin.hiImpedance = false;
-        m1Pin.setState(true, true);
-        refreshPin.state = true;
-        refreshPin.hiImpedance = false;
-        refreshPin.setState(true, true);
+        if (!mReqPin.state) {
+            mReqPin.state = true;
+            mReqPin.setState(true, true);
+            mReqPin.hiImpedance = false;
+        }
+        if (!rdPin.state) {
+            rdPin.state = true;
+            rdPin.setState(true, true);
+            rdPin.hiImpedance = false;
+        }
+        if (!wrPin.state) {
+            wrPin.state = true;
+            wrPin.setState(true, true);
+            wrPin.hiImpedance = false;
+        }
+        if (!aOut.hiImpedance) {
+            aOut.setHiImpedance();
+            aOut.hiImpedance = true;
+        }
+        if (!dOut.hiImpedance) {
+            dOut.setHiImpedance();
+            dOut.hiImpedance = true;
+        }
+        if (!rdPin.state) {
+            rdPin.state = true;
+            rdPin.setState(true, true);
+            rdPin.hiImpedance = false;
+        }
+        if (!wrPin.state) {
+            wrPin.state = true;
+            wrPin.setState(true, true);
+            wrPin.hiImpedance = false;
+        }
+        if (!mReqPin.state) {
+            mReqPin.state = true;
+            mReqPin.setState(true, true);
+            mReqPin.hiImpedance = false;
+        }
+        if (!ioReqPin.state) {
+            ioReqPin.state = true;
+            ioReqPin.setState(true, true);
+            ioReqPin.hiImpedance = false;
+        }
+        if (!m1Pin.state) {
+            m1Pin.state = true;
+            m1Pin.setState(true, true);
+            m1Pin.hiImpedance = false;
+        }
+        if (!refreshPin.state) {
+            refreshPin.state = true;
+            refreshPin.setState(true, true);
+            refreshPin.hiImpedance = false;
+        }
         M = 1;
     }
 }

@@ -166,8 +166,8 @@ public class Ram extends SchemaPart {
         if (oePin.state && csPin.state) {
             if (dOut.state != words[(int) aBus.state]) {
                 dOut.state = words[(int) aBus.state];
-                dOut.hiImpedance = false;
                 dOut.setState(dOut.state);
+                dOut.hiImpedance = false;
             }
         } else {
             if (!dOut.hiImpedance) {
@@ -186,8 +186,8 @@ public class Ram extends SchemaPart {
         } else {
             if (dOut.state != words[(int) aBus.state]) {
                 dOut.state = words[(int) aBus.state];
-                dOut.hiImpedance = false;
                 dOut.setState(dOut.state);
+                dOut.hiImpedance = false;
             }
         }
     }

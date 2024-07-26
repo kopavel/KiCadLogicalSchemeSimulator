@@ -57,8 +57,8 @@ public class Decoder extends SchemaPart {
                     outState = ~(1L << newState);
                     if (csState && (outBus.state != outState || outBus.hiImpedance)) {
                         outBus.state = outState;
-                        outBus.hiImpedance = false;
                         outBus.setState(outState);
+                        outBus.hiImpedance = false;
                     }
                 }
 
@@ -81,8 +81,8 @@ public class Decoder extends SchemaPart {
                     if (csState) {
                         if (outBus.state != outState || outBus.hiImpedance) {
                             outBus.state = outState;
-                            outBus.hiImpedance = false;
                             outBus.setState(outState);
+                            outBus.hiImpedance = false;
                         }
                     }
                 }
@@ -108,8 +108,8 @@ public class Decoder extends SchemaPart {
                             throw new FloatingInException(aBus);
                         } else if (outBus.state != outState || outBus.hiImpedance) {
                             outBus.state = outState;
-                            outBus.hiImpedance = false;
                             outBus.setState(outState);
+                            outBus.hiImpedance = false;
                         }
                     } else if (!outBus.hiImpedance) {
                         outBus.setHiImpedance();
@@ -128,8 +128,8 @@ public class Decoder extends SchemaPart {
                             throw new FloatingInException(aBus);
                         } else if (outBus.state != outState || outBus.hiImpedance) {
                             outBus.state = outState;
-                            outBus.hiImpedance = false;
                             outBus.setState(outState);
+                            outBus.hiImpedance = false;
                         }
                     } else if (!outBus.hiImpedance) {
                         outBus.setHiImpedance();

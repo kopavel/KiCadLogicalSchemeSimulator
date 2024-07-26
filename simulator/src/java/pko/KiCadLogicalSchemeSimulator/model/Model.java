@@ -135,7 +135,6 @@ public class Model {
                     insOffsets.computeIfAbsent(inItem, p -> new TreeSet<>()).add(inItem.getAliasOffset(pinName));
                 }
                 case "tri_state", "output" -> {
-//FixMe interconnect are added 2 times??
                     ModelOutItem outItem = (ModelOutItem) schemaPart.getOutItem(pinName);
                     outsOffset.put(outItem, outItem.getAliasOffset(pinName));
                 }
@@ -183,7 +182,7 @@ public class Model {
 
     private void buildBuses() {
         //FixMe if passive pin are not only one input - remove it (we need it only once in ideal case and it is added as output to mergers)
-        //FixMe don't do interconnect throe power rails
+        //FixMe don't do interconnect throe power rails (seems it's better just generate Power pin for each connection separately)
         inMap.forEach((inItem, inDescriptor) -> {
             if (inDescriptor.getPermutationCount() == 1) {
                 //pin-to-pin connection

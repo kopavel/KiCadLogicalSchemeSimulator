@@ -36,7 +36,7 @@ import pko.KiCadLogicalSchemeSimulator.api_v2.wire.Pin;
 
 public class NCWire extends OutPin {
     public NCWire(OutPin outPin) {
-        super(outPin.id, outPin.parent);
+        super(outPin, "NC");
     }
 
     @Override

@@ -64,8 +64,10 @@ public class MaskGroupBus extends OutBus {
 
     @Override
     public void setHiImpedance() {
-        super.setHiImpedance();
-        hiImpedance = true;
+        if (!hiImpedance) {
+            super.setHiImpedance();
+            hiImpedance = true;
+        }
     }
 
     @Override
@@ -75,14 +77,17 @@ public class MaskGroupBus extends OutBus {
         } else if (destinations.length == 1) {
             Bus destination = destinations[0];
             if (destination instanceof BusToWireAdapter) {
+                destination.state = state;
+                destination.hiImpedance = hiImpedance;
                 return destination;
             } else {
                 return new MaskGroupBus(MaskGroupBus.this, "SingleDestination") {
                     @Override
                     public void setHiImpedance() {
-                        assert !hiImpedance : "Already in hiImpedance:" + this;
-                        destination.setHiImpedance();
-                        hiImpedance = true;
+                        if (!hiImpedance) {
+                            destination.setHiImpedance();
+                            hiImpedance = true;
+                        }
                     }
 
                     @Override

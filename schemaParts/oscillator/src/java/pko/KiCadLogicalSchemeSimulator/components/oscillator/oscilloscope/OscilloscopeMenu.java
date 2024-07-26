@@ -35,6 +35,7 @@ import pko.KiCadLogicalSchemeSimulator.api_v2.IModelItem;
 import pko.KiCadLogicalSchemeSimulator.api_v2.ModelInItem;
 
 import javax.swing.*;
+import java.util.Comparator;
 import java.util.List;
 
 public class OscilloscopeMenu extends JMenuBar {
@@ -49,7 +50,7 @@ public class OscilloscopeMenu extends JMenuBar {
         List<IModelItem> outPins = Simulator.model.schemaParts.values()
                 .stream()
                 .flatMap(p -> p.outMap.values()
-                        .stream())
+                        .stream()).sorted(Comparator.comparing(IModelItem::getName))
                 .toList();
         for (IModelItem pin : outPins) {
             JMenuItem outPinItem = new JMenuItem(pin.getName());
@@ -59,7 +60,7 @@ public class OscilloscopeMenu extends JMenuBar {
         List<ModelInItem> inPins = Simulator.model.schemaParts.values()
                 .stream()
                 .flatMap(p -> p.inMap.values()
-                        .stream())
+                        .stream()).sorted(Comparator.comparing(IModelItem::getName))
                 .toList();
         for (ModelInItem pin : inPins) {
             JMenuItem inPinItem = new JMenuItem(pin.getName());

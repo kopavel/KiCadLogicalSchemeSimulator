@@ -36,6 +36,7 @@ import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
 public abstract class NoFloatingInBus extends InBus {
     public NoFloatingInBus(String id, SchemaPart parent, int size, String... names) {
         super(id, parent, size, names);
+        hiImpedance = false;
     }
 
     @Override

@@ -70,8 +70,8 @@ public class Buffer extends SchemaPart {
                     if (!state) {
                         if (qBus.state != latch || qBus.hiImpedance) {
                             qBus.state = latch;
-                            qBus.hiImpedance = false;
                             qBus.setState(qBus.state);
+                            qBus.hiImpedance = false;
                         }
                     } else if (!qBus.hiImpedance) {
                         qBus.setHiImpedance();
@@ -85,8 +85,8 @@ public class Buffer extends SchemaPart {
                     latch = dBus.state;
                     if (!oePin.state && (qBus.state != latch || qBus.hiImpedance)) {
                         qBus.state = latch;
-                        qBus.hiImpedance = false;
                         qBus.setState(latch);
+                        qBus.hiImpedance = false;
                     }
                 }
             });
@@ -99,8 +99,8 @@ public class Buffer extends SchemaPart {
                     if (!state) {
                         if (qBus.state != dBus.state || qBus.hiImpedance) {
                             qBus.state = dBus.state;
-                            qBus.hiImpedance = false;
                             qBus.setState(qBus.state);
+                            qBus.hiImpedance = false;
                         }
                     } else if (!qBus.hiImpedance) {
                         qBus.setHiImpedance();
@@ -123,8 +123,8 @@ public class Buffer extends SchemaPart {
                     hiImpedance = false;
                     if (!oePin.state && (qBus.state != latch || qBus.hiImpedance)) {
                         qBus.state = newState;
-                        qBus.hiImpedance = false;
                         qBus.setState(newState);
+                        qBus.hiImpedance = false;
                     }
                 }
             });

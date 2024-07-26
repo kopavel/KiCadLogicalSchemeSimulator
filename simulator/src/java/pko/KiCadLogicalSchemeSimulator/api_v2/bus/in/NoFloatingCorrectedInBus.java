@@ -33,9 +33,10 @@ package pko.KiCadLogicalSchemeSimulator.api_v2.bus.in;
 import pko.KiCadLogicalSchemeSimulator.api_v2.FloatingInException;
 import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
 
-public abstract class NoFloatingCorrectedInBus extends InBus {
+public abstract class NoFloatingCorrectedInBus extends CorrectedInBus {
     public NoFloatingCorrectedInBus(String id, SchemaPart parent, int size, String... names) {
         super(id, parent, size, names);
+        hiImpedance = false;
     }
 
     @Override

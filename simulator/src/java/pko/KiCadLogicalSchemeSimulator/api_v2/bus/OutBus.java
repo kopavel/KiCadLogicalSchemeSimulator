@@ -121,7 +121,10 @@ public class OutBus extends Bus implements ModelOutItem {
         if (destinations.length == 0) {
             return new NCBus(this);
         } else if (destinations.length == 1) {
-            return destinations[0].getOptimised();
+            Bus optimised = destinations[0].getOptimised();
+            optimised.state = state;
+            optimised.hiImpedance = hiImpedance;
+            return optimised;
         } else {
             for (int i = 0; i < destinations.length; i++) {
                 destinations[i] = destinations[i].getOptimised();

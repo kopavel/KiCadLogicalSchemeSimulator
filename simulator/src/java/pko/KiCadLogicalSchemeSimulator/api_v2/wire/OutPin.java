@@ -99,7 +99,11 @@ public class OutPin extends Pin implements ModelOutItem {
         if (destinations.length == 0) {
             return new NCWire(this);
         } else if (destinations.length == 1) {
-            return destinations[0].getOptimised();
+            Pin optimised = destinations[0].getOptimised();
+            optimised.state = state;
+            optimised.strong = strong;
+            optimised.hiImpedance = hiImpedance;
+            return optimised;
         } else {
             for (int i = 0; i < destinations.length; i++) {
                 destinations[i] = destinations[i].getOptimised();

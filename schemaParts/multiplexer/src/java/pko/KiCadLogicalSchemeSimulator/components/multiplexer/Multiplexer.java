@@ -91,7 +91,7 @@ public class Multiplexer extends SchemaPart {
         for (byte i = 0; i < partsAmount; i++) {
             aliases[i] = 'Q' + String.valueOf((char) (((byte) 'A') + i));
         }
-        addOutBus("Q", partsAmount, aliases);
+        addOutBus("Q", partsAmount, 0, aliases);
     }
 
     @Override
