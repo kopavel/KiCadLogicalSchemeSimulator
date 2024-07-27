@@ -53,7 +53,7 @@ public class WireMerger extends OutPin implements IMerger {
     public String hash;
 
     public WireMerger(Pin destination) {
-        super(destination.id, destination.parent);
+        super(destination, "merger");
         destinations = new Pin[]{destination};
         strong = false;
     }
@@ -70,6 +70,11 @@ public class WireMerger extends OutPin implements IMerger {
             }
             case InBus ignored -> throw new RuntimeException("Use BusMerger for bus destination");
             default -> throw new RuntimeException("Unsupported destination " + item.getClass().getName());
+        }
+        if (item.getId().contains("->")) {
+            id += "/" + item.getId().substring(item.getId().indexOf("->") + 2);
+        } else {
+            id += "/" + item.getName();
         }
     }
 
@@ -145,6 +150,6 @@ public class WireMerger extends OutPin implements IMerger {
 
     @Override
     public Pin getOptimised() {
-        return this;
+        throw new UnsupportedOperationException();
     }
 }

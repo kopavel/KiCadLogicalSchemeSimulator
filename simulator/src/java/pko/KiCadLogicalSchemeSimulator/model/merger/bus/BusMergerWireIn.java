@@ -48,7 +48,7 @@ public class BusMergerWireIn extends InPin implements MergerInput {
     public final long nMask;
     private final byte offset;
     private final BusMerger merger;
-    public WireMerger input;
+    public Pin input;
 
     public BusMergerWireIn(OutPin source, long mask, byte offset, BusMerger merger) {
         super(source, "BMergePIn");
@@ -56,8 +56,21 @@ public class BusMergerWireIn extends InPin implements MergerInput {
         nMask = ~mask;
         this.offset = offset;
         this.merger = merger;
-        this.input = new WireMerger(this);
-        this.input.addSource(source, mask, offset);
+        id = merger.id + ":in";
+        parent = merger.parent;
+        WireMerger wireMerger = new WireMerger(this);
+        wireMerger.id = id;
+        wireMerger.parent = merger.parent;
+        wireMerger.addSource(source, mask, offset);
+        this.input = wireMerger;
+    }
+
+    public void addSource(ModelOutItem newSource) {
+        if (input instanceof WireMerger wireMerger) {
+            wireMerger.addSource(newSource, 0L, (byte) 0);
+        } else {
+            throw new RuntimeException("Can't add source to non Merger input");
+        }
     }
 
     @Override
@@ -147,7 +160,6 @@ public class BusMergerWireIn extends InPin implements MergerInput {
 
     @Override
     public void setHiImpedance() {
-        assert !hiImpedance : "Already in hiImpedance:" + this + "; merger=" + merger.getName();
         assert Log.debug(WireMergerWireIn.class,
                 "Bus merger setImpedance. before: Source:{} (state:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{}, " +
                         "hiImpedance:{})",
@@ -161,6 +173,7 @@ public class BusMergerWireIn extends InPin implements MergerInput {
                 merger.weakState,
                 merger.weakPins,
                 merger.hiImpedance);
+        assert !hiImpedance : "Already in hiImpedance:" + this + "; merger=" + merger.getName();
         long oldState = merger.state;
         if (strong) {
             merger.strongPins &= nMask;
@@ -203,15 +216,11 @@ public class BusMergerWireIn extends InPin implements MergerInput {
 
     @Override
     public String getHash() {
-        return mask + ":" + getName();
-    }
-
-    public void bindSources() {
-        input.bindSources();
-    }
-
-    public void addSource(ModelOutItem newSource) {
-        input.addSource(newSource, 0L, (byte) 0);
+        if (input instanceof WireMerger wireMerger) {
+            return mask + ":" + wireMerger.getHash();
+        } else {
+            return mask + ":" + getName();
+        }
     }
 
     @Override

@@ -63,11 +63,11 @@ public class Shifter extends SchemaPart {
 
             @Override
             public void setState(long newState) {
-                hiImpedance = false;
                 state = newState;
                 if (!plInactive) {
                     latch = dBus.state;
                 }
+                hiImpedance = false;
             }
         });
         boolean plReverse = params.containsKey("plReverse");

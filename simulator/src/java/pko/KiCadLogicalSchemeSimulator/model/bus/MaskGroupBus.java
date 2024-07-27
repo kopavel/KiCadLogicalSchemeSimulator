@@ -37,13 +37,14 @@ import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 public class MaskGroupBus extends OutBus {
     private long maskState;
 
-    public MaskGroupBus(OutBus source, long mask, String id) {
-        super(source, id);
+    public MaskGroupBus(OutBus source, long mask, String variantId) {
+        super(source, variantId);
         this.mask = mask;
+        id += ":mask" + mask;
     }
 
-    public MaskGroupBus(MaskGroupBus source, String id) {
-        super(source, id);
+    public MaskGroupBus(MaskGroupBus source, String variantId) {
+        super(source, variantId);
     }
 
     public void addDestination(Bus bus) {
@@ -55,10 +56,10 @@ public class MaskGroupBus extends OutBus {
         long maskState = newState & mask;
         if (this.maskState != maskState || hiImpedance) {
             this.maskState = maskState;
-            hiImpedance = false;
             for (Bus destination : destinations) {
                 destination.setState(maskState);
             }
+            hiImpedance = false;
         }
     }
 
@@ -95,8 +96,8 @@ public class MaskGroupBus extends OutBus {
                         long newMaskState = newState & mask;
                         if (maskState != newMaskState || hiImpedance) {
                             maskState = newMaskState;
-                            hiImpedance = false;
                             destination.setState(newMaskState);
+                            hiImpedance = false;
                         }
                     }
                 };
@@ -104,12 +105,7 @@ public class MaskGroupBus extends OutBus {
         } else {
             for (int i = 0; i < destinations.length; i++) {
                 if (destinations[i] instanceof BusToWireAdapter adapter) {
-                    destinations[i] = new BusToWireAdapter(adapter.destination, 0) {
-                        @Override
-                        public void setState(long newState) {
-                            destination.setState(newState != 0, true);
-                        }
-                    };
+                    destinations[i] = new SimpleBusToWireAdapter(adapter.destination);
                 }
             }
             return this;

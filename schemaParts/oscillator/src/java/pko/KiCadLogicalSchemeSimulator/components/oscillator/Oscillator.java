@@ -79,8 +79,8 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
             fullSpeedThread = Thread.ofPlatform().start(() -> {
                 try {
                     while (fullSpeedAlive) {
-                        ticks += 20000;
-                        for (int i = 0; i < 1000; i++) {
+                        for (int i = 0; i < 100; i++) {
+                            ticks += 20;
                             out.state = true;
                             out.setState(true, true);
                             out.state = false;

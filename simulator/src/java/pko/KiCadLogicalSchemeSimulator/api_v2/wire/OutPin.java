@@ -46,7 +46,7 @@ public class OutPin extends Pin implements ModelOutItem {
         super(id, parent);
     }
 
-    public OutPin(OutPin oldPin, String variantId) {
+    public OutPin(Pin oldPin, String variantId) {
         super(oldPin, variantId);
         strong = oldPin.strong;
     }

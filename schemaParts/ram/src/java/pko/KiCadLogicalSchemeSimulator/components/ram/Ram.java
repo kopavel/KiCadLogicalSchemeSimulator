@@ -94,10 +94,10 @@ public class Ram extends SchemaPart {
             @Override
             public void setState(long newState) {
                 state = newState;
-                hiImpedance = false;
                 if (!csPin.state) {
                     out();
                 }
+                hiImpedance = false;
             }
         });
         addOutBus("D", size);
@@ -164,7 +164,7 @@ public class Ram extends SchemaPart {
 
     private void out() {
         if (oePin.state && csPin.state) {
-            if (dOut.state != words[(int) aBus.state]) {
+            if (dOut.state != words[(int) aBus.state] || dOut.hiImpedance) {
                 dOut.state = words[(int) aBus.state];
                 dOut.setState(dOut.state);
                 dOut.hiImpedance = false;
@@ -184,7 +184,7 @@ public class Ram extends SchemaPart {
                 dOut.hiImpedance = true;
             }
         } else {
-            if (dOut.state != words[(int) aBus.state]) {
+            if (dOut.state != words[(int) aBus.state] || dOut.hiImpedance) {
                 dOut.state = words[(int) aBus.state];
                 dOut.setState(dOut.state);
                 dOut.hiImpedance = false;

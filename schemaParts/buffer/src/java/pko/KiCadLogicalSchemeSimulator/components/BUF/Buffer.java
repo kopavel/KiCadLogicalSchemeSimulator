@@ -120,12 +120,12 @@ public class Buffer extends SchemaPart {
                 @Override
                 public void setState(long newState) {
                     state = newState;
-                    hiImpedance = false;
                     if (!oePin.state && (qBus.state != latch || qBus.hiImpedance)) {
                         qBus.state = newState;
                         qBus.setState(newState);
                         qBus.hiImpedance = false;
                     }
+                    hiImpedance = false;
                 }
             });
         }
@@ -133,12 +133,16 @@ public class Buffer extends SchemaPart {
 
     @Override
     public String extraState() {
-        return "D:" + String.format("%" + (int) Math.ceil(busSize / 4d) + "X", dBus.state) + "\nQ:" +
-                String.format("%" + (int) Math.ceil(busSize / 4d) + "X", qBus.state);
+        return params.containsKey("latch") ? "latch" : "";
     }
 
     @Override
     public void initOuts() {
         qBus = getOutBus("Q");
+    }
+
+    @Override
+    public void reset() {
+        latch = 0;
     }
 }

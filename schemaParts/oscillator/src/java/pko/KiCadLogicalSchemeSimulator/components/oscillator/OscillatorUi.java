@@ -101,25 +101,29 @@ public class OscillatorUi extends JFrame {
         oneTickButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent event) {
-                try {
-                    parent.parent.tick();
-                } catch (Exception ex) {
-                    Log.error(OscillatorUi.class, "Error in tick", ex);
-                }
+                Thread.ofPlatform().start(() -> {
+                    try {
+                        parent.parent.tick();
+                    } catch (Exception ex) {
+                        Log.error(OscillatorUi.class, "Error in tick", ex);
+                    }
+                });
 //                stateButton.setText(parent.parent.state ? "1" : "0");
             }
         });
         doTicks.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                try {
-                    int amount = Integer.parseInt(tickAmount.getText());
-                    for (int i = 0; i < amount; i++) {
-                        parent.parent.tick();
+                Thread.ofPlatform().start(() -> {
+                    try {
+                        int amount = Integer.parseInt(tickAmount.getText());
+                        for (int i = 0; i < amount; i++) {
+                            parent.parent.tick();
+                        }
+                    } catch (Exception ex) {
+                        Log.error(OscillatorUi.class, "Error in tick", ex);
                     }
-                } catch (Exception ex) {
-                    Log.error(OscillatorUi.class, "Error in tick", ex);
-                }
+                });
             }
         });
         scheduler = Executors.newSingleThreadScheduledExecutor();

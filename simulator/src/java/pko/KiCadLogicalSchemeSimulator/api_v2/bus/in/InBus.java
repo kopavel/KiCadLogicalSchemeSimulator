@@ -39,7 +39,7 @@ public abstract class InBus extends Bus implements ModelInItem {
         super(id, parent, size, names);
     }
 
-    public InBus(Bus source, String id) {
-        super(source, id);
+    public InBus(Bus source, String variantId) {
+        super(source, variantId);
     }
 }

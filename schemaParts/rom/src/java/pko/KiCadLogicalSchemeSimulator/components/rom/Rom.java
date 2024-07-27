@@ -120,13 +120,14 @@ public class Rom extends SchemaPart {
             public void setState(long newState) {
                 addr = (int) newState;
                 state = newState;
-                hiImpedance = false;
                 if (csActive) {
                     if (outPin.state != words[addr]) {
                         outPin.state = words[addr];
                         outPin.setState(outPin.state);
+                        outPin.hiImpedance = false;
                     }
                 }
+                hiImpedance = false;
             }
         });
         addOutBus("D", size);

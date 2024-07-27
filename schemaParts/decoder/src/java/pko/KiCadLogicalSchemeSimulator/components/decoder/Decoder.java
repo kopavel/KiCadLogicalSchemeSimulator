@@ -53,13 +53,13 @@ public class Decoder extends SchemaPart {
                 @Override
                 public void setState(long newState) {
                     state = newState;
-                    hiImpedance = false;
                     outState = ~(1L << newState);
                     if (csState && (outBus.state != outState || outBus.hiImpedance)) {
                         outBus.state = outState;
                         outBus.setState(outState);
                         outBus.hiImpedance = false;
                     }
+                    hiImpedance = false;
                 }
 
                 @Override
@@ -76,7 +76,6 @@ public class Decoder extends SchemaPart {
                 @Override
                 public void setState(long newState) {
                     state = newState;
-                    hiImpedance = false;
                     outState = 1L << state;
                     if (csState) {
                         if (outBus.state != outState || outBus.hiImpedance) {
@@ -85,6 +84,7 @@ public class Decoder extends SchemaPart {
                             outBus.hiImpedance = false;
                         }
                     }
+                    hiImpedance = false;
                 }
 
                 @Override

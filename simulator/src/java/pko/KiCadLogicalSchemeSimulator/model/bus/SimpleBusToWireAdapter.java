@@ -29,35 +29,16 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.api_v2;
-import lombok.Getter;
-import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
+package pko.KiCadLogicalSchemeSimulator.model.bus;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.Pin;
 
-@Getter
-public abstract class ModelItem implements IModelItem {
-    public String id;
-    public SchemaPart parent;
-    public String variantId;
-    public boolean hiImpedance = true;
-
-    protected ModelItem(String id, SchemaPart parent) {
-        this.id = id;
-        this.parent = parent;
+public class SimpleBusToWireAdapter extends BusToWireAdapter {
+    public SimpleBusToWireAdapter(Pin destination) {
+        super(destination, 0);
     }
 
     @Override
-    public ModelItem getOptimised() {
-        return this;
+    public void setState(long newState) {
+        destination.setState(newState != 0, true);
     }
-
-    public String getName() {
-        return parent.id + "_" + id;
-    }
-
-    @Override
-    public String toString() {
-        return hiImpedance + ":" + getName() + (variantId == null ? "" : ":" + variantId) + ":" + super.toString();
-    }
-
-    public abstract void setHiImpedance();
 }

@@ -81,6 +81,8 @@ public class BusMerger extends OutBus implements IMerger {
             case InBus bus -> destinations = Utils.addToArray(destinations, bus);
             default -> throw new RuntimeException("Unsupported destination " + item.getClass().getName());
         }
+        id += "/" + item.getName();
+        wires.values().forEach(i -> i.id = id + ":in");
     }
 
     public String getHash() {
@@ -89,7 +91,7 @@ public class BusMerger extends OutBus implements IMerger {
                 .collect(Collectors.joining(";"));
     }
 
-    public void addSource(ModelOutItem src, long mask, byte offset) {
+    public void addSource(ModelOutItem src, long srcMask, byte offset) {
         MergerInput input = null;
         switch (src) {
             case OutPin pin -> {
@@ -126,7 +128,7 @@ public class BusMerger extends OutBus implements IMerger {
                 }
             }
             case OutBus bus -> {
-                long destinationMask = offset == 0 ? mask : (offset > 0 ? mask << offset : mask >> -offset);
+                long destinationMask = offset == 0 ? srcMask : (offset > 0 ? srcMask << offset : srcMask >> -offset);
                 input = new BusMergerBusIn(bus, destinationMask, this);
                 if (!bus.hiImpedance) {
                     if ((strongPins & destinationMask) != 0) {
@@ -137,7 +139,7 @@ public class BusMerger extends OutBus implements IMerger {
                     state |= bus.state;
                     strongPins |= destinationMask;
                 }
-                sources.put(src, new DestinationDescriptor(input, mask, offset));
+                sources.put(src, new DestinationDescriptor(input, srcMask, offset));
             }
             default -> throw new RuntimeException("Unsupported item " + src.getClass().getName());
         }

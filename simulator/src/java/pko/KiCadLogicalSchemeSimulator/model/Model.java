@@ -59,7 +59,7 @@ public class Model {
     public final Map<String, Map<String, PinMapDescriptor>> schemaPartPinMap = new TreeMap<>();
     public final Map<String, SchemaPartSpi> schemaPartSpiMap;
     private final Map<ModelInItem, InItemDescriptor> inMap = new HashMap<>();
-    private final Map<String, IMerger> mergers = new HashMap<>();
+    private final Map<String, IMerger> mergers = new TreeMap<>();
 
     public Model(Export export, String mapPath) throws IOException {
         Log.info(Model.class, "Start Model building");
@@ -210,12 +210,14 @@ public class Model {
                 //Hash calculated from sources (OutItems) name/mask/offset
                 if (merger instanceof BusMerger busMerger) {
                     for (BusMergerWireIn mergerIn : busMerger.wires.values()) {
-                        if (mergers.containsKey(mergerIn.input.getHash())) {
-                            IMerger oldMerger = mergers.get(mergerIn.input.getHash());
-                            oldMerger.addDestination(mergerIn, 0L, (byte) 0);
-                            mergerIn.input = (WireMerger) oldMerger;
-                        } else {
-                            mergers.put(mergerIn.input.getHash(), mergerIn.input);
+                        if (mergerIn.input instanceof IMerger wireMerger) {
+                            if (mergers.containsKey(wireMerger.getHash())) {
+                                IMerger oldMerger = mergers.get(wireMerger.getHash());
+                                oldMerger.addDestination(mergerIn, 0L, (byte) 0);
+                                mergerIn.input = (WireMerger) oldMerger;
+                            } else {
+                                mergers.put(wireMerger.getHash(), wireMerger);
+                            }
                         }
                     }
                 }

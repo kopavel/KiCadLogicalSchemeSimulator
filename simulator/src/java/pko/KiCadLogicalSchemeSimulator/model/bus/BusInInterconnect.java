@@ -56,10 +56,12 @@ public class BusInInterconnect extends InBus {
             destination.state = newState & inverseInterconnectMask;
             destination.setState(destination.state);
         }
+        destination.hiImpedance = false;
     }
 
     @Override
     public void setHiImpedance() {
         destination.setHiImpedance();
+        destination.hiImpedance = true;
     }
 }

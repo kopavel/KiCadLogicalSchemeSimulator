@@ -45,6 +45,7 @@ public class OffsetBus extends Bus {
         this.destination = destination;
         this.offset = offset;
         nOffset = (byte) -offset;
+        id += ":offset" + offset;
     }
 
     @Override
