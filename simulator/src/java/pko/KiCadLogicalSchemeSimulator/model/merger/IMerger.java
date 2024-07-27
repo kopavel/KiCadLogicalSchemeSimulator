@@ -33,7 +33,7 @@ package pko.KiCadLogicalSchemeSimulator.model.merger;
 import pko.KiCadLogicalSchemeSimulator.api_v2.ModelOutItem;
 
 public interface IMerger extends ModelOutItem {
-    void bindSources();
+    void bind();
     void addSource(ModelOutItem src, long mask, byte offset);
     String getHash();
 }

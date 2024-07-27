@@ -37,6 +37,7 @@ import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPartSpi;
 import pko.KiCadLogicalSchemeSimulator.api_v2.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.InPin;
 import pko.KiCadLogicalSchemeSimulator.model.bus.BusInInterconnect;
+import pko.KiCadLogicalSchemeSimulator.model.merger.DestinationDescriptor;
 import pko.KiCadLogicalSchemeSimulator.model.merger.IMerger;
 import pko.KiCadLogicalSchemeSimulator.model.merger.bus.BusMerger;
 import pko.KiCadLogicalSchemeSimulator.model.merger.bus.BusMergerWireIn;
@@ -213,8 +214,8 @@ public class Model {
                         if (mergerIn.input instanceof IMerger wireMerger) {
                             if (mergers.containsKey(wireMerger.getHash())) {
                                 IMerger oldMerger = mergers.get(wireMerger.getHash());
-                                oldMerger.addDestination(mergerIn, 0L, (byte) 0);
                                 mergerIn.input = (WireMerger) oldMerger;
+                                busMerger.forBind.put(oldMerger, new DestinationDescriptor(mergerIn, 0L, (byte) 0));
                             } else {
                                 mergers.put(wireMerger.getHash(), wireMerger);
                             }
@@ -229,7 +230,7 @@ public class Model {
             }
         });
         for (IMerger merger : mergers.values()) {
-            merger.bindSources();
+            merger.bind();
         }
         schemaParts.values()
                 .stream()

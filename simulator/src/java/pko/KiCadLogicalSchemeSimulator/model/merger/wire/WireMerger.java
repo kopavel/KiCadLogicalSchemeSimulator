@@ -47,7 +47,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class WireMerger extends OutPin implements IMerger {
-    private final Map<ModelOutItem, DestinationDescriptor> sources = new HashMap<>();
+    private final Map<ModelOutItem, DestinationDescriptor> forBind = new HashMap<>();
     public MergerInput[] mergerInputs = new MergerInput[0];
     public byte weakState;
     public String hash;
@@ -97,7 +97,7 @@ public class WireMerger extends OutPin implements IMerger {
                         hiImpedance = false;
                         if (pin.strong) {
                             if (strong) {
-                                Set<ModelOutItem> items = new HashSet<>(sources.keySet());
+                                Set<ModelOutItem> items = new HashSet<>(forBind.keySet());
                                 items.add(src);
                                 throw new ShortcutException(items.toArray(new ModelOutItem[0]));
                             }
@@ -105,7 +105,7 @@ public class WireMerger extends OutPin implements IMerger {
                             state = pin.state;
                         } else {
                             if ((weakState > 0 && !pin.state) || (weakState < 0 && pin.state)) {
-                                Set<ModelOutItem> items = new HashSet<>(sources.keySet());
+                                Set<ModelOutItem> items = new HashSet<>(forBind.keySet());
                                 items.add(src);
                                 throw new ShortcutException(items.toArray(new ModelOutItem[0]));
                             }
@@ -120,7 +120,7 @@ public class WireMerger extends OutPin implements IMerger {
                     input = new WireMergerBusIn(bus, mask, this);
                     if (!bus.hiImpedance) {
                         if (strong) {
-                            Set<ModelOutItem> items = new HashSet<>(sources.keySet());
+                            Set<ModelOutItem> items = new HashSet<>(forBind.keySet());
                             items.add(src);
                             throw new ShortcutException(items.toArray(new ModelOutItem[0]));
                         }
@@ -130,15 +130,15 @@ public class WireMerger extends OutPin implements IMerger {
                 }
                 default -> throw new RuntimeException("Unsupported item " + src.getClass().getName());
             }
-            sources.put(src, new DestinationDescriptor(input, mask, offset));
+            forBind.put(src, new DestinationDescriptor(input, mask, offset));
             mergerInputs = Utils.addToArray(mergerInputs, input);
             Arrays.sort(mergerInputs, Comparator.comparing(MergerInput::getName));
             hash = getHash();
         }
     }
 
-    public void bindSources() {
-        sources.forEach((source, descriptor) -> source.addDestination(descriptor.item, descriptor.mask, descriptor.offset));
+    public void bind() {
+        forBind.forEach((source, descriptor) -> source.addDestination(descriptor.item, descriptor.mask, descriptor.offset));
     }
 
     @Override

@@ -50,7 +50,7 @@ import java.util.stream.Collectors;
 //FixMe use one destination with splitter
 //FixMe create pure bus (no pin/strength) implementation
 public class BusMerger extends OutBus implements IMerger {
-    private final Map<ModelOutItem, DestinationDescriptor> sources = new HashMap<>();
+    public final Map<ModelOutItem, DestinationDescriptor> forBind = new HashMap<>();
     public MergerInput[] inputs = new MergerInput[0];
     public long strongPins;
     public long weakPins;
@@ -105,7 +105,7 @@ public class BusMerger extends OutBus implements IMerger {
                 if (!pin.hiImpedance) {
                     if (pin.strong) {
                         if ((strongPins & destinationMask) != 0) {
-                            Set<ModelOutItem> items = new HashSet<>(sources.keySet());
+                            Set<ModelOutItem> items = new HashSet<>(forBind.keySet());
                             items.add(src);
                             throw new ShortcutException(items.toArray(new ModelOutItem[0]));
                         }
@@ -115,7 +115,7 @@ public class BusMerger extends OutBus implements IMerger {
                         }
                     } else {
                         if ((weakPins & destinationMask) > 0 && ((weakState & destinationMask) > 0) != pin.state) {
-                            Set<ModelOutItem> items = new HashSet<>(sources.keySet());
+                            Set<ModelOutItem> items = new HashSet<>(forBind.keySet());
                             items.add(src);
                             throw new ShortcutException(items.toArray(new ModelOutItem[0]));
                         }
@@ -132,14 +132,14 @@ public class BusMerger extends OutBus implements IMerger {
                 input = new BusMergerBusIn(bus, destinationMask, this);
                 if (!bus.hiImpedance) {
                     if ((strongPins & destinationMask) != 0) {
-                        Set<ModelOutItem> items = new HashSet<>(sources.keySet());
+                        Set<ModelOutItem> items = new HashSet<>(forBind.keySet());
                         items.add(src);
                         throw new ShortcutException(items.toArray(new ModelOutItem[0]));
                     }
                     state |= bus.state;
                     strongPins |= destinationMask;
                 }
-                sources.put(src, new DestinationDescriptor(input, srcMask, offset));
+                forBind.put(src, new DestinationDescriptor(input, srcMask, offset));
             }
             default -> throw new RuntimeException("Unsupported item " + src.getClass().getName());
         }
@@ -151,8 +151,8 @@ public class BusMerger extends OutBus implements IMerger {
         hash = getHash();
     }
 
-    public void bindSources() {
-        sources.forEach((source, descriptor) -> source.addDestination(descriptor.item, descriptor.mask, descriptor.offset));
+    public void bind() {
+        forBind.forEach((source, descriptor) -> source.addDestination(descriptor.item, descriptor.mask, descriptor.offset));
     }
 
     @Override
