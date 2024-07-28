@@ -89,8 +89,8 @@ public class SdRam extends SchemaPart {
                     if (we.state) {
                         if (dOut.state != bytes[addr] || dOut.hiImpedance) {
                             dOut.state = bytes[addr];
-                            dOut.hiImpedance = false;
                             dOut.setState(dOut.state);
+                            dOut.hiImpedance = false;
                         }
                     } else {
                         bytes[addr] = dIn.state;
@@ -129,8 +129,8 @@ public class SdRam extends SchemaPart {
                     } else {
                         if (dOut.state != bytes[addr] || dOut.hiImpedance) {
                             dOut.state = bytes[addr];
-                            dOut.hiImpedance = false;
                             dOut.setState(dOut.state);
+                            dOut.hiImpedance = false;
                         }
                     }
                 }
@@ -141,8 +141,7 @@ public class SdRam extends SchemaPart {
 
     @Override
     public String extraState() {
-        return "A:" + String.format("%" + (int) Math.ceil(aSize / 4d) + "X", addr) + "\nD:" +
-                String.format("%" + (int) Math.ceil(size / 4d) + "X", dIn.state);
+        return "A:" + String.format("%" + (int) Math.ceil(aSize / 4d) + "X", addr) + "\nD:" + String.format("%" + (int) Math.ceil(size / 4d) + "X", dIn.state);
     }
 
     @Override

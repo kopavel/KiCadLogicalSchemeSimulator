@@ -61,8 +61,8 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
                 } else {
                     for (Pin destination : destinations) {
                         if (!destination.hiImpedance) {
-                            destination.hiImpedance = true;
                             destination.setHiImpedance();
+                            destination.hiImpedance = true;
                         }
                     }
                 }
@@ -129,8 +129,8 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
                 } else {
                     for (Pin destination : destinations) {
                         if (!destination.hiImpedance) {
-                            destination.hiImpedance = true;
                             destination.setHiImpedance();
+                            destination.hiImpedance = true;
                         }
                     }
                 }

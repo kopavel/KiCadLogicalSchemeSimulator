@@ -17,20 +17,19 @@
 			<Policies>
 				<OnStartupTriggeringPolicy/>
 				<SizeBasedTriggeringPolicy size="100 MB"/>
-				<CronTriggeringPolicy schedule="0 0 0 ? * 2" evaluateOnStartup="true"/>
+				<CronTriggeringPolicy schedule="0 0 0 * * ?" evaluateOnStartup="true"/>
 			</Policies>
 			<DefaultRolloverStrategy fileIndex="nomax"/>
 		</RollingRandomAccessFile>
 		<RollingRandomAccessFile name="MFILE"
-		                         fileName="${logdir}/mergers.log"
-		                         filePattern="${logdir}/%d{yyyy-MM-dd}/display.%d{yyyy-MM-dd}.%i.log"
+		                         fileName="${logdir}/mergers.log" filePattern="${logdir}/%d{yyyy-MM-dd}/mergers.%d{yyyy-MM-dd}.%i.log"
 		                         immediateFlush="false"
 		                         append="false">
 			<PatternLayout pattern="${layout}" charset="UTF-8"/>
 			<Policies>
 				<OnStartupTriggeringPolicy/>
 				<SizeBasedTriggeringPolicy size="100 MB"/>
-				<CronTriggeringPolicy schedule="0 0 0 ? * 2" evaluateOnStartup="true"/>
+				<CronTriggeringPolicy schedule="0 0 0 * * ?" evaluateOnStartup="true"/>
 			</Policies>
 			<DefaultRolloverStrategy fileIndex="nomax"/>
 		</RollingRandomAccessFile>
@@ -40,11 +39,9 @@
 			<AppenderRef ref="FILE"/>
 			<AppenderRef ref="STDOUT" level="INFO"/>
 		</Root>
-		<!--
-				<logger name="pko.KiCadLogicalSchemeSimulator.model.merger" level="TRACE" additivity="false">
-					<AppenderRef ref="MFILE"/>
-				</logger>
-		-->
+		<logger name="pko.KiCadLogicalSchemeSimulator.model.merger" level="TRACE" additivity="false">
+			<AppenderRef ref="MFILE"/>
+		</logger>
 		<logger name="pko" level="DEBUG" additivity="false">
 			<AppenderRef ref="FILE"/>
 			<AppenderRef ref="STDOUT"/>

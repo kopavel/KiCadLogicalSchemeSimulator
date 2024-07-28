@@ -88,8 +88,8 @@ public class Z80Cpu extends SchemaPart {
                         }
                         if (ioRequest.isWrite) {
                             dOut.state = ioRequest.payload;
-                            dOut.hiImpedance = false;
                             dOut.setState(ioRequest.payload);
+                            dOut.hiImpedance = false;
                             needDataPinReset = true;
                         }
                     } else if (T2) {
@@ -180,8 +180,8 @@ public class Z80Cpu extends SchemaPart {
                         }
                         assert ioRequest != null : "Cpu core ioQueue is empty on T" + T + ":M" + M;
                         aOut.state = ioRequest.address;
-                        aOut.hiImpedance = false;
                         aOut.setState(ioRequest.address);
+                        aOut.hiImpedance = false;
                         extraWait = !ioRequest.isMemory;
                     } else if (T2) {
                         if (!inWait && !ioRequest.isMemory) {
