@@ -30,115 +30,44 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.model.merger.wire;
-import pko.KiCadLogicalSchemeSimulator.api_v2.IModelItem;
-import pko.KiCadLogicalSchemeSimulator.api_v2.ModelOutItem;
 import pko.KiCadLogicalSchemeSimulator.api_v2.ShortcutException;
 import pko.KiCadLogicalSchemeSimulator.api_v2.bus.OutBus;
-import pko.KiCadLogicalSchemeSimulator.api_v2.bus.in.InBus;
 import pko.KiCadLogicalSchemeSimulator.api_v2.wire.OutPin;
 import pko.KiCadLogicalSchemeSimulator.api_v2.wire.PassivePin;
 import pko.KiCadLogicalSchemeSimulator.api_v2.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.model.merger.DestinationDescriptor;
-import pko.KiCadLogicalSchemeSimulator.model.merger.IMerger;
 import pko.KiCadLogicalSchemeSimulator.model.merger.MergerInput;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Map;
 
-public class WireMerger extends OutPin implements IMerger {
-    private final Map<ModelOutItem, DestinationDescriptor> forBind = new HashMap<>();
-    public MergerInput[] mergerInputs = new MergerInput[0];
+public class WireMerger extends OutPin {
+    public MergerInput<?>[] sources = new MergerInput[0];
     public byte weakState;
-    public String hash;
 
-    public WireMerger(Pin destination) {
-        super(destination, "merger");
+    public WireMerger(Pin destination, List<OutPin> pins, Map<OutBus, Long> buses) {
+        super(destination, "wireMerger");
         destinations = new Pin[]{destination};
         strong = false;
+        pins.forEach(this::addSource);
+        if (buses != null) {
+            buses.forEach(this::addSource);
+        }
     }
 
+    //FixMe what about destination optimisation?
     @Override
-    public void addDestination(IModelItem item, long mask, byte offset) {
-        switch (item) {
-            case Pin pin -> {
-                if (destinations.length == 1 && destinations[0] instanceof PassivePin passivePin) {
-                    passivePin.addDestination(item, mask, offset);
-                } else {
-                    destinations = Utils.addToArray(destinations, pin);
-                }
-            }
-            case InBus ignored -> throw new RuntimeException("Use BusMerger for bus destination");
-            default -> throw new RuntimeException("Unsupported destination " + item.getClass().getName());
-        }
-        if (item.getId().contains("->")) {
-            id += "/" + item.getId().substring(item.getId().indexOf("->") + 2);
+    public void addDestination(Pin pin) {
+        if (destinations.length == 1 && destinations[0] instanceof PassivePin passivePin) {
+            passivePin.addDestination(pin);
         } else {
-            id += "/" + item.getName();
+            destinations = Utils.addToArray(destinations, pin);
         }
-    }
-
-    public String getHash() {
-        return Arrays.stream(mergerInputs)
-                .map(MergerInput::getHash)
-                .collect(Collectors.joining(";"));
-    }
-
-    public void addSource(ModelOutItem src, long mask, byte offset) {
-        if (src instanceof PassivePin passivePin) {
-            passivePin.destinations = destinations;
-            destinations = new Pin[]{passivePin};
+        if (pin.getId().contains("->")) {
+            id += "/" + pin.getId().substring(pin.getId().indexOf("->") + 2);
         } else {
-            MergerInput input;
-            switch (src) {
-                case OutPin pin -> {
-                    input = new WireMergerWireIn(pin, this);
-                    if (!pin.hiImpedance) {
-                        hiImpedance = false;
-                        if (pin.strong) {
-                            if (strong) {
-                                Set<ModelOutItem> items = new HashSet<>(forBind.keySet());
-                                items.add(src);
-                                throw new ShortcutException(items.toArray(new ModelOutItem[0]));
-                            }
-                            strong = true;
-                            state = pin.state;
-                        } else {
-                            if ((weakState > 0 && !pin.state) || (weakState < 0 && pin.state)) {
-                                Set<ModelOutItem> items = new HashSet<>(forBind.keySet());
-                                items.add(src);
-                                throw new ShortcutException(items.toArray(new ModelOutItem[0]));
-                            }
-                            weakState += (byte) (pin.state ? 1 : -1);
-                            if (!strong) {
-                                state = pin.state;
-                            }
-                        }
-                    }
-                }
-                case OutBus bus -> {
-                    input = new WireMergerBusIn(bus, mask, this);
-                    if (!bus.hiImpedance) {
-                        if (strong) {
-                            Set<ModelOutItem> items = new HashSet<>(forBind.keySet());
-                            items.add(src);
-                            throw new ShortcutException(items.toArray(new ModelOutItem[0]));
-                        }
-                        strong = true;
-                        state = (bus.state & mask) > 0;
-                    }
-                }
-                default -> throw new RuntimeException("Unsupported item " + src.getClass().getName());
-            }
-            forBind.put(src, new DestinationDescriptor(input, mask, offset));
-            mergerInputs = Utils.addToArray(mergerInputs, input);
-            Arrays.sort(mergerInputs, Comparator.comparing(MergerInput::getName));
-            hash = getHash();
+            id += "/" + pin.getName();
         }
-    }
-
-    public void bind() {
-        forBind.forEach((source, descriptor) -> source.addDestination(descriptor.item, descriptor.mask, descriptor.offset));
     }
 
     @Override
@@ -151,5 +80,42 @@ public class WireMerger extends OutPin implements IMerger {
     @Override
     public Pin getOptimised() {
         throw new UnsupportedOperationException();
+    }
+
+    private void addSource(OutBus bus, long mask) {
+        WireMergerBusIn input = new WireMergerBusIn(bus, mask, this);
+        bus.addDestination(input, mask, (byte) 0);
+        sources = Utils.addToArray(sources, input);
+        if (!bus.hiImpedance) {
+            if (strong) {
+                throw new ShortcutException(sources);
+            }
+            strong = true;
+            state = (bus.state & mask) > 0;
+        }
+    }
+
+    private void addSource(OutPin pin) {
+        WireMergerWireIn input = new WireMergerWireIn(pin, this);
+        pin.addDestination(input);
+        sources = Utils.addToArray(sources, input);
+        if (!pin.hiImpedance) {
+            hiImpedance = false;
+            if (pin.strong) {
+                if (strong) {
+                    throw new ShortcutException(sources);
+                }
+                strong = true;
+                state = pin.state;
+            } else {
+                if ((weakState > 0 && !pin.state) || (weakState < 0 && pin.state)) {
+                    throw new ShortcutException(sources);
+                }
+                weakState += (byte) (pin.state ? 1 : -1);
+                if (!strong) {
+                    state = pin.state;
+                }
+            }
+        }
     }
 }

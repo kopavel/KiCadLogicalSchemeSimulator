@@ -32,7 +32,6 @@
 package pko.KiCadLogicalSchemeSimulator.model.merger;
 import pko.KiCadLogicalSchemeSimulator.api_v2.IModelItem;
 
-public interface MergerInput extends IModelItem {
-    String getHash();
+public interface MergerInput<T> extends IModelItem<T> {
     String getName();
 }

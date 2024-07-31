@@ -21,8 +21,7 @@
 			</Policies>
 			<DefaultRolloverStrategy fileIndex="nomax"/>
 		</RollingRandomAccessFile>
-		<RollingRandomAccessFile name="MFILE"
-		                         fileName="${logdir}/mergers.log" filePattern="${logdir}/%d{yyyy-MM-dd}/mergers.%d{yyyy-MM-dd}.%i.log"
+		<RollingRandomAccessFile name="MFILE" fileName="${logdir}/mergers.log" filePattern="${logdir}/%d{yyyy-MM-dd}/mergers.%d{yyyy-MM-dd}.%i.log"
 		                         immediateFlush="false"
 		                         append="false">
 			<PatternLayout pattern="${layout}" charset="UTF-8"/>
@@ -41,6 +40,7 @@
 		</Root>
 		<logger name="pko.KiCadLogicalSchemeSimulator.model.merger" level="TRACE" additivity="false">
 			<AppenderRef ref="MFILE"/>
+			<AppenderRef ref="STDOUT"/>
 		</logger>
 		<logger name="pko" level="DEBUG" additivity="false">
 			<AppenderRef ref="FILE"/>

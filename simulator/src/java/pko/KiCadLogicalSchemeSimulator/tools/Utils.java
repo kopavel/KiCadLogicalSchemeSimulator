@@ -30,10 +30,15 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.tools;
+import pko.KiCadLogicalSchemeSimulator.api_v2.ModelItem;
+import pko.KiCadLogicalSchemeSimulator.api_v2.bus.OutBus;
+
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @SuppressWarnings("unused")
 public class Utils {
@@ -92,5 +97,30 @@ public class Utils {
             retVal = (retVal << 1) | 1;
         }
         return retVal;
+    }
+
+    @SafeVarargs
+    public static String getHash(Collection<? extends ModelItem>... items) {
+        Stream<String> mergedStream = null;
+        for (Collection<? extends ModelItem> item : items) {
+            Stream<String> itemStream = item.stream()
+                    .map(modelItem -> {
+                        String result = modelItem.getName();
+                        if (modelItem instanceof OutBus bus) {
+                            result += ":mask" + bus.mask;
+                        }
+                        return result;
+                    });
+            if (mergedStream == null) {
+                mergedStream = itemStream;
+            } else {
+                mergedStream = Stream.concat(mergedStream, itemStream);
+            }
+        }
+        if (mergedStream != null) {
+            return mergedStream.sorted()
+                    .collect(Collectors.joining(";"));
+        }
+        return "";
     }
 }

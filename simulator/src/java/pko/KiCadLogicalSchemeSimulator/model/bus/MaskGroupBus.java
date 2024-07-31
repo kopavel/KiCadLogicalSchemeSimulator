@@ -76,37 +76,34 @@ public class MaskGroupBus extends OutBus {
         if (destinations.length == 0) {
             return new NCBus(this);
         } else if (destinations.length == 1) {
-            Bus destination = destinations[0];
-            if (destination instanceof BusToWireAdapter) {
-                destination.state = state;
-                destination.hiImpedance = hiImpedance;
-                return destination;
-            } else {
-                return new MaskGroupBus(MaskGroupBus.this, "SingleDestination") {
-                    @Override
-                    public void setHiImpedance() {
-                        if (!hiImpedance) {
-                            destination.setHiImpedance();
-                            hiImpedance = true;
-                        }
+            Bus destination = destinations[0].getOptimised();
+            return new MaskGroupBus(MaskGroupBus.this, "SingleDestination") {
+                @Override
+                public void setHiImpedance() {
+                    if (!hiImpedance) {
+                        destination.setHiImpedance();
+                        hiImpedance = true;
                     }
+                }
 
-                    @Override
-                    public void setState(long newState) {
-                        long newMaskState = newState & mask;
-                        if (maskState != newMaskState || hiImpedance) {
-                            maskState = newMaskState;
-                            destination.setState(newMaskState);
-                            hiImpedance = false;
-                        }
+                @Override
+                public void setState(long newState) {
+                    long newMaskState = newState & mask;
+                    if (maskState != newMaskState || hiImpedance) {
+                        maskState = newMaskState;
+                        destination.setState(newMaskState);
+                        hiImpedance = false;
                     }
-                };
-            }
+                }
+
+                @Override
+                public Bus getOptimised() {
+                    return this;
+                }
+            };
         } else {
             for (int i = 0; i < destinations.length; i++) {
-                if (destinations[i] instanceof BusToWireAdapter adapter) {
-                    destinations[i] = new SimpleBusToWireAdapter(adapter.destination);
-                }
+                destinations[i] = destinations[i].getOptimised();
             }
             return this;
         }

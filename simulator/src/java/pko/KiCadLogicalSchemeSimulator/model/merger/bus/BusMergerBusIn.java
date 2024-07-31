@@ -32,13 +32,12 @@
 package pko.KiCadLogicalSchemeSimulator.model.merger.bus;
 import pko.KiCadLogicalSchemeSimulator.api_v2.ShortcutException;
 import pko.KiCadLogicalSchemeSimulator.api_v2.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.api_v2.bus.OutBus;
 import pko.KiCadLogicalSchemeSimulator.api_v2.bus.in.CorrectedInBus;
 import pko.KiCadLogicalSchemeSimulator.model.merger.MergerInput;
 import pko.KiCadLogicalSchemeSimulator.model.merger.wire.WireMergerWireIn;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
-public class BusMergerBusIn extends CorrectedInBus implements MergerInput {
+public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
     public final long mask;
     public final long nMask;
     private final BusMerger merger;
@@ -67,7 +66,7 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput {
                 merger.hiImpedance);
         state = newState;
         if (hiImpedance && (merger.strongPins & mask) != 0) {
-            throw new ShortcutException(merger.inputs);
+            throw new ShortcutException(merger.sources);
         }
         long oldState = merger.state;
         if (hiImpedance) {
@@ -149,23 +148,5 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput {
                 merger.weakState,
                 merger.weakPins,
                 merger.hiImpedance);
-    }
-
-    @Override
-    public String getHash() {
-        return mask + ":" + getName();
-    }
-
-    @Override
-    public Bus getOptimised() {
-        if (merger.inputs.length == 1) {
-            OutBus optimised = new OutBus(merger, "Optimised");
-            optimised.destinations = merger.destinations;
-            optimised.state = state;
-            optimised.hiImpedance = hiImpedance;
-            return optimised;
-        } else {
-            return this;
-        }
     }
 }

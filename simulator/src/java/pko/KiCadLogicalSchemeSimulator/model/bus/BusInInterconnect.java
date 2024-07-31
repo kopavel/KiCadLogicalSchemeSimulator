@@ -33,10 +33,10 @@ package pko.KiCadLogicalSchemeSimulator.model.bus;
 import pko.KiCadLogicalSchemeSimulator.api_v2.bus.in.InBus;
 
 public class BusInInterconnect extends InBus {
-    public final InBus destination;
     public final long interconnectMask;
     public final long senseMask;
     public final long inverseInterconnectMask;
+    public InBus destination;
 
     public BusInInterconnect(InBus destination, long interconnectMask, Byte offset) {
         super(destination, "interconnect" + interconnectMask);
@@ -63,5 +63,11 @@ public class BusInInterconnect extends InBus {
     public void setHiImpedance() {
         destination.setHiImpedance();
         destination.hiImpedance = true;
+    }
+
+    @Override
+    public InBus getOptimised() {
+        destination = destination.getOptimised();
+        return this;
     }
 }

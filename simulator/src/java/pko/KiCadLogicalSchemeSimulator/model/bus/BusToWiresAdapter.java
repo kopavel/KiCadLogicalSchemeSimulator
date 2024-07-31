@@ -29,6 +29,35 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.api_v2;
-public interface ModelInItem extends IModelItem {
+package pko.KiCadLogicalSchemeSimulator.model.bus;
+import pko.KiCadLogicalSchemeSimulator.api_v2.bus.Bus;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.Pin;
+
+public class BusToWiresAdapter extends BusToWireAdapter {
+    public final Pin[] destinations;
+    public long maskState;
+
+    public BusToWiresAdapter(Bus oldBus, Pin[] destinations, long mask) {
+        super(oldBus, null);
+        this.mask = mask;
+        this.destinations = destinations;
+    }
+
+    @Override
+    public void setState(long newState) {
+        if (maskState != (newState & mask)) {
+            maskState = newState & mask;
+            for (Pin destination : destinations) {
+                destination.setState(maskState > 0, true);
+            }
+        }
+    }
+
+    @Override
+    public void setHiImpedance() {
+        assert !hiImpedance : "Already in hiImpedance:" + this;
+        for (Pin destination : destinations) {
+            destination.setHiImpedance();
+        }
+    }
 }

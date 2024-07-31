@@ -30,8 +30,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.api_v2.bus;
-import pko.KiCadLogicalSchemeSimulator.api_v2.IModelItem;
-import pko.KiCadLogicalSchemeSimulator.api_v2.ModelOutItem;
 import pko.KiCadLogicalSchemeSimulator.api_v2.bus.in.CorrectedInBus;
 import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api_v2.wire.Pin;
@@ -41,9 +39,12 @@ import pko.KiCadLogicalSchemeSimulator.model.bus.NCBus;
 import pko.KiCadLogicalSchemeSimulator.model.bus.OffsetBus;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
-public class OutBus extends Bus implements ModelOutItem {
+public class OutBus extends Bus {
+    private final List<Pin> pins = new ArrayList<>();
     public Bus[] destinations = new Bus[0];
     public long mask;
 
@@ -52,43 +53,42 @@ public class OutBus extends Bus implements ModelOutItem {
         mask = Utils.getMaskForSize(size);
     }
 
-    public OutBus(OutBus oldPin, String variantId) {
-        super(oldPin, variantId);
-        mask = oldPin.mask;
+    public OutBus(OutBus oldBus, String variantId) {
+        super(oldBus, variantId);
+        mask = oldBus.mask;
     }
 
-    public void addDestination(IModelItem item, long mask, byte offset) {
-        switch (item) {
-            case Pin pin -> {
-                BusToWireAdapter bus = new BusToWireAdapter(pin, mask);
-                Arrays.stream(destinations)
-                        .filter(d -> d instanceof MaskGroupBus)
-                        .map(d -> ((MaskGroupBus) d))
-                        .filter(d -> d.mask == bus.mask).findFirst().orElseGet(() -> {
-                          MaskGroupBus groupBus = new MaskGroupBus(this, bus.mask, "Mask" + mask);
-                          destinations = Utils.addToArray(destinations, groupBus);
-                          return groupBus;
-                      }).addDestination(bus);
-            }
-            case Bus bus -> {
-                //FixMe group by offset
-                if (bus instanceof CorrectedInBus && offset != 0) {
-                    bus = new OffsetBus(bus, offset);
-                }
-                if (mask != this.mask) {
-                    Arrays.stream(destinations)
-                            .filter(d -> d instanceof MaskGroupBus)
-                            .map(d -> ((MaskGroupBus) d))
-                            .filter(d -> d.mask == mask).findFirst().orElseGet(() -> {
-                              MaskGroupBus groupBus = new MaskGroupBus(this, mask, "Mask" + mask);
-                              destinations = Utils.addToArray(destinations, groupBus);
-                              return groupBus;
-                          }).addDestination(bus);
-                } else {
-                    destinations = Utils.addToArray(destinations, bus);
-                }
-            }
-            default -> throw new RuntimeException("Unsupported destination " + item.getClass().getName());
+    public void addDestination(Bus bus, long mask, byte offset) {
+        //FixMe group by offset
+        if (bus instanceof CorrectedInBus && offset != 0) {
+            bus = new OffsetBus(bus, offset);
+        }
+        if (mask != this.mask) {
+            Arrays.stream(destinations)
+                    .filter(d -> d instanceof MaskGroupBus)
+                    .map(d -> ((MaskGroupBus) d))
+                    .filter(d -> d.mask == mask).findFirst().orElseGet(() -> {
+                      MaskGroupBus groupBus = new MaskGroupBus(this, mask, "Mask" + mask);
+                      destinations = Utils.addToArray(destinations, groupBus);
+                      return groupBus;
+                  }).addDestination(bus);
+        } else {
+            destinations = Utils.addToArray(destinations, bus);
+        }
+    }
+
+    public void addDestination(Pin pin, long mask) {
+        if (!pins.contains(pin)) {
+            pins.add(pin);
+            BusToWireAdapter bus = new BusToWireAdapter(this, pin);
+            Arrays.stream(destinations)
+                    .filter(d -> d instanceof MaskGroupBus)
+                    .map(d -> ((MaskGroupBus) d))
+                    .filter(d -> d.mask == mask).findFirst().orElseGet(() -> {
+                      MaskGroupBus groupBus = new MaskGroupBus(this, mask, "mask" + mask);
+                      destinations = Utils.addToArray(destinations, groupBus);
+                      return groupBus;
+                  }).addDestination(bus);
         }
     }
 

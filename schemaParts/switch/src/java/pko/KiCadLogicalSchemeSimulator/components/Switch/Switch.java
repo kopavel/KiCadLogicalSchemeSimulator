@@ -72,6 +72,10 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
             public void resend() {
                 if (!hiImpedance) {
                     setState(state, strong);
+                } else {
+                    //noinspection ConstantValue,AssertWithSideEffects
+                    assert !(hiImpedance = false);
+                    setHiImpedance();
                 }
             }
 
@@ -140,6 +144,10 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
             public void resend() {
                 if (!hiImpedance) {
                     setState(state, strong);
+                } else {
+                    //noinspection ConstantValue,AssertWithSideEffects
+                    assert !(hiImpedance = false);
+                    setHiImpedance();
                 }
             }
 

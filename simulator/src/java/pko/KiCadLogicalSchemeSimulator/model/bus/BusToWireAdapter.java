@@ -31,30 +31,41 @@
  */
 package pko.KiCadLogicalSchemeSimulator.model.bus;
 import pko.KiCadLogicalSchemeSimulator.api_v2.bus.Bus;
+import pko.KiCadLogicalSchemeSimulator.api_v2.bus.OutBus;
 import pko.KiCadLogicalSchemeSimulator.api_v2.wire.Pin;
 
-public class BusToWireAdapter extends Bus {
-    public final Pin destination;
-    public final long mask;
-    private long maskState;
+public class BusToWireAdapter extends OutBus {
+    public Pin destination;
 
-    public BusToWireAdapter(Pin destination, long mask) {
-        super(destination.id, destination.parent, 1);
+    public BusToWireAdapter(OutBus src, Pin destination) {
+        super(src, "BusToWire");
         this.destination = destination;
-        this.mask = mask;
+    }
+
+    public BusToWireAdapter(Bus oldBus, Pin destination) {
+        super(oldBus.id, oldBus.parent, oldBus.size);
+        aliasOffsets = oldBus.aliasOffsets;
+        useBitPresentation = oldBus.useBitPresentation;
+        state = oldBus.state;
+        hiImpedance = oldBus.hiImpedance;
+        this.destination = destination;
+        variantId = "BusToWire";
     }
 
     @Override
     public void setState(long newState) {
-        if (maskState != (newState & mask)) {
-            maskState = newState & mask;
-            destination.setState(maskState > 0, true);
-        }
+        destination.setState(newState != 0, true);
     }
 
     @Override
     public void setHiImpedance() {
         assert !hiImpedance : "Already in hiImpedance:" + this;
         destination.setHiImpedance();
+    }
+
+    @Override
+    public Bus getOptimised() {
+        destination = destination.getOptimised();
+        return this;
     }
 }

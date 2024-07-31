@@ -32,7 +32,6 @@
 package pko.KiCadLogicalSchemeSimulator.components.oscillator.oscilloscope;
 import pko.KiCadLogicalSchemeSimulator.Simulator;
 import pko.KiCadLogicalSchemeSimulator.api_v2.IModelItem;
-import pko.KiCadLogicalSchemeSimulator.api_v2.ModelInItem;
 
 import javax.swing.*;
 import java.util.Comparator;
@@ -41,28 +40,31 @@ import java.util.List;
 public class OscilloscopeMenu extends JMenuBar {
     private final Oscilloscope oscilloscope;
 
+    //FixMe add passive pins menu
     public OscilloscopeMenu(Oscilloscope parent) {
         oscilloscope = parent;
         JMenu outPinMenu = new JMenu(Oscilloscope.localization.getString("outPins"));
         add(outPinMenu);
         JMenu inPinMenu = new JMenu(Oscilloscope.localization.getString("InPins"));
         add(inPinMenu);
-        List<IModelItem> outPins = Simulator.model.schemaParts.values()
+        List<IModelItem<?>> outPins = Simulator.model.schemaParts.values()
                 .stream()
-                .flatMap(p -> p.outMap.values()
-                        .stream()).sorted(Comparator.comparing(IModelItem::getName))
+                .flatMap(p -> p.outPins.values()
+                        .stream().distinct())
+                .sorted(Comparator.comparing(IModelItem::getName))
                 .toList();
-        for (IModelItem pin : outPins) {
+        for (IModelItem<?> pin : outPins) {
             JMenuItem outPinItem = new JMenuItem(pin.getName());
             outPinItem.addActionListener(e -> oscilloscope.addPin(pin, pin.getName()));
             outPinMenu.add(outPinItem);
         }
-        List<ModelInItem> inPins = Simulator.model.schemaParts.values()
+        List<IModelItem<?>> inPins = Simulator.model.schemaParts.values()
                 .stream()
-                .flatMap(p -> p.inMap.values()
-                        .stream()).sorted(Comparator.comparing(IModelItem::getName))
+                .flatMap(p -> p.inPins.values()
+                        .stream().distinct())
+                .sorted(Comparator.comparing(IModelItem::getName))
                 .toList();
-        for (ModelInItem pin : inPins) {
+        for (IModelItem<?> pin : inPins) {
             JMenuItem inPinItem = new JMenuItem(pin.getName());
             inPinItem.addActionListener(e -> oscilloscope.addPin(pin, pin.getName()));
             inPinMenu.add(inPinItem);

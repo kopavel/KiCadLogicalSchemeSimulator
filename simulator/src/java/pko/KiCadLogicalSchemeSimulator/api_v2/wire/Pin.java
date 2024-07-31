@@ -31,13 +31,22 @@
  */
 package pko.KiCadLogicalSchemeSimulator.api_v2.wire;
 import lombok.Getter;
+import pko.KiCadLogicalSchemeSimulator.api_v2.IModelItem;
 import pko.KiCadLogicalSchemeSimulator.api_v2.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
 
 import java.util.Set;
 
-public abstract class Pin extends ModelItem {
+public abstract class Pin extends ModelItem<Pin> {
     public boolean state;
+
+    @Override
+    public void copyState(IModelItem<Pin> oldPin) {
+        this.strong = oldPin.isStrong();
+        this.state = oldPin.getState() > 0;
+        this.hiImpedance = oldPin.isHiImpedance();
+    }
+
     @Getter
     public boolean strong = true;
 

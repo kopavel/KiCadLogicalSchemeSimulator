@@ -31,17 +31,28 @@
  */
 package pko.KiCadLogicalSchemeSimulator.model.wire;
 import pko.KiCadLogicalSchemeSimulator.api_v2.bus.Bus;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.OutPin;
 import pko.KiCadLogicalSchemeSimulator.api_v2.wire.Pin;
 
-public class WireToBusAdapter extends Pin {
-    private final Bus destination;
+public class WireToBusAdapter extends OutPin {
     public long mask;
+    private Bus destination;
 
-    public WireToBusAdapter(Pin src, Bus destination, byte offset) {
-        super(src.id, src.parent);
+    public WireToBusAdapter(Bus destination, byte offset) {
+        super(destination.id, destination.parent);
         variantId = "WireToBasAdapter:offset" + offset;
         mask = 1L << offset;
         this.destination = destination;
+    }
+
+    @Override
+    public void addDestination(Pin pin) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void addDestination(Bus bus, byte offset) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -53,5 +64,15 @@ public class WireToBusAdapter extends Pin {
     public void setHiImpedance() {
         assert !hiImpedance : "Already in hiImpedance:" + this;
         destination.setHiImpedance();
+    }
+
+    @Override
+    public Pin getOptimised() {
+        if (destinations.length == 0) {
+            return new NCWire(this);
+        } else {
+            destination = destination.getOptimised();
+            return this;
+        }
     }
 }

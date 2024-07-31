@@ -30,37 +30,51 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.model;
-import pko.KiCadLogicalSchemeSimulator.api_v2.*;
+import pko.KiCadLogicalSchemeSimulator.api_v2.FloatingInException;
+import pko.KiCadLogicalSchemeSimulator.api_v2.IModelItem;
+import pko.KiCadLogicalSchemeSimulator.api_v2.ShortcutException;
+import pko.KiCadLogicalSchemeSimulator.api_v2.bus.Bus;
+import pko.KiCadLogicalSchemeSimulator.api_v2.bus.OutBus;
 import pko.KiCadLogicalSchemeSimulator.api_v2.bus.in.InBus;
 import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPartSpi;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.OutPin;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.PassivePin;
 import pko.KiCadLogicalSchemeSimulator.api_v2.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.InPin;
 import pko.KiCadLogicalSchemeSimulator.model.bus.BusInInterconnect;
-import pko.KiCadLogicalSchemeSimulator.model.merger.DestinationDescriptor;
-import pko.KiCadLogicalSchemeSimulator.model.merger.IMerger;
 import pko.KiCadLogicalSchemeSimulator.model.merger.bus.BusMerger;
-import pko.KiCadLogicalSchemeSimulator.model.merger.bus.BusMergerWireIn;
 import pko.KiCadLogicalSchemeSimulator.model.merger.wire.WireMerger;
+import pko.KiCadLogicalSchemeSimulator.model.wire.WireToBusAdapter;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.Comp;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.Export;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.Net;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.Property;
-import pko.KiCadLogicalSchemeSimulator.parsers.pojo.symbolMap.*;
-import pko.KiCadLogicalSchemeSimulator.parsers.xml.XmlParser;
+import pko.KiCadLogicalSchemeSimulator.parsers.pojo.symbolMap.SchemaPartMap;
+import pko.KiCadLogicalSchemeSimulator.parsers.pojo.symbolMap.SymbolDesc;
+import pko.KiCadLogicalSchemeSimulator.parsers.pojo.symbolMap.SymbolLibMap;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
+import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
+import static pko.KiCadLogicalSchemeSimulator.model.SymbolDescriptions.PinMapDescriptor;
+import static pko.KiCadLogicalSchemeSimulator.model.SymbolDescriptions.parse;
+import static pko.KiCadLogicalSchemeSimulator.model.SymbolDescriptions.schemaPartPinMap;
+
 public class Model {
-    public static boolean stabilizing;
+    public static boolean stabilized;
+    private static boolean stabilizing;
     public final Map<String, SchemaPart> schemaParts = new TreeMap<>();
-    public final Map<String, Map<String, PinMapDescriptor>> schemaPartPinMap = new TreeMap<>();
     public final Map<String, SchemaPartSpi> schemaPartSpiMap;
-    private final Map<ModelInItem, InItemDescriptor> inMap = new HashMap<>();
-    private final Map<String, IMerger> mergers = new TreeMap<>();
+    private final Map<Pin, DestinationWireDescriptor> destinationWireDescriptors = new HashMap<>();
+    private final Map<Bus, DestinationBusDescriptor> destinationBusDescriptors = new HashMap<>();
+    private final Map<String, BusMerger> busMergers = new TreeMap<>();
+    private final Map<String, OutPin> wires = new TreeMap<>();
 
     public Model(Export export, String mapPath) throws IOException {
         Log.info(Model.class, "Start Model building");
@@ -68,32 +82,8 @@ public class Model {
                 .stream()
                 .map(ServiceLoader.Provider::get)
                 .collect(Collectors.toMap(spi -> spi.getSchemaPartClass().getSimpleName(), spi -> spi));
-        SchemaPartMap schemaPartMap;
-        if (mapPath != null) {
-            SymbolMap symbolMap = XmlParser.parse(mapPath, SymbolMap.class);
-            schemaPartMap = new SchemaPartMap();
-            for (Library library : symbolMap.getLib()) {
-                SymbolLibMap lib = schemaPartMap.libs.computeIfAbsent(library.getName(), name -> new SymbolLibMap());
-                for (Symbol symbol : library.getSymbol()) {
-                    SymbolDesc symbolDesc = lib.symbols.computeIfAbsent(symbol.getName(), name -> new SymbolDesc());
-                    symbolDesc.clazz = symbol.getSymPartClass();
-                    symbolDesc.params = symbol.getSymPartParam();
-                    if (symbol.getUnit() != null) {
-                        symbolDesc.units = symbol.getUnit()
-                                .stream()
-                                .map(Unit::getPinMap)
-                                .collect(Collectors.toCollection(ArrayList::new));
-                    }
-                }
-            }
-        } else {
-            schemaPartMap = null;
-        }
+        SchemaPartMap schemaPartMap = parse(mapPath);
         export.getComponents().getComp().forEach((Comp component) -> createSchemaPart(component, schemaPartMap));
-        SchemaPart gnd = getSchemaPart("Power", "gnd", "strong");
-        schemaParts.put(gnd.id, gnd);
-        SchemaPart pwr = getSchemaPart("Power", "pwr", "hi;strong");
-        schemaParts.put(pwr.id, pwr);
         export.getNets().getNet().forEach(this::processNet);
         buildBuses();
         schemaParts.values().forEach(SchemaPart::initOuts);
@@ -102,13 +92,79 @@ public class Model {
         Log.info(Model.class, "Model build complete");
     }
 
+    public Pin processWire(Pin destination, List<OutPin> pins, List<PassivePin> passivePins, Map<OutBus, Long> buses) {
+        //passive pins chain used in direct connect and in mergers - always  process it.
+        Pin retVal = null;
+        boolean useOldWire = false;
+        if (!passivePins.isEmpty()) {
+            String destinationHash = Utils.getHash(passivePins);
+            if (wires.containsKey(destinationHash)) {
+                OutPin pin = wires.get(destinationHash);
+                pin.addDestination(destination);
+                retVal = pin;
+                // if wire already processed before it is complete,so just add destination to it and don't process further
+                useOldWire = true;
+            } else {
+                for (PassivePin passivePin : passivePins) {
+                    passivePin.addDestination(destination);
+                    destination = passivePin;
+                }
+                //collect passive pins chain as wire for further usage, if any
+                wires.put(destinationHash, (OutPin) destination);
+            }
+        }
+        if (!useOldWire) {
+            if (buses.size() + pins.size() > 1) {
+                //connect destination to multiple sources throe Merger
+                String mergerHash = Utils.getHash(pins, buses.keySet());
+                if (wires.containsKey(mergerHash)) {
+                    //use old merger. in case if there is no passive pins - it's not handled earlier.
+                    OutPin pin = wires.get(mergerHash);
+                    pin.addDestination(destination);
+                    retVal = pin;
+                } else {
+                    //collect merger as wire
+                    WireMerger wireMerger = new WireMerger(destination, pins, buses);
+                    retVal = wireMerger;
+                    wires.put(mergerHash, wireMerger);
+                    //in busMerger wire input contain only wires - no buses, so store with only pins hash, it's unique combination any way.
+                    String wireOnlyHash = Utils.getHash(pins);
+                    wires.put(wireOnlyHash, wireMerger);
+                }
+            } else {
+                //No merger needed. Passive pins, if any, are handled as pin chain in destination.
+                if (!pins.isEmpty()) {
+                    //pin-to-pin connection
+                    for (OutPin pin : pins) {
+                        pin.addDestination(destination);
+                        retVal = pin;
+                    }
+                } else {
+                    //bus-to-pin connection
+                    for (Map.Entry<OutBus, Long> bus : buses.entrySet()) {
+                        bus.getKey().addDestination(destination, bus.getValue());
+                    }
+                }
+            }
+        }
+        return retVal;
+    }
+
     private void processNet(Net net) {
-        Map<ModelOutItem, Byte> outsOffset = new HashMap<>();
-        Map<ModelInItem, SortedSet<Byte>> insOffsets = new HashMap<>();
+        if (net.getName().startsWith("unconnected-")) {
+            return;
+        }
+        Map<IModelItem<?>, Byte> sourcesOffset = new HashMap<>();
+        List<Pin> destinationPins = new ArrayList<>();
+        Map<InBus, SortedSet<Byte>> destinationBusesOffsets = new HashMap<>();
+        List<PassivePin> passivePins = new ArrayList<>();
+        Boolean powerState;
         if ("gnd".equalsIgnoreCase(net.getName())) {
-            outsOffset.put((ModelOutItem) schemaParts.get("gnd").getOutItem("OUT"), (byte) 0);
+            powerState = false;
         } else if ("pwr".equalsIgnoreCase(net.getName())) {
-            outsOffset.put((ModelOutItem) schemaParts.get("pwr").getOutItem("OUT"), (byte) 0);
+            powerState = true;
+        } else {
+            powerState = null;
         }
         net.getNode().forEach(node -> {
             Map<String, PinMapDescriptor> pinMap = schemaPartPinMap.get(node.getRef());
@@ -132,120 +188,198 @@ public class Model {
             }
             switch (pinType) {
                 case "input" -> {
-                    ModelInItem inItem = schemaPart.getInItem(pinName);
-                    insOffsets.computeIfAbsent(inItem, p -> new TreeSet<>()).add(inItem.getAliasOffset(pinName));
+                    IModelItem<?> destination = schemaPart.getInItem(pinName);
+                    switch (destination) {
+                        case InPin pin -> destinationPins.add(pin);
+                        case InBus bus -> destinationBusesOffsets.computeIfAbsent(bus, p -> new TreeSet<>()).add(bus.getAliasOffset(pinName));
+                        default -> throw new IllegalStateException("Unexpected input type: " + destination.getClass().getName());
+                    }
                 }
                 case "tri_state", "output" -> {
-                    ModelOutItem outItem = (ModelOutItem) schemaPart.getOutItem(pinName);
-                    outsOffset.put(outItem, outItem.getAliasOffset(pinName));
+                    if (powerState != null) {
+                        throw new RuntimeException("OUt pin on power rail");
+                    }
+                    IModelItem<?> source = schemaPart.getOutItem(pinName);
+                    sourcesOffset.put(source, source.getAliasOffset(pinName));
                 }
-                case "bidirectional", "passive" -> {
-                    ModelInItem inItem;
-                    ModelOutItem outItem;
-                    inItem = schemaPart.getInItem(pinName);
-                    insOffsets.computeIfAbsent(inItem, p -> new TreeSet<>()).add(inItem.getAliasOffset(pinName));
-                    outItem = (ModelOutItem) schemaPart.getOutItem(pinName);
-                    outsOffset.put(outItem, outItem.getAliasOffset(pinName));
+                case "bidirectional" -> {
+                    if (powerState != null) {
+                        throw new RuntimeException("OUt pin on power rail");
+                    }
+                    IModelItem<?> destination = schemaPart.getInItem(pinName);
+                    switch (destination) {
+                        case InPin pin -> destinationPins.add(pin);
+                        case InBus bus -> destinationBusesOffsets.computeIfAbsent(bus, p -> new TreeSet<>()).add(bus.getAliasOffset(pinName));
+                        default -> throw new IllegalStateException("Unexpected input type: " + destination.getClass().getName());
+                    }
+                    IModelItem<?> source = schemaPart.getOutItem(pinName);
+                    sourcesOffset.put(source, source.getAliasOffset(pinName));
                 }
+                case "passive" -> passivePins.add(schemaPart.passivePins.get(pinName));
                 case "power_in" -> { //ignore
                 }
                 default -> throw new RuntimeException("Unsupported pin type " + pinType);
             }
         });
-        Map<ModelInItem, ModelInItem> wrappers = new HashMap<>();
-        insOffsets.forEach((inItem, inOffsets) -> {
-            outsOffset.forEach((outItem, outOffset) -> {
-                InItemDescriptor inItemDescriptor = inMap.computeIfAbsent(wrappers.getOrDefault(inItem, inItem), p -> new InItemDescriptor());
-                if (inOffsets.size() > 1) {
-                    switch (inItem) {
-                        case InPin ignored -> throw new RuntimeException("Pin can't be interconnected");
-                        case InBus bus -> {
-                            // interconnected Bus pins
-                            long interconnectMask = 0;
-                            for (Byte offset : inOffsets) {
-                                interconnectMask |= (1L << offset);
-                            }
-                            BusInInterconnect interconnect = new BusInInterconnect(bus, interconnectMask, inOffsets.getFirst());
-                            inMap.remove(inItem);
-                            inMap.put(interconnect, inItemDescriptor);
-                            wrappers.put(inItem, interconnect);
-                            Byte offset = inOffsets.getFirst();
-                            inOffsets.clear();
-                            inOffsets.add(offset);
-                        }
-                        default -> throw new RuntimeException("Unsupported inItem: " + inItem.getClass().getName());
-                    }
+        if (powerState != null) {
+            //if on power rail - connect all passive pin power rail it and don't add to any others nets
+            passivePins.forEach(passivePin -> {
+                if (TRUE == powerState) {
+                    SchemaPart pwr = getSchemaPart("Power", "pwr_" + passivePin.getName(), "hi;strong");
+                    schemaParts.put(pwr.id, pwr);
+                    ((OutPin) pwr.getOutPin("OUT")).addDestination(passivePin);
+                } else if (FALSE == powerState) {
+                    SchemaPart gnd = getSchemaPart("Power", "gnd_" + passivePin.getName(), "strong");
+                    schemaParts.put(gnd.id, gnd);
+                    ((OutPin) gnd.getOutPin("OUT")).addDestination(passivePin);
                 }
-                inItemDescriptor.addInItem(outItem, outOffset, inOffsets.getFirst());
             });
+            passivePins.clear();
+        } else {
+            //if there is no destination pins but is passive pins - use one of it as destination, in other way passive pins don't get any changes
+            if ((destinationPins.isEmpty())) {
+                if (passivePins.isEmpty()) {
+                    sourcesOffset.forEach((out, offset) -> Log.warn(Model.class, "Unconnected Out:" + out.getName() + offset));
+                } else {
+                    destinationPins.add(passivePins.getFirst());
+                }
+            }
+        }
+        //
+        //Process Pin destinations
+        //
+        destinationPins.forEach((destinationPin) -> {
+            DestinationWireDescriptor descriptor = destinationWireDescriptors.computeIfAbsent(destinationPin, i -> new DestinationWireDescriptor(passivePins));
+            if (TRUE == powerState) {
+                SchemaPart pwr = getSchemaPart("Power", "pwr_" + destinationPin.getName(), "hi;strong");
+                schemaParts.put(pwr.id, pwr);
+                descriptor.add(pwr.getOutItem("OUT"), (byte) 0);
+            } else if (FALSE == powerState) {
+                SchemaPart gnd = getSchemaPart("Power", "gnd_" + destinationPin.getName(), "strong");
+                schemaParts.put(gnd.id, gnd);
+                descriptor.add(gnd.getOutItem("OUT"), (byte) 0);
+            } else {
+                sourcesOffset.forEach(descriptor::add);
+            }
+        });
+        //
+        //Process Bus destinations
+        //
+        destinationBusesOffsets.forEach((destinationBus, destinationOffsets) -> {
+            DestinationBusDescriptor descriptor = destinationBusDescriptors.computeIfAbsent(destinationBus, p -> new DestinationBusDescriptor());
+            if (destinationOffsets.size() > 1) {
+                // interconnected Bus pins
+                destinationBusDescriptors.remove(destinationBus);
+                long interconnectMask = 0;
+                for (Byte offset : destinationOffsets) {
+                    interconnectMask |= (1L << offset);
+                }
+                Byte offset = destinationOffsets.getFirst();
+                destinationOffsets.clear();
+                destinationOffsets.add(offset);
+                BusInInterconnect interconnect = new BusInInterconnect(destinationBus, interconnectMask, offset);
+                destinationBusDescriptors.put(interconnect, descriptor);
+            }
+            if (TRUE == powerState) {
+                SchemaPart pwr = getSchemaPart("Power", "pwr_" + destinationBus.getName(), "hi;strong");
+                schemaParts.put(pwr.id, pwr);
+                descriptor.add(pwr.getOutItem("OUT"), (byte) 0, destinationOffsets.getFirst());
+                sourcesOffset.put(pwr.getOutItem("OUT"), (byte) 0);
+            } else if (FALSE == powerState) {
+                SchemaPart gnd = getSchemaPart("Power", "gnd_" + destinationBus.getName(), "strong");
+                schemaParts.put(gnd.id, gnd);
+                descriptor.add(gnd.getOutItem("OUT"), (byte) 0, destinationOffsets.getFirst());
+            } else {
+                sourcesOffset.forEach((source, sourceOffset) -> descriptor.add(source, sourceOffset, destinationOffsets.getFirst()));
+            }
+            passivePins.forEach(passivePin -> descriptor.add(passivePin, (byte) 0, destinationOffsets.getFirst()));
         });
     }
 
     private void buildBuses() {
-        //FixMe if passive pin are not only one input - remove it (we need it only once in ideal case and it is added as output to mergers)
-        //FixMe don't do interconnect throe power rails (seems it's better just generate Power pin for each connection separately)
-        inMap.forEach((inItem, inDescriptor) -> {
-            if (inDescriptor.getPermutationCount() == 1) {
-                //pin-to-pin connection
-                //noinspection OptionalGetWithoutIsPresent
-                Map.Entry<ModelOutItem, Map<Byte, Long>> outItemEntry = inDescriptor.entrySet()
-                        .stream().findFirst().get();
-                //noinspection OptionalGetWithoutIsPresent
-                Map.Entry<Byte, Long> maskEntry = outItemEntry.getValue().entrySet()
-                        .stream().findFirst().get();
-                outItemEntry.getKey().addDestination(inItem, maskEntry.getValue(), maskEntry.getKey());
-            } else {
-                //connect InPin to multiple OutPins throe Merger
-                IMerger merger;
-                switch (inItem) {
-                    case InBus bus -> merger = new BusMerger(bus);
-                    case Pin pin -> merger = new WireMerger(pin);
-                    default -> throw new RuntimeException("Unsupported inItem: " + inItem.getClass().getName());
-                }
-                for (Map.Entry<ModelOutItem, Map<Byte, Long>> outItemEntry : inDescriptor.entrySet()) {
-                    for (Map.Entry<Byte, Long> offsetMap : outItemEntry.getValue().entrySet()) {
-                        merger.addSource(outItemEntry.getKey(), offsetMap.getValue(), offsetMap.getKey());
-                    }
-                }
-                //Use only one merger with splitter for a similar in-out connections
-                //Hash calculated from sources (OutItems) name/mask/offset
-                if (merger instanceof BusMerger busMerger) {
-                    for (BusMergerWireIn mergerIn : busMerger.wires.values()) {
-                        if (mergerIn.input instanceof IMerger wireMerger) {
-                            if (mergers.containsKey(wireMerger.getHash())) {
-                                IMerger oldMerger = mergers.get(wireMerger.getHash());
-                                mergerIn.input = (WireMerger) oldMerger;
-                                busMerger.forBind.put(oldMerger, new DestinationDescriptor(mergerIn, 0L, (byte) 0));
+        //wire destinations
+        destinationWireDescriptors.forEach((destination, descriptor) -> processWire(destination, descriptor.pins, descriptor.passivePins, descriptor.buses));
+        //Bus destinations
+        destinationBusDescriptors.forEach((destination, descriptor) -> {
+            if (descriptor.useBusMerger()) {
+                //connect destination to multiple sources throe Merger
+                String busMergerHash = Utils.getHash(descriptor.offsets.values()
+                                .stream().flatMap(i -> i.pins.stream()).toList(),
+                        descriptor.offsets.values()
+                                .stream().flatMap(i -> i.passivePins.stream()).toList(),
+                        descriptor.buses.keySet());
+                if (busMergers.containsKey(busMergerHash)) {
+                    //just connect to already created bus merger
+                    busMergers.get(busMergerHash).addDestination(destination);
+                } else {
+                    //create new one bus merger
+                    BusMerger busMerger = new BusMerger(destination);
+                    //add all pins
+                    descriptor.offsets.forEach((offset, lists) -> {
+                        //search already processed wires
+                        String passiveHash = Utils.getHash(lists.passivePins);
+                        if (wires.containsKey(passiveHash)) {
+                            //if found by passive pins - connect it and don't process further
+                            busMerger.addSource(wires.get(passiveHash), offset);
+                        } else {
+                            String wireHash = Utils.getHash(lists.pins);
+                            if (wires.containsKey(wireHash)) {
+                                //if found by usual pins (complete wire merger) - connect it and don't process further
+                                busMerger.addSource(wires.get(wireHash), offset);
                             } else {
-                                mergers.put(wireMerger.getHash(), wireMerger);
+                                //process unprocessed wire
+                                busMerger.addSource(Model.this, lists.pins, lists.passivePins, offset);
                             }
                         }
-                    }
+                    });
+                    //add all buses
+                    descriptor.buses.forEach((source, offsets) -> offsets.forEach((offset, mask) -> busMerger.addSource(source, mask, offset)));
+                    busMergers.put(busMergerHash, busMerger);
                 }
-                if (mergers.containsKey(merger.getHash())) {
-                    mergers.get(merger.getHash()).addDestination(inItem, 0L, (byte) 0);
+            } else {
+                //use direct connect to destination
+                if (descriptor.buses.isEmpty()) {
+                    //pin-to-bus
+                    //search if wire already processed
+                    descriptor.offsets.forEach((offset, lists) -> {
+                        //search already processed wires
+                        String passiveHash = Utils.getHash(lists.passivePins);
+                        if (wires.containsKey(passiveHash)) {
+                            //if found by passive pins - connect it and don't process further
+                            wires.get(passiveHash).addDestination(destination, offset);
+                        } else {
+                            String wireHash = Utils.getHash(lists.pins);
+                            if (wires.containsKey(wireHash)) {
+                                //if found by usual pins (complete wire merger) - connect it and don't process further
+                                wires.get(wireHash).addDestination(destination, offset);
+                            } else {
+                                //process unprocessed wire
+                                if (lists.pins.size() > 1) {
+                                    //use wire merger
+                                    processWire(new WireToBusAdapter(destination, offset), lists.pins, lists.passivePins, null);
+                                } else {
+                                    //use direct wire connect
+                                    lists.pins.getFirst().addDestination(destination, offset);
+                                }
+                            }
+                        }
+                    });
                 } else {
-                    mergers.put(merger.getHash(), merger);
+                    //bus-to-bus connection
+                    descriptor.buses.forEach((source, offsetMap) -> offsetMap.forEach((offset, mask) -> source.addDestination(destination, mask, offset)));
                 }
             }
         });
-        for (IMerger merger : mergers.values()) {
-            merger.bind();
+        for (SchemaPart p : schemaParts.values()) {
+            for (IModelItem<?> outItem : p.outPins.values()
+                    .stream().distinct().toList()) {
+                replaceOut(outItem);
+            }
         }
-        schemaParts.values()
-                .stream()
-                .flatMap(p -> p.outMap.values()
-                        .stream())
-                .forEach(outItem -> {
-                    IModelItem newItem = outItem.getOptimised();
-                    if (outItem != newItem) {
-                        replaceOut(outItem, newItem);
-                    }
-                });
     }
 
-    private void replaceOut(IModelItem outItem, IModelItem newOutItem) {
-        outItem.getParent().replaceOut(outItem, newOutItem);
+    private void replaceOut(IModelItem<?> outItem) {
+        outItem.getParent().replaceOut(outItem);
     }
 
     private void createSchemaPart(Comp component, SchemaPartMap map) {
@@ -315,25 +449,34 @@ public class Model {
 
     private void stabilise() {
         stabilizing = true;
-        List<IModelItem> items = schemaParts.values()
+        List<IModelItem<?>> items = schemaParts.values()
                 .stream()
-                .flatMap(p -> p.outMap.values()
-                        .stream())
+                .flatMap(p -> p.outPins.values()
+                        .stream().distinct())
                 .toList();
         while (stabilizing) {
             stabilizing = false;
             items.forEach(item -> {
                 try {
-                    assert Log.debug(Model.class, "Resend {}", item);
+                    assert Log.debug(Model.class, "Resend pin {}", item);
                     item.resend();
                 } catch (FloatingInException | ShortcutException e) {
                     assert Log.debug(Model.class, "Item stabilising exception", e);
                     stabilizing = true;
                 }
             });
-            mergers.values().forEach(merger -> {
+            wires.values().forEach(merger -> {
                 try {
-                    assert Log.debug(Model.class, "Resend {}", merger);
+                    assert Log.debug(Model.class, "Resend wire merger {}", merger);
+                    merger.resend();
+                } catch (FloatingInException | ShortcutException e) {
+                    assert Log.debug(Model.class, "Merger stabilising exception", e);
+                    stabilizing = true;
+                }
+            });
+            busMergers.values().forEach(merger -> {
+                try {
+                    assert Log.debug(Model.class, "Resend bus merger {}", merger);
                     merger.resend();
                 } catch (FloatingInException | ShortcutException e) {
                     assert Log.debug(Model.class, "Merger stabilising exception", e);
@@ -347,21 +490,56 @@ public class Model {
                 stabilizing = true;
             }
         }
+        stabilized = true;
     }
 
-    public record PinMapDescriptor(String pinName, SchemaPart schemaPart) {
-    }
+    private static class DestinationBusDescriptor {
+        //Bus, offset, mask
+        public HashMap<OutBus, Map<Byte, Long>> buses = new HashMap<>();
+        //Pin, offset
+        public HashMap<Byte, BusPinsOffset> offsets = new HashMap<>();
 
-    //OutPin, offset, outMask
-    public static class InItemDescriptor extends HashMap<ModelOutItem, Map<Byte, Long>> {
-        public long getPermutationCount() {
-            return values().stream().mapToLong(Map::size).sum();
+        public boolean useBusMerger() {
+            return buses.values()
+                    .stream().mapToLong(Map::size).sum() + offsets.values().size() > 1;
         }
 
-        public void addInItem(ModelOutItem outItem, byte outOffset, byte inOffset) {
-            byte offset = (byte) (inOffset - outOffset);
-            long newMask = computeIfAbsent(outItem, p -> new HashMap<>()).computeIfAbsent(offset, p -> 0L) | (1L << outOffset);
-            get(outItem).put(offset, newMask);
+        public void add(IModelItem item, byte sourceOffset, byte destinationOffset) {
+            switch (item) {
+                case PassivePin passivePin -> offsets.computeIfAbsent(destinationOffset, e -> new BusPinsOffset()).passivePins.add(passivePin);
+                case OutPin pin -> offsets.computeIfAbsent(destinationOffset, e -> new BusPinsOffset()).pins.add(pin);
+                case OutBus bus -> {
+                    byte offset = (byte) (destinationOffset - sourceOffset);
+                    long newMask = buses.computeIfAbsent(bus, p -> new HashMap<>()).computeIfAbsent(offset, p -> 0L) | (1L << sourceOffset);
+                    buses.get(bus).put(offset, newMask);
+                }
+                default -> throw new IllegalStateException("Unsupported item: " + item.getClass().getName());
+            }
+        }
+    }
+
+    private static class BusPinsOffset {
+        public List<OutPin> pins = new ArrayList<>();
+        public List<PassivePin> passivePins = new ArrayList<>();
+    }
+
+    public static class DestinationWireDescriptor {
+        //Bus, offset
+        public final HashMap<OutBus, Long> buses = new HashMap<>();
+        //Pin, offset
+        public final List<OutPin> pins = new ArrayList<>();
+        public final List<PassivePin> passivePins;
+
+        public DestinationWireDescriptor(List<PassivePin> passivePins) {
+            this.passivePins = passivePins;
+        }
+
+        public void add(IModelItem item, byte offset) {
+            switch (item) {
+                case OutPin pin -> pins.add(pin);
+                case OutBus bus -> buses.put(bus, 1L << offset);
+                default -> throw new IllegalStateException("Unsupported item: " + item.getClass().getName());
+            }
         }
     }
 }

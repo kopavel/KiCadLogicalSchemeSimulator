@@ -33,9 +33,9 @@ package pko.KiCadLogicalSchemeSimulator.model.bus;
 import pko.KiCadLogicalSchemeSimulator.api_v2.bus.Bus;
 
 public class OffsetBus extends Bus {
-    private final Bus destination;
     private final byte offset;
     private final byte nOffset;
+    private Bus destination;
 
     public OffsetBus(Bus destination, byte offset) {
         super(destination, "offset" + offset);
@@ -65,6 +65,7 @@ public class OffsetBus extends Bus {
 
     @Override
     public Bus getOptimised() {
+        destination = destination.getOptimised();
         if (offset > 0) {
             return new OffsetBus(this, offset) {
                 @Override

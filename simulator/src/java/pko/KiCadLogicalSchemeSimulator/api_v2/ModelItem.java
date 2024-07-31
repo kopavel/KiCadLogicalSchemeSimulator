@@ -34,7 +34,7 @@ import lombok.Getter;
 import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
 
 @Getter
-public abstract class ModelItem implements IModelItem {
+public abstract class ModelItem<T> implements IModelItem<T> {
     public String id;
     public SchemaPart parent;
     public String variantId;
@@ -46,7 +46,7 @@ public abstract class ModelItem implements IModelItem {
     }
 
     @Override
-    public ModelItem getOptimised() {
+    public ModelItem<T> getOptimised() {
         return this;
     }
 
@@ -60,4 +60,9 @@ public abstract class ModelItem implements IModelItem {
     }
 
     public abstract void setHiImpedance();
+
+    @Override
+    public int compareTo(IModelItem other) {
+        return getName().compareTo(other.getName());
+    }
 }

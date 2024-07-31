@@ -31,7 +31,6 @@
  */
 package pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart;
 import pko.KiCadLogicalSchemeSimulator.api_v2.IModelItem;
-import pko.KiCadLogicalSchemeSimulator.api_v2.ModelInItem;
 import pko.KiCadLogicalSchemeSimulator.api_v2.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api_v2.bus.OutBus;
 import pko.KiCadLogicalSchemeSimulator.api_v2.bus.in.CorrectedInBus;
@@ -43,19 +42,17 @@ import pko.KiCadLogicalSchemeSimulator.api_v2.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.InPin;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 @SuppressWarnings("unused")
 public abstract class SchemaPart {
     public final String id;
-    public final Map<String, IModelItem> outMap = new LinkedHashMap<>();
-    public final Map<String, ModelInItem> inMap = new LinkedHashMap<>();
+    public final Map<String, PassivePin> passivePins = new HashMap<>();
+    public final Map<String, IModelItem<?>> inPins = new HashMap<>();
+    public final Map<String, IModelItem<?>> outPins = new HashMap<>();
     protected final Map<String, String> params = new HashMap<>();
     protected final boolean reverse;
     protected final boolean nReverse;
-    private final Map<String, ModelInItem> inAliasMap = new HashMap<>();
-    private final Map<String, IModelItem> outAliasMap = new HashMap<>();
     public Map<Integer, String> pinNumberMap;
     protected long hiState;
     protected long loState;
@@ -100,28 +97,22 @@ public abstract class SchemaPart {
     }
 
     public <T extends InPin> T addInPin(T pin) {
-        inMap.put(pin.id, pin);
-        inAliasMap.put(pin.id, pin);
+        inPins.put(pin.id, pin);
         return pin;
     }
 
     public PassivePin addPassivePin(PassivePin pin) {
-        outMap.put(pin.id, pin);
-        outAliasMap.put(pin.id, pin);
-        inMap.put(pin.id, pin);
-        inAliasMap.put(pin.id, pin);
+        passivePins.put(pin.id, pin);
         return pin;
     }
 
     public void addOutPin(String pinId) {
-        OutPin pin = new OutPin(pinId, this);
-        outAliasMap.put(pinId, pin);
-        outMap.put(pinId, pin);
+        outPins.put(pinId, new OutPin(pinId, this));
     }
 
     public void addOutPin(String pinId, boolean state, boolean strong) {
         addOutPin(pinId);
-        OutPin pin = (OutPin) outMap.get(pinId);
+        OutPin pin = (OutPin) outPins.get(pinId);
         pin.state = state;
         pin.strong = strong;
         pin.hiImpedance = false;
@@ -153,52 +144,46 @@ public abstract class SchemaPart {
     }
 
     public <T extends InBus> T addInBus(T bus) {
-        inMap.put(bus.id, bus);
+        inPins.put(bus.id, bus);
         for (String alias : bus.aliasOffsets.keySet()) {
-            inAliasMap.put(alias, bus);
+            inPins.put(alias, bus);
         }
         return bus;
     }
 
     public void addOutBus(String pinId, int size, String... names) {
         OutBus pin = new OutBus(pinId, this, size, names);
+        outPins.put(pinId, pin);
         for (String alias : pin.aliasOffsets.keySet()) {
-            outAliasMap.put(alias, pin);
+            outPins.put(alias, pin);
         }
-        outMap.put(pinId, pin);
     }
 
     public void addOutBus(String pinId, int size, long state, String... names) {
         addOutBus(pinId, size, names);
-        OutBus pin = (OutBus) outMap.get(pinId);
+        OutBus pin = (OutBus) outPins.get(pinId);
         pin.state = state;
         pin.hiImpedance = false;
     }
 
-    public ModelInItem getInItem(String name) {
-        ModelInItem item = inMap.get(name);
-        if (item == null) {
-            item = inAliasMap.get(name);
-        }
+    public IModelItem<?> getInItem(String name) {
+        IModelItem<?> item = inPins.get(name);
         if (item == null) {
             throw new RuntimeException("Unknown input item " + name + " in SchemaPart " + id);
         }
         return item;
     }
 
-    public IModelItem getOutItem(String name) {
-        IModelItem pin = outMap.get(name);
-        if (pin == null) {
-            pin = outAliasMap.get(name);
+    public IModelItem<?> getOutItem(String name) {
+        IModelItem<?> item = outPins.get(name);
+        if (item != null) {
+            return item;
         }
-        if (pin == null) {
-            throw new RuntimeException("Unknown output item " + name + " in SchemaPart " + id);
-        }
-        return pin;
+        throw new RuntimeException("Unknown output item " + name + " in SchemaPart " + id);
     }
 
     public Bus getOutBus(String name) {
-        IModelItem item = getOutItem(name);
+        IModelItem<?> item = getOutItem(name);
         if (item instanceof Bus bus) {
             return bus;
         }
@@ -206,7 +191,7 @@ public abstract class SchemaPart {
     }
 
     public Pin getOutPin(String name) {
-        IModelItem item = getOutItem(name);
+        IModelItem<?> item = getOutItem(name);
         if (item instanceof Pin pin) {
             return pin;
         }
@@ -219,17 +204,19 @@ public abstract class SchemaPart {
 
     public abstract void initOuts();
 
-    public <T extends IModelItem> void replaceOut(T outPin, T newOutPin) {
-        switch (outPin) {
-            case OutPin pin -> outAliasMap.put(outPin.getId(), newOutPin);
-            case OutBus bus -> {
+    public <T> void replaceOut(IModelItem<T> outPin) {
+        IModelItem<T> newOutPin = outPin.getOptimised();
+        if (outPin != newOutPin) {
+            newOutPin.copyState(outPin);
+            outPins.put(outPin.getId(), newOutPin);
+            if (outPin instanceof Bus) {
                 for (String alias : outPin.getAliases()) {
-                    outAliasMap.put(alias, newOutPin);
+                    outPins.put(alias, newOutPin);
                 }
+            } else if (!(outPin instanceof Pin)) {
+                throw new RuntimeException("Unsupported item: " + outPin.getClass().getName());
             }
-            default -> throw new RuntimeException("Unsupported ModelOutItem: " + outPin.getClass().getName());
         }
-        outMap.put(outPin.getId(), newOutPin);
     }
 
     public void reset() {

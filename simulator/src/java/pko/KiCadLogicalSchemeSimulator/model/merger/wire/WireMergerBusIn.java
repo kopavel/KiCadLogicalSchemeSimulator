@@ -37,7 +37,7 @@ import pko.KiCadLogicalSchemeSimulator.api_v2.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.model.merger.MergerInput;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
-public class WireMergerBusIn extends CorrectedInBus implements MergerInput {
+public class WireMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
     public final long mask;
     private final WireMerger merger;
 
@@ -61,7 +61,7 @@ public class WireMergerBusIn extends CorrectedInBus implements MergerInput {
                 merger.hiImpedance);
         state = newState;
         if (hiImpedance && merger.strong) { //merger already in strong
-            throw new ShortcutException(merger.mergerInputs);
+            throw new ShortcutException(merger.sources);
         }
         if (merger.state != (state > 0)) { //merger state changes
             merger.state = state > 0;
@@ -104,10 +104,5 @@ public class WireMergerBusIn extends CorrectedInBus implements MergerInput {
         }
         hiImpedance = true;
         merger.strong = false;
-    }
-
-    @Override
-    public String getHash() {
-        return mask + ":" + getName();
     }
 }

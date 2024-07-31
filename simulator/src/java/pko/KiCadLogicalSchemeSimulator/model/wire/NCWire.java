@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.model.wire;
-import pko.KiCadLogicalSchemeSimulator.api_v2.IModelItem;
+import pko.KiCadLogicalSchemeSimulator.api_v2.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api_v2.wire.OutPin;
 import pko.KiCadLogicalSchemeSimulator.api_v2.wire.Pin;
 
@@ -40,8 +40,13 @@ public class NCWire extends OutPin {
     }
 
     @Override
-    public void addDestination(IModelItem item, long mask, byte offset) {
-        throw new RuntimeException("Can't add destination to NC Out Pin");
+    public void addDestination(Pin pin) {
+        throw new UnsupportedOperationException("Can't add destination to NC Out Pin");
+    }
+
+    @Override
+    public void addDestination(Bus bus, byte offset) {
+        throw new UnsupportedOperationException("Can't add destination to NC Out Pin");
     }
 
     @Override

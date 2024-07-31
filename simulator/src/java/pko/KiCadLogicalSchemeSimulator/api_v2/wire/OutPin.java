@@ -30,8 +30,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.api_v2.wire;
-import pko.KiCadLogicalSchemeSimulator.api_v2.IModelItem;
-import pko.KiCadLogicalSchemeSimulator.api_v2.ModelOutItem;
 import pko.KiCadLogicalSchemeSimulator.api_v2.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.model.wire.NCWire;
@@ -39,7 +37,7 @@ import pko.KiCadLogicalSchemeSimulator.model.wire.WireToBusAdapter;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 //FixMe use one destination with splitter
-public class OutPin extends Pin implements ModelOutItem {
+public class OutPin extends Pin {
     public Pin[] destinations = new Pin[0];
 
     public OutPin(String id, SchemaPart parent) {
@@ -48,25 +46,20 @@ public class OutPin extends Pin implements ModelOutItem {
 
     public OutPin(Pin oldPin, String variantId) {
         super(oldPin, variantId);
-        strong = oldPin.strong;
     }
 
-    public void addDestination(IModelItem item, long mask, byte offset) {
-        if (destinations.length == 1 && destinations[0] instanceof PassivePin passivePin) {
-            passivePin.addDestination(item, mask, offset);
-        } else {
-            switch (item) {
-                case PassivePin passivePin -> {
-                    passivePin.destinations = destinations;
-                    destinations = new Pin[]{passivePin};
-                }
-                case Pin pin -> {
-                    destinations = Utils.addToArray(destinations, pin);
-                }
-                case Bus bus -> destinations = Utils.addToArray(destinations, new WireToBusAdapter(this, bus, offset));
-                default -> throw new RuntimeException("Unsupported destination " + item.getClass().getName());
+    public void addDestination(Pin pin) {
+        if (pin != this) {
+            if (destinations.length == 1 && destinations[0] instanceof PassivePin passivePin) {
+                passivePin.addDestination(pin);
+            } else {
+                destinations = Utils.addToArray(destinations, pin);
             }
         }
+    }
+
+    public void addDestination(Bus bus, byte offset) {
+        destinations = Utils.addToArray(destinations, new WireToBusAdapter(bus, offset));
     }
 
     @Override
@@ -87,8 +80,6 @@ public class OutPin extends Pin implements ModelOutItem {
     public void resend() {
         if (!hiImpedance) {
             for (Pin destination : destinations) {
-                destination.state = state;
-                destination.strong = strong;
                 destination.setState(state, strong);
             }
         }

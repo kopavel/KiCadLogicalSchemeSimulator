@@ -31,16 +31,48 @@
  */
 package pko.KiCadLogicalSchemeSimulator.model.wire;
 import pko.KiCadLogicalSchemeSimulator.api_v2.bus.Bus;
+import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.OutPin;
 import pko.KiCadLogicalSchemeSimulator.api_v2.wire.Pin;
+import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
-public class WireToBusesAdapter extends Pin {
-    private final Bus[] destinations;
+public class WireToBusesAdapter extends OutPin {
     public long mask;
+    private Bus[] destinations;
 
     public WireToBusesAdapter(Pin src, Bus[] destinations, byte offset) {
-        super(src.id, src.parent);
+        this(src.id, src.parent, destinations, offset);
+    }
+
+    public WireToBusesAdapter(String id, SchemaPart parent, Bus[] destinations, byte offset) {
+        super(id, parent);
         mask = 1L << offset;
         this.destinations = destinations;
+    }
+
+    @Override
+    public void addDestination(Bus bus, byte offset) {
+        if (mask != (1L << offset)) {
+            throw new RuntimeException("Can't add bus with offset " + offset + " to adapter with mask " + mask);
+        }
+        destinations = Utils.addToArray(destinations, bus);
+    }
+
+    @Override
+    public void addDestination(Pin pin) {
+        throw new UnsupportedOperationException("Can't add Pin as destination to WireToBusesAdapter");
+    }
+
+    @Override
+    public Pin getOptimised() {
+        if (destinations.length == 0) {
+            return new NCWire(this);
+        } else {
+            for (int i = 0; i < destinations.length; i++) {
+                destinations[i] = destinations[i].getOptimised();
+            }
+            return this;
+        }
     }
 
     @Override

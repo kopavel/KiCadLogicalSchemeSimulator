@@ -226,11 +226,11 @@ public class Diagram extends JPanel {
     }
 
     private static final class PinItem implements Comparable<PinItem> {
-        private final IModelItem pin;
+        private final IModelItem<?> pin;
         private final String name;
         private final RingBuffer buffer;
 
-        private PinItem(IModelItem pin, String name) {
+        private PinItem(IModelItem<?> pin, String name) {
             this.pin = pin;
             this.name = name;
             if (pin.getSize() < 8) {

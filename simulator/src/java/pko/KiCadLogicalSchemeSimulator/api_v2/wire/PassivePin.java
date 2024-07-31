@@ -30,38 +30,22 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.api_v2.wire;
-import pko.KiCadLogicalSchemeSimulator.api_v2.IModelItem;
-import pko.KiCadLogicalSchemeSimulator.api_v2.ModelInItem;
-import pko.KiCadLogicalSchemeSimulator.api_v2.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
-public abstract class PassivePin extends OutPin implements ModelInItem {
+public abstract class PassivePin extends OutPin {
     public PassivePin(String id, SchemaPart parent) {
         super(id, parent);
-    }
-
-    public void addDestination(IModelItem item, long mask, byte offset) {
-        if (item == this) {
-            return;
-        }
-        switch (item) {
-            case Pin pin -> destinations = Utils.addToArray(destinations, pin);
-            case Bus bus -> throw new RuntimeException("Can't add bus as destination for PassivePin" + this + "; bus:" + bus);
-            default -> throw new RuntimeException("Unsupported destination " + item.getClass().getName());
-        }
     }
 
     @Override
     abstract public void setState(boolean newState, boolean strong);
     @Override
     abstract public void setHiImpedance();
+    @Override
+    abstract public void resend();
 
     @Override
     public Pin getOptimised() {
         return this;
     }
-
-    @Override
-    abstract public void resend();
 }

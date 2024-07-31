@@ -34,7 +34,7 @@ import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
 
 import java.util.Set;
 
-public interface IModelItem {
+public interface IModelItem<T> extends Comparable<IModelItem<T>> {
     String getName();
     int getSize();
     long getState();
@@ -44,6 +44,7 @@ public interface IModelItem {
     Set<String> getAliases();
     SchemaPart getParent();
     String getId();
-    IModelItem getOptimised();
+    IModelItem<T> getOptimised();
     void resend();
+    void copyState(IModelItem<T> oldItem);
 }

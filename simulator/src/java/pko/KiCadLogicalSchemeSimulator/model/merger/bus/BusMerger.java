@@ -30,33 +30,30 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.model.merger.bus;
-import pko.KiCadLogicalSchemeSimulator.api_v2.IModelItem;
-import pko.KiCadLogicalSchemeSimulator.api_v2.ModelOutItem;
 import pko.KiCadLogicalSchemeSimulator.api_v2.ShortcutException;
 import pko.KiCadLogicalSchemeSimulator.api_v2.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api_v2.bus.OutBus;
 import pko.KiCadLogicalSchemeSimulator.api_v2.bus.in.InBus;
 import pko.KiCadLogicalSchemeSimulator.api_v2.wire.OutPin;
-import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.InPin;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.PassivePin;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.Pin;
+import pko.KiCadLogicalSchemeSimulator.model.Model;
 import pko.KiCadLogicalSchemeSimulator.model.bus.BusInInterconnect;
-import pko.KiCadLogicalSchemeSimulator.model.merger.DestinationDescriptor;
-import pko.KiCadLogicalSchemeSimulator.model.merger.IMerger;
 import pko.KiCadLogicalSchemeSimulator.model.merger.MergerInput;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 //FixMe use one destination with splitter
 //FixMe create pure bus (no pin/strength) implementation
-public class BusMerger extends OutBus implements IMerger {
-    public final Map<ModelOutItem, DestinationDescriptor> forBind = new HashMap<>();
-    public MergerInput[] inputs = new MergerInput[0];
+public class BusMerger extends OutBus {
+    public MergerInput<?>[] sources = new MergerInput[0];
     public long strongPins;
     public long weakPins;
     public long weakState;
-    public Map<Byte, BusMergerWireIn> wires = new HashMap<>();
-    public String hash;
 
     public BusMerger(Bus destination) {
         super(destination.id, destination.parent, destination.size);
@@ -69,90 +66,75 @@ public class BusMerger extends OutBus implements IMerger {
         destinations = new Bus[]{destination};
     }
 
-    @Override
-    public void addDestination(IModelItem item, long mask, byte offset) {
+    //fixme what about optimisation?
+    public void addDestination(Bus item) {
         switch (item) {
-            case InPin ignored -> throw new RuntimeException("Use WireMerger for pin destination");
             case BusInInterconnect interconnect -> {
                 this.mask &= interconnect.inverseInterconnectMask;
-                this.mask |= mask;
+                this.mask |= interconnect.senseMask;
                 destinations = Utils.addToArray(destinations, interconnect);
             }
             case InBus bus -> destinations = Utils.addToArray(destinations, bus);
             default -> throw new RuntimeException("Unsupported destination " + item.getClass().getName());
         }
         id += "/" + item.getName();
-        wires.values().forEach(i -> i.id = id + ":in");
     }
 
-    public String getHash() {
-        return "mask" + mask + ":" + Arrays.stream(inputs)
-                .map(MergerInput::getHash)
-                .collect(Collectors.joining(";"));
-    }
-
-    public void addSource(ModelOutItem src, long srcMask, byte offset) {
-        MergerInput input = null;
-        switch (src) {
-            case OutPin pin -> {
-                long destinationMask = 1L << offset;
-                if (wires.containsKey(offset)) {
-                    wires.get(offset).addSource(pin);
-                } else {
-                    input = new BusMergerWireIn(pin, destinationMask, offset, this);
-                    wires.put(offset, (BusMergerWireIn) input);
-                }
-                if (!pin.hiImpedance) {
-                    if (pin.strong) {
-                        if ((strongPins & destinationMask) != 0) {
-                            Set<ModelOutItem> items = new HashSet<>(forBind.keySet());
-                            items.add(src);
-                            throw new ShortcutException(items.toArray(new ModelOutItem[0]));
-                        }
-                        strongPins |= destinationMask;
-                        if (pin.state) {
-                            state |= destinationMask;
-                        }
-                    } else {
-                        if ((weakPins & destinationMask) > 0 && ((weakState & destinationMask) > 0) != pin.state) {
-                            Set<ModelOutItem> items = new HashSet<>(forBind.keySet());
-                            items.add(src);
-                            throw new ShortcutException(items.toArray(new ModelOutItem[0]));
-                        }
-                        weakPins |= destinationMask;
-                        weakState |= pin.state ? destinationMask : 0;
-                        if (pin.state && (strongPins & destinationMask) == 0) {
-                            state |= destinationMask;
-                        }
-                    }
-                }
+    public void addSource(OutBus bus, long srcMask, byte offset) {
+        long destinationMask = offset == 0 ? srcMask : (offset > 0 ? srcMask << offset : srcMask >> -offset);
+        BusMergerBusIn input = new BusMergerBusIn(bus, destinationMask, this);
+        bus.addDestination(input, srcMask, offset);
+        sources = Utils.addToArray(sources, input);
+        if (!bus.hiImpedance) {
+            if ((strongPins & destinationMask) != 0) {
+                throw new ShortcutException(sources);
             }
-            case OutBus bus -> {
-                long destinationMask = offset == 0 ? srcMask : (offset > 0 ? srcMask << offset : srcMask >> -offset);
-                input = new BusMergerBusIn(bus, destinationMask, this);
-                if (!bus.hiImpedance) {
-                    if ((strongPins & destinationMask) != 0) {
-                        Set<ModelOutItem> items = new HashSet<>(forBind.keySet());
-                        items.add(src);
-                        throw new ShortcutException(items.toArray(new ModelOutItem[0]));
-                    }
-                    state |= bus.state;
-                    strongPins |= destinationMask;
-                }
-                forBind.put(src, new DestinationDescriptor(input, srcMask, offset));
-            }
-            default -> throw new RuntimeException("Unsupported item " + src.getClass().getName());
+            state |= bus.state;
+            strongPins |= destinationMask;
         }
-        if (input != null) {
-            inputs = Utils.addToArray(inputs, input);
-            Arrays.sort(inputs, Comparator.comparing(MergerInput::getName));
-        }
+        Arrays.sort(sources, Comparator.comparing(MergerInput::getName));
         hiImpedance = (strongPins | weakPins) != mask;
-        hash = getHash();
     }
 
-    public void bind() {
-        forBind.forEach((source, descriptor) -> source.addDestination(descriptor.item, descriptor.mask, descriptor.offset));
+    public void addSource(OutPin pin, byte offset) {
+        long destinationMask = 1L << offset;
+        BusMergerWireIn input = new BusMergerWireIn(destinationMask, this);
+        pin.addDestination(input);
+        processPin(pin, input, destinationMask);
+    }
+
+    public void addSource(Model model, List<OutPin> pins, List<PassivePin> passivePins, Byte offset) {
+        long destinationMask = 1L << offset;
+        BusMergerWireIn input = new BusMergerWireIn(destinationMask, this);
+        Pin pin = model.processWire(input, pins, passivePins, Collections.emptyMap());
+        processPin(pin, input, destinationMask);
+    }
+
+    private void processPin(Pin pin, BusMergerWireIn input, long destinationMask) {
+        input.source = pin;
+        sources = Utils.addToArray(sources, input);
+        if (!pin.hiImpedance) {
+            if (pin.strong) {
+                if ((strongPins & destinationMask) != 0) {
+                    throw new ShortcutException(sources);
+                }
+                strongPins |= destinationMask;
+                if (pin.state) {
+                    state |= destinationMask;
+                }
+            } else {
+                if ((weakPins & destinationMask) > 0 && ((weakState & destinationMask) > 0) != pin.state) {
+                    throw new ShortcutException(sources);
+                }
+                weakPins |= destinationMask;
+                weakState |= pin.state ? destinationMask : 0;
+                if (pin.state && (strongPins & destinationMask) == 0) {
+                    state |= destinationMask;
+                }
+            }
+        }
+        Arrays.sort(sources, Comparator.comparing(MergerInput::getName));
+        hiImpedance = (strongPins | weakPins) != mask;
     }
 
     @Override

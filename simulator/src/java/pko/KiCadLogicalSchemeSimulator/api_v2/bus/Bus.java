@@ -31,6 +31,7 @@
  */
 package pko.KiCadLogicalSchemeSimulator.api_v2.bus;
 import lombok.Getter;
+import pko.KiCadLogicalSchemeSimulator.api_v2.IModelItem;
 import pko.KiCadLogicalSchemeSimulator.api_v2.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.model.bus.BusToWireAdapter;
@@ -40,7 +41,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public abstract class Bus extends ModelItem {
+public abstract class Bus extends ModelItem<Bus> {
     @Getter
     public final int size;
     public long state;
@@ -94,6 +95,12 @@ public abstract class Bus extends ModelItem {
     }
 
     abstract public void setState(long newState);
+
+    @Override
+    public void copyState(IModelItem<Bus> oldBus) {
+        this.state = oldBus.getState();
+        this.hiImpedance = oldBus.isHiImpedance();
+    }
 
     @Override
     public Bus getOptimised() {

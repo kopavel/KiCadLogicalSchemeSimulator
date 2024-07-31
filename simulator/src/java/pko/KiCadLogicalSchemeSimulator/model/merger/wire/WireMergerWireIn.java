@@ -36,7 +36,7 @@ import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.InPin;
 import pko.KiCadLogicalSchemeSimulator.model.merger.MergerInput;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
-public class WireMergerWireIn extends InPin implements MergerInput {
+public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
     private final WireMerger merger;
 
     public WireMergerWireIn(Pin source, WireMerger merger) {
@@ -65,19 +65,19 @@ public class WireMergerWireIn extends InPin implements MergerInput {
         if (newStrong) { // to strong
             if (!strong) { // from weak
                 if (merger.strong) {
-                    throw new ShortcutException(merger.mergerInputs); //but merger already strong
+                    throw new ShortcutException(merger.sources); //but merger already strong
                 }
                 if (!hiImpedance) {
                     merger.weakState -= (byte) (merger.weakState > 0 ? 1 : -1); //count down weak states
                 }
             } else if (hiImpedance && merger.strong) { //from hiImpedance but merger already strong
-                throw new ShortcutException(merger.mergerInputs);
+                throw new ShortcutException(merger.sources);
             }
             merger.state = state;
             merger.strong = true;
         } else { //to weak
             if (merger.weakState != 0 && (merger.weakState > 0 ^ state)) {
-                throw new ShortcutException(merger.mergerInputs); // merger in opposite weak state
+                throw new ShortcutException(merger.sources); // merger in opposite weak state
             }
             if (strong) { // from string
                 merger.weakState += (byte) (state ? 1 : -1); // count up weak state
@@ -131,10 +131,5 @@ public class WireMergerWireIn extends InPin implements MergerInput {
             }
         }
         hiImpedance = true;
-    }
-
-    @Override
-    public String getHash() {
-        return getName();
     }
 }

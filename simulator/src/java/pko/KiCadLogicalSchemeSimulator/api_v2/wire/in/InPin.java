@@ -30,11 +30,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.api_v2.wire.in;
-import pko.KiCadLogicalSchemeSimulator.api_v2.ModelInItem;
 import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api_v2.wire.Pin;
 
-public abstract class InPin extends Pin implements ModelInItem {
+public abstract class InPin extends Pin {
     public InPin(String id, SchemaPart parent) {
         super(id, parent);
     }

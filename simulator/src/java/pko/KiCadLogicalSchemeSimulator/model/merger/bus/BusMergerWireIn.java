@@ -30,47 +30,27 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.model.merger.bus;
-import pko.KiCadLogicalSchemeSimulator.api_v2.ModelOutItem;
+import pko.KiCadLogicalSchemeSimulator.api_v2.IModelItem;
 import pko.KiCadLogicalSchemeSimulator.api_v2.ShortcutException;
 import pko.KiCadLogicalSchemeSimulator.api_v2.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.api_v2.wire.OutPin;
 import pko.KiCadLogicalSchemeSimulator.api_v2.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.InPin;
 import pko.KiCadLogicalSchemeSimulator.model.merger.MergerInput;
-import pko.KiCadLogicalSchemeSimulator.model.merger.wire.WireMerger;
 import pko.KiCadLogicalSchemeSimulator.model.merger.wire.WireMergerWireIn;
-import pko.KiCadLogicalSchemeSimulator.model.wire.WireToBusAdapter;
-import pko.KiCadLogicalSchemeSimulator.model.wire.WireToBusesAdapter;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
-public class BusMergerWireIn extends InPin implements MergerInput {
+public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
     public final long mask;
     public final long nMask;
-    private final byte offset;
     private final BusMerger merger;
-    public Pin input;
+    public IModelItem<?> source;
 
-    public BusMergerWireIn(OutPin source, long mask, byte offset, BusMerger merger) {
-        super(source, "BMergePIn");
+    public BusMergerWireIn(long mask, BusMerger merger) {
+        super(merger.id + ":in", merger.parent);
+        variantId = "BMergePIn";
         this.mask = mask;
         nMask = ~mask;
-        this.offset = offset;
         this.merger = merger;
-        id = merger.id + ":in";
-        parent = merger.parent;
-        WireMerger wireMerger = new WireMerger(this);
-        wireMerger.id = id;
-        wireMerger.parent = merger.parent;
-        wireMerger.addSource(source, mask, offset);
-        this.input = wireMerger;
-    }
-
-    public void addSource(ModelOutItem newSource) {
-        if (input instanceof WireMerger wireMerger) {
-            wireMerger.addSource(newSource, 0L, (byte) 0);
-        } else {
-            throw new RuntimeException("Can't add source to non Merger input");
-        }
     }
 
     @Override
@@ -94,7 +74,7 @@ public class BusMergerWireIn extends InPin implements MergerInput {
         state = newState;
         if (newStrong) { //to strong
             if (hiImpedance && (merger.strongPins & mask) != 0) {
-                throw new ShortcutException(merger.inputs);
+                throw new ShortcutException(merger.sources);
             }
             if (hiImpedance) {
                 merger.strongPins |= mask;
@@ -110,7 +90,7 @@ public class BusMergerWireIn extends InPin implements MergerInput {
             }
         } else { //to weak
             if ((merger.weakPins & mask) > 0 && ((merger.weakState & mask) > 0) != state) {
-                throw new ShortcutException(merger.inputs);
+                throw new ShortcutException(merger.sources);
             }
             if (hiImpedance) {
                 merger.weakPins |= mask;
@@ -212,27 +192,5 @@ public class BusMergerWireIn extends InPin implements MergerInput {
                 merger.weakState,
                 merger.weakPins,
                 merger.hiImpedance);
-    }
-
-    @Override
-    public String getHash() {
-        if (input instanceof WireMerger wireMerger) {
-            return mask + ":" + wireMerger.getHash();
-        } else {
-            return mask + ":" + getName();
-        }
-    }
-
-    @Override
-    public Pin getOptimised() {
-        if (merger.inputs.length == 1) {
-            if (merger.destinations.length == 1) {
-                return new WireToBusAdapter(this, merger.destinations[0], offset);
-            } else {
-                return new WireToBusesAdapter(this, merger.destinations, offset);
-            }
-        } else {
-            return this;
-        }
     }
 }
