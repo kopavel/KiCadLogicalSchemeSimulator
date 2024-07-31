@@ -62,7 +62,7 @@ public abstract class ModelItem<T> implements IModelItem<T> {
     public abstract void setHiImpedance();
 
     @Override
-    public int compareTo(IModelItem other) {
+    public int compareTo(IModelItem<T> other) {
         return getName().compareTo(other.getName());
     }
 }

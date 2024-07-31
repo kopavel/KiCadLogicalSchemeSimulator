@@ -36,7 +36,6 @@ import pko.KiCadLogicalSchemeSimulator.api_v2.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api_v2.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.InPin;
 import pko.KiCadLogicalSchemeSimulator.model.merger.MergerInput;
-import pko.KiCadLogicalSchemeSimulator.model.merger.wire.WireMergerWireIn;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
@@ -55,7 +54,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
 
     @Override
     public void setState(boolean newState, boolean newStrong) {
-        assert Log.debug(WireMergerWireIn.class,
+        assert Log.debug(BusMergerWireIn.class,
                 "Bus merger change. before: newState:{}, newStrong:{}, Source:{} (state:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, " +
                         "weakState:{}, weakPins:{}, hiImpedance:{})",
                 newState,
@@ -121,7 +120,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
         }
         strong = newStrong;
         hiImpedance = false;
-        assert Log.debug(WireMergerWireIn.class,
+        assert Log.debug(BusMergerWireIn.class,
                 "Bus merger change. after: newState:{}, newStrong:{}, Source:{} (state:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, " +
                         "weakState:{}, weakPins:{}, hiImpedance:{})",
                 newState,
@@ -140,7 +139,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
 
     @Override
     public void setHiImpedance() {
-        assert Log.debug(WireMergerWireIn.class,
+        assert Log.debug(BusMergerWireIn.class,
                 "Bus merger setImpedance. before: Source:{} (state:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{}, " +
                         "hiImpedance:{})",
                 getName(),
@@ -179,7 +178,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
             }
         }
         hiImpedance = true;
-        assert Log.debug(WireMergerWireIn.class,
+        assert Log.debug(BusMergerWireIn.class,
                 "Bus merger setImpedance. after: Source:{} (state:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{}, " +
                         "hiImpedance:{})",
                 getName(),

@@ -127,9 +127,6 @@ public class Model {
                     WireMerger wireMerger = new WireMerger(destination, pins, buses);
                     retVal = wireMerger;
                     wires.put(mergerHash, wireMerger);
-                    //in busMerger wire input contain only wires - no buses, so store with only pins hash, it's unique combination any way.
-                    String wireOnlyHash = Utils.getHash(pins);
-                    wires.put(wireOnlyHash, wireMerger);
                 }
             } else {
                 //No merger needed. Passive pins, if any, are handled as pin chain in destination.
@@ -238,10 +235,10 @@ public class Model {
         } else {
             //if there is no destination pins but is passive pins - use one of it as destination, in other way passive pins don't get any changes
             if ((destinationPins.isEmpty())) {
-                if (passivePins.isEmpty()) {
-                    sourcesOffset.forEach((out, offset) -> Log.warn(Model.class, "Unconnected Out:" + out.getName() + offset));
-                } else {
+                if (!passivePins.isEmpty()) {
                     destinationPins.add(passivePins.getFirst());
+                } else if (destinationBusesOffsets.isEmpty()) {
+                    sourcesOffset.forEach((out, offset) -> Log.warn(Model.class, "Unconnected Out:" + out.getName() + offset));
                 }
             }
         }
@@ -504,7 +501,7 @@ public class Model {
                     .stream().mapToLong(Map::size).sum() + offsets.values().size() > 1;
         }
 
-        public void add(IModelItem item, byte sourceOffset, byte destinationOffset) {
+        public void add(IModelItem<?> item, byte sourceOffset, byte destinationOffset) {
             switch (item) {
                 case PassivePin passivePin -> offsets.computeIfAbsent(destinationOffset, e -> new BusPinsOffset()).passivePins.add(passivePin);
                 case OutPin pin -> offsets.computeIfAbsent(destinationOffset, e -> new BusPinsOffset()).pins.add(pin);
@@ -534,7 +531,7 @@ public class Model {
             this.passivePins = passivePins;
         }
 
-        public void add(IModelItem item, byte offset) {
+        public void add(IModelItem<?> item, byte offset) {
             switch (item) {
                 case OutPin pin -> pins.add(pin);
                 case OutBus bus -> buses.put(bus, 1L << offset);

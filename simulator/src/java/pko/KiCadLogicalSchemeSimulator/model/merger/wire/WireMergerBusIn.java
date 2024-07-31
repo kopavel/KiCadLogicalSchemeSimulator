@@ -49,7 +49,7 @@ public class WireMergerBusIn extends CorrectedInBus implements MergerInput<Bus> 
 
     @Override
     public void setState(long newState) {
-        assert Log.debug(WireMergerWireIn.class,
+        assert Log.debug(WireMergerBusIn.class,
                 "Pin merger change. before: newState:{}, Source:{} (state:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{}, hiImpedance:{})",
                 newState,
                 getName(),
@@ -76,7 +76,7 @@ public class WireMergerBusIn extends CorrectedInBus implements MergerInput<Bus> 
         hiImpedance = false;
         merger.strong = true;
         merger.hiImpedance = false;
-        assert Log.debug(WireMergerWireIn.class,
+        assert Log.debug(WireMergerBusIn.class,
                 "Pin merger change. after: newState:{}, Source:{} (state:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{}, hiImpedance:{})",
                 newState,
                 getName(),

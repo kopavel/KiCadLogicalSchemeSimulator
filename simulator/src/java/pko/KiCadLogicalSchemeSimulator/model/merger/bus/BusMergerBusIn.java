@@ -34,7 +34,6 @@ import pko.KiCadLogicalSchemeSimulator.api_v2.ShortcutException;
 import pko.KiCadLogicalSchemeSimulator.api_v2.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api_v2.bus.in.CorrectedInBus;
 import pko.KiCadLogicalSchemeSimulator.model.merger.MergerInput;
-import pko.KiCadLogicalSchemeSimulator.model.merger.wire.WireMergerWireIn;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
@@ -51,7 +50,7 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
 
     @Override
     public void setState(long newState) {
-        assert Log.debug(WireMergerWireIn.class,
+        assert Log.debug(BusMergerBusIn.class,
                 "Bus merger change. before: newState:{}, Source:{} (state:{},  hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{}, " +
                         "hiImpedance:{})\",",
                 newState,
@@ -88,7 +87,7 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
                 destination.setState(merger.state);
             }
         }
-        assert Log.debug(WireMergerWireIn.class,
+        assert Log.debug(BusMergerBusIn.class,
                 "Bus merger change. after: newState:{}, Source:{} (state:{},  hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{}, " +
                         "hiImpedance:{})\",",
                 newState,
@@ -105,7 +104,7 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
 
     @Override
     public void setHiImpedance() {
-        assert Log.debug(WireMergerWireIn.class,
+        assert Log.debug(BusMergerBusIn.class,
                 "Bus merger setImpedance. before: Source:{} (state:{},  hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{}, " +
                         "hiImpedance:{})\",",
                 getName(),
@@ -136,7 +135,7 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
             }
         }
         hiImpedance = true;
-        assert Log.debug(WireMergerWireIn.class,
+        assert Log.debug(BusMergerBusIn.class,
                 "Bus merger setImpedance. after: Source:{} (state:{},  hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{}, " +
                         "hiImpedance:{})\",",
                 getName(),

@@ -84,10 +84,12 @@ run {
                  "-XX:MaxInlineSize=65536",
                  "-XX:ParallelGCThreads=1",
                  "-Xmx2G",
-                 "-ea",
                  "-XX:+UnlockDiagnosticVMOptions",
                  "-XX:+DebugNonSafepoints",
                  "-Dlog4j2.asyncLoggerThreadNameStrategy=CACHED"]
+    if (project.hasProperty('ea')) {
+        jvm_args += ["-ea"]
+    }
     jvmArgs(jvm_args)
     if (project.hasProperty('appArgs')) {
         def appArgsList = project.getProperties().get('appArgs').split(',')

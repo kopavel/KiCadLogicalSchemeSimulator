@@ -99,6 +99,8 @@ public class BusMerger extends OutBus {
     public void addSource(OutPin pin, byte offset) {
         long destinationMask = 1L << offset;
         BusMergerWireIn input = new BusMergerWireIn(destinationMask, this);
+        input.id = pin.id;
+        input.parent = pin.parent;
         pin.addDestination(input);
         processPin(pin, input, destinationMask);
     }
@@ -112,6 +114,9 @@ public class BusMerger extends OutBus {
 
     private void processPin(Pin pin, BusMergerWireIn input, long destinationMask) {
         input.source = pin;
+        input.id = pin.id;
+        input.parent = pin.parent;
+        input.copyState(pin);
         sources = Utils.addToArray(sources, input);
         if (!pin.hiImpedance) {
             if (pin.strong) {

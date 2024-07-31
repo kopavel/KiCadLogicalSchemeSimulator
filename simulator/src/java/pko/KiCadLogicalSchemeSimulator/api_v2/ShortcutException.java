@@ -36,9 +36,9 @@ import lombok.Getter;
 public class ShortcutException extends RuntimeException {
     private final String message;
 
-    public ShortcutException(IModelItem... pins) {
+    public ShortcutException(IModelItem<?>... pins) {
         StringBuilder message = new StringBuilder("Shortcut on ");
-        for (IModelItem pin : pins) {
+        for (IModelItem<?> pin : pins) {
             message.append(pin.getName()).append(":");
             if (pin.isHiImpedance()) {
                 message.append("H");

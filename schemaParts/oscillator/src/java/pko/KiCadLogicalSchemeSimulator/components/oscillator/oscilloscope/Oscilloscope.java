@@ -86,7 +86,7 @@ public class Oscilloscope extends JFrame {
         diagram.addPin(parent.parent.parent.out, parent.parent.parent.out.getName());
     }
 
-    public void addPin(IModelItem pin, String name) {
+    public void addPin(IModelItem<?> pin, String name) {
         watchedItemNamesPanel.add(new FixedHeightLabel(name));
         watchedItemNamesPanel.revalidate();
         //FixMe check if diagram need to be pinBased, not busBased

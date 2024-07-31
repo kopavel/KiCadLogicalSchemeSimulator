@@ -82,7 +82,7 @@ public class Diagram extends JPanel {
         });
     }
 
-    public void addPin(IModelItem out, String name) {
+    public void addPin(IModelItem<?> out, String name) {
         pins.add(new PinItem(out, name));
         revalidate();
     }
