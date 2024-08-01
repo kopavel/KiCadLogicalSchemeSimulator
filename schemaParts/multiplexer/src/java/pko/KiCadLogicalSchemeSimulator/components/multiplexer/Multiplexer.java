@@ -34,13 +34,14 @@ import pko.KiCadLogicalSchemeSimulator.api_v2.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api_v2.bus.in.InBus;
 import pko.KiCadLogicalSchemeSimulator.api_v2.bus.in.NoFloatingCorrectedInBus;
 import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.NoFloatingInPin;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Multiplexer extends SchemaPart {
     private final InBus[] inBuses;
-    private final InBus nBus;
+    private int nState;
     private Bus outBus;
 
     protected Multiplexer(String id, String sParam) {
@@ -67,7 +68,7 @@ public class Multiplexer extends SchemaPart {
                 @Override
                 public void setState(long newState) {
                     state = newState;
-                    if (this == inBuses[(int) nBus.state]) {
+                    if (this == inBuses[nState]) {
                         if (outBus.state != newState) {
                             outBus.state = newState;
                             outBus.setState(newState);
@@ -76,17 +77,25 @@ public class Multiplexer extends SchemaPart {
                 }
             });
         }
-        nBus = addInBus(new NoFloatingCorrectedInBus("N", this, nSize) {
-            @Override
-            public void setState(long newState) {
-                state = newState;
-                newState = inBuses[(int) newState].state;
-                if (outBus.state != newState) {
-                    outBus.state = newState;
-                    outBus.setState(newState);
+        for (int i = 0; i < nSize; i++) {
+            int mask = 1 << i;
+            int nMask = ~mask;
+            addInPin(new NoFloatingInPin("N" + i, this) {
+                @Override
+                public void setState(boolean newState, boolean strong) {
+                    state = newState;
+                    if (newState) {
+                        nState |= mask;
+                    } else {
+                        nState &= nMask;
+                    }
+                    if (outBus.state != inBuses[nState].state) {
+                        outBus.state = inBuses[nState].state;
+                        outBus.setState(outBus.state);
+                    }
                 }
-            }
-        });
+            });
+        }
         String[] aliases = new String[partsAmount];
         for (byte i = 0; i < partsAmount; i++) {
             aliases[i] = 'Q' + String.valueOf((char) (((byte) 'A') + i));

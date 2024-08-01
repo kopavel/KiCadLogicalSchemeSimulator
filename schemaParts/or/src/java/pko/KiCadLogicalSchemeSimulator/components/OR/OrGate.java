@@ -30,13 +30,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.OR;
-import pko.KiCadLogicalSchemeSimulator.api_v2.bus.in.NoFloatingInBus;
 import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api_v2.wire.Pin;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.NoFloatingInPin;
 
 public class OrGate extends SchemaPart {
     private Pin out;
-    private boolean outState;
+    private int inState;
 
     public OrGate(String id, String sParam) {
         super(id, sParam);
@@ -45,27 +45,68 @@ public class OrGate extends SchemaPart {
             throw new RuntimeException("Component " + id + " has no parameter \"size\"");
         }
         int pinAmount = Integer.parseInt(params.get("size"));
-        addInBus(new NoFloatingInBus("IN", this, pinAmount) {
-            @Override
-            public void setState(long newState) {
-                state = newState;
-                if (outState == (newState == 0)) {
-                    outState = newState != 0;
-                    if (newState != 0) {
-                        out.state = nReverse;
-                        out.setState(nReverse, true);
-                    } else {
-                        out.state = reverse;
-                        out.setState(reverse, true);
+        for (int i = 0; i < pinAmount; i++) {
+            int mask = 1 << i;
+            int nMask = ~mask;
+            if (reverse) {
+                addInPin(new NoFloatingInPin("IN" + i, this) {
+                    @Override
+                    public void setState(boolean newState, boolean strong) {
+                        state = newState;
+                        if (newState) {
+                            inState |= mask;
+                        } else {
+                            inState &= nMask;
+                        }
+                        if (out.state != (inState == 0)) {
+                            out.state = inState == 0;
+                            out.setState(out.state, true);
+                        }
                     }
-                }
+
+                    @Override
+                    public void resend() {
+                    }
+                });
+            } else {
+                addInPin(new NoFloatingInPin("IN" + i, this) {
+                    @Override
+                    public void setState(boolean newState, boolean strong) {
+                        state = newState;
+                        if (newState) {
+                            inState |= mask;
+                        } else {
+                            inState &= nMask;
+                        }
+                        if (out.state == (inState == 0)) {
+                            out.state = inState != 0;
+                            out.setState(out.state, true);
+                        }
+                    }
+
+                    @Override
+                    public void resend() {
+                    }
+                });
             }
-        }).useBitPresentation = true;
+        }
     }
 
     @Override
     public void initOuts() {
         out = getOutPin("OUT");
-        out.state = reverse;
+        inPins.values().forEach(pin -> {
+            int i = Integer.parseInt(pin.getId().substring(2));
+            int mask = 1 << i;
+            int nMask = ~mask;
+            if (!pin.isHiImpedance() && pin.getState() > 0) {
+                if (pin.getState() > 0) {
+                    inState |= mask;
+                } else {
+                    inState &= nMask;
+                }
+            }
+        });
+        out.state = inState != 0 ? nReverse : reverse;
     }
 }
