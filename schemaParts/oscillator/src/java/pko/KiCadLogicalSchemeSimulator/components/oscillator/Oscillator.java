@@ -31,7 +31,7 @@
  */
 package pko.KiCadLogicalSchemeSimulator.components.oscillator;
 import lombok.Getter;
-import pko.KiCadLogicalSchemeSimulator.api.AbstractUiComponent;
+import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.AbstractUiComponent;
 import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.InteractiveSchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api_v2.wire.Pin;

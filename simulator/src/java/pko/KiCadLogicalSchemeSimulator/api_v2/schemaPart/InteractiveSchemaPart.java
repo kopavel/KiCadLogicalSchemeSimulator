@@ -30,8 +30,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart;
-import pko.KiCadLogicalSchemeSimulator.api.AbstractUiComponent;
-
 public interface InteractiveSchemaPart {
     AbstractUiComponent getComponent();
 }

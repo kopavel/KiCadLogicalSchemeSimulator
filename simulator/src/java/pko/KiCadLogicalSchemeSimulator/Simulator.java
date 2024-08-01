@@ -32,7 +32,7 @@
 package pko.KiCadLogicalSchemeSimulator;
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import picocli.CommandLine;
-import pko.KiCadLogicalSchemeSimulator.api.AbstractUiComponent;
+import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.AbstractUiComponent;
 import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.InteractiveSchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.model.Model;

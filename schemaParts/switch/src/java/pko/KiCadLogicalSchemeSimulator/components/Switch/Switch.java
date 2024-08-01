@@ -30,8 +30,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.Switch;
-import pko.KiCadLogicalSchemeSimulator.api.AbstractUiComponent;
 import pko.KiCadLogicalSchemeSimulator.api_v2.ShortcutException;
+import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.AbstractUiComponent;
 import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.InteractiveSchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api_v2.wire.PassivePin;
