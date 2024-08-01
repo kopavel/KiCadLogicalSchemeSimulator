@@ -30,20 +30,21 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.stateMachine;
-import pko.KiCadLogicalSchemeSimulator.api.pins.in.EdgeInPin;
-import pko.KiCadLogicalSchemeSimulator.api.pins.in.FloatingPinException;
-import pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
-import pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
-import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api_v2.FloatingInException;
+import pko.KiCadLogicalSchemeSimulator.api_v2.bus.Bus;
+import pko.KiCadLogicalSchemeSimulator.api_v2.bus.in.InBus;
+import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.EdgeInPin;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.InPin;
 
 public class StateMachine extends SchemaPart {
     private final long[] states;
-    private final InPin in;
-    private boolean strobeActive;
-    private boolean disabled;
-    private OutPin out;
-    private long latch;
-    private long outMash;
+    private final InBus in;
+    private final InPin dPin;
+    private final InPin sPin;
+    private Bus out;
+    private int latch;
+    private long outMask;
 
     public StateMachine(String id, String sParam) {
         super(id, sParam);
@@ -65,7 +66,7 @@ public class StateMachine extends SchemaPart {
         } catch (NumberFormatException r) {
             throw new RuntimeException("Component " + id + " size must be positive number");
         }
-        addOutPin("OUT", outSize);
+        addOutBus("OUT", outSize);
         if (!params.containsKey("states")) {
             throw new RuntimeException("Component " + id + " has no parameter \"states\"");
         }
@@ -82,46 +83,81 @@ public class StateMachine extends SchemaPart {
         } catch (NumberFormatException r) {
             throw new RuntimeException("Component " + id + " state must be positive number");
         }
-        addOutPin("OUT", outSize);
-        addInPin(new InPin("D", this) {
+        dPin = addInPin(new InPin("D", this) {
             @Override
-            public void onChange(long newState, boolean hiImpedance, boolean strong) {
-                disabled = newState == 1;
-                out.setState((disabled ? 0 : states[(int) latch]) ^ outMash);
+            public void setHiImpedance() {
+                hiImpedance = true;
+            }
+
+            @Override
+            public void setState(boolean newState, boolean strong) {
+                hiImpedance = false;
+                state = newState;
+                long newOutState = (newState ? 0 : states[latch]) ^ outMask;
+                if (out.state != newOutState) {
+                    out.state = newOutState;
+                    out.setState(newOutState);
+                }
             }
         });
-        addInPin(new InPin("S", this) {
+        sPin = addInPin(new InPin("S", this) {
             @Override
-            public void onChange(long newState, boolean hiImpedance, boolean strong) {
-                strobeActive = newState > 0;
-                if (strobeActive) {
-                    latch = in.getState();
-                    out.setState((disabled ? 0 : states[(int) latch]) ^ outMash);
+            public void setHiImpedance() {
+                hiImpedance = true;
+            }
+
+            @Override
+            public void setState(boolean newState, boolean strong) {
+                state = newState;
+                hiImpedance = false;
+                if (state) {
+                    latch = (int) in.state;
+                    long newOutState = (dPin.state ? 0 : states[latch]) ^ outMask;
+                    if (out.state != newOutState) {
+                        out.state = newOutState;
+                        out.setState(newOutState);
+                    }
                 }
             }
         });
         addInPin(new EdgeInPin("R", this) {
             @Override
             public void onFallingEdge() {
-                outMash = 0;
-                out.setState((disabled ? 0 : states[(int) latch]) ^ outMash);
+                outMask = 0;
+                long newOutState = (dPin.state ? 0 : states[latch]) ^ outMask;
+                if (out.state != newOutState) {
+                    out.state = newOutState;
+                    out.setState(newOutState);
+                }
             }
 
             @Override
             public void onRisingEdge() {
-                outMash = -1;
-                out.setState((disabled ? 0 : states[(int) latch]) ^ outMash);
+                outMask = -1;
+                long newOutState = (dPin.state ? 0 : states[latch]) ^ outMask;
+                if (out.state != newOutState) {
+                    out.state = newOutState;
+                    out.setState(newOutState);
+                }
             }
         });
-        in = addInPin(new InPin("IN", this, inSize) {
+        in = addInBus(new InBus("IN", this, inSize) {
             @Override
-            public void onChange(long newState, boolean hiImpedance, boolean strong) {
-                if (strobeActive) {
-                    if (hiImpedance) {
-                        throw new FloatingPinException(this);
+            public void setHiImpedance() {
+                if (sPin.state) {
+                    throw new FloatingInException(this);
+                }
+            }
+
+            @Override
+            public void setState(long newState) {
+                if (sPin.state) {
+                    latch = (int) newState;
+                    long newOutState = (dPin.state ? 0 : states[latch]) ^ outMask;
+                    if (out.state != newOutState) {
+                        out.state = newOutState;
+                        out.setState(newOutState);
                     }
-                    latch = newState;
-                    out.setState((disabled ? 0 : states[(int) latch]) ^ outMash);
                 }
             }
         });
@@ -130,8 +166,8 @@ public class StateMachine extends SchemaPart {
 
     @Override
     public void initOuts() {
-        out = getOutPin("OUT");
-        out.state = loState;
+        out = getOutBus("OUT");
+        out.state = reverse ? -1L : 0;
         out.useBitPresentation = true;
     }
 }
