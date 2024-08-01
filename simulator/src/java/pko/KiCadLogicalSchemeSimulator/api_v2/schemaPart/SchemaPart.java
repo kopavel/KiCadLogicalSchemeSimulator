@@ -54,8 +54,6 @@ public abstract class SchemaPart {
     protected final boolean reverse;
     protected final boolean nReverse;
     public Map<Integer, String> pinNumberMap;
-    protected long hiState;
-    protected long loState;
 
     protected SchemaPart(String id, String sParam) {
         this.id = id;
@@ -67,15 +65,7 @@ public abstract class SchemaPart {
                 }
             }
         }
-        if (params.containsKey("reverse")) {
-            hiState = 0;
-            loState = -1;
-            reverse = true;
-        } else {
-            hiState = -1;
-            loState = 0;
-            reverse = false;
-        }
+        reverse = params.containsKey("reverse");
         nReverse = !reverse;
     }
 

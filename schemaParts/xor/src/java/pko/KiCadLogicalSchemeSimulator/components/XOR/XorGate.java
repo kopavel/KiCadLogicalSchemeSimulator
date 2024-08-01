@@ -30,47 +30,67 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.XOR;
-import pko.KiCadLogicalSchemeSimulator.api.pins.in.FloatingPinException;
-import pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
-import pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
-import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.Pin;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.InPin;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.NoFloatingInPin;
 
 public class XorGate extends SchemaPart {
-    private OutPin out;
-    private boolean in1Active;
-    private boolean in2Active;
+    private final InPin in1;
+    private final InPin in2;
+    private Pin out;
 
     protected XorGate(String id, String sParam) {
         super(id, sParam);
-        addInPin(new InPin("IN0", this) {
-            @Override
-            public void onChange(long newState, boolean hiImpedance, boolean strong) {
-                if (hiImpedance) {
-                    throw new FloatingPinException(this);
+        if (reverse) {
+            in1 = addInPin(new NoFloatingInPin("IN0", this) {
+                @Override
+                public void setState(boolean newState, boolean strong) {
+                    state = newState;
+                    if (out.state != in1.state == in2.state) {
+                        out.state = in1.state == in2.state;
+                        out.setState(out.state, strong);
+                    }
                 }
-                in1Active = newState > 0;
-                out.setState((in1Active ^ in2Active) ? hiState : loState);
-            }
-        });
-        addInPin(new InPin("IN1", this) {
-            @Override
-            public void onChange(long newState, boolean hiImpedance, boolean strong) {
-                if (hiImpedance) {
-                    throw new FloatingPinException(this);
+            });
+            in2 = addInPin(new NoFloatingInPin("IN1", this) {
+                @Override
+                public void setState(boolean newState, boolean strong) {
+                    state = newState;
+                    if (out.state != in1.state == in2.state) {
+                        out.state = in1.state == in2.state;
+                        out.setState(out.state, strong);
+                    }
                 }
-                in2Active = newState > 0;
-                out.setState((in1Active ^ in2Active) ? hiState : loState);
-            }
-        });
-        addOutPin("OUT", 1);
+            });
+        } else {
+            in1 = addInPin(new NoFloatingInPin("IN0", this) {
+                @Override
+                public void setState(boolean newState, boolean strong) {
+                    state = newState;
+                    if (out.state != (in1.state ^ in2.state)) {
+                        out.state = (in1.state ^ in2.state);
+                        out.setState(out.state, strong);
+                    }
+                }
+            });
+            in2 = addInPin(new NoFloatingInPin("IN1", this) {
+                @Override
+                public void setState(boolean newState, boolean strong) {
+                    state = newState;
+                    if (out.state != (in1.state ^ in2.state)) {
+                        out.state = (in1.state ^ in2.state);
+                        out.setState(out.state, strong);
+                    }
+                }
+            });
+        }
+        addOutPin("OUT");
     }
 
     @Override
     public void initOuts() {
         out = getOutPin("OUT");
-        out.state = hiState;
-        out.useBitPresentation = true;
-        hiState = hiState & out.mask;
-        loState = loState & out.mask;
+        out.state = (in1.state ^ in2.state);
     }
 }
