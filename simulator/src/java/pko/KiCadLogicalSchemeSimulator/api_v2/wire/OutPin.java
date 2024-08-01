@@ -90,11 +90,7 @@ public class OutPin extends Pin {
         if (destinations.length == 0) {
             return new NCWire(this);
         } else if (destinations.length == 1) {
-            Pin optimised = destinations[0].getOptimised();
-            optimised.state = state;
-            optimised.strong = strong;
-            optimised.hiImpedance = hiImpedance;
-            return optimised;
+            return destinations[0].getOptimised().copyState(this);
         } else {
             for (int i = 0; i < destinations.length; i++) {
                 destinations[i] = destinations[i].getOptimised();

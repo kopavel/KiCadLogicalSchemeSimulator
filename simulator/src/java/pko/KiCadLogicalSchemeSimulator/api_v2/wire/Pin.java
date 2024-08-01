@@ -41,10 +41,11 @@ public abstract class Pin extends ModelItem<Pin> {
     public boolean state;
 
     @Override
-    public void copyState(IModelItem<Pin> oldPin) {
+    public Pin copyState(IModelItem<Pin> oldPin) {
         this.strong = oldPin.isStrong();
         this.state = oldPin.getState() > 0;
         this.hiImpedance = oldPin.isHiImpedance();
+        return this;
     }
 
     @Getter

@@ -46,5 +46,5 @@ public interface IModelItem<T> extends Comparable<IModelItem<T>> {
     String getId();
     IModelItem<T> getOptimised();
     void resend();
-    void copyState(IModelItem<T> oldItem);
+    IModelItem<T> copyState(IModelItem<T> oldItem);
 }

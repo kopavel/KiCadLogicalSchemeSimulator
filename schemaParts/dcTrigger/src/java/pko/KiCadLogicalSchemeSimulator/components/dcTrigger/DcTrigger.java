@@ -140,23 +140,17 @@ public class DcTrigger extends SchemaPart {
     private void store() {
         if (clockEnabled) {
             if (dPin.state) {
-                if (!qOut.state) {
+                if (iqOut.state) {
                     qOut.state = true;
                     qOut.setState(true, true);
-                }
-                if (iqOut.state) {
                     iqOut.state = false;
                     iqOut.setState(false, true);
                 }
-            } else {
-                if (qOut.state) {
-                    qOut.state = false;
-                    qOut.setState(false, true);
-                }
-                if (!iqOut.state) {
-                    iqOut.state = true;
-                    iqOut.setState(true, true);
-                }
+            } else if (qOut.state) {
+                qOut.state = false;
+                qOut.setState(false, true);
+                iqOut.state = true;
+                iqOut.setState(true, true);
             }
         }
     }
