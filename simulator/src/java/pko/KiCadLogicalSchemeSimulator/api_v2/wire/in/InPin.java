@@ -41,4 +41,10 @@ public abstract class InPin extends Pin {
     public InPin(Pin oldPin, String variantId) {
         super(oldPin, variantId);
     }
+
+    public InPin(String id, SchemaPart parent, boolean state) {
+        super(id, parent);
+        this.state = state;
+        hiImpedance = false;
+    }
 }

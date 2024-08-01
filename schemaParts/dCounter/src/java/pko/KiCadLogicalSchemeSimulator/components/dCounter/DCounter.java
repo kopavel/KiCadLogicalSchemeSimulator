@@ -30,91 +30,188 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.dCounter;
-import pko.KiCadLogicalSchemeSimulator.api.pins.in.EdgeInPin;
-import pko.KiCadLogicalSchemeSimulator.api.pins.in.FloatingPinException;
-import pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
-import pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
-import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api_v2.bus.Bus;
+import pko.KiCadLogicalSchemeSimulator.api_v2.bus.in.InBus;
+import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.Pin;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.EdgeInPin;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.InPin;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.NoFloatingInPin;
 
 public class DCounter extends SchemaPart {
-    private final InPin jPin;
-    private final boolean carryReverse;
-    private final boolean bdReverse;
-    private final long carryHi;
-    private final long carryLo;
+    private final InBus jBus;
+    private final boolean carryHi;
+    private final boolean carryLo;
+    private final InPin udPin;
     public long maxCount;
-    private OutPin outPin;
-    private OutPin cOutPin;
-    private boolean countUp = true;
+    private Bus outBus;
+    private Pin cOutPin;
     private boolean ciState;
     private boolean cState = true;
     private boolean eState;
     private boolean presetDisabled = true;
-    private long count = 0;
     private boolean resetInactive = true;
 
     protected DCounter(String id, String sParam) {
         super(id, sParam);
-        carryReverse = params.containsKey("carryReverse");
-        bdReverse = params.containsKey("bdReverse");
         boolean eReverse = params.containsKey("eReverse");
-        addOutPin("Q", 4);
-        addOutPin("CO", 1);
-        addInPin(new InPin("CI", this) {
-            @Override
-            public void onChange(long newState, boolean hiImpedance, boolean strong) {
-                if (hiImpedance) {
-                    throw new FloatingPinException(this);
+        addOutBus("Q", 4);
+        addOutPin("CO");
+        if (params.containsKey("carryReverse")) {
+            addInPin(new NoFloatingInPin("CI", this) {
+                @Override
+                public void setState(boolean newState, boolean strong) {
+                    state = newState;
+                    ciState = !newState;
                 }
-                ciState = (newState > 0) ^ carryReverse;
-            }
-        });
-        jPin = addInPin(new InPin("J", this) {
+            });
+            carryHi = false;
+            carryLo = true;
+            udPin = addInPin(new InPin("UD", this, true) {
+                @Override
+                public void setHiImpedance() {
+                    hiImpedance = true;
+                }
+
+                @Override
+                public void setState(boolean newState, boolean strong) {
+                    hiImpedance = false;
+                    state = newState;
+                    boolean newOutState = (!newState || outBus.state != maxCount) && (newState || outBus.state != 0);
+                    if (cOutPin.state != newOutState) {
+                        cOutPin.state = newOutState;
+                        cOutPin.setState(newOutState, strong);
+                    }
+                }
+            });
+            addInPin(new InPin("R", this) {
+                @Override
+                public void setHiImpedance() {
+                    hiImpedance = true;
+                }
+
+                @Override
+                public void setState(boolean newState, boolean strong) {
+                    hiImpedance = false;
+                    state = newState;
+                    resetInactive = !newState;
+                    if (!resetInactive && outBus.state != 0) {
+                        outBus.state = 0;
+                        outBus.setState(0);
+                        if (!cOutPin.state) {
+                            cOutPin.state = true;
+                            cOutPin.setState(true, true);
+                        }
+                    }
+                }
+            });
+        } else {
+            addInPin(new NoFloatingInPin("CI", this) {
+                @Override
+                public void setState(boolean newState, boolean strong) {
+                    state = newState;
+                    ciState = newState;
+                }
+            });
+            carryHi = true;
+            carryLo = false;
+            udPin = addInPin(new InPin("UD", this, true) {
+                @Override
+                public void setHiImpedance() {
+                    hiImpedance = true;
+                }
+
+                @Override
+                public void setState(boolean newState, boolean strong) {
+                    hiImpedance = false;
+                    state = newState;
+                    boolean newOutState = newState && outBus.state == maxCount || !newState && outBus.state == 0;
+                    if (cOutPin.state != newOutState) {
+                        cOutPin.state = newOutState;
+                        cOutPin.setState(newOutState, strong);
+                    }
+                }
+            });
+            addInPin(new InPin("R", this) {
+                @Override
+                public void setHiImpedance() {
+                    hiImpedance = true;
+                }
+
+                @Override
+                public void setState(boolean newState, boolean strong) {
+                    hiImpedance = false;
+                    state = newState;
+                    resetInactive = !newState;
+                    if (!resetInactive && outBus.state != 0) {
+                        outBus.state = 0;
+                        outBus.setState(0);
+                        if (cOutPin.state) {
+                            cOutPin.state = false;
+                            cOutPin.setState(false, true);
+                        }
+                    }
+                }
+            });
+        }
+        jBus = addInBus(new InBus("J", this, 4) {
             @Override
-            public void onChange(long newState, boolean hiImpedance, boolean strong) {
-                if (!presetDisabled && resetInactive) {
-                    count = getState();
-                    outPin.setState(count);
+            public void setHiImpedance() {
+                hiImpedance = true;
+            }
+
+            @Override
+            public void setState(long newState) {
+                hiImpedance = false;
+                state = newState;
+                if (!presetDisabled && resetInactive && outBus.state != newState) {
+                    outBus.state = newState;
+                    outBus.setState(newState);
                 }
             }
         });
-        addInPin(new InPin("PE", this) {
+        addInPin(new NoFloatingInPin("PE", this) {
             @Override
-            public void onChange(long newState, boolean hiImpedance, boolean strong) {
-                if (hiImpedance) {
-                    throw new FloatingPinException(this);
-                }
-                presetDisabled = newState == 0;
-                if (!presetDisabled && resetInactive) {
-                    count = jPin.getState();
-                    outPin.setState(count);
+            public void setState(boolean newState, boolean strong) {
+                state = newState;
+                presetDisabled = !newState;
+                if (!presetDisabled && resetInactive && outBus.state != jBus.state) {
+                    outBus.state = jBus.state;
+                    outBus.setState(outBus.state);
                 }
             }
         });
-        addInPin(new InPin("UD", this) {
-            @Override
-            public void onChange(long newState, boolean hiImpedance, boolean strong) {
-                countUp = newState > 0;
-                cOutPin.setState(((countUp && (count == maxCount)) || (!countUp && (count == 0)) ? carryHi : carryLo));
-            }
-        });
-        addInPin(new InPin("BD", this) {
-            @Override
-            public void onChange(long newState, boolean hiImpedance, boolean strong) {
-                maxCount = ((newState > 0) ^ bdReverse) ? 15 : 9;
-            }
-        });
-        addInPin(new InPin("R", this) {
-            @Override
-            public void onChange(long newState, boolean hiImpedance, boolean strong) {
-                resetInactive = newState == 0;
-                if (!resetInactive) {
-                    count = 0;
-                    outPin.setState(0);
-                    cOutPin.setState(carryLo);
+        if (params.containsKey("bdReverse")) {
+            addInPin(new InPin("BD", this) {
+                @Override
+                public void setHiImpedance() {
+                    hiImpedance = true;
                 }
-            }
-        });
+
+                @Override
+                public void setState(boolean newState, boolean strong) {
+                    hiImpedance = false;
+                    state = newState;
+                    maxCount = !newState ? 15 : 9;
+                }
+            });
+            maxCount = 9;
+        } else {
+            addInPin(new InPin("BD", this) {
+                @Override
+                public void setHiImpedance() {
+                    hiImpedance = true;
+                }
+
+                @Override
+                public void setState(boolean newState, boolean strong) {
+                    hiImpedance = false;
+                    state = newState;
+                    maxCount = newState ? 15 : 9;
+                }
+            });
+            maxCount = 15;
+        }
         if (reverse) {
             addInPin(new EdgeInPin("C", this) {
                 @Override
@@ -177,51 +274,52 @@ public class DCounter extends SchemaPart {
                 }
             });
         }
-        carryHi = carryReverse ? 0 : 1;
-        carryLo = carryReverse ? 1 : 0;
-        maxCount = bdReverse ? 9 : 15;
         eState = !eReverse;
     }
 
     @Override
     public void initOuts() {
-        outPin = getOutPin("Q");
-        outPin.useBitPresentation = true;
+        outBus = getOutBus("Q");
+        outBus.useBitPresentation = true;
+        outBus.state = 0;
+        outBus.hiImpedance = false;
         cOutPin = getOutPin("CO");
         cOutPin.state = carryLo;
+        cOutPin.hiImpedance = false;
     }
 
     @Override
     public void reset() {
-        count = 0;
-        outPin.setState(0);
-        cOutPin.setState(carryLo);
+        outBus.state = 0;
+        outBus.setState(0);
+        cOutPin.state = carryLo;
+        cOutPin.setState(carryLo, true);
     }
 
     private void process() {
         if (ciState && presetDisabled && resetInactive) {
-            if (countUp) {
-                count++;
-                if (count == maxCount) {
-                    cOutPin.setState(carryHi);
+            if (udPin.state) {
+                outBus.state++;
+                if (outBus.state == maxCount) {
+                    cOutPin.setState(carryHi, true);
                 } else {
-                    cOutPin.setState(carryLo);
-                    if (count > maxCount) {
-                        count = 0;
+                    cOutPin.setState(carryLo, true);
+                    if (outBus.state > maxCount) {
+                        outBus.state = 0;
                     }
                 }
             } else {
-                count--;
-                if (count == 0) {
-                    cOutPin.setState(carryHi);
+                outBus.state--;
+                if (outBus.state == 0) {
+                    cOutPin.setState(carryHi, true);
                 } else {
-                    cOutPin.setState(carryLo);
-                    if (count < 0) {
-                        count = maxCount;
+                    cOutPin.setState(carryLo, true);
+                    if (outBus.state < 0) {
+                        outBus.state = maxCount;
                     }
                 }
             }
-            outPin.setState(count);
+            outBus.setState(outBus.state);
         }
     }
 }
