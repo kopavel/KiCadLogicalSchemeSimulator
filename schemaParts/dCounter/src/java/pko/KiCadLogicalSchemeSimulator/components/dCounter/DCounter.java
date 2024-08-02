@@ -291,8 +291,10 @@ public class DCounter extends SchemaPart {
     @Override
     public void reset() {
         outBus.state = 0;
+        outBus.hiImpedance = false;
         outBus.setState(0);
         cOutPin.state = carryLo;
+        cOutPin.hiImpedance = false;
         cOutPin.setState(carryLo, true);
     }
 

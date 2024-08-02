@@ -184,6 +184,8 @@ public class Shifter extends SchemaPart {
     @Override
     public void reset() {
         latch = 0;
+        out.state = false;
+        out.hiImpedance = false;
         out.setState(false, true);
     }
 }

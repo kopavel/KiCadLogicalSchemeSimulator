@@ -30,18 +30,18 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.jnCounter;
-import pko.KiCadLogicalSchemeSimulator.api.pins.in.EdgeInPin;
-import pko.KiCadLogicalSchemeSimulator.api.pins.in.FallingEdgeInPin;
-import pko.KiCadLogicalSchemeSimulator.api.pins.in.RisingEdgeInPin;
-import pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
-import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api_v2.bus.Bus;
+import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.Pin;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.EdgeInPin;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.FallingEdgeInPin;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.RisingEdgeInPin;
 
 public class JnCounter extends SchemaPart {
-    private final int coMax;
-    private OutPin outPin;
-    private OutPin carryOutPin;
-    private int countMax = 1;
-    private int count = 1;
+    private final long coMax;
+    private Bus outBus;
+    private Pin carryOutPin;
+    private long countMax = 1;
     private boolean clockEnabled = true;
 
     protected JnCounter(String id, String sParam) {
@@ -62,8 +62,8 @@ public class JnCounter extends SchemaPart {
             countMax = countMax << 1;
         }
         coMax = countMax / 2;
-        addOutPin("Q", pinAmount);
-        addOutPin("CO", pinAmount);
+        addOutBus("Q", pinAmount);
+        addOutBus("CO", pinAmount);
         addInPin(new EdgeInPin("CI", this) {
             @Override
             public void onFallingEdge() {
@@ -80,14 +80,20 @@ public class JnCounter extends SchemaPart {
                 @Override
                 public void onFallingEdge() {
                     if (clockEnabled) {
-                        if (count >= countMax) {
-                            count = 1;
-                            carryOutPin.setState(0);
+                        if (outBus.state >= countMax) {
+                            outBus.state = 1;
+                            if (carryOutPin.state) {
+                                carryOutPin.state = false;
+                                carryOutPin.setState(false, true);
+                            }
                         } else {
-                            count = count << 1;
-                            carryOutPin.setState(count >= coMax ? 1 : 0);
+                            outBus.state = outBus.state << 1;
+                            if (carryOutPin.state != outBus.state >= coMax) {
+                                carryOutPin.state = outBus.state >= coMax;
+                                carryOutPin.setState(carryOutPin.state, true);
+                            }
                         }
-                        outPin.setState(count);
+                        outBus.setState(outBus.state);
                     }
                 }
             });
@@ -95,8 +101,10 @@ public class JnCounter extends SchemaPart {
                 @Override
                 public void onFallingEdge() {
                     clockEnabled = false;
-                    count = 1;
-                    outPin.setState(count);
+                    if (outBus.state != 1) {
+                        outBus.state = 1;
+                        outBus.setState(outBus.state);
+                    }
                 }
 
                 @Override
@@ -109,14 +117,20 @@ public class JnCounter extends SchemaPart {
                 @Override
                 public void onRisingEdge() {
                     if (clockEnabled) {
-                        if (count >= countMax) {
-                            count = 1;
-                            carryOutPin.setState(0);
+                        if (outBus.state >= countMax) {
+                            outBus.state = 1;
+                            if (carryOutPin.state) {
+                                carryOutPin.state = false;
+                                carryOutPin.setState(false, true);
+                            }
                         } else {
-                            count = count << 1;
-                            carryOutPin.setState(count >= coMax ? 1 : 0);
+                            outBus.state = outBus.state << 1;
+                            if (carryOutPin.state != outBus.state >= coMax) {
+                                carryOutPin.state = outBus.state >= coMax;
+                                carryOutPin.setState(carryOutPin.state, true);
+                            }
                         }
-                        outPin.setState(count);
+                        outBus.setState(outBus.state);
                     }
                 }
             });
@@ -129,8 +143,10 @@ public class JnCounter extends SchemaPart {
                 @Override
                 public void onRisingEdge() {
                     clockEnabled = false;
-                    count = 1;
-                    outPin.setState(count);
+                    if (outBus.state != 1) {
+                        outBus.state = 1;
+                        outBus.setState(outBus.state);
+                    }
                 }
             });
         }
@@ -138,14 +154,15 @@ public class JnCounter extends SchemaPart {
 
     @Override
     public void initOuts() {
-        outPin = getOutPin("Q");
-        outPin.useBitPresentation = true;
+        outBus = getOutBus("Q");
+        outBus.useBitPresentation = true;
         carryOutPin = getOutPin("CO");
     }
 
     @Override
     public void reset() {
-        count = 1;
-        outPin.setState(1);
+        outBus.state = 1;
+        outBus.hiImpedance = false;
+        outBus.setState(1);
     }
 }

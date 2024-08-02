@@ -191,6 +191,8 @@ public class MultiOutShifter extends SchemaPart {
     @Override
     public void reset() {
         latch = 0;
+        out.state = 0;
+        out.hiImpedance = false;
         out.setState(0);
     }
 }
