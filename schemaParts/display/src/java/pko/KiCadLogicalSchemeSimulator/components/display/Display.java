@@ -71,22 +71,20 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
             addInPin(new FallingEdgeInPin("Clock", this) {
                 @Override
                 public void onFallingEdge() {
-                    boolean currHSync = !hSync.state;
-                    boolean currVSync = !vSync.state;
-                    if (currVSync && !lastVSync) {
+                    if (!vSync.state && !lastVSync) {
                         if (vSize == 0) {
                             vSize = vPos + 2;
-                            SwingUtilities.invokeLater(() -> {
+                            Thread.ofVirtual().start(() -> SwingUtilities.invokeLater(() -> {
                                 //noinspection deprecation
                                 display.reshape(display.currentX, display.currentY, hSize * display.scaleFactor, vSize * display.scaleFactor);
-                            });
+                            }));
                             ram = Arrays.copyOf(ram, vSize);
                         } else {
-                            SwingUtilities.invokeLater(display::repaint);
+                            Thread.ofVirtual().start(() -> SwingUtilities.invokeLater(display::repaint));
                         }
                         hPos = 0;
                         vPos = 0;
-                    } else if (currHSync && !lastHSync) {
+                    } else if (!hSync.state && !lastHSync) {
                         if (hSize == 0) {
                             hSize = hPos + 2;
                             ram = new byte[2048][hSize];
@@ -105,17 +103,15 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                     } else {
                         ram[vPos][hPos] = data;
                     }
-                    lastHSync = currHSync;
-                    lastVSync = currVSync;
+                    lastHSync = !hSync.state;
+                    lastVSync = !vSync.state;
                 }
             });
         } else {
             addInPin(new FallingEdgeInPin("Clock", this) {
                 @Override
                 public void onFallingEdge() {
-                    boolean currHSync = hSync.state;
-                    boolean currVSync = vSync.state;
-                    if (currVSync && !lastVSync) {
+                    if (vSync.state && !lastVSync) {
                         if (vSize == 0) {
                             vSize = vPos + 2;
                             SwingUtilities.invokeLater(() -> {
@@ -128,7 +124,7 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                         }
                         hPos = 0;
                         vPos = 0;
-                    } else if (currHSync && !lastHSync) {
+                    } else if (hSync.state && !lastHSync) {
                         if (hSize == 0) {
                             hSize = hPos + 2;
                             ram = new byte[2048][hSize];
@@ -147,8 +143,8 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                     } else {
                         ram[vPos][hPos] = data;
                     }
-                    lastHSync = currHSync;
-                    lastVSync = currVSync;
+                    lastHSync = hSync.state;
+                    lastVSync = vSync.state;
                 }
             });
         }

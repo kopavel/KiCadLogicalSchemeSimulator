@@ -34,6 +34,7 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.model.wire.NCWire;
 import pko.KiCadLogicalSchemeSimulator.model.wire.WireToBusAdapter;
+import pko.KiCadLogicalSchemeSimulator.tools.Log;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 //FixMe use one destination with splitter
@@ -200,6 +201,7 @@ public class OutPin extends Pin {
                 }
             };
         } else {
+            Log.warn(OutPin.class, "No unroll instance for {} items", destinations.length);
             for (int i = 0; i < destinations.length; i++) {
                 destinations[i] = destinations[i].getOptimised();
             }

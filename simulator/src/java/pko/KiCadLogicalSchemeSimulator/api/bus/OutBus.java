@@ -37,6 +37,7 @@ import pko.KiCadLogicalSchemeSimulator.model.bus.BusToWiresAdapter;
 import pko.KiCadLogicalSchemeSimulator.model.bus.MaskGroupBus;
 import pko.KiCadLogicalSchemeSimulator.model.bus.NCBus;
 import pko.KiCadLogicalSchemeSimulator.model.bus.OffsetBus;
+import pko.KiCadLogicalSchemeSimulator.tools.Log;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 import java.util.ArrayList;
@@ -233,7 +234,150 @@ public class OutBus extends Bus {
                     d6.setHiImpedance();
                 }
             };
+        } else if (destinations.length == 7) {
+            Bus d1 = destinations[0].getOptimised();
+            Bus d2 = destinations[1].getOptimised();
+            Bus d3 = destinations[2].getOptimised();
+            Bus d4 = destinations[3].getOptimised();
+            Bus d5 = destinations[4].getOptimised();
+            Bus d6 = destinations[5].getOptimised();
+            Bus d7 = destinations[6].getOptimised();
+            return new OutBus(this, "unroll7") {
+                @Override
+                public void setState(long state) {
+                    d1.setState(state);
+                    d2.setState(state);
+                    d3.setState(state);
+                    d4.setState(state);
+                    d5.setState(state);
+                    d6.setState(state);
+                    d7.setState(state);
+                }
+
+                @Override
+                public void setHiImpedance() {
+                    d1.setHiImpedance();
+                    d2.setHiImpedance();
+                    d3.setHiImpedance();
+                    d4.setHiImpedance();
+                    d5.setHiImpedance();
+                    d6.setHiImpedance();
+                    d7.setHiImpedance();
+                }
+            };
+        } else if (destinations.length == 8) {
+            Bus d1 = destinations[0].getOptimised();
+            Bus d2 = destinations[1].getOptimised();
+            Bus d3 = destinations[2].getOptimised();
+            Bus d4 = destinations[3].getOptimised();
+            Bus d5 = destinations[4].getOptimised();
+            Bus d6 = destinations[5].getOptimised();
+            Bus d7 = destinations[6].getOptimised();
+            Bus d8 = destinations[7].getOptimised();
+            return new OutBus(this, "unroll8") {
+                @Override
+                public void setState(long state) {
+                    d1.setState(state);
+                    d2.setState(state);
+                    d3.setState(state);
+                    d4.setState(state);
+                    d5.setState(state);
+                    d6.setState(state);
+                    d7.setState(state);
+                    d8.setState(state);
+                }
+
+                @Override
+                public void setHiImpedance() {
+                    d1.setHiImpedance();
+                    d2.setHiImpedance();
+                    d3.setHiImpedance();
+                    d4.setHiImpedance();
+                    d5.setHiImpedance();
+                    d6.setHiImpedance();
+                    d7.setHiImpedance();
+                    d8.setHiImpedance();
+                }
+            };
+        } else if (destinations.length == 9) {
+            Bus d1 = destinations[0].getOptimised();
+            Bus d2 = destinations[1].getOptimised();
+            Bus d3 = destinations[2].getOptimised();
+            Bus d4 = destinations[3].getOptimised();
+            Bus d5 = destinations[4].getOptimised();
+            Bus d6 = destinations[5].getOptimised();
+            Bus d7 = destinations[6].getOptimised();
+            Bus d8 = destinations[7].getOptimised();
+            Bus d9 = destinations[8].getOptimised();
+            return new OutBus(this, "unroll9") {
+                @Override
+                public void setState(long state) {
+                    d1.setState(state);
+                    d2.setState(state);
+                    d3.setState(state);
+                    d4.setState(state);
+                    d5.setState(state);
+                    d6.setState(state);
+                    d7.setState(state);
+                    d8.setState(state);
+                    d9.setState(state);
+                }
+
+                @Override
+                public void setHiImpedance() {
+                    d1.setHiImpedance();
+                    d2.setHiImpedance();
+                    d3.setHiImpedance();
+                    d4.setHiImpedance();
+                    d5.setHiImpedance();
+                    d6.setHiImpedance();
+                    d7.setHiImpedance();
+                    d8.setHiImpedance();
+                    d9.setHiImpedance();
+                }
+            };
+        } else if (destinations.length == 10) {
+            Bus d1 = destinations[0].getOptimised();
+            Bus d2 = destinations[1].getOptimised();
+            Bus d3 = destinations[2].getOptimised();
+            Bus d4 = destinations[3].getOptimised();
+            Bus d5 = destinations[4].getOptimised();
+            Bus d6 = destinations[5].getOptimised();
+            Bus d7 = destinations[6].getOptimised();
+            Bus d8 = destinations[7].getOptimised();
+            Bus d9 = destinations[8].getOptimised();
+            Bus d10 = destinations[9].getOptimised();
+            return new OutBus(this, "unroll10") {
+                @Override
+                public void setState(long state) {
+                    d1.setState(state);
+                    d2.setState(state);
+                    d3.setState(state);
+                    d4.setState(state);
+                    d5.setState(state);
+                    d6.setState(state);
+                    d7.setState(state);
+                    d8.setState(state);
+                    d9.setState(state);
+                    d10.setState(state);
+                }
+
+                @Override
+                public void setHiImpedance() {
+                    d1.setHiImpedance();
+                    d2.setHiImpedance();
+                    d3.setHiImpedance();
+                    d4.setHiImpedance();
+                    d5.setHiImpedance();
+                    d6.setHiImpedance();
+                    d7.setHiImpedance();
+                    d8.setHiImpedance();
+                    d9.setHiImpedance();
+                    d10.setHiImpedance();
+                }
+            };
         } else {
+            Log.warn(OutBus.class, "No unroll instance for {} items", destinations.length);
             for (int i = 0; i < destinations.length; i++) {
                 destinations[i] = destinations[i].getOptimised();
             }
