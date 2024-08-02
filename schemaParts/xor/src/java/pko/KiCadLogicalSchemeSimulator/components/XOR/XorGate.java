@@ -93,4 +93,9 @@ public class XorGate extends SchemaPart {
         out = getOutPin("OUT");
         out.state = (in1.state ^ in2.state);
     }
+
+    @Override
+    public String extraState() {
+        return reverse ? "reverse" : null;
+    }
 }

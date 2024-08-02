@@ -109,4 +109,9 @@ public class AndGate extends SchemaPart {
         });
         out.state = inState == 0 ? nReverse : reverse;
     }
+
+    @Override
+    public String extraState() {
+        return reverse ? "reverse" : null;
+    }
 }

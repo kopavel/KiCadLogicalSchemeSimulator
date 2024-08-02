@@ -70,4 +70,9 @@ public class Repeater extends SchemaPart {
         out = getOutPin("OUT");
         out.state = reverse ^ (inPins.get("IN").getState() > 0);
     }
+
+    @Override
+    public String extraState() {
+        return reverse ? "reverse" : null;
+    }
 }
