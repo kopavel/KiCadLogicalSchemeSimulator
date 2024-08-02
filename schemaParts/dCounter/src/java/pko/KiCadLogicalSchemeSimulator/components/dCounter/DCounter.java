@@ -32,6 +32,7 @@
 package pko.KiCadLogicalSchemeSimulator.components.dCounter;
 import pko.KiCadLogicalSchemeSimulator.api_v2.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api_v2.bus.in.InBus;
+import pko.KiCadLogicalSchemeSimulator.api_v2.bus.in.NoFloatingInBus;
 import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api_v2.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.EdgeInPin;
@@ -154,15 +155,10 @@ public class DCounter extends SchemaPart {
                 }
             });
         }
-        jBus = addInBus(new InBus("J", this, 4) {
-            @Override
-            public void setHiImpedance() {
-                hiImpedance = true;
-            }
+        jBus = addInBus(new NoFloatingInBus("J", this, 4) {
 
             @Override
             public void setState(long newState) {
-                hiImpedance = false;
                 state = newState;
                 if (!presetDisabled && resetInactive && outBus.state != newState) {
                     outBus.state = newState;

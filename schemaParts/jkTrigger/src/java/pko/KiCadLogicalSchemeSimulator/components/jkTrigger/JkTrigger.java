@@ -30,48 +30,75 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.jkTrigger;
-import pko.KiCadLogicalSchemeSimulator.api.pins.in.FallingEdgeInPin;
-import pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
-import pko.KiCadLogicalSchemeSimulator.api.pins.in.RisingEdgeInPin;
-import pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
-import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.Pin;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.FallingEdgeInPin;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.InPin;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.NoFloatingInPin;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.RisingEdgeInPin;
 
 public class JkTrigger extends SchemaPart {
     private final InPin jPin;
     private final InPin kPin;
     private final InPin rPin;
     private final InPin sPin;
-    private OutPin qOut;
-    private OutPin iqOut;
+    private Pin qOut;
+    private Pin iqOut;
     private boolean clockEnabled = true;
 
     public JkTrigger(String id, String sParam) {
         super(id, sParam);
-        jPin = addInPin("J", 1);
-        kPin = addInPin("K", 1);
-        rPin = addInPin(new InPin("R", this) {
+        jPin = addInPin("J");
+        kPin = addInPin("K");
+        rPin = addInPin(new NoFloatingInPin("R", this) {
             @Override
-            public void onChange(long newState, boolean hiImpedance, boolean strong) {
-                clockEnabled = (newState | sPin.state) == 0;
-                if (newState > 0) {
-                    iqOut.setState(1);
-                    qOut.setState(sPin.state > 0 ? 1 : 0);
-                } else if (sPin.state > 0) {
-                    qOut.setState(1);
-                    iqOut.setState(0);
+            public void setState(boolean newState, boolean strong) {
+                state = newState;
+                clockEnabled = !(newState | sPin.state);
+                if (newState) {
+                    if (!iqOut.state) {
+                        iqOut.state = true;
+                        iqOut.setState(true, true);
+                    }
+                    if (qOut.state != sPin.state) {
+                        qOut.state = sPin.state;
+                        qOut.setState(sPin.state, true);
+                    }
+                } else if (sPin.state) {
+                    if (!qOut.state) {
+                        qOut.state = true;
+                        qOut.setState(true, true);
+                    }
+                    if (iqOut.state) {
+                        iqOut.state = false;
+                        iqOut.setState(false, true);
+                    }
                 }
             }
         });
-        sPin = addInPin(new InPin("S", this) {
+        sPin = addInPin(new NoFloatingInPin("S", this) {
             @Override
-            public void onChange(long newState, boolean hiImpedance, boolean strong) {
-                clockEnabled = (newState | rPin.state) == 0;
-                if (newState > 0) {
-                    qOut.setState(1);
-                    iqOut.setState(rPin.state > 0 ? 1 : 0);
-                } else if (rPin.state > 0) {
-                    qOut.setState(0);
-                    iqOut.setState(1);
+            public void setState(boolean newState, boolean strong) {
+                state = newState;
+                clockEnabled = !(newState | rPin.state);
+                if (newState) {
+                    if (!qOut.state) {
+                        qOut.state = true;
+                        qOut.setState(true, true);
+                    }
+                    if (iqOut.state != rPin.state) {
+                        iqOut.state = rPin.state;
+                        iqOut.setState(rPin.state, true);
+                    }
+                } else if (rPin.state) {
+                    if (qOut.state) {
+                        qOut.state = false;
+                        qOut.setState(false, true);
+                    }
+                    if (!iqOut.state) {
+                        iqOut.state = true;
+                        iqOut.setState(true, true);
+                    }
                 }
             }
         });
@@ -80,18 +107,17 @@ public class JkTrigger extends SchemaPart {
                 @Override
                 public void onFallingEdge() {
                     if (clockEnabled) {
-                        boolean jState = jPin.state > 0;
-                        boolean kState = kPin.state > 0;
-                        if (jState || kState) {
-                            if (jState && !kState) {
-                                qOut.setState(1);
-                                iqOut.setState(0);
-                            } else if (!jState) {
-                                qOut.setState(1);
-                                iqOut.setState(0);
-                            } else {
-                                qOut.setState(qOut.state ^ 1);
-                                iqOut.setState(iqOut.state ^ 1);
+                        if (jPin.state && kPin.state) {
+                            qOut.setState(!qOut.state, true);
+                            iqOut.setState(!iqOut.state, true);
+                        } else if (jPin.state || kPin.state) {
+                            if (!qOut.state) {
+                                qOut.state = true;
+                                qOut.setState(true, true);
+                            }
+                            if (iqOut.state) {
+                                iqOut.state = false;
+                                iqOut.setState(false, true);
                             }
                         }
                     }
@@ -102,35 +128,34 @@ public class JkTrigger extends SchemaPart {
                 @Override
                 public void onRisingEdge() {
                     if (clockEnabled) {
-                        boolean jState = jPin.state > 0;
-                        boolean kState = kPin.state > 0;
-                        if (jState || kState) {
-                            if (jState && !kState) { //set
-                                qOut.setState(1);
-                                iqOut.setState(0);
-                            } else if (!jState) { //reset
-                                qOut.setState(0);
-                                iqOut.setState(1);
-                            } else { //toggle
-                                qOut.setState(qOut.state ^ 1);
-                                iqOut.setState(iqOut.state ^ 1);
+                        if (jPin.state && kPin.state) {
+                            qOut.setState(!qOut.state, true);
+                            iqOut.setState(!iqOut.state, true);
+                        } else if (jPin.state || kPin.state) {
+                            if (!qOut.state) {
+                                qOut.state = true;
+                                qOut.setState(true, true);
+                            }
+                            if (iqOut.state) {
+                                iqOut.state = false;
+                                iqOut.setState(false, true);
                             }
                         }
                     }
                 }
             });
         }
-        addOutPin("Q", 1);
-        addOutPin("~{Q}", 1);
+        addOutPin("Q");
+        addOutPin("~{Q}");
     }
 
     @Override
     public void initOuts() {
         qOut = getOutPin("Q");
-        qOut.state = 0;
+        qOut.state = false;
+        qOut.hiImpedance = false;
         iqOut = getOutPin("~{Q}");
-        iqOut.state = 1;
-        hiState = hiState & qOut.mask;
-        loState = loState & qOut.mask;
+        iqOut.state = true;
+        iqOut.hiImpedance = false;
     }
 }

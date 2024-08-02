@@ -36,6 +36,7 @@ import pko.KiCadLogicalSchemeSimulator.api_v2.bus.in.InBus;
 import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.EdgeInPin;
 import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.InPin;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.NoFloatingInPin;
 
 public class StateMachine extends SchemaPart {
     private final long[] states;
@@ -83,15 +84,9 @@ public class StateMachine extends SchemaPart {
         } catch (NumberFormatException r) {
             throw new RuntimeException("Component " + id + " state must be positive number");
         }
-        dPin = addInPin(new InPin("D", this) {
-            @Override
-            public void setHiImpedance() {
-                hiImpedance = true;
-            }
-
+        dPin = addInPin(new NoFloatingInPin("D", this) {
             @Override
             public void setState(boolean newState, boolean strong) {
-                hiImpedance = false;
                 state = newState;
                 long newOutState = (newState ? 0 : states[latch]) ^ outMask;
                 if (out.state != newOutState) {
@@ -100,16 +95,10 @@ public class StateMachine extends SchemaPart {
                 }
             }
         });
-        sPin = addInPin(new InPin("S", this) {
-            @Override
-            public void setHiImpedance() {
-                hiImpedance = true;
-            }
-
+        sPin = addInPin(new NoFloatingInPin("S", this) {
             @Override
             public void setState(boolean newState, boolean strong) {
                 state = newState;
-                hiImpedance = false;
                 if (state) {
                     latch = (int) in.state;
                     long newOutState = (dPin.state ? 0 : states[latch]) ^ outMask;

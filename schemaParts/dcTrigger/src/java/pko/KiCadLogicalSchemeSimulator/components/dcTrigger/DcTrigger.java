@@ -34,6 +34,7 @@ import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api_v2.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.FallingEdgeInPin;
 import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.InPin;
+import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.NoFloatingInPin;
 import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.RisingEdgeInPin;
 
 public class DcTrigger extends SchemaPart {
@@ -47,17 +48,11 @@ public class DcTrigger extends SchemaPart {
     protected DcTrigger(String id, String sParam) {
         super(id, sParam);
         dPin = addInPin("D");
-        rPin = addInPin(new InPin("R", this) {
-            @Override
-            public void setHiImpedance() {
-                hiImpedance = true;
-            }
+        rPin = addInPin(new NoFloatingInPin("R", this) {
 
             @Override
             public void setState(boolean newState, boolean newStrong) {
-                hiImpedance = false;
                 state = newState;
-                strong = newStrong;
                 clockEnabled = !(newState | sPin.state);
                 if (!newState) {
                     if (!iqOut.state) {
@@ -80,16 +75,10 @@ public class DcTrigger extends SchemaPart {
                 }
             }
         });
-        sPin = addInPin(new InPin("S", this) {
-            @Override
-            public void setHiImpedance() {
-                hiImpedance = true;
-            }
-
+        sPin = addInPin(new NoFloatingInPin("S", this) {
             @Override
             public void setState(boolean newState, boolean strong) {
                 state = newState;
-                hiImpedance = false;
                 clockEnabled = !(newState | rPin.state);
                 if (!newState) {
                     if (!qOut.state) {
