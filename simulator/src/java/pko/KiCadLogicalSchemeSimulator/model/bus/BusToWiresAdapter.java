@@ -30,17 +30,21 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.model.bus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
+import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
+import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
-public class BusToWiresAdapter extends BusToWireAdapter {
-    public final Pin[] destinations;
+public class BusToWiresAdapter extends OutBus {
+    public Pin[] destinations = new Pin[0];
     public long maskState;
 
-    public BusToWiresAdapter(Bus oldBus, Pin[] destinations, long mask) {
-        super(oldBus, null);
+    public BusToWiresAdapter(BusToWiresAdapter oldBus, String variantId) {
+        super(oldBus, variantId);
+    }
+
+    public BusToWiresAdapter(OutBus outBus, long mask) {
+        super(outBus, "BusToWire");
         this.mask = mask;
-        this.destinations = destinations;
     }
 
     @Override
@@ -48,7 +52,7 @@ public class BusToWiresAdapter extends BusToWireAdapter {
         if (maskState != (newState & mask)) {
             maskState = newState & mask;
             for (Pin destination : destinations) {
-                destination.setState(maskState > 0, true);
+                destination.setState(maskState != 0, true);
             }
         }
     }
@@ -58,6 +62,166 @@ public class BusToWiresAdapter extends BusToWireAdapter {
         assert !hiImpedance : "Already in hiImpedance:" + this;
         for (Pin destination : destinations) {
             destination.setHiImpedance();
+        }
+    }
+
+    public void addDestination(Pin pin) {
+        destinations = Utils.addToArray(destinations, pin);
+    }
+
+    @Override
+    public BusToWiresAdapter getOptimised() {
+        if (destinations.length == 6) {
+            Pin d1 = destinations[0].getOptimised();
+            Pin d2 = destinations[1].getOptimised();
+            Pin d3 = destinations[2].getOptimised();
+            Pin d4 = destinations[3].getOptimised();
+            Pin d5 = destinations[4].getOptimised();
+            Pin d6 = destinations[5].getOptimised();
+            return new BusToWiresAdapter(this, "unroll6") {
+                @Override
+                public void setState(long newState) {
+                    if (maskState != (newState & mask)) {
+                        maskState = newState & mask;
+                        boolean newOutState = maskState != 0;
+                        d1.setState(newOutState, true);
+                        d2.setState(newOutState, true);
+                        d3.setState(newOutState, true);
+                        d4.setState(newOutState, true);
+                        d5.setState(newOutState, true);
+                        d6.setState(newOutState, true);
+                    }
+                }
+
+                @Override
+                public void setHiImpedance() {
+                    d1.setHiImpedance();
+                    d2.setHiImpedance();
+                    d3.setHiImpedance();
+                    d4.setHiImpedance();
+                    d5.setHiImpedance();
+                    d6.setHiImpedance();
+                }
+            };
+        } else if (destinations.length == 5) {
+            Pin d1 = destinations[0].getOptimised();
+            Pin d2 = destinations[1].getOptimised();
+            Pin d3 = destinations[2].getOptimised();
+            Pin d4 = destinations[3].getOptimised();
+            Pin d5 = destinations[4].getOptimised();
+            return new BusToWiresAdapter(this, "unroll5") {
+                @Override
+                public void setState(long newState) {
+                    if (maskState != (newState & mask)) {
+                        maskState = newState & mask;
+                        boolean newOutState = maskState != 0;
+                        d1.setState(newOutState, true);
+                        d2.setState(newOutState, true);
+                        d3.setState(newOutState, true);
+                        d4.setState(newOutState, true);
+                        d5.setState(newOutState, true);
+                    }
+                }
+
+                @Override
+                public void setHiImpedance() {
+                    d1.setHiImpedance();
+                    d2.setHiImpedance();
+                    d3.setHiImpedance();
+                    d4.setHiImpedance();
+                    d5.setHiImpedance();
+                }
+            };
+        } else if (destinations.length == 4) {
+            Pin d1 = destinations[0].getOptimised();
+            Pin d2 = destinations[1].getOptimised();
+            Pin d3 = destinations[2].getOptimised();
+            Pin d4 = destinations[3].getOptimised();
+            return new BusToWiresAdapter(this, "unroll4") {
+                @Override
+                public void setState(long newState) {
+                    if (maskState != (newState & mask)) {
+                        maskState = newState & mask;
+                        boolean newOutState = maskState != 0;
+                        d1.setState(newOutState, true);
+                        d2.setState(newOutState, true);
+                        d3.setState(newOutState, true);
+                        d4.setState(newOutState, true);
+                    }
+                }
+
+                @Override
+                public void setHiImpedance() {
+                    d1.setHiImpedance();
+                    d2.setHiImpedance();
+                    d3.setHiImpedance();
+                    d4.setHiImpedance();
+                }
+            };
+        } else if (destinations.length == 3) {
+            Pin d1 = destinations[0].getOptimised();
+            Pin d2 = destinations[1].getOptimised();
+            Pin d3 = destinations[2].getOptimised();
+            return new BusToWiresAdapter(this, "unroll3") {
+                @Override
+                public void setState(long newState) {
+                    if (maskState != (newState & mask)) {
+                        maskState = newState & mask;
+                        boolean newOutState = maskState != 0;
+                        d1.setState(newOutState, true);
+                        d2.setState(newOutState, true);
+                        d3.setState(newOutState, true);
+                    }
+                }
+
+                @Override
+                public void setHiImpedance() {
+                    d1.setHiImpedance();
+                    d2.setHiImpedance();
+                    d3.setHiImpedance();
+                }
+            };
+        } else if (destinations.length == 2) {
+            Pin d1 = destinations[0].getOptimised();
+            Pin d2 = destinations[1].getOptimised();
+            return new BusToWiresAdapter(this, "unroll2") {
+                @Override
+                public void setState(long newState) {
+                    if (maskState != (newState & mask)) {
+                        maskState = newState & mask;
+                        boolean newOutState = maskState != 0;
+                        d1.setState(newOutState, true);
+                        d2.setState(newOutState, true);
+                    }
+                }
+
+                @Override
+                public void setHiImpedance() {
+                    d1.setHiImpedance();
+                    d2.setHiImpedance();
+                }
+            };
+        } else if (destinations.length == 1) {
+            Pin d1 = destinations[0].getOptimised();
+            return new BusToWiresAdapter(this, "unroll1") {
+                @Override
+                public void setState(long newState) {
+                    if (maskState != (newState & mask)) {
+                        maskState = newState & mask;
+                        d1.setState(maskState != 0, true);
+                    }
+                }
+
+                @Override
+                public void setHiImpedance() {
+                    d1.setHiImpedance();
+                }
+            };
+        } else {
+            for (int i = 0; i < destinations.length; i++) {
+                destinations[i] = destinations[i].getOptimised();
+            }
+            return this;
         }
     }
 }

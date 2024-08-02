@@ -92,7 +92,7 @@ public class OutPin extends Pin {
         } else if (destinations.length == 2) {
             Pin d1 = destinations[0].getOptimised();
             Pin d2 = destinations[1].getOptimised();
-            return new OutPin(this, "dualDest") {
+            return new OutPin(this, "unroll2") {
                 @Override
                 public void setState(boolean newState, boolean newStrong) {
                     d1.setState(state, strong);
@@ -109,7 +109,7 @@ public class OutPin extends Pin {
             Pin d1 = destinations[0].getOptimised();
             Pin d2 = destinations[1].getOptimised();
             Pin d3 = destinations[2].getOptimised();
-            return new OutPin(this, "dualDest") {
+            return new OutPin(this, "unroll3") {
                 @Override
                 public void setState(boolean newState, boolean newStrong) {
                     d1.setState(state, strong);
@@ -129,7 +129,7 @@ public class OutPin extends Pin {
             Pin d2 = destinations[1].getOptimised();
             Pin d3 = destinations[2].getOptimised();
             Pin d4 = destinations[3].getOptimised();
-            return new OutPin(this, "dualDest") {
+            return new OutPin(this, "unroll4") {
                 @Override
                 public void setState(boolean newState, boolean newStrong) {
                     d1.setState(state, strong);
@@ -152,7 +152,7 @@ public class OutPin extends Pin {
             Pin d3 = destinations[2].getOptimised();
             Pin d4 = destinations[3].getOptimised();
             Pin d5 = destinations[4].getOptimised();
-            return new OutPin(this, "dualDest") {
+            return new OutPin(this, "unroll5") {
                 @Override
                 public void setState(boolean newState, boolean newStrong) {
                     d1.setState(state, strong);
@@ -178,7 +178,7 @@ public class OutPin extends Pin {
             Pin d4 = destinations[3].getOptimised();
             Pin d5 = destinations[4].getOptimised();
             Pin d6 = destinations[5].getOptimised();
-            return new OutPin(this, "dualDest") {
+            return new OutPin(this, "unroll6") {
                 @Override
                 public void setState(boolean newState, boolean newStrong) {
                     d1.setState(state, strong);

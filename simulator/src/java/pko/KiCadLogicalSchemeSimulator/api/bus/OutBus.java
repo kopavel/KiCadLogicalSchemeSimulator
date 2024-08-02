@@ -33,7 +33,7 @@ package pko.KiCadLogicalSchemeSimulator.api.bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.in.CorrectedInBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.model.bus.BusToWireAdapter;
+import pko.KiCadLogicalSchemeSimulator.model.bus.BusToWiresAdapter;
 import pko.KiCadLogicalSchemeSimulator.model.bus.MaskGroupBus;
 import pko.KiCadLogicalSchemeSimulator.model.bus.NCBus;
 import pko.KiCadLogicalSchemeSimulator.model.bus.OffsetBus;
@@ -78,18 +78,16 @@ public class OutBus extends Bus {
     }
 
     public void addDestination(Pin pin, long mask) {
-        if (!pins.contains(pin)) {
-            pins.add(pin);
-            BusToWireAdapter bus = new BusToWireAdapter(this, pin);
-            Arrays.stream(destinations)
-                    .filter(d -> d instanceof MaskGroupBus)
-                    .map(d -> ((MaskGroupBus) d))
-                    .filter(d -> d.mask == mask).findFirst().orElseGet(() -> {
-                      MaskGroupBus groupBus = new MaskGroupBus(this, mask, "mask" + mask);
-                      destinations = Utils.addToArray(destinations, groupBus);
-                      return groupBus;
-                  }).addDestination(bus);
-        }
+        assert !pins.contains(pin);
+        pins.add(pin);
+        Arrays.stream(destinations)
+                .filter(d -> d instanceof BusToWiresAdapter)
+                .map(d -> ((BusToWiresAdapter) d))
+                .filter(d -> d.mask == mask).findFirst().orElseGet(() -> {
+                  BusToWiresAdapter adapter = new BusToWiresAdapter(this, mask);
+                  destinations = Utils.addToArray(destinations, adapter);
+                  return adapter;
+              }).addDestination(pin);
     }
 
     @Override
@@ -128,7 +126,7 @@ public class OutBus extends Bus {
         } else if (destinations.length == 2) {
             Bus d1 = destinations[0].getOptimised();
             Bus d2 = destinations[1].getOptimised();
-            return new OutBus(this, "dualDest") {
+            return new OutBus(this, "unroll2") {
                 @Override
                 public void setState(long state) {
                     d1.setState(state);
@@ -145,7 +143,7 @@ public class OutBus extends Bus {
             Bus d1 = destinations[0].getOptimised();
             Bus d2 = destinations[1].getOptimised();
             Bus d3 = destinations[2].getOptimised();
-            return new OutBus(this, "dualDest") {
+            return new OutBus(this, "unroll3") {
                 @Override
                 public void setState(long state) {
                     d1.setState(state);
@@ -165,7 +163,7 @@ public class OutBus extends Bus {
             Bus d2 = destinations[1].getOptimised();
             Bus d3 = destinations[2].getOptimised();
             Bus d4 = destinations[3].getOptimised();
-            return new OutBus(this, "dualDest") {
+            return new OutBus(this, "unroll4") {
                 @Override
                 public void setState(long state) {
                     d1.setState(state);
@@ -188,7 +186,7 @@ public class OutBus extends Bus {
             Bus d3 = destinations[2].getOptimised();
             Bus d4 = destinations[3].getOptimised();
             Bus d5 = destinations[4].getOptimised();
-            return new OutBus(this, "dualDest") {
+            return new OutBus(this, "unroll5") {
                 @Override
                 public void setState(long state) {
                     d1.setState(state);
@@ -214,7 +212,7 @@ public class OutBus extends Bus {
             Bus d4 = destinations[3].getOptimised();
             Bus d5 = destinations[4].getOptimised();
             Bus d6 = destinations[5].getOptimised();
-            return new OutBus(this, "dualDest") {
+            return new OutBus(this, "unroll6") {
                 @Override
                 public void setState(long state) {
                     d1.setState(state);

@@ -34,7 +34,6 @@ import lombok.Getter;
 import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.model.bus.BusToWireAdapter;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -61,7 +60,7 @@ public abstract class Bus extends ModelItem<Bus> {
         super(id, parent);
         this.size = size;
         if (aliases == null || aliases.length == 0) {
-            if (size == 1 && !(this instanceof BusToWireAdapter)) {
+            if (size == 1) {
                 throw new RuntimeException("Use Pin for Bus with size 1:" + getName());
             } else {
                 for (byte i = 0; i < size; i++) {
