@@ -64,11 +64,14 @@ public class Multiplexer extends SchemaPart {
             for (int part = 0; part < partsAmount; part++) {
                 aliases.add(String.valueOf((char) (((byte) 'A') + part)) + inNo);
             }
-            inBuses[inNo] = addInBus(new NoFloatingCorrectedInBus(String.valueOf(inNo), this, partsAmount, aliases.toArray(new String[0])) {
+            int finalInNo = inNo;
+            inBuses[inNo] = addInBus(new NoFloatingCorrectedInBus(String.valueOf(finalInNo), this, partsAmount, aliases.toArray(new String[0])) {
+                private final int number = finalInNo;
+
                 @Override
                 public void setState(long newState) {
                     state = newState;
-                    if (this == inBuses[nState]) {
+                    if (number == nState) {
                         if (outBus.state != newState) {
                             outBus.state = newState;
                             outBus.setState(newState);
