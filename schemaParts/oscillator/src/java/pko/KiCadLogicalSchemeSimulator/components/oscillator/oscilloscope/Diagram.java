@@ -121,7 +121,7 @@ public class Diagram extends JPanel {
                         if (curState == -1) {
                             currDiagramState = HiImpedance;
                         } else if (singlePin) {
-                            currDiagramState = curState > 0 ? Hi : Lo;
+                            currDiagramState = curState != 0 ? Hi : Lo;
                         } else if (currDiagramState != BusChange) {
                             currDiagramState = curState != prevState ? BusChange : BusActive;
                         }

@@ -91,7 +91,7 @@ public class WireMerger extends OutPin {
                 throw new ShortcutException(sources);
             }
             strong = true;
-            state = (bus.state & mask) > 0;
+            state = (bus.state & mask) != 0;
         }
     }
 
@@ -108,7 +108,7 @@ public class WireMerger extends OutPin {
                 strong = true;
                 state = pin.state;
             } else {
-                if ((weakState > 0 && !pin.state) || (weakState < 0 && pin.state)) {
+                if (weakState != 0 && (weakState > 0 != pin.state)) {
                     throw new ShortcutException(sources);
                 }
                 weakState += (byte) (pin.state ? 1 : -1);

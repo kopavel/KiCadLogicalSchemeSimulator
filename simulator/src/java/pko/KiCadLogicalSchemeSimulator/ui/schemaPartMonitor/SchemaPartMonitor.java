@@ -192,7 +192,7 @@ public class SchemaPartMonitor extends JFrame {
                 if (out.item.isHiImpedance()) {
                     out.label.setText("Hi");
                 } else if (out.item instanceof Bus bus && bus.useBitPresentation) {
-                    out.label.setText((bus.state & out.mask) > 0 ? "1" : "0");
+                    out.label.setText((bus.state & out.mask) != 0 ? "1" : "0");
                 } else {
                     out.label.setText(String.format("%" + (int) Math.ceil(out.item.getSize() / 4d) + "X", out.item.getState()));
                 }

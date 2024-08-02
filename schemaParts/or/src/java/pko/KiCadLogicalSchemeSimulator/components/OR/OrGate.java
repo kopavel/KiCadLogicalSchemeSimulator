@@ -99,8 +99,8 @@ public class OrGate extends SchemaPart {
             int i = Integer.parseInt(pin.getId().substring(2));
             int mask = 1 << i;
             int nMask = ~mask;
-            if (!pin.isHiImpedance() && pin.getState() > 0) {
-                if (pin.getState() > 0) {
+            if (!pin.isHiImpedance() && pin.getState() != 0) {
+                if (pin.getState() != 0) {
                     inState |= mask;
                 } else {
                     inState &= nMask;

@@ -129,10 +129,10 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
                 merger.hiImpedance = true;
             }
         } else if (oldState != merger.state || merger.hiImpedance) {
-            merger.hiImpedance = false;
             for (Bus destination : merger.destinations) {
                 destination.setState(merger.state);
             }
+            merger.hiImpedance = false;
         }
         hiImpedance = true;
         assert Log.debug(BusMergerBusIn.class,

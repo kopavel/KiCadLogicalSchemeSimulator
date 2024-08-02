@@ -112,6 +112,18 @@ public class BusMerger extends OutBus {
         processPin(pin, input, destinationMask);
     }
 
+    @Override
+    public void resend() {
+        if ((strongPins | weakPins) == mask) {
+            setState(state);
+        }
+    }
+
+    @Override
+    public Bus getOptimised() {
+        throw new UnsupportedOperationException();
+    }
+
     private void processPin(Pin pin, BusMergerWireIn input, long destinationMask) {
         input.source = pin;
         input.id = pin.id;
@@ -128,7 +140,7 @@ public class BusMerger extends OutBus {
                     state |= destinationMask;
                 }
             } else {
-                if ((weakPins & destinationMask) > 0 && ((weakState & destinationMask) > 0) != pin.state) {
+                if ((weakPins & destinationMask) != 0 && ((weakState & destinationMask) == 0) == pin.state) {
                     throw new ShortcutException(sources);
                 }
                 weakPins |= destinationMask;
@@ -140,17 +152,5 @@ public class BusMerger extends OutBus {
         }
         Arrays.sort(sources, Comparator.comparing(MergerInput::getName));
         hiImpedance = (strongPins | weakPins) != mask;
-    }
-
-    @Override
-    public void resend() {
-        if ((strongPins | weakPins) == mask) {
-            setState(state);
-        }
-    }
-
-    @Override
-    public Bus getOptimised() {
-        throw new UnsupportedOperationException();
     }
 }

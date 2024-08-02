@@ -49,7 +49,7 @@ public class BusInInterconnect extends InBus {
 
     @Override
     public void setState(long newState) {
-        if ((newState & interconnectMask) > 0) {
+        if ((newState & interconnectMask) != 0) {
             destination.state = newState | interconnectMask;
             destination.setState(destination.state);
         } else {

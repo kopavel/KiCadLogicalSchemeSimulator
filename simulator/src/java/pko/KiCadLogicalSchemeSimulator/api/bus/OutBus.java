@@ -125,6 +125,116 @@ public class OutBus extends Bus {
             optimised.state = state;
             optimised.hiImpedance = hiImpedance;
             return optimised;
+        } else if (destinations.length == 2) {
+            Bus d1 = destinations[0].getOptimised();
+            Bus d2 = destinations[1].getOptimised();
+            return new OutBus(this, "dualDest") {
+                @Override
+                public void setState(long state) {
+                    d1.setState(state);
+                    d2.setState(state);
+                }
+
+                @Override
+                public void setHiImpedance() {
+                    d1.setHiImpedance();
+                    d2.setHiImpedance();
+                }
+            };
+        } else if (destinations.length == 3) {
+            Bus d1 = destinations[0].getOptimised();
+            Bus d2 = destinations[1].getOptimised();
+            Bus d3 = destinations[2].getOptimised();
+            return new OutBus(this, "dualDest") {
+                @Override
+                public void setState(long state) {
+                    d1.setState(state);
+                    d2.setState(state);
+                    d3.setState(state);
+                }
+
+                @Override
+                public void setHiImpedance() {
+                    d1.setHiImpedance();
+                    d2.setHiImpedance();
+                    d3.setHiImpedance();
+                }
+            };
+        } else if (destinations.length == 4) {
+            Bus d1 = destinations[0].getOptimised();
+            Bus d2 = destinations[1].getOptimised();
+            Bus d3 = destinations[2].getOptimised();
+            Bus d4 = destinations[3].getOptimised();
+            return new OutBus(this, "dualDest") {
+                @Override
+                public void setState(long state) {
+                    d1.setState(state);
+                    d2.setState(state);
+                    d3.setState(state);
+                    d4.setState(state);
+                }
+
+                @Override
+                public void setHiImpedance() {
+                    d1.setHiImpedance();
+                    d2.setHiImpedance();
+                    d3.setHiImpedance();
+                    d4.setHiImpedance();
+                }
+            };
+        } else if (destinations.length == 5) {
+            Bus d1 = destinations[0].getOptimised();
+            Bus d2 = destinations[1].getOptimised();
+            Bus d3 = destinations[2].getOptimised();
+            Bus d4 = destinations[3].getOptimised();
+            Bus d5 = destinations[4].getOptimised();
+            return new OutBus(this, "dualDest") {
+                @Override
+                public void setState(long state) {
+                    d1.setState(state);
+                    d2.setState(state);
+                    d3.setState(state);
+                    d4.setState(state);
+                    d5.setState(state);
+                }
+
+                @Override
+                public void setHiImpedance() {
+                    d1.setHiImpedance();
+                    d2.setHiImpedance();
+                    d3.setHiImpedance();
+                    d4.setHiImpedance();
+                    d5.setHiImpedance();
+                }
+            };
+        } else if (destinations.length == 6) {
+            Bus d1 = destinations[0].getOptimised();
+            Bus d2 = destinations[1].getOptimised();
+            Bus d3 = destinations[2].getOptimised();
+            Bus d4 = destinations[3].getOptimised();
+            Bus d5 = destinations[4].getOptimised();
+            Bus d6 = destinations[5].getOptimised();
+            return new OutBus(this, "dualDest") {
+                @Override
+                public void setState(long state) {
+                    d1.setState(state);
+                    d2.setState(state);
+                    d3.setState(state);
+                    d4.setState(state);
+                    d5.setState(state);
+                    d6.setState(state);
+                }
+
+                @Override
+                public void setHiImpedance() {
+                    d1.setHiImpedance();
+                    d2.setHiImpedance();
+                    d3.setHiImpedance();
+                    d4.setHiImpedance();
+                    d5.setHiImpedance();
+                    d6.setHiImpedance();
+                }
+            };
         } else {
             for (int i = 0; i < destinations.length; i++) {
                 destinations[i] = destinations[i].getOptimised();

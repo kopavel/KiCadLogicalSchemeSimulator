@@ -79,9 +79,7 @@ public class OutPin extends Pin {
 
     public void resend() {
         if (!hiImpedance) {
-            for (Pin destination : destinations) {
-                destination.setState(state, strong);
-            }
+            setState(state, strong);
         }
     }
 
@@ -91,6 +89,116 @@ public class OutPin extends Pin {
             return new NCWire(this);
         } else if (destinations.length == 1) {
             return destinations[0].getOptimised().copyState(this);
+        } else if (destinations.length == 2) {
+            Pin d1 = destinations[0].getOptimised();
+            Pin d2 = destinations[1].getOptimised();
+            return new OutPin(this, "dualDest") {
+                @Override
+                public void setState(boolean newState, boolean newStrong) {
+                    d1.setState(state, strong);
+                    d2.setState(state, strong);
+                }
+
+                @Override
+                public void setHiImpedance() {
+                    d1.setHiImpedance();
+                    d2.setHiImpedance();
+                }
+            };
+        } else if (destinations.length == 3) {
+            Pin d1 = destinations[0].getOptimised();
+            Pin d2 = destinations[1].getOptimised();
+            Pin d3 = destinations[2].getOptimised();
+            return new OutPin(this, "dualDest") {
+                @Override
+                public void setState(boolean newState, boolean newStrong) {
+                    d1.setState(state, strong);
+                    d2.setState(state, strong);
+                    d3.setState(state, strong);
+                }
+
+                @Override
+                public void setHiImpedance() {
+                    d1.setHiImpedance();
+                    d2.setHiImpedance();
+                    d3.setHiImpedance();
+                }
+            };
+        } else if (destinations.length == 4) {
+            Pin d1 = destinations[0].getOptimised();
+            Pin d2 = destinations[1].getOptimised();
+            Pin d3 = destinations[2].getOptimised();
+            Pin d4 = destinations[3].getOptimised();
+            return new OutPin(this, "dualDest") {
+                @Override
+                public void setState(boolean newState, boolean newStrong) {
+                    d1.setState(state, strong);
+                    d2.setState(state, strong);
+                    d3.setState(state, strong);
+                    d4.setState(state, strong);
+                }
+
+                @Override
+                public void setHiImpedance() {
+                    d1.setHiImpedance();
+                    d2.setHiImpedance();
+                    d3.setHiImpedance();
+                    d4.setHiImpedance();
+                }
+            };
+        } else if (destinations.length == 5) {
+            Pin d1 = destinations[0].getOptimised();
+            Pin d2 = destinations[1].getOptimised();
+            Pin d3 = destinations[2].getOptimised();
+            Pin d4 = destinations[3].getOptimised();
+            Pin d5 = destinations[4].getOptimised();
+            return new OutPin(this, "dualDest") {
+                @Override
+                public void setState(boolean newState, boolean newStrong) {
+                    d1.setState(state, strong);
+                    d2.setState(state, strong);
+                    d3.setState(state, strong);
+                    d4.setState(state, strong);
+                    d5.setState(state, strong);
+                }
+
+                @Override
+                public void setHiImpedance() {
+                    d1.setHiImpedance();
+                    d2.setHiImpedance();
+                    d3.setHiImpedance();
+                    d4.setHiImpedance();
+                    d5.setHiImpedance();
+                }
+            };
+        } else if (destinations.length == 6) {
+            Pin d1 = destinations[0].getOptimised();
+            Pin d2 = destinations[1].getOptimised();
+            Pin d3 = destinations[2].getOptimised();
+            Pin d4 = destinations[3].getOptimised();
+            Pin d5 = destinations[4].getOptimised();
+            Pin d6 = destinations[5].getOptimised();
+            return new OutPin(this, "dualDest") {
+                @Override
+                public void setState(boolean newState, boolean newStrong) {
+                    d1.setState(state, strong);
+                    d2.setState(state, strong);
+                    d3.setState(state, strong);
+                    d4.setState(state, strong);
+                    d5.setState(state, strong);
+                    d6.setState(state, strong);
+                }
+
+                @Override
+                public void setHiImpedance() {
+                    d1.setHiImpedance();
+                    d2.setHiImpedance();
+                    d3.setHiImpedance();
+                    d4.setHiImpedance();
+                    d5.setHiImpedance();
+                    d6.setHiImpedance();
+                }
+            };
         } else {
             for (int i = 0; i < destinations.length; i++) {
                 destinations[i] = destinations[i].getOptimised();

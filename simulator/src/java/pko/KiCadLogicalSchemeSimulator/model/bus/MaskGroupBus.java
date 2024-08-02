@@ -54,12 +54,17 @@ public class MaskGroupBus extends OutBus {
     @Override
     public void setState(long newState) {
         long maskState = newState & mask;
-        if (this.maskState != maskState || hiImpedance) {
+        if (hiImpedance) {
             this.maskState = maskState;
             for (Bus destination : destinations) {
                 destination.setState(maskState);
             }
             hiImpedance = false;
+        } else if (this.maskState != maskState) {
+            this.maskState = maskState;
+            for (Bus destination : destinations) {
+                destination.setState(maskState);
+            }
         }
     }
 
@@ -88,10 +93,13 @@ public class MaskGroupBus extends OutBus {
 
                 @Override
                 public void setState(long newState) {
-                    if (hiImpedance || maskState != (newState & mask)) {
+                    if (hiImpedance) {
                         maskState = newState & mask;
                         destination.setState(maskState);
                         hiImpedance = false;
+                    } else if (maskState != (newState & mask)) {
+                        maskState = newState & mask;
+                        destination.setState(maskState);
                     }
                 }
 

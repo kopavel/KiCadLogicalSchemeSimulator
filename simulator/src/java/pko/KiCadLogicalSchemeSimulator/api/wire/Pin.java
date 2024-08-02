@@ -39,15 +39,6 @@ import java.util.Set;
 
 public abstract class Pin extends ModelItem<Pin> {
     public boolean state;
-
-    @Override
-    public Pin copyState(IModelItem<Pin> oldPin) {
-        this.strong = oldPin.isStrong();
-        this.state = oldPin.getState() > 0;
-        this.hiImpedance = oldPin.isHiImpedance();
-        return this;
-    }
-
     @Getter
     public boolean strong = true;
 
@@ -61,6 +52,14 @@ public abstract class Pin extends ModelItem<Pin> {
 
     public Pin(String id, SchemaPart parent) {
         super(id, parent);
+    }
+
+    @Override
+    public Pin copyState(IModelItem<Pin> oldPin) {
+        this.strong = oldPin.isStrong();
+        this.state = oldPin.getState() != 0;
+        this.hiImpedance = oldPin.isHiImpedance();
+        return this;
     }
 
     abstract public void setState(boolean newState, boolean strong);

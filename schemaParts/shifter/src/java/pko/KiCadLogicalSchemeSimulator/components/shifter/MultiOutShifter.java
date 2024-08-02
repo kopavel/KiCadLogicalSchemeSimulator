@@ -114,7 +114,7 @@ public class MultiOutShifter extends SchemaPart {
             addInPin(new FallingEdgeInPin("CP", this) {
                 @Override
                 public void onFallingEdge() {
-                    if (plInactive && latch > 0) {
+                    if (plInactive && latch != 0) {
                         latch = (latch << 1) & outMask;
                         if (dsPins.state) {
                             latch = latch | 1;
@@ -129,7 +129,7 @@ public class MultiOutShifter extends SchemaPart {
             addInPin(new FallingEdgeInPin("CN", this) {
                 @Override
                 public void onFallingEdge() {
-                    if (plInactive && latch > 0) {
+                    if (plInactive && latch != 0) {
                         latch = latch >> 1;
                         if (dsPins.state) {
                             latch = latch | hiDsMask;
@@ -145,7 +145,7 @@ public class MultiOutShifter extends SchemaPart {
             addInPin(new RisingEdgeInPin("CP", this) {
                 @Override
                 public void onRisingEdge() {
-                    if (plInactive && latch > 0) {
+                    if (plInactive && latch != 0) {
                         latch = (latch << 1) & outMask;
                         if (dsPins.state) {
                             latch = latch | 1;
@@ -160,7 +160,7 @@ public class MultiOutShifter extends SchemaPart {
             addInPin(new RisingEdgeInPin("CN", this) {
                 @Override
                 public void onRisingEdge() {
-                    if (plInactive && latch > 0) {
+                    if (plInactive && latch != 0) {
                         latch = latch >> 1;
                         if (dsPins.state) {
                             latch = latch | hiDsMask;

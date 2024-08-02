@@ -76,7 +76,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
             merger.state = state;
             merger.strong = true;
         } else { //to weak
-            if (merger.weakState != 0 && (merger.weakState > 0 ^ state)) {
+            if (merger.weakState != 0 && (merger.weakState > 0) != state) {
                 throw new ShortcutException(merger.sources); // merger in opposite weak state
             }
             if (strong) { // from string

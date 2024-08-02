@@ -82,8 +82,8 @@ public class Shifter extends SchemaPart {
                     plInactive = newState;
                     if (!plInactive) {
                         latch = dBus.state;
-                        if (out.state != ((latch & 1) > 0)) {
-                            out.state = ((latch & 1) > 0);
+                        if (out.state == ((latch & 1) == 0)) {
+                            out.state = ((latch & 1) != 0);
                             out.setState(out.state, true);
                         }
                     }
@@ -97,8 +97,8 @@ public class Shifter extends SchemaPart {
                     plInactive = !newState;
                     if (!plInactive) {
                         latch = dBus.state;
-                        if (out.state != ((latch & 1) > 0)) {
-                            out.state = ((latch & 1) > 0);
+                        if (out.state == ((latch & 1) == 0)) {
+                            out.state = ((latch & 1) != 0);
                             out.setState(out.state, true);
                         }
                     }
@@ -109,13 +109,13 @@ public class Shifter extends SchemaPart {
             addInPin(new FallingEdgeInPin("CP", this) {
                 @Override
                 public void onFallingEdge() {
-                    if (plInactive && latch > 0) {
+                    if (plInactive && latch != 0) {
                         latch = (latch << 1) & outMask;
                         if (dsPins.state) {
                             latch = latch | 1;
                         }
-                        if (out.state != ((latch & 1) > 0)) {
-                            out.state = ((latch & 1) > 0);
+                        if (out.state == ((latch & 1) == 0)) {
+                            out.state = ((latch & 1) != 0);
                             out.setState(out.state, true);
                         }
                     }
@@ -124,13 +124,13 @@ public class Shifter extends SchemaPart {
             addInPin(new FallingEdgeInPin("CN", this) {
                 @Override
                 public void onFallingEdge() {
-                    if (plInactive && latch > 0) {
+                    if (plInactive && latch != 0) {
                         latch = latch >> 1;
                         if (dsPins.state) {
                             latch = latch | hiDsMask;
                         }
-                        if (out.state != ((latch & 1) > 0)) {
-                            out.state = ((latch & 1) > 0);
+                        if (out.state == ((latch & 1) == 0)) {
+                            out.state = ((latch & 1) != 0);
                             out.setState(out.state, true);
                         }
                     }
@@ -140,13 +140,13 @@ public class Shifter extends SchemaPart {
             addInPin(new RisingEdgeInPin("CP", this) {
                 @Override
                 public void onRisingEdge() {
-                    if (plInactive && latch > 0) {
+                    if (plInactive && latch != 0) {
                         latch = (latch << 1) & outMask;
                         if (dsPins.state) {
                             latch = latch | 1;
                         }
-                        if (out.state != ((latch & 1) > 0)) {
-                            out.state = ((latch & 1) > 0);
+                        if (out.state == ((latch & 1) == 0)) {
+                            out.state = ((latch & 1) != 0);
                             out.setState(out.state, true);
                         }
                     }
@@ -155,13 +155,13 @@ public class Shifter extends SchemaPart {
             addInPin(new RisingEdgeInPin("CN", this) {
                 @Override
                 public void onRisingEdge() {
-                    if (plInactive && latch > 0) {
+                    if (plInactive && latch != 0) {
                         latch = latch >> 1;
                         if (dsPins.state) {
                             latch = latch | hiDsMask;
                         }
-                        if (out.state != ((latch & 1) > 0)) {
-                            out.state = ((latch & 1) > 0);
+                        if (out.state == ((latch & 1) == 0)) {
+                            out.state = ((latch & 1) != 0);
                             out.setState(out.state, true);
                         }
                     }

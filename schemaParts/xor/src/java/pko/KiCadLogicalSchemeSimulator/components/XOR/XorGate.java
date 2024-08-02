@@ -68,8 +68,8 @@ public class XorGate extends SchemaPart {
                 @Override
                 public void setState(boolean newState, boolean strong) {
                     state = newState;
-                    if (out.state != (in1.state ^ in2.state)) {
-                        out.state = (in1.state ^ in2.state);
+                    if (out.state == (in1.state == in2.state)) {
+                        out.state = (in1.state != in2.state);
                         out.setState(out.state, strong);
                     }
                 }
@@ -78,8 +78,8 @@ public class XorGate extends SchemaPart {
                 @Override
                 public void setState(boolean newState, boolean strong) {
                     state = newState;
-                    if (out.state != (in1.state ^ in2.state)) {
-                        out.state = (in1.state ^ in2.state);
+                    if (out.state == (in1.state == in2.state)) {
+                        out.state = (in1.state != in2.state);
                         out.setState(out.state, strong);
                     }
                 }
@@ -91,7 +91,7 @@ public class XorGate extends SchemaPart {
     @Override
     public void initOuts() {
         out = getOutPin("OUT");
-        out.state = (in1.state ^ in2.state);
+        out.state = (in1.state != in2.state);
     }
 
     @Override
