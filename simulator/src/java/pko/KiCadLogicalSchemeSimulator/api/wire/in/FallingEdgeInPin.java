@@ -29,59 +29,23 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.api.pins.out;
-import pko.KiCadLogicalSchemeSimulator.api.pins.in.EdgeInPin;
-import pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
+package pko.KiCadLogicalSchemeSimulator.api.wire.in;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 
-public class TriStateOutPin extends OutPin {
-    public boolean hiImpedance = true;
-
-    public TriStateOutPin(String id, SchemaPart parent, int size, String... names) {
-        super(id, parent, size, names);
+public abstract class FallingEdgeInPin extends EdgeInPin {
+    public FallingEdgeInPin(String id, SchemaPart parent) {
+        super(id, parent);
     }
 
     @Override
-    public void addDestination(InPin pin) {
-        if (pin instanceof EdgeInPin) {
-            throw new RuntimeException("Edge pin on tri-state out");
-        }
-        destination = pin;
+    public void onRisingEdge() {
     }
 
     @Override
-    public void setState(long newState) {
-        if (hiImpedance) {
-            hiImpedance = false;
-            state = newState;
-            destination.state = newState & destination.mask;
-            destination.onChange(destination.state, false, true);
-        } else if (newState != this.state) {
-            state = newState;
-            destination.state = newState & destination.mask;
-            destination.onChange(destination.state, false, true);
-        }
-    }
-
-    @Override
-    public void setStateForce(long newState) {
-        hiImpedance = false;
+    public void setState(boolean newState, boolean strong) {
         state = newState;
-        destination.state = newState & destination.mask;
-        destination.onChange(destination.state, false, true);
-    }
-
-    @Override
-    public void reSendState() {
-        destination.state = state & destination.mask;
-        destination.onChange(destination.state, hiImpedance, true);
-    }
-
-    public void setHiImpedance() {
-        if (!hiImpedance) {
-            hiImpedance = true;
-            destination.state = 0;
-            destination.onChange(destination.state, true, true);
+        if (!newState) {
+            onFallingEdge();
         }
     }
 }

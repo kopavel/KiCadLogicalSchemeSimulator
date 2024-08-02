@@ -29,19 +29,14 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.api_v2.wire.in;
-import pko.KiCadLogicalSchemeSimulator.api_v2.FloatingInException;
-import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api_v2.wire.Pin;
+package pko.KiCadLogicalSchemeSimulator.api.bus.in;
+import pko.KiCadLogicalSchemeSimulator.api.FloatingInException;
+import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 
-public abstract class NoFloatingInPin extends InPin {
-    public NoFloatingInPin(String id, SchemaPart parent) {
-        super(id, parent);
+public abstract class NoFloatingCorrectedInBus extends CorrectedInBus {
+    public NoFloatingCorrectedInBus(String id, SchemaPart parent, int size, String... names) {
+        super(id, parent, size, names);
         hiImpedance = false;
-    }
-
-    public NoFloatingInPin(Pin oldPin, String variantId) {
-        super(oldPin, variantId);
     }
 
     @Override

@@ -29,11 +29,11 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.api_v2.wire;
+package pko.KiCadLogicalSchemeSimulator.api.wire;
 import lombok.Getter;
-import pko.KiCadLogicalSchemeSimulator.api_v2.IModelItem;
-import pko.KiCadLogicalSchemeSimulator.api_v2.ModelItem;
-import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
+import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
+import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 
 import java.util.Set;
 

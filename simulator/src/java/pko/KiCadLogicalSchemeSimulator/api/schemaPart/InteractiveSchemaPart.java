@@ -29,47 +29,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.api.pins;
-import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
-public abstract class Pin {
-    public final String id;
-    public final SchemaPart parent;
-    public final int size;
-    //Fixme volatile??
-    public long state;
-    public long mask;
-    public Map<String, Byte> aliasOffsets = new HashMap<>();
-    public boolean useBitPresentation;
-
-    public Pin(String id, SchemaPart parent, int size, String... names) {
-        this.id = id;
-        this.parent = parent;
-        this.size = size;
-        if (names == null || names.length == 0) {
-            if (size == 1) {
-                aliasOffsets.put(id, (byte) 0);
-            } else {
-                for (byte i = 0; i < size; i++) {
-                    aliasOffsets.put(id + i, i);
-                }
-            }
-        } else if (names.length != size) {
-            throw new RuntimeException("Pin definition Error, Names amount not equal size, pin" + getName());
-        } else if (size == 1) {
-            aliasOffsets = Collections.singletonMap(id, (byte) 0);
-        } else {
-            for (byte i = 0; i < names.length; i++) {
-                aliasOffsets.put(names[i], i);
-            }
-        }
-    }
-
-    public String getName() {
-        return parent.id + "_" + id;
-    }
+package pko.KiCadLogicalSchemeSimulator.api.schemaPart;
+public interface InteractiveSchemaPart {
+    AbstractUiComponent getComponent();
 }

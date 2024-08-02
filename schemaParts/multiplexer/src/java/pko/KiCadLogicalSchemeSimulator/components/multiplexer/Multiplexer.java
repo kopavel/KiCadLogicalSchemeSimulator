@@ -30,11 +30,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.multiplexer;
-import pko.KiCadLogicalSchemeSimulator.api_v2.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.api_v2.bus.in.InBus;
-import pko.KiCadLogicalSchemeSimulator.api_v2.bus.in.NoFloatingCorrectedInBus;
-import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.NoFloatingInPin;
+import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
+import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
+import pko.KiCadLogicalSchemeSimulator.api.bus.in.NoFloatingCorrectedInBus;
+import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
 
 import java.util.ArrayList;
 import java.util.List;

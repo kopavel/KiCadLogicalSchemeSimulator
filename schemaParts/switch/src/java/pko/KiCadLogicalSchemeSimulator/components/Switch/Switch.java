@@ -30,12 +30,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.Switch;
-import pko.KiCadLogicalSchemeSimulator.api_v2.ShortcutException;
-import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.AbstractUiComponent;
-import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.InteractiveSchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api_v2.wire.PassivePin;
-import pko.KiCadLogicalSchemeSimulator.api_v2.wire.Pin;
+import pko.KiCadLogicalSchemeSimulator.api.ShortcutException;
+import pko.KiCadLogicalSchemeSimulator.api.schemaPart.AbstractUiComponent;
+import pko.KiCadLogicalSchemeSimulator.api.schemaPart.InteractiveSchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 
 public class Switch extends SchemaPart implements InteractiveSchemaPart {
     private final PassivePin pin1;

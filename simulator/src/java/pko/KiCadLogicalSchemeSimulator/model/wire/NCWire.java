@@ -30,9 +30,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.model.wire;
-import pko.KiCadLogicalSchemeSimulator.api_v2.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.api_v2.wire.OutPin;
-import pko.KiCadLogicalSchemeSimulator.api_v2.wire.Pin;
+import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
+import pko.KiCadLogicalSchemeSimulator.api.wire.OutPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 
 public class NCWire extends OutPin {
     public NCWire(OutPin outPin) {

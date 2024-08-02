@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.oscillator;
-import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.AbstractUiComponent;
+import pko.KiCadLogicalSchemeSimulator.api.schemaPart.AbstractUiComponent;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;

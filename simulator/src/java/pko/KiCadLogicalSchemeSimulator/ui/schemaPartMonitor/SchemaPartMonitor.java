@@ -33,10 +33,10 @@ package pko.KiCadLogicalSchemeSimulator.ui.schemaPartMonitor;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import pko.KiCadLogicalSchemeSimulator.Simulator;
-import pko.KiCadLogicalSchemeSimulator.api_v2.IModelItem;
-import pko.KiCadLogicalSchemeSimulator.api_v2.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.AbstractUiComponent;
-import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
+import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
+import pko.KiCadLogicalSchemeSimulator.api.schemaPart.AbstractUiComponent;
+import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 import javax.swing.*;

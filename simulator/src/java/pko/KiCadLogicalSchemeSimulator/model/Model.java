@@ -30,18 +30,18 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.model;
-import pko.KiCadLogicalSchemeSimulator.api_v2.FloatingInException;
-import pko.KiCadLogicalSchemeSimulator.api_v2.IModelItem;
-import pko.KiCadLogicalSchemeSimulator.api_v2.ShortcutException;
-import pko.KiCadLogicalSchemeSimulator.api_v2.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.api_v2.bus.OutBus;
-import pko.KiCadLogicalSchemeSimulator.api_v2.bus.in.InBus;
-import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPartSpi;
-import pko.KiCadLogicalSchemeSimulator.api_v2.wire.OutPin;
-import pko.KiCadLogicalSchemeSimulator.api_v2.wire.PassivePin;
-import pko.KiCadLogicalSchemeSimulator.api_v2.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.InPin;
+import pko.KiCadLogicalSchemeSimulator.api.FloatingInException;
+import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
+import pko.KiCadLogicalSchemeSimulator.api.ShortcutException;
+import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
+import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
+import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
+import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
+import pko.KiCadLogicalSchemeSimulator.api.wire.OutPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
 import pko.KiCadLogicalSchemeSimulator.model.bus.BusInInterconnect;
 import pko.KiCadLogicalSchemeSimulator.model.merger.bus.BusMerger;
 import pko.KiCadLogicalSchemeSimulator.model.merger.wire.WireMerger;

@@ -31,7 +31,7 @@
  */
 package pko.KiCadLogicalSchemeSimulator.components.oscillator.oscilloscope;
 import pko.KiCadLogicalSchemeSimulator.Simulator;
-import pko.KiCadLogicalSchemeSimulator.api_v2.IModelItem;
+import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
 
 import javax.swing.*;
 import java.util.Comparator;

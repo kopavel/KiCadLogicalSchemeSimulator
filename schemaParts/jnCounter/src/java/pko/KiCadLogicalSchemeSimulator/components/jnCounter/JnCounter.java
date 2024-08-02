@@ -30,12 +30,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.jnCounter;
-import pko.KiCadLogicalSchemeSimulator.api_v2.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api_v2.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.EdgeInPin;
-import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.FallingEdgeInPin;
-import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.RisingEdgeInPin;
+import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
+import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.in.EdgeInPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.in.FallingEdgeInPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.in.RisingEdgeInPin;
 
 public class JnCounter extends SchemaPart {
     private final long coMax;

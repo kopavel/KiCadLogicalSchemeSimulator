@@ -34,13 +34,13 @@ import com.codingrodent.microprocessor.Io.AsyncIoQueue;
 import com.codingrodent.microprocessor.Io.IoRequest;
 import com.codingrodent.microprocessor.Z80.CPUConstants;
 import com.codingrodent.microprocessor.Z80.Z80Core;
-import pko.KiCadLogicalSchemeSimulator.api_v2.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.api_v2.bus.in.InBus;
-import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api_v2.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.EdgeInPin;
-import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.InPin;
-import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.RisingEdgeInPin;
+import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
+import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
+import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.in.EdgeInPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.in.RisingEdgeInPin;
 
 public class Z80Cpu extends SchemaPart {
     private final Z80Core cpu;

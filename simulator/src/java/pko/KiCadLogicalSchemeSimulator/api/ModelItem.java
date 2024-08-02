@@ -29,9 +29,40 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.api_v2;
-public class FloatingInException extends RuntimeException {
-    public FloatingInException(ModelItem pin) {
-        super("Floating pin " + pin.getName());
+package pko.KiCadLogicalSchemeSimulator.api;
+import lombok.Getter;
+import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+
+@Getter
+public abstract class ModelItem<T> implements IModelItem<T> {
+    public String id;
+    public SchemaPart parent;
+    public String variantId;
+    public boolean hiImpedance = true;
+
+    protected ModelItem(String id, SchemaPart parent) {
+        this.id = id;
+        this.parent = parent;
+    }
+
+    @Override
+    public ModelItem<T> getOptimised() {
+        return this;
+    }
+
+    public String getName() {
+        return parent.id + "_" + id;
+    }
+
+    @Override
+    public String toString() {
+        return hiImpedance + ":" + getName() + (variantId == null ? "" : ":" + variantId) + ":" + super.toString();
+    }
+
+    public abstract void setHiImpedance();
+
+    @Override
+    public int compareTo(IModelItem<T> other) {
+        return getName().compareTo(other.getName());
     }
 }

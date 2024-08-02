@@ -29,16 +29,24 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.api_v2.bus.in;
-import pko.KiCadLogicalSchemeSimulator.api_v2.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
+package pko.KiCadLogicalSchemeSimulator.api.wire.in;
+import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 
-public abstract class CorrectedInBus extends InBus {
-    public CorrectedInBus(String id, SchemaPart parent, int size, String... names) {
-        super(id, parent, size, names);
+public abstract class EdgeInPin extends NoFloatingInPin {
+    public EdgeInPin(String id, SchemaPart parent) {
+        super(id, parent);
     }
 
-    public CorrectedInBus(Bus oldBus, String variantId) {
-        super(oldBus, variantId);
+    public abstract void onFallingEdge();
+    public abstract void onRisingEdge();
+
+    @Override
+    public void setState(boolean newState, boolean strong) {
+        state = newState;
+        if (newState) {
+            onRisingEdge();
+        } else {
+            onFallingEdge();
+        }
     }
 }

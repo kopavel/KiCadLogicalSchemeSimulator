@@ -31,7 +31,7 @@
  */
 package pko.KiCadLogicalSchemeSimulator.components.LED;
 import lombok.Setter;
-import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.AbstractUiComponent;
+import pko.KiCadLogicalSchemeSimulator.api.schemaPart.AbstractUiComponent;
 
 import java.awt.*;
 import java.awt.geom.Ellipse2D;

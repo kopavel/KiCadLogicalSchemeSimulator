@@ -29,8 +29,8 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.api_v2;
-import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
+package pko.KiCadLogicalSchemeSimulator.api;
+import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 
 import java.util.Set;
 

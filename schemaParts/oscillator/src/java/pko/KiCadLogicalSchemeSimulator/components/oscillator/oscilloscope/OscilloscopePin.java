@@ -30,8 +30,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.oscillator.oscilloscope;
-import pko.KiCadLogicalSchemeSimulator.api_v2.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.NoFloatingInPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
 
 public class OscilloscopePin extends NoFloatingInPin {
     public final Pin wrapped;

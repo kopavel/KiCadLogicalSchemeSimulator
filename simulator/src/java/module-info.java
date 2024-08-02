@@ -29,19 +29,15 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPartSpi;
+import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
 
 module KiCadLogicalSchemeSimulator.simulator {
-    exports pko.KiCadLogicalSchemeSimulator.api.pins.in;
-    exports pko.KiCadLogicalSchemeSimulator.api.pins.out;
-    exports pko.KiCadLogicalSchemeSimulator.api.pins;
+    exports pko.KiCadLogicalSchemeSimulator.api.bus.in;
+    exports pko.KiCadLogicalSchemeSimulator.api.bus;
     exports pko.KiCadLogicalSchemeSimulator.api.schemaPart;
-    exports pko.KiCadLogicalSchemeSimulator.api_v2;
-    exports pko.KiCadLogicalSchemeSimulator.api_v2.bus.in;
-    exports pko.KiCadLogicalSchemeSimulator.api_v2.bus;
-    exports pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart;
-    exports pko.KiCadLogicalSchemeSimulator.api_v2.wire.in;
-    exports pko.KiCadLogicalSchemeSimulator.api_v2.wire;
+    exports pko.KiCadLogicalSchemeSimulator.api.wire.in;
+    exports pko.KiCadLogicalSchemeSimulator.api.wire;
+    exports pko.KiCadLogicalSchemeSimulator.api;
     exports pko.KiCadLogicalSchemeSimulator.model;
     exports pko.KiCadLogicalSchemeSimulator.parsers.pojo.symbolMap;
     exports pko.KiCadLogicalSchemeSimulator.parsers.pojo;

@@ -30,13 +30,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.stateMachine;
-import pko.KiCadLogicalSchemeSimulator.api_v2.FloatingInException;
-import pko.KiCadLogicalSchemeSimulator.api_v2.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.api_v2.bus.in.InBus;
-import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.EdgeInPin;
-import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.InPin;
-import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.NoFloatingInPin;
+import pko.KiCadLogicalSchemeSimulator.api.FloatingInException;
+import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
+import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
+import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api.wire.in.EdgeInPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
 
 public class StateMachine extends SchemaPart {
     private final long[] states;

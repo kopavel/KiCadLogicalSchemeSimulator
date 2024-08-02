@@ -30,9 +30,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.model.merger.wire;
-import pko.KiCadLogicalSchemeSimulator.api_v2.ShortcutException;
-import pko.KiCadLogicalSchemeSimulator.api_v2.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.InPin;
+import pko.KiCadLogicalSchemeSimulator.api.ShortcutException;
+import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
 import pko.KiCadLogicalSchemeSimulator.model.merger.MergerInput;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 

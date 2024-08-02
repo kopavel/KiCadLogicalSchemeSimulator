@@ -29,10 +29,10 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.api_v2.bus;
-import pko.KiCadLogicalSchemeSimulator.api_v2.bus.in.CorrectedInBus;
-import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api_v2.wire.Pin;
+package pko.KiCadLogicalSchemeSimulator.api.bus;
+import pko.KiCadLogicalSchemeSimulator.api.bus.in.CorrectedInBus;
+import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.model.bus.BusToWireAdapter;
 import pko.KiCadLogicalSchemeSimulator.model.bus.MaskGroupBus;
 import pko.KiCadLogicalSchemeSimulator.model.bus.NCBus;

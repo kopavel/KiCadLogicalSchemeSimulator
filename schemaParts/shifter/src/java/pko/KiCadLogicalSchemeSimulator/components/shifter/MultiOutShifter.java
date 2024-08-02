@@ -30,14 +30,14 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.shifter;
-import pko.KiCadLogicalSchemeSimulator.api_v2.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.api_v2.bus.in.CorrectedInBus;
-import pko.KiCadLogicalSchemeSimulator.api_v2.bus.in.InBus;
-import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.FallingEdgeInPin;
-import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.InPin;
-import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.NoFloatingInPin;
-import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.RisingEdgeInPin;
+import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
+import pko.KiCadLogicalSchemeSimulator.api.bus.in.CorrectedInBus;
+import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
+import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api.wire.in.FallingEdgeInPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.in.RisingEdgeInPin;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 import java.util.stream.IntStream;

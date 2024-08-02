@@ -30,8 +30,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.tools;
-import pko.KiCadLogicalSchemeSimulator.api_v2.ModelItem;
-import pko.KiCadLogicalSchemeSimulator.api_v2.bus.OutBus;
+import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
+import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;

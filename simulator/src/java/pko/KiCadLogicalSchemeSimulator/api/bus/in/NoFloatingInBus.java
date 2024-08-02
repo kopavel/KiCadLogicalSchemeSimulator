@@ -29,48 +29,18 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.api.pins.in;
-import pko.KiCadLogicalSchemeSimulator.api.pins.Pin;
-import pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
+package pko.KiCadLogicalSchemeSimulator.api.bus.in;
+import pko.KiCadLogicalSchemeSimulator.api.FloatingInException;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 
-//FixMe make Sense Pin
-public abstract class InPin extends Pin {
-    public byte offset;
-    public OutPin source;
-    public byte nOffset;
-
-    public InPin(String id, SchemaPart parent, int size, String... names) {
+public abstract class NoFloatingInBus extends InBus {
+    public NoFloatingInBus(String id, SchemaPart parent, int size, String... names) {
         super(id, parent, size, names);
+        hiImpedance = false;
     }
 
-    public InPin(String id, SchemaPart parent) {
-        super(id, parent, 1);
+    @Override
+    public void setHiImpedance() {
+        throw new FloatingInException(this);
     }
-
-    public void addSource(OutPin source) {
-        this.source = source;
-        source.addDestination(this);
-    }
-
-    public long getState() {
-        return correctState(state);
-    }
-
-    public long correctState(long state) {
-        if (offset == 0) {
-            return state;
-        } else if (offset > 0) {
-            return state >> offset;
-        } else {
-            return state << nOffset;
-        }
-    }
-
-    public void setOffset(byte offset) {
-        this.offset = offset;
-        this.nOffset = (byte) -offset;
-    }
-
-    abstract public void onChange(long newState, boolean hiImpedance, boolean strong);
 }

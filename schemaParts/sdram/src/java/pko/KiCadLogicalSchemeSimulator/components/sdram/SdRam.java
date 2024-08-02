@@ -30,13 +30,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.sdram;
-import pko.KiCadLogicalSchemeSimulator.api_v2.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.api_v2.bus.in.InBus;
-import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.EdgeInPin;
-import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.FallingEdgeInPin;
-import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.InPin;
-import pko.KiCadLogicalSchemeSimulator.api_v2.wire.in.RisingEdgeInPin;
+import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
+import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
+import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api.wire.in.EdgeInPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.in.FallingEdgeInPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.in.RisingEdgeInPin;
 
 public class SdRam extends SchemaPart {
     private final long[] bytes;

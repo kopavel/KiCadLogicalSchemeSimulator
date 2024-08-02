@@ -29,9 +29,9 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.api_v2.wire;
-import pko.KiCadLogicalSchemeSimulator.api_v2.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
+package pko.KiCadLogicalSchemeSimulator.api.wire;
+import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
+import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.model.wire.NCWire;
 import pko.KiCadLogicalSchemeSimulator.model.wire.WireToBusAdapter;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;

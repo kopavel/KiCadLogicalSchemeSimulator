@@ -29,22 +29,23 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.api.pins.in;
+package pko.KiCadLogicalSchemeSimulator.api.wire;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 
-public abstract class RisingEdgeInPin extends EdgeInPin {
-    public RisingEdgeInPin(String id, SchemaPart parent) {
+public abstract class PassivePin extends OutPin {
+    public PassivePin(String id, SchemaPart parent) {
         super(id, parent);
     }
 
     @Override
-    public void onFallingEdge() {
-    }
+    abstract public void setState(boolean newState, boolean strong);
+    @Override
+    abstract public void setHiImpedance();
+    @Override
+    abstract public void resend();
 
     @Override
-    public void onChange(long newState, boolean hiImpedance, boolean strong) {
-        if (newState != 0) {
-            onRisingEdge();
-        }
+    public Pin getOptimised() {
+        return this;
     }
 }

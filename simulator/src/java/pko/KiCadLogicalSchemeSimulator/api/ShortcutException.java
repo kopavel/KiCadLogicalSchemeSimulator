@@ -29,23 +29,27 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.api_v2.wire.in;
-import pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart.SchemaPart;
+package pko.KiCadLogicalSchemeSimulator.api;
+import lombok.Getter;
 
-public abstract class RisingEdgeInPin extends EdgeInPin {
-    public RisingEdgeInPin(String id, SchemaPart parent) {
-        super(id, parent);
-    }
+@Getter
+public class ShortcutException extends RuntimeException {
+    private final String message;
 
-    @Override
-    public void onFallingEdge() {
-    }
-
-    @Override
-    public void setState(boolean newState, boolean strong) {
-        state = newState;
-        if (newState) {
-            onRisingEdge();
+    public ShortcutException(IModelItem<?>... pins) {
+        StringBuilder message = new StringBuilder("Shortcut on ");
+        for (IModelItem<?> pin : pins) {
+            message.append(pin.getName()).append(":");
+            if (pin.isHiImpedance()) {
+                message.append("H");
+            } else {
+                if (!pin.isStrong()) {
+                    message.append("W");
+                }
+                message.append(pin.getState());
+            }
+            message.append("; ");
         }
+        this.message = message.toString();
     }
 }

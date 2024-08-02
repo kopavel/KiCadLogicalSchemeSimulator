@@ -30,8 +30,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.oscillator.oscilloscope;
-import pko.KiCadLogicalSchemeSimulator.api_v2.IModelItem;
-import pko.KiCadLogicalSchemeSimulator.api_v2.bus.Bus;
+import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
+import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.tools.UiTools;
 import pko.KiCadLogicalSchemeSimulator.tools.ringBuffers.*;
 

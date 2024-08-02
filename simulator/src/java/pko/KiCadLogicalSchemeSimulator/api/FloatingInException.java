@@ -29,8 +29,9 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.api_v2.schemaPart;
-public interface SchemaPartSpi {
-    SchemaPart getSchemaPart(String id, String params);
-    Class<? extends SchemaPart> getSchemaPartClass();
+package pko.KiCadLogicalSchemeSimulator.api;
+public class FloatingInException extends RuntimeException {
+    public FloatingInException(ModelItem pin) {
+        super("Floating pin " + pin.getName());
+    }
 }

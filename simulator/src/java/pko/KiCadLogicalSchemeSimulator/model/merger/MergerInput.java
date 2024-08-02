@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.model.merger;
-import pko.KiCadLogicalSchemeSimulator.api_v2.IModelItem;
+import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
 
 public interface MergerInput<T> extends IModelItem<T> {
     String getName();
