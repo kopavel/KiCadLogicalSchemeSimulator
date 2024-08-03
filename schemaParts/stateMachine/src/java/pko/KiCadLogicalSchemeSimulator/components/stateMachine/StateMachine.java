@@ -37,6 +37,8 @@ import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.EdgeInPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
+import pko.KiCadLogicalSchemeSimulator.model.Model;
+import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 public class StateMachine extends SchemaPart {
     private final long[] states;
@@ -134,7 +136,12 @@ public class StateMachine extends SchemaPart {
             @Override
             public void setHiImpedance() {
                 if (sPin.state) {
-                    throw new FloatingInException(this);
+                    if (Model.stabilizing) {
+                        Model.forResend.add(this);
+                        Log.warn(this.getClass(), "Floating pin {}, try resend later", this);
+                    } else {
+                        throw new FloatingInException(this);
+                    }
                 }
             }
 

@@ -35,6 +35,8 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.in.CorrectedInBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
+import pko.KiCadLogicalSchemeSimulator.model.Model;
+import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 public class Decoder extends SchemaPart {
     private Bus outBus;
@@ -67,7 +69,12 @@ public class Decoder extends SchemaPart {
                     assert !hiImpedance : "Already in hiImpedance:" + this;
                     hiImpedance = true;
                     if (csState) {
-                        throw new FloatingInException(this);
+                        if (Model.stabilizing) {
+                            Model.forResend.add(this);
+                            Log.warn(this.getClass(), "Floating pin {}, try resend later", this);
+                        } else {
+                            throw new FloatingInException(this);
+                        }
                     }
                 }
             });
@@ -92,7 +99,12 @@ public class Decoder extends SchemaPart {
                     assert !hiImpedance : "Already in hiImpedance:" + this;
                     hiImpedance = true;
                     if (csState) {
-                        throw new FloatingInException(this);
+                        if (Model.stabilizing) {
+                            Model.forResend.add(this);
+                            Log.warn(this.getClass(), "Floating pin {}, try resend later", this);
+                        } else {
+                            throw new FloatingInException(this);
+                        }
                     }
                 }
             });
@@ -105,7 +117,12 @@ public class Decoder extends SchemaPart {
                     csState = !newState;
                     if (csState) {
                         if (aBus.hiImpedance) {
-                            throw new FloatingInException(aBus);
+                            if (Model.stabilizing) {
+                                Model.forResend.add(this);
+                                Log.warn(this.getClass(), "Floating pin {}, try resend later", this);
+                            } else {
+                                throw new FloatingInException(aBus);
+                            }
                         } else if (outBus.state != outState || outBus.hiImpedance) {
                             outBus.state = outState;
                             outBus.setState(outState);
@@ -125,7 +142,12 @@ public class Decoder extends SchemaPart {
                     csState = newState;
                     if (csState) {
                         if (aBus.hiImpedance) {
-                            throw new FloatingInException(aBus);
+                            if (Model.stabilizing) {
+                                Model.forResend.add(this);
+                                Log.warn(this.getClass(), "Floating pin {}, try resend later", this);
+                            } else {
+                                throw new FloatingInException(aBus);
+                            }
                         } else if (outBus.state != outState || outBus.hiImpedance) {
                             outBus.state = outState;
                             outBus.setState(outState);

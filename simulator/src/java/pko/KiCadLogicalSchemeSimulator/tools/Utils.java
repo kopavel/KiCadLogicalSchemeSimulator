@@ -100,9 +100,9 @@ public class Utils {
     }
 
     @SafeVarargs
-    public static String getHash(Collection<? extends ModelItem>... items) {
+    public static String getHash(Collection<? extends ModelItem<?>>... items) {
         Stream<String> mergedStream = null;
-        for (Collection<? extends ModelItem> item : items) {
+        for (Collection<? extends ModelItem<?>> item : items) {
             Stream<String> itemStream = item.stream()
                     .map(modelItem -> {
                         String result = modelItem.getName();

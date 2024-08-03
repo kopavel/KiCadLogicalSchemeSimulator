@@ -32,6 +32,8 @@
 package pko.KiCadLogicalSchemeSimulator.api.bus.in;
 import pko.KiCadLogicalSchemeSimulator.api.FloatingInException;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.model.Model;
+import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 public abstract class NoFloatingInBus extends InBus {
     public NoFloatingInBus(String id, SchemaPart parent, int size, String... names) {
@@ -41,6 +43,11 @@ public abstract class NoFloatingInBus extends InBus {
 
     @Override
     public void setHiImpedance() {
-        throw new FloatingInException(this);
+        if (Model.stabilizing) {
+            Model.forResend.add(this);
+            Log.warn(this.getClass(), "Floating pin {}, try resend later", this);
+        } else {
+            throw new FloatingInException(this);
+        }
     }
 }

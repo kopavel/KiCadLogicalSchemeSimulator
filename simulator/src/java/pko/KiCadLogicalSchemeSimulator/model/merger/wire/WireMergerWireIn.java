@@ -33,6 +33,7 @@ package pko.KiCadLogicalSchemeSimulator.model.merger.wire;
 import pko.KiCadLogicalSchemeSimulator.api.ShortcutException;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
+import pko.KiCadLogicalSchemeSimulator.model.Model;
 import pko.KiCadLogicalSchemeSimulator.model.merger.MergerInput;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
@@ -65,19 +66,37 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
         if (newStrong) { // to strong
             if (!strong) { // from weak
                 if (merger.strong) {
-                    throw new ShortcutException(merger.sources); //but merger already strong
+                    if (Model.stabilizing) {
+                        Model.forResend.add(this);
+                        Log.warn(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
+                        return;
+                    } else {
+                        throw new ShortcutException(merger.sources); //but merger already strong
+                    }
                 }
                 if (!hiImpedance) {
                     merger.weakState -= (byte) (merger.weakState > 0 ? 1 : -1); //count down weak states
                 }
             } else if (hiImpedance && merger.strong) { //from hiImpedance but merger already strong
-                throw new ShortcutException(merger.sources);
+                if (Model.stabilizing) {
+                    Model.forResend.add(this);
+                    Log.warn(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
+                    return;
+                } else {
+                    throw new ShortcutException(merger.sources);
+                }
             }
             merger.state = state;
             merger.strong = true;
         } else { //to weak
             if (merger.weakState != 0 && (merger.weakState > 0) != state) {
-                throw new ShortcutException(merger.sources); // merger in opposite weak state
+                if (Model.stabilizing) {
+                    Model.forResend.add(this);
+                    Log.warn(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
+                    return;
+                } else {
+                    throw new ShortcutException(merger.sources); // merger in opposite weak state
+                }
             }
             if (strong) { // from string
                 merger.weakState += (byte) (state ? 1 : -1); // count up weak state

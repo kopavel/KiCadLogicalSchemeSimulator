@@ -48,7 +48,7 @@ public class MainUI extends JFrame {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                if (Model.stabilized) {
+                if (!Model.stabilizing) {
                     Simulator.saveLayout();
                 }
                 System.exit(0);

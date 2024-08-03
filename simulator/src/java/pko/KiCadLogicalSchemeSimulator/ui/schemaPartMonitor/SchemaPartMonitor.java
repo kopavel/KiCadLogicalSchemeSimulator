@@ -241,6 +241,6 @@ public class SchemaPartMonitor extends JFrame {
         var1.add(var7, new GridConstraints(1, 2, 1, 1, 8, 2, 3, 3, null, null, null));
     }
 
-    private record Item(IModelItem item, JLabel label, Long mask) {
+    private record Item(IModelItem<?> item, JLabel label, Long mask) {
     }
 }

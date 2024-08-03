@@ -39,6 +39,8 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.in.FallingEdgeInPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.RisingEdgeInPin;
+import pko.KiCadLogicalSchemeSimulator.model.Model;
+import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 public class Ram extends SchemaPart {
     private final long[] words;
@@ -87,7 +89,12 @@ public class Ram extends SchemaPart {
             public void setHiImpedance() {
                 hiImpedance = true;
                 if (!csPin.state) {
-                    throw new FloatingInException(this);
+                    if (Model.stabilizing) {
+                        Model.forResend.add(this);
+                        Log.warn(this.getClass(), "Floating pin {}, try resend later", this);
+                    } else {
+                        throw new FloatingInException(this);
+                    }
                 }
             }
 

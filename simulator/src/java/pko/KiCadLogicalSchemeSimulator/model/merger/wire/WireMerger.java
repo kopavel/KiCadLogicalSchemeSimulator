@@ -35,7 +35,9 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
 import pko.KiCadLogicalSchemeSimulator.api.wire.OutPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
+import pko.KiCadLogicalSchemeSimulator.model.Model;
 import pko.KiCadLogicalSchemeSimulator.model.merger.MergerInput;
+import pko.KiCadLogicalSchemeSimulator.tools.Log;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 import java.util.List;
@@ -88,7 +90,13 @@ public class WireMerger extends OutPin {
         sources = Utils.addToArray(sources, input);
         if (!bus.hiImpedance) {
             if (strong) {
-                throw new ShortcutException(sources);
+                if (Model.stabilizing) {
+                    Model.forResend.add(this);
+                    Log.warn(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
+                    return;
+                } else {
+                    throw new ShortcutException(sources);
+                }
             }
             strong = true;
             state = (bus.state & mask) != 0;
@@ -103,13 +111,25 @@ public class WireMerger extends OutPin {
             hiImpedance = false;
             if (pin.strong) {
                 if (strong) {
-                    throw new ShortcutException(sources);
+                    if (Model.stabilizing) {
+                        Model.forResend.add(this);
+                        Log.warn(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
+                        return;
+                    } else {
+                        throw new ShortcutException(sources);
+                    }
                 }
                 strong = true;
                 state = pin.state;
             } else {
                 if (weakState != 0 && (weakState > 0 != pin.state)) {
-                    throw new ShortcutException(sources);
+                    if (Model.stabilizing) {
+                        Model.forResend.add(this);
+                        Log.warn(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
+                        return;
+                    } else {
+                        throw new ShortcutException(sources);
+                    }
                 }
                 weakState += (byte) (pin.state ? 1 : -1);
                 if (!strong) {

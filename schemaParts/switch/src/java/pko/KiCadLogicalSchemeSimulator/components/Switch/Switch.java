@@ -36,6 +36,8 @@ import pko.KiCadLogicalSchemeSimulator.api.schemaPart.InteractiveSchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
+import pko.KiCadLogicalSchemeSimulator.model.Model;
+import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 public class Switch extends SchemaPart implements InteractiveSchemaPart {
     private final PassivePin pin1;
@@ -69,17 +71,6 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
             }
 
             @Override
-            public void resend() {
-                if (!hiImpedance) {
-                    setState(state, strong);
-                } else {
-                    //noinspection ConstantValue,AssertWithSideEffects
-                    assert !(hiImpedance = false);
-                    setHiImpedance();
-                }
-            }
-
-            @Override
             public void setState(boolean newState, boolean newStrong) {
                 hiImpedance = false;
                 state = newState;
@@ -87,7 +78,12 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
                 if (toggled && !pin2.hiImpedance) {
                     if (pin2.strong) {
                         if (newStrong) {
-                            throw new ShortcutException(pin1, pin2);
+                            if (Model.stabilizing) {
+                                Model.forResend.add(this);
+                                Log.warn(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
+                            } else {
+                                throw new ShortcutException(pin1, pin2);
+                            }
                         } else {
                             for (Pin destination : destinations) {
                                 if (destination.state != pin2.state || destination.strong != pin2.strong) {
@@ -141,17 +137,6 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
             }
 
             @Override
-            public void resend() {
-                if (!hiImpedance) {
-                    setState(state, strong);
-                } else {
-                    //noinspection ConstantValue,AssertWithSideEffects
-                    assert !(hiImpedance = false);
-                    setHiImpedance();
-                }
-            }
-
-            @Override
             public void setState(boolean newState, boolean newStrong) {
                 hiImpedance = false;
                 state = newState;
@@ -159,7 +144,12 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
                 if (toggled && !pin1.hiImpedance) {
                     if (pin1.strong) {
                         if (newStrong) {
-                            throw new ShortcutException(pin1, pin2);
+                            if (Model.stabilizing) {
+                                Model.forResend.add(this);
+                                Log.warn(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
+                            } else {
+                                throw new ShortcutException(pin1, pin2);
+                            }
                         } else {
                             for (Pin destination : destinations) {
                                 if (destination.state != pin1.state || destination.strong != pin1.strong) {

@@ -35,6 +35,7 @@ import pko.KiCadLogicalSchemeSimulator.api.ShortcutException;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
+import pko.KiCadLogicalSchemeSimulator.model.Model;
 import pko.KiCadLogicalSchemeSimulator.model.merger.MergerInput;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
@@ -73,7 +74,13 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
         state = newState;
         if (newStrong) { //to strong
             if (hiImpedance && (merger.strongPins & mask) != 0) {
-                throw new ShortcutException(merger.sources);
+                if (Model.stabilizing) {
+                    Model.forResend.add(this);
+                    Log.warn(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
+                    return;
+                } else {
+                    throw new ShortcutException(merger.sources);
+                }
             }
             if (hiImpedance) {
                 merger.strongPins |= mask;
@@ -89,7 +96,13 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
             }
         } else { //to weak
             if ((merger.weakPins & mask) != 0 && ((merger.weakState & mask) == 0) == state) {
-                throw new ShortcutException(merger.sources);
+                if (Model.stabilizing) {
+                    Model.forResend.add(this);
+                    Log.warn(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
+                    return;
+                } else {
+                    throw new ShortcutException(merger.sources);
+                }
             }
             if (hiImpedance) {
                 merger.weakPins |= mask;

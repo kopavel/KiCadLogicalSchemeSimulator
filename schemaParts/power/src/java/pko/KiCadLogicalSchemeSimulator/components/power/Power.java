@@ -31,13 +31,45 @@
  */
 package pko.KiCadLogicalSchemeSimulator.components.power;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 
 public class Power extends SchemaPart {
+    private final boolean powerState;
+
     protected Power(String id, String sParams) {
         super(id, sParams);
-        boolean state = params.containsKey("hi");
-        boolean strong = params.containsKey("strong");
-        addOutPin("OUT", state, strong);
+        powerState = params.containsKey("hi");
+        if (params.containsKey("strong")) {
+            addOutPin("OUT", powerState, true);
+        } else {
+            PassivePin pin = addPassivePin(new PassivePin("OUT", this) {
+                @Override
+                public void setState(boolean newState, boolean newStrong) {
+                    state = newState;
+                    strong = newStrong;
+                    for (Pin destination : destinations) {
+                        destination.state = newState;
+                        destination.strong = newStrong;
+                        destination.setState(newState, newStrong);
+                    }
+                    hiImpedance = false;
+                }
+
+                @Override
+                public void setHiImpedance() {
+                    state = powerState;
+                    strong = false;
+                    for (Pin destination : destinations) {
+                        destination.state = powerState;
+                        destination.strong = false;
+                        destination.setState(powerState, false);
+                    }
+                    hiImpedance = false;
+                }
+            });
+            pin.outImpedance = false;
+        }
     }
 
     @Override

@@ -365,15 +365,17 @@ public class BusToWiresAdapter extends OutBus {
             return new BusToWiresAdapter(this, "unroll1") {
                 @Override
                 public void setState(long newState) {
-                    if (maskState != (newState & mask)) {
+                    if (maskState != (newState & mask) || hiImpedance) {
                         maskState = newState & mask;
                         d1.setState(maskState != 0, true);
                     }
+                    hiImpedance = false;
                 }
 
                 @Override
                 public void setHiImpedance() {
                     d1.setHiImpedance();
+                    hiImpedance = true;
                 }
             };
         } else {

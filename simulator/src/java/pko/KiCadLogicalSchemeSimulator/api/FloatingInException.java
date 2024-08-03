@@ -31,7 +31,7 @@
  */
 package pko.KiCadLogicalSchemeSimulator.api;
 public class FloatingInException extends RuntimeException {
-    public FloatingInException(ModelItem pin) {
+    public FloatingInException(ModelItem<?> pin) {
         super("Floating pin " + pin.getName());
     }
 }

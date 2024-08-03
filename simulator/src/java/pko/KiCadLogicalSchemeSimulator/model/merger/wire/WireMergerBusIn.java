@@ -34,6 +34,7 @@ import pko.KiCadLogicalSchemeSimulator.api.ShortcutException;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.in.CorrectedInBus;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
+import pko.KiCadLogicalSchemeSimulator.model.Model;
 import pko.KiCadLogicalSchemeSimulator.model.merger.MergerInput;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
@@ -61,7 +62,13 @@ public class WireMergerBusIn extends CorrectedInBus implements MergerInput<Bus> 
                 merger.hiImpedance);
         state = newState;
         if (hiImpedance && merger.strong) { //merger already in strong
-            throw new ShortcutException(merger.sources);
+            if (Model.stabilizing) {
+                Model.forResend.add(this);
+                Log.warn(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
+                return;
+            } else {
+                throw new ShortcutException(merger.sources);
+            }
         }
         if (merger.state == (state == 0)) { //merger state changes
             merger.state = state != 0;

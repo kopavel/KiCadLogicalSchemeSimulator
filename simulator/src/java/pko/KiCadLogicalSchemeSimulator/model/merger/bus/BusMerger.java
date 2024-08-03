@@ -40,6 +40,7 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.model.Model;
 import pko.KiCadLogicalSchemeSimulator.model.bus.BusInInterconnect;
 import pko.KiCadLogicalSchemeSimulator.model.merger.MergerInput;
+import pko.KiCadLogicalSchemeSimulator.tools.Log;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 import java.util.Arrays;
@@ -87,7 +88,13 @@ public class BusMerger extends OutBus {
         sources = Utils.addToArray(sources, input);
         if (!bus.hiImpedance) {
             if ((strongPins & destinationMask) != 0) {
-                throw new ShortcutException(sources);
+                if (Model.stabilizing) {
+                    Model.forResend.add(this);
+                    Log.warn(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
+                    return;
+                } else {
+                    throw new ShortcutException(sources);
+                }
             }
             state |= bus.state;
             strongPins |= destinationMask;
@@ -133,7 +140,13 @@ public class BusMerger extends OutBus {
         if (!pin.hiImpedance) {
             if (pin.strong) {
                 if ((strongPins & destinationMask) != 0) {
-                    throw new ShortcutException(sources);
+                    if (Model.stabilizing) {
+                        Model.forResend.add(this);
+                        Log.warn(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
+                        return;
+                    } else {
+                        throw new ShortcutException(sources);
+                    }
                 }
                 strongPins |= destinationMask;
                 if (pin.state) {
@@ -141,7 +154,13 @@ public class BusMerger extends OutBus {
                 }
             } else {
                 if ((weakPins & destinationMask) != 0 && ((weakState & destinationMask) == 0) == pin.state) {
-                    throw new ShortcutException(sources);
+                    if (Model.stabilizing) {
+                        Model.forResend.add(this);
+                        Log.warn(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
+                        return;
+                    } else {
+                        throw new ShortcutException(sources);
+                    }
                 }
                 weakPins |= destinationMask;
                 weakState |= pin.state ? destinationMask : 0;

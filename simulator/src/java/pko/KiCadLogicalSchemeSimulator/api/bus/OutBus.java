@@ -129,7 +129,7 @@ public class OutBus extends Bus {
             Bus d2 = destinations[1].getOptimised();
             return new OutBus(this, "unroll2") {
                 @Override
-                public void setState(long state) {
+                public void setState(long newState) {
                     d1.setState(state);
                     d2.setState(state);
                 }
@@ -146,7 +146,7 @@ public class OutBus extends Bus {
             Bus d3 = destinations[2].getOptimised();
             return new OutBus(this, "unroll3") {
                 @Override
-                public void setState(long state) {
+                public void setState(long newState) {
                     d1.setState(state);
                     d2.setState(state);
                     d3.setState(state);
@@ -166,7 +166,7 @@ public class OutBus extends Bus {
             Bus d4 = destinations[3].getOptimised();
             return new OutBus(this, "unroll4") {
                 @Override
-                public void setState(long state) {
+                public void setState(long newState) {
                     d1.setState(state);
                     d2.setState(state);
                     d3.setState(state);
@@ -189,7 +189,7 @@ public class OutBus extends Bus {
             Bus d5 = destinations[4].getOptimised();
             return new OutBus(this, "unroll5") {
                 @Override
-                public void setState(long state) {
+                public void setState(long newState) {
                     d1.setState(state);
                     d2.setState(state);
                     d3.setState(state);
@@ -215,7 +215,7 @@ public class OutBus extends Bus {
             Bus d6 = destinations[5].getOptimised();
             return new OutBus(this, "unroll6") {
                 @Override
-                public void setState(long state) {
+                public void setState(long newState) {
                     d1.setState(state);
                     d2.setState(state);
                     d3.setState(state);
@@ -244,7 +244,7 @@ public class OutBus extends Bus {
             Bus d7 = destinations[6].getOptimised();
             return new OutBus(this, "unroll7") {
                 @Override
-                public void setState(long state) {
+                public void setState(long newState) {
                     d1.setState(state);
                     d2.setState(state);
                     d3.setState(state);
@@ -276,7 +276,7 @@ public class OutBus extends Bus {
             Bus d8 = destinations[7].getOptimised();
             return new OutBus(this, "unroll8") {
                 @Override
-                public void setState(long state) {
+                public void setState(long newState) {
                     d1.setState(state);
                     d2.setState(state);
                     d3.setState(state);
@@ -311,7 +311,7 @@ public class OutBus extends Bus {
             Bus d9 = destinations[8].getOptimised();
             return new OutBus(this, "unroll9") {
                 @Override
-                public void setState(long state) {
+                public void setState(long newState) {
                     d1.setState(state);
                     d2.setState(state);
                     d3.setState(state);
@@ -349,7 +349,7 @@ public class OutBus extends Bus {
             Bus d10 = destinations[9].getOptimised();
             return new OutBus(this, "unroll10") {
                 @Override
-                public void setState(long state) {
+                public void setState(long newState) {
                     d1.setState(state);
                     d2.setState(state);
                     d3.setState(state);

@@ -30,9 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.model;
-import pko.KiCadLogicalSchemeSimulator.api.FloatingInException;
 import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
-import pko.KiCadLogicalSchemeSimulator.api.ShortcutException;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
@@ -59,6 +57,7 @@ import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
@@ -67,8 +66,8 @@ import static pko.KiCadLogicalSchemeSimulator.model.SymbolDescriptions.parse;
 import static pko.KiCadLogicalSchemeSimulator.model.SymbolDescriptions.schemaPartPinMap;
 
 public class Model {
-    public static boolean stabilized;
-    private static boolean stabilizing;
+    public static final Queue<IModelItem<?>> forResend = new LinkedList<>();
+    public static boolean stabilizing;
     public final Map<String, SchemaPart> schemaParts = new TreeMap<>();
     public final Map<String, SchemaPartSpi> schemaPartSpiMap;
     private final Map<Pin, DestinationWireDescriptor> destinationWireDescriptors = new HashMap<>();
@@ -116,7 +115,10 @@ public class Model {
         if (!useOldWire) {
             if (buses.size() + pins.size() > 1) {
                 //connect destination to multiple sources throe Merger
-                String mergerHash = Utils.getHash(pins, buses.keySet());
+                String mergerHash = Utils.getHash(pins, buses.keySet()) + "masks:" + buses.values()
+                        .stream()
+                        .map(String::valueOf)
+                        .collect(Collectors.joining(":"));
                 if (wires.containsKey(mergerHash)) {
                     //use old merger. in case if there is no passive pins - it's not handled earlier.
                     OutPin pin = wires.get(mergerHash);
@@ -446,48 +448,20 @@ public class Model {
 
     private void stabilise() {
         stabilizing = true;
-        List<IModelItem<?>> items = schemaParts.values()
+        forResend.addAll(schemaParts.values()
                 .stream()
-                .flatMap(p -> p.outPins.values()
-                        .stream().distinct())
-                .toList();
-        while (stabilizing) {
-            stabilizing = false;
-            items.forEach(item -> {
-                try {
-                    assert Log.debug(Model.class, "Resend pin {}", item);
-                    item.resend();
-                } catch (FloatingInException | ShortcutException e) {
-                    assert Log.debug(Model.class, "Item stabilising exception", e);
-                    stabilizing = true;
-                }
-            });
-            wires.values().forEach(merger -> {
-                try {
-                    assert Log.debug(Model.class, "Resend wire merger {}", merger);
-                    merger.resend();
-                } catch (FloatingInException | ShortcutException e) {
-                    assert Log.debug(Model.class, "Merger stabilising exception", e);
-                    stabilizing = true;
-                }
-            });
-            busMergers.values().forEach(merger -> {
-                try {
-                    assert Log.debug(Model.class, "Resend bus merger {}", merger);
-                    merger.resend();
-                } catch (FloatingInException | ShortcutException e) {
-                    assert Log.debug(Model.class, "Merger stabilising exception", e);
-                    stabilizing = true;
-                }
-            });
-            try {
-                schemaParts.values().forEach(SchemaPart::reset);
-            } catch (FloatingInException | ShortcutException e) {
-                assert Log.debug(Model.class, "Reset stabilising exception", e);
-                stabilizing = true;
-            }
+                .flatMap(p -> Stream.concat(p.outPins.values()
+                                .stream(),
+                        p.passivePins.values()
+                                .stream()).distinct())
+                .toList());
+        while (!forResend.isEmpty()) {
+            IModelItem<?> item = forResend.poll();
+            assert Log.debug(Model.class, "Resend pin {}", item);
+            item.resend();
+            schemaParts.values().forEach(SchemaPart::reset);
         }
-        stabilized = true;
+        stabilizing = false;
     }
 
     private static class DestinationBusDescriptor {
