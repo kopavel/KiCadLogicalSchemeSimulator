@@ -45,42 +45,42 @@ public class XorGate extends SchemaPart {
         if (reverse) {
             in1 = addInPin(new NoFloatingInPin("IN0", this) {
                 @Override
-                public void setState(boolean newState, boolean strong) {
+                public void setState(boolean newState) {
                     state = newState;
                     if (out.state != in1.state == in2.state) {
                         out.state = in1.state == in2.state;
-                        out.setState(out.state, strong);
+                        out.setState(out.state);
                     }
                 }
             });
             in2 = addInPin(new NoFloatingInPin("IN1", this) {
                 @Override
-                public void setState(boolean newState, boolean strong) {
+                public void setState(boolean newState) {
                     state = newState;
                     if (out.state != in1.state == in2.state) {
                         out.state = in1.state == in2.state;
-                        out.setState(out.state, strong);
+                        out.setState(out.state);
                     }
                 }
             });
         } else {
             in1 = addInPin(new NoFloatingInPin("IN0", this) {
                 @Override
-                public void setState(boolean newState, boolean strong) {
+                public void setState(boolean newState) {
                     state = newState;
                     if (out.state == (in1.state == in2.state)) {
                         out.state = (in1.state != in2.state);
-                        out.setState(out.state, strong);
+                        out.setState(out.state);
                     }
                 }
             });
             in2 = addInPin(new NoFloatingInPin("IN1", this) {
                 @Override
-                public void setState(boolean newState, boolean strong) {
+                public void setState(boolean newState) {
                     state = newState;
                     if (out.state == (in1.state == in2.state)) {
                         out.state = (in1.state != in2.state);
-                        out.setState(out.state, strong);
+                        out.setState(out.state);
                     }
                 }
             });

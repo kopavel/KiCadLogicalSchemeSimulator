@@ -43,14 +43,13 @@ import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 import java.util.List;
 import java.util.Map;
 
+//FixMe use one destination with splitter
 public class WireMerger extends OutPin {
     public MergerInput<?>[] sources = new MergerInput[0];
-    public byte weakState;
 
     public WireMerger(Pin destination, List<OutPin> pins, Map<OutBus, Long> buses) {
         super(destination, "wireMerger");
         destinations = new Pin[]{destination};
-        strong = false;
         pins.forEach(this::addSource);
         if (buses != null) {
             buses.forEach(this::addSource);
@@ -63,19 +62,15 @@ public class WireMerger extends OutPin {
         if (destinations.length == 1 && destinations[0] instanceof PassivePin passivePin) {
             passivePin.addDestination(pin);
         } else {
+            if (pin instanceof PassivePin passivePin) {
+                passivePin.source = this;
+            }
             destinations = Utils.addToArray(destinations, pin);
         }
         if (pin.getId().contains("->")) {
             id += "/" + pin.getId().substring(pin.getId().indexOf("->") + 2);
         } else {
             id += "/" + pin.getName();
-        }
-    }
-
-    @Override
-    public void resend() {
-        if (!hiImpedance) {
-            setState(state, strong);
         }
     }
 
@@ -89,16 +84,15 @@ public class WireMerger extends OutPin {
         bus.addDestination(input, mask, (byte) 0);
         sources = Utils.addToArray(sources, input);
         if (!bus.hiImpedance) {
-            if (strong) {
+            if (!hiImpedance) {
                 if (Model.stabilizing) {
                     Model.forResend.add(this);
-                    Log.warn(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
+                    Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
                     return;
                 } else {
                     throw new ShortcutException(sources);
                 }
             }
-            strong = true;
             state = (bus.state & mask) != 0;
         }
     }
@@ -108,34 +102,18 @@ public class WireMerger extends OutPin {
         pin.addDestination(input);
         sources = Utils.addToArray(sources, input);
         if (!pin.hiImpedance) {
-            hiImpedance = false;
-            if (pin.strong) {
-                if (strong) {
-                    if (Model.stabilizing) {
-                        Model.forResend.add(this);
-                        Log.warn(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
-                        return;
-                    } else {
-                        throw new ShortcutException(sources);
-                    }
-                }
-                strong = true;
-                state = pin.state;
-            } else {
-                if (weakState != 0 && (weakState > 0 != pin.state)) {
-                    if (Model.stabilizing) {
-                        Model.forResend.add(this);
-                        Log.warn(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
-                        return;
-                    } else {
-                        throw new ShortcutException(sources);
-                    }
-                }
-                weakState += (byte) (pin.state ? 1 : -1);
-                if (!strong) {
-                    state = pin.state;
+            if (!hiImpedance) {
+                if (Model.stabilizing) {
+                    Model.forResend.add(this);
+                    Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
+                    return;
+                } else {
+                    throw new ShortcutException(sources);
                 }
             }
+            strong = true;
+            state = pin.state;
+            hiImpedance = false;
         }
     }
 }

@@ -52,52 +52,52 @@ public class JkTrigger extends SchemaPart {
         kPin = addInPin("K");
         rPin = addInPin(new NoFloatingInPin("R", this) {
             @Override
-            public void setState(boolean newState, boolean strong) {
+            public void setState(boolean newState) {
                 state = newState;
                 clockEnabled = !(newState | sPin.state);
                 if (newState) {
                     if (!iqOut.state) {
                         iqOut.state = true;
-                        iqOut.setState(true, true);
+                        iqOut.setState(true);
                     }
                     if (qOut.state != sPin.state) {
                         qOut.state = sPin.state;
-                        qOut.setState(sPin.state, true);
+                        qOut.setState(sPin.state);
                     }
                 } else if (sPin.state) {
                     if (!qOut.state) {
                         qOut.state = true;
-                        qOut.setState(true, true);
+                        qOut.setState(true);
                     }
                     if (iqOut.state) {
                         iqOut.state = false;
-                        iqOut.setState(false, true);
+                        iqOut.setState(false);
                     }
                 }
             }
         });
         sPin = addInPin(new NoFloatingInPin("S", this) {
             @Override
-            public void setState(boolean newState, boolean strong) {
+            public void setState(boolean newState) {
                 state = newState;
                 clockEnabled = !(newState | rPin.state);
                 if (newState) {
                     if (!qOut.state) {
                         qOut.state = true;
-                        qOut.setState(true, true);
+                        qOut.setState(true);
                     }
                     if (iqOut.state != rPin.state) {
                         iqOut.state = rPin.state;
-                        iqOut.setState(rPin.state, true);
+                        iqOut.setState(rPin.state);
                     }
                 } else if (rPin.state) {
                     if (qOut.state) {
                         qOut.state = false;
-                        qOut.setState(false, true);
+                        qOut.setState(false);
                     }
                     if (!iqOut.state) {
                         iqOut.state = true;
-                        iqOut.setState(true, true);
+                        iqOut.setState(true);
                     }
                 }
             }
@@ -108,16 +108,16 @@ public class JkTrigger extends SchemaPart {
                 public void onFallingEdge() {
                     if (clockEnabled) {
                         if (jPin.state && kPin.state) {
-                            qOut.setState(!qOut.state, true);
-                            iqOut.setState(!iqOut.state, true);
+                            qOut.setState(!qOut.state);
+                            iqOut.setState(!iqOut.state);
                         } else if (jPin.state || kPin.state) {
                             if (!qOut.state) {
                                 qOut.state = true;
-                                qOut.setState(true, true);
+                                qOut.setState(true);
                             }
                             if (iqOut.state) {
                                 iqOut.state = false;
-                                iqOut.setState(false, true);
+                                iqOut.setState(false);
                             }
                         }
                     }
@@ -129,16 +129,16 @@ public class JkTrigger extends SchemaPart {
                 public void onRisingEdge() {
                     if (clockEnabled) {
                         if (jPin.state && kPin.state) {
-                            qOut.setState(!qOut.state, true);
-                            iqOut.setState(!iqOut.state, true);
+                            qOut.setState(!qOut.state);
+                            iqOut.setState(!iqOut.state);
                         } else if (jPin.state || kPin.state) {
                             if (!qOut.state) {
                                 qOut.state = true;
-                                qOut.setState(true, true);
+                                qOut.setState(true);
                             }
                             if (iqOut.state) {
                                 iqOut.state = false;
-                                iqOut.setState(false, true);
+                                iqOut.setState(false);
                             }
                         }
                     }

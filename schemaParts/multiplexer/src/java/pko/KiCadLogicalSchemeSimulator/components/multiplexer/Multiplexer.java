@@ -85,7 +85,7 @@ public class Multiplexer extends SchemaPart {
             int nMask = ~mask;
             addInPin(new NoFloatingInPin("N" + i, this) {
                 @Override
-                public void setState(boolean newState, boolean strong) {
+                public void setState(boolean newState) {
                     state = newState;
                     if (newState) {
                         nState |= mask;

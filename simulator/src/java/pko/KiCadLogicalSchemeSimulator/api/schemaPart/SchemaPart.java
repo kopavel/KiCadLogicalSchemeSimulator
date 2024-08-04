@@ -78,10 +78,9 @@ public abstract class SchemaPart {
             }
 
             @Override
-            public void setState(boolean newState, boolean newStrong) {
+            public void setState(boolean newState) {
                 hiImpedance = false;
                 state = newState;
-                strong = newStrong;
             }
         });
     }
@@ -100,11 +99,10 @@ public abstract class SchemaPart {
         outPins.put(pinId, new OutPin(pinId, this));
     }
 
-    public void addOutPin(String pinId, boolean state, boolean strong) {
+    public void addOutPin(String pinId, boolean state) {
         addOutPin(pinId);
         OutPin pin = (OutPin) outPins.get(pinId);
         pin.state = state;
-        pin.strong = strong;
         pin.hiImpedance = false;
     }
 

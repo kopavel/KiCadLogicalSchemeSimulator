@@ -41,75 +41,71 @@ import pko.KiCadLogicalSchemeSimulator.tools.Log;
 public class WireMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
     public final long mask;
     private final WireMerger merger;
+    private boolean oldImpedance;
 
     public WireMergerBusIn(Bus source, long mask, WireMerger merger) {
         super(source, "PMergeBIn");
         this.mask = mask;
         this.merger = merger;
+        oldImpedance = hiImpedance;
     }
 
     @Override
     public void setState(long newState) {
-        assert Log.debug(WireMergerBusIn.class,
-                "Pin merger change. before: newState:{}, Source:{} (state:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{}, hiImpedance:{})",
+        assert Log.debug(WireMergerBusIn.class, "Pin merger change. before: newState:{}, Source:{} (state:{}, hiImpedance:{}), Merger:{} (state:{}, hiImpedance:{})",
                 newState,
                 getName(),
                 state,
                 hiImpedance,
                 merger.getName(),
                 merger.state,
-                merger.strong,
                 merger.hiImpedance);
         state = newState;
-        if (hiImpedance && merger.strong) { //merger already in strong
+        hiImpedance = false;
+        if (!merger.hiImpedance && oldImpedance) { //merger not in hiImpedance
             if (Model.stabilizing) {
                 Model.forResend.add(this);
-                Log.warn(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
+                Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
                 return;
             } else {
                 throw new ShortcutException(merger.sources);
             }
-        }
-        if (merger.state == (state == 0)) { //merger state changes
+        } else if (merger.hiImpedance || merger.state == (state == 0)) { // merger state changes
+            merger.hiImpedance = false;
             merger.state = state != 0;
             for (Pin destination : merger.destinations) {
-                destination.setState(merger.state, true);
-            }
-        } else if (!merger.strong || merger.hiImpedance) { //merger in weak state or in hiImpedance
-            for (Pin destination : merger.destinations) {
-                destination.setState(merger.state, true);
+                destination.setState(merger.state);
             }
         }
-        hiImpedance = false;
-        merger.strong = true;
-        merger.hiImpedance = false;
-        assert Log.debug(WireMergerBusIn.class,
-                "Pin merger change. after: newState:{}, Source:{} (state:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{}, hiImpedance:{})",
+        oldImpedance = false;
+        assert Log.debug(WireMergerBusIn.class, "Pin merger change. after: newState:{}, Source:{} (state:{}, hiImpedance:{}), Merger:{} (state:{}, hiImpedance:{})",
                 newState,
                 getName(),
                 state,
                 hiImpedance,
                 merger.getName(),
                 merger.state,
-                merger.strong,
                 merger.hiImpedance);
     }
 
     @Override
     public void setHiImpedance() {
         assert !hiImpedance : "Already in hiImpedance:" + this + "; merger=" + merger.getName();
-        if (merger.weakState == 0) { //no weak state - go to hiImpedance.
-            for (Pin destination : merger.destinations) {
-                destination.setHiImpedance();
-            }
-            merger.hiImpedance = true;
-        } else if (merger.state != (merger.weakState > 0)) { // state changes to weak
-            merger.state = merger.weakState > 0;
-            for (Pin destination : merger.destinations) {
-                destination.setState((merger.weakState > 0), false);
-            }
-        }
+        merger.hiImpedance = true;
         hiImpedance = true;
-        merger.strong = false;
+        oldImpedance = true;
+        for (Pin destination : merger.destinations) {
+            destination.setHiImpedance();
+        }
     }
+
+    @Override
+    public void resend() {
+        if (!hiImpedance) {
+            setState(state);
+        } else if (!oldImpedance) {
+            setHiImpedance();
+        }
+    }
+
 }

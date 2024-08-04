@@ -77,14 +77,14 @@ public class Shifter extends SchemaPart {
         if (plReverse) {
             addInPin(new NoFloatingInPin("PL", this) {
                 @Override
-                public void setState(boolean newState, boolean strong) {
+                public void setState(boolean newState) {
                     state = newState;
                     plInactive = newState;
                     if (!plInactive) {
                         latch = dBus.state;
                         if (out.state == ((latch & 1) == 0)) {
                             out.state = ((latch & 1) != 0);
-                            out.setState(out.state, true);
+                            out.setState(out.state);
                         }
                     }
                 }
@@ -92,14 +92,14 @@ public class Shifter extends SchemaPart {
         } else {
             addInPin(new NoFloatingInPin("PL", this) {
                 @Override
-                public void setState(boolean newState, boolean strong) {
+                public void setState(boolean newState) {
                     state = newState;
                     plInactive = !newState;
                     if (!plInactive) {
                         latch = dBus.state;
                         if (out.state == ((latch & 1) == 0)) {
                             out.state = ((latch & 1) != 0);
-                            out.setState(out.state, true);
+                            out.setState(out.state);
                         }
                     }
                 }
@@ -116,7 +116,7 @@ public class Shifter extends SchemaPart {
                         }
                         if (out.state == ((latch & 1) == 0)) {
                             out.state = ((latch & 1) != 0);
-                            out.setState(out.state, true);
+                            out.setState(out.state);
                         }
                     }
                 }
@@ -131,7 +131,7 @@ public class Shifter extends SchemaPart {
                         }
                         if (out.state == ((latch & 1) == 0)) {
                             out.state = ((latch & 1) != 0);
-                            out.setState(out.state, true);
+                            out.setState(out.state);
                         }
                     }
                 }
@@ -147,7 +147,7 @@ public class Shifter extends SchemaPart {
                         }
                         if (out.state == ((latch & 1) == 0)) {
                             out.state = ((latch & 1) != 0);
-                            out.setState(out.state, true);
+                            out.setState(out.state);
                         }
                     }
                 }
@@ -162,13 +162,13 @@ public class Shifter extends SchemaPart {
                         }
                         if (out.state == ((latch & 1) == 0)) {
                             out.state = ((latch & 1) != 0);
-                            out.setState(out.state, true);
+                            out.setState(out.state);
                         }
                     }
                 }
             });
         }
-        addOutPin("Q", false, true);
+        addOutPin("Q", false);
     }
 
     @Override
@@ -185,7 +185,7 @@ public class Shifter extends SchemaPart {
     public void reset() {
         latch = 0;
         out.state = false;
+        out.setState(false);
         out.hiImpedance = false;
-        out.setState(false, true);
     }
 }

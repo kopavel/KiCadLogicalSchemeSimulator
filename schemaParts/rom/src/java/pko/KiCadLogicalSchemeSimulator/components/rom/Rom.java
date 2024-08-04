@@ -116,7 +116,7 @@ public class Rom extends SchemaPart {
                 if (csActive) {
                     if (Model.stabilizing) {
                         Model.forResend.add(this);
-                        Log.warn(this.getClass(), "Floating pin {}, try resend later", this);
+                        Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
                     } else {
                         throw new FloatingInException(this);
                     }

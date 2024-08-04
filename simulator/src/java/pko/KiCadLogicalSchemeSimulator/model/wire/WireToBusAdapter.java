@@ -56,7 +56,7 @@ public class WireToBusAdapter extends OutPin {
     }
 
     @Override
-    public void setState(boolean newState, boolean strong) {
+    public void setState(boolean newState) {
         destination.setState(newState ? mask : 0);
     }
 

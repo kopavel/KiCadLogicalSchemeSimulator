@@ -31,6 +31,7 @@
  */
 package pko.KiCadLogicalSchemeSimulator.components.power;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api.wire.PassiveOutPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 
@@ -41,31 +42,31 @@ public class Power extends SchemaPart {
         super(id, sParams);
         powerState = params.containsKey("hi");
         if (params.containsKey("strong")) {
-            addOutPin("OUT", powerState, true);
+            addOutPin("OUT", powerState);
         } else {
-            PassivePin pin = addPassivePin(new PassivePin("OUT", this) {
+            PassivePin pin = addPassivePin(new PassiveOutPin("OUT", this) {
                 @Override
-                public void setState(boolean newState, boolean newStrong) {
+                public void setState(boolean newState) {
                     state = newState;
-                    strong = newStrong;
+                    strong = true;
+                    hiImpedance = false;
                     for (Pin destination : destinations) {
                         destination.state = newState;
-                        destination.strong = newStrong;
-                        destination.setState(newState, newStrong);
+                        destination.strong = true;
+                        destination.setState(newState);
                     }
-                    hiImpedance = false;
                 }
 
                 @Override
                 public void setHiImpedance() {
                     state = powerState;
                     strong = false;
+                    hiImpedance = true;
                     for (Pin destination : destinations) {
                         destination.state = powerState;
                         destination.strong = false;
-                        destination.setState(powerState, false);
+                        destination.setState(powerState);
                     }
-                    hiImpedance = false;
                 }
             });
             pin.outImpedance = false;

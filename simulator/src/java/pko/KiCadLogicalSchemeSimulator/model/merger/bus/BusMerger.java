@@ -49,7 +49,6 @@ import java.util.Comparator;
 import java.util.List;
 
 //FixMe use one destination with splitter
-//FixMe create pure bus (no pin/strength) implementation
 public class BusMerger extends OutBus {
     public MergerInput<?>[] sources = new MergerInput[0];
     public long strongPins;
@@ -90,7 +89,7 @@ public class BusMerger extends OutBus {
             if ((strongPins & destinationMask) != 0) {
                 if (Model.stabilizing) {
                     Model.forResend.add(this);
-                    Log.warn(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
+                    Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
                     return;
                 } else {
                     throw new ShortcutException(sources);
@@ -132,7 +131,8 @@ public class BusMerger extends OutBus {
     }
 
     private void processPin(Pin pin, BusMergerWireIn input, long destinationMask) {
-        input.source = pin;
+        input.oldStrong = pin.strong;
+        input.oldImpedance = pin.hiImpedance;
         input.id = pin.id;
         input.parent = pin.parent;
         input.copyState(pin);
@@ -142,7 +142,7 @@ public class BusMerger extends OutBus {
                 if ((strongPins & destinationMask) != 0) {
                     if (Model.stabilizing) {
                         Model.forResend.add(this);
-                        Log.warn(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
+                        Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
                         return;
                     } else {
                         throw new ShortcutException(sources);
@@ -156,7 +156,7 @@ public class BusMerger extends OutBus {
                 if ((weakPins & destinationMask) != 0 && ((weakState & destinationMask) == 0) == pin.state) {
                     if (Model.stabilizing) {
                         Model.forResend.add(this);
-                        Log.warn(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
+                        Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
                         return;
                     } else {
                         throw new ShortcutException(sources);

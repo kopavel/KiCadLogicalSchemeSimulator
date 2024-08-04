@@ -61,7 +61,7 @@ public class DCounter extends SchemaPart {
         if (params.containsKey("carryReverse")) {
             addInPin(new NoFloatingInPin("CI", this) {
                 @Override
-                public void setState(boolean newState, boolean strong) {
+                public void setState(boolean newState) {
                     state = newState;
                     ciState = !newState;
                 }
@@ -75,13 +75,13 @@ public class DCounter extends SchemaPart {
                 }
 
                 @Override
-                public void setState(boolean newState, boolean strong) {
+                public void setState(boolean newState) {
                     hiImpedance = false;
                     state = newState;
                     boolean newOutState = (!newState || outBus.state != maxCount) && (newState || outBus.state != 0);
                     if (cOutPin.state != newOutState) {
                         cOutPin.state = newOutState;
-                        cOutPin.setState(newOutState, strong);
+                        cOutPin.setState(newOutState);
                     }
                 }
             });
@@ -92,7 +92,7 @@ public class DCounter extends SchemaPart {
                 }
 
                 @Override
-                public void setState(boolean newState, boolean strong) {
+                public void setState(boolean newState) {
                     hiImpedance = false;
                     state = newState;
                     resetInactive = !newState;
@@ -101,7 +101,7 @@ public class DCounter extends SchemaPart {
                         outBus.setState(0);
                         if (!cOutPin.state) {
                             cOutPin.state = true;
-                            cOutPin.setState(true, true);
+                            cOutPin.setState(true);
                         }
                     }
                 }
@@ -109,7 +109,7 @@ public class DCounter extends SchemaPart {
         } else {
             addInPin(new NoFloatingInPin("CI", this) {
                 @Override
-                public void setState(boolean newState, boolean strong) {
+                public void setState(boolean newState) {
                     state = newState;
                     ciState = newState;
                 }
@@ -123,13 +123,13 @@ public class DCounter extends SchemaPart {
                 }
 
                 @Override
-                public void setState(boolean newState, boolean strong) {
+                public void setState(boolean newState) {
                     hiImpedance = false;
                     state = newState;
                     boolean newOutState = newState && outBus.state == maxCount || !newState && outBus.state == 0;
                     if (cOutPin.state != newOutState) {
                         cOutPin.state = newOutState;
-                        cOutPin.setState(newOutState, strong);
+                        cOutPin.setState(newOutState);
                     }
                 }
             });
@@ -140,7 +140,7 @@ public class DCounter extends SchemaPart {
                 }
 
                 @Override
-                public void setState(boolean newState, boolean strong) {
+                public void setState(boolean newState) {
                     hiImpedance = false;
                     state = newState;
                     resetInactive = !newState;
@@ -149,7 +149,7 @@ public class DCounter extends SchemaPart {
                         outBus.setState(0);
                         if (cOutPin.state) {
                             cOutPin.state = false;
-                            cOutPin.setState(false, true);
+                            cOutPin.setState(false);
                         }
                     }
                 }
@@ -168,7 +168,7 @@ public class DCounter extends SchemaPart {
         });
         addInPin(new NoFloatingInPin("PE", this) {
             @Override
-            public void setState(boolean newState, boolean strong) {
+            public void setState(boolean newState) {
                 state = newState;
                 presetDisabled = !newState;
                 if (!presetDisabled && resetInactive && outBus.state != jBus.state) {
@@ -185,7 +185,7 @@ public class DCounter extends SchemaPart {
                 }
 
                 @Override
-                public void setState(boolean newState, boolean strong) {
+                public void setState(boolean newState) {
                     hiImpedance = false;
                     state = newState;
                     maxCount = !newState ? 15 : 9;
@@ -200,7 +200,7 @@ public class DCounter extends SchemaPart {
                 }
 
                 @Override
-                public void setState(boolean newState, boolean strong) {
+                public void setState(boolean newState) {
                     hiImpedance = false;
                     state = newState;
                     maxCount = newState ? 15 : 9;
@@ -287,11 +287,11 @@ public class DCounter extends SchemaPart {
     @Override
     public void reset() {
         outBus.state = 0;
-        outBus.hiImpedance = false;
         outBus.setState(0);
+        outBus.hiImpedance = false;
         cOutPin.state = carryLo;
+        cOutPin.setState(carryLo);
         cOutPin.hiImpedance = false;
-        cOutPin.setState(carryLo, true);
     }
 
     private void process() {
@@ -299,9 +299,9 @@ public class DCounter extends SchemaPart {
             if (udPin.state) {
                 outBus.state++;
                 if (outBus.state == maxCount) {
-                    cOutPin.setState(carryHi, true);
+                    cOutPin.setState(carryHi);
                 } else {
-                    cOutPin.setState(carryLo, true);
+                    cOutPin.setState(carryLo);
                     if (outBus.state > maxCount) {
                         outBus.state = 0;
                     }
@@ -309,9 +309,9 @@ public class DCounter extends SchemaPart {
             } else {
                 outBus.state--;
                 if (outBus.state == 0) {
-                    cOutPin.setState(carryHi, true);
+                    cOutPin.setState(carryHi);
                 } else {
-                    cOutPin.setState(carryLo, true);
+                    cOutPin.setState(carryLo);
                     if (outBus.state < 0) {
                         outBus.state = maxCount;
                     }

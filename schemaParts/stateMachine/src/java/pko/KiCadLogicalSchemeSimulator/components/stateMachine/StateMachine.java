@@ -88,7 +88,7 @@ public class StateMachine extends SchemaPart {
         }
         dPin = addInPin(new NoFloatingInPin("D", this) {
             @Override
-            public void setState(boolean newState, boolean strong) {
+            public void setState(boolean newState) {
                 state = newState;
                 long newOutState = (newState ? 0 : states[latch]) ^ outMask;
                 if (out.state != newOutState) {
@@ -99,7 +99,7 @@ public class StateMachine extends SchemaPart {
         });
         sPin = addInPin(new NoFloatingInPin("S", this) {
             @Override
-            public void setState(boolean newState, boolean strong) {
+            public void setState(boolean newState) {
                 state = newState;
                 if (state) {
                     latch = (int) in.state;
@@ -138,7 +138,7 @@ public class StateMachine extends SchemaPart {
                 if (sPin.state) {
                     if (Model.stabilizing) {
                         Model.forResend.add(this);
-                        Log.warn(this.getClass(), "Floating pin {}, try resend later", this);
+                        Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
                     } else {
                         throw new FloatingInException(this);
                     }

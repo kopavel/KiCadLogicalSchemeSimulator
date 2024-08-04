@@ -80,10 +80,10 @@ public class Z80Cpu extends SchemaPart {
                     if (T1) {
                         if (ioRequest.isMemory) {
                             mReqPin.state = false;
-                            mReqPin.setState(false, true);
+                            mReqPin.setState(false);
                             if (!ioRequest.isWrite) {
                                 rdPin.state = false;
-                                rdPin.setState(false, true);
+                                rdPin.setState(false);
                             }
                         }
                         if (ioRequest.isWrite) {
@@ -95,39 +95,39 @@ public class Z80Cpu extends SchemaPart {
                     } else if (T2) {
                         if (!inWait && ioRequest.isMemory && ioRequest.isWrite) {
                             wrPin.state = false;
-                            wrPin.setState(false, true);
+                            wrPin.setState(false);
                         }
                         inWait = !waitPin.state;
                     } else if (T3) {
                         if (M1) {
                             mReqPin.state = false;
-                            mReqPin.setState(false, true);
+                            mReqPin.setState(false);
                         } else if (ioRequest.isMemory) {
                             if (!ioRequest.isWrite) {
                                 ioRequest.callback.accept((int) dIn.getState());
                                 rdPin.state = true;
-                                rdPin.setState(true, true);
+                                rdPin.setState(true);
                             } else {
                                 wrPin.state = true;
-                                wrPin.setState(true, true);
+                                wrPin.setState(true);
                             }
                             mReqPin.state = true;
-                            mReqPin.setState(true, true);
+                            mReqPin.setState(true);
                         } else {
                             if (!ioRequest.isWrite) {
                                 ioRequest.callback.accept((int) dIn.getState());
                                 rdPin.state = true;
-                                rdPin.setState(true, true);
+                                rdPin.setState(true);
                             } else {
                                 wrPin.state = true;
-                                wrPin.setState(true, true);
+                                wrPin.setState(true);
                             }
                             ioReqPin.state = true;
-                            ioReqPin.setState(true, true);
+                            ioReqPin.setState(true);
                         }
                     } else {
                         mReqPin.state = true;
-                        mReqPin.setState(true, true);
+                        mReqPin.setState(true);
                     }
                 }
             }
@@ -162,7 +162,7 @@ public class Z80Cpu extends SchemaPart {
                     if (T1) {
                         if (needRefreshPinReset) {
                             refreshPin.state = true;
-                            refreshPin.setState(true, true);
+                            refreshPin.setState(true);
                             needRefreshPinReset = false;
                         }
                         if (needDataPinReset) {
@@ -174,7 +174,7 @@ public class Z80Cpu extends SchemaPart {
                         }
                         if (M1) {
                             m1Pin.state = false;
-                            m1Pin.setState(false, true);
+                            m1Pin.setState(false);
                             cpu.executeOneInstruction();
                             ioRequest = ioQueue.requests.peek();
                         }
@@ -186,26 +186,26 @@ public class Z80Cpu extends SchemaPart {
                     } else if (T2) {
                         if (!inWait && !ioRequest.isMemory) {
                             ioReqPin.state = false;
-                            ioReqPin.setState(false, true);
+                            ioReqPin.setState(false);
                             if (ioRequest.isWrite) {
                                 wrPin.state = false;
-                                wrPin.setState(false, true);
+                                wrPin.setState(false);
                             } else {
                                 rdPin.state = false;
-                                rdPin.setState(false, true);
+                                rdPin.setState(false);
                             }
                         }
                     } else if (T3) {
                         if (M1) {
                             ioRequest.callback.accept((int) dIn.getState());
                             rdPin.state = true;
-                            rdPin.setState(true, true);
+                            rdPin.setState(true);
                             mReqPin.state = true;
-                            mReqPin.setState(true, true);
+                            mReqPin.setState(true);
                             m1Pin.state = true;
-                            m1Pin.setState(true, true);
+                            m1Pin.setState(true);
                             refreshPin.state = false;
-                            refreshPin.setState(false, true);
+                            refreshPin.setState(false);
                             needRefreshPinReset = true;
                         }
                     }
@@ -222,14 +222,14 @@ public class Z80Cpu extends SchemaPart {
         addInPin("~{INT}");
         waitPin = addInPin("~{WAIT}");
         addInPin("~{BUSRQ}");
-        addOutPin("~{BUSACK}", true, true);
-        addOutPin("~{RD}", true, true);
-        addOutPin("~{WR}", true, true);
-        addOutPin("~{MREQ}", true, true);
-        addOutPin("~{IORQ}", true, true);
-        addOutPin("~{M1}", true, true);
-        addOutPin("~{RFSH}", true, true);
-        addOutPin("~{HALT}", true, true);
+        addOutPin("~{BUSACK}", true);
+        addOutPin("~{RD}", true);
+        addOutPin("~{WR}", true);
+        addOutPin("~{MREQ}", true);
+        addOutPin("~{IORQ}", true);
+        addOutPin("~{M1}", true);
+        addOutPin("~{RFSH}", true);
+        addOutPin("~{HALT}", true);
         addOutBus("D", 8);
         addOutBus("A", 16);
         dIn = addInBus("D", 8);
@@ -275,17 +275,17 @@ public class Z80Cpu extends SchemaPart {
         cpu.reset();
         if (!mReqPin.state) {
             mReqPin.state = true;
-            mReqPin.setState(true, true);
+            mReqPin.setState(true);
             mReqPin.hiImpedance = false;
         }
         if (!rdPin.state) {
             rdPin.state = true;
-            rdPin.setState(true, true);
+            rdPin.setState(true);
             rdPin.hiImpedance = false;
         }
         if (!wrPin.state) {
             wrPin.state = true;
-            wrPin.setState(true, true);
+            wrPin.setState(true);
             wrPin.hiImpedance = false;
         }
         if (!aOut.hiImpedance) {
@@ -298,32 +298,32 @@ public class Z80Cpu extends SchemaPart {
         }
         if (!rdPin.state) {
             rdPin.state = true;
-            rdPin.setState(true, true);
+            rdPin.setState(true);
             rdPin.hiImpedance = false;
         }
         if (!wrPin.state) {
             wrPin.state = true;
-            wrPin.setState(true, true);
+            wrPin.setState(true);
             wrPin.hiImpedance = false;
         }
         if (!mReqPin.state) {
             mReqPin.state = true;
-            mReqPin.setState(true, true);
+            mReqPin.setState(true);
             mReqPin.hiImpedance = false;
         }
         if (!ioReqPin.state) {
             ioReqPin.state = true;
-            ioReqPin.setState(true, true);
+            ioReqPin.setState(true);
             ioReqPin.hiImpedance = false;
         }
         if (!m1Pin.state) {
             m1Pin.state = true;
-            m1Pin.setState(true, true);
+            m1Pin.setState(true);
             m1Pin.hiImpedance = false;
         }
         if (!refreshPin.state) {
             refreshPin.state = true;
-            refreshPin.setState(true, true);
+            refreshPin.setState(true);
             refreshPin.hiImpedance = false;
         }
         M = 1;

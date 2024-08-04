@@ -62,7 +62,7 @@ public abstract class Pin extends ModelItem<Pin> {
         return this;
     }
 
-    abstract public void setState(boolean newState, boolean strong);
+    abstract public void setState(boolean newState);
 
     @Override
     public int getSize() {
@@ -91,7 +91,7 @@ public abstract class Pin extends ModelItem<Pin> {
 
     public void resend() {
         if (!hiImpedance) {
-            setState(state, strong);
+            setState(state);
         }
     }
 

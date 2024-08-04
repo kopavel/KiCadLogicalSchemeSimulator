@@ -51,52 +51,52 @@ public class DcTrigger extends SchemaPart {
         rPin = addInPin(new NoFloatingInPin("R", this) {
 
             @Override
-            public void setState(boolean newState, boolean newStrong) {
+            public void setState(boolean newState) {
                 state = newState;
                 clockEnabled = !(newState | sPin.state);
                 if (!newState) {
                     if (!iqOut.state) {
                         iqOut.state = true;
-                        iqOut.setState(true, true);
+                        iqOut.setState(true);
                     }
                     if (qOut.state != sPin.state) {
                         qOut.state = sPin.state;
-                        qOut.setState(qOut.state, true);
+                        qOut.setState(qOut.state);
                     }
                 } else if (!sPin.state) {
                     if (!qOut.state) {
                         qOut.state = true;
-                        qOut.setState(true, true);
+                        qOut.setState(true);
                     }
                     if (iqOut.state) {
                         iqOut.state = false;
-                        iqOut.setState(false, true);
+                        iqOut.setState(false);
                     }
                 }
             }
         });
         sPin = addInPin(new NoFloatingInPin("S", this) {
             @Override
-            public void setState(boolean newState, boolean strong) {
+            public void setState(boolean newState) {
                 state = newState;
                 clockEnabled = !(newState | rPin.state);
                 if (!newState) {
                     if (!qOut.state) {
                         qOut.state = true;
-                        qOut.setState(true, true);
+                        qOut.setState(true);
                     }
                     if (iqOut.state != rPin.state) {
                         iqOut.state = rPin.state;
-                        iqOut.setState(rPin.state, true);
+                        iqOut.setState(rPin.state);
                     }
                 } else if (rPin.state) {
                     if (!qOut.state) {
                         qOut.state = true;
-                        qOut.setState(false, true);
+                        qOut.setState(false);
                     }
                     if (!iqOut.state) {
                         iqOut.state = true;
-                        iqOut.setState(true, true);
+                        iqOut.setState(true);
                     }
                 }
             }
@@ -116,8 +116,8 @@ public class DcTrigger extends SchemaPart {
                 }
             });
         }
-        addOutPin("Q", true, true);
-        addOutPin("~{Q}", false, true);
+        addOutPin("Q", true);
+        addOutPin("~{Q}", false);
     }
 
     @Override
@@ -131,15 +131,15 @@ public class DcTrigger extends SchemaPart {
             if (dPin.state) {
                 if (iqOut.state) {
                     qOut.state = true;
-                    qOut.setState(true, true);
+                    qOut.setState(true);
                     iqOut.state = false;
-                    iqOut.setState(false, true);
+                    iqOut.setState(false);
                 }
             } else if (qOut.state) {
                 qOut.state = false;
-                qOut.setState(false, true);
+                qOut.setState(false);
                 iqOut.state = true;
-                iqOut.setState(true, true);
+                iqOut.setState(true);
             }
         }
     }

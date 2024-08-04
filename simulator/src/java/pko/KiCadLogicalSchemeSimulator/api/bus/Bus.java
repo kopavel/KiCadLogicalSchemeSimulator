@@ -111,6 +111,8 @@ public abstract class Bus extends ModelItem<Bus> {
     public void resend() {
         if (!hiImpedance) {
             setState(state);
+        } else {
+            setHiImpedance();
         }
     }
 

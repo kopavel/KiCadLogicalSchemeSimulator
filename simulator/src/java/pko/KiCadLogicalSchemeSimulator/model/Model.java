@@ -31,12 +31,14 @@
  */
 package pko.KiCadLogicalSchemeSimulator.model;
 import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
+import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
 import pko.KiCadLogicalSchemeSimulator.api.wire.OutPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.PassiveOutPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
@@ -57,7 +59,6 @@ import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
@@ -110,6 +111,7 @@ public class Model {
                 }
                 //collect passive pins chain as wire for further usage, if any
                 wires.put(destinationHash, (OutPin) destination);
+                retVal = destination;
             }
         }
         if (!useOldWire) {
@@ -235,10 +237,12 @@ public class Model {
             });
             passivePins.clear();
         } else {
-            //if there is no destination pins but is passive pins - use one of it as destination, in other way passive pins don't get any changes
+            //if there is no destination pins but is passive (no out only) pins - use one of it as destination, in other way passive pins don't get any changes
             if ((destinationPins.isEmpty())) {
-                if (!passivePins.isEmpty()) {
-                    destinationPins.add(passivePins.getFirst());
+                Optional<PassivePin> passivePin = passivePins.stream()
+                        .filter(p -> !(p instanceof PassiveOutPin)).findAny();
+                if (passivePin.isPresent()) {
+                    destinationPins.add(passivePin.get());
                 } else if (destinationBusesOffsets.isEmpty()) {
                     sourcesOffset.forEach((out, offset) -> Log.warn(Model.class, "Unconnected Out:" + out.getName() + offset));
                 }
@@ -300,6 +304,7 @@ public class Model {
         destinationWireDescriptors.forEach((destination, descriptor) -> processWire(destination, descriptor.pins, descriptor.passivePins, descriptor.buses));
         //Bus destinations
         destinationBusDescriptors.forEach((destination, descriptor) -> {
+            descriptor.cleanBuses();
             if (descriptor.useBusMerger()) {
                 //connect destination to multiple sources throe Merger
                 String busMergerHash = Utils.getHash(descriptor.offsets.values()
@@ -448,45 +453,39 @@ public class Model {
 
     private void stabilise() {
         stabilizing = true;
-        forResend.addAll(schemaParts.values()
+        schemaParts.values()
                 .stream()
-                .flatMap(p -> Stream.concat(p.outPins.values()
-                                .stream(),
-                        p.passivePins.values()
-                                .stream()).distinct())
-                .toList());
-        while (!forResend.isEmpty()) {
-            IModelItem<?> item = forResend.poll();
-            assert Log.debug(Model.class, "Resend pin {}", item);
-            item.resend();
-            schemaParts.values().forEach(SchemaPart::reset);
-        }
+                .flatMap(p -> p.outPins.values()
+                        .stream())
+                .filter(i -> !i.isHiImpedance())
+                .distinct()
+                .forEach(item -> {
+                    assert Log.debug(Model.class, "Resend pin {}", item);
+                    item.resend();
+                    resend();
+                });
+        schemaParts.values()
+                .stream()
+                .flatMap(p -> p.passivePins.values()
+                        .stream())
+                .filter(ModelItem::isHiImpedance)
+                .distinct()
+                .forEach(item -> {
+                    assert Log.debug(Model.class, "Resend pin {}", item);
+                    item.resend();
+                    resend();
+                });
+        schemaParts.values().forEach(SchemaPart::reset);
         stabilizing = false;
     }
 
-    private static class DestinationBusDescriptor {
-        //Bus, offset, mask
-        public HashMap<OutBus, Map<Byte, Long>> buses = new HashMap<>();
-        //Pin, offset
-        public HashMap<Byte, BusPinsOffset> offsets = new HashMap<>();
-
-        public boolean useBusMerger() {
-            return buses.values()
-                    .stream().mapToLong(Map::size).sum() + offsets.values().size() > 1;
-        }
-
-        public void add(IModelItem<?> item, byte sourceOffset, byte destinationOffset) {
-            switch (item) {
-                case PassivePin passivePin -> offsets.computeIfAbsent(destinationOffset, e -> new BusPinsOffset()).passivePins.add(passivePin);
-                case OutPin pin -> offsets.computeIfAbsent(destinationOffset, e -> new BusPinsOffset()).pins.add(pin);
-                case OutBus bus -> {
-                    byte offset = (byte) (destinationOffset - sourceOffset);
-                    long newMask = buses.computeIfAbsent(bus, p -> new HashMap<>()).computeIfAbsent(offset, p -> 0L) | (1L << sourceOffset);
-                    buses.get(bus).put(offset, newMask);
-                }
-                default -> throw new IllegalStateException("Unsupported item: " + item.getClass().getName());
-            }
-        }
+    private void resend() {
+        ArrayList<IModelItem<?>> items = new ArrayList<>(forResend);
+        forResend.clear();
+        items.forEach(item -> {
+            assert Log.debug(Model.class, "Resend postponed pin {}", item);
+            item.resend();
+        });
     }
 
     private static class BusPinsOffset {
@@ -511,6 +510,54 @@ public class Model {
                 case OutBus bus -> buses.put(bus, 1L << offset);
                 default -> throw new IllegalStateException("Unsupported item: " + item.getClass().getName());
             }
+        }
+    }
+
+    private class DestinationBusDescriptor {
+        //Bus, offset, mask
+        public HashMap<OutBus, Map<Byte, Long>> buses = new HashMap<>();
+        //Pin, offset
+        public HashMap<Byte, BusPinsOffset> offsets = new HashMap<>();
+
+        public boolean useBusMerger() {
+            return buses.values()
+                    .stream().mapToLong(Map::size).sum() + offsets.values().size() > 1;
+        }
+
+        public void add(IModelItem<?> item, byte sourceOffset, byte destinationOffset) {
+            switch (item) {
+                case PassivePin passivePin -> offsets.computeIfAbsent(destinationOffset, e -> new BusPinsOffset()).passivePins.add(passivePin);
+                case OutPin pin -> offsets.computeIfAbsent(destinationOffset, e -> new BusPinsOffset()).pins.add(pin);
+                case OutBus bus -> {
+                    byte offset = (byte) (destinationOffset - sourceOffset);
+                    long newMask = buses.computeIfAbsent(bus, p -> new HashMap<>()).computeIfAbsent(offset, p -> 0L) | (1L << sourceOffset);
+                    buses.get(bus).put(offset, newMask);
+                }
+                default -> throw new IllegalStateException("Unsupported item: " + item.getClass().getName());
+            }
+        }
+
+        public void cleanBuses() {
+            offsets.forEach((pinsOffset, lists) -> {
+                if (!lists.passivePins.isEmpty()) {
+                    String passivePinHash = Utils.getHash(lists.passivePins);
+                    if (wires.containsKey(passivePinHash)) {
+                        //clean up all buses mask
+                        buses.values()
+                                .stream()
+                                .flatMap(m -> m.entrySet()
+                                        .stream())
+                                .filter(o -> o.getKey() <= pinsOffset)
+                                .forEach(pair -> {
+                                    long correctedMask = ~(1L << (pinsOffset - pair.getKey()));
+                                    pair.setValue(pair.getValue() & correctedMask);
+                                });
+                        //remove empty offsets
+                        buses.values().forEach(map -> map.entrySet().removeIf(entry -> entry.getValue() == 0));
+                        buses.entrySet().removeIf(entry -> entry.getValue().isEmpty());
+                    }
+                }
+            });
         }
     }
 }

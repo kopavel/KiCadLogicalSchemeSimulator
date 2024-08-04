@@ -59,7 +59,7 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
         if (sAliases != null) {
             outAlias = sAliases;
         }
-        addOutPin(outAlias, false, true);
+        addOutPin(outAlias, false);
         oscillatorUiComponent = new OscillatorUiComponent(20, id, this);
     }
 
@@ -82,45 +82,45 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
                         for (int i = 0; i < 100; i++) {
                             ticks += 20;
                             out.state = true;
-                            out.setState(true, true);
+                            out.setState(true);
                             out.state = false;
-                            out.setState(false, true);
+                            out.setState(false);
                             out.state = true;
-                            out.setState(true, true);
+                            out.setState(true);
                             out.state = false;
-                            out.setState(false, true);
+                            out.setState(false);
                             out.state = true;
-                            out.setState(true, true);
+                            out.setState(true);
                             out.state = false;
-                            out.setState(false, true);
+                            out.setState(false);
                             out.state = true;
-                            out.setState(true, true);
+                            out.setState(true);
                             out.state = false;
-                            out.setState(false, true);
+                            out.setState(false);
                             out.state = true;
-                            out.setState(true, true);
+                            out.setState(true);
                             out.state = false;
-                            out.setState(false, true);
+                            out.setState(false);
                             out.state = true;
-                            out.setState(true, true);
+                            out.setState(true);
                             out.state = false;
-                            out.setState(false, true);
+                            out.setState(false);
                             out.state = true;
-                            out.setState(true, true);
+                            out.setState(true);
                             out.state = false;
-                            out.setState(false, true);
+                            out.setState(false);
                             out.state = true;
-                            out.setState(true, true);
+                            out.setState(true);
                             out.state = false;
-                            out.setState(false, true);
+                            out.setState(false);
                             out.state = true;
-                            out.setState(true, true);
+                            out.setState(true);
                             out.state = false;
-                            out.setState(false, true);
+                            out.setState(false);
                             out.state = true;
-                            out.setState(true, true);
+                            out.setState(true);
                             out.state = false;
-                            out.setState(false, true);
+                            out.setState(false);
                         }
                     }
                 } catch (Throwable e) {
@@ -173,7 +173,7 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
         try {
             ticks++;
             out.state = !out.state;
-            out.setState(out.state, true);
+            out.setState(out.state);
         } catch (Throwable e) {
             Log.error(Oscillator.class, "TickError", e);
         }

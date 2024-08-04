@@ -40,7 +40,7 @@ public class OrGate extends SchemaPart {
 
     public OrGate(String id, String sParam) {
         super(id, sParam);
-        addOutPin("OUT", false, true);
+        addOutPin("OUT", false);
         if (!params.containsKey("size")) {
             throw new RuntimeException("Component " + id + " has no parameter \"size\"");
         }
@@ -51,7 +51,7 @@ public class OrGate extends SchemaPart {
             if (reverse) {
                 addInPin(new NoFloatingInPin("IN" + i, this) {
                     @Override
-                    public void setState(boolean newState, boolean strong) {
+                    public void setState(boolean newState) {
                         state = newState;
                         if (newState) {
                             inState |= mask;
@@ -60,7 +60,7 @@ public class OrGate extends SchemaPart {
                         }
                         if (out.state != (inState == 0)) {
                             out.state = inState == 0;
-                            out.setState(out.state, true);
+                            out.setState(out.state);
                         }
                     }
 
@@ -71,7 +71,7 @@ public class OrGate extends SchemaPart {
             } else {
                 addInPin(new NoFloatingInPin("IN" + i, this) {
                     @Override
-                    public void setState(boolean newState, boolean strong) {
+                    public void setState(boolean newState) {
                         state = newState;
                         if (newState) {
                             inState |= mask;
@@ -80,7 +80,7 @@ public class OrGate extends SchemaPart {
                         }
                         if (out.state == (inState == 0)) {
                             out.state = inState != 0;
-                            out.setState(out.state, true);
+                            out.setState(out.state);
                         }
                     }
 

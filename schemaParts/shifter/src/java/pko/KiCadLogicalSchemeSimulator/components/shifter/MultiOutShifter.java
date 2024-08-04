@@ -83,7 +83,7 @@ public class MultiOutShifter extends SchemaPart {
         if (plReverse) {
             addInPin(new NoFloatingInPin("PL", this) {
                 @Override
-                public void setState(boolean newState, boolean strong) {
+                public void setState(boolean newState) {
                     state = newState;
                     plInactive = newState;
                     if (!plInactive) {
@@ -98,7 +98,7 @@ public class MultiOutShifter extends SchemaPart {
         } else {
             addInPin(new NoFloatingInPin("PL", this) {
                 @Override
-                public void setState(boolean newState, boolean strong) {
+                public void setState(boolean newState) {
                     plInactive = !newState;
                     if (!plInactive) {
                         latch = dBus.getState();

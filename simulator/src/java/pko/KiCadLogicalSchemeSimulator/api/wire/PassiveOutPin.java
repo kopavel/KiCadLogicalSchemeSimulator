@@ -29,50 +29,11 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.components.repeater;
+package pko.KiCadLogicalSchemeSimulator.api.wire;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
 
-public class Repeater extends SchemaPart {
-    private Pin out;
-
-    public Repeater(String id, String sParam) {
-        super(id, sParam);
-        if (reverse) {
-            addInPin(new NoFloatingInPin("IN", this) {
-                @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    if (out.state == newState) {
-                        out.state = !newState;
-                        out.setState(out.state);
-                    }
-                }
-            });
-        } else {
-            addInPin(new NoFloatingInPin("IN", this) {
-                @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    if (out.state != newState) {
-                        out.state = newState;
-                        out.setState(newState);
-                    }
-                }
-            });
-        }
-        addOutPin("OUT", false);
-    }
-
-    @Override
-    public void initOuts() {
-        out = getOutPin("OUT");
-        out.state = reverse == (inPins.get("IN").getState() == 0);
-    }
-
-    @Override
-    public String extraState() {
-        return reverse ? "reverse" : null;
+public abstract class PassiveOutPin extends PassivePin {
+    public PassiveOutPin(String id, SchemaPart parent) {
+        super(id, parent);
     }
 }

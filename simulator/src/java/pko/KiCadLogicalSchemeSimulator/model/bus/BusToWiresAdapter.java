@@ -53,7 +53,7 @@ public class BusToWiresAdapter extends OutBus {
         if (maskState != (newState & mask)) {
             maskState = newState & mask;
             for (Pin destination : destinations) {
-                destination.setState(maskState != 0, true);
+                destination.setState(maskState != 0);
             }
         }
     }
@@ -89,16 +89,16 @@ public class BusToWiresAdapter extends OutBus {
                     if (maskState != (newState & mask)) {
                         maskState = newState & mask;
                         boolean newOutState = maskState != 0;
-                        d1.setState(newOutState, true);
-                        d2.setState(newOutState, true);
-                        d3.setState(newOutState, true);
-                        d4.setState(newOutState, true);
-                        d5.setState(newOutState, true);
-                        d6.setState(newOutState, true);
-                        d7.setState(newOutState, true);
-                        d8.setState(newOutState, true);
-                        d9.setState(newOutState, true);
-                        d10.setState(newOutState, true);
+                        d1.setState(newOutState);
+                        d2.setState(newOutState);
+                        d3.setState(newOutState);
+                        d4.setState(newOutState);
+                        d5.setState(newOutState);
+                        d6.setState(newOutState);
+                        d7.setState(newOutState);
+                        d8.setState(newOutState);
+                        d9.setState(newOutState);
+                        d10.setState(newOutState);
                     }
                 }
 
@@ -132,15 +132,15 @@ public class BusToWiresAdapter extends OutBus {
                     if (maskState != (newState & mask)) {
                         maskState = newState & mask;
                         boolean newOutState = maskState != 0;
-                        d1.setState(newOutState, true);
-                        d2.setState(newOutState, true);
-                        d3.setState(newOutState, true);
-                        d4.setState(newOutState, true);
-                        d5.setState(newOutState, true);
-                        d6.setState(newOutState, true);
-                        d7.setState(newOutState, true);
-                        d8.setState(newOutState, true);
-                        d9.setState(newOutState, true);
+                        d1.setState(newOutState);
+                        d2.setState(newOutState);
+                        d3.setState(newOutState);
+                        d4.setState(newOutState);
+                        d5.setState(newOutState);
+                        d6.setState(newOutState);
+                        d7.setState(newOutState);
+                        d8.setState(newOutState);
+                        d9.setState(newOutState);
                     }
                 }
 
@@ -172,14 +172,14 @@ public class BusToWiresAdapter extends OutBus {
                     if (maskState != (newState & mask)) {
                         maskState = newState & mask;
                         boolean newOutState = maskState != 0;
-                        d1.setState(newOutState, true);
-                        d2.setState(newOutState, true);
-                        d3.setState(newOutState, true);
-                        d4.setState(newOutState, true);
-                        d5.setState(newOutState, true);
-                        d6.setState(newOutState, true);
-                        d7.setState(newOutState, true);
-                        d8.setState(newOutState, true);
+                        d1.setState(newOutState);
+                        d2.setState(newOutState);
+                        d3.setState(newOutState);
+                        d4.setState(newOutState);
+                        d5.setState(newOutState);
+                        d6.setState(newOutState);
+                        d7.setState(newOutState);
+                        d8.setState(newOutState);
                     }
                 }
 
@@ -209,13 +209,13 @@ public class BusToWiresAdapter extends OutBus {
                     if (maskState != (newState & mask)) {
                         maskState = newState & mask;
                         boolean newOutState = maskState != 0;
-                        d1.setState(newOutState, true);
-                        d2.setState(newOutState, true);
-                        d3.setState(newOutState, true);
-                        d4.setState(newOutState, true);
-                        d5.setState(newOutState, true);
-                        d6.setState(newOutState, true);
-                        d7.setState(newOutState, true);
+                        d1.setState(newOutState);
+                        d2.setState(newOutState);
+                        d3.setState(newOutState);
+                        d4.setState(newOutState);
+                        d5.setState(newOutState);
+                        d6.setState(newOutState);
+                        d7.setState(newOutState);
                     }
                 }
 
@@ -243,12 +243,12 @@ public class BusToWiresAdapter extends OutBus {
                     if (maskState != (newState & mask)) {
                         maskState = newState & mask;
                         boolean newOutState = maskState != 0;
-                        d1.setState(newOutState, true);
-                        d2.setState(newOutState, true);
-                        d3.setState(newOutState, true);
-                        d4.setState(newOutState, true);
-                        d5.setState(newOutState, true);
-                        d6.setState(newOutState, true);
+                        d1.setState(newOutState);
+                        d2.setState(newOutState);
+                        d3.setState(newOutState);
+                        d4.setState(newOutState);
+                        d5.setState(newOutState);
+                        d6.setState(newOutState);
                     }
                 }
 
@@ -274,11 +274,11 @@ public class BusToWiresAdapter extends OutBus {
                     if (maskState != (newState & mask)) {
                         maskState = newState & mask;
                         boolean newOutState = maskState != 0;
-                        d1.setState(newOutState, true);
-                        d2.setState(newOutState, true);
-                        d3.setState(newOutState, true);
-                        d4.setState(newOutState, true);
-                        d5.setState(newOutState, true);
+                        d1.setState(newOutState);
+                        d2.setState(newOutState);
+                        d3.setState(newOutState);
+                        d4.setState(newOutState);
+                        d5.setState(newOutState);
                     }
                 }
 
@@ -302,10 +302,10 @@ public class BusToWiresAdapter extends OutBus {
                     if (maskState != (newState & mask)) {
                         maskState = newState & mask;
                         boolean newOutState = maskState != 0;
-                        d1.setState(newOutState, true);
-                        d2.setState(newOutState, true);
-                        d3.setState(newOutState, true);
-                        d4.setState(newOutState, true);
+                        d1.setState(newOutState);
+                        d2.setState(newOutState);
+                        d3.setState(newOutState);
+                        d4.setState(newOutState);
                     }
                 }
 
@@ -327,9 +327,9 @@ public class BusToWiresAdapter extends OutBus {
                     if (maskState != (newState & mask)) {
                         maskState = newState & mask;
                         boolean newOutState = maskState != 0;
-                        d1.setState(newOutState, true);
-                        d2.setState(newOutState, true);
-                        d3.setState(newOutState, true);
+                        d1.setState(newOutState);
+                        d2.setState(newOutState);
+                        d3.setState(newOutState);
                     }
                 }
 
@@ -349,8 +349,8 @@ public class BusToWiresAdapter extends OutBus {
                     if (maskState != (newState & mask)) {
                         maskState = newState & mask;
                         boolean newOutState = maskState != 0;
-                        d1.setState(newOutState, true);
-                        d2.setState(newOutState, true);
+                        d1.setState(newOutState);
+                        d2.setState(newOutState);
                     }
                 }
 
@@ -367,7 +367,7 @@ public class BusToWiresAdapter extends OutBus {
                 public void setState(long newState) {
                     if (maskState != (newState & mask) || hiImpedance) {
                         maskState = newState & mask;
-                        d1.setState(maskState != 0, true);
+                        d1.setState(maskState != 0);
                     }
                     hiImpedance = false;
                 }

@@ -91,7 +91,7 @@ public class Ram extends SchemaPart {
                 if (!csPin.state) {
                     if (Model.stabilizing) {
                         Model.forResend.add(this);
-                        Log.warn(this.getClass(), "Floating pin {}, try resend later", this);
+                        Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
                     } else {
                         throw new FloatingInException(this);
                     }
@@ -112,14 +112,14 @@ public class Ram extends SchemaPart {
         if (reverse) {
             csPin = addInPin(new NoFloatingInPin("~{CS}", this) {
                 @Override
-                public void setState(boolean newState, boolean strong) {
+                public void setState(boolean newState) {
                     state = newState;
                     rOut();
                 }
             });
             oePin = addInPin(new NoFloatingInPin("~{OE}", this) {
                 @Override
-                public void setState(boolean newState, boolean strong) {
+                public void setState(boolean newState) {
                     state = newState;
                     rOut();
                 }
@@ -135,14 +135,14 @@ public class Ram extends SchemaPart {
         } else {
             csPin = addInPin(new NoFloatingInPin("CS", this) {
                 @Override
-                public void setState(boolean newState, boolean strong) {
+                public void setState(boolean newState) {
                     state = newState;
                     out();
                 }
             });
             oePin = addInPin(new NoFloatingInPin("OE", this) {
                 @Override
-                public void setState(boolean newState, boolean strong) {
+                public void setState(boolean newState) {
                     state = newState;
                     out();
                 }

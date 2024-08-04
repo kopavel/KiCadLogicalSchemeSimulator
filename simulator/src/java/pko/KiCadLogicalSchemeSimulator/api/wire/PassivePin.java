@@ -34,19 +34,20 @@ import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 
 public abstract class PassivePin extends OutPin {
     public boolean outImpedance = true;
+    public Pin source;
 
     public PassivePin(String id, SchemaPart parent) {
         super(id, parent);
     }
 
     @Override
-    abstract public void setState(boolean newState, boolean strong);
+    abstract public void setState(boolean newState);
     @Override
     abstract public void setHiImpedance();
 
     public void resend() {
         if (!hiImpedance) {
-            setState(state, strong);
+            setState(state);
         } else {
             //noinspection ConstantValue,AssertWithSideEffects
             assert !(hiImpedance = false);

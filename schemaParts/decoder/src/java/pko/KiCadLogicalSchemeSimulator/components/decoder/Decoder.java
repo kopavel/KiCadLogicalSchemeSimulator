@@ -71,7 +71,7 @@ public class Decoder extends SchemaPart {
                     if (csState) {
                         if (Model.stabilizing) {
                             Model.forResend.add(this);
-                            Log.warn(this.getClass(), "Floating pin {}, try resend later", this);
+                            Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
                         } else {
                             throw new FloatingInException(this);
                         }
@@ -101,7 +101,7 @@ public class Decoder extends SchemaPart {
                     if (csState) {
                         if (Model.stabilizing) {
                             Model.forResend.add(this);
-                            Log.warn(this.getClass(), "Floating pin {}, try resend later", this);
+                            Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
                         } else {
                             throw new FloatingInException(this);
                         }
@@ -112,14 +112,14 @@ public class Decoder extends SchemaPart {
         if (reverse) {
             addInPin(new NoFloatingInPin("CS", this) {
                 @Override
-                public void setState(boolean newState, boolean strong) {
+                public void setState(boolean newState) {
                     state = newState;
                     csState = !newState;
                     if (csState) {
                         if (aBus.hiImpedance) {
                             if (Model.stabilizing) {
                                 Model.forResend.add(this);
-                                Log.warn(this.getClass(), "Floating pin {}, try resend later", this);
+                                Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
                             } else {
                                 throw new FloatingInException(aBus);
                             }
@@ -137,14 +137,14 @@ public class Decoder extends SchemaPart {
         } else {
             addInPin(new NoFloatingInPin("CS", this) {
                 @Override
-                public void setState(boolean newState, boolean strong) {
+                public void setState(boolean newState) {
                     state = newState;
                     csState = newState;
                     if (csState) {
                         if (aBus.hiImpedance) {
                             if (Model.stabilizing) {
                                 Model.forResend.add(this);
-                                Log.warn(this.getClass(), "Floating pin {}, try resend later", this);
+                                Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
                             } else {
                                 throw new FloatingInException(aBus);
                             }

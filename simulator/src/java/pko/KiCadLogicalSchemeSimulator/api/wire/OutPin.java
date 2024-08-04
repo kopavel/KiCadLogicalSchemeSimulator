@@ -37,7 +37,6 @@ import pko.KiCadLogicalSchemeSimulator.model.wire.WireToBusAdapter;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
-//FixMe use one destination with splitter
 public class OutPin extends Pin {
     public Pin[] destinations = new Pin[0];
 
@@ -56,6 +55,9 @@ public class OutPin extends Pin {
             } else {
                 destinations = Utils.addToArray(destinations, pin);
             }
+            if (pin instanceof PassivePin passivePin) {
+                passivePin.source = this;
+            }
         }
     }
 
@@ -64,9 +66,9 @@ public class OutPin extends Pin {
     }
 
     @Override
-    public void setState(boolean newState, boolean newStrong) {
+    public void setState(boolean newState) {
         for (Pin destination : destinations) {
-            destination.setState(state, strong);
+            destination.setState(state);
         }
     }
 
@@ -80,7 +82,7 @@ public class OutPin extends Pin {
 
     public void resend() {
         if (!hiImpedance) {
-            setState(state, strong);
+            setState(state);
         }
     }
 
@@ -95,9 +97,9 @@ public class OutPin extends Pin {
             Pin d2 = destinations[1].getOptimised();
             return new OutPin(this, "unroll2") {
                 @Override
-                public void setState(boolean newState, boolean newStrong) {
-                    d1.setState(state, strong);
-                    d2.setState(state, strong);
+                public void setState(boolean newState) {
+                    d1.setState(state);
+                    d2.setState(state);
                 }
 
                 @Override
@@ -112,10 +114,10 @@ public class OutPin extends Pin {
             Pin d3 = destinations[2].getOptimised();
             return new OutPin(this, "unroll3") {
                 @Override
-                public void setState(boolean newState, boolean newStrong) {
-                    d1.setState(state, strong);
-                    d2.setState(state, strong);
-                    d3.setState(state, strong);
+                public void setState(boolean newState) {
+                    d1.setState(state);
+                    d2.setState(state);
+                    d3.setState(state);
                 }
 
                 @Override
@@ -132,11 +134,11 @@ public class OutPin extends Pin {
             Pin d4 = destinations[3].getOptimised();
             return new OutPin(this, "unroll4") {
                 @Override
-                public void setState(boolean newState, boolean newStrong) {
-                    d1.setState(state, strong);
-                    d2.setState(state, strong);
-                    d3.setState(state, strong);
-                    d4.setState(state, strong);
+                public void setState(boolean newState) {
+                    d1.setState(state);
+                    d2.setState(state);
+                    d3.setState(state);
+                    d4.setState(state);
                 }
 
                 @Override
@@ -155,12 +157,12 @@ public class OutPin extends Pin {
             Pin d5 = destinations[4].getOptimised();
             return new OutPin(this, "unroll5") {
                 @Override
-                public void setState(boolean newState, boolean newStrong) {
-                    d1.setState(state, strong);
-                    d2.setState(state, strong);
-                    d3.setState(state, strong);
-                    d4.setState(state, strong);
-                    d5.setState(state, strong);
+                public void setState(boolean newState) {
+                    d1.setState(state);
+                    d2.setState(state);
+                    d3.setState(state);
+                    d4.setState(state);
+                    d5.setState(state);
                 }
 
                 @Override
@@ -181,13 +183,13 @@ public class OutPin extends Pin {
             Pin d6 = destinations[5].getOptimised();
             return new OutPin(this, "unroll6") {
                 @Override
-                public void setState(boolean newState, boolean newStrong) {
-                    d1.setState(state, strong);
-                    d2.setState(state, strong);
-                    d3.setState(state, strong);
-                    d4.setState(state, strong);
-                    d5.setState(state, strong);
-                    d6.setState(state, strong);
+                public void setState(boolean newState) {
+                    d1.setState(state);
+                    d2.setState(state);
+                    d3.setState(state);
+                    d4.setState(state);
+                    d5.setState(state);
+                    d6.setState(state);
                 }
 
                 @Override

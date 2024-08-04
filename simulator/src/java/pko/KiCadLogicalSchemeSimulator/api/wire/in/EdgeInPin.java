@@ -41,7 +41,7 @@ public abstract class EdgeInPin extends NoFloatingInPin {
     public abstract void onRisingEdge();
 
     @Override
-    public void setState(boolean newState, boolean strong) {
+    public void setState(boolean newState) {
         state = newState;
         if (newState) {
             onRisingEdge();

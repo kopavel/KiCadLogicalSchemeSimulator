@@ -57,7 +57,8 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
                         if (destination.state != pin2.state || destination.strong != pin2.strong) {
                             destination.state = pin2.state;
                             destination.strong = pin2.strong;
-                            destination.setState(pin2.state, pin2.strong);
+                            destination.setState(pin2.state);
+                            destination.hiImpedance = false;
                         }
                     }
                 } else {
@@ -71,43 +72,47 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
             }
 
             @Override
-            public void setState(boolean newState, boolean newStrong) {
+            public void setState(boolean newState) {
                 hiImpedance = false;
                 state = newState;
-                strong = newStrong;
+                strong = source == null || source.strong;
                 if (toggled && !pin2.hiImpedance) {
                     if (pin2.strong) {
-                        if (newStrong) {
+                        if (strong) {
                             if (Model.stabilizing) {
                                 Model.forResend.add(this);
-                                Log.warn(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
+                                Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
                             } else {
                                 throw new ShortcutException(pin1, pin2);
                             }
                         } else {
+                            strong = true;
                             for (Pin destination : destinations) {
                                 if (destination.state != pin2.state || destination.strong != pin2.strong) {
                                     destination.state = pin2.state;
-                                    destination.strong = pin2.strong;
-                                    destination.setState(pin2.state, pin2.strong);
+                                    destination.strong = true;
+                                    destination.setState(pin2.state);
+                                    destination.hiImpedance = false;
                                 }
                             }
                         }
-                    } else if (newStrong) {
+                    } else if (strong) {
                         for (Pin destination : destinations) {
                             if (destination.state != newState || !destination.strong) {
                                 destination.state = newState;
                                 destination.strong = true;
-                                destination.setState(newState, true);
+                                destination.setState(newState);
+                                destination.hiImpedance = false;
                             }
                         }
                     }
                 } else {
                     for (Pin destination : destinations) {
-                        if (destination.state != newState || destination.strong != newStrong) {
+                        if (destination.state != newState || destination.strong != strong) {
                             destination.state = newState;
-                            destination.strong = newStrong;
-                            destination.setState(newState, newStrong);
+                            destination.strong = strong;
+                            destination.setState(newState);
+                            destination.hiImpedance = false;
                         }
                     }
                 }
@@ -123,7 +128,8 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
                         if (destination.state != pin1.state || destination.strong != pin1.strong) {
                             destination.state = pin1.state;
                             destination.strong = pin1.strong;
-                            destination.setState(pin1.state, pin1.strong);
+                            destination.setState(pin1.state);
+                            destination.hiImpedance = false;
                         }
                     }
                 } else {
@@ -137,43 +143,47 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
             }
 
             @Override
-            public void setState(boolean newState, boolean newStrong) {
+            public void setState(boolean newState) {
                 hiImpedance = false;
                 state = newState;
-                strong = newStrong;
+                strong = source == null || source.strong;
                 if (toggled && !pin1.hiImpedance) {
                     if (pin1.strong) {
-                        if (newStrong) {
+                        if (strong) {
                             if (Model.stabilizing) {
                                 Model.forResend.add(this);
-                                Log.warn(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
+                                Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
                             } else {
                                 throw new ShortcutException(pin1, pin2);
                             }
                         } else {
+                            strong = true;
                             for (Pin destination : destinations) {
                                 if (destination.state != pin1.state || destination.strong != pin1.strong) {
                                     destination.state = pin1.state;
-                                    destination.strong = pin1.strong;
-                                    destination.setState(pin1.state, pin1.strong);
+                                    destination.strong = true;
+                                    destination.setState(pin1.state);
+                                    destination.hiImpedance = false;
                                 }
                             }
                         }
-                    } else if (newStrong) {
+                    } else if (strong) {
                         for (Pin destination : destinations) {
                             if (destination.state != newState || !destination.strong) {
                                 destination.state = newState;
                                 destination.strong = true;
-                                destination.setState(newState, true);
+                                destination.setState(newState);
+                                destination.hiImpedance = false;
                             }
                         }
                     }
                 } else {
                     for (Pin destination : destinations) {
-                        if (destination.state != newState || destination.strong != newStrong) {
+                        if (destination.state != newState || destination.strong != strong) {
                             destination.state = newState;
-                            destination.strong = newStrong;
-                            destination.setState(newState, newStrong);
+                            destination.strong = strong;
+                            destination.setState(newState);
+                            destination.hiImpedance = false;
                         }
                     }
                 }

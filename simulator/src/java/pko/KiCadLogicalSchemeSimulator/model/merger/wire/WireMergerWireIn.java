@@ -39,116 +39,71 @@ import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
     private final WireMerger merger;
+    private boolean oldImpedance;
 
     public WireMergerWireIn(Pin source, WireMerger merger) {
         super(source, "PMergePIn");
         this.merger = merger;
+        oldImpedance = source.hiImpedance;
     }
 
     @Override
-    public void setState(boolean newState, boolean newStrong) {
+    public void setState(boolean newState) {
         assert Log.debug(WireMergerWireIn.class,
-                "Pin merger change. before: newState:{}, newStrong:{}, Source:{} (state:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{}, " +
-                        "hiImpedance:{})",
+                "Pin merger change. before: newState:{}, Source:{} (state:{}, hiImpedance:{}), Merger:{} (state:{},  hiImpedance:{})",
                 newState,
-                newStrong,
                 getName(),
                 state,
-                strong,
                 hiImpedance,
                 merger.getName(),
                 merger.state,
-                merger.strong,
                 merger.hiImpedance);
         state = newState;
-        boolean oldState = merger.state;
-        boolean oldStrong = merger.strong;
-        if (newStrong) { // to strong
-            if (!strong) { // from weak
-                if (merger.strong) {
-                    if (Model.stabilizing) {
-                        Model.forResend.add(this);
-                        Log.warn(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
-                        return;
-                    } else {
-                        throw new ShortcutException(merger.sources); //but merger already strong
-                    }
-                }
-                if (!hiImpedance) {
-                    merger.weakState -= (byte) (merger.weakState > 0 ? 1 : -1); //count down weak states
-                }
-            } else if (hiImpedance && merger.strong) { //from hiImpedance but merger already strong
-                if (Model.stabilizing) {
-                    Model.forResend.add(this);
-                    Log.warn(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
-                    return;
-                } else {
-                    throw new ShortcutException(merger.sources);
-                }
-            }
-            merger.state = state;
-            merger.strong = true;
-        } else { //to weak
-            if (merger.weakState != 0 && (merger.weakState > 0) != state) {
-                if (Model.stabilizing) {
-                    Model.forResend.add(this);
-                    Log.warn(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
-                    return;
-                } else {
-                    throw new ShortcutException(merger.sources); // merger in opposite weak state
-                }
-            }
-            if (strong) { // from string
-                merger.weakState += (byte) (state ? 1 : -1); // count up weak state
-                merger.state = state;
-                merger.strong = false;
-            } else if (hiImpedance) { // from hiImpedance
-                merger.weakState += (byte) (state ? 1 : -1);// count up weak state
-            }
-        }
-        if (merger.hiImpedance) { // from merger hiImpedance
-            merger.state = state;
-            merger.hiImpedance = false;
-            for (Pin destination : merger.destinations) {
-                destination.setState(merger.state, merger.strong);
-            }
-        } else if (oldState != merger.state || oldStrong != merger.strong) { // in case of merger state changed
-            for (Pin destination : merger.destinations) {
-                destination.setState(merger.state, merger.strong);
-            }
-        }
         hiImpedance = false;
-        strong = newStrong;
-        assert Log.debug(WireMergerWireIn.class,
-                "Pin merger change. after: newState:{}, newStrong:{}, Source:{} (state:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{}, " +
-                        "hiImpedance:{})",
+        if (!merger.hiImpedance && oldImpedance) { //merger not in hiImpedance
+            if (Model.stabilizing) {
+                Model.forResend.add(this);
+                Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
+                return;
+            } else {
+                throw new ShortcutException(merger.sources);
+            }
+        } else if (merger.hiImpedance || state != merger.state) { // merger state changes
+            merger.hiImpedance = false;
+            merger.state = state;
+            for (Pin destination : merger.destinations) {
+                destination.setState(merger.state);
+            }
+        }
+        oldImpedance = false;
+        assert Log.debug(WireMergerWireIn.class, "Pin merger change. after: newState:{}, Source:{} (state:{}, hiImpedance:{}), Merger:{} (state:{}, hiImpedance:{})",
                 newState,
-                newStrong,
                 getName(),
                 state,
-                strong,
                 hiImpedance,
                 merger.getName(),
                 merger.state,
-                merger.strong,
                 merger.hiImpedance);
     }
 
     @Override
     public void setHiImpedance() {
         assert !hiImpedance : "Already in hiImpedance:" + this + "; merger=" + merger.getName();
-        if (!strong) { //from weak
-            merger.weakState -= (byte) (merger.weakState > 0 ? 1 : -1); //count down weak states
-        } else {
-            merger.strong = false;
-        }
-        if (!merger.strong) { //merger in weak state
-            if (merger.weakState == 0) {
-                for (Pin destination : merger.destinations) {
-                    destination.setHiImpedance(); //no weak state anymore - go to hiImpedance
-                }
-            }
-        }
+        merger.hiImpedance = true;
         hiImpedance = true;
+        oldImpedance = true;
+        for (Pin destination : merger.destinations) {
+            destination.setHiImpedance();
+        }
     }
+
+    @Override
+    public void resend() {
+        if (!hiImpedance) {
+            setState(state);
+        } else if (!oldImpedance) {
+            setHiImpedance();
+        }
+    }
+
 }

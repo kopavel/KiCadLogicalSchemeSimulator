@@ -42,7 +42,7 @@ public abstract class FallingEdgeInPin extends EdgeInPin {
     }
 
     @Override
-    public void setState(boolean newState, boolean strong) {
+    public void setState(boolean newState) {
         state = newState;
         if (!newState) {
             onFallingEdge();

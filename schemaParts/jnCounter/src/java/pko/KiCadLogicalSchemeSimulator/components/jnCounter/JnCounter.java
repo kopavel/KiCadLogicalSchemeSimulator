@@ -84,13 +84,13 @@ public class JnCounter extends SchemaPart {
                             outBus.state = 1;
                             if (carryOutPin.state) {
                                 carryOutPin.state = false;
-                                carryOutPin.setState(false, true);
+                                carryOutPin.setState(false);
                             }
                         } else {
                             outBus.state = outBus.state << 1;
                             if (carryOutPin.state != outBus.state >= coMax) {
                                 carryOutPin.state = outBus.state >= coMax;
-                                carryOutPin.setState(carryOutPin.state, true);
+                                carryOutPin.setState(carryOutPin.state);
                             }
                         }
                         outBus.setState(outBus.state);
@@ -121,13 +121,13 @@ public class JnCounter extends SchemaPart {
                             outBus.state = 1;
                             if (carryOutPin.state) {
                                 carryOutPin.state = false;
-                                carryOutPin.setState(false, true);
+                                carryOutPin.setState(false);
                             }
                         } else {
                             outBus.state = outBus.state << 1;
                             if (carryOutPin.state != outBus.state >= coMax) {
                                 carryOutPin.state = outBus.state >= coMax;
-                                carryOutPin.setState(carryOutPin.state, true);
+                                carryOutPin.setState(carryOutPin.state);
                             }
                         }
                         outBus.setState(outBus.state);
@@ -162,7 +162,7 @@ public class JnCounter extends SchemaPart {
     @Override
     public void reset() {
         outBus.state = 1;
-        outBus.hiImpedance = false;
         outBus.setState(1);
+        outBus.hiImpedance = false;
     }
 }
