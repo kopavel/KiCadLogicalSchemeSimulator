@@ -71,7 +71,7 @@ public class Decoder extends SchemaPart {
                     if (csState) {
                         if (Model.stabilizing) {
                             Model.forResend.add(this);
-                            Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
+                            assert Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
                         } else {
                             throw new FloatingInException(this);
                         }
@@ -101,7 +101,7 @@ public class Decoder extends SchemaPart {
                     if (csState) {
                         if (Model.stabilizing) {
                             Model.forResend.add(this);
-                            Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
+                            assert Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
                         } else {
                             throw new FloatingInException(this);
                         }
@@ -119,7 +119,7 @@ public class Decoder extends SchemaPart {
                         if (aBus.hiImpedance) {
                             if (Model.stabilizing) {
                                 Model.forResend.add(this);
-                                Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
+                                assert Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
                             } else {
                                 throw new FloatingInException(aBus);
                             }
@@ -144,7 +144,7 @@ public class Decoder extends SchemaPart {
                         if (aBus.hiImpedance) {
                             if (Model.stabilizing) {
                                 Model.forResend.add(this);
-                                Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
+                                assert Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
                             } else {
                                 throw new FloatingInException(aBus);
                             }

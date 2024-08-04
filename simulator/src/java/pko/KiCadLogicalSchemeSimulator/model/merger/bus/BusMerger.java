@@ -89,7 +89,7 @@ public class BusMerger extends OutBus {
             if ((strongPins & destinationMask) != 0) {
                 if (Model.stabilizing) {
                     Model.forResend.add(this);
-                    Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
+                    assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
                     return;
                 } else {
                     throw new ShortcutException(sources);
@@ -142,7 +142,7 @@ public class BusMerger extends OutBus {
                 if ((strongPins & destinationMask) != 0) {
                     if (Model.stabilizing) {
                         Model.forResend.add(this);
-                        Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
+                        assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
                         return;
                     } else {
                         throw new ShortcutException(sources);
@@ -156,7 +156,7 @@ public class BusMerger extends OutBus {
                 if ((weakPins & destinationMask) != 0 && ((weakState & destinationMask) == 0) == pin.state) {
                     if (Model.stabilizing) {
                         Model.forResend.add(this);
-                        Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
+                        assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
                         return;
                     } else {
                         throw new ShortcutException(sources);

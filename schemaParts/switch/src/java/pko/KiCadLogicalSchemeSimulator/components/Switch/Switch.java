@@ -81,7 +81,7 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
                         if (strong) {
                             if (Model.stabilizing) {
                                 Model.forResend.add(this);
-                                Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
+                                assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
                             } else {
                                 throw new ShortcutException(pin1, pin2);
                             }
@@ -152,7 +152,7 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
                         if (strong) {
                             if (Model.stabilizing) {
                                 Model.forResend.add(this);
-                                Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
+                                assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
                             } else {
                                 throw new ShortcutException(pin1, pin2);
                             }

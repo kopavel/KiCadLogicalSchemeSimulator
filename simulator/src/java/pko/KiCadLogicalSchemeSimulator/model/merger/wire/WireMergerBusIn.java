@@ -65,7 +65,7 @@ public class WireMergerBusIn extends CorrectedInBus implements MergerInput<Bus> 
         if (!merger.hiImpedance && oldImpedance) { //merger not in hiImpedance
             if (Model.stabilizing) {
                 Model.forResend.add(this);
-                Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
+                assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
                 return;
             } else {
                 throw new ShortcutException(merger.sources);

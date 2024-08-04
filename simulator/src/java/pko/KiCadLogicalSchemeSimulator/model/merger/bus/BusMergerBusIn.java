@@ -71,7 +71,7 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
         if (oldImpedance && (merger.strongPins & mask) != 0) {
             if (Model.stabilizing) {
                 Model.forResend.add(this);
-                Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
+                assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
                 return;
             } else {
                 throw new ShortcutException(merger.sources);

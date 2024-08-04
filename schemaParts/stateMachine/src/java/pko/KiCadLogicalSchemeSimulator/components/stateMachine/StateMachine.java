@@ -138,7 +138,7 @@ public class StateMachine extends SchemaPart {
                 if (sPin.state) {
                     if (Model.stabilizing) {
                         Model.forResend.add(this);
-                        Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
+                        assert Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
                     } else {
                         throw new FloatingInException(this);
                     }

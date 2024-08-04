@@ -87,7 +87,7 @@ public class WireMerger extends OutPin {
             if (!hiImpedance) {
                 if (Model.stabilizing) {
                     Model.forResend.add(this);
-                    Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
+                    assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
                     return;
                 } else {
                     throw new ShortcutException(sources);
@@ -105,7 +105,7 @@ public class WireMerger extends OutPin {
             if (!hiImpedance) {
                 if (Model.stabilizing) {
                     Model.forResend.add(this);
-                    Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
+                    assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
                     return;
                 } else {
                     throw new ShortcutException(sources);

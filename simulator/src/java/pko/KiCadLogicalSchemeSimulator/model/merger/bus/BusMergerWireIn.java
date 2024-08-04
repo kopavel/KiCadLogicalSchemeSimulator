@@ -76,7 +76,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
             if (oldImpedance && (merger.strongPins & mask) != 0) { //strong pins shortcut
                 if (Model.stabilizing) {
                     Model.forResend.add(this);
-                    Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
+                    assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
                     return;
                 } else {
                     throw new ShortcutException(merger.sources);
@@ -98,7 +98,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
             if ((merger.weakPins & mask) != 0 && ((merger.weakState & mask) == 0) == state) { //opposite weak state
                 if (Model.stabilizing) {
                     Model.forResend.add(this);
-                    Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
+                    assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
                     return;
                 } else {
                     throw new ShortcutException(merger.sources);
