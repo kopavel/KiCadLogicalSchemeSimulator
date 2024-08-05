@@ -49,7 +49,7 @@ public class WireMerger extends OutPin {
 
     public WireMerger(Pin destination, List<OutPin> pins, Map<OutBus, Long> buses) {
         super(destination, "wireMerger");
-        destinations = new Pin[]{destination};
+        addDestination(destination);
         pins.forEach(this::addSource);
         if (buses != null) {
             buses.forEach(this::addSource);

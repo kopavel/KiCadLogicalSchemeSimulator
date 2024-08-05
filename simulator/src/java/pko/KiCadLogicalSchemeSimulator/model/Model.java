@@ -539,23 +539,20 @@ public class Model {
 
         public void cleanBuses() {
             offsets.forEach((pinsOffset, lists) -> {
-                if (!lists.passivePins.isEmpty()) {
-                    String passivePinHash = Utils.getHash(lists.passivePins);
-                    if (wires.containsKey(passivePinHash)) {
-                        //clean up all buses mask
-                        buses.values()
-                                .stream()
-                                .flatMap(m -> m.entrySet()
-                                        .stream())
-                                .filter(o -> o.getKey() <= pinsOffset)
-                                .forEach(pair -> {
-                                    long correctedMask = ~(1L << (pinsOffset - pair.getKey()));
-                                    pair.setValue(pair.getValue() & correctedMask);
-                                });
-                        //remove empty offsets
-                        buses.values().forEach(map -> map.entrySet().removeIf(entry -> entry.getValue() == 0));
-                        buses.entrySet().removeIf(entry -> entry.getValue().isEmpty());
-                    }
+                if (lists.passivePins.stream().allMatch(p -> p.source != null)) {
+                    //clean up all buses mask
+                    buses.values()
+                            .stream()
+                            .flatMap(m -> m.entrySet()
+                                    .stream())
+                            .filter(o -> o.getKey() <= pinsOffset)
+                            .forEach(pair -> {
+                                long correctedMask = ~(1L << (pinsOffset - pair.getKey()));
+                                pair.setValue(pair.getValue() & correctedMask);
+                            });
+                    //remove empty offsets
+                    buses.values().forEach(map -> map.entrySet().removeIf(entry -> entry.getValue() == 0));
+                    buses.entrySet().removeIf(entry -> entry.getValue().isEmpty());
                 }
             });
         }

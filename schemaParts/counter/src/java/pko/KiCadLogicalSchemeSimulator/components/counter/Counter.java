@@ -99,6 +99,5 @@ public class Counter extends SchemaPart {
     public void reset() {
         outBus.state = 0;
         outBus.setState(0);
-        outBus.hiImpedance = false;
     }
 }

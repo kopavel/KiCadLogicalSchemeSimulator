@@ -86,17 +86,17 @@ public class MaskGroupBus extends OutBus {
                 @Override
                 public void setHiImpedance() {
                     if (!hiImpedance) {
-                        destination.setHiImpedance();
                         hiImpedance = true;
+                        destination.setHiImpedance();
                     }
                 }
 
                 @Override
                 public void setState(long newState) {
-                    if (hiImpedance) {
+                    if (hiImpedance || destination.hiImpedance) {
                         maskState = newState & mask;
-                        destination.setState(maskState);
                         hiImpedance = false;
+                        destination.setState(maskState);
                     } else if (maskState != (newState & mask)) {
                         maskState = newState & mask;
                         destination.setState(maskState);
