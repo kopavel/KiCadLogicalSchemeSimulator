@@ -29,14 +29,14 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.model.merger.wire;
+package pko.KiCadLogicalSchemeSimulator.net.merger.wire;
 import pko.KiCadLogicalSchemeSimulator.api.ShortcutException;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
 import pko.KiCadLogicalSchemeSimulator.api.wire.OutPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.model.Model;
-import pko.KiCadLogicalSchemeSimulator.model.merger.MergerInput;
+import pko.KiCadLogicalSchemeSimulator.net.Net;
+import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
@@ -85,8 +85,8 @@ public class WireMerger extends OutPin {
         sources = Utils.addToArray(sources, input);
         if (!bus.hiImpedance) {
             if (!hiImpedance) {
-                if (Model.stabilizing) {
-                    Model.forResend.add(this);
+                if (Net.stabilizing) {
+                    Net.forResend.add(this);
                     assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
                     return;
                 } else {
@@ -103,8 +103,8 @@ public class WireMerger extends OutPin {
         sources = Utils.addToArray(sources, input);
         if (!pin.hiImpedance) {
             if (!hiImpedance) {
-                if (Model.stabilizing) {
-                    Model.forResend.add(this);
+                if (Net.stabilizing) {
+                    Net.forResend.add(this);
                     assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
                     return;
                 } else {

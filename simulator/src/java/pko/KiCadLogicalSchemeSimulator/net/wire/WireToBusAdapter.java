@@ -29,30 +29,50 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.model.bus;
+package pko.KiCadLogicalSchemeSimulator.net.wire;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
+import pko.KiCadLogicalSchemeSimulator.api.wire.OutPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 
-public class NCBus extends OutBus {
-    public NCBus(OutBus outPin) {
-        super(outPin.id, outPin.parent, outPin.size);
-        aliasOffsets = outPin.aliasOffsets;
+public class WireToBusAdapter extends OutPin {
+    public long mask;
+    private Bus destination;
+
+    public WireToBusAdapter(Bus destination, byte offset) {
+        super(destination.id, destination.parent);
+        variantId = "WireToBasAdapter:offset" + offset;
+        mask = 1L << offset;
+        this.destination = destination;
     }
 
     @Override
-    public void setState(long newState) {
+    public void addDestination(Pin pin) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void addDestination(Bus bus, byte offset) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setState(boolean newState) {
+        destination.setState(newState ? mask : 0);
     }
 
     @Override
     public void setHiImpedance() {
+        assert !hiImpedance : "Already in hiImpedance:" + this;
+        destination.setHiImpedance();
     }
 
     @Override
-    public void resend() {
-    }
-
-    @Override
-    public Bus getOptimised() {
-        return this;
+    public Pin getOptimised() {
+        if (destinations.length == 0) {
+            return new NCWire(this);
+        } else {
+            destination = destination.getOptimised();
+            return this;
+        }
     }
 }

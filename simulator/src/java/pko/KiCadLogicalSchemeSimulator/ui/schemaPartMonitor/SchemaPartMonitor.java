@@ -80,7 +80,7 @@ public class SchemaPartMonitor extends JFrame {
                 dispose();
             }
         });
-        schemaPart = Simulator.model.schemaParts.get(id);
+        schemaPart = Simulator.net.schemaParts.get(id);
         title.setText(id);
         schemaPartBox.setBorder(BorderFactory.createLineBorder(borderColor));
         schemaPart.inPins.values()

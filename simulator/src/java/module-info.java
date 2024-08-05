@@ -38,13 +38,13 @@ module KiCadLogicalSchemeSimulator.simulator {
     exports pko.KiCadLogicalSchemeSimulator.api.wire.in;
     exports pko.KiCadLogicalSchemeSimulator.api.wire;
     exports pko.KiCadLogicalSchemeSimulator.api;
-    exports pko.KiCadLogicalSchemeSimulator.model;
+    exports pko.KiCadLogicalSchemeSimulator.net;
     exports pko.KiCadLogicalSchemeSimulator.parsers.pojo.symbolMap;
     exports pko.KiCadLogicalSchemeSimulator.parsers.pojo;
     exports pko.KiCadLogicalSchemeSimulator.tools.ringBuffers;
     exports pko.KiCadLogicalSchemeSimulator.tools;
     exports pko.KiCadLogicalSchemeSimulator;
-    opens pko.KiCadLogicalSchemeSimulator.model;
+    opens pko.KiCadLogicalSchemeSimulator.net;
     opens pko.KiCadLogicalSchemeSimulator.parsers.pojo.symbolMap;
     opens pko.KiCadLogicalSchemeSimulator.parsers.pojo;
     opens pko.KiCadLogicalSchemeSimulator;

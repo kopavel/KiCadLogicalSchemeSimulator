@@ -35,7 +35,7 @@ import picocli.CommandLine;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.AbstractUiComponent;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.InteractiveSchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.model.Model;
+import pko.KiCadLogicalSchemeSimulator.net.Net;
 import pko.KiCadLogicalSchemeSimulator.parsers.net.NetFileParser;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.Export;
 import pko.KiCadLogicalSchemeSimulator.parsers.xml.XmlParser;
@@ -60,7 +60,7 @@ public class Simulator implements Runnable {
     private static final Map<String, SchemaPartMonitor> monitoredParts = new HashMap<>();
     public static MainUI ui;
     public static String netFilePathNoExtension;
-    public static Model model;
+    public static Net net;
     @CommandLine.Parameters(index = "0", arity = "1", description = "Path to KiCad NET file")
     public String netFilePath;
     @CommandLine.Option(names = {"-m", "--mapFile"}, description = "Path to KiCad symbol mapping file")
@@ -100,7 +100,7 @@ public class Simulator implements Runnable {
                         addMonitoringPart(parts[1],
                                 new Rectangle(Integer.parseInt(parts[2]), Integer.parseInt(parts[3]), Integer.parseInt(parts[4]), Integer.parseInt(parts[5])));
                     } else if (!parts[0].equals("locale")) {
-                        SchemaPart component = model.schemaParts.get(parts[0]);
+                        SchemaPart component = net.schemaParts.get(parts[0]);
                         if (component instanceof InteractiveSchemaPart uiComponent) {
                             int x = Integer.parseInt(parts[1]);
                             int y = Integer.parseInt(parts[2]);
@@ -121,7 +121,7 @@ public class Simulator implements Runnable {
     }
 
     public static void saveLayout() throws RuntimeException {
-        if (model == null) {
+        if (net == null) {
             return;
         }
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(netFilePathNoExtension + ".sym_layout"))) {
@@ -129,7 +129,7 @@ public class Simulator implements Runnable {
             bw.write("\n");
             bw.write("main:" + ui.getX() + ":" + ui.getY() + ":" + ui.getWidth() + ":" + ui.getHeight());
             bw.write("\n");
-            String content = model.schemaParts.values()
+            String content = net.schemaParts.values()
                     .stream()
                     .filter(c -> c instanceof InteractiveSchemaPart)
                     .map(c -> c.id + ":" + ((InteractiveSchemaPart) c).getComponent().getX() + ":" + ((InteractiveSchemaPart) c).getComponent().getY())
@@ -172,13 +172,13 @@ public class Simulator implements Runnable {
                 ui.setVisible(true);
             });
             if (netFilePath.endsWith("xml")) {
-                model = new Model(XmlParser.parse(netFilePath, Export.class), mapFile);
+                net = new Net(XmlParser.parse(netFilePath, Export.class), mapFile);
             } else if (netFilePath.endsWith(".net")) {
-                model = new Model(new NetFileParser().parse(netFilePath), mapFile);
+                net = new Net(new NetFileParser().parse(netFilePath), mapFile);
             } else {
                 throw new RuntimeException("Unsupported file extension. " + netFilePath);
             }
-            model.schemaParts.values().forEach(schemaPart -> {
+            net.schemaParts.values().forEach(schemaPart -> {
                 if (schemaPart instanceof InteractiveSchemaPart) {
                     try {
                         SwingUtilities.invokeAndWait(() -> ui.add(((InteractiveSchemaPart) schemaPart).getComponent()));
@@ -191,7 +191,7 @@ public class Simulator implements Runnable {
                 ui.setJMenuBar(new MainMenu());
                 ui.revalidate();
                 ui.repaint();
-                for (SchemaPart c : model.schemaParts.values()) {
+                for (SchemaPart c : net.schemaParts.values()) {
                     if (c instanceof InteractiveSchemaPart) {
                         AbstractUiComponent component = ((InteractiveSchemaPart) c).getComponent();
                         component.revalidate();

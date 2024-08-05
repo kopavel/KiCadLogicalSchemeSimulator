@@ -47,7 +47,7 @@ public class OscilloscopeMenu extends JMenuBar {
         add(outPinMenu);
         JMenu inPinMenu = new JMenu(Oscilloscope.localization.getString("InPins"));
         add(inPinMenu);
-        List<IModelItem<?>> outPins = Simulator.model.schemaParts.values()
+        List<IModelItem<?>> outPins = Simulator.net.schemaParts.values()
                 .stream()
                 .flatMap(p -> p.outPins.values()
                         .stream().distinct())
@@ -58,7 +58,7 @@ public class OscilloscopeMenu extends JMenuBar {
             outPinItem.addActionListener(e -> oscilloscope.addPin(pin, pin.getName()));
             outPinMenu.add(outPinItem);
         }
-        List<IModelItem<?>> inPins = Simulator.model.schemaParts.values()
+        List<IModelItem<?>> inPins = Simulator.net.schemaParts.values()
                 .stream()
                 .flatMap(p -> p.inPins.values()
                         .stream().distinct())

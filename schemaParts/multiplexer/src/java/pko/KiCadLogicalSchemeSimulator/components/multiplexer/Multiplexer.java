@@ -36,7 +36,7 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.in.CorrectedInBus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
-import pko.KiCadLogicalSchemeSimulator.model.Model;
+import pko.KiCadLogicalSchemeSimulator.net.Net;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 import java.util.ArrayList;
@@ -102,8 +102,8 @@ public class Multiplexer extends SchemaPart {
                         nState &= nMask;
                     }
                     if (inBuses[nState].hiImpedance) {
-                        if (Model.stabilizing) {
-                            Model.forResend.add(this);
+                        if (Net.stabilizing) {
+                            Net.forResend.add(this);
                             assert Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
                         } else {
                             throw new FloatingInException(inBuses[nState]);

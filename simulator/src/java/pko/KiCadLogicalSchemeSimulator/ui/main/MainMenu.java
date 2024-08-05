@@ -47,7 +47,7 @@ public class MainMenu extends JMenuBar {
     public MainMenu() {
         JMenu schemaParts = new JMenu(mainI81n.getString("schemaParts"));
         add(schemaParts);
-        for (SchemaPart schemaPart : Simulator.model.schemaParts.values()) {
+        for (SchemaPart schemaPart : Simulator.net.schemaParts.values()) {
             JMenuItem schemaPartItem = new JMenuItem(schemaPart.id);
             schemaPartItem.addActionListener(e -> Simulator.addMonitoringPart(schemaPart.id, null));
             schemaParts.add(schemaPartItem);

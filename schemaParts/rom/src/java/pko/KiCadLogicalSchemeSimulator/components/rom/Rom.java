@@ -35,7 +35,7 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.EdgeInPin;
-import pko.KiCadLogicalSchemeSimulator.model.Model;
+import pko.KiCadLogicalSchemeSimulator.net.Net;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
@@ -114,8 +114,8 @@ public class Rom extends SchemaPart {
             public void setHiImpedance() {
                 hiImpedance = true;
                 if (csActive) {
-                    if (Model.stabilizing) {
-                        Model.forResend.add(this);
+                    if (Net.stabilizing) {
+                        Net.forResend.add(this);
                         assert Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
                     } else {
                         throw new FloatingInException(this);

@@ -29,30 +29,45 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.api.wire.in;
-import pko.KiCadLogicalSchemeSimulator.api.FloatingInException;
-import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.net.Net;
-import pko.KiCadLogicalSchemeSimulator.tools.Log;
+package pko.KiCadLogicalSchemeSimulator.net.bus;
+import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
 
-public abstract class NoFloatingInPin extends InPin {
-    public NoFloatingInPin(String id, SchemaPart parent) {
-        super(id, parent);
-        hiImpedance = false;
+public class BusInInterconnect extends InBus {
+    public final long interconnectMask;
+    public final long senseMask;
+    public final long inverseInterconnectMask;
+    public InBus destination;
+
+    public BusInInterconnect(InBus destination, long interconnectMask, Byte offset) {
+        super(destination, "interconnect" + interconnectMask);
+        this.destination = destination;
+        this.interconnectMask = interconnectMask;
+        this.inverseInterconnectMask = ~interconnectMask;
+        this.senseMask = 1L << offset;
+        //FixMe check if shortcut multiple out pins.
     }
 
-    public NoFloatingInPin(Pin oldPin, String variantId) {
-        super(oldPin, variantId);
+    @Override
+    public void setState(long newState) {
+        if ((newState & interconnectMask) != 0) {
+            destination.state = newState | interconnectMask;
+            destination.setState(destination.state);
+        } else {
+            destination.state = newState & inverseInterconnectMask;
+            destination.setState(destination.state);
+        }
+        destination.hiImpedance = false;
     }
 
     @Override
     public void setHiImpedance() {
-        if (Net.stabilizing) {
-            Net.forResend.add(this);
-            assert Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
-        } else {
-            throw new FloatingInException(this);
-        }
+        destination.setHiImpedance();
+        destination.hiImpedance = true;
+    }
+
+    @Override
+    public InBus getOptimised() {
+        destination = destination.getOptimised();
+        return this;
     }
 }

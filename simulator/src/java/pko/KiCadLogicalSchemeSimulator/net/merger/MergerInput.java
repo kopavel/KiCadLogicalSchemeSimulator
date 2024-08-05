@@ -29,45 +29,9 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.model.bus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
+package pko.KiCadLogicalSchemeSimulator.net.merger;
+import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
 
-public class BusInInterconnect extends InBus {
-    public final long interconnectMask;
-    public final long senseMask;
-    public final long inverseInterconnectMask;
-    public InBus destination;
-
-    public BusInInterconnect(InBus destination, long interconnectMask, Byte offset) {
-        super(destination, "interconnect" + interconnectMask);
-        this.destination = destination;
-        this.interconnectMask = interconnectMask;
-        this.inverseInterconnectMask = ~interconnectMask;
-        this.senseMask = 1L << offset;
-        //FixMe check if shortcut multiple out pins.
-    }
-
-    @Override
-    public void setState(long newState) {
-        if ((newState & interconnectMask) != 0) {
-            destination.state = newState | interconnectMask;
-            destination.setState(destination.state);
-        } else {
-            destination.state = newState & inverseInterconnectMask;
-            destination.setState(destination.state);
-        }
-        destination.hiImpedance = false;
-    }
-
-    @Override
-    public void setHiImpedance() {
-        destination.setHiImpedance();
-        destination.hiImpedance = true;
-    }
-
-    @Override
-    public InBus getOptimised() {
-        destination = destination.getOptimised();
-        return this;
-    }
+public interface MergerInput<T> extends IModelItem<T> {
+    String getName();
 }

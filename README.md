@@ -3,7 +3,7 @@
 [KiCad](https://www.kicad.org) plugin for interactive logical scheme simulation.
 Supports two usage methods: directly from KiCad or standalone, using a schema file exported from KiCad in the "PCB Netlist"(`.net`) file format.
 
-Focuses on performance and simplicity of the model schema part API, allowing easy implementation of custom schema part behaviors for simulation.
+Focuses on performance and simplicity of the net schema part API, allowing easy implementation of custom schema part behaviors for simulation.
 
 [Here is more info](stuff%2Fkicad_symbols%2FREADME.md) about the supported schema part list and how to configure KiCad symbols mapping for the simulator.
 
@@ -47,7 +47,7 @@ located under the menu Tools->"Generate Legacy Bill of Materials...". That can b
 
 ## Usage
 
-After launching the project, the simulator builds the simulation model and displays all "interactive" schema parts, such as LEDs, displays, or oscillators, on the
+After launching the project, the simulator builds the simulation net and displays all "interactive" schema parts, such as LEDs, displays, or oscillators, on the
 desk. Parts can be arranged freely, and the layout is saved near the Netlist file in a file with the `.sym_layout` extension.
 
 For a detailed description of components, see [more information](schemaParts%2FREADME.md).

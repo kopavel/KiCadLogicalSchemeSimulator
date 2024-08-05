@@ -1,6 +1,6 @@
 ## KiCad Symbols
 
-For building the schema simulation model, the project utilizes a map file named `SymbolsDescription.xml` located in the 'distro' directory. Another approach is
+For building the schema simulation net, the project utilizes a map file named `SymbolsDescription.xml` located in the 'distro' directory. Another approach is
 declaring custom fields `SymPartClass` and/or `SymPartParam` directly in KiCad symbols.
 
 - `SymPartClass` points to the Java class name used for schema part behavior simulation.

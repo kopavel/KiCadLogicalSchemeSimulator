@@ -29,7 +29,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.model;
+package pko.KiCadLogicalSchemeSimulator.net;
 import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
@@ -42,13 +42,12 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.PassiveOutPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
-import pko.KiCadLogicalSchemeSimulator.model.bus.BusInInterconnect;
-import pko.KiCadLogicalSchemeSimulator.model.merger.bus.BusMerger;
-import pko.KiCadLogicalSchemeSimulator.model.merger.wire.WireMerger;
-import pko.KiCadLogicalSchemeSimulator.model.wire.WireToBusAdapter;
+import pko.KiCadLogicalSchemeSimulator.net.bus.BusInInterconnect;
+import pko.KiCadLogicalSchemeSimulator.net.merger.bus.BusMerger;
+import pko.KiCadLogicalSchemeSimulator.net.merger.wire.WireMerger;
+import pko.KiCadLogicalSchemeSimulator.net.wire.WireToBusAdapter;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.Comp;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.Export;
-import pko.KiCadLogicalSchemeSimulator.parsers.pojo.Net;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.Property;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.symbolMap.SchemaPartMap;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.symbolMap.SymbolDesc;
@@ -62,11 +61,11 @@ import java.util.stream.Collectors;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
-import static pko.KiCadLogicalSchemeSimulator.model.SymbolDescriptions.PinMapDescriptor;
-import static pko.KiCadLogicalSchemeSimulator.model.SymbolDescriptions.parse;
-import static pko.KiCadLogicalSchemeSimulator.model.SymbolDescriptions.schemaPartPinMap;
+import static pko.KiCadLogicalSchemeSimulator.net.SymbolDescriptions.PinMapDescriptor;
+import static pko.KiCadLogicalSchemeSimulator.net.SymbolDescriptions.parse;
+import static pko.KiCadLogicalSchemeSimulator.net.SymbolDescriptions.schemaPartPinMap;
 
-public class Model {
+public class Net {
     public static final Queue<IModelItem<?>> forResend = new LinkedList<>();
     public static boolean stabilizing;
     public final Map<String, SchemaPart> schemaParts = new TreeMap<>();
@@ -76,8 +75,8 @@ public class Model {
     private final Map<String, BusMerger> busMergers = new TreeMap<>();
     private final Map<String, OutPin> wires = new TreeMap<>();
 
-    public Model(Export export, String mapPath) throws IOException {
-        Log.info(Model.class, "Start Model building");
+    public Net(Export export, String mapPath) throws IOException {
+        Log.info(Net.class, "Start Net building");
         schemaPartSpiMap = ServiceLoader.load(SchemaPartSpi.class)
                 .stream()
                 .map(ServiceLoader.Provider::get)
@@ -87,9 +86,9 @@ public class Model {
         export.getNets().getNet().forEach(this::processNet);
         buildBuses();
         schemaParts.values().forEach(SchemaPart::initOuts);
-        Log.info(Model.class, "Stabilizing model");
+        Log.info(Net.class, "Stabilizing net");
         stabilise();
-        Log.info(Model.class, "Model build complete");
+        Log.info(Net.class, "Net build complete");
     }
 
     public Pin processWire(Pin destination, List<OutPin> pins, List<PassivePin> passivePins, Map<OutBus, Long> buses) {
@@ -151,7 +150,7 @@ public class Model {
         return retVal;
     }
 
-    private void processNet(Net net) {
+    private void processNet(pko.KiCadLogicalSchemeSimulator.parsers.pojo.Net net) {
         if (net.getName().startsWith("unconnected-")) {
             return;
         }
@@ -244,7 +243,7 @@ public class Model {
                 if (passivePin.isPresent()) {
                     destinationPins.add(passivePin.get());
                 } else if (destinationBusesOffsets.isEmpty()) {
-                    sourcesOffset.forEach((out, offset) -> Log.warn(Model.class, "Unconnected Out:" + out.getName() + offset));
+                    sourcesOffset.forEach((out, offset) -> Log.warn(Net.class, "Unconnected Out:" + out.getName() + offset));
                 }
             }
         }
@@ -332,7 +331,7 @@ public class Model {
                                 busMerger.addSource(wires.get(wireHash), offset);
                             } else {
                                 //process unprocessed wire
-                                busMerger.addSource(Model.this, lists.pins, lists.passivePins, offset);
+                                busMerger.addSource(Net.this, lists.pins, lists.passivePins, offset);
                             }
                         }
                     });
@@ -460,7 +459,7 @@ public class Model {
                 .filter(i -> !i.isHiImpedance())
                 .distinct()
                 .forEach(item -> {
-                    assert Log.debug(Model.class, "Resend pin {}", item);
+                    assert Log.debug(Net.class, "Resend pin {}", item);
                     item.resend();
                     resend();
                 });
@@ -471,7 +470,7 @@ public class Model {
                 .filter(ModelItem::isHiImpedance)
                 .distinct()
                 .forEach(item -> {
-                    assert Log.debug(Model.class, "Resend pin {}", item);
+                    assert Log.debug(Net.class, "Resend pin {}", item);
                     item.resend();
                     resend();
                 });
@@ -483,7 +482,7 @@ public class Model {
         ArrayList<IModelItem<?>> items = new ArrayList<>(forResend);
         forResend.clear();
         items.forEach(item -> {
-            assert Log.debug(Model.class, "Resend postponed pin {}", item);
+            assert Log.debug(Net.class, "Resend postponed pin {}", item);
             item.resend();
         });
     }

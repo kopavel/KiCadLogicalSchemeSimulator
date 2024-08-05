@@ -29,7 +29,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.model.merger.bus;
+package pko.KiCadLogicalSchemeSimulator.net.merger.bus;
 import pko.KiCadLogicalSchemeSimulator.api.ShortcutException;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
@@ -37,9 +37,9 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.wire.OutPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.model.Model;
-import pko.KiCadLogicalSchemeSimulator.model.bus.BusInInterconnect;
-import pko.KiCadLogicalSchemeSimulator.model.merger.MergerInput;
+import pko.KiCadLogicalSchemeSimulator.net.Net;
+import pko.KiCadLogicalSchemeSimulator.net.bus.BusInInterconnect;
+import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
@@ -87,8 +87,8 @@ public class BusMerger extends OutBus {
         sources = Utils.addToArray(sources, input);
         if (!bus.hiImpedance) {
             if ((strongPins & destinationMask) != 0) {
-                if (Model.stabilizing) {
-                    Model.forResend.add(this);
+                if (Net.stabilizing) {
+                    Net.forResend.add(this);
                     assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
                     return;
                 } else {
@@ -111,10 +111,10 @@ public class BusMerger extends OutBus {
         processPin(pin, input, destinationMask);
     }
 
-    public void addSource(Model model, List<OutPin> pins, List<PassivePin> passivePins, Byte offset) {
+    public void addSource(Net net, List<OutPin> pins, List<PassivePin> passivePins, Byte offset) {
         long destinationMask = 1L << offset;
         BusMergerWireIn input = new BusMergerWireIn(destinationMask, this);
-        Pin pin = model.processWire(input, pins, passivePins, Collections.emptyMap());
+        Pin pin = net.processWire(input, pins, passivePins, Collections.emptyMap());
         processPin(pin, input, destinationMask);
     }
 
@@ -140,8 +140,8 @@ public class BusMerger extends OutBus {
         if (!pin.hiImpedance) {
             if (pin.strong) {
                 if ((strongPins & destinationMask) != 0) {
-                    if (Model.stabilizing) {
-                        Model.forResend.add(this);
+                    if (Net.stabilizing) {
+                        Net.forResend.add(this);
                         assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
                         return;
                     } else {
@@ -154,8 +154,8 @@ public class BusMerger extends OutBus {
                 }
             } else {
                 if ((weakPins & destinationMask) != 0 && ((weakState & destinationMask) == 0) == pin.state) {
-                    if (Model.stabilizing) {
-                        Model.forResend.add(this);
+                    if (Net.stabilizing) {
+                        Net.forResend.add(this);
                         assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
                         return;
                     } else {

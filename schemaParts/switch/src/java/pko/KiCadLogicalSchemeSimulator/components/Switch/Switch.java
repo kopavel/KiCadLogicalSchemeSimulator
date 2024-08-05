@@ -36,7 +36,7 @@ import pko.KiCadLogicalSchemeSimulator.api.schemaPart.InteractiveSchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.model.Model;
+import pko.KiCadLogicalSchemeSimulator.net.Net;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 public class Switch extends SchemaPart implements InteractiveSchemaPart {
@@ -79,8 +79,8 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
                 if (toggled && !pin2.hiImpedance) {
                     if (pin2.strong) {
                         if (strong) {
-                            if (Model.stabilizing) {
-                                Model.forResend.add(this);
+                            if (Net.stabilizing) {
+                                Net.forResend.add(this);
                                 assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
                             } else {
                                 throw new ShortcutException(pin1, pin2);
@@ -150,8 +150,8 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
                 if (toggled && !pin1.hiImpedance) {
                     if (pin1.strong) {
                         if (strong) {
-                            if (Model.stabilizing) {
-                                Model.forResend.add(this);
+                            if (Net.stabilizing) {
+                                Net.forResend.add(this);
                                 assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
                             } else {
                                 throw new ShortcutException(pin1, pin2);

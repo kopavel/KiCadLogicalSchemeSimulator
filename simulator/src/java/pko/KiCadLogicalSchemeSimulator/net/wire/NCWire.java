@@ -29,9 +29,41 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.model.merger;
-import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
+package pko.KiCadLogicalSchemeSimulator.net.wire;
+import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
+import pko.KiCadLogicalSchemeSimulator.api.wire.OutPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 
-public interface MergerInput<T> extends IModelItem<T> {
-    String getName();
+public class NCWire extends OutPin {
+    public NCWire(OutPin outPin) {
+        super(outPin, "NC");
+    }
+
+    @Override
+    public void addDestination(Pin pin) {
+        throw new UnsupportedOperationException("Can't add destination to NC Out Pin");
+    }
+
+    @Override
+    public void addDestination(Bus bus, byte offset) {
+        throw new UnsupportedOperationException("Can't add destination to NC Out Pin");
+    }
+
+    @Override
+    public void setState(boolean newState) {
+    }
+
+    @Override
+    public void setHiImpedance() {
+        assert !hiImpedance : "Already in hiImpedance:" + this;
+    }
+
+    @Override
+    public void resend() {
+    }
+
+    @Override
+    public Pin getOptimised() {
+        return this;
+    }
 }

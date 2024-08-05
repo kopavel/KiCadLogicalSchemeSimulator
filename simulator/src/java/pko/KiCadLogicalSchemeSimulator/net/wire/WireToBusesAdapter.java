@@ -29,41 +29,38 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.model.wire;
+package pko.KiCadLogicalSchemeSimulator.net.wire;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
+import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.OutPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
+import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
-public class WireToBusAdapter extends OutPin {
+public class WireToBusesAdapter extends OutPin {
     public long mask;
-    private Bus destination;
+    private Bus[] destinations;
 
-    public WireToBusAdapter(Bus destination, byte offset) {
-        super(destination.id, destination.parent);
-        variantId = "WireToBasAdapter:offset" + offset;
-        mask = 1L << offset;
-        this.destination = destination;
+    public WireToBusesAdapter(Pin src, Bus[] destinations, byte offset) {
+        this(src.id, src.parent, destinations, offset);
     }
 
-    @Override
-    public void addDestination(Pin pin) {
-        throw new UnsupportedOperationException();
+    public WireToBusesAdapter(String id, SchemaPart parent, Bus[] destinations, byte offset) {
+        super(id, parent);
+        mask = 1L << offset;
+        this.destinations = destinations;
     }
 
     @Override
     public void addDestination(Bus bus, byte offset) {
-        throw new UnsupportedOperationException();
+        if (mask != (1L << offset)) {
+            throw new RuntimeException("Can't add bus with offset " + offset + " to adapter with mask " + mask);
+        }
+        destinations = Utils.addToArray(destinations, bus);
     }
 
     @Override
-    public void setState(boolean newState) {
-        destination.setState(newState ? mask : 0);
-    }
-
-    @Override
-    public void setHiImpedance() {
-        assert !hiImpedance : "Already in hiImpedance:" + this;
-        destination.setHiImpedance();
+    public void addDestination(Pin pin) {
+        throw new UnsupportedOperationException("Can't add Pin as destination to WireToBusesAdapter");
     }
 
     @Override
@@ -71,8 +68,25 @@ public class WireToBusAdapter extends OutPin {
         if (destinations.length == 0) {
             return new NCWire(this);
         } else {
-            destination = destination.getOptimised();
+            for (int i = 0; i < destinations.length; i++) {
+                destinations[i] = destinations[i].getOptimised();
+            }
             return this;
+        }
+    }
+
+    @Override
+    public void setState(boolean newState) {
+        for (Bus destination : destinations) {
+            destination.setState(newState ? mask : 0);
+        }
+    }
+
+    @Override
+    public void setHiImpedance() {
+        assert !hiImpedance : "Already in hiImpedance:" + this;
+        for (Bus destination : destinations) {
+            destination.setHiImpedance();
         }
     }
 }

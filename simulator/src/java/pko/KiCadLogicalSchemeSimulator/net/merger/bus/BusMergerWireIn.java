@@ -29,36 +29,39 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.model.merger.bus;
+package pko.KiCadLogicalSchemeSimulator.net.merger.bus;
 import pko.KiCadLogicalSchemeSimulator.api.ShortcutException;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.in.CorrectedInBus;
-import pko.KiCadLogicalSchemeSimulator.model.Model;
-import pko.KiCadLogicalSchemeSimulator.model.merger.MergerInput;
+import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
+import pko.KiCadLogicalSchemeSimulator.net.Net;
+import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
-public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
+public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
     public final long mask;
     public final long nMask;
     private final BusMerger merger;
-    private boolean oldImpedance;
+    public boolean oldStrong;
+    public boolean oldImpedance;
 
-    public BusMergerBusIn(Bus source, long mask, BusMerger merger) {
-        super(source, "BMergeBIn");
+    public BusMergerWireIn(long mask, BusMerger merger) {
+        super(merger.id + ":in", merger.parent);
+        variantId = "BMergePIn";
         this.mask = mask;
-        this.merger = merger;
         nMask = ~mask;
-        oldImpedance = hiImpedance;
+        this.merger = merger;
     }
 
     @Override
-    public void setState(long newState) {
-        assert Log.debug(BusMergerBusIn.class,
-                "Bus merger change. before: newState:{}, Source:{} (state:{},  hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{}, " +
-                        "hiImpedance:{})\",",
+    public void setState(boolean newState) {
+        assert Log.debug(BusMergerWireIn.class,
+                "Bus merger change. before: newState:{},  Source:{} (state:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, " +
+                        "weakState:{}, weakPins:{}, hiImpedance:{})",
                 newState,
                 getName(),
                 state,
+                strong,
                 hiImpedance,
                 merger.getName(),
                 merger.state,
@@ -66,23 +69,55 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
                 merger.weakState,
                 merger.weakPins,
                 merger.hiImpedance);
+        long oldState = merger.state;
         state = newState;
         hiImpedance = false;
-        if (oldImpedance && (merger.strongPins & mask) != 0) {
-            if (Model.stabilizing) {
-                Model.forResend.add(this);
-                assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
-                return;
+        if (strong) { //to strong
+            if (oldImpedance && (merger.strongPins & mask) != 0) { //strong pins shortcut
+                if (Net.stabilizing) {
+                    Net.forResend.add(this);
+                    assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
+                    return;
+                } else {
+                    throw new ShortcutException(merger.sources);
+                }
+            }
+            if (oldImpedance) { //from impedance
+                merger.strongPins |= mask;
+            } else if (!oldStrong) { // from weak
+                merger.strongPins |= mask;
+                merger.weakState &= nMask;
+                merger.weakPins &= nMask;
+            }
+            if (state) {
+                merger.state |= mask;
             } else {
-                throw new ShortcutException(merger.sources);
+                merger.state &= nMask;
+            }
+        } else { //to weak
+            if ((merger.weakPins & mask) != 0 && ((merger.weakState & mask) == 0) == state) { //opposite weak state
+                if (Net.stabilizing) {
+                    Net.forResend.add(this);
+                    assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
+                    return;
+                } else {
+                    throw new ShortcutException(merger.sources);
+                }
+            }
+            if (oldImpedance) { // from impedance
+                merger.weakPins |= mask;
+            } else if (oldStrong) { //from strong
+                merger.strongPins &= nMask;
+                merger.weakPins |= mask;
+            }
+            if ((merger.strongPins & mask) == 0) {
+                if (state) {
+                    merger.state |= mask;
+                } else {
+                    merger.state &= nMask;
+                }
             }
         }
-        long oldState = merger.state;
-        if (oldImpedance) {
-            merger.strongPins |= mask;
-        }
-        merger.state &= nMask;
-        merger.state |= newState;
         if ((merger.strongPins | merger.weakPins) != merger.mask) {
             if (!merger.hiImpedance) {
                 for (Bus destination : merger.destinations) {
@@ -96,13 +131,15 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
                 destination.setState(merger.state);
             }
         }
+        oldStrong = strong;
         oldImpedance = false;
-        assert Log.debug(BusMergerBusIn.class,
-                "Bus merger change. after: newState:{}, Source:{} (state:{},  hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{}, " +
-                        "hiImpedance:{})\",",
+        assert Log.debug(BusMergerWireIn.class,
+                "Bus merger change. after: newState:{},  Source:{} (state:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, " +
+                        "weakState:{}, weakPins:{}, hiImpedance:{})",
                 newState,
                 getName(),
                 state,
+                strong,
                 hiImpedance,
                 merger.getName(),
                 merger.state,
@@ -114,11 +151,12 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
 
     @Override
     public void setHiImpedance() {
-        assert Log.debug(BusMergerBusIn.class,
-                "Bus merger setImpedance. before: Source:{} (state:{},  hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{}, " +
-                        "hiImpedance:{})\",",
+        assert Log.debug(BusMergerWireIn.class,
+                "Bus merger setImpedance. before: Source:{} (state:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{}, " +
+                        "hiImpedance:{})",
                 getName(),
                 state,
+                strong,
                 hiImpedance,
                 merger.getName(),
                 merger.state,
@@ -128,9 +166,16 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
                 merger.hiImpedance);
         assert !hiImpedance : "Already in hiImpedance:" + this + "; merger=" + merger.getName();
         long oldState = merger.state;
-        merger.strongPins &= nMask;
-        merger.state &= nMask;
-        merger.state |= merger.weakState & mask;
+        if (oldStrong) {
+            merger.strongPins &= nMask;
+            merger.state &= nMask;
+            merger.state |= merger.weakState & mask;
+        } else {
+            merger.weakPins &= nMask;
+            if ((merger.strongPins & mask) != 0) {
+                merger.state &= nMask;
+            }
+        }
         if ((merger.strongPins | merger.weakPins) != merger.mask) {
             if (!merger.hiImpedance) {
                 for (Bus destination : merger.destinations) {
@@ -139,18 +184,18 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
                 merger.hiImpedance = true;
             }
         } else if (oldState != merger.state || merger.hiImpedance) {
+            merger.hiImpedance = false;
             for (Bus destination : merger.destinations) {
                 destination.setState(merger.state);
             }
-            merger.hiImpedance = false;
         }
         hiImpedance = true;
-        oldImpedance = true;
-        assert Log.debug(BusMergerBusIn.class,
-                "Bus merger setImpedance. after: Source:{} (state:{},  hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{}, " +
-                        "hiImpedance:{})\",",
+        assert Log.debug(BusMergerWireIn.class,
+                "Bus merger setImpedance. after: Source:{} (state:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{}, " +
+                        "hiImpedance:{})",
                 getName(),
                 state,
+                strong,
                 hiImpedance,
                 merger.getName(),
                 merger.state,

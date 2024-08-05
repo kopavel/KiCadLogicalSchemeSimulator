@@ -29,41 +29,57 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.model.wire;
+package pko.KiCadLogicalSchemeSimulator.net.bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.api.wire.OutPin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 
-public class NCWire extends OutPin {
-    public NCWire(OutPin outPin) {
-        super(outPin, "NC");
+public class OffsetBus extends Bus {
+    private final byte offset;
+    private final byte nOffset;
+    private Bus destination;
+
+    public OffsetBus(Bus destination, byte offset) {
+        super(destination, "offset" + offset);
+        if (offset == 0) {
+            throw new RuntimeException("Offset must not be 0");
+        }
+        this.destination = destination;
+        this.offset = offset;
+        nOffset = (byte) -offset;
+        id += ":offset" + offset;
     }
 
     @Override
-    public void addDestination(Pin pin) {
-        throw new UnsupportedOperationException("Can't add destination to NC Out Pin");
-    }
-
-    @Override
-    public void addDestination(Bus bus, byte offset) {
-        throw new UnsupportedOperationException("Can't add destination to NC Out Pin");
-    }
-
-    @Override
-    public void setState(boolean newState) {
+    public void setState(long newState) {
+        if (offset > 0) {
+            newState = newState << offset;
+        } else {
+            newState = newState >> nOffset;
+        }
+        destination.setState(newState);
     }
 
     @Override
     public void setHiImpedance() {
-        assert !hiImpedance : "Already in hiImpedance:" + this;
+        destination.setHiImpedance();
     }
 
     @Override
-    public void resend() {
-    }
-
-    @Override
-    public Pin getOptimised() {
-        return this;
+    public Bus getOptimised() {
+        destination = destination.getOptimised();
+        if (offset > 0) {
+            return new OffsetBus(this, offset) {
+                @Override
+                public void setState(long newState) {
+                    destination.setState(newState << offset);
+                }
+            };
+        } else {
+            return new OffsetBus(this, offset) {
+                @Override
+                public void setState(long newState) {
+                    destination.setState(newState >> nOffset);
+                }
+            };
+        }
     }
 }

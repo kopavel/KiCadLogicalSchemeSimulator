@@ -32,8 +32,8 @@
 package pko.KiCadLogicalSchemeSimulator.api.wire;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.model.wire.NCWire;
-import pko.KiCadLogicalSchemeSimulator.model.wire.WireToBusAdapter;
+import pko.KiCadLogicalSchemeSimulator.net.wire.NCWire;
+import pko.KiCadLogicalSchemeSimulator.net.wire.WireToBusAdapter;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 

@@ -1,4 +1,4 @@
-package pko.KiCadLogicalSchemeSimulator.model;
+package pko.KiCadLogicalSchemeSimulator.net;
 import lombok.AllArgsConstructor;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.symbolMap.*;

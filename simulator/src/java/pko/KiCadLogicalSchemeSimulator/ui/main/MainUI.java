@@ -31,7 +31,7 @@
  */
 package pko.KiCadLogicalSchemeSimulator.ui.main;
 import pko.KiCadLogicalSchemeSimulator.Simulator;
-import pko.KiCadLogicalSchemeSimulator.model.Model;
+import pko.KiCadLogicalSchemeSimulator.net.Net;
 
 import javax.swing.*;
 import java.awt.*;
@@ -48,7 +48,7 @@ public class MainUI extends JFrame {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                if (!Model.stabilizing) {
+                if (!Net.stabilizing) {
                     Simulator.saveLayout();
                 }
                 System.exit(0);

@@ -29,57 +29,30 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.model.bus;
+package pko.KiCadLogicalSchemeSimulator.net.bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
+import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
 
-public class OffsetBus extends Bus {
-    private final byte offset;
-    private final byte nOffset;
-    private Bus destination;
-
-    public OffsetBus(Bus destination, byte offset) {
-        super(destination, "offset" + offset);
-        if (offset == 0) {
-            throw new RuntimeException("Offset must not be 0");
-        }
-        this.destination = destination;
-        this.offset = offset;
-        nOffset = (byte) -offset;
-        id += ":offset" + offset;
+public class NCBus extends OutBus {
+    public NCBus(OutBus outPin) {
+        super(outPin.id, outPin.parent, outPin.size);
+        aliasOffsets = outPin.aliasOffsets;
     }
 
     @Override
     public void setState(long newState) {
-        if (offset > 0) {
-            newState = newState << offset;
-        } else {
-            newState = newState >> nOffset;
-        }
-        destination.setState(newState);
     }
 
     @Override
     public void setHiImpedance() {
-        destination.setHiImpedance();
+    }
+
+    @Override
+    public void resend() {
     }
 
     @Override
     public Bus getOptimised() {
-        destination = destination.getOptimised();
-        if (offset > 0) {
-            return new OffsetBus(this, offset) {
-                @Override
-                public void setState(long newState) {
-                    destination.setState(newState << offset);
-                }
-            };
-        } else {
-            return new OffsetBus(this, offset) {
-                @Override
-                public void setState(long newState) {
-                    destination.setState(newState >> nOffset);
-                }
-            };
-        }
+        return this;
     }
 }

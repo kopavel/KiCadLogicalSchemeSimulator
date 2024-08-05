@@ -29,28 +29,30 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.model.merger.wire;
+package pko.KiCadLogicalSchemeSimulator.net.merger.wire;
 import pko.KiCadLogicalSchemeSimulator.api.ShortcutException;
+import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
+import pko.KiCadLogicalSchemeSimulator.api.bus.in.CorrectedInBus;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
-import pko.KiCadLogicalSchemeSimulator.model.Model;
-import pko.KiCadLogicalSchemeSimulator.model.merger.MergerInput;
+import pko.KiCadLogicalSchemeSimulator.net.Net;
+import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
-public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
+public class WireMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
+    public final long mask;
     private final WireMerger merger;
     private boolean oldImpedance;
 
-    public WireMergerWireIn(Pin source, WireMerger merger) {
-        super(source, "PMergePIn");
+    public WireMergerBusIn(Bus source, long mask, WireMerger merger) {
+        super(source, "PMergeBIn");
+        this.mask = mask;
         this.merger = merger;
-        oldImpedance = source.hiImpedance;
+        oldImpedance = hiImpedance;
     }
 
     @Override
-    public void setState(boolean newState) {
-        assert Log.debug(WireMergerWireIn.class,
-                "Pin merger change. before: newState:{}, Source:{} (state:{}, hiImpedance:{}), Merger:{} (state:{},  hiImpedance:{})",
+    public void setState(long newState) {
+        assert Log.debug(WireMergerBusIn.class, "Pin merger change. before: newState:{}, Source:{} (state:{}, hiImpedance:{}), Merger:{} (state:{}, hiImpedance:{})",
                 newState,
                 getName(),
                 state,
@@ -61,22 +63,22 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
         state = newState;
         hiImpedance = false;
         if (!merger.hiImpedance && oldImpedance) { //merger not in hiImpedance
-            if (Model.stabilizing) {
-                Model.forResend.add(this);
+            if (Net.stabilizing) {
+                Net.forResend.add(this);
                 assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
                 return;
             } else {
                 throw new ShortcutException(merger.sources);
             }
-        } else if (merger.hiImpedance || state != merger.state) { // merger state changes
+        } else if (merger.hiImpedance || merger.state == (state == 0)) { // merger state changes
             merger.hiImpedance = false;
-            merger.state = state;
+            merger.state = state != 0;
             for (Pin destination : merger.destinations) {
                 destination.setState(merger.state);
             }
         }
         oldImpedance = false;
-        assert Log.debug(WireMergerWireIn.class, "Pin merger change. after: newState:{}, Source:{} (state:{}, hiImpedance:{}), Merger:{} (state:{}, hiImpedance:{})",
+        assert Log.debug(WireMergerBusIn.class, "Pin merger change. after: newState:{}, Source:{} (state:{}, hiImpedance:{}), Merger:{} (state:{}, hiImpedance:{})",
                 newState,
                 getName(),
                 state,
@@ -105,4 +107,5 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
             setHiImpedance();
         }
     }
+
 }

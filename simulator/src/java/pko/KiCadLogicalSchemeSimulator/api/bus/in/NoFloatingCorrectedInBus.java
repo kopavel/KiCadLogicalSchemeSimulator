@@ -32,7 +32,7 @@
 package pko.KiCadLogicalSchemeSimulator.api.bus.in;
 import pko.KiCadLogicalSchemeSimulator.api.FloatingInException;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.model.Model;
+import pko.KiCadLogicalSchemeSimulator.net.Net;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 public abstract class NoFloatingCorrectedInBus extends CorrectedInBus {
@@ -43,8 +43,8 @@ public abstract class NoFloatingCorrectedInBus extends CorrectedInBus {
 
     @Override
     public void setHiImpedance() {
-        if (Model.stabilizing) {
-            Model.forResend.add(this);
+        if (Net.stabilizing) {
+            Net.forResend.add(this);
             assert Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
         } else {
             throw new FloatingInException(this);

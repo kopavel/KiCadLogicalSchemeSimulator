@@ -33,10 +33,10 @@ package pko.KiCadLogicalSchemeSimulator.api.bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.in.CorrectedInBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.model.bus.BusToWiresAdapter;
-import pko.KiCadLogicalSchemeSimulator.model.bus.MaskGroupBus;
-import pko.KiCadLogicalSchemeSimulator.model.bus.NCBus;
-import pko.KiCadLogicalSchemeSimulator.model.bus.OffsetBus;
+import pko.KiCadLogicalSchemeSimulator.net.bus.BusToWiresAdapter;
+import pko.KiCadLogicalSchemeSimulator.net.bus.MaskGroupBus;
+import pko.KiCadLogicalSchemeSimulator.net.bus.NCBus;
+import pko.KiCadLogicalSchemeSimulator.net.bus.OffsetBus;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
