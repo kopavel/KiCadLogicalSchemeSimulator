@@ -78,11 +78,9 @@ public class WireMergerBusIn extends CorrectedInBus implements MergerInput<Bus> 
             for (Pin destination : merger.destinations) {
                 destination.setState(merger.state);
             }
-        } else if (!merger.strong || merger.hiImpedance) {
+        } else if (merger.hiImpedance /*|| (merger.destinations[0] instanceof PassivePin && !merger.strong)*/) { //FixMe known in net build time
             for (Pin destination : merger.destinations) {
-//                if (destination instanceof PassivePin) { //FixMe known in Net build time
                 destination.setState(merger.state);
-//                }
             }
         }
         merger.strong = true;
@@ -103,7 +101,7 @@ public class WireMergerBusIn extends CorrectedInBus implements MergerInput<Bus> 
     @Override
     public void setHiImpedance() {
         assert !hiImpedance : "Already in hiImpedance:" + this + "; merger=" + merger.getName();
-        if (merger.hasWeak) {
+        if (merger.hasWeak) { //FixMe known in Net build time
             if (merger.state != merger.weakState) {
                 merger.state = merger.weakState;
                 for (Pin destination : merger.destinations) {

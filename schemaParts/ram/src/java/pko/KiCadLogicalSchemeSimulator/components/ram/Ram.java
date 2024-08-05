@@ -187,14 +187,14 @@ public class Ram extends SchemaPart {
     private void rOut() {
         if (oePin.state | csPin.state) {
             if (!dOut.hiImpedance) {
-                dOut.setHiImpedance();
                 dOut.hiImpedance = true;
+                dOut.setHiImpedance();
             }
         } else {
             if (dOut.state != words[(int) aBus.state] || dOut.hiImpedance) {
                 dOut.state = words[(int) aBus.state];
-                dOut.setState(dOut.state);
                 dOut.hiImpedance = false;
+                dOut.setState(dOut.state);
             }
         }
     }

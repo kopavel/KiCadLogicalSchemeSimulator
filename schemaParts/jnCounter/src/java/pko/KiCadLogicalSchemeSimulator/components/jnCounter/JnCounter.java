@@ -162,7 +162,7 @@ public class JnCounter extends SchemaPart {
     @Override
     public void reset() {
         outBus.state = 1;
-        outBus.setState(1);
         outBus.hiImpedance = false;
+        outBus.setState(1);
     }
 }

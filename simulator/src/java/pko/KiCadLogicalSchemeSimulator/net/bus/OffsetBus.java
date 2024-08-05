@@ -50,6 +50,7 @@ public class OffsetBus extends Bus {
 
     @Override
     public void setState(long newState) {
+        hiImpedance = false;
         if (offset > 0) {
             newState = newState << offset;
         } else {
@@ -60,6 +61,7 @@ public class OffsetBus extends Bus {
 
     @Override
     public void setHiImpedance() {
+        hiImpedance = true;
         destination.setHiImpedance();
     }
 
@@ -70,6 +72,7 @@ public class OffsetBus extends Bus {
             return new OffsetBus(this, offset) {
                 @Override
                 public void setState(long newState) {
+                    hiImpedance = false;
                     destination.setState(newState << offset);
                 }
             };
@@ -77,6 +80,7 @@ public class OffsetBus extends Bus {
             return new OffsetBus(this, offset) {
                 @Override
                 public void setState(long newState) {
+                    hiImpedance = false;
                     destination.setState(newState >> nOffset);
                 }
             };
