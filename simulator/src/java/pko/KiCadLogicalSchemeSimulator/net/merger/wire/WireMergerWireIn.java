@@ -60,7 +60,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                 merger.hiImpedance);
         state = newState;
         hiImpedance = false;
-        if (!merger.hiImpedance && oldImpedance) { //merger not in hiImpedance
+        if (oldImpedance && merger.strong) { //merger not in hiImpedance ow weak
             if (Net.stabilizing) {
                 Net.forResend.add(this);
                 assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
@@ -68,13 +68,21 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
             } else {
                 throw new ShortcutException(merger.sources);
             }
-        } else if (merger.hiImpedance || state != merger.state) { // merger state changes
-            merger.hiImpedance = false;
+        }
+        if (state != merger.state) { // merger state changes
             merger.state = state;
             for (Pin destination : merger.destinations) {
                 destination.setState(merger.state);
             }
+        } else if (!merger.strong || merger.hiImpedance) {
+            for (Pin destination : merger.destinations) {
+//                if (destination instanceof PassivePin) { //FixMe known in Net build time
+                destination.setState(merger.state);
+//                }
+            }
         }
+        merger.strong = true;
+        merger.hiImpedance = false;
         oldImpedance = false;
         assert Log.debug(WireMergerWireIn.class, "Pin merger change. after: newState:{}, Source:{} (state:{}, hiImpedance:{}), Merger:{} (state:{}, hiImpedance:{})",
                 newState,
@@ -89,12 +97,22 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
     @Override
     public void setHiImpedance() {
         assert !hiImpedance : "Already in hiImpedance:" + this + "; merger=" + merger.getName();
-        merger.hiImpedance = true;
+        if (merger.hasWeak) {
+            if (merger.state != merger.weakState) {
+                merger.state = merger.weakState;
+                for (Pin destination : merger.destinations) {
+                    destination.setState(merger.weakState);
+                }
+            }
+        } else {
+            for (Pin destination : merger.destinations) {
+                destination.setHiImpedance();
+            }
+            merger.hiImpedance = true;
+        }
         hiImpedance = true;
         oldImpedance = true;
-        for (Pin destination : merger.destinations) {
-            destination.setHiImpedance();
-        }
+        merger.strong = false;
     }
 
     @Override

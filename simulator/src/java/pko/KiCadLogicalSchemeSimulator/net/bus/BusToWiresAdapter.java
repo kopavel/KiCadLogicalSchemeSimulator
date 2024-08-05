@@ -367,15 +367,15 @@ public class BusToWiresAdapter extends OutBus {
                 public void setState(long newState) {
                     if (maskState != (newState & mask) || hiImpedance) {
                         maskState = newState & mask;
+                        hiImpedance = false;
                         d1.setState(maskState != 0);
                     }
-                    hiImpedance = false;
                 }
 
                 @Override
                 public void setHiImpedance() {
-                    d1.setHiImpedance();
                     hiImpedance = true;
+                    d1.setHiImpedance();
                 }
             };
         } else {

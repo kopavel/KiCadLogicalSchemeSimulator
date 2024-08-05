@@ -31,34 +31,13 @@
  */
 package pko.KiCadLogicalSchemeSimulator.api.wire;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
 
-public abstract class PassivePin extends OutPin {
-    public boolean inImpedance = true;
-    public boolean inState = true;
-    public boolean inStrong = true;
-    public Pin source;
-
-    public PassivePin(String id, SchemaPart parent) {
+public class PullPin extends OutPin implements MergerInput<Pin> {
+    public PullPin(String id, SchemaPart parent, boolean state) {
         super(id, parent);
-    }
-
-    @Override
-    abstract public void setState(boolean newState);
-    @Override
-    abstract public void setHiImpedance();
-
-    public void resend() {
-        if (!inImpedance) {
-            setState(inState);
-        } else {
-            //noinspection ConstantValue,AssertWithSideEffects
-            assert !(inImpedance = false);
-            setHiImpedance();
-        }
-    }
-
-    @Override
-    public Pin getOptimised() {
-        return this;
+        this.strong = false;
+        hiImpedance = false;
+        this.state = state;
     }
 }

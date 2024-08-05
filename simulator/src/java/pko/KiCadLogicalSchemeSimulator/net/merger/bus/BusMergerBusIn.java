@@ -68,21 +68,21 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
                 merger.hiImpedance);
         state = newState;
         hiImpedance = false;
-        if (oldImpedance && (merger.strongPins & mask) != 0) {
-            if (Net.stabilizing) {
-                Net.forResend.add(this);
-                assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
-                return;
-            } else {
-                throw new ShortcutException(merger.sources);
-            }
-        }
         long oldState = merger.state;
         if (oldImpedance) {
+            if ((merger.strongPins & mask) != 0) {
+                if (Net.stabilizing) {
+                    Net.forResend.add(this);
+                    assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
+                    return;
+                } else {
+                    throw new ShortcutException(merger.sources);
+                }
+            }
             merger.strongPins |= mask;
         }
         merger.state &= nMask;
-        merger.state |= newState;
+        merger.state |= state;
         if ((merger.strongPins | merger.weakPins) != merger.mask) {
             if (!merger.hiImpedance) {
                 for (Bus destination : merger.destinations) {

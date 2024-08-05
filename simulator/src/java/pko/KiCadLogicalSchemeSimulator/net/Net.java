@@ -215,7 +215,13 @@ public class Net {
                     IModelItem<?> source = schemaPart.getOutItem(pinName);
                     sourcesOffset.put(source, source.getAliasOffset(pinName));
                 }
-                case "passive" -> passivePins.add(schemaPart.passivePins.get(pinName));
+                case "passive" -> {
+                    if (schemaPart.passivePins.containsKey(pinName)) {
+                        passivePins.add(schemaPart.passivePins.get(pinName));
+                    } else {
+                        throw new RuntimeException("Unknown passive pin " + pinName + " in schema part " + schemaPart.id);
+                    }
+                }
                 case "power_in" -> { //ignore
                 }
                 default -> throw new RuntimeException("Unsupported pin type " + pinType);
@@ -463,6 +469,13 @@ public class Net {
                     item.resend();
                     resend();
                 });
+        wires.values()
+                .stream()
+                .filter(i -> !i.isHiImpedance()).distinct().forEach(item -> {
+                 assert Log.debug(Net.class, "Resend pin {}", item);
+                 item.resend();
+                 resend();
+             });
         schemaParts.values()
                 .stream()
                 .flatMap(p -> p.passivePins.values()
@@ -474,7 +487,21 @@ public class Net {
                     item.resend();
                     resend();
                 });
+        busMergers.values()
+                .stream()
+                .filter(i -> !i.isHiImpedance()).distinct().forEach(item -> {
+                      assert Log.debug(Net.class, "Resend pin {}", item);
+                      item.resend();
+                      resend();
+                  });
+        int resendTry = 10;
         schemaParts.values().forEach(SchemaPart::reset);
+        for (int i = 0; i < resendTry && !forResend.isEmpty(); i++) {
+            resend();
+        }
+        if (!forResend.isEmpty()) {
+            throw new RuntimeException("Can't stabilize Net");
+        }
         stabilizing = false;
     }
 
@@ -512,7 +539,7 @@ public class Net {
         }
     }
 
-    private class DestinationBusDescriptor {
+    private static class DestinationBusDescriptor {
         //Bus, offset, mask
         public HashMap<OutBus, Map<Byte, Long>> buses = new HashMap<>();
         //Pin, offset
@@ -538,7 +565,8 @@ public class Net {
 
         public void cleanBuses() {
             offsets.forEach((pinsOffset, lists) -> {
-                if (lists.passivePins.stream().allMatch(p -> p.source != null)) {
+                if (lists.passivePins.stream()
+                        .anyMatch(p -> p.source != null)) {
                     //clean up all buses mask
                     buses.values()
                             .stream()

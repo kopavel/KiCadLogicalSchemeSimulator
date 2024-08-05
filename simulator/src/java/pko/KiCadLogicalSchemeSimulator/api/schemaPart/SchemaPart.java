@@ -39,6 +39,7 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.in.NoFloatingInBus;
 import pko.KiCadLogicalSchemeSimulator.api.wire.OutPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.PullPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
 
 import java.util.HashMap;
@@ -93,6 +94,10 @@ public abstract class SchemaPart {
     public PassivePin addPassivePin(PassivePin pin) {
         passivePins.put(pin.id, pin);
         return pin;
+    }
+
+    public void addPullPin(String pinId, boolean state) {
+        outPins.put(pinId, new PullPin(pinId, this, state));
     }
 
     public void addOutPin(String pinId) {

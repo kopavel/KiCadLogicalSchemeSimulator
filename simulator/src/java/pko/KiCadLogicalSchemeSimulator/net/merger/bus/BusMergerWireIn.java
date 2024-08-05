@@ -73,16 +73,16 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
         state = newState;
         hiImpedance = false;
         if (strong) { //to strong
-            if (oldImpedance && (merger.strongPins & mask) != 0) { //strong pins shortcut
-                if (Net.stabilizing) {
-                    Net.forResend.add(this);
-                    assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
-                    return;
-                } else {
-                    throw new ShortcutException(merger.sources);
+            if (oldImpedance) { //from hiImpedance
+                if ((merger.strongPins & mask) != 0) { //strong pins shortcut
+                    if (Net.stabilizing) {
+                        Net.forResend.add(this);
+                        assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
+                        return;
+                    } else {
+                        throw new ShortcutException(merger.sources);
+                    }
                 }
-            }
-            if (oldImpedance) { //from impedance
                 merger.strongPins |= mask;
             } else if (!oldStrong) { // from weak
                 merger.strongPins |= mask;

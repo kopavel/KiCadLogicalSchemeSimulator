@@ -37,6 +37,7 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.wire.OutPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.PullPin;
 import pko.KiCadLogicalSchemeSimulator.net.Net;
 import pko.KiCadLogicalSchemeSimulator.net.bus.BusInInterconnect;
 import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
@@ -49,6 +50,7 @@ import java.util.Comparator;
 import java.util.List;
 
 //FixMe use one destination with splitter
+//ToDo implement pure bus implementation
 public class BusMerger extends OutBus {
     public MergerInput<?>[] sources = new MergerInput[0];
     public long strongPins;
@@ -104,11 +106,21 @@ public class BusMerger extends OutBus {
 
     public void addSource(OutPin pin, byte offset) {
         long destinationMask = 1L << offset;
-        BusMergerWireIn input = new BusMergerWireIn(destinationMask, this);
-        input.id = pin.id;
-        input.parent = pin.parent;
-        pin.addDestination(input);
-        processPin(pin, input, destinationMask);
+        if (pin instanceof PullPin pullPin) {
+            weakPins |= destinationMask;
+            if (pin.state) {
+                weakState |= destinationMask;
+            }
+            sources = Utils.addToArray(sources, pullPin);
+            Arrays.sort(sources, Comparator.comparing(MergerInput::getName));
+            hiImpedance = (strongPins | weakPins) != mask;
+        } else {
+            BusMergerWireIn input = new BusMergerWireIn(destinationMask, this);
+            input.id = pin.id;
+            input.parent = pin.parent;
+            pin.addDestination(input);
+            processPin(pin, input, destinationMask);
+        }
     }
 
     public void addSource(Net net, List<OutPin> pins, List<PassivePin> passivePins, Byte offset) {

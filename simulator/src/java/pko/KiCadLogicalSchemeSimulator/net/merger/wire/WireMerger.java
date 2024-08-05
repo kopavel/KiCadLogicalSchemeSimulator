@@ -35,21 +35,32 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
 import pko.KiCadLogicalSchemeSimulator.api.wire.OutPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.PullPin;
 import pko.KiCadLogicalSchemeSimulator.net.Net;
 import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
 //FixMe use one destination with splitter
+//FixMe implement passive pin merger (signal need to be send in both directions"for passive pins)
 public class WireMerger extends OutPin {
     public MergerInput<?>[] sources = new MergerInput[0];
+    public boolean weakState;
+    public boolean hasWeak;
 
     public WireMerger(Pin destination, List<OutPin> pins, Map<OutBus, Long> buses) {
-        super(destination, "wireMerger");
-        addDestination(destination);
+        super(destination.id, destination.parent);
+        variantId = destination.variantId == null ? "" : destination.variantId + ":";
+        variantId += "merger";
+        destinations = new Pin[]{destination};
+        if (destination instanceof PassivePin passivePin) {
+            passivePin.source = this;
+        }
         pins.forEach(this::addSource);
         if (buses != null) {
             buses.forEach(this::addSource);
@@ -98,22 +109,37 @@ public class WireMerger extends OutPin {
     }
 
     private void addSource(OutPin pin) {
-        WireMergerWireIn input = new WireMergerWireIn(pin, this);
-        pin.addDestination(input);
-        sources = Utils.addToArray(sources, input);
-        if (!pin.hiImpedance) {
-            if (!hiImpedance) {
-                if (Net.stabilizing) {
-                    Net.forResend.add(this);
-                    assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
-                    return;
-                } else {
-                    throw new ShortcutException(sources);
-                }
+        if (pin instanceof PullPin pullPin) {
+            sources = Utils.addToArray(sources, pullPin);
+            Arrays.sort(sources, Comparator.comparing(MergerInput::getName));
+            if (hasWeak && pin.state != weakState) {
+                throw new ShortcutException(sources);
             }
-            strong = true;
-            state = pin.state;
-            hiImpedance = false;
+            weakState = pin.state;
+            hasWeak = true;
+            if (hiImpedance) {
+                state = weakState;
+                strong = false;
+                hiImpedance = false;
+            }
+        } else {
+            WireMergerWireIn input = new WireMergerWireIn(pin, this);
+            pin.addDestination(input);
+            sources = Utils.addToArray(sources, input);
+            if (!pin.hiImpedance) {
+                if (!hiImpedance && strong) {
+                    if (Net.stabilizing) {
+                        Net.forResend.add(this);
+                        assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
+                        return;
+                    } else {
+                        throw new ShortcutException(sources);
+                    }
+                }
+                strong = true;
+                state = pin.state;
+                hiImpedance = false;
+            }
         }
     }
 }

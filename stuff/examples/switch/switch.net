@@ -1,7 +1,7 @@
 (export (version "E")
   (design
     (source "D:\\soft_a\\verilog\\KiCadLogicalSchemeSimulator\\stuff\\examples\\switch\\switch.kicad_sch")
-    (date "04/08/2024 21:13:51")
+    (date "05/08/2024 19:08:32")
     (tool "Eeschema 7.0.9")
     (sheet (number "1") (name "/") (tstamps "/")
       (title_block
@@ -171,13 +171,13 @@
         (field (name "Reference") "pulldown")
         (field (name "Value") "pull_down"))
       (pins
-        (pin (num "1") (name "OUT") (type "passive"))))
+        (pin (num "1") (name "OUT") (type "tri_state"))))
     (libpart (lib "chip") (part "PULLUP")
       (fields
         (field (name "Reference") "pullup")
         (field (name "Value") "pull_up"))
       (pins
-        (pin (num "1") (name "OUT") (type "passive")))))
+        (pin (num "1") (name "OUT") (type "tri_state")))))
   (libraries
     (library (logical "Switch")
       (uri "C:\\Program Files\\KiCad\\7.0\\share\\kicad\\symbols\\/Switch.kicad_sym"))
@@ -186,7 +186,7 @@
   (nets
     (net (code "1") (name "Net-(DEC1-A0)")
       (node (ref "DEC1") (pin "1") (pinfunction "A0") (pintype "input"))
-      (node (ref "pullup1") (pin "1") (pinfunction "OUT") (pintype "passive")))
+      (node (ref "pullup1") (pin "1") (pinfunction "OUT") (pintype "tri_state")))
     (net (code "2") (name "Net-(DEC1-A1)")
       (node (ref "DEC1") (pin "2") (pinfunction "A1") (pintype "input"))
       (node (ref "DEC1") (pin "3") (pinfunction "A2") (pintype "input"))
@@ -194,18 +194,18 @@
       (node (ref "Led5") (pin "1") (pinfunction "IN") (pintype "input"))
       (node (ref "SA2") (pin "1") (pinfunction "1") (pintype "passive"))
       (node (ref "SA3") (pin "2") (pinfunction "2") (pintype "passive"))
-      (node (ref "pulldown1") (pin "1") (pinfunction "OUT") (pintype "passive")))
+      (node (ref "pulldown1") (pin "1") (pinfunction "OUT") (pintype "tri_state")))
     (net (code "3") (name "Net-(DEC1-Q0)")
       (node (ref "DEC1") (pin "4") (pinfunction "Q0") (pintype "tri_state"))
       (node (ref "SA3") (pin "1") (pinfunction "1") (pintype "passive")))
     (net (code "4") (name "Net-(DEC1-Q1)")
       (node (ref "DEC1") (pin "5") (pinfunction "Q1") (pintype "tri_state"))
       (node (ref "DEC2") (pin "2") (pinfunction "A1") (pintype "input"))
-      (node (ref "pulldown2") (pin "1") (pinfunction "OUT") (pintype "passive")))
+      (node (ref "pulldown2") (pin "1") (pinfunction "OUT") (pintype "tri_state")))
     (net (code "5") (name "Net-(DEC1-~{CS})")
       (node (ref "DEC1") (pin "12") (pinfunction "~{CS}") (pintype "input"))
       (node (ref "SA1") (pin "2") (pinfunction "2") (pintype "passive"))
-      (node (ref "pullup2") (pin "1") (pinfunction "OUT") (pintype "passive")))
+      (node (ref "pullup2") (pin "1") (pinfunction "OUT") (pintype "tri_state")))
     (net (code "6") (name "Net-(DEC2-Q0)")
       (node (ref "DEC2") (pin "4") (pinfunction "Q0") (pintype "tri_state"))
       (node (ref "Led1") (pin "1") (pinfunction "IN") (pintype "input")))
