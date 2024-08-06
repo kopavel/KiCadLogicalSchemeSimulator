@@ -31,6 +31,7 @@
  */
 package pko.KiCadLogicalSchemeSimulator.net.merger.wire;
 import pko.KiCadLogicalSchemeSimulator.api.ShortcutException;
+import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
 import pko.KiCadLogicalSchemeSimulator.net.Net;
@@ -75,7 +76,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
             for (Pin destination : merger.destinations) {
                 destination.setState(merger.state);
             }
-        } else if (merger.hiImpedance /*|| (merger.destinations[0] instanceof PassivePin && !merger.strong)*/) { //FixMe known in Net build time
+        } else if (merger.hiImpedance || (merger.destinations[0] instanceof PassivePin && !merger.strong)) { //FixMe known in Net build time
             for (Pin destination : merger.destinations) {
                 destination.setState(merger.state);
             }
@@ -123,5 +124,11 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
         } else if (!oldImpedance) {
             setHiImpedance();
         }
+    }
+
+    @Override
+    public WireMergerWireIn getOptimised() {
+        //FixMe need replace in merger.sources
+        return this;
     }
 }

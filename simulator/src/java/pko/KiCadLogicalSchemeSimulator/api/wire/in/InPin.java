@@ -47,4 +47,9 @@ public abstract class InPin extends Pin {
         this.state = state;
         hiImpedance = false;
     }
+
+    @Override
+    public InPin getOptimised() {
+        return this;
+    }
 }

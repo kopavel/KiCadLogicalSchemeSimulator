@@ -84,10 +84,10 @@ public class Utils {
         return content.toString();
     }
 
-    public static <T> T[] addToArray(T[] array, T item) {
-        T[] newArray;
-        newArray = Arrays.copyOf(array, array.length + 1);
-        newArray[array.length] = item;
+    public static <T> T[] addToArray(final T[] array, final T item) {
+        final int length = array.length;
+        final T[] newArray = Arrays.copyOf(array, length + 1);
+        newArray[length] = item;
         return newArray;
     }
 
@@ -122,5 +122,12 @@ public class Utils {
                     .collect(Collectors.joining(";"));
         }
         return "";
+    }
+
+    public static int countLeadingSpaces(String text) {
+        if (text == null || text.isEmpty()) {
+            return 0;
+        }
+        return text.length() - text.stripLeading().length();
     }
 }

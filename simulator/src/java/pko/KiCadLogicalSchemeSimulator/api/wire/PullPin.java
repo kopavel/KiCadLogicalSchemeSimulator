@@ -40,4 +40,8 @@ public class PullPin extends OutPin implements MergerInput<Pin> {
         hiImpedance = false;
         this.state = state;
     }
+
+    public PullPin(OutPin oldPin, String variantId) {
+        super(oldPin, variantId);
+    }
 }

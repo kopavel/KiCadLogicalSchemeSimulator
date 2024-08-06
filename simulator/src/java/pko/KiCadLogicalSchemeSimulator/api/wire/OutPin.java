@@ -34,9 +34,10 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.net.wire.NCWire;
 import pko.KiCadLogicalSchemeSimulator.net.wire.WireToBusAdapter;
-import pko.KiCadLogicalSchemeSimulator.tools.Log;
+import pko.KiCadLogicalSchemeSimulator.optimizer.ClassOptimizer;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
+/*Optimiser iterator destinations->destination*/
 public class OutPin extends Pin {
     public Pin[] destinations = new Pin[0];
 
@@ -44,8 +45,9 @@ public class OutPin extends Pin {
         super(id, parent);
     }
 
-    public OutPin(Pin oldPin, String variantId) {
+    public OutPin(OutPin oldPin, String variantId) {
         super(oldPin, variantId);
+        destinations = oldPin.destinations;
     }
 
     public void addDestination(Pin pin) {
@@ -65,16 +67,20 @@ public class OutPin extends Pin {
         destinations = Utils.addToArray(destinations, new WireToBusAdapter(bus, offset));
     }
 
+    /*Optimiser override*/
     @Override
     public void setState(boolean newState) {
+        /*Optimiser iterator unwrap*/
         for (Pin destination : destinations) {
             destination.setState(state);
         }
     }
 
+    /*Optimiser override*/
     @Override
     public void setHiImpedance() {
-        assert !hiImpedance : "Already in hiImpedance:" + this;
+//        assert !hiImpedance : "Already in hiImpedance:" + this;
+        /*Optimiser iterator unwrap*/
         for (Pin destination : destinations) {
             destination.setHiImpedance();
         }
@@ -92,122 +98,8 @@ public class OutPin extends Pin {
             return new NCWire(this);
         } else if (destinations.length == 1) {
             return destinations[0].getOptimised().copyState(this);
-        } else if (destinations.length == 2) {
-            Pin d1 = destinations[0].getOptimised();
-            Pin d2 = destinations[1].getOptimised();
-            return new OutPin(this, "unroll2") {
-                @Override
-                public void setState(boolean newState) {
-                    d1.setState(state);
-                    d2.setState(state);
-                }
-
-                @Override
-                public void setHiImpedance() {
-                    d1.setHiImpedance();
-                    d2.setHiImpedance();
-                }
-            };
-        } else if (destinations.length == 3) {
-            Pin d1 = destinations[0].getOptimised();
-            Pin d2 = destinations[1].getOptimised();
-            Pin d3 = destinations[2].getOptimised();
-            return new OutPin(this, "unroll3") {
-                @Override
-                public void setState(boolean newState) {
-                    d1.setState(state);
-                    d2.setState(state);
-                    d3.setState(state);
-                }
-
-                @Override
-                public void setHiImpedance() {
-                    d1.setHiImpedance();
-                    d2.setHiImpedance();
-                    d3.setHiImpedance();
-                }
-            };
-        } else if (destinations.length == 4) {
-            Pin d1 = destinations[0].getOptimised();
-            Pin d2 = destinations[1].getOptimised();
-            Pin d3 = destinations[2].getOptimised();
-            Pin d4 = destinations[3].getOptimised();
-            return new OutPin(this, "unroll4") {
-                @Override
-                public void setState(boolean newState) {
-                    d1.setState(state);
-                    d2.setState(state);
-                    d3.setState(state);
-                    d4.setState(state);
-                }
-
-                @Override
-                public void setHiImpedance() {
-                    d1.setHiImpedance();
-                    d2.setHiImpedance();
-                    d3.setHiImpedance();
-                    d4.setHiImpedance();
-                }
-            };
-        } else if (destinations.length == 5) {
-            Pin d1 = destinations[0].getOptimised();
-            Pin d2 = destinations[1].getOptimised();
-            Pin d3 = destinations[2].getOptimised();
-            Pin d4 = destinations[3].getOptimised();
-            Pin d5 = destinations[4].getOptimised();
-            return new OutPin(this, "unroll5") {
-                @Override
-                public void setState(boolean newState) {
-                    d1.setState(state);
-                    d2.setState(state);
-                    d3.setState(state);
-                    d4.setState(state);
-                    d5.setState(state);
-                }
-
-                @Override
-                public void setHiImpedance() {
-                    d1.setHiImpedance();
-                    d2.setHiImpedance();
-                    d3.setHiImpedance();
-                    d4.setHiImpedance();
-                    d5.setHiImpedance();
-                }
-            };
-        } else if (destinations.length == 6) {
-            Pin d1 = destinations[0].getOptimised();
-            Pin d2 = destinations[1].getOptimised();
-            Pin d3 = destinations[2].getOptimised();
-            Pin d4 = destinations[3].getOptimised();
-            Pin d5 = destinations[4].getOptimised();
-            Pin d6 = destinations[5].getOptimised();
-            return new OutPin(this, "unroll6") {
-                @Override
-                public void setState(boolean newState) {
-                    d1.setState(state);
-                    d2.setState(state);
-                    d3.setState(state);
-                    d4.setState(state);
-                    d5.setState(state);
-                    d6.setState(state);
-                }
-
-                @Override
-                public void setHiImpedance() {
-                    d1.setHiImpedance();
-                    d2.setHiImpedance();
-                    d3.setHiImpedance();
-                    d4.setHiImpedance();
-                    d5.setHiImpedance();
-                    d6.setHiImpedance();
-                }
-            };
         } else {
-            Log.warn(OutPin.class, "No unroll instance for {} items", destinations.length);
-            for (int i = 0; i < destinations.length; i++) {
-                destinations[i] = destinations[i].getOptimised();
-            }
-            return this;
+            return new ClassOptimizer<>(OutPin.class, this, "unwrap" + destinations.length).unwrapIterators(destinations.length).getInstance();
         }
     }
 }

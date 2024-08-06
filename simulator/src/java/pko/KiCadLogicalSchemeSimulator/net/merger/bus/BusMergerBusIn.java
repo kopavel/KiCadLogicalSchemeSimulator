@@ -168,4 +168,10 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
             setHiImpedance();
         }
     }
+
+    @Override
+    public BusMergerBusIn getOptimised() {
+        //FixMe need replace in merger.sources
+        return this;
+    }
 }

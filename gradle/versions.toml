@@ -21,7 +21,7 @@ jackson-jaxb-annotations = { module = 'com.fasterxml.jackson.module:jackson-modu
 jakarta-api = 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.1'
 jaxb-api = 'javax.xml.bind:jaxb-api:2.3.1'
 picocli = 'info.picocli:picocli:4.7.5'
-
+javaassist = 'org.javassist:javassist:3.30.2-GA'
 #log4j2
 log4j-slf4j = { version.ref = 'log4j2', module = 'org.apache.logging.log4j:log4j-slf4j-impl' }
 log4j-old = { version.ref = 'log4j2', module = 'org.apache.logging.log4j:log4j-1.2-api' }

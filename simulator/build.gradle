@@ -56,12 +56,16 @@ dependencies {
     implementation libs.jackson.dataformat.xml
     implementation libs.jackson.datatype.jsr310
     implementation libs.jackson.jaxb.annotations
+    implementation libs.javaassist
     implementation libs.picocli
 
 }
 
 jar {
     destinationDirectory = file("$rootDir/distro")
+    from(sourceSets.main.allSource) {
+        include '**/*.java'  // Filter to include only Java files
+    }
     exclude 'classpath.index'
 }
 application {

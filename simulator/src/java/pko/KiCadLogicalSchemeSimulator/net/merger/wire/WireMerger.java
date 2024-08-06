@@ -47,7 +47,7 @@ import java.util.List;
 import java.util.Map;
 
 //FixMe use one destination with splitter
-//FixMe implement passive pin merger (signal need to be send in both directions"for passive pins)
+//FixMe implement passive pin merger (signal need to be send in both directions for passive pins)
 public class WireMerger extends OutPin {
     public MergerInput<?>[] sources = new MergerInput[0];
     public boolean weakState;

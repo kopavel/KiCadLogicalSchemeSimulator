@@ -50,7 +50,7 @@ import java.util.Comparator;
 import java.util.List;
 
 //FixMe use one destination with splitter
-//ToDo implement pure bus implementation
+//ToDo implement pure bus implementation (no weak state)
 public class BusMerger extends OutBus {
     public MergerInput<?>[] sources = new MergerInput[0];
     public long strongPins;

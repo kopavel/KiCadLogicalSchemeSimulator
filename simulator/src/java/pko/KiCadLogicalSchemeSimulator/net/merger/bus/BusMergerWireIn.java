@@ -213,4 +213,11 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
             setHiImpedance();
         }
     }
+
+    @Override
+    public BusMergerWireIn getOptimised() {
+        //FixMe need replace in merger.sources
+        return this;
+    }
+
 }

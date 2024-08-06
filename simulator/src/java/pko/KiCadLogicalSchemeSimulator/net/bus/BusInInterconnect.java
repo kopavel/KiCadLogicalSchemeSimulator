@@ -44,7 +44,6 @@ public class BusInInterconnect extends InBus {
         this.interconnectMask = interconnectMask;
         this.inverseInterconnectMask = ~interconnectMask;
         this.senseMask = 1L << offset;
-        //FixMe check if shortcut multiple out pins.
     }
 
     @Override

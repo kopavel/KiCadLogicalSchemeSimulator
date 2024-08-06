@@ -72,5 +72,6 @@ module KiCadLogicalSchemeSimulator.simulator {
     requires org.apache.logging.log4j;
     requires org.tukaani.xz;
     requires static lombok;
+    requires org.javassist;
     uses SchemaPartSpi;
 }
