@@ -33,9 +33,7 @@ package pko.KiCadLogicalSchemeSimulator.components.jnCounter;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.EdgeInPin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.FallingEdgeInPin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.RisingEdgeInPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
 
 public class JnCounter extends SchemaPart {
     private final long coMax;
@@ -64,22 +62,19 @@ public class JnCounter extends SchemaPart {
         coMax = countMax / 2;
         addOutBus("Q", pinAmount);
         addOutBus("CO", pinAmount);
-        addInPin(new EdgeInPin("CI", this) {
+        addInPin(new NoFloatingInPin("CI", this) {
             @Override
-            public void onFallingEdge() {
-                clockEnabled = true;
-            }
-
-            @Override
-            public void onRisingEdge() {
-                clockEnabled = false;
+            public void setState(boolean newState) {
+                state = newState;
+                clockEnabled = !state;
             }
         });
         if (reverse) {
-            addInPin(new FallingEdgeInPin("C", this) {
+            addInPin(new NoFloatingInPin("C", this) {
                 @Override
-                public void onFallingEdge() {
-                    if (clockEnabled) {
+                public void setState(boolean newState) {
+                    state = newState;
+                    if (!state && clockEnabled) {
                         if (outBus.state >= countMax) {
                             outBus.state = 1;
                             if (carryOutPin.state) {
@@ -97,26 +92,25 @@ public class JnCounter extends SchemaPart {
                     }
                 }
             });
-            addInPin(new EdgeInPin("R", this) {
+            addInPin(new NoFloatingInPin("R", this) {
                 @Override
-                public void onFallingEdge() {
-                    clockEnabled = false;
-                    if (outBus.state != 1) {
-                        outBus.state = 1;
-                        outBus.setState(outBus.state);
+                public void setState(boolean newState) {
+                    state = newState;
+                    clockEnabled = state;
+                    if (!state) {
+                        if (outBus.state != 1) {
+                            outBus.state = 1;
+                            outBus.setState(outBus.state);
+                        }
                     }
-                }
-
-                @Override
-                public void onRisingEdge() {
-                    clockEnabled = true;
                 }
             });
         } else {
-            addInPin(new RisingEdgeInPin("C", this) {
+            addInPin(new NoFloatingInPin("C", this) {
                 @Override
-                public void onRisingEdge() {
-                    if (clockEnabled) {
+                public void setState(boolean newState) {
+                    state = newState;
+                    if (state && clockEnabled) {
                         if (outBus.state >= countMax) {
                             outBus.state = 1;
                             if (carryOutPin.state) {
@@ -134,18 +128,18 @@ public class JnCounter extends SchemaPart {
                     }
                 }
             });
-            addInPin(new EdgeInPin("R", this) {
+            addInPin(new NoFloatingInPin("R", this) {
                 @Override
-                public void onFallingEdge() {
-                    clockEnabled = true;
-                }
-
-                @Override
-                public void onRisingEdge() {
-                    clockEnabled = false;
-                    if (outBus.state != 1) {
-                        outBus.state = 1;
-                        outBus.setState(outBus.state);
+                public void setState(boolean newState) {
+                    state = newState;
+                    if (state) {
+                        clockEnabled = false;
+                        if (outBus.state != 1) {
+                            outBus.state = 1;
+                            outBus.setState(outBus.state);
+                        }
+                    } else {
+                        clockEnabled = true;
                     }
                 }
             });

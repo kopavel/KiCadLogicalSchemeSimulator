@@ -33,8 +33,8 @@ package pko.KiCadLogicalSchemeSimulator.components.display;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.AbstractUiComponent;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.InteractiveSchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.FallingEdgeInPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
 
 import javax.swing.*;
 import java.util.Arrays;
@@ -68,83 +68,89 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
             throw new RuntimeException("Component " + id + " size must be positive number");
         }
         if (reverse) {
-            addInPin(new FallingEdgeInPin("Clock", this) {
+            addInPin(new NoFloatingInPin("Clock", this) {
                 @Override
-                public void onFallingEdge() {
-                    if (!vSync.state && !lastVSync) {
-                        if (vSize == 0) {
-                            vSize = vPos + 2;
-                            Thread.ofVirtual().start(() -> SwingUtilities.invokeLater(() -> {
-                                //noinspection deprecation
-                                display.reshape(display.currentX, display.currentY, hSize * display.scaleFactor, vSize * display.scaleFactor);
-                            }));
-                            ram = Arrays.copyOf(ram, vSize);
-                        } else {
-                            Thread.ofVirtual().start(() -> SwingUtilities.invokeLater(display::repaint));
+                public void setState(boolean newState) {
+                    state = newState;
+                    if (!state) {
+                        if (!vSync.state && !lastVSync) {
+                            if (vSize == 0) {
+                                vSize = vPos + 2;
+                                Thread.ofVirtual().start(() -> SwingUtilities.invokeLater(() -> {
+                                    //noinspection deprecation
+                                    display.reshape(display.currentX, display.currentY, hSize * display.scaleFactor, vSize * display.scaleFactor);
+                                }));
+                                ram = Arrays.copyOf(ram, vSize);
+                            } else {
+                                Thread.ofVirtual().start(() -> SwingUtilities.invokeLater(display::repaint));
+                            }
+                            hPos = 0;
+                            vPos = 0;
+                        } else if (!hSync.state && !lastHSync) {
+                            if (hSize == 0) {
+                                hSize = hPos + 2;
+                                ram = new byte[2048][hSize];
+                                ram[vPos] = Arrays.copyOf(firstRow, hSize);
+                                firstRow = null;
+                            }
+                            hPos = 0;
+                            vPos++;
+                            rows++;
                         }
-                        hPos = 0;
-                        vPos = 0;
-                    } else if (!hSync.state && !lastHSync) {
+                        hPos++;
+                        byte data = (byte) (vIn.state ? 0xff : 0x0);
                         if (hSize == 0) {
-                            hSize = hPos + 2;
-                            ram = new byte[2048][hSize];
-                            ram[vPos] = Arrays.copyOf(firstRow, hSize);
-                            firstRow = null;
+                            //noinspection DataFlowIssue
+                            firstRow[hPos] = data;
+                        } else {
+                            ram[vPos][hPos] = data;
                         }
-                        hPos = 0;
-                        vPos++;
-                        rows++;
+                        lastHSync = !hSync.state;
+                        lastVSync = !vSync.state;
                     }
-                    hPos++;
-                    byte data = (byte) (vIn.state ? 0xff : 0x0);
-                    if (hSize == 0) {
-                        //noinspection DataFlowIssue
-                        firstRow[hPos] = data;
-                    } else {
-                        ram[vPos][hPos] = data;
-                    }
-                    lastHSync = !hSync.state;
-                    lastVSync = !vSync.state;
                 }
             });
         } else {
-            addInPin(new FallingEdgeInPin("Clock", this) {
+            addInPin(new NoFloatingInPin("Clock", this) {
                 @Override
-                public void onFallingEdge() {
-                    if (vSync.state && !lastVSync) {
-                        if (vSize == 0) {
-                            vSize = vPos + 2;
-                            SwingUtilities.invokeLater(() -> {
-                                //noinspection deprecation
-                                display.reshape(display.currentX, display.currentY, hSize * display.scaleFactor, vSize * display.scaleFactor);
-                            });
-                            ram = Arrays.copyOf(ram, vSize);
-                        } else {
-                            SwingUtilities.invokeLater(display::repaint);
+                public void setState(boolean newState) {
+                    state = newState;
+                    if (!state) {
+                        if (vSync.state && !lastVSync) {
+                            if (vSize == 0) {
+                                vSize = vPos + 2;
+                                SwingUtilities.invokeLater(() -> {
+                                    //noinspection deprecation
+                                    display.reshape(display.currentX, display.currentY, hSize * display.scaleFactor, vSize * display.scaleFactor);
+                                });
+                                ram = Arrays.copyOf(ram, vSize);
+                            } else {
+                                SwingUtilities.invokeLater(display::repaint);
+                            }
+                            hPos = 0;
+                            vPos = 0;
+                        } else if (hSync.state && !lastHSync) {
+                            if (hSize == 0) {
+                                hSize = hPos + 2;
+                                ram = new byte[2048][hSize];
+                                ram[vPos] = Arrays.copyOf(firstRow, hSize);
+                                firstRow = null;
+                            }
+                            hPos = 0;
+                            vPos++;
+                            rows++;
                         }
-                        hPos = 0;
-                        vPos = 0;
-                    } else if (hSync.state && !lastHSync) {
+                        hPos++;
+                        byte data = (byte) (vIn.state ? 0xff : 0x0);
                         if (hSize == 0) {
-                            hSize = hPos + 2;
-                            ram = new byte[2048][hSize];
-                            ram[vPos] = Arrays.copyOf(firstRow, hSize);
-                            firstRow = null;
+                            //noinspection DataFlowIssue
+                            firstRow[hPos] = data;
+                        } else {
+                            ram[vPos][hPos] = data;
                         }
-                        hPos = 0;
-                        vPos++;
-                        rows++;
+                        lastHSync = hSync.state;
+                        lastVSync = vSync.state;
                     }
-                    hPos++;
-                    byte data = (byte) (vIn.state ? 0xff : 0x0);
-                    if (hSize == 0) {
-                        //noinspection DataFlowIssue
-                        firstRow[hPos] = data;
-                    } else {
-                        ram[vPos][hPos] = data;
-                    }
-                    lastHSync = hSync.state;
-                    lastVSync = vSync.state;
                 }
             });
         }

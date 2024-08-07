@@ -365,8 +365,9 @@ public class BusToWiresAdapter extends OutBus {
             return new BusToWiresAdapter(this, "unroll1") {
                 @Override
                 public void setState(long newState) {
-                    if (maskState != (newState & mask)) {
-                        maskState = newState & mask;
+                    final long m = newState & mask;
+                    if (maskState != m) {
+                        maskState = m;
                         d1.setState(maskState != 0);
                     }
                 }

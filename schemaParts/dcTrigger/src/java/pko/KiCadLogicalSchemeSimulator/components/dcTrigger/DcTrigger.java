@@ -32,10 +32,8 @@
 package pko.KiCadLogicalSchemeSimulator.components.dcTrigger;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.FallingEdgeInPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.RisingEdgeInPin;
 
 public class DcTrigger extends SchemaPart {
     private final InPin dPin;
@@ -49,7 +47,6 @@ public class DcTrigger extends SchemaPart {
         super(id, sParam);
         dPin = addInPin("D");
         rPin = addInPin(new NoFloatingInPin("R", this) {
-
             @Override
             public void setState(boolean newState) {
                 state = newState;
@@ -102,17 +99,23 @@ public class DcTrigger extends SchemaPart {
             }
         });
         if (reverse) {
-            addInPin(new FallingEdgeInPin("C", this) {
+            addInPin(new NoFloatingInPin("C", this) {
                 @Override
-                public void onFallingEdge() {
-                    store();
+                public void setState(boolean newState) {
+                    state = newState;
+                    if (!state) {
+                        store();
+                    }
                 }
             });
         } else {
-            addInPin(new RisingEdgeInPin("C", this) {
+            addInPin(new NoFloatingInPin("C", this) {
                 @Override
-                public void onRisingEdge() {
-                    store();
+                public void setState(boolean newState) {
+                    state = newState;
+                    if (state) {
+                        store();
+                    }
                 }
             });
         }
@@ -124,6 +127,14 @@ public class DcTrigger extends SchemaPart {
     public void initOuts() {
         qOut = getOutPin("Q");
         iqOut = getOutPin("~{Q}");
+    }
+
+    @Override
+    public void reset() {
+        qOut.state = false;
+        qOut.setState(false);
+        iqOut.state = true;
+        iqOut.setState(true);
     }
 
     private void store() {
@@ -142,13 +153,5 @@ public class DcTrigger extends SchemaPart {
                 iqOut.setState(true);
             }
         }
-    }
-
-    @Override
-    public void reset() {
-        qOut.state = false;
-        qOut.setState(false);
-        iqOut.state = true;
-        iqOut.setState(true);
     }
 }

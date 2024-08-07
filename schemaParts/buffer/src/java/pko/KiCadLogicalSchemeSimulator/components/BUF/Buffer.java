@@ -34,7 +34,6 @@ import pko.KiCadLogicalSchemeSimulator.api.FloatingInException;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.FallingEdgeInPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
 import pko.KiCadLogicalSchemeSimulator.net.Net;
@@ -81,14 +80,17 @@ public class Buffer extends SchemaPart {
                     }
                 }
             });
-            addInPin(new FallingEdgeInPin("~{WR}", this) {
+            addInPin(new NoFloatingInPin("~{WR}", this) {
                 @Override
-                public void onFallingEdge() {
-                    latch = dBus.state;
-                    if (!oePin.state && (qBus.state != latch || qBus.hiImpedance)) {
-                        qBus.state = latch;
-                        qBus.setState(latch);
-                        qBus.hiImpedance = false;
+                public void setState(boolean newState) {
+                    state = newState;
+                    if (!state) {
+                        latch = dBus.state;
+                        if (!oePin.state && (qBus.state != latch || qBus.hiImpedance)) {
+                            qBus.state = latch;
+                            qBus.setState(latch);
+                            qBus.hiImpedance = false;
+                        }
                     }
                 }
             });

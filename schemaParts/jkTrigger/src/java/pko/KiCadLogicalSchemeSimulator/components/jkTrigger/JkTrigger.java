@@ -32,10 +32,8 @@
 package pko.KiCadLogicalSchemeSimulator.components.jkTrigger;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.FallingEdgeInPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.RisingEdgeInPin;
 
 public class JkTrigger extends SchemaPart {
     private final InPin jPin;
@@ -103,10 +101,11 @@ public class JkTrigger extends SchemaPart {
             }
         });
         if (reverse) {
-            addInPin(new FallingEdgeInPin("C", this) {
+            addInPin(new NoFloatingInPin("C", this) {
                 @Override
-                public void onFallingEdge() {
-                    if (clockEnabled) {
+                public void setState(boolean newState) {
+                    state = newState;
+                    if (!state && clockEnabled) {
                         if (jPin.state && kPin.state) {
                             qOut.setState(!qOut.state);
                             iqOut.setState(!iqOut.state);
@@ -124,10 +123,11 @@ public class JkTrigger extends SchemaPart {
                 }
             });
         } else {
-            addInPin(new RisingEdgeInPin("C", this) {
+            addInPin(new NoFloatingInPin("C", this) {
                 @Override
-                public void onRisingEdge() {
-                    if (clockEnabled) {
+                public void setState(boolean newState) {
+                    state = newState;
+                    if (state && clockEnabled) {
                         if (jPin.state && kPin.state) {
                             qOut.setState(!qOut.state);
                             iqOut.setState(!iqOut.state);

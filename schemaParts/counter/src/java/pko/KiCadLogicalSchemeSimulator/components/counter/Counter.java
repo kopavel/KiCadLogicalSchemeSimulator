@@ -32,8 +32,7 @@
 package pko.KiCadLogicalSchemeSimulator.components.counter;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.FallingEdgeInPin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.RisingEdgeInPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 public class Counter extends SchemaPart {
@@ -57,33 +56,45 @@ public class Counter extends SchemaPart {
         countMask = Utils.getMaskForSize(pinAmount);
         addOutBus("Q", pinAmount, 0);
         if (reverse) {
-            addInPin(new FallingEdgeInPin("C", this) {
+            addInPin(new NoFloatingInPin("C", this) {
                 @Override
-                public void onFallingEdge() {
-                    outBus.state = (outBus.state + 1) & countMask;
-                    outBus.setState(outBus.state);
+                public void setState(boolean newState) {
+                    state = newState;
+                    if (!state) {
+                        outBus.state = (outBus.state + 1) & countMask;
+                        outBus.setState(outBus.state);
+                    }
                 }
             });
-            addInPin(new FallingEdgeInPin("R", this) {
+            addInPin(new NoFloatingInPin("R", this) {
                 @Override
-                public void onFallingEdge() {
-                    outBus.state = 0;
-                    outBus.setState(outBus.state);
+                public void setState(boolean newState) {
+                    state = newState;
+                    if (!state) {
+                        outBus.state = 0;
+                        outBus.setState(outBus.state);
+                    }
                 }
             });
         } else {
-            addInPin(new RisingEdgeInPin("C", this) {
+            addInPin(new NoFloatingInPin("C", this) {
                 @Override
-                public void onRisingEdge() {
-                    outBus.state = (outBus.state + 1) & countMask;
-                    outBus.setState(outBus.state);
+                public void setState(boolean newState) {
+                    state = newState;
+                    if (state) {
+                        outBus.state = (outBus.state + 1) & countMask;
+                        outBus.setState(outBus.state);
+                    }
                 }
             });
-            addInPin(new RisingEdgeInPin("R", this) {
+            addInPin(new NoFloatingInPin("R", this) {
                 @Override
-                public void onRisingEdge() {
-                    outBus.state = 0;
-                    outBus.setState(outBus.state);
+                public void setState(boolean newState) {
+                    state = newState;
+                    if (state) {
+                        outBus.state = 0;
+                        outBus.setState(outBus.state);
+                    }
                 }
             });
         }

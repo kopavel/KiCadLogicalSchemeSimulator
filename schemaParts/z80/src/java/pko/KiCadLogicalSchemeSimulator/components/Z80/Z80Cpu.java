@@ -38,9 +38,8 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.EdgeInPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.RisingEdgeInPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
 
 public class Z80Cpu extends SchemaPart {
     private final Z80Core cpu;
@@ -71,151 +70,154 @@ public class Z80Cpu extends SchemaPart {
     public Z80Cpu(String id) {
         super(id, null);
         cpu = new Z80Core(ioQueue);
-        addInPin(new EdgeInPin("CLK", this) {
+        addInPin(new NoFloatingInPin("CLK", this) {
             @Override
-            public void onFallingEdge() {
-                if (M > 0) {
-                    IoRequest ioRequest = ioQueue.requests.peek();
-                    assert ioRequest != null;
-                    if (T1) {
-                        if (ioRequest.isMemory) {
-                            mReqPin.state = false;
-                            mReqPin.setState(false);
-                            if (!ioRequest.isWrite) {
-                                rdPin.state = false;
-                                rdPin.setState(false);
-                            }
-                        }
-                        if (ioRequest.isWrite) {
-                            dOut.state = ioRequest.payload;
-                            dOut.setState(ioRequest.payload);
-                            dOut.hiImpedance = false;
-                            needDataPinReset = true;
-                        }
-                    } else if (T2) {
-                        if (!inWait && ioRequest.isMemory && ioRequest.isWrite) {
-                            wrPin.state = false;
-                            wrPin.setState(false);
-                        }
-                        inWait = !waitPin.state;
-                    } else if (T3) {
-                        if (M1) {
-                            mReqPin.state = false;
-                            mReqPin.setState(false);
-                        } else if (ioRequest.isMemory) {
-                            if (!ioRequest.isWrite) {
-                                ioRequest.callback.accept((int) dIn.getState());
-                                rdPin.state = true;
-                                rdPin.setState(true);
-                            } else {
-                                wrPin.state = true;
-                                wrPin.setState(true);
-                            }
-                            mReqPin.state = true;
-                            mReqPin.setState(true);
-                        } else {
-                            if (!ioRequest.isWrite) {
-                                ioRequest.callback.accept((int) dIn.getState());
-                                rdPin.state = true;
-                                rdPin.setState(true);
-                            } else {
-                                wrPin.state = true;
-                                wrPin.setState(true);
-                            }
-                            ioReqPin.state = true;
-                            ioReqPin.setState(true);
-                        }
-                    } else {
-                        mReqPin.state = true;
-                        mReqPin.setState(true);
-                    }
-                }
-            }
-
-            @Override
-            public void onRisingEdge() {
-                if (M > 0) {
-                    if (T4 || (!M1 && T3)) {
-                        T = 1;
-                        ioQueue.requests.poll();
+            public void setState(boolean newState) {
+                state = newState;
+                if (state) {
+                    if (M > 0) {
+                        if (T4 || (!M1 && T3)) {
+                            T = 1;
+                            ioQueue.requests.poll();
 //                Log.trace(Z80Cpu.class, "cpuDone is {}", cpuDone);
-                        if (ioQueue.requests.isEmpty()) {
-                            M = 1;
+                            if (ioQueue.requests.isEmpty()) {
+                                M = 1;
+                            } else {
+                                M++;
+                            }
                         } else {
-                            M++;
+                            if (T2 && (inWait || extraWait)) {
+                                extraWait = false;
+                            } else {
+                                T++;
+                            }
                         }
-                    } else {
-                        if (T2 && (inWait || extraWait)) {
-                            extraWait = false;
-                        } else {
-                            T++;
+                        T1 = T == 1;
+                        T2 = T == 2;
+                        T3 = T == 3;
+                        T4 = T == 4;
+                        M1 = M == 1;
+//        Log.trace(Z80Cpu.class, "Set pins at {},{}", M, T);
+                        IoRequest ioRequest = ioQueue.requests.peek();
+                        assert T1 || ioRequest != null;
+                        if (T1) {
+                            if (needRefreshPinReset) {
+                                refreshPin.state = true;
+                                refreshPin.setState(true);
+                                needRefreshPinReset = false;
+                            }
+                            if (needDataPinReset) {
+                                if (!dOut.hiImpedance) {
+                                    dOut.setHiImpedance();
+                                    dOut.hiImpedance = true;
+                                }
+                                needDataPinReset = false;
+                            }
+                            if (M1) {
+                                m1Pin.state = false;
+                                m1Pin.setState(false);
+                                cpu.executeOneInstruction();
+                                ioRequest = ioQueue.requests.peek();
+                            }
+                            assert ioRequest != null : "Cpu core ioQueue is empty on T" + T + ":M" + M;
+                            aOut.state = ioRequest.address;
+                            aOut.setState(ioRequest.address);
+                            aOut.hiImpedance = false;
+                            extraWait = !ioRequest.isMemory;
+                        } else if (T2) {
+                            if (!inWait && !ioRequest.isMemory) {
+                                ioReqPin.state = false;
+                                ioReqPin.setState(false);
+                                if (ioRequest.isWrite) {
+                                    wrPin.state = false;
+                                    wrPin.setState(false);
+                                } else {
+                                    rdPin.state = false;
+                                    rdPin.setState(false);
+                                }
+                            }
+                        } else if (T3) {
+                            if (M1) {
+                                ioRequest.callback.accept((int) dIn.getState());
+                                rdPin.state = true;
+                                rdPin.setState(true);
+                                mReqPin.state = true;
+                                mReqPin.setState(true);
+                                m1Pin.state = true;
+                                m1Pin.setState(true);
+                                refreshPin.state = false;
+                                refreshPin.setState(false);
+                                needRefreshPinReset = true;
+                            }
                         }
                     }
-                    T1 = T == 1;
-                    T2 = T == 2;
-                    T3 = T == 3;
-                    T4 = T == 4;
-                    M1 = M == 1;
-//        Log.trace(Z80Cpu.class, "Set pins at {},{}", M, T);
-                    IoRequest ioRequest = ioQueue.requests.peek();
-                    assert T1 || ioRequest != null;
-                    if (T1) {
-                        if (needRefreshPinReset) {
-                            refreshPin.state = true;
-                            refreshPin.setState(true);
-                            needRefreshPinReset = false;
-                        }
-                        if (needDataPinReset) {
-                            if (!dOut.hiImpedance) {
-                                dOut.setHiImpedance();
-                                dOut.hiImpedance = true;
+                } else {
+                    if (M > 0) {
+                        IoRequest ioRequest = ioQueue.requests.peek();
+                        assert ioRequest != null;
+                        if (T1) {
+                            if (ioRequest.isMemory) {
+                                mReqPin.state = false;
+                                mReqPin.setState(false);
+                                if (!ioRequest.isWrite) {
+                                    rdPin.state = false;
+                                    rdPin.setState(false);
+                                }
                             }
-                            needDataPinReset = false;
-                        }
-                        if (M1) {
-                            m1Pin.state = false;
-                            m1Pin.setState(false);
-                            cpu.executeOneInstruction();
-                            ioRequest = ioQueue.requests.peek();
-                        }
-                        assert ioRequest != null : "Cpu core ioQueue is empty on T" + T + ":M" + M;
-                        aOut.state = ioRequest.address;
-                        aOut.setState(ioRequest.address);
-                        aOut.hiImpedance = false;
-                        extraWait = !ioRequest.isMemory;
-                    } else if (T2) {
-                        if (!inWait && !ioRequest.isMemory) {
-                            ioReqPin.state = false;
-                            ioReqPin.setState(false);
                             if (ioRequest.isWrite) {
+                                dOut.state = ioRequest.payload;
+                                dOut.setState(ioRequest.payload);
+                                dOut.hiImpedance = false;
+                                needDataPinReset = true;
+                            }
+                        } else if (T2) {
+                            if (!inWait && ioRequest.isMemory && ioRequest.isWrite) {
                                 wrPin.state = false;
                                 wrPin.setState(false);
-                            } else {
-                                rdPin.state = false;
-                                rdPin.setState(false);
                             }
-                        }
-                    } else if (T3) {
-                        if (M1) {
-                            ioRequest.callback.accept((int) dIn.getState());
-                            rdPin.state = true;
-                            rdPin.setState(true);
+                            inWait = !waitPin.state;
+                        } else if (T3) {
+                            if (M1) {
+                                mReqPin.state = false;
+                                mReqPin.setState(false);
+                            } else if (ioRequest.isMemory) {
+                                if (!ioRequest.isWrite) {
+                                    ioRequest.callback.accept((int) dIn.getState());
+                                    rdPin.state = true;
+                                    rdPin.setState(true);
+                                } else {
+                                    wrPin.state = true;
+                                    wrPin.setState(true);
+                                }
+                                mReqPin.state = true;
+                                mReqPin.setState(true);
+                            } else {
+                                if (!ioRequest.isWrite) {
+                                    ioRequest.callback.accept((int) dIn.getState());
+                                    rdPin.state = true;
+                                    rdPin.setState(true);
+                                } else {
+                                    wrPin.state = true;
+                                    wrPin.setState(true);
+                                }
+                                ioReqPin.state = true;
+                                ioReqPin.setState(true);
+                            }
+                        } else {
                             mReqPin.state = true;
                             mReqPin.setState(true);
-                            m1Pin.state = true;
-                            m1Pin.setState(true);
-                            refreshPin.state = false;
-                            refreshPin.setState(false);
-                            needRefreshPinReset = true;
                         }
                     }
                 }
             }
         });
-        addInPin(new RisingEdgeInPin("~{RESET}", this) {
+        addInPin(new NoFloatingInPin("~{RESET}", this) {
             @Override
-            public void onRisingEdge() {
-                reset();
+            public void setState(boolean newState) {
+                state = newState;
+                if (state) {
+                    reset();
+                }
             }
         });
         addInPin("~{NMI}");

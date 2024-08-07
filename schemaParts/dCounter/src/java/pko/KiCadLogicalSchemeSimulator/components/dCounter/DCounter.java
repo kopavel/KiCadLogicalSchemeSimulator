@@ -35,7 +35,6 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.in.NoFloatingInBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.EdgeInPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
 
@@ -156,7 +155,6 @@ public class DCounter extends SchemaPart {
             });
         }
         jBus = addInBus(new NoFloatingInBus("J", this, 4) {
-
             @Override
             public void setState(long newState) {
                 state = newState;
@@ -209,64 +207,64 @@ public class DCounter extends SchemaPart {
             maxCount = 15;
         }
         if (reverse) {
-            addInPin(new EdgeInPin("C", this) {
+            addInPin(new NoFloatingInPin("C", this) {
                 @Override
-                public void onFallingEdge() {
-                    cState = true;
-                    if (eState) {
-                        process();
+                public void setState(boolean newState) {
+                    state = newState;
+                    if (state) {
+                        cState = false;
+                    } else {
+                        cState = true;
+                        if (eState) {
+                            process();
+                        }
                     }
-                }
-
-                @Override
-                public void onRisingEdge() {
-                    cState = false;
                 }
             });
         } else {
-            addInPin(new EdgeInPin("C", this) {
+            addInPin(new NoFloatingInPin("C", this) {
                 @Override
-                public void onFallingEdge() {
-                    cState = false;
-                }
-
-                @Override
-                public void onRisingEdge() {
-                    cState = true;
-                    if (eState) {
-                        process();
+                public void setState(boolean newState) {
+                    state = newState;
+                    if (state) {
+                        cState = true;
+                        if (eState) {
+                            process();
+                        }
+                    } else {
+                        cState = false;
                     }
                 }
             });
         }
         if (eReverse) {
-            addInPin(new EdgeInPin("E", this) {
+            addInPin(new NoFloatingInPin("E", this) {
                 @Override
-                public void onRisingEdge() {
-                    eState = false;
-                }
-
-                @Override
-                public void onFallingEdge() {
-                    eState = true;
-                    if (cState) {
-                        process();
+                public void setState(boolean newState) {
+                    state = newState;
+                    if (state) {
+                        eState = false;
+                    } else {
+                        eState = true;
+                        if (cState) {
+                            process();
+                        }
                     }
                 }
             });
         } else {
-            addInPin(new EdgeInPin("E", this) {
+            addInPin(new NoFloatingInPin("E", this) {
                 @Override
-                public void onRisingEdge() {
-                    eState = true;
-                    if (cState) {
-                        process();
+                public void setState(boolean newState) {
+                    state = newState;
+                    if (state) {
+                        eState = true;
+                        if (cState) {
+                            process();
+                        }
+                    } else {
+                        eState = false;
                     }
-                }
-
-                @Override
-                public void onFallingEdge() {
-                    eState = false;
                 }
             });
         }

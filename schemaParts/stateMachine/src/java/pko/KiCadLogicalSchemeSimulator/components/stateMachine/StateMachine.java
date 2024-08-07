@@ -34,7 +34,6 @@ import pko.KiCadLogicalSchemeSimulator.api.FloatingInException;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.EdgeInPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
 import pko.KiCadLogicalSchemeSimulator.net.Net;
@@ -111,24 +110,24 @@ public class StateMachine extends SchemaPart {
                 }
             }
         });
-        addInPin(new EdgeInPin("R", this) {
+        addInPin(new NoFloatingInPin("R", this) {
             @Override
-            public void onFallingEdge() {
-                outMask = 0;
-                long newOutState = (dPin.state ? 0 : states[latch]) ^ outMask;
-                if (out.state != newOutState) {
-                    out.state = newOutState;
-                    out.setState(newOutState);
-                }
-            }
-
-            @Override
-            public void onRisingEdge() {
-                outMask = -1;
-                long newOutState = (dPin.state ? 0 : states[latch]) ^ outMask;
-                if (out.state != newOutState) {
-                    out.state = newOutState;
-                    out.setState(newOutState);
+            public void setState(boolean newState) {
+                state = newState;
+                if (state) {
+                    outMask = -1;
+                    long newOutState = (dPin.state ? 0 : states[latch]) ^ outMask;
+                    if (out.state != newOutState) {
+                        out.state = newOutState;
+                        out.setState(newOutState);
+                    }
+                } else {
+                    outMask = 0;
+                    long newOutState = (dPin.state ? 0 : states[latch]) ^ outMask;
+                    if (out.state != newOutState) {
+                        out.state = newOutState;
+                        out.setState(newOutState);
+                    }
                 }
             }
         });

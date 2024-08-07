@@ -33,10 +33,8 @@ package pko.KiCadLogicalSchemeSimulator.components.sdram;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.EdgeInPin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.FallingEdgeInPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.RisingEdgeInPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
 
 public class SdRam extends SchemaPart {
     private final long[] bytes;
@@ -76,61 +74,67 @@ public class SdRam extends SchemaPart {
         addOutBus("D", size);
         dIn = addInBus("D", size);
         if (reverse) {
-            addInPin(new FallingEdgeInPin("~{RAS}", this) {
+            addInPin(new NoFloatingInPin("~{RAS}", this) {
                 @Override
-                public void onFallingEdge() {
-                    hiPart = (int) (addrPin.state * module);
-                }
-            });
-            addInPin(new EdgeInPin("~{CAS}", this) {
-                @Override
-                public void onFallingEdge() {
-                    addr = (int) (hiPart + addrPin.state);
-                    if (we.state) {
-                        if (dOut.state != bytes[addr] || dOut.hiImpedance) {
-                            dOut.state = bytes[addr];
-                            dOut.setState(dOut.state);
-                            dOut.hiImpedance = false;
-                        }
-                    } else {
-                        bytes[addr] = dIn.state;
+                public void setState(boolean newState) {
+                    state = newState;
+                    if (!state) {
+                        hiPart = (int) (addrPin.state * module);
                     }
                 }
-
+            });
+            addInPin(new NoFloatingInPin("~{CAS}", this) {
                 @Override
-                public void onRisingEdge() {
-                    if (!dOut.hiImpedance) {
-                        dOut.setHiImpedance();
-                        dOut.hiImpedance = true;
+                public void setState(boolean newState) {
+                    state = newState;
+                    if (state) {
+                        if (!dOut.hiImpedance) {
+                            dOut.setHiImpedance();
+                            dOut.hiImpedance = true;
+                        }
+                    } else {
+                        addr = (int) (hiPart + addrPin.state);
+                        if (we.state) {
+                            if (dOut.state != bytes[addr] || dOut.hiImpedance) {
+                                dOut.state = bytes[addr];
+                                dOut.setState(dOut.state);
+                                dOut.hiImpedance = false;
+                            }
+                        } else {
+                            bytes[addr] = dIn.state;
+                        }
                     }
                 }
             });
         } else {
-            addInPin(new RisingEdgeInPin("RAS", this) {
+            addInPin(new NoFloatingInPin("RAS", this) {
                 @Override
-                public void onRisingEdge() {
-                    hiPart = (int) (addrPin.state * module);
-                }
-            });
-            addInPin(new EdgeInPin("CAS", this) {
-                @Override
-                public void onFallingEdge() {
-                    if (!dOut.hiImpedance) {
-                        dOut.setHiImpedance();
-                        dOut.hiImpedance = true;
+                public void setState(boolean newState) {
+                    state = newState;
+                    if (state) {
+                        hiPart = (int) (addrPin.state * module);
                     }
                 }
-
+            });
+            addInPin(new NoFloatingInPin("CAS", this) {
                 @Override
-                public void onRisingEdge() {
-                    addr = (int) (hiPart + addrPin.state);
-                    if (we.state) {
-                        bytes[addr] = dIn.state;
+                public void setState(boolean newState) {
+                    state = newState;
+                    if (state) {
+                        addr = (int) (hiPart + addrPin.state);
+                        if (we.state) {
+                            bytes[addr] = dIn.state;
+                        } else {
+                            if (dOut.state != bytes[addr] || dOut.hiImpedance) {
+                                dOut.state = bytes[addr];
+                                dOut.setState(dOut.state);
+                                dOut.hiImpedance = false;
+                            }
+                        }
                     } else {
-                        if (dOut.state != bytes[addr] || dOut.hiImpedance) {
-                            dOut.state = bytes[addr];
-                            dOut.setState(dOut.state);
-                            dOut.hiImpedance = false;
+                        if (!dOut.hiImpedance) {
+                            dOut.setHiImpedance();
+                            dOut.hiImpedance = true;
                         }
                     }
                 }

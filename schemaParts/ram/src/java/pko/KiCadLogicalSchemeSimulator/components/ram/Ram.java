@@ -35,10 +35,8 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.in.CorrectedInBus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.FallingEdgeInPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.RisingEdgeInPin;
 import pko.KiCadLogicalSchemeSimulator.net.Net;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
@@ -124,10 +122,11 @@ public class Ram extends SchemaPart {
                     rOut();
                 }
             });
-            addInPin(new FallingEdgeInPin("~{WE}", this) {
+            addInPin(new NoFloatingInPin("~{WE}", this) {
                 @Override
-                public void onFallingEdge() {
-                    if (!csPin.state) {
+                public void setState(boolean newState) {
+                    state = newState;
+                    if (!state && !csPin.state) {
                         words[(int) aBus.state] = dIn.state;
                     }
                 }
@@ -147,10 +146,11 @@ public class Ram extends SchemaPart {
                     out();
                 }
             });
-            addInPin(new RisingEdgeInPin("WE", this) {
+            addInPin(new NoFloatingInPin("WE", this) {
                 @Override
-                public void onRisingEdge() {
-                    if (csPin.state) {
+                public void setState(boolean newState) {
+                    state = newState;
+                    if (state && csPin.state) {
                         words[(int) aBus.state] = dIn.state;
                     }
                 }

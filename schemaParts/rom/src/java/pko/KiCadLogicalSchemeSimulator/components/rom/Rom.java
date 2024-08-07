@@ -34,7 +34,7 @@ import pko.KiCadLogicalSchemeSimulator.api.FloatingInException;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.EdgeInPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
 import pko.KiCadLogicalSchemeSimulator.net.Net;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
@@ -139,44 +139,43 @@ public class Rom extends SchemaPart {
         });
         addOutBus("D", size);
         if (reverse) {
-            addInPin(new EdgeInPin("~{CS}", this) {
+            addInPin(new NoFloatingInPin("~{CS}", this) {
                 @Override
-                public void onFallingEdge() {
-                    csActive = true;
-                    if (outPin.hiImpedance || outPin.state != words[addr]) {
-                        outPin.state = words[addr];
-                        outPin.setState(outPin.state);
-                        outPin.hiImpedance = false;
-                    }
-                }
-
-                @Override
-                public void onRisingEdge() {
-                    csActive = false;
-                    if (!outPin.hiImpedance) {
-                        outPin.setHiImpedance();
-                        outPin.hiImpedance = true;
+                public void setState(boolean newState) {
+                    state = newState;
+                    if (state) {
+                        csActive = false;
+                        if (!outPin.hiImpedance) {
+                            outPin.setHiImpedance();
+                            outPin.hiImpedance = true;
+                        }
+                    } else {
+                        csActive = true;
+                        if (outPin.hiImpedance || outPin.state != words[addr]) {
+                            outPin.state = words[addr];
+                            outPin.setState(outPin.state);
+                            outPin.hiImpedance = false;
+                        }
                     }
                 }
             });
         } else {
-            addInPin(new EdgeInPin("CS", this) {
+            addInPin(new NoFloatingInPin("CS", this) {
                 @Override
-                public void onFallingEdge() {
-                    csActive = false;
-                    if (!outPin.hiImpedance) {
-                        outPin.setHiImpedance();
-                        outPin.hiImpedance = true;
-                    }
-                }
-
-                @Override
-                public void onRisingEdge() {
-                    csActive = true;
-                    if (outPin.hiImpedance || outPin.state != words[addr]) {
-                        outPin.state = words[addr];
-                        outPin.setState(outPin.state);
-                        outPin.hiImpedance = false;
+                public void setState(boolean newState) {
+                    state = newState;
+                    csActive = state;
+                    if (state) {
+                        if (outPin.hiImpedance || outPin.state != words[addr]) {
+                            outPin.state = words[addr];
+                            outPin.setState(outPin.state);
+                            outPin.hiImpedance = false;
+                        }
+                    } else {
+                        if (!outPin.hiImpedance) {
+                            outPin.setHiImpedance();
+                            outPin.hiImpedance = true;
+                        }
                     }
                 }
             });

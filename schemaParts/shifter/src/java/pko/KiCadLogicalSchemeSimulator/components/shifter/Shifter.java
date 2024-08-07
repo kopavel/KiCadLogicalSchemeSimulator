@@ -34,10 +34,8 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.in.CorrectedInBus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.FallingEdgeInPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.RisingEdgeInPin;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 public class Shifter extends SchemaPart {
@@ -106,10 +104,11 @@ public class Shifter extends SchemaPart {
             });
         }
         if (reverse) {
-            addInPin(new FallingEdgeInPin("CP", this) {
+            addInPin(new NoFloatingInPin("CP", this) {
                 @Override
-                public void onFallingEdge() {
-                    if (plInactive && latch != 0) {
+                public void setState(boolean newState) {
+                    state = newState;
+                    if (!state && plInactive && latch != 0) {
                         latch = (latch << 1) & outMask;
                         if (dsPins.state) {
                             latch = latch | 1;
@@ -121,26 +120,30 @@ public class Shifter extends SchemaPart {
                     }
                 }
             });
-            addInPin(new FallingEdgeInPin("CN", this) {
+            addInPin(new NoFloatingInPin("CN", this) {
                 @Override
-                public void onFallingEdge() {
-                    if (plInactive && latch != 0) {
-                        latch = latch >> 1;
-                        if (dsPins.state) {
-                            latch = latch | hiDsMask;
-                        }
-                        if (out.state == ((latch & 1) == 0)) {
-                            out.state = ((latch & 1) != 0);
-                            out.setState(out.state);
+                public void setState(boolean newState) {
+                    state = newState;
+                    if (!state) {
+                        if (plInactive && latch != 0) {
+                            latch = latch >> 1;
+                            if (dsPins.state) {
+                                latch = latch | hiDsMask;
+                            }
+                            if (out.state == ((latch & 1) == 0)) {
+                                out.state = ((latch & 1) != 0);
+                                out.setState(out.state);
+                            }
                         }
                     }
                 }
             });
         } else {
-            addInPin(new RisingEdgeInPin("CP", this) {
+            addInPin(new NoFloatingInPin("CP", this) {
                 @Override
-                public void onRisingEdge() {
-                    if (plInactive && latch != 0) {
+                public void setState(boolean newState) {
+                    state = newState;
+                    if (state && plInactive && latch != 0) {
                         latch = (latch << 1) & outMask;
                         if (dsPins.state) {
                             latch = latch | 1;
@@ -152,10 +155,11 @@ public class Shifter extends SchemaPart {
                     }
                 }
             });
-            addInPin(new RisingEdgeInPin("CN", this) {
+            addInPin(new NoFloatingInPin("CN", this) {
                 @Override
-                public void onRisingEdge() {
-                    if (plInactive && latch != 0) {
+                public void setState(boolean newState) {
+                    state = newState;
+                    if (state && plInactive && latch != 0) {
                         latch = latch >> 1;
                         if (dsPins.state) {
                             latch = latch | hiDsMask;
