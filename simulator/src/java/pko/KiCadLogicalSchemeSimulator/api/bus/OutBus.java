@@ -34,10 +34,7 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.in.CorrectedInBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.net.ClassOptimiser;
-import pko.KiCadLogicalSchemeSimulator.net.bus.BusToWiresAdapter;
-import pko.KiCadLogicalSchemeSimulator.net.bus.MaskGroupBus;
-import pko.KiCadLogicalSchemeSimulator.net.bus.NCBus;
-import pko.KiCadLogicalSchemeSimulator.net.bus.OffsetBus;
+import pko.KiCadLogicalSchemeSimulator.net.bus.*;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 import java.util.ArrayList;
@@ -63,7 +60,11 @@ public class OutBus extends Bus {
     public void addDestination(Bus bus, long mask, byte offset) {
         //FixMe group by offset
         if (bus instanceof CorrectedInBus && offset != 0) {
-            bus = new OffsetBus(bus, offset);
+            if (offset > 0) {
+                bus = new OffsetBus(bus, offset);
+            } else {
+                bus = new NegativeOffsetBus(bus, offset);
+            }
         }
         if (mask != this.mask) {
             Arrays.stream(destinations)

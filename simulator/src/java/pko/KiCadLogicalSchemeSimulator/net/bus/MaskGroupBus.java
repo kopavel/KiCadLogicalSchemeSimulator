@@ -57,7 +57,7 @@ public class MaskGroupBus extends OutBus {
     @Override
     public void setState(long newState) {
         /*Optimiser bind mask*/
-        long maskState = newState & mask;
+        final long maskState = newState & mask;
         /*Optimiser bind destinations[0] d*/
         if (destinations[0].hiImpedance || this.maskState != maskState) {
             this.maskState = maskState;
@@ -79,7 +79,7 @@ public class MaskGroupBus extends OutBus {
     @Override
     public Bus getOptimised() {
         if (destinations.length == 0) {
-            return new NCBus(this);
+            throw new RuntimeException("unconnected MaskGroupBus " + getName());
         } else {
             for (int i = 0; i < destinations.length; i++) {
                 destinations[i] = destinations[i].getOptimised();

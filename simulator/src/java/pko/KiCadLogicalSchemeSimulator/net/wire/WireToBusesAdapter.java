@@ -64,18 +64,6 @@ public class WireToBusesAdapter extends OutPin {
     }
 
     @Override
-    public Pin getOptimised() {
-        if (destinations.length == 0) {
-            return new NCWire(this);
-        } else {
-            for (int i = 0; i < destinations.length; i++) {
-                destinations[i] = destinations[i].getOptimised();
-            }
-            return this;
-        }
-    }
-
-    @Override
     public void setState(boolean newState) {
         for (Bus destination : destinations) {
             destination.setState(newState ? mask : 0);
@@ -87,6 +75,18 @@ public class WireToBusesAdapter extends OutPin {
         assert !hiImpedance : "Already in hiImpedance:" + this;
         for (Bus destination : destinations) {
             destination.setHiImpedance();
+        }
+    }
+
+    @Override
+    public Pin getOptimised() {
+        if (destinations.length == 0) {
+            throw new RuntimeException("unconnected WireToBusAdapter " + getName());
+        } else {
+            for (int i = 0; i < destinations.length; i++) {
+                destinations[i] = destinations[i].getOptimised();
+            }
+            return this;
         }
     }
 }

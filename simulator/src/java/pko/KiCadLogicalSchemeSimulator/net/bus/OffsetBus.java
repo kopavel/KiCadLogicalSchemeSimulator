@@ -31,10 +31,10 @@
  */
 package pko.KiCadLogicalSchemeSimulator.net.bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
+import pko.KiCadLogicalSchemeSimulator.net.ClassOptimiser;
 
 public class OffsetBus extends Bus {
     private final byte offset;
-    private final byte nOffset;
     private Bus destination;
 
     public OffsetBus(Bus destination, byte offset) {
@@ -44,46 +44,29 @@ public class OffsetBus extends Bus {
         }
         this.destination = destination;
         this.offset = offset;
-        nOffset = (byte) -offset;
         id += ":offset" + offset;
+    }
+
+    public OffsetBus(OffsetBus oldBus, String variantId) {
+        super(oldBus, variantId);
+        offset = oldBus.offset;
+        destination = oldBus.destination;
     }
 
     @Override
     public void setState(long newState) {
-        hiImpedance = false;
-        if (offset > 0) {
-            newState = newState << offset;
-        } else {
-            newState = newState >> nOffset;
-        }
-        destination.setState(newState);
+        /*Optimiser bind offset*/
+        destination.setState(newState << offset);
     }
 
     @Override
     public void setHiImpedance() {
-        hiImpedance = true;
         destination.setHiImpedance();
     }
 
     @Override
     public Bus getOptimised() {
         destination = destination.getOptimised();
-        if (offset > 0) {
-            return new OffsetBus(destination, offset) {
-                @Override
-                public void setState(long newState) {
-                    hiImpedance = false;
-                    destination.setState(newState << offset);
-                }
-            };
-        } else {
-            return new OffsetBus(destination, offset) {
-                @Override
-                public void setState(long newState) {
-                    hiImpedance = false;
-                    destination.setState(newState >> nOffset);
-                }
-            };
-        }
+        return new ClassOptimiser(OffsetBus.class).bind("offset", String.valueOf(offset)).build(this);
     }
 }

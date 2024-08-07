@@ -30,63 +30,43 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.net.bus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
-import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
+import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.net.ClassOptimiser;
-import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
-/*Optimiser iterator destinations->destination*/
-public class BusToWiresAdapter extends OutBus {
-    public Pin[] destinations = new Pin[0];
-    public long maskState;
+public class NegativeOffsetBus extends Bus {
+    private final byte offset;
+    private Bus destination;
 
-    public BusToWiresAdapter(BusToWiresAdapter oldBus, String variantId) {
+    public NegativeOffsetBus(Bus destination, byte offset) {
+        super(destination, "offset" + offset);
+        if (offset == 0) {
+            throw new RuntimeException("Offset must not be 0");
+        }
+        this.destination = destination;
+        this.offset = (byte) -offset;
+        id += ":offset" + offset;
+    }
+
+    public NegativeOffsetBus(NegativeOffsetBus oldBus, String variantId) {
         super(oldBus, variantId);
+        offset = oldBus.offset;
+        destination = oldBus.destination;
     }
 
-    public BusToWiresAdapter(OutBus outBus, long mask) {
-        super(outBus, "BusToWire");
-        this.mask = mask;
-    }
-
-    /*Optimiser override*/
     @Override
     public void setState(long newState) {
-        /*Optimiser bind mask*/
-        final long mState = newState & mask;
-        /*Optimiser bind destinations[0] d*/
-        if (destinations[0].hiImpedance || maskState != mState) {
-            maskState = mState;
-            /*Optimiser iterator unroll*/
-            for (Pin destination : destinations) {
-                destination.setState(maskState != 0);
-            }
-        }
+        /*Optimiser bind offset*/
+        destination.setState(newState >> offset);
     }
 
-    /*Optimiser override*/
     @Override
     public void setHiImpedance() {
-        assert !hiImpedance : "Already in hiImpedance:" + this;
-        /*Optimiser iterator unroll*/
-        for (Pin destination : destinations) {
-            destination.setHiImpedance();
-        }
-    }
-
-    public void addDestination(Pin pin) {
-        destinations = Utils.addToArray(destinations, pin);
+        destination.setHiImpedance();
     }
 
     @Override
-    public BusToWiresAdapter getOptimised() {
-        if (destinations.length == 0) {
-            throw new RuntimeException("unconnected BusToWiresAdapter " + getName());
-        } else {
-            for (int i = 0; i < destinations.length; i++) {
-                destinations[i] = destinations[i].getOptimised();
-            }
-            return new ClassOptimiser(BusToWiresAdapter.class).unroll(destinations.length).bind("mask", String.valueOf(mask)).bind("d", "destination0").build(this);
-        }
+    public Bus getOptimised() {
+        destination = destination.getOptimised();
+        return new ClassOptimiser(NegativeOffsetBus.class).bind("offset", String.valueOf(offset)).build(this);
     }
 }

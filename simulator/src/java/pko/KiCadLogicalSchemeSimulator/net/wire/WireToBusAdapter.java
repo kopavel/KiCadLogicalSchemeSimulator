@@ -33,12 +33,13 @@ package pko.KiCadLogicalSchemeSimulator.net.wire;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.wire.OutPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
+import pko.KiCadLogicalSchemeSimulator.net.ClassOptimiser;
 
 public class WireToBusAdapter extends OutPin {
-    public long mask;
+    public final long mask;
     private Bus destination;
 
-    //FixMe use multi destinations
+    //FixMe use multi destinations and Optimiser
     public WireToBusAdapter(Bus destination, byte offset) {
         super(destination.id, destination.parent);
         variantId = "WireToBasAdapter:offset" + offset;
@@ -58,6 +59,7 @@ public class WireToBusAdapter extends OutPin {
 
     @Override
     public void setState(boolean newState) {
+        /*Optimiser bind mask*/
         destination.setState(newState ? mask : 0);
     }
 
@@ -70,10 +72,10 @@ public class WireToBusAdapter extends OutPin {
     @Override
     public Pin getOptimised() {
         if (destinations.length == 0) {
-            return new NCWire(this);
+            throw new RuntimeException("unconnected WireToBusAdapter " + getName());
         } else {
             destination = destination.getOptimised();
-            return this;
+            return new ClassOptimiser(WireToBusAdapter.class).bind("mask", String.valueOf(mask)).build(this);
         }
     }
 }
