@@ -32,10 +32,12 @@
 package pko.KiCadLogicalSchemeSimulator.net.bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
+import pko.KiCadLogicalSchemeSimulator.net.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
+/*Optimiser iterator destinations->destination*/
 public class MaskGroupBus extends OutBus {
-    private long maskState;
+    protected long maskState;
 
     public MaskGroupBus(OutBus source, long mask, String variantId) {
         super(source, variantId);
@@ -51,17 +53,15 @@ public class MaskGroupBus extends OutBus {
         destinations = Utils.addToArray(destinations, bus);
     }
 
+    /*Optimiser override*/
     @Override
     public void setState(long newState) {
+        /*Optimiser bind mask*/
         long maskState = newState & mask;
-        if (hiImpedance) {
+        /*Optimiser bind destinations[0] d*/
+        if (destinations[0].hiImpedance || this.maskState != maskState) {
             this.maskState = maskState;
-            for (Bus destination : destinations) {
-                destination.setState(maskState);
-            }
-            hiImpedance = false;
-        } else if (this.maskState != maskState) {
-            this.maskState = maskState;
+            /*Optimiser iterator unroll*/
             for (Bus destination : destinations) {
                 destination.setState(maskState);
             }
@@ -70,9 +70,9 @@ public class MaskGroupBus extends OutBus {
 
     @Override
     public void setHiImpedance() {
-        if (!hiImpedance) {
-            super.setHiImpedance();
-            hiImpedance = true;
+        /*Optimiser iterator unroll*/
+        for (Bus destination : destinations) {
+            destination.setHiImpedance();
         }
     }
 
@@ -80,37 +80,11 @@ public class MaskGroupBus extends OutBus {
     public Bus getOptimised() {
         if (destinations.length == 0) {
             return new NCBus(this);
-        } else if (destinations.length == 1) {
-            Bus destination = destinations[0].getOptimised();
-            return new MaskGroupBus(MaskGroupBus.this, "SingleDestination") {
-                @Override
-                public void setHiImpedance() {
-                    if (!destination.hiImpedance) {
-                        destination.setHiImpedance();
-                    }
-                }
-
-                @Override
-                public void setState(long newState) {
-                    if (destination.hiImpedance) {
-                        maskState = newState & mask;
-                        destination.setState(maskState);
-                    } else if (maskState != (newState & mask)) {
-                        maskState = newState & mask;
-                        destination.setState(maskState);
-                    }
-                }
-
-                @Override
-                public Bus getOptimised() {
-                    return this;
-                }
-            };
         } else {
             for (int i = 0; i < destinations.length; i++) {
                 destinations[i] = destinations[i].getOptimised();
             }
-            return this;
+            return new ClassOptimiser(MaskGroupBus.class).unroll(destinations.length).bind("mask", String.valueOf(mask)).bind("d", "destination0").build(this);
         }
     }
 }

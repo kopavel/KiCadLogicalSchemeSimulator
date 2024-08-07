@@ -54,7 +54,7 @@ public class Counter extends SchemaPart {
             throw new RuntimeException("Component " + id + " size must be positive number");
         }
         countMask = Utils.getMaskForSize(pinAmount);
-        addOutBus("Q", pinAmount, 0);
+        addOutBus("Q", pinAmount);
         if (reverse) {
             addInPin(new NoFloatingInPin("C", this) {
                 @Override

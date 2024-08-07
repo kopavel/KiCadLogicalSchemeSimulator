@@ -120,11 +120,18 @@ public class Multiplexer extends SchemaPart {
         for (byte i = 0; i < partsAmount; i++) {
             aliases[i] = 'Q' + String.valueOf((char) (((byte) 'A') + i));
         }
-        addOutBus("Q", partsAmount, 0, aliases);
+        addOutBus("Q", partsAmount, aliases);
     }
 
     @Override
     public void initOuts() {
         outBus = getOutBus("Q");
+    }
+
+    @Override
+    public void reset() {
+        outBus.state = 0;
+        outBus.hiImpedance = false;
+        outBus.setState(0);
     }
 }

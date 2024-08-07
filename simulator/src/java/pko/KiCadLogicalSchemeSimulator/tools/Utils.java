@@ -130,4 +130,12 @@ public class Utils {
         }
         return text.length() - text.stripLeading().length();
     }
+
+    public static String regexEscape(String input) {
+        String[] specialChars = {"\\", "^", "$", ".", "|", "?", "*", "+", "(", ")", "[", "{", "]", "}", ":", "!"};
+        for (String ch : specialChars) {
+            input = input.replace(ch, "\\" + ch);
+        }
+        return input;
+    }
 }

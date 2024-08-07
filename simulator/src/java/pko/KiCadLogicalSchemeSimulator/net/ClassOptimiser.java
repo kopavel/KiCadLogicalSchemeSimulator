@@ -41,24 +41,28 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.IntStream;
 
 import static pko.KiCadLogicalSchemeSimulator.tools.Utils.countLeadingSpaces;
+import static pko.KiCadLogicalSchemeSimulator.tools.Utils.regexEscape;
 
 //ToDo Maski menjat' na konstanti
 //ToDo iskljuchat' bloki celikom
-public class ClassOptimizer {
+public class ClassOptimiser {
     private final ClassPool pool = ClassPool.getDefault();
     private final StringBuilder init = new StringBuilder();
     private final Class<?> sourceJavaClass;
     private final CtClass sourceClass;
+    private final Map<String, String> binds = new HashMap<>();
     CtClass optimizedClass = null;
     private String suffix = "";
     private List<String> source;
     private int unrollSize;
 
-    public ClassOptimizer(Class<?> sourceJavaClass) {
+    public ClassOptimiser(Class<?> sourceJavaClass) {
         try {
             this.sourceJavaClass = sourceJavaClass;
             sourceClass = pool.get(sourceJavaClass.getName());
@@ -92,15 +96,21 @@ public class ClassOptimizer {
             public void setState(boolean newState) {
             }
         });
-        ClassOptimizer optimizer = new ClassOptimizer(OutPin.class);
+        ClassOptimiser optimizer = new ClassOptimiser(OutPin.class);
         optimizer.unroll(2);
         OutPin optimised = optimizer.build(source);
         System.out.println(optimised.getName());
     }
 
-    public ClassOptimizer unroll(int size) {
+    public ClassOptimiser unroll(int size) {
         unrollSize = size;
         suffix += "$unroll" + size;
+        return this;
+    }
+
+    public ClassOptimiser bind(String bindName, String replacement) {
+        binds.put(bindName, replacement);
+        suffix += "$" + bindName + ":" + replacement;
         return this;
     }
 
@@ -159,10 +169,11 @@ public class ClassOptimizer {
     }
 
     private void process() {
-        String iterator = null;
-        String variable = null;
+        String iteratorVariable = null;
         int methodOffset = -1;
         int iteratorOffset = -1;
+        String bindPattern = "";
+        String bindName = "";
         StringBuilder methodSource = new StringBuilder();
         StringBuilder iteratorSource = new StringBuilder();
         String methodName = "";
@@ -171,63 +182,74 @@ public class ClassOptimizer {
                 int lineOffset = countLeadingSpaces(line);
                 if (line.contains("/*Optimiser ")) {
                     String[] params = line.substring(line.indexOf("/*Optimiser ") + 12, line.lastIndexOf("*/")).split(" ");
-                    if (params[0].equals("iterator")) {
-                        if (params[1].contains("->")) {
-                            String[] split = params[1].split("->");
-                            iterator = split[0];
-                            variable = split[1];
-                        } else if (params[1].equals("unroll")) {
-                            iteratorOffset = lineOffset;
-                            iteratorSource = new StringBuilder();
-                        }
-                    }
-                    if (params[0].equals("override")) {
-                        methodOffset = lineOffset;
-                        methodSource = new StringBuilder();
-                    }
-                } else {
-                    if (iterator != null && line.contains("[] " + iterator + " ")) {
-                        CtField arrayField = sourceClass.getField(iterator);
-                        CtClass arrayType = arrayField.getType();
-                        CtClass variableType = arrayType.getComponentType();
-                        if (unrollSize == 0) {
-                            throw new RuntimeException("iterator size not provided");
-                        }
-                        init.append(iterator).append(" = $1.").append(iterator).append(";");
-                        for (int j = 0; j < unrollSize; j++) {
-                            CtField publicField = new CtField(variableType, variable + j, optimizedClass);
-                            publicField.setModifiers(Modifier.PUBLIC);
-                            optimizedClass.addField(publicField);
-                            init.append(variable).append(j).append(" = ").append(iterator).append("[").append(j).append("];");
-                        }
-                    }
-                    if (methodOffset >= 0) {
-                        if (lineOffset == methodOffset) {
-                            if (!line.trim().startsWith("@") && !line.trim().startsWith("}")) {
-                                methodName = line.substring(line.substring(0, line.indexOf('(')).lastIndexOf(' ') + 1, line.indexOf('('));
-                            }
-                        } else if (lineOffset > methodOffset) {
-                            if (iteratorOffset >= 1) {
-                                if (lineOffset > iteratorOffset) {
-                                    if (!line.trim().startsWith("assert ")) {
-                                        iteratorSource.append(line).append("\n");
-                                    }
-                                } else if (lineOffset == iteratorOffset && !iteratorSource.isEmpty()) {
-                                    if (unrollSize == 0) {
-                                        throw new RuntimeException("iterator size not provided");
-                                    }
-                                    for (int j = 0; j < unrollSize; j++) {
-                                        methodSource.append(iteratorSource.toString().replaceAll("\\b" + variable + "\\b", variable + j));
-                                    }
-                                    iteratorOffset = -1;
+                    switch (params[0]) {
+                        case "iterator" -> {
+                            if (params[1].contains("->")) {
+                                if (unrollSize == 0) {
+                                    throw new RuntimeException("iterator size not provided");
                                 }
-                            } else if (!line.trim().startsWith("assert ")) {
-                                methodSource.append(line).append("\n");
+                                String[] split = params[1].split("->");
+                                String iterator = split[0];
+                                iteratorVariable = split[1];
+                                CtField arrayField = sourceClass.getField(iterator);
+                                CtClass arrayType = arrayField.getType();
+                                CtClass variableType = arrayType.getComponentType();
+                                init.append(iterator).append(" = $1.").append(iterator).append(";");
+                                for (int j = 0; j < unrollSize; j++) {
+                                    CtField publicField = new CtField(variableType, iteratorVariable + j, optimizedClass);
+                                    publicField.setModifiers(Modifier.PUBLIC);
+                                    optimizedClass.addField(publicField);
+                                    init.append(iteratorVariable).append(j).append(" = ").append(iterator).append("[").append(j).append("];");
+                                }
+                            } else if (params[1].equals("unroll")) {
+                                iteratorOffset = lineOffset;
+                                iteratorSource = new StringBuilder();
                             }
-                        } else {
-                            methodOffset = -1;
-                            overrideMethod(methodName, methodSource.toString());
                         }
+                        case "override" -> {
+                            methodOffset = lineOffset;
+                            methodSource = new StringBuilder();
+                        }
+                        case "bind" -> {
+                            bindPattern = regexEscape(params[1]);
+                            bindName = bindPattern;
+                            if (params.length == 3) {
+                                bindName = params[2];
+                            }
+                        }
+                    }
+                } else if (methodOffset >= 0) {
+                    if (lineOffset == methodOffset) {
+                        if (!line.trim().startsWith("@") && !line.trim().startsWith("}")) {
+                            methodName = line.substring(line.substring(0, line.indexOf('(')).lastIndexOf(' ') + 1, line.indexOf('('));
+                        }
+                    } else if (lineOffset > methodOffset) {
+                        if (iteratorOffset >= 1) {
+                            if (lineOffset > iteratorOffset) {
+                                if (!line.trim().startsWith("assert ")) {
+                                    iteratorSource.append(line).append("\n");
+                                }
+                            } else if (lineOffset == iteratorOffset && !iteratorSource.isEmpty()) {
+                                if (unrollSize == 0) {
+                                    throw new RuntimeException("iterator size not provided");
+                                }
+                                for (int j = 0; j < unrollSize; j++) {
+                                    methodSource.append(iteratorSource.toString().replaceAll("\\b" + iteratorVariable + "\\b", iteratorVariable + j));
+                                }
+                                iteratorOffset = -1;
+                            }
+                        } else if (!line.trim().startsWith("assert ")) {
+                            if (!bindPattern.isBlank()) {
+                                line = line.replaceAll("(?<=\\W|^)" + bindPattern + "(?=\\W|$)", binds.get(bindName));
+                                bindPattern = "";
+                            }
+                            //FixMe define all method params in annotation or read all params from source
+                            line = line.replaceAll("\\bnewState\\b", "\\$1");
+                            methodSource.append(line).append("\n");
+                        }
+                    } else {
+                        methodOffset = -1;
+                        overrideMethod(methodName, methodSource.toString());
                     }
                 }
             }

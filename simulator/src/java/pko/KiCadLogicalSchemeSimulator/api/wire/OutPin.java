@@ -32,7 +32,7 @@
 package pko.KiCadLogicalSchemeSimulator.api.wire;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.net.ClassOptimizer;
+import pko.KiCadLogicalSchemeSimulator.net.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.net.wire.NCWire;
 import pko.KiCadLogicalSchemeSimulator.net.wire.WireToBusAdapter;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
@@ -101,7 +101,7 @@ public class OutPin extends Pin {
             for (int i = 0; i < destinations.length; i++) {
                 destinations[i] = destinations[i].getOptimised();
             }
-            return new ClassOptimizer(OutPin.class).unroll(destinations.length).build(this);
+            return new ClassOptimiser(OutPin.class).unroll(destinations.length).build(this);
         }
     }
 }
