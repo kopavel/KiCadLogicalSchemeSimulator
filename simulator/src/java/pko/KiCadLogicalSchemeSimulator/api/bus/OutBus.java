@@ -124,10 +124,7 @@ public class OutBus extends Bus {
         if (destinations.length == 0) {
             return new NCBus(this);
         } else if (destinations.length == 1) {
-            Bus optimised = destinations[0].getOptimised();
-            optimised.state = state;
-            optimised.hiImpedance = hiImpedance;
-            return optimised;
+            return destinations[0].getOptimised().copyState(this);
         } else {
             for (int i = 0; i < destinations.length; i++) {
                 destinations[i] = destinations[i].getOptimised();

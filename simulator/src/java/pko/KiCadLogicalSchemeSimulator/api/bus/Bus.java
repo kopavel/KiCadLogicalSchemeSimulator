@@ -43,14 +43,15 @@ import java.util.Set;
 public abstract class Bus extends ModelItem<Bus> {
     @Getter
     public final int size;
+    public final Map<String, Byte> aliasOffsets;
     public long state;
-    public Map<String, Byte> aliasOffsets = new HashMap<>();
     public boolean useBitPresentation;
 
     public Bus(Bus oldBus, String variantId) {
         this(oldBus.id, oldBus.parent, oldBus.size);
         this.variantId = variantId + (oldBus.variantId == null ? "" : ":" + oldBus.variantId);
-        aliasOffsets = oldBus.aliasOffsets;
+        aliasOffsets.clear();
+        aliasOffsets.putAll(oldBus.aliasOffsets);
         useBitPresentation = oldBus.useBitPresentation;
         state = oldBus.state;
         hiImpedance = oldBus.hiImpedance;
@@ -63,6 +64,7 @@ public abstract class Bus extends ModelItem<Bus> {
             if (size == 1) {
                 throw new RuntimeException("Use Pin for Bus with size 1:" + getName());
             } else {
+                aliasOffsets = new HashMap<>();
                 for (byte i = 0; i < size; i++) {
                     aliasOffsets.put(id + i, i);
                 }
@@ -72,6 +74,7 @@ public abstract class Bus extends ModelItem<Bus> {
         } else if (size == 1) {
             aliasOffsets = Collections.singletonMap(id, (byte) 0);
         } else {
+            aliasOffsets = new HashMap<>();
             for (byte i = 0; i < aliases.length; i++) {
                 aliasOffsets.put(aliases[i], i);
             }

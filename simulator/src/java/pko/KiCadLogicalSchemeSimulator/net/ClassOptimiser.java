@@ -196,9 +196,9 @@ public class ClassOptimiser {
                                 CtClass variableType = arrayType.getComponentType();
                                 init.append(iterator).append(" = $1.").append(iterator).append(";");
                                 for (int j = 0; j < unrollSize; j++) {
-                                    CtField publicField = new CtField(variableType, iteratorVariable + j, optimizedClass);
-                                    publicField.setModifiers(Modifier.PUBLIC);
-                                    optimizedClass.addField(publicField);
+                                    CtField field = new CtField(variableType, iteratorVariable + j, optimizedClass);
+                                    field.setModifiers(Modifier.PRIVATE | Modifier.FINAL);
+                                    optimizedClass.addField(field);
                                     init.append(iteratorVariable).append(j).append(" = ").append(iterator).append("[").append(j).append("];");
                                 }
                             } else if (params[1].equals("unroll")) {

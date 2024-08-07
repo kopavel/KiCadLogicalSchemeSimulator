@@ -36,7 +36,8 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
 public class NCBus extends OutBus {
     public NCBus(OutBus outPin) {
         super(outPin.id, outPin.parent, outPin.size);
-        aliasOffsets = outPin.aliasOffsets;
+        aliasOffsets.clear();
+        aliasOffsets.putAll(outPin.aliasOffsets);
     }
 
     @Override

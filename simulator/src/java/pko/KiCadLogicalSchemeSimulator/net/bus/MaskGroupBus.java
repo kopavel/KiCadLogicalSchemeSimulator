@@ -59,7 +59,7 @@ public class MaskGroupBus extends OutBus {
         /*Optimiser bind mask*/
         final long maskState = newState & mask;
         /*Optimiser bind destinations[0] d*/
-        if (destinations[0].hiImpedance || this.maskState != maskState) {
+        if (this.maskState != maskState || destinations[0].hiImpedance) {
             this.maskState = maskState;
             /*Optimiser iterator unroll*/
             for (Bus destination : destinations) {

@@ -55,7 +55,7 @@ public class BusToWiresAdapter extends OutBus {
         /*Optimiser bind mask*/
         final long mState = newState & mask;
         /*Optimiser bind destinations[0] d*/
-        if (destinations[0].hiImpedance || maskState != mState) {
+        if (maskState != mState || destinations[0].hiImpedance) {
             maskState = mState;
             /*Optimiser iterator unroll*/
             for (Pin destination : destinations) {
