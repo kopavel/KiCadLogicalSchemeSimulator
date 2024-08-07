@@ -69,7 +69,7 @@ public class OffsetBus extends Bus {
     public Bus getOptimised() {
         destination = destination.getOptimised();
         if (offset > 0) {
-            return new OffsetBus(this, offset) {
+            return new OffsetBus(destination, offset) {
                 @Override
                 public void setState(long newState) {
                     hiImpedance = false;
@@ -77,7 +77,7 @@ public class OffsetBus extends Bus {
                 }
             };
         } else {
-            return new OffsetBus(this, offset) {
+            return new OffsetBus(destination, offset) {
                 @Override
                 public void setState(long newState) {
                     hiImpedance = false;

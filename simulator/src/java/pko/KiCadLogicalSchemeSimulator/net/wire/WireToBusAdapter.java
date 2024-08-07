@@ -38,6 +38,7 @@ public class WireToBusAdapter extends OutPin {
     public long mask;
     private Bus destination;
 
+    //FixMe use multi destinations
     public WireToBusAdapter(Bus destination, byte offset) {
         super(destination.id, destination.parent);
         variantId = "WireToBasAdapter:offset" + offset;

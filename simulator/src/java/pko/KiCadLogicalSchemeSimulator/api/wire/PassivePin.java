@@ -42,10 +42,6 @@ public abstract class PassivePin extends OutPin {
         super(id, parent);
     }
 
-    public PassivePin(OutPin oldPin, String variantId) {
-        super(oldPin, variantId);
-    }
-
     @Override
     abstract public void setState(boolean newState);
     @Override

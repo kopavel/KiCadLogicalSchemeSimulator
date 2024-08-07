@@ -47,6 +47,7 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
 
     protected Switch(String id, String sParams) {
         super(id, sParams);
+        //FixMe create non abstract class as Switch Pin, so can use optimizer on it.
         pin1 = addPassivePin(new PassivePin("IN1", this) {
             @Override
             public void setHiImpedance() {
@@ -146,6 +147,7 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
                 //second pin are weak but we are strong
                 pin1.state = newState;
                 pin1.strong = true;
+                //FixMe move to passive pin itself and make unroll
                 for (Pin destination : pin1.destinations) {
                     if (destination.state != newState || !destination.strong) {
                         destination.state = newState;
