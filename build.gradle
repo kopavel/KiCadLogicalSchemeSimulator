@@ -77,14 +77,6 @@ configure(subprojects) {
                 srcDirs = ["src/resources"]
             }
         }
-        test {
-            java {
-                srcDirs = []
-            }
-            resources {
-                srcDirs = []
-            }
-        }
     }
 
     dependencies {

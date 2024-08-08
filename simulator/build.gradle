@@ -58,7 +58,8 @@ dependencies {
     implementation libs.jackson.jaxb.annotations
     implementation libs.javaassist
     implementation libs.picocli
-
+    testImplementation libs.jmh
+    testAnnotationProcessor libs.jmh.annotations
 }
 
 jar {
