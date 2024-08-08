@@ -234,7 +234,9 @@ public class ClassOptimiser {
                                     throw new RuntimeException("iterator size not provided");
                                 }
                                 for (int j = 0; j < unrollSize; j++) {
-                                    methodSource.append(iteratorSource.toString().replaceAll("\\b" + iteratorVariable + "\\b", iteratorVariable + j));
+                                    methodSource.append(iteratorSource.toString()
+                                                                      .replaceAll("\\b" + iteratorVariable + "\\b", iteratorVariable + j)
+                                                                      .replaceAll("\\bnewState\\b", "\\$1"));
                                 }
                                 iteratorOffset = -1;
                             }
