@@ -31,14 +31,14 @@
  */
 package pko.KiCadLogicalSchemeSimulator.test.benchmarks;
 import org.openjdk.jmh.annotations.*;
+import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
+import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api.wire.OutPin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 
 import java.util.concurrent.TimeUnit;
 
 @State(Scope.Benchmark)
-public class OutPinBenchmark {
+public class MaskGroupBenchmark {
     @Benchmark
     @Fork(value = 1)
     @Warmup(iterations = 1, time = 15)
@@ -48,7 +48,7 @@ public class OutPinBenchmark {
         BenchmarkRunner.doWork(state.out);
     }
 
-    @Benchmark
+    @org.openjdk.jmh.annotations.Benchmark
     @Fork(value = 1)
     @Warmup(iterations = 1, time = 15)
     @Measurement(iterations = 3, time = 15)
@@ -59,7 +59,7 @@ public class OutPinBenchmark {
 
     @State(Scope.Thread)
     public static class StateForJavac {
-        Pin out;
+        Bus out;
 
         @Setup(Level.Trial)
         public void setUp() {
@@ -68,9 +68,9 @@ public class OutPinBenchmark {
                 public void initOuts() {
                 }
             };
-            out = new OutPin("test", testPart);
+            out = new OutBus("test", testPart, 5);
             for (int i = 0; i < 5; i++) {
-                ((OutPin) out).addDestination(testPart.addInPin("in" + i));
+                ((OutBus) out).addDestination(testPart.addInBus("in" + i, 5), 0b1111, (byte) 0);
             }
             out = out.getOptimised();
         }
@@ -78,7 +78,7 @@ public class OutPinBenchmark {
 
     @State(Scope.Thread)
     public static class StateForOptimiser {
-        Pin out;
+        Bus out;
 
         @Setup(Level.Trial)
         public void setUp() {
@@ -87,10 +87,11 @@ public class OutPinBenchmark {
                 public void initOuts() {
                 }
             };
-            out = new OutPin("test", testPart);
+            out = new OutBus("test", testPart, 5);
             for (int i = 0; i < 5; i++) {
-                ((OutPin) out).addDestination(testPart.addInPin("in" + i));
+                ((OutBus) out).addDestination(testPart.addInBus("in" + i, 5), 0b1111, (byte) 0);
             }
+            System.out.println("mask are:" + ((OutBus) out).mask);
             out = out.getOptimised();
         }
     }

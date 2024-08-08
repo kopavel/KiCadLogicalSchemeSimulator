@@ -121,8 +121,34 @@ public class OutBus extends Bus {
             return new NCBus(this);
         } else if (destinations.length == 1) {
             return destinations[0].getOptimised().copyState(this);
+        } else if (parent.id.equals("javac")) {
+            Bus d1 = destinations[0].getOptimised();
+            Bus d2 = destinations[1].getOptimised();
+            Bus d3 = destinations[2].getOptimised();
+            Bus d4 = destinations[3].getOptimised();
+            Bus d5 = destinations[4].getOptimised();
+            return new OutBus(this, "unroll5") {
+                @Override
+                public void setState(long newState) {
+                    d1.setState(state);
+                    d2.setState(state);
+                    d3.setState(state);
+                    d4.setState(state);
+                    d5.setState(state);
+                }
+
+                @Override
+                public void setHiImpedance() {
+                    d1.setHiImpedance();
+                    d2.setHiImpedance();
+                    d3.setHiImpedance();
+                    d4.setHiImpedance();
+                    d5.setHiImpedance();
+                }
+            };
         } else {
             for (int i = 0; i < destinations.length; i++) {
+                System.out.println("get optimal for " + destinations[i].getClass().getName());
                 destinations[i] = destinations[i].getOptimised();
             }
             return new ClassOptimiser(OutBus.class).unroll(destinations.length).build(this);

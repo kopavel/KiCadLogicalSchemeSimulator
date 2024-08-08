@@ -116,10 +116,7 @@ public class ClassOptimiser {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> T build(T originalInstance) {
-        if (suffix.isBlank()) {
-            return originalInstance;
-        }
+    public <T, R extends T> R build(T originalInstance) {
         try {
             CtClass originalClass = pool.get(originalInstance.getClass().getName());
             String optimizedClassName = originalInstance.getClass().getName() + suffix;
@@ -134,7 +131,7 @@ public class ClassOptimiser {
             if (optimizedClass != null) {
                 // Create a new constructor
                 if (!hasConstructor(sourceClass, sourceJavaClass, String.class)) {
-                    throw new RuntimeException("Can't fins \"clone\" constructor for class" + sourceJavaClass.getName());
+                    throw new RuntimeException("Can't find \"clone\" constructor for class" + sourceJavaClass.getName());
                 }
                 CtConstructor constructor = new CtConstructor(new CtClass[]{pool.get(originalInstance.getClass().getName())}, optimizedClass);
                 String constructorBody = "{ super($1,\"" + suffix + "\"); " + init + "}";
@@ -153,7 +150,7 @@ public class ClassOptimiser {
                 dynamicClass = Class.forName(optimizedClassName);
             }
             // Create an instance and invoke the overridden method
-            return (T) dynamicClass.getDeclaredConstructor(originalInstance.getClass()).newInstance(originalInstance);
+            return (R) dynamicClass.getDeclaredConstructor(originalInstance.getClass()).newInstance(originalInstance);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

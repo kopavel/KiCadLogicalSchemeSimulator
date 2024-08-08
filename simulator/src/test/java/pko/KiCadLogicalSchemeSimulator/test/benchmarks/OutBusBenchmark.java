@@ -39,31 +39,22 @@ import java.util.concurrent.TimeUnit;
 
 @State(Scope.Benchmark)
 public class OutBusBenchmark {
-    @org.openjdk.jmh.annotations.Benchmark
+    @Benchmark
     @Fork(value = 1)
-    @Warmup(iterations = 1, time = 5)
-    @Measurement(iterations = 3, time = 5)
-    @OutputTimeUnit(TimeUnit.SECONDS)
-    public void iterator(StateForIterator state) {
-        Benchmark.doWork(state.out);
-    }
-
-    @org.openjdk.jmh.annotations.Benchmark
-    @Fork(value = 1)
-    @Warmup(iterations = 1, time = 5)
-    @Measurement(iterations = 3, time = 5)
+    @Warmup(iterations = 1, time = 15)
+    @Measurement(iterations = 3, time = 15)
     @OutputTimeUnit(TimeUnit.SECONDS)
     public void javac(StateForJavac state) {
-        Benchmark.doWork(state.out);
+        BenchmarkRunner.doWork(state.out);
     }
 
-    @org.openjdk.jmh.annotations.Benchmark
+    @Benchmark
     @Fork(value = 1)
-    @Warmup(iterations = 1, time = 5)
-    @Measurement(iterations = 3, time = 5)
+    @Warmup(iterations = 1, time = 15)
+    @Measurement(iterations = 3, time = 15)
     @OutputTimeUnit(TimeUnit.SECONDS)
     public void optimiser(StateForOptimiser state) {
-        Benchmark.doWork(state.out);
+        BenchmarkRunner.doWork(state.out);
     }
 
     @State(Scope.Thread)

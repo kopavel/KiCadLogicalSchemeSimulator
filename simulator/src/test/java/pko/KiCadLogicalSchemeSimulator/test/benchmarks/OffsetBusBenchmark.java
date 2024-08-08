@@ -29,56 +29,42 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.net.wire;
+package pko.KiCadLogicalSchemeSimulator.test.benchmarks;
+import org.openjdk.jmh.annotations.*;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.api.wire.OutPin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.net.ClassOptimiser;
+import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
+import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 
-public class WireToBusAdapter extends OutPin {
-    public final long mask;
-    public Bus destination;
+import java.util.concurrent.TimeUnit;
 
-    //FixMe use multi destinations and Optimiser
-    public WireToBusAdapter(Bus destination, byte offset) {
-        super(destination.id, destination.parent);
-        variantId = "WireToBasAdapter:offset" + offset;
-        mask = 1L << offset;
-        this.destination = destination;
+@State(Scope.Benchmark)
+public class OffsetBusBenchmark {
+    @Benchmark
+    @Fork(value = 1)
+    @Warmup(iterations = 1, time = 15)
+    @Measurement(iterations = 3, time = 15)
+    @OutputTimeUnit(TimeUnit.SECONDS)
+    public void optimiser(StateForOptimiser state) {
+        BenchmarkRunner.doWork(state.out);
     }
 
-    public WireToBusAdapter(WireToBusAdapter oldPin, String variantId) {
-        super(oldPin, variantId);
-        destination = oldPin.destination;
-        mask = oldPin.mask;
-    }
+    @State(Scope.Thread)
+    public static class StateForOptimiser {
+        Bus out;
 
-    @Override
-    public void addDestination(Pin pin) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void addDestination(Bus bus, byte offset) {
-        throw new UnsupportedOperationException();
-    }
-
-    /*Optimiser override*/
-    @Override
-    public void setState(boolean newState) {
-        /*Optimiser bind mask*/
-        destination.setState(newState ? mask : 0L);
-    }
-
-    @Override
-    public void setHiImpedance() {
-        assert !hiImpedance : "Already in hiImpedance:" + this;
-        destination.setHiImpedance();
-    }
-
-    @Override
-    public Pin getOptimised() {
-        destination = destination.getOptimised();
-        return new ClassOptimiser(WireToBusAdapter.class).bind("mask", String.valueOf(mask)).build(this);
+        @Setup(Level.Trial)
+        public void setUp() {
+            SchemaPart testPart = new SchemaPart("Optimiser", "") {
+                @Override
+                public void initOuts() {
+                }
+            };
+            out = new OutBus("test", testPart, 5);
+            for (int i = 0; i < 5; i++) {
+                ((OutBus) out).addDestination(testPart.addInBus("in" + i, 7), 0b11111, (byte) 2);
+            }
+            System.out.println("mask are:" + ((OutBus) out).mask);
+            out = out.getOptimised();
+        }
     }
 }

@@ -35,7 +35,7 @@ import pko.KiCadLogicalSchemeSimulator.net.ClassOptimiser;
 
 public class OffsetBus extends Bus {
     private final byte offset;
-    private Bus destination;
+    protected Bus destination;
 
     public OffsetBus(Bus destination, byte offset) {
         super(destination, "offset" + offset);
@@ -53,6 +53,7 @@ public class OffsetBus extends Bus {
         destination = oldBus.destination;
     }
 
+    /*Optimiser override*/
     @Override
     public void setState(long newState) {
         /*Optimiser bind offset*/
