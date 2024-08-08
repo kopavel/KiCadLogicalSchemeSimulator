@@ -34,10 +34,6 @@
 		</RollingRandomAccessFile>
 	</Appenders>
 	<Loggers>
-		<Root level="INFO">
-			<AppenderRef ref="FILE"/>
-			<AppenderRef ref="STDOUT" level="INFO"/>
-		</Root>
 		<logger name="pko.KiCadLogicalSchemeSimulator.net.merger" level="TRACE" additivity="false">
 			<AppenderRef ref="MFILE"/>
 			<AppenderRef ref="STDOUT"/>
@@ -46,5 +42,9 @@
 			<AppenderRef ref="FILE"/>
 			<AppenderRef ref="STDOUT"/>
 		</logger>
+		<Root level="INFO">
+			<AppenderRef ref="FILE"/>
+			<AppenderRef ref="STDOUT"/>
+		</Root>
 	</Loggers>
 </Configuration>

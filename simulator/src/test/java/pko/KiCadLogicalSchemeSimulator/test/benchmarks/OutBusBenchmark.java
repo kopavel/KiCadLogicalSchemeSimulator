@@ -39,31 +39,31 @@ import java.util.concurrent.TimeUnit;
 
 @State(Scope.Benchmark)
 public class OutBusBenchmark {
-    @Benchmark
+    @org.openjdk.jmh.annotations.Benchmark
     @Fork(value = 1)
     @Warmup(iterations = 1, time = 5)
     @Measurement(iterations = 3, time = 5)
     @OutputTimeUnit(TimeUnit.SECONDS)
     public void iterator(StateForIterator state) {
-        Runner.doWork(state.out);
+        Benchmark.doWork(state.out);
     }
 
-    @Benchmark
+    @org.openjdk.jmh.annotations.Benchmark
     @Fork(value = 1)
     @Warmup(iterations = 1, time = 5)
     @Measurement(iterations = 3, time = 5)
     @OutputTimeUnit(TimeUnit.SECONDS)
     public void javac(StateForJavac state) {
-        Runner.doWork(state.out);
+        Benchmark.doWork(state.out);
     }
 
-    @Benchmark
+    @org.openjdk.jmh.annotations.Benchmark
     @Fork(value = 1)
     @Warmup(iterations = 1, time = 5)
     @Measurement(iterations = 3, time = 5)
     @OutputTimeUnit(TimeUnit.SECONDS)
     public void optimiser(StateForOptimiser state) {
-        Runner.doWork(state.out);
+        Benchmark.doWork(state.out);
     }
 
     @State(Scope.Thread)
@@ -79,7 +79,7 @@ public class OutBusBenchmark {
             };
             out = new OutBus("test", testPart, 5);
             for (int i = 0; i < 5; i++) {
-                ((OutBus) out).addDestination(testPart.addInBus("in" + i, 5), 0x31, (byte) 0);
+                ((OutBus) out).addDestination(testPart.addInBus("in" + i, 5), 0b11111, (byte) 0);
             }
         }
     }
@@ -97,7 +97,7 @@ public class OutBusBenchmark {
             };
             out = new OutBus("test", testPart, 5);
             for (int i = 0; i < 5; i++) {
-                ((OutBus) out).addDestination(testPart.addInBus("in" + i, 5), 0x31, (byte) 0);
+                ((OutBus) out).addDestination(testPart.addInBus("in" + i, 5), 0b11111, (byte) 0);
             }
             out = out.getOptimised();
         }
@@ -116,8 +116,9 @@ public class OutBusBenchmark {
             };
             out = new OutBus("test", testPart, 5);
             for (int i = 0; i < 5; i++) {
-                ((OutBus) out).addDestination(testPart.addInBus("in" + i, 5), 0x31, (byte) 0);
+                ((OutBus) out).addDestination(testPart.addInBus("in" + i, 5), 0b11111, (byte) 0);
             }
+            System.out.println("mask are:" + ((OutBus) out).mask);
             out = out.getOptimised();
         }
     }

@@ -34,6 +34,7 @@ import javassist.*;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.OutPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
+import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -115,7 +116,10 @@ public class ClassOptimiser {
     }
 
     @SuppressWarnings("unchecked")
-    public <T, R extends T> R build(T originalInstance) {
+    public <T> T build(T originalInstance) {
+        if (suffix.isBlank()) {
+            return originalInstance;
+        }
         try {
             CtClass originalClass = pool.get(originalInstance.getClass().getName());
             String optimizedClassName = originalInstance.getClass().getName() + suffix;
@@ -149,7 +153,7 @@ public class ClassOptimiser {
                 dynamicClass = Class.forName(optimizedClassName);
             }
             // Create an instance and invoke the overridden method
-            return (R) dynamicClass.getDeclaredConstructor(originalInstance.getClass()).newInstance(originalInstance);
+            return (T) dynamicClass.getDeclaredConstructor(originalInstance.getClass()).newInstance(originalInstance);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -272,6 +276,7 @@ public class ClassOptimiser {
     }
 
     private void overrideMethod(String methodName, String methodSource) throws CannotCompileException, NotFoundException {
+        Log.debug(ClassOptimiser.class, "Override class:method {}:{}\n{}", sourceJavaClass.getName(), methodName, methodSource);
         // Override the method
         CtMethod originalMethod = sourceClass.getDeclaredMethod(methodName);
         CtMethod newMethod = new CtMethod(originalMethod, optimizedClass, null);

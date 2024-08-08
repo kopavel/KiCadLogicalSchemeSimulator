@@ -35,13 +35,13 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 
 import java.io.IOException;
 
-public class Runner {
+public class Benchmark {
     public static void main(String[] args) throws IOException {
         String[] benchmarks = {//
-                "pko.KiCadLogicalSchemeSimulator.test.benchmarks.OutPinBenchmark.iterator",//
+//                "pko.KiCadLogicalSchemeSimulator.test.benchmarks.OutPinBenchmark.iterator",//
 //                "pko.KiCadLogicalSchemeSimulator.test.benchmarks.OutPinBenchmark.javac",//
-                "pko.KiCadLogicalSchemeSimulator.test.benchmarks.OutPinBenchmark.optimiser",//
-                "pko.KiCadLogicalSchemeSimulator.test.benchmarks.OutBusBenchmark.iterator",//
+//                "pko.KiCadLogicalSchemeSimulator.test.benchmarks.OutPinBenchmark.optimiser",//
+//                "pko.KiCadLogicalSchemeSimulator.test.benchmarks.OutBusBenchmark.iterator",//
 //                "pko.KiCadLogicalSchemeSimulator.test.benchmarks.OutPinBenchmark.javac",//
                 "pko.KiCadLogicalSchemeSimulator.test.benchmarks.OutBusBenchmark.optimiser"//
         };

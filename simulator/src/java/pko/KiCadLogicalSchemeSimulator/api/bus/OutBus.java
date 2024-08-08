@@ -37,13 +37,10 @@ import pko.KiCadLogicalSchemeSimulator.net.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.net.bus.*;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 /*Optimiser iterator destinations->destination*/
 public class OutBus extends Bus {
-    private final List<Pin> pins = new ArrayList<>();
     public Bus[] destinations = new Bus[0];
     public long mask;
 
@@ -81,8 +78,7 @@ public class OutBus extends Bus {
     }
 
     public void addDestination(Pin pin, long mask) {
-        assert !pins.contains(pin);
-        pins.add(pin);
+        //FixMe try add "no mask" adapter to mask group and replace if it's only one in group with masked one on optimisation
         Arrays.stream(destinations)
                 .filter(d -> d instanceof BusToWiresAdapter)
                 .map(d -> ((BusToWiresAdapter) d))
