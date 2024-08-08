@@ -148,7 +148,6 @@ public class OutBus extends Bus {
             };
         } else {
             for (int i = 0; i < destinations.length; i++) {
-                System.out.println("get optimal for " + destinations[i].getClass().getName());
                 destinations[i] = destinations[i].getOptimised();
             }
             return new ClassOptimiser(OutBus.class).unroll(destinations.length).build(this);

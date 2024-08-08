@@ -100,7 +100,6 @@ public class ClassOptimiser {
         ClassOptimiser optimizer = new ClassOptimiser(OutPin.class);
         optimizer.unroll(2);
         OutPin optimised = optimizer.build(source);
-        System.out.println(optimised.getName());
     }
 
     public ClassOptimiser unroll(int size) {

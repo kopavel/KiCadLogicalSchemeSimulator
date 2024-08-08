@@ -91,7 +91,6 @@ public class MaskGroupBenchmark {
             for (int i = 0; i < 5; i++) {
                 ((OutBus) out).addDestination(testPart.addInBus("in" + i, 5), 0b1111, (byte) 0);
             }
-            System.out.println("mask are:" + ((OutBus) out).mask);
             out = out.getOptimised();
         }
     }

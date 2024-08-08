@@ -109,7 +109,6 @@ public class OutBusBenchmark {
             for (int i = 0; i < 5; i++) {
                 ((OutBus) out).addDestination(testPart.addInBus("in" + i, 5), 0b11111, (byte) 0);
             }
-            System.out.println("mask are:" + ((OutBus) out).mask);
             out = out.getOptimised();
         }
     }
