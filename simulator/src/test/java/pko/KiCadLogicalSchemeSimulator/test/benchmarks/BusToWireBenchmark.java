@@ -34,6 +34,7 @@ import org.openjdk.jmh.annotations.*;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.net.bus.BusToWiresAdapter;
 
 import java.util.concurrent.TimeUnit;
 
@@ -59,9 +60,9 @@ public class BusToWireBenchmark {
                 public void initOuts() {
                 }
             };
-            out = new OutBus("test", testPart, 5);
+            out = new BusToWiresAdapter(new OutBus("test", testPart, 4), 0b10);
             for (int i = 0; i < 5; i++) {
-                ((OutBus) out).addDestination(testPart.addInPin("in" + i), 0b10);
+                ((BusToWiresAdapter) out).addDestination(testPart.addInPin("in" + i));
             }
             out = out.getOptimised();
         }
