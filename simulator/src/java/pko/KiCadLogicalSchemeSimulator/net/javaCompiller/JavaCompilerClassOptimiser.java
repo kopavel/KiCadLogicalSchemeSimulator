@@ -34,6 +34,7 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
 import pko.KiCadLogicalSchemeSimulator.net.bus.BusToWiresAdapter;
+import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -113,9 +114,13 @@ public class JavaCompilerClassOptimiser<T> {
                 if (!hasConstructor(oldInstance.getClass(), oldInstance.getClass(), String.class)) {
                     throw new RuntimeException("Can't find \"clone\" constructor for class" + oldInstance.getClass().getName());
                 }
+                Log.trace(JavaCompiler.class, "Load source for {}", oldInstance.getClass().getSimpleName());
                 loadSource(oldInstance.getClass());
+                Log.trace(JavaCompiler.class, "Process");
                 String optimisedSource = process();
+                Log.trace(JavaCompiler.class, "Compile");
                 JavaCompiler.compileJavaSource(oldInstance.getClass(), optimizedClassName, optimisedSource);
+                Log.trace(JavaCompiler.class, "Return instance");
                 dynamicClass = Class.forName(oldInstance.getClass().getName() + suffix);
             }
             // Create an instance and invoke the overridden method

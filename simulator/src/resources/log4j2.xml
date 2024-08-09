@@ -38,9 +38,9 @@
 			<AppenderRef ref="MFILE"/>
 			<AppenderRef ref="STDOUT"/>
 		</logger>
-		<logger name="pko" level="DEBUG" additivity="false">
+		<logger name="pko" level="TRACE" additivity="false">
 			<AppenderRef ref="FILE"/>
-			<AppenderRef ref="STDOUT"/>
+			<AppenderRef ref="STDOUT" level="DEBUG"/>
 		</logger>
 		<Root level="INFO">
 			<AppenderRef ref="FILE"/>

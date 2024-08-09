@@ -52,6 +52,7 @@ public class JavaCompiler {
     private static final Method privateLookupInMethod;
     private static final MethodHandles.Lookup lookup;
     private static final javax.tools.JavaCompiler compiler;
+    private static final List<String> optionList;
     static {
         try {
             lookup = MethodHandles.lookup();
@@ -63,6 +64,15 @@ public class JavaCompiler {
             if (compiler == null) {
                 throw new IllegalStateException("No Java compiler available");
             }
+            String path = JavaCompiler.class.getProtectionDomain().getCodeSource().getLocation().getFile();
+            if (System.getProperty("os.name").toLowerCase().contains("win") && path.startsWith("/")) {
+                path = path.substring(1);
+            }
+            Log.info(JavaCompiler.class, "Use class path for compiler: {}", path);
+            optionList = new ArrayList<>();
+            optionList.add("-cp");
+            optionList.add(path);
+            optionList.add("-proc:none");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -99,17 +109,8 @@ public class JavaCompiler {
     public static boolean compileJavaSource(Class<?> srcClass,
             String className,
             String sourceCode) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
-        Log.debug(JavaCompiler.class, "Compile source \n{}", sourceCode);
+        Log.trace(JavaCompiler.class, "Compile source \n{}", sourceCode);
         InMemoryJavaFileManager fileManager = new InMemoryJavaFileManager(compiler.getStandardFileManager(null, null, null));
-        List<String> optionList = new ArrayList<>();
-        if (System.getProperty("jdk.module.path") != null) {
-            optionList.add("-cp");
-            optionList.add(System.getProperty("jdk.module.path"));
-        } else if (System.getProperty("java.class.path") != null) {
-            optionList.add("-cp");
-            optionList.add(System.getProperty("java.class.path"));
-        }
-        optionList.add("-proc:none");
         JavaFileObject javaFileObject = new InMemoryJavaFileObject(className, sourceCode);
         List<JavaFileObject> javaFileObjects = Collections.singletonList(javaFileObject);
         javax.tools.JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, null, optionList, null, javaFileObjects);
