@@ -32,10 +32,10 @@
 package pko.KiCadLogicalSchemeSimulator.net.bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.net.ClassOptimiser;
+import pko.KiCadLogicalSchemeSimulator.net.javaCompiller.JavaCompilerClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
-/*Optimiser iterator destinations->destination*/
+/*Optimiser unroll destination:destinations*/
 public class BusToWiresAdapter extends OutBus {
     public Pin[] destinations = new Pin[0];
     public long maskState;
@@ -44,32 +44,30 @@ public class BusToWiresAdapter extends OutBus {
         super(oldBus, variantId);
     }
 
+    public BusToWiresAdapter(OutBus oldBus, String variantId) {
+        super(oldBus, variantId);
+    }
+
     public BusToWiresAdapter(OutBus outBus, long mask) {
         super(outBus, "BusToWire");
         this.mask = mask;
     }
 
-    /*Optimiser override*/
     @Override
     public void setState(long newState) {
-        /*Optimiser bind mask*/
-        final long mState = newState & mask;
-        /*Optimiser bind destinations[0] d*/
-        if (maskState != mState || destinations[0].hiImpedance) {
-            maskState = mState;
+        /*Optimiser bind d:destinations[0] bind mask*/
+        if (maskState != (newState & mask) || destinations[0].hiImpedance) {
+            maskState = newState & mask;
             final boolean dState = maskState != 0;
-            /*Optimiser iterator unroll*/
             for (Pin destination : destinations) {
                 destination.setState(dState);
             }
         }
     }
 
-    /*Optimiser override*/
     @Override
     public void setHiImpedance() {
         assert !hiImpedance : "Already in hiImpedance:" + this;
-        /*Optimiser iterator unroll*/
         for (Pin destination : destinations) {
             destination.setHiImpedance();
         }
@@ -87,7 +85,7 @@ public class BusToWiresAdapter extends OutBus {
             for (int i = 0; i < destinations.length; i++) {
                 destinations[i] = destinations[i].getOptimised();
             }
-            return new ClassOptimiser(BusToWiresAdapter.class).unroll(destinations.length).bind("mask", String.valueOf(mask)).bind("d", "destination0").build(this);
+            return new JavaCompilerClassOptimiser<>(this).unroll(destinations.length).bind("mask", String.valueOf(mask)).bind("d", "destination0").build();
         }
     }
 }

@@ -33,13 +33,13 @@ package pko.KiCadLogicalSchemeSimulator.api.bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.in.CorrectedInBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.net.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.net.bus.*;
+import pko.KiCadLogicalSchemeSimulator.net.javaCompiller.JavaCompilerClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 import java.util.Arrays;
 
-/*Optimiser iterator destinations->destination*/
+/*Optimiser unroll destination:destinations*/
 public class OutBus extends Bus {
     public Bus[] destinations = new Bus[0];
     public long mask;
@@ -89,20 +89,16 @@ public class OutBus extends Bus {
               }).addDestination(pin);
     }
 
-    /*Optimiser override*/
     @Override
     public void setState(long newState) {
-        /*Optimiser iterator unroll*/
         for (Bus destination : destinations) {
             destination.setState(state);
         }
     }
 
-    /*Optimiser override*/
     @Override
     public void setHiImpedance() {
         assert !hiImpedance : "Already in hiImpedance:" + this;
-        /*Optimiser iterator unroll*/
         for (Bus destination : destinations) {
             destination.setHiImpedance();
         }
@@ -150,7 +146,7 @@ public class OutBus extends Bus {
             for (int i = 0; i < destinations.length; i++) {
                 destinations[i] = destinations[i].getOptimised();
             }
-            return new ClassOptimiser(OutBus.class).unroll(destinations.length).build(this);
+            return new JavaCompilerClassOptimiser<>(this).unroll(destinations.length).build();
         }
     }
 }

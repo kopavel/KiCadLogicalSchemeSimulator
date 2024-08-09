@@ -40,11 +40,11 @@ public class BenchmarkRunner {
         String[] benchmarks = {//
 //                "pko.KiCadLogicalSchemeSimulator.test.benchmarks.OutPinBenchmark.javac",//
 //                "pko.KiCadLogicalSchemeSimulator.test.benchmarks.OutBusBenchmark.javac",//
-                "pko.KiCadLogicalSchemeSimulator.test.benchmarks.OutPinBenchmark.optimiser",//
-                "pko.KiCadLogicalSchemeSimulator.test.benchmarks.OutBusBenchmark.optimiser",//
-                "pko.KiCadLogicalSchemeSimulator.test.benchmarks.MaskGroupBenchmark.optimiser",//
-                "pko.KiCadLogicalSchemeSimulator.test.benchmarks.OffsetBusBenchmark.optimiser",//
-                "pko.KiCadLogicalSchemeSimulator.test.benchmarks.WireToBusBenchmark.optimiser",//
+//                "pko.KiCadLogicalSchemeSimulator.test.benchmarks.OutPinBenchmark.optimiser",//
+//                "pko.KiCadLogicalSchemeSimulator.test.benchmarks.OutBusBenchmark.optimiser",//
+//                "pko.KiCadLogicalSchemeSimulator.test.benchmarks.MaskGroupBenchmark.optimiser",//
+//                "pko.KiCadLogicalSchemeSimulator.test.benchmarks.OffsetBusBenchmark.optimiser",//
+//                "pko.KiCadLogicalSchemeSimulator.test.benchmarks.WireToBusBenchmark.optimiser",//
                 "pko.KiCadLogicalSchemeSimulator.test.benchmarks.BusToWireBenchmark.optimiser"//
         };
         org.openjdk.jmh.Main.main(benchmarks);

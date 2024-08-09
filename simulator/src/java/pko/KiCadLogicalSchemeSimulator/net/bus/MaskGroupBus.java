@@ -32,10 +32,10 @@
 package pko.KiCadLogicalSchemeSimulator.net.bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
-import pko.KiCadLogicalSchemeSimulator.net.ClassOptimiser;
+import pko.KiCadLogicalSchemeSimulator.net.javaCompiller.JavaCompilerClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
-/*Optimiser iterator destinations->destination*/
+/*Optimiser unroll destination:destinations*/
 public class MaskGroupBus extends OutBus {
     protected long maskState;
 
@@ -45,6 +45,9 @@ public class MaskGroupBus extends OutBus {
         id += ":mask" + mask;
     }
 
+    public MaskGroupBus(OutBus source, String variantId) {
+        super(source, variantId);
+    }
     public MaskGroupBus(MaskGroupBus source, String variantId) {
         super(source, variantId);
     }
@@ -53,15 +56,11 @@ public class MaskGroupBus extends OutBus {
         destinations = Utils.addToArray(destinations, bus);
     }
 
-    /*Optimiser override*/
     @Override
     public void setState(long newState) {
-        /*Optimiser bind mask*/
-        final long maskState = newState & mask;
-        /*Optimiser bind destinations[0] d*/
-        if (this.maskState != maskState || destinations[0].hiImpedance) {
-            this.maskState = maskState;
-            /*Optimiser iterator unroll*/
+        /*Optimiser bind d:destinations[0] bind mask*/
+        if (this.maskState != (newState & mask) || destinations[0].hiImpedance) {
+            this.maskState = newState & mask;
             for (Bus destination : destinations) {
                 destination.setState(maskState);
             }
@@ -70,7 +69,6 @@ public class MaskGroupBus extends OutBus {
 
     @Override
     public void setHiImpedance() {
-        /*Optimiser iterator unroll*/
         for (Bus destination : destinations) {
             destination.setHiImpedance();
         }
@@ -84,7 +82,7 @@ public class MaskGroupBus extends OutBus {
             for (int i = 0; i < destinations.length; i++) {
                 destinations[i] = destinations[i].getOptimised();
             }
-            return new ClassOptimiser(MaskGroupBus.class).unroll(destinations.length).bind("mask", String.valueOf(mask)).bind("d", "destination0").build(this);
+            return new JavaCompilerClassOptimiser<>(this).unroll(destinations.length).bind("mask", String.valueOf(mask)).bind("d", "destination0").build();
         }
     }
 }

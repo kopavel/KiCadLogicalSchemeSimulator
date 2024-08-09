@@ -44,4 +44,9 @@ public class PullPin extends OutPin implements MergerInput<Pin> {
     public PullPin(OutPin oldPin, String variantId) {
         super(oldPin, variantId);
     }
+
+    @Override
+    public Pin getOptimised() {
+        return this;
+    }
 }

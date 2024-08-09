@@ -31,10 +31,10 @@
  */
 package pko.KiCadLogicalSchemeSimulator.net.bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.net.ClassOptimiser;
+import pko.KiCadLogicalSchemeSimulator.net.javaCompiller.JavaCompilerClassOptimiser;
 
 public class OffsetBus extends Bus {
-    private final byte offset;
+    protected final byte offset;
     protected Bus destination;
 
     public OffsetBus(Bus destination, byte offset) {
@@ -47,13 +47,18 @@ public class OffsetBus extends Bus {
         id += ":offset" + offset;
     }
 
+    public OffsetBus(Bus oldBus, String variantId) {
+        super(oldBus, variantId);
+        offset = 0;
+    }
+
+
     public OffsetBus(OffsetBus oldBus, String variantId) {
         super(oldBus, variantId);
         offset = oldBus.offset;
         destination = oldBus.destination;
     }
 
-    /*Optimiser override*/
     @Override
     public void setState(long newState) {
         /*Optimiser bind offset*/
@@ -68,6 +73,6 @@ public class OffsetBus extends Bus {
     @Override
     public Bus getOptimised() {
         destination = destination.getOptimised();
-        return new ClassOptimiser(OffsetBus.class).bind("offset", String.valueOf(offset)).build(this);
+        return new JavaCompilerClassOptimiser<>(this).bind("offset", String.valueOf(offset)).build();
     }
 }
