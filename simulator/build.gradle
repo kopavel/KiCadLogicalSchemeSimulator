@@ -91,6 +91,7 @@ run {
                  "-Xmx2G",
                  "-XX:+UnlockDiagnosticVMOptions",
                  "-XX:+DebugNonSafepoints",
+                 '--patch-module', "KiCadLogicalSchemeSimulator.simulator=optimised",
                  "-Dlog4j2.asyncLoggerThreadNameStrategy=CACHED"]
     if (project.hasProperty('ea')) {
         jvm_args += ["-ea"]

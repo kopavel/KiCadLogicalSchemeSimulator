@@ -32,10 +32,9 @@
 package pko.KiCadLogicalSchemeSimulator.net.bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
-import pko.KiCadLogicalSchemeSimulator.net.javaCompiller.JavaCompilerClassOptimiser;
+import pko.KiCadLogicalSchemeSimulator.net.javaCompiller.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
-/*Optimiser unroll destination:destinations*/
 public class MaskGroupBus extends OutBus {
     protected long maskState;
 
@@ -45,10 +44,8 @@ public class MaskGroupBus extends OutBus {
         id += ":mask" + mask;
     }
 
+    /*Optimiser constructor unroll destination:destinations*/
     public MaskGroupBus(OutBus source, String variantId) {
-        super(source, variantId);
-    }
-    public MaskGroupBus(MaskGroupBus source, String variantId) {
         super(source, variantId);
     }
 
@@ -60,6 +57,7 @@ public class MaskGroupBus extends OutBus {
     public void setState(long newState) {
         /*Optimiser bind d:destinations[0] bind mask*/
         if (this.maskState != (newState & mask) || destinations[0].hiImpedance) {
+            /*Optimiser bind mask*/
             this.maskState = newState & mask;
             for (Bus destination : destinations) {
                 destination.setState(maskState);
@@ -82,7 +80,7 @@ public class MaskGroupBus extends OutBus {
             for (int i = 0; i < destinations.length; i++) {
                 destinations[i] = destinations[i].getOptimised();
             }
-            return new JavaCompilerClassOptimiser<>(this).unroll(destinations.length).bind("mask", String.valueOf(mask)).bind("d", "destination0").build();
+            return new ClassOptimiser<>(this).unroll(destinations.length).bind("mask", String.valueOf(mask)).bind("d", "destination0").build();
         }
     }
 }

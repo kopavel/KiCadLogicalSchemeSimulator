@@ -44,6 +44,7 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
     private final DisplayUiComponent display;
     private final InPin hSync;
     private final InPin vSync;
+    private final Object refresh = new Object();
     public byte[][] ram;
     public int hSize;
     public int vSize;
@@ -67,6 +68,19 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
         } catch (NumberFormatException r) {
             throw new RuntimeException("Component " + id + " size must be positive number");
         }
+        Thread.ofVirtual().start(() -> {
+            try {
+                //noinspection InfiniteLoopStatement
+                while (true) {
+                    SwingUtilities.invokeLater(display::repaint);
+                    synchronized (refresh) {
+                        refresh.wait();
+                    }
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        });
         if (reverse) {
             addInPin(new NoFloatingInPin("Clock", this) {
                 @Override
@@ -82,7 +96,9 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                                 }));
                                 ram = Arrays.copyOf(ram, vSize);
                             } else {
-                                Thread.ofVirtual().start(() -> SwingUtilities.invokeLater(display::repaint));
+                                synchronized (refresh) {
+                                    refresh.notifyAll();
+                                }
                             }
                             hPos = 0;
                             vPos = 0;
@@ -125,7 +141,9 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                                 });
                                 ram = Arrays.copyOf(ram, vSize);
                             } else {
-                                SwingUtilities.invokeLater(display::repaint);
+                                synchronized (refresh) {
+                                    refresh.notifyAll();
+                                }
                             }
                             hPos = 0;
                             vPos = 0;

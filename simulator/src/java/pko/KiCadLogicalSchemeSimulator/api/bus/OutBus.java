@@ -34,12 +34,11 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.in.CorrectedInBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.net.bus.*;
-import pko.KiCadLogicalSchemeSimulator.net.javaCompiller.JavaCompilerClassOptimiser;
+import pko.KiCadLogicalSchemeSimulator.net.javaCompiller.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 import java.util.Arrays;
 
-/*Optimiser unroll destination:destinations*/
 public class OutBus extends Bus {
     public Bus[] destinations = new Bus[0];
     public long mask;
@@ -49,6 +48,7 @@ public class OutBus extends Bus {
         mask = Utils.getMaskForSize(size);
     }
 
+    /*Optimiser constructor unroll destination:destinations*/
     public OutBus(OutBus oldBus, String variantId) {
         super(oldBus, variantId);
         mask = oldBus.mask;
@@ -146,7 +146,7 @@ public class OutBus extends Bus {
             for (int i = 0; i < destinations.length; i++) {
                 destinations[i] = destinations[i].getOptimised();
             }
-            return new JavaCompilerClassOptimiser<>(this).unroll(destinations.length).build();
+            return new ClassOptimiser<>(this).unroll(destinations.length).build();
         }
     }
 }

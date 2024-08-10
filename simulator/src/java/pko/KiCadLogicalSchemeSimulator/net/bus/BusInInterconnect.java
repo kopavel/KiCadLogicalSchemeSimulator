@@ -31,7 +31,7 @@
  */
 package pko.KiCadLogicalSchemeSimulator.net.bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
-import pko.KiCadLogicalSchemeSimulator.net.javaCompiller.JavaCompilerClassOptimiser;
+import pko.KiCadLogicalSchemeSimulator.net.javaCompiller.ClassOptimiser;
 
 public class BusInInterconnect extends InBus {
     public final long interconnectMask;
@@ -47,6 +47,7 @@ public class BusInInterconnect extends InBus {
         this.senseMask = 1L << offset;
     }
 
+    /*Optimiser constructor*/
     public BusInInterconnect(BusInInterconnect oldBus, String variantId) {
         super(oldBus, variantId);
         interconnectMask = oldBus.interconnectMask;
@@ -76,8 +77,8 @@ public class BusInInterconnect extends InBus {
     @Override
     public InBus getOptimised() {
         destination = destination.getOptimised();
-        return new JavaCompilerClassOptimiser<>(this).bind("interconnectMask", String.valueOf(interconnectMask))
-                                                     .bind("inverseInterconnectMask", String.valueOf(inverseInterconnectMask))
-                                                     .build();
+        return new ClassOptimiser<>(this).bind("interconnectMask", String.valueOf(interconnectMask))
+                                         .bind("inverseInterconnectMask", String.valueOf(inverseInterconnectMask))
+                                         .build();
     }
 }

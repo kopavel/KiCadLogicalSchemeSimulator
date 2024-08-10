@@ -32,12 +32,11 @@
 package pko.KiCadLogicalSchemeSimulator.api.wire;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.net.javaCompiller.JavaCompilerClassOptimiser;
+import pko.KiCadLogicalSchemeSimulator.net.javaCompiller.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.net.wire.NCWire;
 import pko.KiCadLogicalSchemeSimulator.net.wire.WireToBusAdapter;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
-/*Optimiser unroll destination:destinations*/
 public class OutPin extends Pin {
     public Pin[] destinations = new Pin[0];
 
@@ -45,6 +44,7 @@ public class OutPin extends Pin {
         super(id, parent);
     }
 
+    /*Optimiser constructor unroll destination:destinations*/
     public OutPin(OutPin oldPin, String variantId) {
         super(oldPin, variantId);
     }
@@ -123,7 +123,7 @@ public class OutPin extends Pin {
             for (int i = 0; i < destinations.length; i++) {
                 destinations[i] = destinations[i].getOptimised();
             }
-            return new JavaCompilerClassOptimiser<>(this).unroll(destinations.length).build();
+            return new ClassOptimiser<>(this).unroll(destinations.length).build();
         }
     }
 }
