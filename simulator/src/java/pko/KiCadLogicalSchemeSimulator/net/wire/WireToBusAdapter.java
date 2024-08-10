@@ -36,7 +36,7 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.net.javaCompiller.ClassOptimiser;
 
 public class WireToBusAdapter extends OutPin {
-    public final long mask;
+    public long mask;
     public Bus destination;
 
     //FixMe use multi destinations and Optimiser
@@ -47,7 +47,7 @@ public class WireToBusAdapter extends OutPin {
         this.destination = destination;
     }
 
-    /*Optimiser constructor unroll*/
+    /*Optimiser constructor*/
     public WireToBusAdapter(WireToBusAdapter oldPin, String variantId) {
         super(oldPin, variantId);
         destination = oldPin.destination;
