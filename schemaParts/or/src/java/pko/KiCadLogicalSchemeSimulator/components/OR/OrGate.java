@@ -55,12 +55,16 @@ public class OrGate extends SchemaPart {
                         state = newState;
                         if (newState) {
                             inState |= mask;
+                            if (out.state) {
+                                out.state = false;
+                                out.setState(false);
+                            }
                         } else {
                             inState &= nMask;
-                        }
-                        if (out.state != (inState == 0)) {
-                            out.state = inState == 0;
-                            out.setState(out.state);
+                            if (out.state != (inState == 0)) {
+                                out.state = inState == 0;
+                                out.setState(out.state);
+                            }
                         }
                     }
 
@@ -75,12 +79,16 @@ public class OrGate extends SchemaPart {
                         state = newState;
                         if (newState) {
                             inState |= mask;
+                            if (!out.state) {
+                                out.state = true;
+                                out.setState(true);
+                            }
                         } else {
                             inState &= nMask;
-                        }
-                        if (out.state == (inState == 0)) {
-                            out.state = inState != 0;
-                            out.setState(out.state);
+                            if (out.state == (inState == 0)) {
+                                out.state = inState != 0;
+                                out.setState(out.state);
+                            }
                         }
                     }
 

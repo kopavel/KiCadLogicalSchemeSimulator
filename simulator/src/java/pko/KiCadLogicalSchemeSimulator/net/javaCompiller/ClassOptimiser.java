@@ -50,8 +50,8 @@ import java.util.Map;
 import static pko.KiCadLogicalSchemeSimulator.tools.Utils.countLeadingSpaces;
 import static pko.KiCadLogicalSchemeSimulator.tools.Utils.regexEscape;
 
-//ToDo iskljuchat' bloki celikom
-//Fixme - vikinut' vsje konstruktori i vjse polja (oni extendjaca)
+//ToDo whole block cut possibility
+//FixMe block comment support
 public class ClassOptimiser<T> {
     private final Map<String, String> binds = new HashMap<>();
     private final T oldInstance;
@@ -228,11 +228,13 @@ public class ClassOptimiser<T> {
                                 .append(" extends ")
                                 .append(oldInstance.getClass().getSimpleName())
                                 .append(" {\n");
-                } else if (!line.trim().isBlank() && blockOffset < 0) {
+                    blockOffset = -1;
+                    blockSource = new StringBuilder();
+                } else if (!line.trim().isBlank() && blockOffset < 0 && lineOffset > 0) {
                     //block begin
                     blockOffset = lineOffset;
                     blockSource = new StringBuilder(line).append("\n");
-                } else if (lineOffset <= blockOffset) {
+                } else if (lineOffset <= blockOffset && !line.isBlank() && !line.trim().startsWith("//")) {
                     //block end
                     if (line.trim().equals("}")) {
                         blockSource.append(line).append("\n");

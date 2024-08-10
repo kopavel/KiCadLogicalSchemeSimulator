@@ -101,17 +101,18 @@ public class Multiplexer extends SchemaPart {
                     } else {
                         nState &= nMask;
                     }
-                    if (inBuses[nState].hiImpedance) {
+                    InBus inBus = inBuses[nState];
+                    if (inBus.hiImpedance) {
                         if (Net.stabilizing) {
                             Net.forResend.add(this);
                             assert Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
                         } else {
-                            throw new FloatingInException(inBuses[nState]);
+                            throw new FloatingInException(inBus);
                         }
                     }
-                    if (outBus.state != inBuses[nState].state) {
-                        outBus.state = inBuses[nState].state;
-                        outBus.setState(outBus.state);
+                    if (outBus.state != inBus.state) {
+                        outBus.state = inBus.state;
+                        outBus.setState(inBus.state);
                     }
                 }
             });

@@ -35,7 +35,6 @@ import pko.KiCadLogicalSchemeSimulator.api.schemaPart.AbstractUiComponent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
-import java.util.Arrays;
 
 public class DisplayUiComponent extends AbstractUiComponent {
     public final int scaleFactor;
@@ -51,7 +50,7 @@ public class DisplayUiComponent extends AbstractUiComponent {
     protected void draw() {
         if (parent.vSize > 0) {
             BufferedImage image = new BufferedImage(parent.hSize, parent.vSize, BufferedImage.TYPE_BYTE_GRAY);
-            byte[][] snapshot = Arrays.copyOf(parent.ram, parent.ram.length);
+            byte[][] snapshot = parent.ram;
             WritableRaster raster = image.getRaster();
             for (int x = 0; x < parent.hSize; x++) {
                 for (int y = 0; y < parent.vSize; y++) {

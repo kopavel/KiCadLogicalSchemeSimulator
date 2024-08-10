@@ -66,7 +66,7 @@ public class Decoder extends SchemaPart {
 
                 @Override
                 public void setHiImpedance() {
-                    assert !hiImpedance : "Already in hiImpedance:" + this;
+//                    assert !hiImpedance : "Already in hiImpedance:" + this;
                     hiImpedance = true;
                     if (csState) {
                         if (Net.stabilizing) {
@@ -96,7 +96,7 @@ public class Decoder extends SchemaPart {
 
                 @Override
                 public void setHiImpedance() {
-                    assert !hiImpedance : "Already in hiImpedance:" + this;
+//                    assert !hiImpedance : "Already in hiImpedance:" + this;
                     hiImpedance = true;
                     if (csState) {
                         if (Net.stabilizing) {

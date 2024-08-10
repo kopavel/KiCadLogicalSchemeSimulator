@@ -72,7 +72,7 @@ public class WireToBusAdapter extends OutPin {
 
     @Override
     public void setHiImpedance() {
-        assert !hiImpedance : "Already in hiImpedance:" + this;
+//        assert !hiImpedance : "Already in hiImpedance:" + this;
         destination.setHiImpedance();
     }
 

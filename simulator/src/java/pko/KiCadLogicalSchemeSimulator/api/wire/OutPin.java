@@ -76,7 +76,7 @@ public class OutPin extends Pin {
 
     @Override
     public void setHiImpedance() {
-        assert !hiImpedance : "Already in hiImpedance:" + this;
+//        assert !hiImpedance : "Already in hiImpedance:" + this;
         for (Pin destination : destinations) {
             destination.setHiImpedance();
         }

@@ -45,12 +45,12 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
     private final InPin hSync;
     private final InPin vSync;
     private final Object refresh = new Object();
-    public byte[][] ram;
+    public byte[][] ram = new byte[1][4096];
     public int hSize;
     public int vSize;
     int rows;
     double fps;
-    private byte[] firstRow = new byte[4096];
+    //    private byte[] firstRow = new byte[4096];
     private int hPos;
     private int vPos;
     private boolean lastVSync = true;
@@ -88,39 +88,34 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                     state = newState;
                     if (!state) {
                         if (!vSync.state && !lastVSync) {
-                            if (vSize == 0) {
-                                vSize = vPos + 2;
+                            if (vSize != 0) {
+                                synchronized (refresh) {
+                                    refresh.notifyAll();
+                                }
+                            } else {
+                                vSize = vPos + 1;
                                 Thread.ofVirtual().start(() -> SwingUtilities.invokeLater(() -> {
                                     //noinspection deprecation
                                     display.reshape(display.currentX, display.currentY, hSize * display.scaleFactor, vSize * display.scaleFactor);
                                 }));
                                 ram = Arrays.copyOf(ram, vSize);
-                            } else {
-                                synchronized (refresh) {
-                                    refresh.notifyAll();
-                                }
                             }
                             hPos = 0;
                             vPos = 0;
                         } else if (!hSync.state && !lastHSync) {
                             if (hSize == 0) {
-                                hSize = hPos + 2;
+                                hSize = hPos + 1;
+                                byte[] firstRow = Arrays.copyOf(ram[0], hSize);
                                 ram = new byte[2048][hSize];
-                                ram[vPos] = Arrays.copyOf(firstRow, hSize);
-                                firstRow = null;
+                                ram[0] = firstRow;
                             }
                             hPos = 0;
                             vPos++;
                             rows++;
                         }
-                        hPos++;
                         byte data = (byte) (vIn.state ? 0xff : 0x0);
-                        if (hSize == 0) {
-                            //noinspection DataFlowIssue
-                            firstRow[hPos] = data;
-                        } else {
-                            ram[vPos][hPos] = data;
-                        }
+                        ram[vPos][hPos] = data;
+                        hPos++;
                         lastHSync = !hSync.state;
                         lastVSync = !vSync.state;
                     }
@@ -150,22 +145,16 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                         } else if (hSync.state && !lastHSync) {
                             if (hSize == 0) {
                                 hSize = hPos + 2;
+                                byte[] firstRow = Arrays.copyOf(ram[0], hSize);
                                 ram = new byte[2048][hSize];
-                                ram[vPos] = Arrays.copyOf(firstRow, hSize);
-                                firstRow = null;
+                                ram[0] = firstRow;
                             }
                             hPos = 0;
                             vPos++;
                             rows++;
                         }
                         hPos++;
-                        byte data = (byte) (vIn.state ? 0xff : 0x0);
-                        if (hSize == 0) {
-                            //noinspection DataFlowIssue
-                            firstRow[hPos] = data;
-                        } else {
-                            ram[vPos][hPos] = data;
-                        }
+                        ram[vPos][hPos] = (byte) (vIn.state ? 0xff : 0x0);
                         lastHSync = hSync.state;
                         lastVSync = vSync.state;
                     }

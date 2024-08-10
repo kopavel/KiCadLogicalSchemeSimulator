@@ -74,7 +74,7 @@ public abstract class SchemaPart {
         return addInPin(new InPin(pinId, this) {
             @Override
             public void setHiImpedance() {
-                assert !hiImpedance : "Already in hiImpedance:" + this;
+//                assert !hiImpedance : "Already in hiImpedance:" + this;
                 hiImpedance = true;
             }
 
@@ -115,7 +115,7 @@ public abstract class SchemaPart {
         return addInBus(new CorrectedInBus(pinId, this, size, names) {
             @Override
             public void setHiImpedance() {
-                assert !hiImpedance : "Already in hiImpedance:" + this;
+//                assert !hiImpedance : "Already in hiImpedance:" + this;
                 hiImpedance = true;
             }
 

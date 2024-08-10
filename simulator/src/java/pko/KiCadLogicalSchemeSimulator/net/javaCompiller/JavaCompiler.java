@@ -105,8 +105,7 @@ public class JavaCompiler {
         }
     }
 
-    public static boolean compileJavaSource(Class<?> srcClass,
-            String className, String sourceCode) {
+    public static boolean compileJavaSource(Class<?> srcClass, String className, String sourceCode) {
         Log.trace(JavaCompiler.class, "Compile source \n{}", sourceCode);
         InMemoryJavaFileManager fileManager = new InMemoryJavaFileManager(compiler.getStandardFileManager(null, null, null));
         JavaFileObject javaFileObject = new InMemoryJavaFileObject(className, sourceCode);
@@ -116,8 +115,13 @@ public class JavaCompiler {
             fileManager.getClassBytes().entrySet()
                     .stream().sorted(Map.Entry.<String, ByteArrayOutputStream>comparingByKey().reversed()).forEach(entry -> {
                            try {
-                               Log.debug(JavaCompiler.class, "Load class {}", entry.getKey());
-                               loadClass(srcClass, entry.getValue().toByteArray());
+                               try {
+                                   Class.forName(entry.getKey());
+                                   Log.warn(JavaCompiler.class, "Class {} already loaded", srcClass.getName());
+                               } catch (ClassNotFoundException ignore) {
+                                   Log.debug(JavaCompiler.class, "Load class {}", entry.getKey());
+                                   loadClass(srcClass, entry.getValue().toByteArray());
+                               }
                                storeClass(entry.getKey(), entry.getValue().toByteArray(), sourceCode);
                            } catch (Exception e) {
                                throw new RuntimeException(e);
