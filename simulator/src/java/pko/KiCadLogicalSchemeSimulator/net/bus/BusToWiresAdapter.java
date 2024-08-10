@@ -54,6 +54,7 @@ public class BusToWiresAdapter extends OutBus {
         /*Optimiser bind d:destinations[0] bind mask*/
         if (maskState != (newState & mask) || destinations[0].hiImpedance) {
             maskState = newState & mask;
+            //FixMe new  variable not worth, if iteration are less then 3-4... need more benchmarks...
             final boolean dState = maskState != 0;
             for (Pin destination : destinations) {
                 destination.setState(dState);
