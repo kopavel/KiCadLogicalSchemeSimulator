@@ -181,6 +181,7 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
 
     @Override
     public BusMergerBusIn getOptimised() {
+        destinations = merger.destinations;
         //FixMe need replace in merger.sources
         return this;
     }

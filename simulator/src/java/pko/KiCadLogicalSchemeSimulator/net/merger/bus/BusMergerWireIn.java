@@ -226,6 +226,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
 
     @Override
     public BusMergerWireIn getOptimised() {
+        destinations = merger.destinations;
         //FixMe need replace in merger.sources
         return this;
     }

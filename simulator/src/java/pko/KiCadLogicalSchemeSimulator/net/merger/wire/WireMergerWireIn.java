@@ -40,8 +40,8 @@ import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
     private final WireMerger merger;
-    private boolean oldImpedance;
     Pin[] destinations;
+    private boolean oldImpedance;
 
     public WireMergerWireIn(Pin source, WireMerger merger) {
         super(source, "PMergePIn");
@@ -134,6 +134,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
 
     @Override
     public WireMergerWireIn getOptimised() {
+        destinations = merger.destinations;
         //FixMe need replace in merger.sources
         return this;
     }

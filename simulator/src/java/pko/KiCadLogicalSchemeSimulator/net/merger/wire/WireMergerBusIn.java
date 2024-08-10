@@ -137,6 +137,7 @@ public class WireMergerBusIn extends CorrectedInBus implements MergerInput<Bus> 
 
     @Override
     public WireMergerBusIn getOptimised() {
+        destinations = merger.destinations;
         //FixMe need replace in merger.sources
         return this;
     }
