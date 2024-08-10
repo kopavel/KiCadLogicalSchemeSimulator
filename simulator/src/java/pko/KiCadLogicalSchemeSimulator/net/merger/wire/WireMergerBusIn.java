@@ -42,6 +42,7 @@ import pko.KiCadLogicalSchemeSimulator.tools.Log;
 public class WireMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
     public final long mask;
     private final WireMerger merger;
+    Pin[] destinations;
     private boolean oldImpedance;
 
     public WireMergerBusIn(Bus source, long mask, WireMerger merger) {
@@ -49,6 +50,7 @@ public class WireMergerBusIn extends CorrectedInBus implements MergerInput<Bus> 
         this.mask = mask;
         this.merger = merger;
         oldImpedance = hiImpedance;
+        destinations = merger.destinations;
     }
 
     @Override
@@ -78,11 +80,11 @@ public class WireMergerBusIn extends CorrectedInBus implements MergerInput<Bus> 
         }
         if (merger.state == (state == 0)) { // merger state changes
             merger.state = state != 0;
-            for (Pin destination : merger.destinations) {
+            for (Pin destination : destinations) {
                 destination.setState(merger.state);
             }
-        } else if (merger.hiImpedance || (merger.destinations[0] instanceof PassivePin && !merger.strong)) { //FixMe known in net build time
-            for (Pin destination : merger.destinations) {
+        } else if (merger.hiImpedance || (destinations[0] instanceof PassivePin && !merger.strong)) { //FixMe known in net build time
+            for (Pin destination : destinations) {
                 destination.setState(merger.state);
             }
         }
@@ -109,12 +111,12 @@ public class WireMergerBusIn extends CorrectedInBus implements MergerInput<Bus> 
         if (merger.hasWeak) { //FixMe known in Net build time
             if (merger.state != merger.weakState) {
                 merger.state = merger.weakState;
-                for (Pin destination : merger.destinations) {
+                for (Pin destination : destinations) {
                     destination.setState(merger.weakState);
                 }
             }
         } else {
-            for (Pin destination : merger.destinations) {
+            for (Pin destination : destinations) {
                 destination.setHiImpedance();
             }
             merger.hiImpedance = true;

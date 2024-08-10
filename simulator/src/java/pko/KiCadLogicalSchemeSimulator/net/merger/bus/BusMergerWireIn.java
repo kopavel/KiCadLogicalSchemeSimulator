@@ -44,6 +44,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
     private final BusMerger merger;
     public boolean oldStrong;
     public boolean oldImpedance;
+    Bus[] destinations;
 
     public BusMergerWireIn(long mask, BusMerger merger) {
         super(merger.id + ":in", merger.parent);
@@ -51,6 +52,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
         this.mask = mask;
         nMask = ~mask;
         this.merger = merger;
+        destinations = merger.destinations;
     }
 
     @Override
@@ -122,14 +124,14 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
         }
         if ((merger.strongPins | merger.weakPins) != merger.mask) {
             if (!merger.hiImpedance) {
-                for (Bus destination : merger.destinations) {
+                for (Bus destination : destinations) {
                     destination.setHiImpedance();
                 }
                 merger.hiImpedance = true;
             }
         } else if (oldState != merger.state || merger.hiImpedance) {
             merger.hiImpedance = false;
-            for (Bus destination : merger.destinations) {
+            for (Bus destination : destinations) {
                 destination.setState(merger.state);
             }
         }
@@ -184,14 +186,14 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
         }
         if ((merger.strongPins | merger.weakPins) != merger.mask) {
             if (!merger.hiImpedance) {
-                for (Bus destination : merger.destinations) {
+                for (Bus destination : destinations) {
                     destination.setHiImpedance();
                 }
                 merger.hiImpedance = true;
             }
         } else if (oldState != merger.state || merger.hiImpedance) {
             merger.hiImpedance = false;
-            for (Bus destination : merger.destinations) {
+            for (Bus destination : destinations) {
                 destination.setState(merger.state);
             }
         }
@@ -227,5 +229,4 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
         //FixMe need replace in merger.sources
         return this;
     }
-
 }

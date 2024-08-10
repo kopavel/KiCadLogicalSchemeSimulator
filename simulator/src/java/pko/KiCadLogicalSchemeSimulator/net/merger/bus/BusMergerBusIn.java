@@ -42,6 +42,7 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
     public final long nMask;
     private final BusMerger merger;
     private boolean oldImpedance;
+    Bus[] destinations;
 
     public BusMergerBusIn(Bus source, long mask, BusMerger merger) {
         super(source, "BMergeBIn");
@@ -49,6 +50,7 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
         this.merger = merger;
         nMask = ~mask;
         oldImpedance = hiImpedance;
+        destinations = merger.destinations;
     }
 
     @Override
@@ -87,14 +89,14 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
         merger.state |= state;
         if ((merger.strongPins | merger.weakPins) != merger.mask) {
             if (!merger.hiImpedance) {
-                for (Bus destination : merger.destinations) {
+                for (Bus destination : destinations) {
                     destination.setHiImpedance();
                 }
                 merger.hiImpedance = true;
             }
         } else if (oldState != merger.state || merger.hiImpedance) {
             merger.hiImpedance = false;
-            for (Bus destination : merger.destinations) {
+            for (Bus destination : destinations) {
                 destination.setState(merger.state);
             }
         }
@@ -139,13 +141,13 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
         merger.state |= merger.weakState & mask;
         if ((merger.strongPins | merger.weakPins) != merger.mask) {
             if (!merger.hiImpedance) {
-                for (Bus destination : merger.destinations) {
+                for (Bus destination : destinations) {
                     destination.setHiImpedance();
                 }
                 merger.hiImpedance = true;
             }
         } else if (oldState != merger.state || merger.hiImpedance) {
-            for (Bus destination : merger.destinations) {
+            for (Bus destination : destinations) {
                 destination.setState(merger.state);
             }
             merger.hiImpedance = false;
