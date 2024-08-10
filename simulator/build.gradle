@@ -111,3 +111,32 @@ run {
 
     }
 }
+tasks.register("runJmh", JavaExec) {
+    group = 'Benchmark'
+    description = 'Run JMH benchmarks'
+
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'org.openjdk.jmh.Main'
+    // Optional: Set JVM arguments
+    jvmArgs = [
+            '--module-path', "$rootDir/distro/;$rootDir/distro/lib/",
+            '--add-modules', "KiCadLogicalSchemeSimulator.simulator",
+            '--add-exports', 'KiCadLogicalSchemeSimulator.simulator/pko.KiCadLogicalSchemeSimulator.net.bus=ALL-UNNAMED', // Add this line
+            '--add-exports', 'KiCadLogicalSchemeSimulator.simulator/pko.KiCadLogicalSchemeSimulator.net.wire=ALL-UNNAMED', // Add this line
+            '--patch-module', "KiCadLogicalSchemeSimulator.simulator=$projectDir/optimised"
+    ]
+    args = [
+            '-wi', '1', // Number of warm-up iterations
+            '-w', '2', // time of warm-up iterations
+            '-i', '3', // Number of iterations
+            '-r', '5', // time of iterations
+            '-f1', // Number of forks
+            '-t1', // Number of threads
+            "pko.KiCadLogicalSchemeSimulator.test.benchmarks.OutPinBenchmark.optimiser",//
+            "pko.KiCadLogicalSchemeSimulator.test.benchmarks.OutBusBenchmark.optimiser",//
+            "pko.KiCadLogicalSchemeSimulator.test.benchmarks.MaskGroupBenchmark.optimiser",//
+            "pko.KiCadLogicalSchemeSimulator.test.benchmarks.OffsetBusBenchmark.optimiser",//
+            "pko.KiCadLogicalSchemeSimulator.test.benchmarks.WireToBusBenchmark.optimiser",//
+            "pko.KiCadLogicalSchemeSimulator.test.benchmarks.BusToWireBenchmark.optimiser"//
+    ]
+}

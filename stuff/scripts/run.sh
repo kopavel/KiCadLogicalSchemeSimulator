@@ -12,6 +12,7 @@ java -Xms16m -Xmx2g \
 -Dlog4j2.asyncLoggerWaitStrategy=Block \
 -Dlog4j2.asyncLoggerThreadNameStrategy=CACHED \
 -p "${SCRIPT_DIR}":"${SCRIPT_DIR}/lib":"${SCRIPT_DIR}/schemaParts" \
+--patch-module KiCadLogicalSchemeSimulator.simulator=optimised \
 -m KiCadLogicalSchemeSimulator.simulator/pko.KiCadLogicalSchemeSimulator.Simulator -m="${SCRIPT_DIR}/SymbolsDescription.xml" "$@"
 
 # Check the exit code from Java application

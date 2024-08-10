@@ -36,15 +36,14 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.OutPin;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 import javax.tools.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class JavaCompiler {
@@ -107,8 +106,7 @@ public class JavaCompiler {
     }
 
     public static boolean compileJavaSource(Class<?> srcClass,
-            String className,
-            String sourceCode) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+            String className, String sourceCode) {
         Log.trace(JavaCompiler.class, "Compile source \n{}", sourceCode);
         InMemoryJavaFileManager fileManager = new InMemoryJavaFileManager(compiler.getStandardFileManager(null, null, null));
         JavaFileObject javaFileObject = new InMemoryJavaFileObject(className, sourceCode);
@@ -120,6 +118,7 @@ public class JavaCompiler {
                            try {
                                Log.debug(JavaCompiler.class, "Load class {}", entry.getKey());
                                loadClass(srcClass, entry.getValue().toByteArray());
+                               storeClass(entry.getKey(), entry.getValue().toByteArray());
                            } catch (Exception e) {
                                throw new RuntimeException(e);
                            }
@@ -130,7 +129,16 @@ public class JavaCompiler {
         }
     }
 
-    private static void loadClass(Class<?> srcClass, byte[] byteCode) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    private static void storeClass(String className, byte[] byteArray) throws IOException {
+        String path = "optimised" + File.separator + className.replace(".", File.separator) + ".class";
+        String dirPath = path.substring(0, path.lastIndexOf(File.separator));
+        Files.createDirectories(Paths.get(dirPath));
+        try (OutputStream os = new BufferedOutputStream(new FileOutputStream(path))) {
+            os.write(byteArray);
+        }
+    }
+
+    private static void loadClass(Class<?> srcClass, byte[] byteCode) throws InvocationTargetException, IllegalAccessException {
         MethodHandles.Lookup privateLookup = (MethodHandles.Lookup) privateLookupInMethod.invoke(null, srcClass, lookup);
         //noinspection PrimitiveArrayArgumentToVarargsMethod
         defineClassMethod.invoke(privateLookup, byteCode);
