@@ -36,14 +36,15 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.in.CorrectedInBus;
 import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.net.Net;
+import pko.KiCadLogicalSchemeSimulator.net.javaCompiller.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 public class WireMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
-    public final long mask;
-    private final WireMerger merger;
-    Pin[] destinations;
-    private boolean oldImpedance;
+    public long mask;
+    public WireMerger merger;
+    public Pin[] destinations;
+    public boolean oldImpedance;
 
     public WireMergerBusIn(Bus source, long mask, WireMerger merger) {
         super(source, "PMergeBIn");
@@ -53,20 +54,27 @@ public class WireMergerBusIn extends CorrectedInBus implements MergerInput<Bus> 
         destinations = merger.destinations;
     }
 
+    /*Optimiser constructor unroll destination:destinations*/
+    public WireMergerBusIn(WireMergerBusIn oldPin, String variantId) {
+        super(oldPin, variantId);
+        this.mask = oldPin.mask;
+        this.merger = oldPin.merger;
+        oldImpedance = hiImpedance;
+        destinations = merger.destinations;
+    }
+
     @Override
     public void setState(long newState) {
-/*
-        assert Log.debug(WireMergerBusIn.class,
-                "Pin merger change. before: newState:{}, Source:{} (state:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{}, hiImpedance:{})",
-                newState,
-                getName(),
-                state,
-                hiImpedance,
-                merger.getName(),
-                merger.state,
-                merger.strong,
-                merger.hiImpedance);
-*/
+// assert Log.debug(WireMergerBusIn.class,
+//         "Pin merger change. before: newState:{}, Source:{} (state:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{}, hiImpedance:{})",
+//         newState,
+//         getName(),
+//         state,
+//         hiImpedance,
+//         merger.getName(),
+//         merger.state,
+//         merger.strong,
+//         merger.hiImpedance);
         state = newState;
         hiImpedance = false;
         if (oldImpedance && merger.strong) { //merger not in hiImpedance or weak
@@ -91,18 +99,16 @@ public class WireMergerBusIn extends CorrectedInBus implements MergerInput<Bus> 
         merger.strong = true;
         merger.hiImpedance = false;
         oldImpedance = false;
-/*
-        assert Log.debug(WireMergerBusIn.class,
-                "Pin merger change. after: newState:{}, Source:{} (state:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{}, hiImpedance:{})",
-                newState,
-                getName(),
-                state,
-                hiImpedance,
-                merger.getName(),
-                merger.state,
-                merger.strong,
-                merger.hiImpedance);
-*/
+// assert Log.debug(WireMergerBusIn.class,
+//         "Pin merger change. after: newState:{}, Source:{} (state:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{}, hiImpedance:{})",
+//         newState,
+//         getName(),
+//         state,
+//         hiImpedance,
+//         merger.getName(),
+//         merger.state,
+//         merger.strong,
+//         merger.hiImpedance);
     }
 
     @Override
@@ -137,8 +143,8 @@ public class WireMergerBusIn extends CorrectedInBus implements MergerInput<Bus> 
 
     @Override
     public WireMergerBusIn getOptimised() {
-        destinations = merger.destinations;
         //FixMe need replace in merger.sources
-        return this;
+        destinations = merger.destinations;
+        return new ClassOptimiser<>(this).unroll(merger.destinations.length).build();
     }
 }

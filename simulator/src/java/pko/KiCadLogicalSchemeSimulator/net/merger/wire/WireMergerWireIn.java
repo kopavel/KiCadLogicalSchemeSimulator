@@ -35,18 +35,27 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
 import pko.KiCadLogicalSchemeSimulator.net.Net;
+import pko.KiCadLogicalSchemeSimulator.net.javaCompiller.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
-    private final WireMerger merger;
-    Pin[] destinations;
-    private boolean oldImpedance;
+    public WireMerger merger;
+    public Pin[] destinations;
+    public boolean oldImpedance;
 
     public WireMergerWireIn(Pin source, WireMerger merger) {
         super(source, "PMergePIn");
         this.merger = merger;
         oldImpedance = source.hiImpedance;
+        destinations = merger.destinations;
+    }
+
+    /*Optimiser constructor unroll destination:destinations*/
+    public WireMergerWireIn(WireMergerWireIn oldPin, String variantId) {
+        super(oldPin, variantId);
+        this.merger = oldPin.merger;
+        oldImpedance = hiImpedance;
         destinations = merger.destinations;
     }
 
@@ -134,8 +143,8 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
 
     @Override
     public WireMergerWireIn getOptimised() {
-        destinations = merger.destinations;
         //FixMe need replace in merger.sources
-        return this;
+        destinations = merger.destinations;
+        return new ClassOptimiser<>(this).unroll(merger.destinations.length).build();
     }
 }
