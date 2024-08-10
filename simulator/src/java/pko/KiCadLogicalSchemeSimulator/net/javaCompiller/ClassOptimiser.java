@@ -137,7 +137,6 @@ public class ClassOptimiser<T> {
         boolean preserveBlock = false;
         int blockOffset = -1;
         int iteratorOffset = -1;
-        Map<String, String> bindPatterns = new HashMap<>();
         StringBuilder resultSource = new StringBuilder();
         StringBuilder iteratorSource = new StringBuilder();
         StringBuilder blockSource = new StringBuilder();
@@ -152,6 +151,7 @@ public class ClassOptimiser<T> {
                     String[] params = line.substring(line.indexOf("/*Optimiser ") + 12, line.lastIndexOf("*/")).split(" ");
                     int i = 0;
                     String oldItemName = null;
+                    Map<String, String> bindPatterns = new HashMap<>();
                     while (i < params.length) {
                         String command = params[i++];
                         switch (command) {
@@ -201,14 +201,16 @@ public class ClassOptimiser<T> {
                                     bindPattern = regexEscape(bindName);
                                 }
                                 bindPatterns.put(bindPattern, bindName);
-                                line = lines.next();
-                                for (Map.Entry<String, String> bind : bindPatterns.entrySet()) {
-                                    line = line.replaceAll("(?<=\\W|^)" + bind.getKey() + "(?=\\W|$)", binds.get(bind.getValue()));
-                                }
-                                blockSource.append(line).append("\n");
-                                preserveBlock = true;
                             }
                         }
+                    }
+                    if (!bindPatterns.isEmpty()) {
+                        line = lines.next();
+                        for (Map.Entry<String, String> bind : bindPatterns.entrySet()) {
+                            line = line.replaceAll("(?<=\\W|^)" + bind.getKey() + "(?=\\W|$)", binds.get(bind.getValue()));
+                        }
+                        blockSource.append(line).append("\n");
+                        preserveBlock = true;
                     }
                 } else if (line.contains("public class " + oldInstance.getClass().getSimpleName())) {
                     //rename class definition
