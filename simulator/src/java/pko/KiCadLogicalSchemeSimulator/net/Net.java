@@ -379,6 +379,12 @@ public class Net {
                 }
             }
         });
+        for (OutPin wire : wires.values()) {
+            wire.getOptimised();
+        }
+        for (OutBus merger : busMergers.values()) {
+            merger.getOptimised();
+        }
         for (SchemaPart p : schemaParts.values()) {
             for (IModelItem<?> outItem : p.outPins.values()
                     .stream().distinct().toList()) {

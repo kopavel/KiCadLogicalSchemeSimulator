@@ -63,7 +63,6 @@ public class WireMerger extends OutPin {
         }
     }
 
-    //FixMe what about destination optimisation?
     @Override
     public void addDestination(Pin pin) {
         if (destinations.length == 1 && destinations[0] instanceof PassivePin passivePin) {
@@ -83,7 +82,10 @@ public class WireMerger extends OutPin {
 
     @Override
     public Pin getOptimised() {
-        throw new UnsupportedOperationException();
+        for (int i = 0; i < destinations.length; i++) {
+            destinations[i] = destinations[i].getOptimised();
+        }
+        return this;
     }
 
     private void addSource(OutBus bus, long mask) {

@@ -46,7 +46,6 @@ import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 import java.util.*;
 
-//ToDo implement pure bus implementation (no weak state)
 public class BusMerger extends OutBus {
     public Set<MergerInput<?>> sources = new TreeSet<>(Comparator.comparing(MergerInput::getName));
     public long strongPins;
@@ -64,7 +63,6 @@ public class BusMerger extends OutBus {
         destinations = new Bus[]{destination};
     }
 
-    //fixme what about optimisation?
     public void addDestination(Bus item) {
         switch (item) {
             case BusInInterconnect interconnect -> {
@@ -133,7 +131,10 @@ public class BusMerger extends OutBus {
 
     @Override
     public Bus getOptimised() {
-        throw new UnsupportedOperationException();
+        for (int i = 0; i < destinations.length; i++) {
+            destinations[i] = destinations[i].getOptimised();
+        }
+        return this;
     }
 
     private void processPin(Pin pin, BusMergerWireIn input, long destinationMask) {
