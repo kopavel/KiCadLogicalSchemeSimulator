@@ -103,20 +103,8 @@ public class DcTrigger extends SchemaPart {
                 @Override
                 public void setState(boolean newState) {
                     state = newState;
-                    if (!state && clockEnabled) {
-                        if (dPin.state) {
-                            if (iqOut.state) {
-                                qOut.state = true;
-                                qOut.setState(true);
-                                iqOut.state = false;
-                                iqOut.setState(false);
-                            }
-                        } else if (qOut.state) {
-                            qOut.state = false;
-                            qOut.setState(false);
-                            iqOut.state = true;
-                            iqOut.setState(true);
-                        }
+                    if (!state) {
+                        store();
                     }
                 }
             });
@@ -125,20 +113,8 @@ public class DcTrigger extends SchemaPart {
                 @Override
                 public void setState(boolean newState) {
                     state = newState;
-                    if (state && clockEnabled) {
-                        if (dPin.state) {
-                            if (iqOut.state) {
-                                qOut.state = true;
-                                qOut.setState(true);
-                                iqOut.state = false;
-                                iqOut.setState(false);
-                            }
-                        } else if (qOut.state) {
-                            qOut.state = false;
-                            qOut.setState(false);
-                            iqOut.state = true;
-                            iqOut.setState(true);
-                        }
+                    if (state) {
+                        store();
                     }
                 }
             });
@@ -159,5 +135,23 @@ public class DcTrigger extends SchemaPart {
         qOut.setState(false);
         iqOut.state = true;
         iqOut.setState(true);
+    }
+
+    private void store() {
+        if (clockEnabled) {
+            if (dPin.state) {
+                if (iqOut.state) {
+                    qOut.state = true;
+                    qOut.setState(true);
+                    iqOut.state = false;
+                    iqOut.setState(false);
+                }
+            } else if (qOut.state) {
+                qOut.state = false;
+                qOut.setState(false);
+                iqOut.state = true;
+                iqOut.setState(true);
+            }
+        }
     }
 }
