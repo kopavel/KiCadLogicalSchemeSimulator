@@ -36,12 +36,12 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 import static pko.KiCadLogicalSchemeSimulator.tools.Utils.countLeadingSpaces;
@@ -120,6 +120,11 @@ public class ClassOptimiser<T> {
                 Log.trace(JavaCompiler.class, "Process");
                 String optimisedSource = process();
                 Log.trace(JavaCompiler.class, "Compile");
+                try {
+                    storeSrc(oldInstance.getClass().getName() + suffix, optimisedSource);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
                 JavaCompiler.compileJavaSource(oldInstance.getClass(), optimizedClassName, optimisedSource);
                 Log.trace(JavaCompiler.class, "Return instance");
                 dynamicClass = Class.forName(oldInstance.getClass().getName() + suffix);
@@ -132,6 +137,15 @@ public class ClassOptimiser<T> {
             return (T) constructors[0].newInstance(oldInstance, suffix);
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private static void storeSrc(String className, String source) throws IOException {
+        String srcPath = "optimised" + File.separator + className.replace(".", File.separator) + ".java";
+        String dirPath = srcPath.substring(0, srcPath.lastIndexOf(File.separator));
+        Files.createDirectories(Paths.get(dirPath));
+        try (OutputStream os = new BufferedOutputStream(new FileOutputStream(srcPath))) {
+            os.write(source.getBytes(StandardCharsets.UTF_8));
         }
     }
 
@@ -233,7 +247,11 @@ public class ClassOptimiser<T> {
                                 for (Map.Entry<String, String> bind : bindPatterns.entrySet()) {
                                     line = line.replaceAll("(?<=\\W|^)" + bind.getKey() + "(?=\\W|$)", binds.get(bind.getValue()));
                                 }
-                                blockSource.append(line).append("\n");
+                                if (iteratorOffset > -1) {
+                                    iteratorSource.append(line).append("\n");
+                                } else {
+                                    blockSource.append(line).append("\n");
+                                }
                                 preserveBlock = true;
                             }
                         } else if (line.trim().startsWith("/*") || inComment) {

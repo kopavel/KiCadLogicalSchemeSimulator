@@ -45,7 +45,7 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
 import pko.KiCadLogicalSchemeSimulator.net.bus.BusInInterconnect;
 import pko.KiCadLogicalSchemeSimulator.net.merger.bus.BusMerger;
 import pko.KiCadLogicalSchemeSimulator.net.merger.wire.WireMerger;
-import pko.KiCadLogicalSchemeSimulator.net.wire.WireToBusAdapter;
+import pko.KiCadLogicalSchemeSimulator.net.wire.WireToBusesAdapter;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.Comp;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.Export;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.Property;
@@ -365,7 +365,10 @@ public class Net {
                                 //process unprocessed wire
                                 if (lists.pins.size() > 1) {
                                     //use wire merger
-                                    processWire(new WireToBusAdapter(destination, offset), lists.pins, lists.passivePins, null);
+                                    WireToBusesAdapter adapter = new WireToBusesAdapter(null, null, destination, offset);
+                                    Pin src = processWire(adapter, lists.pins, lists.passivePins, null);
+                                    adapter.id = src.id;
+                                    adapter.parent = src.parent;
                                 } else {
                                     //use direct wire connect
                                     lists.pins.getFirst().addDestination(destination, offset);

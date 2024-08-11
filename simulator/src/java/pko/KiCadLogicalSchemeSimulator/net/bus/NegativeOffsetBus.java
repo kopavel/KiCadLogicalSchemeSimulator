@@ -31,43 +31,28 @@
  */
 package pko.KiCadLogicalSchemeSimulator.net.bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
+import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
+import pko.KiCadLogicalSchemeSimulator.api.bus.in.CorrectedInBus;
 
-public class NegativeOffsetBus extends Bus {
-    protected byte offset;
-    protected Bus destination;
-
-    public NegativeOffsetBus(Bus destination, byte offset) {
-        super(destination, "offset" + offset);
+public class NegativeOffsetBus extends OffsetBus {
+    public NegativeOffsetBus(OutBus outBus, CorrectedInBus destination, byte offset) {
+        super(outBus, destination, (byte) -offset);
         if (offset == 0) {
             throw new RuntimeException("Offset must not be 0");
         }
-        this.destination = destination;
-        this.offset = (byte) -offset;
-        id += ":offset" + offset;
+        id += ":N";
     }
 
-    /*Optimiser constructor*/
+    /*Optimiser constructor unroll destination:destinations*/
     public NegativeOffsetBus(NegativeOffsetBus oldBus, String variantId) {
         super(oldBus, variantId);
-        offset = oldBus.offset;
-        destination = oldBus.destination;
     }
 
     @Override
     public void setState(long newState) {
-        /*Optimiser bind offset*/
-        destination.setState(newState >> offset);
-    }
-
-    @Override
-    public void setHiImpedance() {
-        destination.setHiImpedance();
-    }
-
-    @Override
-    public Bus getOptimised() {
-        destination = destination.getOptimised();
-        return new ClassOptimiser<>(this).bind("offset", String.valueOf(offset)).build();
+        for (Bus destination : destinations) {
+            /*Optimiser bind offset*/
+            destination.setState(newState >> offset);
+        }
     }
 }

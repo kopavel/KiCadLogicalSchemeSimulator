@@ -30,6 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.api.wire;
+import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 
 public abstract class PassivePin extends OutPin {
@@ -55,6 +56,14 @@ public abstract class PassivePin extends OutPin {
             assert !(inImpedance = false);
             setHiImpedance();
         }
+    }
+
+    @Override
+    public Pin copyState(IModelItem<Pin> oldPin) {
+        inStrong = oldPin.isStrong();
+        inState = oldPin.getState() != 0;
+        inImpedance = oldPin.isHiImpedance();
+        return this;
     }
 
     @Override

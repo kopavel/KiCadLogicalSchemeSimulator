@@ -31,43 +31,55 @@
  */
 package pko.KiCadLogicalSchemeSimulator.net.bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
+import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
+import pko.KiCadLogicalSchemeSimulator.api.bus.in.CorrectedInBus;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
+import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
-public class OffsetBus extends Bus {
+public class OffsetBus extends OutBus {
     protected byte offset;
-    protected Bus destination;
 
-    public OffsetBus(Bus destination, byte offset) {
-        super(destination, "offset" + offset);
+    public OffsetBus(OutBus outBus, CorrectedInBus destination, byte offset) {
+        super(outBus, "offset" + offset);
         if (offset == 0) {
             throw new RuntimeException("Offset must not be 0");
         }
-        this.destination = destination;
+        destinations = new Bus[]{destination};
         this.offset = offset;
         id += ":offset" + offset;
     }
 
-    /*Optimiser constructor*/
+    /*Optimiser constructor unroll destination:destinations*/
     public OffsetBus(OffsetBus oldBus, String variantId) {
         super(oldBus, variantId);
         offset = oldBus.offset;
-        destination = oldBus.destination;
+        destinations = oldBus.destinations;
     }
 
     @Override
     public void setState(long newState) {
-        /*Optimiser bind offset*/
-        destination.setState(newState << offset);
+        for (Bus destination : destinations) {
+            /*Optimiser bind offset*/
+            destination.setState(newState << offset);
+        }
     }
 
     @Override
     public void setHiImpedance() {
-        destination.setHiImpedance();
+        for (Bus destination : destinations) {
+            destination.setHiImpedance();
+        }
+    }
+
+    public void addDestination(Bus item) {
+        destinations = Utils.addToArray(destinations, item);
     }
 
     @Override
     public Bus getOptimised() {
-        destination = destination.getOptimised();
-        return new ClassOptimiser<>(this).bind("offset", String.valueOf(offset)).build();
+        for (int i = 0; i < destinations.length; i++) {
+            destinations[i] = destinations[i].getOptimised();
+        }
+        return new ClassOptimiser<>(this).unroll(destinations.length).bind("offset", String.valueOf(offset)).build();
     }
 }

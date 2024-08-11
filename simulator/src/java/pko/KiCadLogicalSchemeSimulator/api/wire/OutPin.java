@@ -33,11 +33,15 @@ package pko.KiCadLogicalSchemeSimulator.api.wire;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.net.wire.NCWire;
-import pko.KiCadLogicalSchemeSimulator.net.wire.WireToBusAdapter;
+import pko.KiCadLogicalSchemeSimulator.net.wire.WireToBusesAdapter;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class OutPin extends Pin {
+    private final Map<Byte, WireToBusesAdapter> adapters = new HashMap<>();
     public Pin[] destinations = new Pin[0];
 
     public OutPin(String id, SchemaPart parent) {
@@ -63,8 +67,11 @@ public class OutPin extends Pin {
     }
 
     public void addDestination(Bus bus, byte offset) {
-        //FixMe group by offset
-        destinations = Utils.addToArray(destinations, new WireToBusAdapter(bus, offset));
+        if (adapters.containsKey(offset)) {
+            adapters.get(offset).addDestination(bus);
+        } else {
+            destinations = Utils.addToArray(destinations, new WireToBusesAdapter(this.id, this.parent, bus, offset));
+        }
     }
 
     @Override

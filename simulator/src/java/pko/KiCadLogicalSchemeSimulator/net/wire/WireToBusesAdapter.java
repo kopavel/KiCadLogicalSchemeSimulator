@@ -34,27 +34,27 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.OutPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
+import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 public class WireToBusesAdapter extends OutPin {
     public long mask;
     private Bus[] destinations;
 
-    public WireToBusesAdapter(Pin src, Bus[] destinations, byte offset) {
-        this(src.id, src.parent, destinations, offset);
-    }
-
-    public WireToBusesAdapter(String id, SchemaPart parent, Bus[] destinations, byte offset) {
+    public WireToBusesAdapter(String id, SchemaPart parent, Bus destinations, byte offset) {
         super(id, parent);
         mask = 1L << offset;
-        this.destinations = destinations;
+        this.destinations = new Bus[]{destinations};
     }
 
-    @Override
-    public void addDestination(Bus bus, byte offset) {
-        if (mask != (1L << offset)) {
-            throw new RuntimeException("Can't add bus with offset " + offset + " to adapter with mask " + mask);
-        }
+    /*Optimiser constructor unroll destination:destinations*/
+    public WireToBusesAdapter(WireToBusesAdapter oldPin, String variantId) {
+        super(oldPin, variantId);
+        destinations = oldPin.destinations;
+        mask = oldPin.mask;
+    }
+
+    public void addDestination(Bus bus) {
         destinations = Utils.addToArray(destinations, bus);
     }
 
@@ -66,7 +66,8 @@ public class WireToBusesAdapter extends OutPin {
     @Override
     public void setState(boolean newState) {
         for (Bus destination : destinations) {
-            destination.setState(newState ? mask : 0);
+            /*Optimiser bind mask*/
+            destination.setState(newState ? mask : 0L);
         }
     }
 
@@ -81,12 +82,12 @@ public class WireToBusesAdapter extends OutPin {
     @Override
     public Pin getOptimised() {
         if (destinations.length == 0) {
-            throw new RuntimeException("unconnected WireToBusAdapter " + getName());
+            throw new RuntimeException("unconnected WireToBusesAdapter " + getName());
         } else {
             for (int i = 0; i < destinations.length; i++) {
                 destinations[i] = destinations[i].getOptimised();
             }
-            return this;
+            return new ClassOptimiser<>(this).unroll(destinations.length).bind("mask", String.valueOf(mask)).build();
         }
     }
 }

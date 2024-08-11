@@ -38,9 +38,12 @@ import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class OutBus extends Bus {
     public Bus[] destinations = new Bus[0];
+    public Map<Byte, OffsetBus> corrected = new HashMap<>();
     public long mask;
 
     public OutBus(String id, SchemaPart parent, int size, String... names) {
@@ -55,12 +58,17 @@ public class OutBus extends Bus {
     }
 
     public void addDestination(Bus bus, long mask, byte offset) {
-        //FixMe group by offset
-        if (bus instanceof CorrectedInBus && offset != 0) {
-            if (offset > 0) {
-                bus = new OffsetBus(bus, offset);
+        if (bus instanceof CorrectedInBus correctedBus && offset != 0) {
+            if (corrected.containsKey(offset)) {
+                corrected.get(offset).addDestination(bus);
+                return;
             } else {
-                bus = new NegativeOffsetBus(bus, offset);
+                if (offset > 0) {
+                    bus = new OffsetBus(this, correctedBus, offset);
+                } else {
+                    bus = new NegativeOffsetBus(this, correctedBus, offset);
+                }
+                corrected.put(offset, (OffsetBus) bus);
             }
         }
         if (mask != this.mask) {

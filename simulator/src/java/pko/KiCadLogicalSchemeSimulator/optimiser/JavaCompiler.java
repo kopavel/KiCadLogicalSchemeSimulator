@@ -42,8 +42,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 
 public class JavaCompiler {
@@ -110,6 +108,7 @@ public class JavaCompiler {
         InMemoryJavaFileManager fileManager = new InMemoryJavaFileManager(compiler.getStandardFileManager(null, null, null));
         JavaFileObject javaFileObject = new InMemoryJavaFileObject(className, sourceCode);
         List<JavaFileObject> javaFileObjects = Collections.singletonList(javaFileObject);
+        //FixMe add diagnostic listener and LOG all errors;
         javax.tools.JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, null, optionList, null, javaFileObjects);
         if (task.call()) {
             fileManager.getClassBytes().entrySet()
@@ -122,7 +121,7 @@ public class JavaCompiler {
                                    Log.debug(JavaCompiler.class, "Load class {}", entry.getKey());
                                    loadClass(srcClass, entry.getValue().toByteArray());
                                }
-                               storeClass(entry.getKey(), entry.getValue().toByteArray(), sourceCode);
+                               storeClass(entry.getKey(), entry.getValue().toByteArray());
                            } catch (Exception e) {
                                throw new RuntimeException(e);
                            }
@@ -133,16 +132,10 @@ public class JavaCompiler {
         }
     }
 
-    private static void storeClass(String className, byte[] byteArray, String source) throws IOException {
+    private static void storeClass(String className, byte[] byteArray) throws IOException {
         String path = "optimised" + File.separator + className.replace(".", File.separator) + ".class";
-        String srcPath = "optimised" + File.separator + className.replace(".", File.separator) + ".java";
-        String dirPath = path.substring(0, path.lastIndexOf(File.separator));
-        Files.createDirectories(Paths.get(dirPath));
         try (OutputStream os = new BufferedOutputStream(new FileOutputStream(path))) {
             os.write(byteArray);
-        }
-        try (OutputStream os = new BufferedOutputStream(new FileOutputStream(srcPath))) {
-            os.write(source.getBytes(StandardCharsets.UTF_8));
         }
     }
 
