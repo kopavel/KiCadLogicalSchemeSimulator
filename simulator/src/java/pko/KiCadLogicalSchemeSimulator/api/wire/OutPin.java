@@ -32,9 +32,9 @@
 package pko.KiCadLogicalSchemeSimulator.api.wire;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.net.javaCompiller.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.net.wire.NCWire;
 import pko.KiCadLogicalSchemeSimulator.net.wire.WireToBusAdapter;
+import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 public class OutPin extends Pin {
@@ -76,7 +76,7 @@ public class OutPin extends Pin {
 
     @Override
     public void setHiImpedance() {
-//        assert !hiImpedance : "Already in hiImpedance:" + this;
+        assert !hiImpedance : "Already in hiImpedance:" + this;
         for (Pin destination : destinations) {
             destination.setHiImpedance();
         }

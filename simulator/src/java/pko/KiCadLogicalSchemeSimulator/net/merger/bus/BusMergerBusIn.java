@@ -34,8 +34,8 @@ import pko.KiCadLogicalSchemeSimulator.api.ShortcutException;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.in.CorrectedInBus;
 import pko.KiCadLogicalSchemeSimulator.net.Net;
-import pko.KiCadLogicalSchemeSimulator.net.javaCompiller.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
+import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
@@ -66,19 +66,19 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
 
     @Override
     public void setState(long newState) {
-//        assert Log.debug(BusMergerBusIn.class,
-//                "Bus merger change. before: newState:{}, Source:{} (state:{},  hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{}, " +
-//                        "hiImpedance:{})\",",
-//                newState,
-//                getName(),
-//                state,
-//                hiImpedance,
-//                merger.getName(),
-//                merger.state,
-//                merger.strongPins,
-//                merger.weakState,
-//                merger.weakPins,
-//                merger.hiImpedance);
+        assert Log.debug(BusMergerBusIn.class,
+                "Bus merger change. before: newState:{}, Source:{} (state:{},  hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{}, " +
+                        "hiImpedance:{})\",",
+                newState,
+                getName(),
+                state,
+                hiImpedance,
+                merger.getName(),
+                merger.state,
+                merger.strongPins,
+                merger.weakState,
+                merger.weakPins,
+                merger.hiImpedance);
         state = newState;
         hiImpedance = false;
         long oldState = merger.state;
@@ -110,36 +110,36 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
             }
         }
         oldImpedance = false;
-//        assert Log.debug(BusMergerBusIn.class,
-//                "Bus merger change. after: newState:{}, Source:{} (state:{},  hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{}, " +
-//                        "hiImpedance:{})\",",
-//                newState,
-//                getName(),
-//                state,
-//                hiImpedance,
-//                merger.getName(),
-//                merger.state,
-//                merger.strongPins,
-//                merger.weakState,
-//                merger.weakPins,
-//                merger.hiImpedance);
+        assert Log.debug(BusMergerBusIn.class,
+                "Bus merger change. after: newState:{}, Source:{} (state:{},  hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{}, " +
+                        "hiImpedance:{})\",",
+                newState,
+                getName(),
+                state,
+                hiImpedance,
+                merger.getName(),
+                merger.state,
+                merger.strongPins,
+                merger.weakState,
+                merger.weakPins,
+                merger.hiImpedance);
     }
 
     @Override
     public void setHiImpedance() {
-//        assert Log.debug(BusMergerBusIn.class,
-//                "Bus merger setImpedance. before: Source:{} (state:{},  hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{}, " +
-//                        "hiImpedance:{})\",",
-//                getName(),
-//                state,
-//                hiImpedance,
-//                merger.getName(),
-//                merger.state,
-//                merger.strongPins,
-//                merger.weakState,
-//                merger.weakPins,
-//                merger.hiImpedance);
-//        assert !hiImpedance : "Already in hiImpedance:" + this + "; merger=" + merger.getName();
+        assert Log.debug(BusMergerBusIn.class,
+                "Bus merger setImpedance. before: Source:{} (state:{},  hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{}, " +
+                        "hiImpedance:{})\",",
+                getName(),
+                state,
+                hiImpedance,
+                merger.getName(),
+                merger.state,
+                merger.strongPins,
+                merger.weakState,
+                merger.weakPins,
+                merger.hiImpedance);
+        assert !hiImpedance : "Already in hiImpedance:" + this + "; merger=" + merger.getName();
         long oldState = merger.state;
         merger.strongPins &= nMask;
         merger.state &= nMask;
@@ -159,18 +159,18 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
         }
         hiImpedance = true;
         oldImpedance = true;
-//        assert Log.debug(BusMergerBusIn.class,
-//                "Bus merger setImpedance. after: Source:{} (state:{},  hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{}, " +
-//                        "hiImpedance:{})\",",
-//                getName(),
-//                state,
-//                hiImpedance,
-//                merger.getName(),
-//                merger.state,
-//                merger.strongPins,
-//                merger.weakState,
-//                merger.weakPins,
-//                merger.hiImpedance);
+        assert Log.debug(BusMergerBusIn.class,
+                "Bus merger setImpedance. after: Source:{} (state:{},  hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{}, " +
+                        "hiImpedance:{})\",",
+                getName(),
+                state,
+                hiImpedance,
+                merger.getName(),
+                merger.state,
+                merger.strongPins,
+                merger.weakState,
+                merger.weakPins,
+                merger.hiImpedance);
     }
 
     @Override

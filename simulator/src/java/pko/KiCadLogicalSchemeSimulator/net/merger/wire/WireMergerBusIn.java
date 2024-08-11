@@ -36,8 +36,8 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.in.CorrectedInBus;
 import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.net.Net;
-import pko.KiCadLogicalSchemeSimulator.net.javaCompiller.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
+import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 public class WireMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
@@ -65,16 +65,16 @@ public class WireMergerBusIn extends CorrectedInBus implements MergerInput<Bus> 
 
     @Override
     public void setState(long newState) {
-// assert Log.debug(WireMergerBusIn.class,
-//         "Pin merger change. before: newState:{}, Source:{} (state:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{}, hiImpedance:{})",
-//         newState,
-//         getName(),
-//         state,
-//         hiImpedance,
-//         merger.getName(),
-//         merger.state,
-//         merger.strong,
-//         merger.hiImpedance);
+        assert Log.debug(WireMergerBusIn.class,
+                "Pin merger change. before: newState:{}, Source:{} (state:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{}, hiImpedance:{})",
+                newState,
+                getName(),
+                state,
+                hiImpedance,
+                merger.getName(),
+                merger.state,
+                merger.strong,
+                merger.hiImpedance);
         state = newState;
         hiImpedance = false;
         if (oldImpedance && merger.strong) { //merger not in hiImpedance or weak
@@ -99,21 +99,21 @@ public class WireMergerBusIn extends CorrectedInBus implements MergerInput<Bus> 
         merger.strong = true;
         merger.hiImpedance = false;
         oldImpedance = false;
-// assert Log.debug(WireMergerBusIn.class,
-//         "Pin merger change. after: newState:{}, Source:{} (state:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{}, hiImpedance:{})",
-//         newState,
-//         getName(),
-//         state,
-//         hiImpedance,
-//         merger.getName(),
-//         merger.state,
-//         merger.strong,
-//         merger.hiImpedance);
+        assert Log.debug(WireMergerBusIn.class,
+                "Pin merger change. after: newState:{}, Source:{} (state:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{}, hiImpedance:{})",
+                newState,
+                getName(),
+                state,
+                hiImpedance,
+                merger.getName(),
+                merger.state,
+                merger.strong,
+                merger.hiImpedance);
     }
 
     @Override
     public void setHiImpedance() {
-//        assert !hiImpedance : "Already in hiImpedance:" + this + "; merger=" + merger.getName();
+        assert !hiImpedance : "Already in hiImpedance:" + this + "; merger=" + merger.getName();
         if (merger.hasWeak) { //FixMe known in Net build time
             if (merger.state != merger.weakState) {
                 merger.state = merger.weakState;

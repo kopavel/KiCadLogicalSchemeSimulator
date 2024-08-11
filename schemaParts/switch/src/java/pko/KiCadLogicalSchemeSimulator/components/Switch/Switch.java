@@ -92,7 +92,7 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
     }
 
     private void setImpedance(PassivePin pin1, PassivePin pin2) {
-//        assert !pin1.inImpedance : "Already in hiImpedance:" + pin1;
+        assert !pin1.inImpedance : "Already in hiImpedance:" + pin1;
         pin1.inImpedance = true;
         if (toggled && !pin2.inImpedance) {
             for (Pin destination : pin1.destinations) {

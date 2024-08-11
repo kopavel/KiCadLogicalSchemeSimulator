@@ -35,8 +35,8 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
 import pko.KiCadLogicalSchemeSimulator.net.Net;
-import pko.KiCadLogicalSchemeSimulator.net.javaCompiller.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
+import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
@@ -113,7 +113,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
 
     @Override
     public void setHiImpedance() {
-//        assert !hiImpedance : "Already in hiImpedance:" + this + "; merger=" + merger.getName();
+        assert !hiImpedance : "Already in hiImpedance:" + this + "; merger=" + merger.getName();
         if (merger.hasWeak) { //FixMe known in Net build time
             if (merger.state != merger.weakState) {
                 merger.state = merger.weakState;

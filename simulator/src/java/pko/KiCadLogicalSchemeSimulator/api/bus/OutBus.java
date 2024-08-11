@@ -34,7 +34,7 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.in.CorrectedInBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.net.bus.*;
-import pko.KiCadLogicalSchemeSimulator.net.javaCompiller.ClassOptimiser;
+import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 import java.util.Arrays;
@@ -98,7 +98,7 @@ public class OutBus extends Bus {
 
     @Override
     public void setHiImpedance() {
-//        assert !hiImpedance : "Already in hiImpedance:" + this;
+        assert !hiImpedance : "Already in hiImpedance:" + this;
         for (Bus destination : destinations) {
             destination.setHiImpedance();
         }

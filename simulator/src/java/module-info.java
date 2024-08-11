@@ -39,17 +39,17 @@ module KiCadLogicalSchemeSimulator.simulator {
     exports pko.KiCadLogicalSchemeSimulator.api.wire;
     exports pko.KiCadLogicalSchemeSimulator.api;
     exports pko.KiCadLogicalSchemeSimulator.net;
+    exports pko.KiCadLogicalSchemeSimulator.optimiser;
     exports pko.KiCadLogicalSchemeSimulator.parsers.pojo.symbolMap;
     exports pko.KiCadLogicalSchemeSimulator.parsers.pojo;
     exports pko.KiCadLogicalSchemeSimulator.tools.ringBuffers;
     exports pko.KiCadLogicalSchemeSimulator.tools;
     exports pko.KiCadLogicalSchemeSimulator;
     opens pko.KiCadLogicalSchemeSimulator.net;
+    opens pko.KiCadLogicalSchemeSimulator.optimiser;
     opens pko.KiCadLogicalSchemeSimulator.parsers.pojo.symbolMap;
     opens pko.KiCadLogicalSchemeSimulator.parsers.pojo;
     opens pko.KiCadLogicalSchemeSimulator;
-    opens pko.KiCadLogicalSchemeSimulator.net.javaCompiller;
-    exports pko.KiCadLogicalSchemeSimulator.net.javaCompiller;
     requires com.fasterxml.jackson.annotation;
     requires com.fasterxml.jackson.core;
     requires com.fasterxml.jackson.databind;
@@ -72,8 +72,8 @@ module KiCadLogicalSchemeSimulator.simulator {
     requires org.apache.logging.log4j.jul;
     requires org.apache.logging.log4j.slf4j.impl;
     requires org.apache.logging.log4j;
+    requires org.javassist;
     requires org.tukaani.xz;
     requires static lombok;
-    requires org.javassist;
     uses SchemaPartSpi;
 }

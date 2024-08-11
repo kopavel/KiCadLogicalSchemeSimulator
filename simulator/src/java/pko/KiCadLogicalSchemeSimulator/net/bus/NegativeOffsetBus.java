@@ -31,7 +31,7 @@
  */
 package pko.KiCadLogicalSchemeSimulator.net.bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.net.javaCompiller.ClassOptimiser;
+import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 
 public class NegativeOffsetBus extends Bus {
     protected byte offset;
