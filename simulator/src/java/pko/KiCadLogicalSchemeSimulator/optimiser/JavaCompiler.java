@@ -82,7 +82,7 @@ public class JavaCompiler {
             public void initOuts() {
             }
         });
-        String suffix = "$test";
+        String suffix = "_test";
         String simpleClassName = scr.getClass().getSimpleName();
         String fullClassName = scr.getClass().getName() + suffix;
         String sourceCode;

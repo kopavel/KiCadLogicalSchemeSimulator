@@ -89,19 +89,20 @@ public class ClassOptimiser<T> {
 
     public ClassOptimiser<T> unroll(int size) {
         unrollSize = size;
-        suffix += "$unroll" + size;
+        suffix += "_unroll" + size;
         return this;
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public ClassOptimiser<T> cut(String cutName) {
         cutList.add(cutName);
-        suffix += "cut_" + cutName;
+        suffix += "_cut_" + cutName;
         return this;
     }
 
     public ClassOptimiser<T> bind(String bindName, String replacement) {
         binds.put(bindName, replacement);
-        suffix += "$" + bindName + "_" + replacement;
+        suffix += "_" + bindName + "_" + replacement;
         return this;
     }
 
