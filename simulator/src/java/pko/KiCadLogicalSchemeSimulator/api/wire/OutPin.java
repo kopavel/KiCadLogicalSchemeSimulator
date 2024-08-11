@@ -94,31 +94,6 @@ public class OutPin extends Pin {
             return new NCWire(this);
         } else if (destinations.length == 1) {
             return destinations[0].getOptimised().copyState(this);
-        } else if (parent.id.equals("javac")) {
-            Pin d1 = destinations[0].getOptimised();
-            Pin d2 = destinations[1].getOptimised();
-            Pin d3 = destinations[2].getOptimised();
-            Pin d4 = destinations[3].getOptimised();
-            Pin d5 = destinations[4].getOptimised();
-            return new OutPin(this, "unroll5") {
-                @Override
-                public void setState(boolean newState) {
-                    d1.setState(state);
-                    d2.setState(state);
-                    d3.setState(state);
-                    d4.setState(state);
-                    d5.setState(state);
-                }
-
-                @Override
-                public void setHiImpedance() {
-                    d1.setHiImpedance();
-                    d2.setHiImpedance();
-                    d3.setHiImpedance();
-                    d4.setHiImpedance();
-                    d5.setHiImpedance();
-                }
-            };
         } else {
             for (int i = 0; i < destinations.length; i++) {
                 destinations[i] = destinations[i].getOptimised();

@@ -44,36 +44,8 @@ public class OutPinBenchmark {
     @Warmup(iterations = 1, time = 15)
     @Measurement(iterations = 3, time = 15)
     @OutputTimeUnit(TimeUnit.SECONDS)
-    public void javac(StateForJavac state) {
-        BenchmarkRunner.doWork(state.out);
-    }
-
-    @Benchmark
-    @Fork(value = 1)
-    @Warmup(iterations = 1, time = 15)
-    @Measurement(iterations = 3, time = 15)
-    @OutputTimeUnit(TimeUnit.SECONDS)
     public void optimiser(StateForOptimiser state) {
         BenchmarkRunner.doWork(state.out);
-    }
-
-    @State(Scope.Thread)
-    public static class StateForJavac {
-        Pin out;
-
-        @Setup(Level.Trial)
-        public void setUp() {
-            SchemaPart testPart = new SchemaPart("javac", "") {
-                @Override
-                public void initOuts() {
-                }
-            };
-            out = new OutPin("test", testPart);
-            for (int i = 0; i < 5; i++) {
-                ((OutPin) out).addDestination(testPart.addInPin("in" + i));
-            }
-            out = out.getOptimised();
-        }
     }
 
     @State(Scope.Thread)

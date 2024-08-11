@@ -34,9 +34,9 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 
 public class BusInInterconnect extends InBus {
-    public final long interconnectMask;
-    public final long senseMask;
-    public final long inverseInterconnectMask;
+    public long interconnectMask;
+    public long senseMask;
+    public long inverseInterconnectMask;
     public InBus destination;
 
     public BusInInterconnect(InBus destination, long interconnectMask, Byte offset) {
@@ -53,6 +53,7 @@ public class BusInInterconnect extends InBus {
         interconnectMask = oldBus.interconnectMask;
         senseMask = oldBus.senseMask;
         inverseInterconnectMask = oldBus.inverseInterconnectMask;
+        destination = oldBus.destination;
     }
 
     @Override

@@ -72,11 +72,15 @@ public class Simulator implements Runnable {
 
     public static void addMonitoringPart(String id, Rectangle sizes) {
         SwingUtilities.invokeLater(() -> {
-            SchemaPartMonitor partMonitor = monitoredParts.computeIfAbsent(id, SchemaPartMonitor::new);
-            partMonitor.setVisible(true);
+            if (!net.schemaParts.containsKey(id)) {
+                Log.warn(Simulator.class, "Unknown monitoring part {} in Layout file", id);
+            } else {
+                SchemaPartMonitor partMonitor = monitoredParts.computeIfAbsent(id, SchemaPartMonitor::new);
+                partMonitor.setVisible(true);
 //            partMonitor.toFront();
-            if (sizes != null) {
-                partMonitor.setBounds(sizes);
+                if (sizes != null) {
+                    partMonitor.setBounds(sizes);
+                }
             }
         });
     }

@@ -44,15 +44,6 @@ public class OutBusBenchmark {
     @Warmup(iterations = 1, time = 15)
     @Measurement(iterations = 3, time = 15)
     @OutputTimeUnit(TimeUnit.SECONDS)
-    public void javac(StateForJavac state) {
-        BenchmarkRunner.doWork(state.out);
-    }
-
-    @Benchmark
-    @Fork(value = 1)
-    @Warmup(iterations = 1, time = 15)
-    @Measurement(iterations = 3, time = 15)
-    @OutputTimeUnit(TimeUnit.SECONDS)
     public void optimiser(StateForOptimiser state) {
         BenchmarkRunner.doWork(state.out);
     }
@@ -72,25 +63,6 @@ public class OutBusBenchmark {
             for (int i = 0; i < 5; i++) {
                 ((OutBus) out).addDestination(testPart.addInBus("in" + i, 5), 0b11111, (byte) 0);
             }
-        }
-    }
-
-    @State(Scope.Thread)
-    public static class StateForJavac {
-        Bus out;
-
-        @Setup(Level.Trial)
-        public void setUp() {
-            SchemaPart testPart = new SchemaPart("javac", "") {
-                @Override
-                public void initOuts() {
-                }
-            };
-            out = new OutBus("test", testPart, 5);
-            for (int i = 0; i < 5; i++) {
-                ((OutBus) out).addDestination(testPart.addInBus("in" + i, 5), 0b11111, (byte) 0);
-            }
-            out = out.getOptimised();
         }
     }
 

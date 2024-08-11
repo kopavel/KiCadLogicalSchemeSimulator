@@ -39,15 +39,6 @@ import java.util.concurrent.TimeUnit;
 
 @State(Scope.Benchmark)
 public class MaskGroupBenchmark {
-    @Benchmark
-    @Fork(value = 1)
-    @Warmup(iterations = 1, time = 15)
-    @Measurement(iterations = 3, time = 15)
-    @OutputTimeUnit(TimeUnit.SECONDS)
-    public void javac(StateForJavac state) {
-        BenchmarkRunner.doWork(state.out);
-    }
-
     @org.openjdk.jmh.annotations.Benchmark
     @Fork(value = 1)
     @Warmup(iterations = 1, time = 15)
@@ -55,25 +46,6 @@ public class MaskGroupBenchmark {
     @OutputTimeUnit(TimeUnit.SECONDS)
     public void optimiser(StateForOptimiser state) {
         BenchmarkRunner.doWork(state.out);
-    }
-
-    @State(Scope.Thread)
-    public static class StateForJavac {
-        Bus out;
-
-        @Setup(Level.Trial)
-        public void setUp() {
-            SchemaPart testPart = new SchemaPart("javac", "") {
-                @Override
-                public void initOuts() {
-                }
-            };
-            out = new OutBus("test", testPart, 5);
-            for (int i = 0; i < 5; i++) {
-                ((OutBus) out).addDestination(testPart.addInBus("in" + i, 5), 0b1111, (byte) 0);
-            }
-            out = out.getOptimised();
-        }
     }
 
     @State(Scope.Thread)
