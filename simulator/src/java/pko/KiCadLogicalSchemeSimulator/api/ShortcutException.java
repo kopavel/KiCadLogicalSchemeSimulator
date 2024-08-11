@@ -32,9 +32,16 @@
 package pko.KiCadLogicalSchemeSimulator.api;
 import lombok.Getter;
 
+import java.util.Set;
+
 @Getter
 public class ShortcutException extends RuntimeException {
     private final String message;
+
+    public ShortcutException(Set<? extends IModelItem<?>> pins) {
+        //noinspection DataFlowIssue
+        this((IModelItem<?>[]) pins.toArray());
+    }
 
     public ShortcutException(IModelItem<?>... pins) {
         StringBuilder message = new StringBuilder("Shortcut on ");

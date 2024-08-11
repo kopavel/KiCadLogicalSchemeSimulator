@@ -41,15 +41,11 @@ import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-//FixMe use one destination with splitter
 //FixMe implement passive pin merger (signal need to be send in both directions for passive pins)
 public class WireMerger extends OutPin {
-    public MergerInput<?>[] sources = new MergerInput[0];
+    public Set<MergerInput<?>> sources = new TreeSet<>(Comparator.comparing(MergerInput::getName));
     public boolean weakState;
     public boolean hasWeak;
 
@@ -93,7 +89,7 @@ public class WireMerger extends OutPin {
     private void addSource(OutBus bus, long mask) {
         WireMergerBusIn input = new WireMergerBusIn(bus, mask, this);
         bus.addDestination(input, mask, (byte) 0);
-        sources = Utils.addToArray(sources, input);
+        sources.add(input);
         if (!bus.hiImpedance) {
             if (!hiImpedance) {
                 if (Net.stabilizing) {
@@ -110,8 +106,7 @@ public class WireMerger extends OutPin {
 
     private void addSource(OutPin pin) {
         if (pin instanceof PullPin pullPin) {
-            sources = Utils.addToArray(sources, pullPin);
-            Arrays.sort(sources, Comparator.comparing(MergerInput::getName));
+            sources.add(pullPin);
             if (hasWeak && pin.state != weakState) {
                 throw new ShortcutException(sources);
             }
@@ -125,7 +120,7 @@ public class WireMerger extends OutPin {
         } else {
             WireMergerWireIn input = new WireMergerWireIn(pin, this);
             pin.addDestination(input);
-            sources = Utils.addToArray(sources, input);
+            sources.add(input);
             if (!pin.hiImpedance) {
                 if (!hiImpedance && strong) {
                     if (Net.stabilizing) {

@@ -123,7 +123,7 @@ idea {
         excludeDirs += file('distro')
         excludeDirs += file('stuff/work')
         fileTree(rootDir).visit { FileVisitDetails details ->
-            if (details.isDirectory() && details.name == 'logs' || details.name.endsWith(".log")) {
+            if (details.isDirectory() && (details.name == 'logs' || details.name == 'optimised') || details.name.endsWith(".log")) {
                 excludeDirs += details.file
             }
         }

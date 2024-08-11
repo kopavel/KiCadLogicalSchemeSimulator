@@ -184,8 +184,10 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
 
     @Override
     public BusMergerBusIn getOptimised() {
-        //FixMe need replace in merger.sources
+        merger.sources.remove(this);
         destinations = merger.destinations;
-        return new ClassOptimiser<>(this).unroll(merger.destinations.length).build();
+        BusMergerBusIn optimised = new ClassOptimiser<>(this).unroll(merger.destinations.length).build();
+        merger.sources.add(optimised);
+        return optimised;
     }
 }

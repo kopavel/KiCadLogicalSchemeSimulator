@@ -44,15 +44,11 @@ import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
-//FixMe use one destination with splitter
 //ToDo implement pure bus implementation (no weak state)
 public class BusMerger extends OutBus {
-    public MergerInput<?>[] sources = new MergerInput[0];
+    public Set<MergerInput<?>> sources = new TreeSet<>(Comparator.comparing(MergerInput::getName));
     public long strongPins;
     public long weakPins;
     public long weakState;
@@ -86,7 +82,7 @@ public class BusMerger extends OutBus {
         long destinationMask = offset == 0 ? srcMask : (offset > 0 ? srcMask << offset : srcMask >> -offset);
         BusMergerBusIn input = new BusMergerBusIn(bus, destinationMask, this);
         bus.addDestination(input, srcMask, offset);
-        sources = Utils.addToArray(sources, input);
+        sources.add(input);
         if (!bus.hiImpedance) {
             if ((strongPins & destinationMask) != 0) {
                 if (Net.stabilizing) {
@@ -100,7 +96,6 @@ public class BusMerger extends OutBus {
             state |= bus.state;
             strongPins |= destinationMask;
         }
-        Arrays.sort(sources, Comparator.comparing(MergerInput::getName));
         hiImpedance = (strongPins | weakPins) != mask;
     }
 
@@ -111,8 +106,7 @@ public class BusMerger extends OutBus {
             if (pin.state) {
                 weakState |= destinationMask;
             }
-            sources = Utils.addToArray(sources, pullPin);
-            Arrays.sort(sources, Comparator.comparing(MergerInput::getName));
+            sources.add(pullPin);
             hiImpedance = (strongPins | weakPins) != mask;
         } else {
             BusMergerWireIn input = new BusMergerWireIn(destinationMask, this);
@@ -148,7 +142,7 @@ public class BusMerger extends OutBus {
         input.id = pin.id;
         input.parent = pin.parent;
         input.copyState(pin);
-        sources = Utils.addToArray(sources, input);
+        sources.add(input);
         if (!pin.hiImpedance) {
             if (pin.strong) {
                 if ((strongPins & destinationMask) != 0) {
@@ -181,7 +175,6 @@ public class BusMerger extends OutBus {
                 }
             }
         }
-        Arrays.sort(sources, Comparator.comparing(MergerInput::getName));
         hiImpedance = (strongPins | weakPins) != mask;
     }
 }
