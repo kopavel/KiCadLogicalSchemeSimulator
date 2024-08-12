@@ -110,8 +110,8 @@ public class JavaCompiler {
         InMemoryJavaFileManager fileManager = new InMemoryJavaFileManager(compiler.getStandardFileManager(null, null, null));
         JavaFileObject javaFileObject = new InMemoryJavaFileObject(className, sourceCode);
         List<JavaFileObject> javaFileObjects = Collections.singletonList(javaFileObject);
-        //FixMe add diagnostic listener and LOG all errors;
-        javax.tools.JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, null, optionList, null, javaFileObjects);
+        final DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
+        javax.tools.JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, diagnostics, optionList, null, javaFileObjects);
         if (task.call()) {
             fileManager.getClassBytes().entrySet()
                     .stream().sorted(Map.Entry.<String, ByteArrayOutputStream>comparingByKey().reversed()).forEach(entry -> {
@@ -130,6 +130,15 @@ public class JavaCompiler {
                        });
             return true;
         } else {
+            Log.error(JavaCompiler.class, "Can't compile source");
+            for (final Diagnostic<? extends JavaFileObject> diagnostic : diagnostics.getDiagnostics()) {
+                Log.error(JavaCompiler.class,
+                        "{} at {}:{} -> {}",
+                        diagnostic.getKind(),
+                        diagnostic.getLineNumber(),
+                        diagnostic.getColumnNumber(),
+                        diagnostic.getMessage(Locale.getDefault()));
+            }
             return false;
         }
     }

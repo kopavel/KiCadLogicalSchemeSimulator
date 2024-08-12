@@ -132,9 +132,13 @@ public class ClassOptimiser<T> {
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-                JavaCompiler.compileJavaSource(oldInstance.getClass(), optimizedClassName, optimisedSource);
-                Log.trace(JavaCompiler.class, "Return instance");
-                dynamicClass = Class.forName(oldInstance.getClass().getName() + suffix);
+                if (JavaCompiler.compileJavaSource(oldInstance.getClass(), optimizedClassName, optimisedSource)) {
+                    Log.trace(JavaCompiler.class, "Return instance");
+                    dynamicClass = Class.forName(oldInstance.getClass().getName() + suffix);
+                } else {
+                    Log.error(JavaCompiler.class, "Optimised class compile was not successful, fall back to generic class");
+                    return oldInstance;
+                }
             }
             // Create an instance and invoke the overridden method
             Constructor<?>[] constructors = dynamicClass.getDeclaredConstructors();
