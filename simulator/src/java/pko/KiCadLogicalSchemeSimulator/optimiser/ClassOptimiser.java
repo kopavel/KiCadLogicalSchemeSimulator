@@ -91,6 +91,11 @@ public class ClassOptimiser<T> {
         return this;
     }
 
+    public ClassOptimiser<T> bind(String bindName, boolean replacement) {
+        bind(bindName, String.valueOf(replacement));
+        return this;
+    }
+
     public ClassOptimiser<T> bind(String bindName, String replacement) {
         binds.put(bindName, replacement);
         suffix += "_" + bindName + "_" + replacement.replaceAll("[^a-zA-Z0-9_$]", "_");
