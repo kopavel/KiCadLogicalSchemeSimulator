@@ -87,7 +87,7 @@ public class WireToBusesAdapter extends OutPin {
             for (int i = 0; i < destinations.length; i++) {
                 destinations[i] = destinations[i].getOptimised();
             }
-            return new ClassOptimiser<>(this).unroll(destinations.length).bind("mask", String.valueOf(mask)).build();
+            return new ClassOptimiser<>(this).unroll(destinations.length).bind("mask", mask).build();
         }
     }
 }

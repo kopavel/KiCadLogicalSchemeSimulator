@@ -78,8 +78,6 @@ public class BusInInterconnect extends InBus {
     @Override
     public InBus getOptimised() {
         destination = destination.getOptimised();
-        return new ClassOptimiser<>(this).bind("interconnectMask", String.valueOf(interconnectMask))
-                                         .bind("inverseInterconnectMask", String.valueOf(inverseInterconnectMask))
-                                         .build();
+        return new ClassOptimiser<>(this).bind("interconnectMask", interconnectMask).bind("inverseInterconnectMask", inverseInterconnectMask).build();
     }
 }

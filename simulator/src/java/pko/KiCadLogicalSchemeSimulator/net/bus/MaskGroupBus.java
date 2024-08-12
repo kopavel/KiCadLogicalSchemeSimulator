@@ -56,9 +56,9 @@ public class MaskGroupBus extends OutBus {
     @Override
     public void setState(long newState) {
         /*Optimiser bind d:destinations[0] bind mask*/
-        if (this.maskState != (newState & mask) || destinations[0].hiImpedance) {
+        if (maskState != (newState & mask) || destinations[0].hiImpedance) {
             /*Optimiser bind mask*/
-            this.maskState = newState & mask;
+            maskState = newState & mask;
             for (Bus destination : destinations) {
                 destination.setState(maskState);
             }
@@ -80,7 +80,7 @@ public class MaskGroupBus extends OutBus {
             for (int i = 0; i < destinations.length; i++) {
                 destinations[i] = destinations[i].getOptimised();
             }
-            return new ClassOptimiser<>(this).unroll(destinations.length).bind("mask", String.valueOf(mask)).bind("d", "destination0").build();
+            return new ClassOptimiser<>(this).unroll(destinations.length).bind("mask", mask).bind("d", "destination0").build();
         }
     }
 }

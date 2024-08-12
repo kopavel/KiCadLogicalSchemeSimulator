@@ -80,6 +80,6 @@ public class OffsetBus extends OutBus {
         for (int i = 0; i < destinations.length; i++) {
             destinations[i] = destinations[i].getOptimised();
         }
-        return new ClassOptimiser<>(this).unroll(destinations.length).bind("offset", String.valueOf(offset)).build();
+        return new ClassOptimiser<>(this).unroll(destinations.length).bind("offset", offset).build();
     }
 }

@@ -61,7 +61,7 @@ public class BusToWireBenchmark {
                 }
             };
             out = new BusToWiresAdapter(new OutBus("test", testPart, 4), 0b10);
-            for (int i = 0; i < 5; i++) {
+            for (int i = 0; i < 1; i++) {
                 ((BusToWiresAdapter) out).addDestination(testPart.addInPin("in" + i));
             }
             out = out.getOptimised();

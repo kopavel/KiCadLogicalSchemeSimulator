@@ -92,8 +92,8 @@ public class WireMergerBusIn extends CorrectedInBus implements MergerInput<Bus> 
                 throw new ShortcutException(merger.sources);
             }
         }
-        if (merger.state == (state == 0)) { // merger state changes
-            merger.state = state != 0;
+        if (merger.state == (newState == 0)) { // merger state changes
+            merger.state = newState != 0;
             for (Pin destination : destinations) {
                 destination.setState(merger.state);
             }

@@ -32,8 +32,9 @@
 package pko.KiCadLogicalSchemeSimulator.optimiser;
 import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
+import pko.KiCadLogicalSchemeSimulator.net.bus.BusToWiresAdapter;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 import java.io.*;
@@ -65,25 +66,27 @@ public class ClassOptimiser<T> {
             public void initOuts() {
             }
         };
-        OutBus source = new OutBus("out", schemaPart, 5);
-        source.addDestination(new InBus("in1", schemaPart, 5) {
+        BusToWiresAdapter source = new BusToWiresAdapter(new OutBus("out", schemaPart, 5), 31);
+        source.addDestination(new InPin("in1", schemaPart) {
             @Override
             public void setHiImpedance() {
             }
 
             @Override
-            public void setState(long newState) {
+            public void setState(boolean newState) {
             }
-        }, 31, (byte) 0);
-        source.addDestination(new InBus("in2", schemaPart, 5) {
+        });
+/*
+        source.addDestination(new InPin("in2", schemaPart) {
             @Override
             public void setHiImpedance() {
             }
 
             @Override
-            public void setState(long newState) {
+            public void setState(boolean newState) {
             }
-        }, 31, (byte) 0);
+        });
+*/
         IModelItem<?> opt = source.getOptimised();
     }
 
@@ -100,10 +103,14 @@ public class ClassOptimiser<T> {
         return this;
     }
 
+    public ClassOptimiser<T> bind(String bindName, long replacement) {
+        bind(bindName, String.valueOf(replacement));
+        return this;
+    }
+
     public ClassOptimiser<T> bind(String bindName, String replacement) {
         binds.put(bindName, replacement);
         suffix += "_" + bindName + "_" + replacement.replaceAll("[^a-zA-Z0-9_$]", "_");
-        ;
         return this;
     }
 
@@ -245,7 +252,9 @@ public class ClassOptimiser<T> {
                             if (!bindPatterns.isEmpty()) {
                                 line = lines.next();
                                 for (Map.Entry<String, String> bind : bindPatterns.entrySet()) {
-                                    line = line.replaceAll("(?<=\\W|^)" + bind.getKey() + "(?=\\W|$)", binds.get(bind.getValue()));
+                                    if (binds.containsKey(bind.getValue())) {
+                                        line = line.replaceAll("(?<=\\W|^)" + bind.getKey() + "(?=\\W|$)", binds.get(bind.getValue()));
+                                    }
                                 }
                                 if (iteratorOffset > -1) {
                                     iteratorSource.append(line).append("\n");

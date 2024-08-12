@@ -88,7 +88,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                 throw new ShortcutException(merger.sources);
             }
         }
-        if (state != merger.state) { // merger state changes
+        if (newState != merger.state) { // merger state changes
             merger.state = state;
             for (Pin destination : destinations) {
                 destination.setState(merger.state);

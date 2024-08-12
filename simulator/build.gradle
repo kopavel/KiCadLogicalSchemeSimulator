@@ -133,8 +133,8 @@ tasks.register("runJmh", JavaExec) {
     args = [
             '-wi', '1', // Number of warm-up iterations
             '-w', '2', // time of warm-up iterations
-            '-i', '3', // Number of iterations
-            '-r', '5', // time of iterations
+            '-i', '5', // Number of iterations
+            '-r', '15', // time of iterations
             '-f1', // Number of forks
             '-t1', // Number of threads
 //            "pko.KiCadLogicalSchemeSimulator.test.benchmarks.OutPinBenchmark.optimiser",//

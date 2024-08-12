@@ -83,6 +83,7 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
         hiImpedance = false;
         long oldState = merger.state;
         if (oldImpedance) {
+            /*Optimiser bind mask*/
             if ((merger.strongPins & mask) != 0) {
                 if (Net.stabilizing) {
                     Net.forResend.add(this);
@@ -92,10 +93,13 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
                     throw new ShortcutException(merger.sources);
                 }
             }
+            /*Optimiser bind mask*/
             merger.strongPins |= mask;
         }
+        /*Optimiser bind nMask*/
         merger.state &= nMask;
-        merger.state |= state;
+        merger.state |= newState;
+        /*Optimiser bind mMask:merger.mask*/
         if ((merger.strongPins | merger.weakPins) != merger.mask) {
             if (!merger.hiImpedance) {
                 for (Bus destination : destinations) {
@@ -141,9 +145,13 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
                 merger.hiImpedance);
         assert !hiImpedance : "Already in hiImpedance:" + this + "; merger=" + merger.getName();
         long oldState = merger.state;
+        /*Optimiser bind nMask*/
         merger.strongPins &= nMask;
+        /*Optimiser bind nMask*/
         merger.state &= nMask;
+        /*Optimiser bind mask*/
         merger.state |= merger.weakState & mask;
+        /*Optimiser bind mMask:merger.mask*/
         if ((merger.strongPins | merger.weakPins) != merger.mask) {
             if (!merger.hiImpedance) {
                 for (Bus destination : destinations) {
@@ -186,7 +194,8 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
     public BusMergerBusIn getOptimised() {
         merger.sources.remove(this);
         destinations = merger.destinations;
-        BusMergerBusIn optimised = new ClassOptimiser<>(this).unroll(merger.destinations.length).build();
+        BusMergerBusIn optimised =
+                new ClassOptimiser<>(this).unroll(merger.destinations.length).bind("mask", mask).bind("nMask", nMask).bind("mMask", merger.mask).build();
         merger.sources.add(optimised);
         return optimised;
     }
