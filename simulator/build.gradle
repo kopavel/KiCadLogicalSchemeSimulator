@@ -47,7 +47,6 @@ dependencies {
     implementation libs.log4j.jpl
     implementation libs.xz
     implementation libs.commons.compress
-    implementation libs.disruptor
     runtimeOnly(project(":schemaParts"))
     implementation libs.jackson.databind
     implementation libs.jaxb.api
@@ -56,7 +55,6 @@ dependencies {
     implementation libs.jackson.dataformat.xml
     implementation libs.jackson.datatype.jsr310
     implementation libs.jackson.jaxb.annotations
-    implementation libs.javaassist
     implementation libs.picocli
     testImplementation libs.jmh
     testAnnotationProcessor libs.jmh.annotations
@@ -82,16 +80,10 @@ run {
     def jvm_args = []
     jvm_args += ["-Dlog4j.configurationFile=${sourceSets.main.resources.srcDirs.first().absolutePath}/log4j2.xml",
                  "-Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager",
-                 "-Dlog4j2.contextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector",
-                 "-Dlog4j2.asyncLoggerWaitStrategy=Block",
-                 "-XX:-OmitStackTraceInFastThrow",
-                 "-XX:CompileThreshold=10",
-                 "-XX:MaxInlineSize=65536",
-                 "-XX:ParallelGCThreads=1",
+                 "-XX:CompileThreshold=100",
+                 "-XX:ParallelGCThreads=2",
                  "-Xmx2G",
-                 "-XX:+UnlockDiagnosticVMOptions",
-                 "-XX:+DebugNonSafepoints",
-                 "-Dlog4j2.asyncLoggerThreadNameStrategy=CACHED"]
+    ]
     if (project.hasProperty('ea')) {
         jvm_args += ["-ea"]
     }

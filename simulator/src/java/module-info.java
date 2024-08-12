@@ -57,7 +57,6 @@ module KiCadLogicalSchemeSimulator.simulator {
     requires com.fasterxml.jackson.module.jakarta.xmlbind;
     requires com.fasterxml.jackson.module.jaxb;
     requires com.formdev.flatlaf;
-    requires com.lmax.disruptor;
     requires info.picocli;
     requires jakarta.xml.bind;
     requires java.desktop;
@@ -72,7 +71,6 @@ module KiCadLogicalSchemeSimulator.simulator {
     requires org.apache.logging.log4j.jul;
     requires org.apache.logging.log4j.slf4j.impl;
     requires org.apache.logging.log4j;
-    requires org.javassist;
     requires org.tukaani.xz;
     requires static lombok;
     uses SchemaPartSpi;
