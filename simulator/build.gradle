@@ -80,7 +80,9 @@ run {
     def jvm_args = []
     jvm_args += ["-Dlog4j.configurationFile=${sourceSets.main.resources.srcDirs.first().absolutePath}/log4j2.xml",
                  "-Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager",
-                 "-XX:CompileThreshold=100",
+                 "-XX:CompileThreshold=10",
+                 "-XX:MaxInlineSize=64",
+                 "-XX:MaxInlineLevel=14",
                  "-XX:ParallelGCThreads=2",
                  "-Xmx2G",
     ]
