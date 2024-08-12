@@ -33,8 +33,8 @@ package pko.KiCadLogicalSchemeSimulator.optimiser;
 import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
-import pko.KiCadLogicalSchemeSimulator.net.bus.BusToWiresAdapter;
+import pko.KiCadLogicalSchemeSimulator.net.bus.MaskGroupBus;
+import pko.KiCadLogicalSchemeSimulator.net.bus.SimpleBusToWireAdapter;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 import java.io.*;
@@ -66,28 +66,11 @@ public class ClassOptimiser<T> {
             public void initOuts() {
             }
         };
-        BusToWiresAdapter source = new BusToWiresAdapter(new OutBus("out", schemaPart, 5), 31);
-        source.addDestination(new InPin("in1", schemaPart) {
-            @Override
-            public void setHiImpedance() {
-            }
-
-            @Override
-            public void setState(boolean newState) {
-            }
-        });
-/*
-        source.addDestination(new InPin("in2", schemaPart) {
-            @Override
-            public void setHiImpedance() {
-            }
-
-            @Override
-            public void setState(boolean newState) {
-            }
-        });
-*/
-        IModelItem<?> opt = source.getOptimised();
+        MaskGroupBus out = new MaskGroupBus(new OutBus("test", schemaPart, 4), "test");
+        for (int i = 0; i < 5; i++) {
+            out.addDestination(new SimpleBusToWireAdapter(out, schemaPart.addInPin("in" + i)));
+        }
+        IModelItem<?> opt = out.getOptimised();
     }
 
     public ClassOptimiser<T> unroll(int size) {

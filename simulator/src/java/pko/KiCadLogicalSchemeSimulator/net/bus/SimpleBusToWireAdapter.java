@@ -30,63 +30,30 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.net.bus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
-import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
-import pko.KiCadLogicalSchemeSimulator.tools.Utils;
+import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 
-import java.util.Arrays;
+public class SimpleBusToWireAdapter extends OutBus {
+    public Pin destination;
 
-public class MaskGroupBus extends OutBus {
-    protected long maskState;
-
-    public MaskGroupBus(OutBus source, long mask, String variantId) {
-        super(source, variantId);
-        this.mask = mask;
-        id += ":mask" + mask;
-    }
-
-    /*Optimiser constructor unroll destination:destinations*/
-    public MaskGroupBus(OutBus source, String variantId) {
-        super(source, variantId);
-    }
-
-    public void addDestination(Bus bus) {
-        destinations = Utils.addToArray(destinations, bus);
+    public SimpleBusToWireAdapter(OutBus parent, Pin destination) {
+        super(parent, "BusToWire");
+        this.destination = destination;
     }
 
     @Override
     public void setState(long newState) {
-        /*Optimiser bind d:destinations[0] bind mask*/
-        if (maskState != (newState & mask) || destinations[0].hiImpedance) {
-            /*Optimiser bind mask*/
-            maskState = newState & mask;
-            for (Bus destination : destinations) {
-                destination.setState(maskState);
-            }
-        }
+        destination.setState(newState != 0);
     }
 
     @Override
     public void setHiImpedance() {
-        for (Bus destination : destinations) {
-            destination.setHiImpedance();
-        }
+        destination.setHiImpedance();
     }
 
     @Override
-    public Bus getOptimised() {
-        if (destinations.length == 0) {
-            throw new RuntimeException("unconnected MaskGroupBus " + getName());
-        } else {
-            for (int i = 0; i < destinations.length; i++) {
-                destinations[i] = destinations[i].getOptimised();
-            }
-            if (Arrays.stream(destinations).allMatch(d -> d instanceof SimpleBusToWireAdapter)) {
-                return new BusToWiresAdapter(this, destinations, mask).getOptimised();
-            } else {
-                return new ClassOptimiser<>(this).unroll(destinations.length).bind("mask", mask).bind("d", "destination0").build();
-            }
-        }
+    public SimpleBusToWireAdapter getOptimised() {
+        destination = destination.getOptimised();
+        return this;
     }
 }

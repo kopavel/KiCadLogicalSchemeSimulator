@@ -42,8 +42,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class OutBus extends Bus {
+    private final Map<Byte, OffsetBus> corrected = new HashMap<>();
     public Bus[] destinations = new Bus[0];
-    public Map<Byte, OffsetBus> corrected = new HashMap<>();
     public long mask;
 
     public OutBus(String id, SchemaPart parent, int size, String... names) {
@@ -86,15 +86,14 @@ public class OutBus extends Bus {
     }
 
     public void addDestination(Pin pin, long mask) {
-        //FixMe try add "no mask" adapter to mask group and replace if it's only one in group with masked one on optimisation
         Arrays.stream(destinations)
-                .filter(d -> d instanceof BusToWiresAdapter)
-                .map(d -> ((BusToWiresAdapter) d))
+                .filter(d -> d instanceof MaskGroupBus)
+                .map(d -> ((MaskGroupBus) d))
                 .filter(d -> d.mask == mask).findFirst().orElseGet(() -> {
-                  BusToWiresAdapter adapter = new BusToWiresAdapter(this, mask);
-                  destinations = Utils.addToArray(destinations, adapter);
-                  return adapter;
-              }).addDestination(pin);
+                  MaskGroupBus groupBus = new MaskGroupBus(this, mask, "Mask" + mask);
+                  destinations = Utils.addToArray(destinations, groupBus);
+                  return groupBus;
+              }).addDestination(new SimpleBusToWireAdapter(this, pin));
     }
 
     @Override
