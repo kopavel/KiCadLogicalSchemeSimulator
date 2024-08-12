@@ -67,6 +67,8 @@ public class JavaCompiler {
             }
             Log.info(JavaCompiler.class, "Use class path for compiler: {}", path);
             optionList = new ArrayList<>();
+            optionList.add("-g:line");
+            optionList.add("-Xlint:none");
             optionList.add("-cp");
             optionList.add(path);
             optionList.add("-proc:none");
