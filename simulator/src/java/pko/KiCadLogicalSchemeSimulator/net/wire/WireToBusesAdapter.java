@@ -39,7 +39,7 @@ import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 public class WireToBusesAdapter extends OutPin {
     public long mask;
-    private Bus[] destinations;
+    public Bus[] destinations;
 
     public WireToBusesAdapter(String id, SchemaPart parent, Bus destinations, byte offset) {
         super(id, parent);
