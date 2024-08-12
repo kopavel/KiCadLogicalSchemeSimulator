@@ -126,8 +126,10 @@ public class WireMergerBusIn extends CorrectedInBus implements MergerInput<Bus> 
     @Override
     public void setHiImpedance() {
         assert !hiImpedance : "Already in hiImpedance:" + this + "; merger=" + merger.getName();
-        /*Optimiser block weak*/
+        /*Optimiser block hasWeak*/
         if (merger.hasWeak) {
+            /*Optimiser blockend hasWeak*/
+            /*Optimiser block weak*/
             /*Optimiser bind weakState:merger.weakState*/
             if (merger.state != merger.weakState) {
                 /*Optimiser bind weakState:merger.weakState*/
@@ -137,16 +139,20 @@ public class WireMergerBusIn extends CorrectedInBus implements MergerInput<Bus> 
                     destination.setState(merger.weakState);
                 }
             }
-        } else {
+            merger.strong = false;
             /*Optimiser blockend weak*/
+            /*Optimiser block hasWeak*/
+        } else {
+            /*Optimiser blockend hasWeak*/
+            /*Optimiser block strong*/
             for (Pin destination : destinations) {
                 destination.setHiImpedance();
             }
             merger.hiImpedance = true;
-            /*Optimiser block weak*/
+            /*Optimiser blockend strong*/
+            /*Optimiser block hasWeak*/
         }
-        merger.strong = false;
-        /*Optimiser blockend weak*/
+        /*Optimiser blockend hasWeak*/
         hiImpedance = true;
         oldImpedance = true;
     }
@@ -165,7 +171,10 @@ public class WireMergerBusIn extends CorrectedInBus implements MergerInput<Bus> 
         merger.sources.remove(this);
         destinations = merger.destinations;
         ClassOptimiser<WireMergerBusIn> optimiser = new ClassOptimiser<>(this).unroll(merger.destinations.length).bind("weakState", merger.weakState);
-        if (!merger.hasWeak) {
+        optimiser.cut("hasWeak");
+        if (merger.hasWeak) {
+            optimiser.cut("strong");
+        } else {
             optimiser.cut("weak");
         }
         if (Arrays.stream(destinations)
