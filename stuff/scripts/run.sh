@@ -4,9 +4,9 @@
 SCRIPT_DIR="$(dirname "$0")"
 
 # Execute Java with the specified options
-java -Xms16m -Xmx2g \
+java -Xmx2g \
 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager \
--XX:CompileThreshold=100 -XX:ParallelGCThreads=2 \
+-XX:+UseParallelGC -XX:CompileThreshold=10 -XX:ParallelGCThreads=1 -XX:MaxInlineSize=64 -XX:MaxInlineLevel=14 \
 -p "${SCRIPT_DIR}":"${SCRIPT_DIR}/lib":"${SCRIPT_DIR}/schemaParts" \
 --patch-module KiCadLogicalSchemeSimulator.simulator=optimised \
 -m KiCadLogicalSchemeSimulator.simulator/pko.KiCadLogicalSchemeSimulator.Simulator -m="${SCRIPT_DIR}/SymbolsDescription.xml" "$@"

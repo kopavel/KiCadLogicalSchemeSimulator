@@ -45,7 +45,7 @@ public class OscilloscopeMenu extends JMenuBar {
         oscilloscope = parent;
         JMenu outPinMenu = new JMenu(Oscilloscope.localization.getString("outPins"));
         add(outPinMenu);
-        JMenu inPinMenu = new JMenu(Oscilloscope.localization.getString("InPins"));
+        JMenu inPinMenu = new JMenu(Oscilloscope.localization.getString("inPins"));
         add(inPinMenu);
         List<IModelItem<?>> outPins = Simulator.net.schemaParts.values()
                 .stream()

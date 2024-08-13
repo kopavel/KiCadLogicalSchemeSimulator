@@ -35,9 +35,16 @@ import pko.KiCadLogicalSchemeSimulator.api.schemaPart.AbstractUiComponent;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.text.DecimalFormat;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class OscillatorUiComponent extends AbstractUiComponent {
     public final Oscillator parent;
+    public volatile OscillatorUi ui;
+    public double freq = 0;
+    public DecimalFormat formatter = new DecimalFormat("#,###");
+    private long lastTicks;
 
     public OscillatorUiComponent(int size, String title, Oscillator parent) {
         super(title, size);
@@ -45,10 +52,20 @@ public class OscillatorUiComponent extends AbstractUiComponent {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                new OscillatorUi(OscillatorUiComponent.this).setVisible(true);
+                if (ui == null) {
+                    synchronized (parent) {
+                        if (ui == null) {
+                            ui = new OscillatorUi(OscillatorUiComponent.this);
+                        }
+                    }
+                }
+                ui.setVisible(true);
             }
         });
         setBackground(Color.white);
+        //noinspection resource
+        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this::repaint, 0, 1, TimeUnit.SECONDS);
+        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this::getFreq, 0, 1, TimeUnit.SECONDS);
     }
 
     @Override
@@ -58,8 +75,17 @@ public class OscillatorUiComponent extends AbstractUiComponent {
 
     @Override
     protected void draw() {
-//        g2d.drawString(String.valueOf(parent.ticks), 0, titleHeight * 2);
-        // Set color and draw the circle
+        g2d.drawString(formatter.format((long) freq), 0, titleHeight * 2);
+    }
+
+    private void getFreq() {
+        double newFreq = (parent.ticks - lastTicks) / 2.0;
+        if (freq < newFreq * 0.9 || freq > newFreq * 1.1) {
+            freq = newFreq;
+        } else {
+            freq = (freq * 0.8) + ((parent.ticks - lastTicks) * 0.1);
+        }
+        lastTicks = parent.ticks;
     }
 }
 

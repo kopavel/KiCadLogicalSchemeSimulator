@@ -41,6 +41,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import static java.lang.Thread.MAX_PRIORITY;
+
 //FixMe sometimes multiple thread started - need make some methods as synchronized. 
 public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
     private final OscillatorUiComponent oscillatorUiComponent;
@@ -48,10 +50,12 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
     public Pin out;
     ScheduledExecutorService scheduler;
     @Getter
-    private long clockPeriod = 1000000000;
+    private double clockFreq = 0;
     private Thread fullSpeedThread;
     private volatile boolean fullSpeedAlive;
     private String outAlias = "OUT";
+    private long timerStart;
+    private long tickStart;
 
     public Oscillator(String id, String sParams) {
         super(id, sParams);
@@ -59,8 +63,11 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
         if (sAliases != null) {
             outAlias = sAliases;
         }
+        if (params.containsKey("freq")) {
+            clockFreq = Double.parseDouble(params.get("freq"));
+        }
         addOutPin(outAlias, false);
-        oscillatorUiComponent = new OscillatorUiComponent(20, id, this);
+        oscillatorUiComponent = new OscillatorUiComponent(120, id, this);
     }
 
     @Override
@@ -74,9 +81,9 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
     }
 
     synchronized public void startClock() {
-        if (clockPeriod == 0) {
+        if (clockFreq == 0) {
             fullSpeedAlive = true;
-            fullSpeedThread = Thread.ofPlatform().start(() -> {
+            fullSpeedThread = Thread.ofPlatform().priority(MAX_PRIORITY).start(() -> {
                 try {
                     while (fullSpeedAlive) {
                         ticks += 2000;
@@ -129,12 +136,67 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
             });
         } else {
             scheduler = Executors.newSingleThreadScheduledExecutor();
-            scheduler.scheduleAtFixedRate(this::tick, 0, clockPeriod, TimeUnit.NANOSECONDS);
+            timerStart = System.currentTimeMillis();
+            tickStart = ticks;
+            long period = Math.max(10, (long) (10000000.0 / clockFreq));
+            scheduler.scheduleAtFixedRate(() -> {
+                long target = Math.min(10000, (long) ((System.currentTimeMillis() - timerStart) * clockFreq * 2) - ticks + tickStart) / 20;
+                ticks += target * 20;
+                for (int i = 0; i < target; i++) {
+                    out.state = true;
+                    out.setState(true);
+                    out.state = false;
+                    out.setState(false);
+                    out.state = true;
+                    out.setState(true);
+                    out.state = false;
+                    out.setState(false);
+                    out.state = true;
+                    out.setState(true);
+                    out.state = false;
+                    out.setState(false);
+                    out.state = true;
+                    out.setState(true);
+                    out.state = false;
+                    out.setState(false);
+                    out.state = true;
+                    out.setState(true);
+                    out.state = false;
+                    out.setState(false);
+                    out.state = true;
+                    out.setState(true);
+                    out.state = false;
+                    out.setState(false);
+                    out.state = true;
+                    out.setState(true);
+                    out.state = false;
+                    out.setState(false);
+                    out.state = true;
+                    out.setState(true);
+                    out.state = false;
+                    out.setState(false);
+                    out.state = true;
+                    out.setState(true);
+                    out.state = false;
+                    out.setState(false);
+                    out.state = true;
+                    out.setState(true);
+                    out.state = false;
+                    out.setState(false);
+                }
+            }, 0, period, TimeUnit.NANOSECONDS);
         }
     }
 
     synchronized public void restartClock() {
         if (stopClock()) {
+            startClock();
+        }
+    }
+
+    @Override
+    public void reset() {
+        if (params.containsKey("start")) {
             startClock();
         }
     }
@@ -164,8 +226,8 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
         return retVal;
     }
 
-    void setClockPeriod(long period) {
-        clockPeriod = period;
+    void setClockFreq(double clockFreq) {
+        this.clockFreq = clockFreq / 1000;
         restartClock();
     }
 

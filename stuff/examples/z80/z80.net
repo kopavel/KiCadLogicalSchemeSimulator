@@ -1,7 +1,7 @@
 (export (version "E")
   (design
     (source "D:\\soft_a\\verilog\\kikad\\z80\\z80.kicad_sch")
-    (date "05/08/2024 20:32:01")
+    (date "13/08/2024 23:33:52")
     (tool "Eeschema 7.0.9")
     (sheet (number "1") (name "/") (tstamps "/")
       (title_block
@@ -373,7 +373,10 @@
       (tstamps "f32614b0-9ec5-40af-b69f-e2a0b6af0957"))
     (comp (ref "OSC1")
       (value "OSC")
+      (fields
+        (field (name "SymPartParam") "start"))
       (libsource (lib "chip") (part "OSCILLATOR") (description ""))
+      (property (name "SymPartParam") (value "start"))
       (property (name "Sheetname") (value ""))
       (property (name "Sheetfile") (value "z80.kicad_sch"))
       (sheetpath (names "/") (tstamps "/"))

@@ -41,7 +41,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.text.DecimalFormat;
 import java.util.ResourceBundle;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -50,10 +49,9 @@ import java.util.concurrent.TimeUnit;
 public class OscillatorUi extends JFrame {
     public final OscillatorUiComponent parent;
     final ScheduledExecutorService scheduler;
-    final DecimalFormat df = new DecimalFormat("#,###");
     public Oscilloscope oscilloscope;
-    JTextField periodTextField;
     JTextField freqTextField;
+    JTextField achievedTextField;
     private JButton startButton;
     private JButton stopButton;
     private JPanel panel;
@@ -62,8 +60,7 @@ public class OscillatorUi extends JFrame {
     private JButton doTicks;
     private JTextField totalTicks;
     private JButton oscilloscopeButton;
-    private long lastTicks;
-    private double freq = 0;
+
 
     public OscillatorUi(OscillatorUiComponent parent) {
         this.$$$setupUI$$$();
@@ -89,12 +86,17 @@ public class OscillatorUi extends JFrame {
                 oscilloscope = new Oscilloscope(OscillatorUi.this);
             }
         });
-        periodTextField.getDocument().addDocumentListener(new UiTools.TextChangeListener() {
+        freqTextField.getDocument().addDocumentListener(new UiTools.TextChangeListener() {
             @Override
             protected void textChanged() {
-                String text = periodTextField.getText();
+                String text = freqTextField.getText();
                 if (!text.isBlank()) {
-                    parent.parent.setClockPeriod(Long.parseLong(periodTextField.getText()));
+                    try {
+                        parent.parent.setClockFreq(Double.parseDouble(freqTextField.getText()));
+                        freqTextField.setBackground(new Color(255, 255, 255, 0));
+                    } catch (NumberFormatException e) {
+                        freqTextField.setBackground(new Color(255, 0, 0, 91));
+                    }
                 }
             }
         });
@@ -135,44 +137,38 @@ public class OscillatorUi extends JFrame {
     public void setVisible(boolean b) {
         super.setVisible(b);
         if (b) {
-            SwingUtilities.invokeLater(() -> periodTextField.setText(String.valueOf(parent.parent.getClockPeriod())));
+            SwingUtilities.invokeLater(() -> freqTextField.setText(String.valueOf(parent.parent.getClockFreq())));
         }
     }
 
     private void tick() {
-        double newFreq = parent.parent.ticks - lastTicks;
-        if (freq < newFreq * 0.9 || freq > newFreq * 1.1) {
-            freq = newFreq;
-        } else {
-            freq = (freq * 0.8) + ((parent.parent.ticks - lastTicks) * 0.2);
-        }
-        lastTicks = parent.parent.ticks;
         SwingUtilities.invokeLater(() -> {
-            freqTextField.setText(df.format(freq / 2));
+            achievedTextField.setText(parent.formatter.format(parent.freq));
             totalTicks.setText(String.valueOf(parent.parent.ticks));
         });
     }
 
     private void $$$setupUI$$$() {
+        setResizable(false);
         JPanel var1 = new JPanel();
         this.panel = var1;
         var1.setLayout(new GridLayoutManager(7, 3, new Insets(10, 10, 10, 10), -1, -1, false, false));
         var1.setOpaque(true);
         var1.setPreferredSize(new Dimension(500, 200));
         JTextField var2 = new JTextField();
-        this.periodTextField = var2;
+        this.freqTextField = var2;
         var2.setText("");
         var1.add(var2, new GridConstraints(0, 1, 1, 1, 8, 1, 6, 0, null, new Dimension(40, 30), null));
         JLabel var3 = new JLabel();
         var3.setHorizontalAlignment(4);
-        this.$$$loadLabelText$$$(var3, ResourceBundle.getBundle("i81n_clock/clock").getString("period"));
+        this.$$$loadLabelText$$$(var3, ResourceBundle.getBundle("i81n_clock/clock").getString("freq"));
         var1.add(var3, new GridConstraints(0, 0, 1, 1, 8, 0, 0, 0, null, new Dimension(80, -1), null));
         JLabel var4 = new JLabel();
         var4.setHorizontalAlignment(4);
-        this.$$$loadLabelText$$$(var4, ResourceBundle.getBundle("i81n_clock/clock").getString("freq"));
+        this.$$$loadLabelText$$$(var4, ResourceBundle.getBundle("i81n_clock/clock").getString("resultFreq"));
         var1.add(var4, new GridConstraints(1, 0, 1, 1, 8, 0, 0, 0, null, new Dimension(80, -1), null));
         JTextField var5 = new JTextField();
-        this.freqTextField = var5;
+        this.achievedTextField = var5;
         var5.setEditable(false);
         var5.setEnabled(true);
         var1.add(var5, new GridConstraints(1, 1, 1, 1, 8, 1, 6, 0, null, new Dimension(40, 30), null));

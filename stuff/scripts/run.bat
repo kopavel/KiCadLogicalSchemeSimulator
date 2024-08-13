@@ -1,8 +1,8 @@
 @@echo off
 
-java -Xms16m -Xmx2g ^
+java -Xmx2g ^
 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager ^
--XX:CompileThreshold=100 -XX:ParallelGCThreads=2 ^
+-XX:+UseParallelGC -XX:CompileThreshold=10 -XX:ParallelGCThreads=1 -XX:MaxInlineSize=64 -XX:MaxInlineLevel=14 ^
 -p %~dp0;%~dp0lib;%~dp0schemaParts; ^
 --patch-module KiCadLogicalSchemeSimulator.simulator=optimised ^
 -m KiCadLogicalSchemeSimulator.simulator/pko.KiCadLogicalSchemeSimulator.Simulator -m=%~dp0SymbolsDescription.xml %*
