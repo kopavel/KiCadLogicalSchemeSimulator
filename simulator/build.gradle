@@ -91,7 +91,7 @@ run {
         jvm_args += ["-ea"]
     }
     if (!project.hasProperty('noCache')) {
-        jvm_args += ["--patch-module", "KiCadLogicalSchemeSimulator.simulator=optimised"]
+        jvm_args += ["--patch-module", "KiCadLogicalSchemeSimulator.simulator=$rootDir/stuff/work/optimised"]
     }
     jvmArgs(jvm_args)
     if (project.hasProperty('appArgs')) {

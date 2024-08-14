@@ -8,7 +8,7 @@ java -Xmx2g \
 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager \
 -XX:+UseParallelGC -XX:CompileThreshold=10 -XX:ParallelGCThreads=1 -XX:MaxInlineSize=64 -XX:MaxInlineLevel=14 \
 -p "${SCRIPT_DIR}":"${SCRIPT_DIR}/lib":"${SCRIPT_DIR}/schemaParts" \
---patch-module KiCadLogicalSchemeSimulator.simulator=optimised \
+--patch-module KiCadLogicalSchemeSimulator.simulator="${SCRIPT_DIR}/optimised" \
 -m KiCadLogicalSchemeSimulator.simulator/pko.KiCadLogicalSchemeSimulator.Simulator -od="${SCRIPT_DIR}/optimised" -m="${SCRIPT_DIR}/SymbolsDescription.xml" "$@"
 
 # Check the exit code from Java application
