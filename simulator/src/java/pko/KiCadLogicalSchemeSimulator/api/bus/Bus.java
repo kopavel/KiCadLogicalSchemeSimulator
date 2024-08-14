@@ -115,6 +115,8 @@ public abstract class Bus extends ModelItem<Bus> {
         if (!hiImpedance) {
             setState(state);
         } else {
+            // noinspection ConstantValue,AssertWithSideEffects
+            assert !(hiImpedance = false);
             setHiImpedance();
         }
     }

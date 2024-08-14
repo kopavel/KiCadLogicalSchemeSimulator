@@ -47,6 +47,9 @@ public class PullPin extends OutPin implements MergerInput<Pin> {
 
     @Override
     public Pin getOptimised() {
+        for (int i = 0; i < destinations.length; i++) {
+            destinations[i] = destinations[i].getOptimised();
+        }
         return this;
     }
 }

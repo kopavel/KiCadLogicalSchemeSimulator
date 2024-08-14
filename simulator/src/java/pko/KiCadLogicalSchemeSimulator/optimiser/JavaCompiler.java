@@ -37,7 +37,6 @@ import pko.KiCadLogicalSchemeSimulator.tools.Log;
 import javax.tools.*;
 import java.io.*;
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.nio.file.Files;
@@ -50,9 +49,12 @@ public class JavaCompiler {
     private static final MethodHandles.Lookup lookup;
     private static final javax.tools.JavaCompiler compiler;
     private static final List<String> optionList;
+    private static final Module currentModule;
+    private static final Method addReadsMethod;
     static {
         try {
             lookup = MethodHandles.lookup();
+            currentModule = JavaCompiler.class.getModule();
             privateLookupInMethod = MethodHandles.class.getDeclaredMethod("privateLookupIn", Class.class, MethodHandles.Lookup.class);
             privateLookupInMethod.setAccessible(true);
             defineClassMethod = MethodHandles.Lookup.class.getDeclaredMethod("defineClass", byte[].class);
@@ -65,13 +67,22 @@ public class JavaCompiler {
             if (System.getProperty("os.name").toLowerCase().contains("win") && path.startsWith("/")) {
                 path = path.substring(1);
             }
-            Log.info(JavaCompiler.class, "Use class path for compiler: {}", path);
+            StringBuilder paths = new StringBuilder(path);
+            Simulator.schemaPartSpiMap.values().forEach(spi -> {
+                String spiPath = spi.getClass().getProtectionDomain().getCodeSource().getLocation().getFile();
+                if (System.getProperty("os.name").toLowerCase().contains("win") && spiPath.startsWith("/")) {
+                    spiPath = spiPath.substring(1);
+                }
+                paths.append(";").append(spiPath);
+            });
+            Log.info(JavaCompiler.class, "Use class path for compiler: {}", paths);
             optionList = new ArrayList<>();
-//            optionList.add("-g:lines");
             optionList.add("-Xlint:none");
             optionList.add("-cp");
-            optionList.add(path);
+            optionList.add(paths.toString());
             optionList.add("-proc:none");
+            addReadsMethod = Module.class.getDeclaredMethod("implAddReads", Module.class);
+            addReadsMethod.setAccessible(true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -129,7 +140,8 @@ public class JavaCompiler {
         });
     }
 
-    private static void loadClass(Class<?> srcClass, byte[] byteCode) throws InvocationTargetException, IllegalAccessException {
+    private static void loadClass(Class<?> srcClass, byte[] byteCode) throws Exception {
+        addReadsMethod.invoke(JavaCompiler.currentModule, srcClass.getModule());
         MethodHandles.Lookup privateLookup = (MethodHandles.Lookup) privateLookupInMethod.invoke(null, srcClass, lookup);
         //noinspection PrimitiveArrayArgumentToVarargsMethod
         defineClassMethod.invoke(privateLookup, byteCode);

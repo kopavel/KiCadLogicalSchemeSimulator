@@ -39,6 +39,14 @@ public abstract class PassivePin extends OutPin {
     public boolean inStrong = true;
     public Pin source;
 
+    public PassivePin(PassivePin oldPin, String variantId) {
+        super(oldPin, variantId);
+        inImpedance = oldPin.inImpedance;
+        inState = oldPin.inState;
+        inStrong = oldPin.inStrong;
+        source = oldPin.source;
+    }
+
     public PassivePin(String id, SchemaPart parent) {
         super(id, parent);
     }
@@ -63,11 +71,6 @@ public abstract class PassivePin extends OutPin {
         inStrong = oldPin.isStrong();
         inState = oldPin.getState() != 0;
         inImpedance = oldPin.isHiImpedance();
-        return this;
-    }
-
-    @Override
-    public Pin getOptimised() {
         return this;
     }
 }

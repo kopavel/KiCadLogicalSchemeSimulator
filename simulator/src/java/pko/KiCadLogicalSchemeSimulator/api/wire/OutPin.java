@@ -70,7 +70,9 @@ public class OutPin extends Pin {
         if (adapters.containsKey(offset)) {
             adapters.get(offset).addDestination(bus);
         } else {
-            destinations = Utils.addToArray(destinations, new WireToBusesAdapter(this.id, this.parent, bus, offset));
+            WireToBusesAdapter adapter = new WireToBusesAdapter(this.id, this.parent, bus, offset);
+            adapters.put(offset, adapter);
+            destinations = Utils.addToArray(destinations, adapter);
         }
     }
 

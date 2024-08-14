@@ -30,46 +30,22 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.Switch;
-import pko.KiCadLogicalSchemeSimulator.api.ShortcutException;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.AbstractUiComponent;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.InteractiveSchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.net.Net;
-import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 public class Switch extends SchemaPart implements InteractiveSchemaPart {
-    private final PassivePin pin1;
-    private final PassivePin pin2;
-    private boolean toggled;
+    private final SwitchPin pin1;
+    private final SwitchPin pin2;
+    public boolean toggled;
     private SwitchUiComponent switchUiComponent;
 
     protected Switch(String id, String sParams) {
         super(id, sParams);
-        //FixMe create non abstract class as Switch Pin, so can use optimizer on it.
-        pin1 = addPassivePin(new PassivePin("IN1", this) {
-            @Override
-            public void setHiImpedance() {
-                Switch.this.setImpedance(this, pin2);
-            }
-
-            @Override
-            public void setState(boolean newState) {
-                Switch.this.setState(this, newState, pin2);
-            }
-        });
-        pin2 = addPassivePin(new PassivePin("IN2", this) {
-            @Override
-            public void setHiImpedance() {
-                Switch.this.setImpedance(this, pin1);
-            }
-
-            @Override
-            public void setState(boolean newState) {
-                Switch.this.setState(this, newState, pin1);
-            }
-        });
+        pin1 = (SwitchPin) addPassivePin(new SwitchPin("IN1", this));
+        pin2 = (SwitchPin) addPassivePin(new SwitchPin("IN2", this));
+        pin1.otherPin = pin2;
+        pin2.otherPin = pin1;
         toggled = reverse;
     }
 
@@ -89,94 +65,5 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
         this.toggled = toggled;
         pin1.resend();
         pin2.resend();
-    }
-
-    private void setImpedance(PassivePin pin1, PassivePin pin2) {
-        assert !pin1.inImpedance : "Already in hiImpedance:" + pin1;
-        pin1.inImpedance = true;
-        if (toggled && !pin2.inImpedance) {
-            for (Pin destination : pin1.destinations) {
-                pin1.hiImpedance = false;
-                pin1.state = pin2.state;
-                pin1.strong = pin2.strong;
-                if (destination.state != pin2.state || destination.strong != pin2.strong) {
-                    destination.state = pin2.state;
-                    destination.strong = pin2.strong;
-                    destination.setState(pin2.state);
-                    destination.hiImpedance = false;
-                }
-            }
-        } else {
-            pin1.hiImpedance = true;
-            for (Pin destination : pin1.destinations) {
-                if (!destination.hiImpedance) {
-                    destination.setHiImpedance();
-                    destination.hiImpedance = true;
-                }
-            }
-        }
-    }
-
-    private void setState(PassivePin pin1, boolean newState, PassivePin pin2) {
-        pin1.inImpedance = false;
-        pin1.inState = newState;
-        pin1.inStrong = pin1.source == null || pin1.source.strong;
-        pin1.hiImpedance = false; //in all scenarios
-        if (toggled && !pin2.inImpedance) { // second pin meter...
-            if (pin2.inStrong) { // second pin are strong
-                if (pin1.inStrong) { // both in strong - shortcut
-                    if (Net.stabilizing) {
-                        Net.forResend.add(pin1);
-                        assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", pin1, pin2);
-                    } else {
-                        throw new ShortcutException(pin1, pin2);
-                    }
-                } else { // we are weak - use second pin
-                    pin1.state = pin2.inState;
-                    pin1.strong = true; //we are strong too now
-                    for (Pin destination : pin1.destinations) {
-                        if (destination.state != pin2.inState || destination.strong != pin2.inStrong) {
-                            destination.state = pin2.inState;
-                            destination.strong = true;
-                            destination.hiImpedance = false;
-                            destination.setState(destination.state);
-                        }
-                    }
-                }
-            } else if (pin1.inStrong) {
-                //second pin are weak but we are strong
-                pin1.state = newState;
-                pin1.strong = true;
-                //FixMe move to passive pin itself and make unroll
-                for (Pin destination : pin1.destinations) {
-                    if (destination.state != newState || !destination.strong) {
-                        destination.state = newState;
-                        destination.strong = true;
-                        destination.setState(newState);
-                        destination.hiImpedance = false;
-                    }
-                }
-            } else if (pin1.inState != pin2.inState) {
-                //both are in opposite weak - shortcut
-                if (Net.stabilizing) {
-                    Net.forResend.add(pin1);
-                    assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", pin1, pin2);
-                } else {
-                    throw new ShortcutException(pin1, pin2);
-                }
-            }
-        } else {
-            // second pin doesn't meter
-            pin1.state = newState;
-            pin1.strong = pin1.inStrong;
-            for (Pin destination : pin1.destinations) {
-                if (destination.state != newState || destination.strong != pin1.strong) {
-                    destination.state = newState;
-                    destination.strong = pin1.strong;
-                    destination.setState(newState);
-                    destination.hiImpedance = false;
-                }
-            }
-        }
     }
 }

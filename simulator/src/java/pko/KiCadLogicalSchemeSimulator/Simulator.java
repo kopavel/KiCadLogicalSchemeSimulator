@@ -35,6 +35,7 @@ import picocli.CommandLine;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.AbstractUiComponent;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.InteractiveSchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
 import pko.KiCadLogicalSchemeSimulator.net.Net;
 import pko.KiCadLogicalSchemeSimulator.parsers.net.NetFileParser;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.Export;
@@ -57,6 +58,7 @@ import java.util.stream.Collectors;
 @CommandLine.Command(name = "", description = "Start Kicad scheme interactive simulation")
 public class Simulator implements Runnable {
     private static final Map<String, SchemaPartMonitor> monitoredParts = new HashMap<>();
+    public static Map<String, SchemaPartSpi> schemaPartSpiMap;
     public static MainUI ui;
     public static String netFilePathNoExtension;
     public static Net net;
@@ -171,6 +173,10 @@ public class Simulator implements Runnable {
     @Override
     public void run() {
         try {
+            schemaPartSpiMap = ServiceLoader.load(SchemaPartSpi.class)
+                    .stream()
+                    .map(ServiceLoader.Provider::get)
+                    .collect(Collectors.toMap(spi -> spi.getSchemaPartClass().getSimpleName(), spi -> spi));
             if (!new File(netFilePath).exists()) {
                 throw new Exception("Cant fine NET file " + netFilePath);
             }

@@ -292,12 +292,12 @@ public class Z80Cpu extends SchemaPart {
             wrPin.setState(true);
         }
         if (!aOut.hiImpedance) {
-            aOut.hiImpedance = true;
             aOut.setHiImpedance();
+            aOut.hiImpedance = true;
         }
         if (!dOut.hiImpedance) {
-            dOut.hiImpedance = true;
             dOut.setHiImpedance();
+            dOut.hiImpedance = true;
         }
         if (!rdPin.state) {
             rdPin.state = true;

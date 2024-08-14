@@ -32,7 +32,7 @@
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
 import pko.KiCadLogicalSchemeSimulator.components.Switch.SwitchSpi;
 
-module KiCadLogicalSchemeSimulator.components.Switch {
+open module KiCadLogicalSchemeSimulator.components.Switch {
     requires KiCadLogicalSchemeSimulator.simulator;
     requires java.desktop;
     provides SchemaPartSpi with SwitchSpi;

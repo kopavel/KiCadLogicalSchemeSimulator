@@ -108,7 +108,7 @@ public class SchemaPartMonitor extends JFrame {
                           label.setAlignmentX(Component.LEFT_ALIGNMENT);
                           label.setFont(AbstractUiComponent.monospacedFont);
                           inputsNames.add(label);
-                          label = new JLabel(String.format("%" + (int) Math.ceil(inItem.getSize() / 4d) + "X", inItem.getState()));
+                          label = new JLabel(String.valueOf(inItem.getState()));
                           label.setFont(AbstractUiComponent.monospacedFont);
                           label.setAlignmentX(RIGHT_ALIGNMENT);
                           label.setBorder(new CompoundBorder(BorderFactory.createEmptyBorder(2, 2, 1, 0),
@@ -142,7 +142,7 @@ public class SchemaPartMonitor extends JFrame {
                           label.setAlignmentX(Component.RIGHT_ALIGNMENT);
                           label.setFont(AbstractUiComponent.monospacedFont);
                           outputsNames.add(label);
-                          label = new JLabel(String.format("%" + (int) Math.ceil(outItem.getSize() / 4d) + "X", outItem.getState()));
+                          label = new JLabel(String.valueOf(outItem.getState()));
                           label.setFont(AbstractUiComponent.monospacedFont);
                           label.setAlignmentX(LEFT_ALIGNMENT);
                           label.setBorder(new CompoundBorder(BorderFactory.createEmptyBorder(2, 0, 1, 2),

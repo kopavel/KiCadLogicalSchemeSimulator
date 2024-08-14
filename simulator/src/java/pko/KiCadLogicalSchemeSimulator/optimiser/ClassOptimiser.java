@@ -56,9 +56,12 @@ public class ClassOptimiser<T> {
     private String suffix = "";
     private List<String> source;
     private int unrollSize;
+    private boolean noAssert = true;
 
     public ClassOptimiser(T oldInstance) {
         this.oldInstance = oldInstance;
+        //noinspection AssertWithSideEffects,ConstantValue
+        assert !(noAssert = false);
     }
 
     public static void main(String[] args) {
@@ -172,7 +175,7 @@ public class ClassOptimiser<T> {
                 int lineOffset = countLeadingSpaces(line);
                 if (line.startsWith("import ") || line.startsWith("package ")) {
                     resultSource.append(line).append("\n");
-                } else if (line.trim().startsWith("assert")) {
+                } else if (noAssert && line.trim().startsWith("assert")) {
                     if (!line.contains(";")) {
                         inAsserts = true; //multiline assert
                     }
@@ -191,6 +194,7 @@ public class ClassOptimiser<T> {
                                 String command = params[i++];
                                 switch (command) {
                                     case "block" -> {
+                                        preserveBlock = true;
                                         String blockName = params[i++];
                                         if (cutList.contains(blockName)) {
                                             line = lines.next();
@@ -212,9 +216,6 @@ public class ClassOptimiser<T> {
                                         blockSource.append(superLine).append("\n");
                                     }
                                     case "unroll" -> {
-                                        if (unrollSize == 0) {
-                                            throw new RuntimeException("iterator size not provided");
-                                        }
                                         iteratorParams = params[i++].split(":");
                                         String iteratorItemType = getField(oldInstance.getClass(), iteratorParams[1]).getType().getComponentType().getSimpleName();
                                         iteratorPattern = "for (" + iteratorItemType + " " + iteratorParams[0] + " : " + iteratorParams[1] + ") {";
@@ -300,6 +301,9 @@ public class ClassOptimiser<T> {
                             iteratorSource = new StringBuilder();
                         } else if (iteratorOffset > -1) {
                             if (lineOffset > iteratorOffset) {
+                                if (unrollSize == 0) {
+                                    throw new RuntimeException("iterator size not provided");
+                                }
                                 //inside iterator block - accumulate whole block
                                 iteratorSource.append(line).append("\n");
                             } else if (lineOffset == iteratorOffset && !blockSource.isEmpty()) {
@@ -324,7 +328,7 @@ public class ClassOptimiser<T> {
     private void loadSource(Class<?> sourceClass) {
         try (InputStream is = sourceClass.getResourceAsStream(sourceClass.getSimpleName() + ".java")) {
             if (is == null) {
-                throw new RuntimeException("Can't fins source for class" + sourceClass.getName());
+                throw new RuntimeException("Can't fins source for class " + sourceClass.getName());
             }
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
                 source = reader.lines().toList();

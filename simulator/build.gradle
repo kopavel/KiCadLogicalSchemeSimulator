@@ -85,6 +85,7 @@ run {
                  "-XX:MaxInlineSize=64",
                  "-XX:MaxInlineLevel=14",
                  "-XX:ParallelGCThreads=1",
+                 "--add-opens", "java.base/java.lang=KiCadLogicalSchemeSimulator.simulator",
                  "-Xmx2G",
     ]
     if (project.hasProperty('ea')) {

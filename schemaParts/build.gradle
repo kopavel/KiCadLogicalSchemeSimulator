@@ -94,6 +94,10 @@ configure(subprojects) { subproject ->
     }
     tasks.named("jar") {
         destinationDirectory = file("$rootDir/distro/schemaParts")
+        from(sourceSets.main.allSource) {
+            include '**/*.java'  // Filter to include only Java files
+        }
+
     }
     test {
         useJUnitPlatform()

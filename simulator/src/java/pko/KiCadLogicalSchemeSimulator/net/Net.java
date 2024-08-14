@@ -30,13 +30,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.net;
+import pko.KiCadLogicalSchemeSimulator.Simulator;
 import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
 import pko.KiCadLogicalSchemeSimulator.api.wire.OutPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.PassiveOutPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
@@ -69,7 +69,6 @@ public class Net {
     public static final Queue<IModelItem<?>> forResend = new LinkedList<>();
     public static boolean stabilizing;
     public final Map<String, SchemaPart> schemaParts = new TreeMap<>();
-    public final Map<String, SchemaPartSpi> schemaPartSpiMap;
     public final String optimisedDir;
     private final Map<Pin, DestinationWireDescriptor> destinationWireDescriptors = new HashMap<>();
     private final Map<Bus, DestinationBusDescriptor> destinationBusDescriptors = new HashMap<>();
@@ -79,10 +78,6 @@ public class Net {
     public Net(Export export, String mapPath, String optimisedDir) throws IOException {
         this.optimisedDir = optimisedDir;
         Log.info(Net.class, "Start Net building");
-        schemaPartSpiMap = ServiceLoader.load(SchemaPartSpi.class)
-                .stream()
-                .map(ServiceLoader.Provider::get)
-                .collect(Collectors.toMap(spi -> spi.getSchemaPartClass().getSimpleName(), spi -> spi));
         SchemaPartMap schemaPartMap = parse(mapPath);
         export.getComponents().getComp().forEach((Comp component) -> createSchemaPart(component, schemaPartMap));
         export.getNets().getNet().forEach(this::processNet);
@@ -446,10 +441,10 @@ public class Net {
     }
 
     private SchemaPart getSchemaPart(String className, String id, String params) {
-        if (!schemaPartSpiMap.containsKey(className)) {
+        if (!Simulator.schemaPartSpiMap.containsKey(className)) {
             throw new RuntimeException("Unknown SchemaPart class " + className + " for SchemaPart id " + id);
         }
-        SchemaPart schemaPart = schemaPartSpiMap.get(className).getSchemaPart(id, params);
+        SchemaPart schemaPart = Simulator.schemaPartSpiMap.get(className).getSchemaPart(id, params);
         if (schemaPart == null) {
             throw new RuntimeException("SchemaPart " + id + " parameter SymPartClass doesn't reflect AbstractSchemaPart class");
         }

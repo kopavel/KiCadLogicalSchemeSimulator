@@ -187,8 +187,8 @@ public class Ram extends SchemaPart {
     private void rOut() {
         if (oePin.state | csPin.state) {
             if (!dOut.hiImpedance) {
-                dOut.hiImpedance = true;
                 dOut.setHiImpedance();
+                dOut.hiImpedance = true;
             }
         } else {
             if (dOut.state != words[(int) aBus.state] || dOut.hiImpedance) {
