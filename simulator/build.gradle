@@ -82,7 +82,7 @@ run {
                  "-Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager",
                  "-XX:+UseParallelGC",
                  "-XX:CompileThreshold=10",
-                 "-XX:MaxInlineSize=48",
+                 "-XX:MaxInlineSize=64",
                  "-XX:MaxInlineLevel=14",
                  "-XX:ParallelGCThreads=1",
                  "-Xmx2G",
@@ -96,6 +96,7 @@ run {
     jvmArgs(jvm_args)
     if (project.hasProperty('appArgs')) {
         def appArgsList = project.getProperties().get('appArgs').split(',')
+        appArgsList += ["-od", "D:\\soft_a\\verilog\\KiCadLogicalSchemeSimulator\\stuff\\work\\optimised"]
         args(appArgsList)
     }
     if (project.hasProperty('workDir')) {

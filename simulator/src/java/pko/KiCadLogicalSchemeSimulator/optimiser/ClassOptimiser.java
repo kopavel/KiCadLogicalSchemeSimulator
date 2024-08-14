@@ -30,6 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.optimiser;
+import pko.KiCadLogicalSchemeSimulator.Simulator;
 import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
@@ -140,12 +141,18 @@ public class ClassOptimiser<T> {
     }
 
     private static void storeSrc(String className, String source) throws IOException {
-        String srcPath = "optimised" + File.separator + className.replace(".", File.separator) + ".java";
-        String dirPath = srcPath.substring(0, srcPath.lastIndexOf(File.separator));
-        Files.createDirectories(Paths.get(dirPath));
-        try (OutputStream os = new BufferedOutputStream(new FileOutputStream(srcPath))) {
-            os.write(source.getBytes(StandardCharsets.UTF_8));
-        }
+        Thread.ofVirtual().start(() -> {
+            String srcPath = Simulator.optimisedDir + File.separator + className.replace(".", File.separator) + ".java";
+            String dirPath = srcPath.substring(0, srcPath.lastIndexOf(File.separator));
+            try {
+                Files.createDirectories(Paths.get(dirPath));
+                try (OutputStream os = new BufferedOutputStream(new FileOutputStream(srcPath))) {
+                    os.write(source.getBytes(StandardCharsets.UTF_8));
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     private String process() {

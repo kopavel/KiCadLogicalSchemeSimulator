@@ -5,7 +5,7 @@ java -Xmx2g ^
 -XX:+UseParallelGC -XX:CompileThreshold=10 -XX:ParallelGCThreads=1 -XX:MaxInlineSize=64 -XX:MaxInlineLevel=14 ^
 -p %~dp0;%~dp0lib;%~dp0schemaParts; ^
 --patch-module KiCadLogicalSchemeSimulator.simulator=optimised ^
--m KiCadLogicalSchemeSimulator.simulator/pko.KiCadLogicalSchemeSimulator.Simulator -m=%~dp0SymbolsDescription.xml %*
+-m KiCadLogicalSchemeSimulator.simulator/pko.KiCadLogicalSchemeSimulator.Simulator -od=%~dp0optimised -m=%~dp0SymbolsDescription.xml %*
 :: Check the exit code from Java application
 if %ERRORLEVEL% equ 0 (
     exit

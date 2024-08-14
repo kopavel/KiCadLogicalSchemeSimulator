@@ -61,10 +61,12 @@ public class Simulator implements Runnable {
     public static MainUI ui;
     public static String netFilePathNoExtension;
     public static Net net;
+    @CommandLine.Option(names = {"-od", "--optimisedDir"}, description = "Cache directory path for generated optimised classes")
+    public static String optimisedDir = "optimised";
     @CommandLine.Parameters(index = "0", arity = "1", description = "Path to KiCad NET file")
     public String netFilePath;
     @CommandLine.Option(names = {"-m", "--mapFile"}, description = "Path to KiCad symbol mapping file")
-    String mapFile;
+    public String mapFile;
 
     public static void main(String[] args) {
         new CommandLine(new Simulator()).execute(args);
@@ -176,9 +178,9 @@ public class Simulator implements Runnable {
                 ui.setVisible(true);
             });
             if (netFilePath.endsWith("xml")) {
-                net = new Net(XmlParser.parse(netFilePath, Export.class), mapFile);
+                net = new Net(XmlParser.parse(netFilePath, Export.class), mapFile, optimisedDir);
             } else if (netFilePath.endsWith(".net")) {
-                net = new Net(new NetFileParser().parse(netFilePath), mapFile);
+                net = new Net(new NetFileParser().parse(netFilePath), mapFile, optimisedDir);
             } else {
                 throw new RuntimeException("Unsupported file extension. " + netFilePath);
             }

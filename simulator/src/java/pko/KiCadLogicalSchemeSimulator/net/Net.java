@@ -70,12 +70,14 @@ public class Net {
     public static boolean stabilizing;
     public final Map<String, SchemaPart> schemaParts = new TreeMap<>();
     public final Map<String, SchemaPartSpi> schemaPartSpiMap;
+    public final String optimisedDir;
     private final Map<Pin, DestinationWireDescriptor> destinationWireDescriptors = new HashMap<>();
     private final Map<Bus, DestinationBusDescriptor> destinationBusDescriptors = new HashMap<>();
     private final Map<String, BusMerger> busMergers = new TreeMap<>();
     private final Map<String, OutPin> wires = new TreeMap<>();
 
-    public Net(Export export, String mapPath) throws IOException {
+    public Net(Export export, String mapPath, String optimisedDir) throws IOException {
+        this.optimisedDir = optimisedDir;
         Log.info(Net.class, "Start Net building");
         schemaPartSpiMap = ServiceLoader.load(SchemaPartSpi.class)
                 .stream()

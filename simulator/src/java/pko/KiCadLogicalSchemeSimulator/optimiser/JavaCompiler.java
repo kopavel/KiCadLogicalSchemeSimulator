@@ -31,8 +31,7 @@
  */
 package pko.KiCadLogicalSchemeSimulator.optimiser;
 import lombok.Getter;
-import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api.wire.OutPin;
+import pko.KiCadLogicalSchemeSimulator.Simulator;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 import javax.tools.*;
@@ -41,7 +40,8 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class JavaCompiler {
@@ -67,7 +67,7 @@ public class JavaCompiler {
             }
             Log.info(JavaCompiler.class, "Use class path for compiler: {}", path);
             optionList = new ArrayList<>();
-            optionList.add("-g:lines");
+//            optionList.add("-g:lines");
             optionList.add("-Xlint:none");
             optionList.add("-cp");
             optionList.add(path);
@@ -76,35 +76,6 @@ public class JavaCompiler {
             throw new RuntimeException(e);
         }
     }
-    public static void main(String[] args) {
-        OutPin scr = new OutPin("test", new SchemaPart("testPsrt", "") {
-            @Override
-            public void initOuts() {
-            }
-        });
-        String suffix = "_test";
-        String simpleClassName = scr.getClass().getSimpleName();
-        String fullClassName = scr.getClass().getName() + suffix;
-        String sourceCode;
-        try (InputStream is = new FileInputStream(
-                "D:\\soft_a\\verilog\\KiCadLogicalSchemeSimulator\\simulator\\src\\java\\pko\\KiCadLogicalSchemeSimulator\\api\\wire\\OutPin.java")) {
-            sourceCode = new String(is.readAllBytes(), StandardCharsets.UTF_8);
-            sourceCode = sourceCode.replace("destinations", "dest");
-            sourceCode = sourceCode.replace("public class " + simpleClassName, "public class " + simpleClassName + suffix);
-            sourceCode = sourceCode.replace("public " + simpleClassName, "public " + simpleClassName + suffix);
-            sourceCode = sourceCode.replace("extends Pin", "extends OutPin");
-            boolean compiled = compileJavaSource(scr.getClass(), fullClassName, sourceCode);
-            if (compiled) {
-                Class<?> clazz = Class.forName(fullClassName);
-                scr = (OutPin) clazz.getDeclaredConstructor(scr.getClass(), String.class).newInstance(scr, suffix);
-            } else {
-                throw new RuntimeException("can't compile");
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public static boolean compileJavaSource(Class<?> srcClass, String className, String sourceCode) {
         Log.trace(JavaCompiler.class, "Compile source \n{}", sourceCode);
         InMemoryJavaFileManager fileManager = new InMemoryJavaFileManager(compiler.getStandardFileManager(null, null, null));
@@ -144,10 +115,18 @@ public class JavaCompiler {
     }
 
     private static void storeClass(String className, byte[] byteArray) throws IOException {
-        String path = "optimised" + File.separator + className.replace(".", File.separator) + ".class";
-        try (OutputStream os = new BufferedOutputStream(new FileOutputStream(path))) {
-            os.write(byteArray);
-        }
+        Thread.ofVirtual().start(() -> {
+            String path = Simulator.optimisedDir + File.separator + className.replace(".", File.separator) + ".class";
+            String dirPath = path.substring(0, path.lastIndexOf(File.separator));
+            try {
+                Files.createDirectories(Paths.get(dirPath));
+                try (OutputStream os = new BufferedOutputStream(new FileOutputStream(path))) {
+                    os.write(byteArray);
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     private static void loadClass(Class<?> srcClass, byte[] byteCode) throws InvocationTargetException, IllegalAccessException {

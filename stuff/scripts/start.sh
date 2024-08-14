@@ -18,7 +18,7 @@ elif command -v x-terminal-emulator >/dev/null 2>&1; then
 	term_cmd="x-terminal-emulator"
 else
 	echo "No known terminal emulator found. Please install one."
-	echo "Attempted to detect: TERMINAL variable, x-terminal-emulator, gnome-terminal, konsole, xterm."
+	echo "Attempted to detect: TERMINAL variable, lxterminal, x-terminal-emulator, gnome-terminal, konsole, xterm."
 	echo "Press any key to continue..."
 	read -n 1 -s -r
 	exit 1
