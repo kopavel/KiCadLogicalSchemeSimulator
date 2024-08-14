@@ -96,7 +96,7 @@ run {
     jvmArgs(jvm_args)
     if (project.hasProperty('appArgs')) {
         def appArgsList = project.getProperties().get('appArgs').split(',')
-        appArgsList += ["-od", "$rootDir\\stuff\\work\\optimised"]
+        appArgsList += ["-od", "$rootDir/stuff/work/optimised".toString()]
         args(appArgsList)
     }
     if (project.hasProperty('workDir')) {
