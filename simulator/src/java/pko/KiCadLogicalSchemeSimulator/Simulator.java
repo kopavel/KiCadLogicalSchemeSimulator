@@ -50,9 +50,8 @@ import java.awt.*;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @CommandLine.Command(name = "", description = "Start Kicad scheme interactive simulation")
@@ -93,8 +92,12 @@ public class Simulator implements Runnable {
 
     @SuppressWarnings("deprecation")
     public static void loadLayout() {
-        //FixMe set all component size, if its not in layout file - it's buggy in swing if don't do that...
         try {
+            List<InteractiveSchemaPart> layoutParts = net.schemaParts.values()
+                    .stream()
+                    .filter(i -> i instanceof InteractiveSchemaPart)
+                    .map(i -> (InteractiveSchemaPart) i)
+                    .collect(Collectors.toCollection(ArrayList::new));
             File layoutFile = new File(netFilePathNoExtension + ".sym_layout");
             if (layoutFile.isFile()) {
                 String content = Utils.readFileToString(layoutFile);
@@ -108,6 +111,7 @@ public class Simulator implements Runnable {
                     } else if (!parts[0].equals("locale")) {
                         SchemaPart component = net.schemaParts.get(parts[0]);
                         if (component instanceof InteractiveSchemaPart uiComponent) {
+                            layoutParts.remove(component);
                             int x = Integer.parseInt(parts[1]);
                             int y = Integer.parseInt(parts[2]);
                             AbstractUiComponent g = uiComponent.getComponent();
@@ -121,6 +125,13 @@ public class Simulator implements Runnable {
                     }
                 }
             }
+            layoutParts.forEach(part -> {
+                AbstractUiComponent g = part.getComponent();
+                g.currentX = g.getX();
+                g.currentY = g.getY();
+                g.reshape(g.currentX, g.currentY, g.getWidth(), g.getHeight());
+                g.hasStoredLayout = true;
+            });
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
