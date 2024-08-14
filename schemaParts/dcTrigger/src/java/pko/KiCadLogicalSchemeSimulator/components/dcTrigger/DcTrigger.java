@@ -131,9 +131,11 @@ public class DcTrigger extends SchemaPart {
 
     @Override
     public void reset() {
+        qOut.hiImpedance = false;
         qOut.state = false;
         qOut.setState(false);
         iqOut.state = true;
+        iqOut.hiImpedance = false;
         iqOut.setState(true);
     }
 

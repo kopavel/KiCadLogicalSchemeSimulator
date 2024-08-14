@@ -46,7 +46,6 @@ public class OffsetBus extends OutBus {
         }
         destinations = new Bus[]{destination};
         this.offset = offset;
-        id += ":offset" + offset;
     }
 
     /*Optimiser constructor unroll destination:destinations*/

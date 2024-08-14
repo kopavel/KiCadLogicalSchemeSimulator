@@ -278,56 +278,56 @@ public class Z80Cpu extends SchemaPart {
         cpu.reset();
         if (!mReqPin.state) {
             mReqPin.state = true;
-            mReqPin.setState(true);
             mReqPin.hiImpedance = false;
+            mReqPin.setState(true);
         }
         if (!rdPin.state) {
             rdPin.state = true;
-            rdPin.setState(true);
             rdPin.hiImpedance = false;
+            rdPin.setState(true);
         }
         if (!wrPin.state) {
             wrPin.state = true;
-            wrPin.setState(true);
             wrPin.hiImpedance = false;
+            wrPin.setState(true);
         }
         if (!aOut.hiImpedance) {
-            aOut.setHiImpedance();
             aOut.hiImpedance = true;
+            aOut.setHiImpedance();
         }
         if (!dOut.hiImpedance) {
-            dOut.setHiImpedance();
             dOut.hiImpedance = true;
+            dOut.setHiImpedance();
         }
         if (!rdPin.state) {
             rdPin.state = true;
-            rdPin.setState(true);
             rdPin.hiImpedance = false;
+            rdPin.setState(true);
         }
         if (!wrPin.state) {
             wrPin.state = true;
-            wrPin.setState(true);
             wrPin.hiImpedance = false;
+            wrPin.setState(true);
         }
         if (!mReqPin.state) {
             mReqPin.state = true;
-            mReqPin.setState(true);
             mReqPin.hiImpedance = false;
+            mReqPin.setState(true);
         }
         if (!ioReqPin.state) {
             ioReqPin.state = true;
-            ioReqPin.setState(true);
             ioReqPin.hiImpedance = false;
+            ioReqPin.setState(true);
         }
         if (!m1Pin.state) {
             m1Pin.state = true;
-            m1Pin.setState(true);
             m1Pin.hiImpedance = false;
+            m1Pin.setState(true);
         }
         if (!refreshPin.state) {
             refreshPin.state = true;
-            refreshPin.setState(true);
             refreshPin.hiImpedance = false;
+            refreshPin.setState(true);
         }
         M = 1;
     }

@@ -41,9 +41,8 @@ public class MaskGroupBus extends OutBus {
     protected long maskState;
 
     public MaskGroupBus(OutBus source, long mask, String variantId) {
-        super(source, variantId);
+        super(source, variantId + ":mask" + mask);
         this.mask = mask;
-        id += ":mask" + mask;
     }
 
     /*Optimiser constructor unroll destination:destinations*/

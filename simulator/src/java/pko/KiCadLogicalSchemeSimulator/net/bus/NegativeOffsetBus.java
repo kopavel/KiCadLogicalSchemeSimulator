@@ -40,7 +40,7 @@ public class NegativeOffsetBus extends OffsetBus {
         if (offset == 0) {
             throw new RuntimeException("Offset must not be 0");
         }
-        id += ":N";
+        variantId += ":N";
     }
 
     /*Optimiser constructor unroll destination:destinations*/
