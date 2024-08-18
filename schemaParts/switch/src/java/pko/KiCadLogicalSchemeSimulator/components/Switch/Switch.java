@@ -63,7 +63,7 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
 
     public void toggle(boolean toggled) {
         this.toggled = toggled;
-        pin1.resend();
-        pin2.resend();
+        pin1.onChange();
+        pin2.onChange();
     }
 }

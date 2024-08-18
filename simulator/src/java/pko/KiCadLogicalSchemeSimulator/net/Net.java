@@ -569,10 +569,11 @@ public class Net {
             }
         }
 
+        //if bus signal go throe wire either - drop certain bus mask bit (got shortcut other way)
         public void cleanBuses() {
             offsets.forEach((pinsOffset, lists) -> {
-                if (lists.passivePins.stream()
-                        .anyMatch(p -> p.source != null)) {
+                //FixMe what we need check here??
+                if (!lists.passivePins.isEmpty()/*stream().anyMatch(p -> p.source != null)*/) {
                     //clean up all buses mask
                     buses.values()
                             .stream()

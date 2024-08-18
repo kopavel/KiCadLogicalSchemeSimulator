@@ -43,6 +43,7 @@ import java.util.Map;
 public class OutPin extends Pin {
     private final Map<Byte, WireToBusesAdapter> adapters = new HashMap<>();
     public Pin[] destinations = new Pin[0];
+    public int weakState;
 
     public OutPin(String id, SchemaPart parent) {
         super(id, parent);
@@ -54,16 +55,8 @@ public class OutPin extends Pin {
     }
 
     public void addDestination(Pin pin) {
-        if (pin != this) {
-            if (destinations.length == 1 && destinations[0] instanceof PassivePin passivePin) {
-                passivePin.addDestination(pin);
-            } else {
-                destinations = Utils.addToArray(destinations, pin);
-            }
-            if (pin instanceof PassivePin passivePin) {
-                passivePin.source = this;
-            }
-        }
+        assert pin != this;
+        destinations = Utils.addToArray(destinations, pin);
     }
 
     public void addDestination(Bus bus, byte offset) {
@@ -72,7 +65,7 @@ public class OutPin extends Pin {
         } else {
             WireToBusesAdapter adapter = new WireToBusesAdapter(this.id, this.parent, bus, offset);
             adapters.put(offset, adapter);
-            destinations = Utils.addToArray(destinations, adapter);
+            addDestination(adapter);
         }
     }
 
@@ -94,6 +87,10 @@ public class OutPin extends Pin {
     public void resend() {
         if (!hiImpedance) {
             setState(state);
+        } else {
+            //noinspection ConstantValue,AssertWithSideEffects
+            assert !(hiImpedance = false);
+            setHiImpedance();
         }
     }
 

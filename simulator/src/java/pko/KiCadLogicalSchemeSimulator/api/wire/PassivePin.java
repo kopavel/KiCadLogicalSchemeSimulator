@@ -30,47 +30,19 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.api.wire;
-import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 
 public abstract class PassivePin extends OutPin {
-    public boolean inImpedance = true;
-    public boolean inState = true;
-    public boolean inStrong = true;
-    public Pin source;
-
-    public PassivePin(PassivePin oldPin, String variantId) {
-        super(oldPin, variantId);
-        inImpedance = oldPin.inImpedance;
-        inState = oldPin.inState;
-        inStrong = oldPin.inStrong;
-        source = oldPin.source;
-    }
+    public OutPin merger;
 
     public PassivePin(String id, SchemaPart parent) {
         super(id, parent);
     }
 
-    @Override
-    abstract public void setState(boolean newState);
-    @Override
-    abstract public void setHiImpedance();
-
-    public void resend() {
-        if (!inImpedance) {
-            setState(inState);
-        } else {
-            //noinspection ConstantValue,AssertWithSideEffects
-            assert !(inImpedance = false);
-            setHiImpedance();
-        }
-    }
+    public abstract void onChange();
 
     @Override
-    public Pin copyState(IModelItem<Pin> oldPin) {
-        inStrong = oldPin.isStrong();
-        inState = oldPin.getState() != 0;
-        inImpedance = oldPin.isHiImpedance();
+    public PassivePin getOptimised() {
         return this;
     }
 }

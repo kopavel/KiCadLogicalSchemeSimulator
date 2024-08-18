@@ -38,16 +38,15 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.PullPin;
 import pko.KiCadLogicalSchemeSimulator.net.Net;
 import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
+import pko.KiCadLogicalSchemeSimulator.net.merger.bus.BusMergerWireIn;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
-import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 import java.util.*;
 
-//FixMe implement passive pin merger (signal need to be send in both directions for passive pins)
 public class WireMerger extends OutPin {
+    public final Set<PassivePin> passivePins = new TreeSet<>();
+    public final Set<BusMergerWireIn> mergers = new TreeSet<>();
     public Set<MergerInput<?>> sources = new TreeSet<>(Comparator.comparing(MergerInput::getName));
-    public boolean weakState;
-    public boolean hasWeak;
 
     public WireMerger(Pin destination, List<OutPin> pins, Map<OutBus, Long> buses) {
         super(destination.id, destination.parent);
@@ -55,7 +54,7 @@ public class WireMerger extends OutPin {
         variantId += "merger";
         destinations = new Pin[]{destination};
         if (destination instanceof PassivePin passivePin) {
-            passivePin.source = this;
+            passivePin.merger = this;
         }
         pins.forEach(this::addSource);
         if (buses != null) {
@@ -65,14 +64,7 @@ public class WireMerger extends OutPin {
 
     @Override
     public void addDestination(Pin pin) {
-        if (destinations.length == 1 && destinations[0] instanceof PassivePin passivePin) {
-            passivePin.addDestination(pin);
-        } else {
-            if (pin instanceof PassivePin passivePin) {
-                passivePin.source = this;
-            }
-            destinations = Utils.addToArray(destinations, pin);
-        }
+        super.addDestination(pin);
         if (pin.getId().contains("->")) {
             id += "/" + pin.getId().substring(pin.getId().indexOf("->") + 2);
         } else {
@@ -109,15 +101,22 @@ public class WireMerger extends OutPin {
     private void addSource(OutPin pin) {
         if (pin instanceof PullPin pullPin) {
             sources.add(pullPin);
-            if (hasWeak && pin.state != weakState) {
+            if (weakState != 0 && pin.state != (weakState > 0)) {
                 throw new ShortcutException(sources);
             }
-            weakState = pin.state;
-            hasWeak = true;
+            weakState += pin.state ? 1 : -1;
             if (hiImpedance) {
-                state = weakState;
+                state = weakState > 0;
                 strong = false;
                 hiImpedance = false;
+            }
+        } else if (pin instanceof PassivePin passivePin) {
+            if (!passivePins.contains(passivePin)) {
+                passivePins.add(passivePin);
+                passivePin.merger = this;
+                if (!passivePin.hiImpedance && !passivePin.strong) {
+                    weakState += pin.state ? 1 : -1;
+                }
             }
         } else {
             WireMergerWireIn input = new WireMergerWireIn(pin, this);

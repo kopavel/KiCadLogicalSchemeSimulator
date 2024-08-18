@@ -86,7 +86,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
         state = newState;
         hiImpedance = false;
         if (strong) { //to strong
-            if (oldImpedance) { //from hiImpedance
+            if (oldImpedance || !oldStrong) { //from hiImpedance or weak
                 /*Optimiser bind mask*/
                 if ((merger.strongPins & mask) != 0) { //strong pins shortcut
                     if (Net.stabilizing) {
@@ -97,15 +97,14 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                         throw new ShortcutException(merger.sources);
                     }
                 }
+                if (!oldImpedance) { // from weak
+                    /*Optimiser bind nmask*/
+                    merger.weakState &= nMask;
+                    /*Optimiser bind nmask*/
+                    merger.weakPins &= nMask;
+                }
                 /*Optimiser bind mask*/
                 merger.strongPins |= mask;
-            } else if (!oldStrong) { // from weak
-                /*Optimiser bind mask*/
-                merger.strongPins |= mask;
-                /*Optimiser bind nmask*/
-                merger.weakState &= nMask;
-                /*Optimiser bind nmask*/
-                merger.weakPins &= nMask;
             }
             if (newState) {
                 /*Optimiser bind mask*/
