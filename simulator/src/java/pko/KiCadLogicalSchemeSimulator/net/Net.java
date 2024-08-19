@@ -80,8 +80,8 @@ public class Net {
         Log.info(Net.class, "Start Net building");
         SchemaPartMap schemaPartMap = parse(mapPath);
         export.getComponents().getComp().forEach((Comp component) -> createSchemaPart(component, schemaPartMap));
-        export.getNets().getNet().forEach(this::processNet);
-        buildBuses();
+        export.getNets().getNet().forEach(this::groupSourcesByDestinations);
+        buildNet();
         schemaParts.values().forEach(SchemaPart::initOuts);
         Log.info(Net.class, "Stabilizing net");
         stabilise();
@@ -89,65 +89,51 @@ public class Net {
     }
 
     public Pin processWire(Pin destination, List<OutPin> pins, List<PassivePin> passivePins, Map<OutBus, Long> buses) {
-        //passive pins chain used in direct connect and in mergers - always  process it.
         Pin retVal = null;
-        boolean useOldWire = false;
-        if (!passivePins.isEmpty()) {
-            String destinationHash = Utils.getHash(passivePins);
-            if (wires.containsKey(destinationHash)) {
-                OutPin pin = wires.get(destinationHash);
-                pin.addDestination(destination);
-                retVal = pin;
-                // if wire already processed before it is complete,so just add destination to it and don't process further
-                useOldWire = true;
+        if (buses.size() + pins.size() + passivePins.size() > 1) {
+            //connect a destination to multiple sources throe Merger
+            String mergerHash = Utils.getHash(pins, passivePins, buses.keySet()) + "masks:" + buses.values()
+                    .stream()
+                    .map(String::valueOf)
+                    .collect(Collectors.joining(":"));
+            if (wires.containsKey(mergerHash)) {
+                //Use old merger.
+                OutPin oldMerger = wires.get(mergerHash);
+                oldMerger.addDestination(destination);
+                retVal = oldMerger;
             } else {
-                for (PassivePin passivePin : passivePins) {
-                    passivePin.addDestination(destination);
-                    destination = passivePin;
+                //collect merger as wire
+                WireMerger newMerger = new WireMerger(destination, pins, passivePins, buses);
+                retVal = newMerger;
+                wires.put(mergerHash, newMerger);
+                if (!passivePins.isEmpty()) {
+                    //Bus merger use passive but not regular pins throe wire merger. Index by passive pins either.
+                    wires.put(Utils.getHash(passivePins), newMerger);
                 }
-                //collect passive pins chain as wire for further usage, if any
-                wires.put(destinationHash, (OutPin) destination);
-                retVal = destination;
             }
-        }
-        if (!useOldWire) {
-            if (buses.size() + pins.size() > 1) {
-                //connect destination to multiple sources throe Merger
-                String mergerHash = Utils.getHash(pins, buses.keySet()) + "masks:" + buses.values()
-                        .stream()
-                        .map(String::valueOf)
-                        .collect(Collectors.joining(":"));
-                if (wires.containsKey(mergerHash)) {
-                    //use old merger. in case if there is no passive pins - it's not handled earlier.
-                    OutPin pin = wires.get(mergerHash);
+        } else {
+            //No merger needed.
+            if (!pins.isEmpty() || !passivePins.isEmpty()) {
+                //Pin-to-pin connection. Has only one regular or passive pin.
+                for (OutPin pin : pins) {
                     pin.addDestination(destination);
                     retVal = pin;
-                } else {
-                    //collect merger as wire
-                    WireMerger wireMerger = new WireMerger(destination, pins, buses);
-                    retVal = wireMerger;
-                    wires.put(mergerHash, wireMerger);
+                }
+                for (OutPin pin : passivePins) {
+                    pin.addDestination(destination);
+                    retVal = pin;
                 }
             } else {
-                //No merger needed. Passive pins, if any, are handled as pin chain in destination.
-                if (!pins.isEmpty()) {
-                    //pin-to-pin connection
-                    for (OutPin pin : pins) {
-                        pin.addDestination(destination);
-                        retVal = pin;
-                    }
-                } else {
-                    //bus-to-pin connection
-                    for (Map.Entry<OutBus, Long> bus : buses.entrySet()) {
-                        bus.getKey().addDestination(destination, bus.getValue());
-                    }
+                //bus-to-pin connection
+                for (Map.Entry<OutBus, Long> bus : buses.entrySet()) {
+                    bus.getKey().addDestination(destination, bus.getValue());
                 }
             }
         }
         return retVal;
     }
 
-    private void processNet(pko.KiCadLogicalSchemeSimulator.parsers.pojo.Net net) {
+    private void groupSourcesByDestinations(pko.KiCadLogicalSchemeSimulator.parsers.pojo.Net net) {
         if (net.getName().startsWith("unconnected-")) {
             return;
         }
@@ -225,7 +211,7 @@ public class Net {
             }
         });
         if (powerState != null) {
-            //if on power rail - connect all passive pin power rail it and don't add to any others nets
+            //if on a power rail – connect all passive pin to individual power out and don't add to any others nets.
             passivePins.forEach(passivePin -> {
                 if (TRUE == powerState) {
                     SchemaPart pwr = getSchemaPart("Power", "pwr_" + passivePin.getName(), "hi;strong");
@@ -239,7 +225,7 @@ public class Net {
             });
             passivePins.clear();
         } else {
-            //if there is no destination pins but is passive (no out only) pins - use one of it as destination, in other way passive pins don't get any changes
+            //If no destination pins, but has passive (no out only) pins – use one of it as destination. In other way passive pins don't get any changes.
             if ((destinationPins.isEmpty())) {
                 Optional<PassivePin> passivePin = passivePins.stream()
                         .filter(p -> !(p instanceof PassiveOutPin)).findAny();
@@ -301,14 +287,14 @@ public class Net {
         });
     }
 
-    private void buildBuses() {
+    private void buildNet() {
         //wire destinations
         destinationWireDescriptors.forEach((destination, descriptor) -> processWire(destination, descriptor.pins, descriptor.passivePins, descriptor.buses));
         //Bus destinations
         destinationBusDescriptors.forEach((destination, descriptor) -> {
             descriptor.cleanBuses();
             if (descriptor.useBusMerger()) {
-                //connect destination to multiple sources throe Merger
+                //Connect a destination to multiple sources throe Merger
                 String busMergerHash = Utils.getHash(descriptor.offsets.values()
                                 .stream().flatMap(i -> i.pins.stream()).toList(),
                         descriptor.offsets.values()
@@ -324,18 +310,12 @@ public class Net {
                     descriptor.offsets.forEach((offset, lists) -> {
                         //search already processed wires
                         String passiveHash = Utils.getHash(lists.passivePins);
-                        if (wires.containsKey(passiveHash)) {
-                            //if found by passive pins - connect it and don't process further
+                        if (!passiveHash.isBlank() && wires.containsKey(passiveHash)) {
+                            //if found by passive pins – connect it and don't process further.
                             busMerger.addSource(wires.get(passiveHash), offset);
                         } else {
-                            String wireHash = Utils.getHash(lists.pins);
-                            if (wires.containsKey(wireHash)) {
-                                //if found by usual pins (complete wire merger) - connect it and don't process further
-                                busMerger.addSource(wires.get(wireHash), offset);
-                            } else {
-                                //process unprocessed wire
-                                busMerger.addSource(Net.this, lists.pins, lists.passivePins, offset);
-                            }
+                            //process unprocessed wire
+                            busMerger.addSource(Net.this, lists.pins, lists.passivePins, offset);
                         }
                     });
                     //add all buses
@@ -351,19 +331,19 @@ public class Net {
                         //search already processed wires
                         String passiveHash = Utils.getHash(lists.passivePins);
                         if (wires.containsKey(passiveHash)) {
-                            //if found by passive pins - connect it and don't process further
+                            //if found by passive pins – connect it and don't process further.
                             wires.get(passiveHash).addDestination(destination, offset);
                         } else {
                             String wireHash = Utils.getHash(lists.pins);
                             if (wires.containsKey(wireHash)) {
-                                //if found by usual pins (complete wire merger) - connect it and don't process further
+                                //if found by usual pins (complete wire merger) – connect it and don't process further.
                                 wires.get(wireHash).addDestination(destination, offset);
                             } else {
                                 //process unprocessed wire
                                 if (lists.pins.size() > 1) {
                                     //use wire merger
                                     WireToBusesAdapter adapter = new WireToBusesAdapter(null, null, destination, offset);
-                                    Pin src = processWire(adapter, lists.pins, lists.passivePins, null);
+                                    Pin src = processWire(adapter, lists.pins, lists.passivePins, Collections.emptyMap());
                                     adapter.id = src.id;
                                     adapter.parent = src.parent;
                                 } else {
@@ -569,10 +549,10 @@ public class Net {
             }
         }
 
-        //if bus signal go throe wire either - drop certain bus mask bit (got shortcut other way)
+        //If “offset” has any passive pin – signal need to be processed using wire merger.
+        //Drop respective bus mask from bus sources bit, other way got shortcut.
         public void cleanBuses() {
             offsets.forEach((pinsOffset, lists) -> {
-                //FixMe what we need check here??
                 if (!lists.passivePins.isEmpty()/*stream().anyMatch(p -> p.source != null)*/) {
                     //clean up all buses mask
                     buses.values()

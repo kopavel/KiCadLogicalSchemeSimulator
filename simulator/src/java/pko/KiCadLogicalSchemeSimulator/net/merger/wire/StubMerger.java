@@ -29,23 +29,36 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.api.wire;
-import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.net.merger.wire.StubMerger;
+package pko.KiCadLogicalSchemeSimulator.net.merger.wire;
+import pko.KiCadLogicalSchemeSimulator.api.wire.OutPin;
 
-public abstract class PassivePin extends OutPin {
-    public PassivePin(String id, SchemaPart parent) {
-        super(id, parent);
+public class StubMerger extends OutPin {
+    OutPin source;
+    boolean oldState;
+    boolean oldStrong;
+
+    public StubMerger(OutPin source) {
+        super(source, "StubMerger");
+        this.source = source;
+        this.merger = this;
+        oldState = source.state;
+        oldStrong = source.strong;
+        if (!oldStrong) {
+            weakState += oldState ? 1 : -1;
+        }
     }
 
-    public abstract void onChange();
-
     @Override
-    public Pin getOptimised() {
-        if (merger == null) {
-            return new StubMerger(this);
-        } else {
-            return this;
+    public void setState(boolean newState) {
+        if (!source.strong) {
+            if (oldStrong) {
+                weakState += newState ? 1 : -1;
+            }
+        } else if (!oldStrong) {
+            weakState -= newState ? 1 : -1;
         }
+        oldState = newState;
+        oldStrong = source.strong;
+        super.setState(newState);
     }
 }

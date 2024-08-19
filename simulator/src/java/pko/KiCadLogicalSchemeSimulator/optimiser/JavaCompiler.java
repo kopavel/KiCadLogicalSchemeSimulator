@@ -49,12 +49,12 @@ public class JavaCompiler {
     private static final MethodHandles.Lookup lookup;
     private static final javax.tools.JavaCompiler compiler;
     private static final List<String> optionList;
-    private static final Module currentModule;
-    private static final Method addReadsMethod;
+    //    private static final Module currentModule;
+//    private static final Method addReadsMethod;
     static {
         try {
             lookup = MethodHandles.lookup();
-            currentModule = JavaCompiler.class.getModule();
+            //          currentModule = JavaCompiler.class.getModule();
             privateLookupInMethod = MethodHandles.class.getDeclaredMethod("privateLookupIn", Class.class, MethodHandles.Lookup.class);
             privateLookupInMethod.setAccessible(true);
             defineClassMethod = MethodHandles.Lookup.class.getDeclaredMethod("defineClass", byte[].class);
@@ -68,6 +68,7 @@ public class JavaCompiler {
                 path = path.substring(1);
             }
             StringBuilder paths = new StringBuilder(path);
+/* don't need for now
             Simulator.schemaPartSpiMap.values().forEach(spi -> {
                 String spiPath = spi.getClass().getProtectionDomain().getCodeSource().getLocation().getFile();
                 if (System.getProperty("os.name").toLowerCase().contains("win") && spiPath.startsWith("/")) {
@@ -75,14 +76,15 @@ public class JavaCompiler {
                 }
                 paths.append(";").append(spiPath);
             });
+*/
             Log.info(JavaCompiler.class, "Use class path for compiler: {}", paths);
             optionList = new ArrayList<>();
             optionList.add("-Xlint:none");
             optionList.add("-cp");
             optionList.add(paths.toString());
             optionList.add("-proc:none");
-            addReadsMethod = Module.class.getDeclaredMethod("implAddReads", Module.class);
-            addReadsMethod.setAccessible(true);
+//            addReadsMethod = Module.class.getDeclaredMethod("implAddReads", Module.class);
+//            addReadsMethod.setAccessible(true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -141,7 +143,11 @@ public class JavaCompiler {
     }
 
     private static void loadClass(Class<?> srcClass, byte[] byteCode) throws Exception {
-        addReadsMethod.invoke(JavaCompiler.currentModule, srcClass.getModule());
+/*
+        if (!JavaCompiler.currentModule.getName().equals(srcClass.getModule().getName())) {
+            addReadsMethod.invoke(JavaCompiler.currentModule, srcClass.getModule());
+        }
+*/
         MethodHandles.Lookup privateLookup = (MethodHandles.Lookup) privateLookupInMethod.invoke(null, srcClass, lookup);
         //noinspection PrimitiveArrayArgumentToVarargsMethod
         defineClassMethod.invoke(privateLookup, byteCode);

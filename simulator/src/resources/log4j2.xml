@@ -11,7 +11,6 @@
 		<RollingRandomAccessFile name="FILE"
 		                         fileName="${logdir}/simulator.log"
 		                         filePattern="${logdir}/%d{yyyy-MM-dd}/simulator.%d{yyyy-MM-dd}.%i.log"
-		                         immediateFlush="false"
 		                         append="false">
 			<PatternLayout pattern="${layout}" charset="UTF-8"/>
 			<Policies>
@@ -22,7 +21,6 @@
 			<DefaultRolloverStrategy fileIndex="nomax"/>
 		</RollingRandomAccessFile>
 		<RollingRandomAccessFile name="MFILE" fileName="${logdir}/mergers.log" filePattern="${logdir}/%d{yyyy-MM-dd}/mergers.%d{yyyy-MM-dd}.%i.log"
-		                         immediateFlush="false"
 		                         append="false">
 			<PatternLayout pattern="${layout}" charset="UTF-8"/>
 			<Policies>

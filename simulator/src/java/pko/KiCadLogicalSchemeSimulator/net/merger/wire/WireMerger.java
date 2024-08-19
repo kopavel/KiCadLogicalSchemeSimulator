@@ -48,7 +48,7 @@ public class WireMerger extends OutPin {
     public final Set<BusMergerWireIn> mergers = new TreeSet<>();
     public Set<MergerInput<?>> sources = new TreeSet<>(Comparator.comparing(MergerInput::getName));
 
-    public WireMerger(Pin destination, List<OutPin> pins, Map<OutBus, Long> buses) {
+    public WireMerger(Pin destination, List<OutPin> pins, List<PassivePin> passivePins, Map<OutBus, Long> buses) {
         super(destination.id, destination.parent);
         variantId = destination.variantId == null ? "" : destination.variantId + ":";
         variantId += "merger";
@@ -57,6 +57,7 @@ public class WireMerger extends OutPin {
             passivePin.merger = this;
         }
         pins.forEach(this::addSource);
+        passivePins.forEach(this::addSource);
         if (buses != null) {
             buses.forEach(this::addSource);
         }

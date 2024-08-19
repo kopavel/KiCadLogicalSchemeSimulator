@@ -250,6 +250,9 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
 
     @Override
     public BusMergerWireIn getOptimised() {
+        if (getClass() == BusMergerWireIn.class) {
+            return this;
+        }
         merger.sources.remove(this);
         destinations = merger.destinations;
         BusMergerWireIn optimised =

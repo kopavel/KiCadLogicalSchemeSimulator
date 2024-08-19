@@ -33,19 +33,28 @@ package pko.KiCadLogicalSchemeSimulator.components.Switch;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.AbstractUiComponent;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.InteractiveSchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
 
 public class Switch extends SchemaPart implements InteractiveSchemaPart {
-    private final SwitchPin pin1;
-    private final SwitchPin pin2;
+    private final PassivePin pin1;
+    private final PassivePin pin2;
     public boolean toggled;
     private SwitchUiComponent switchUiComponent;
 
     protected Switch(String id, String sParams) {
         super(id, sParams);
-        pin1 = (SwitchPin) addPassivePin(new SwitchPin("IN1", this));
-        pin2 = (SwitchPin) addPassivePin(new SwitchPin("IN2", this));
-        pin1.otherPin = pin2;
-        pin2.otherPin = pin1;
+        pin1 = addPassivePin(new PassivePin("IN1", this) {
+            @Override
+            public void onChange() {
+                recalculate(pin1, pin2);
+            }
+        });
+        pin2 = addPassivePin(new PassivePin("IN2", this) {
+            @Override
+            public void onChange() {
+                recalculate(pin2, pin1);
+            }
+        });
         toggled = reverse;
     }
 
@@ -63,7 +72,24 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
 
     public void toggle(boolean toggled) {
         this.toggled = toggled;
-        pin1.onChange();
-        pin2.onChange();
+        recalculate(pin1, pin2);
+        recalculate(pin2, pin1);
+    }
+
+    public void recalculate(PassivePin pin, PassivePin otherPin) {
+        if (!toggled || otherPin.merger.hiImpedance || (!otherPin.merger.strong && !pin.strong && pin.merger.weakState > 1)) {
+            if (!pin.hiImpedance) {
+                pin.setHiImpedance();
+                pin.hiImpedance = true;
+            }
+        } else if (otherPin.merger.strong) {
+            if (!pin.merger.strong) {
+                pin.strong = true;
+                pin.setState(otherPin.merger.state);
+            }
+        } else {
+            pin.strong = false;
+            pin.setState(otherPin.merger.state);
+        }
     }
 }

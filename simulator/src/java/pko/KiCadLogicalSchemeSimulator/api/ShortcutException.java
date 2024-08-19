@@ -39,8 +39,7 @@ public class ShortcutException extends RuntimeException {
     private final String message;
 
     public ShortcutException(Set<? extends IModelItem<?>> pins) {
-        //noinspection DataFlowIssue
-        this((IModelItem<?>[]) pins.toArray());
+        this(pins.toArray(IModelItem<?>[]::new));
     }
 
     public ShortcutException(IModelItem<?>... pins) {
