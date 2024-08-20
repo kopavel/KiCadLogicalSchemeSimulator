@@ -48,7 +48,6 @@ import java.util.Map;
 @SuppressWarnings("unused")
 public abstract class SchemaPart {
     public final String id;
-    public final Map<String, PassivePin> passivePins = new HashMap<>();
     public final Map<String, IModelItem<?>> inPins = new HashMap<>();
     public final Map<String, IModelItem<?>> outPins = new HashMap<>();
     protected final Map<String, String> params = new HashMap<>();
@@ -91,9 +90,8 @@ public abstract class SchemaPart {
         return pin;
     }
 
-    public PassivePin addPassivePin(PassivePin pin) {
-        passivePins.put(pin.id, pin);
-        return pin;
+    public void addPassivePin(String pinId) {
+        outPins.put(pinId, new PassivePin(pinId, this));
     }
 
     public void addPullPin(String pinId, boolean state) {
@@ -193,6 +191,9 @@ public abstract class SchemaPart {
 
     public String extraState() {
         return null;
+    }
+
+    public void onPassivePinChange(Pin source) {
     }
 
     public abstract void initOuts();

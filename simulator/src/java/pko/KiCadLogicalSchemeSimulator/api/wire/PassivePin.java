@@ -31,21 +31,20 @@
  */
 package pko.KiCadLogicalSchemeSimulator.api.wire;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.net.merger.wire.StubMerger;
+import pko.KiCadLogicalSchemeSimulator.net.merger.wire.PassiveOutMerger;
 
-public abstract class PassivePin extends OutPin {
+public class PassivePin extends OutPin {
     public PassivePin(String id, SchemaPart parent) {
         super(id, parent);
     }
 
-    public abstract void onChange();
-
     @Override
     public Pin getOptimised() {
         if (merger == null) {
-            return new StubMerger(this);
+            merger = new PassiveOutMerger(this);
+            return merger;
         } else {
-            return this;
+            return super.getOptimised();
         }
     }
 }

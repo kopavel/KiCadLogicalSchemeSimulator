@@ -39,6 +39,7 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.PullPin;
 import pko.KiCadLogicalSchemeSimulator.net.Net;
 import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
 import pko.KiCadLogicalSchemeSimulator.net.merger.bus.BusMergerWireIn;
+import pko.KiCadLogicalSchemeSimulator.net.wire.NCWire;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 import java.util.*;
@@ -53,6 +54,7 @@ public class WireMerger extends OutPin {
         variantId = destination.variantId == null ? "" : destination.variantId + ":";
         variantId += "merger";
         destinations = new Pin[]{destination};
+        strong = false;
         if (destination instanceof PassivePin passivePin) {
             passivePin.merger = this;
         }
@@ -66,9 +68,7 @@ public class WireMerger extends OutPin {
     @Override
     public void addDestination(Pin pin) {
         super.addDestination(pin);
-        if (pin.getId().contains("->")) {
-            id += "/" + pin.getId().substring(pin.getId().indexOf("->") + 2);
-        } else {
+        if (!(pin instanceof NCWire)) {
             id += "/" + pin.getName();
         }
     }
@@ -115,6 +115,9 @@ public class WireMerger extends OutPin {
             if (!passivePins.contains(passivePin)) {
                 passivePins.add(passivePin);
                 passivePin.merger = this;
+                WireMergerWireIn input = new WireMergerWireIn(pin, this);
+                pin.addDestination(input);
+                sources.add(input);
                 if (!passivePin.hiImpedance && !passivePin.strong) {
                     weakState += pin.state ? 1 : -1;
                 }

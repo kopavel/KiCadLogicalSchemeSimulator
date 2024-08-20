@@ -33,33 +33,25 @@ package pko.KiCadLogicalSchemeSimulator.components.Switch;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.AbstractUiComponent;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.InteractiveSchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 
 public class Switch extends SchemaPart implements InteractiveSchemaPart {
-    private final PassivePin pin1;
-    private final PassivePin pin2;
     public boolean toggled;
+    private Pin pin1;
+    private Pin pin2;
     private SwitchUiComponent switchUiComponent;
 
     protected Switch(String id, String sParams) {
         super(id, sParams);
-        pin1 = addPassivePin(new PassivePin("IN1", this) {
-            @Override
-            public void onChange() {
-                recalculate(pin1, pin2);
-            }
-        });
-        pin2 = addPassivePin(new PassivePin("IN2", this) {
-            @Override
-            public void onChange() {
-                recalculate(pin2, pin1);
-            }
-        });
+        addPassivePin("IN1");
+        addPassivePin("IN2");
         toggled = reverse;
     }
 
     @Override
     public void initOuts() {
+        pin1 = getOutPin("IN1");
+        pin2 = getOutPin("IN2");
     }
 
     @Override
@@ -76,7 +68,16 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
         recalculate(pin2, pin1);
     }
 
-    public void recalculate(PassivePin pin, PassivePin otherPin) {
+    @Override
+    public void onPassivePinChange(Pin source) {
+        if (pin1.merger == source) {
+            recalculate(pin1, pin2);
+        } else {
+            recalculate(pin2, pin1);
+        }
+    }
+
+    public void recalculate(Pin pin, Pin otherPin) {
         if (!toggled || otherPin.merger.hiImpedance || (!otherPin.merger.strong && !pin.strong && pin.merger.weakState > 1)) {
             if (!pin.hiImpedance) {
                 pin.setHiImpedance();
@@ -85,10 +86,12 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
         } else if (otherPin.merger.strong) {
             if (!pin.merger.strong) {
                 pin.strong = true;
+                pin.hiImpedance = false;
                 pin.setState(otherPin.merger.state);
             }
         } else {
             pin.strong = false;
+            pin.hiImpedance = false;
             pin.setState(otherPin.merger.state);
         }
     }

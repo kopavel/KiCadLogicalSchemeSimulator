@@ -30,35 +30,30 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.net.merger.wire;
+import pko.KiCadLogicalSchemeSimulator.api.ShortcutException;
 import pko.KiCadLogicalSchemeSimulator.api.wire.OutPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 
-public class StubMerger extends OutPin {
+public class PassiveInMerger extends OutPin {
     OutPin source;
-    boolean oldState;
-    boolean oldStrong;
 
-    public StubMerger(OutPin source) {
-        super(source, "StubMerger");
+    public PassiveInMerger(OutPin source, Boolean powerState) {
+        super(source, "PassiveInMerger");
         this.source = source;
-        this.merger = this;
-        oldState = source.state;
-        oldStrong = source.strong;
-        if (!oldStrong) {
-            weakState += oldState ? 1 : -1;
-        }
+        state = powerState;
+        hiImpedance = false;
+        merger = this;
     }
 
     @Override
     public void setState(boolean newState) {
-        if (!source.strong) {
-            if (oldStrong) {
-                weakState += newState ? 1 : -1;
-            }
-        } else if (!oldStrong) {
-            weakState -= newState ? 1 : -1;
+        if (source.strong) {
+            throw new ShortcutException(source);
         }
-        oldState = newState;
-        oldStrong = source.strong;
-        super.setState(newState);
+    }
+
+    @Override
+    public Pin getOptimised() {
+        return this;
     }
 }

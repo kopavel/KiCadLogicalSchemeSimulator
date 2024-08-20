@@ -29,40 +29,36 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.net.wire;
-import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
+package pko.KiCadLogicalSchemeSimulator.net.merger.wire;
 import pko.KiCadLogicalSchemeSimulator.api.wire.OutPin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 
-public class NCWire extends OutPin {
-    public NCWire(OutPin outPin) {
-        super(outPin, "NC");
-    }
+public class PassiveOutMerger extends OutPin {
+    OutPin source;
+    boolean oldState;
+    boolean oldStrong;
 
-    @Override
-    public void addDestination(Pin pin) {
-        throw new UnsupportedOperationException("Can't add destination to NC Out Pin");
-    }
-
-    @Override
-    public void addDestination(Bus bus, byte offset) {
-        throw new UnsupportedOperationException("Can't add destination to NC Out Pin");
+    public PassiveOutMerger(OutPin source) {
+        super(source, "PassiveOutMerger");
+        this.source = source;
+        this.merger = this;
+        oldState = source.state;
+        oldStrong = source.strong;
+        if (!oldStrong) {
+            weakState += oldState ? 1 : -1;
+        }
     }
 
     @Override
     public void setState(boolean newState) {
-    }
-
-    @Override
-    public void setHiImpedance() {
-    }
-
-    @Override
-    public void resend() {
-    }
-
-    @Override
-    public Pin getOptimised() {
-        return this;
+        if (!source.strong) {
+            if (oldStrong) {
+                weakState += newState ? 1 : -1;
+            }
+        } else if (!oldStrong) {
+            weakState -= newState ? 1 : -1;
+        }
+        oldState = newState;
+        oldStrong = source.strong;
+        super.setState(newState);
     }
 }

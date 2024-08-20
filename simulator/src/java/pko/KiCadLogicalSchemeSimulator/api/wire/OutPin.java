@@ -30,7 +30,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.api.wire;
-import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.net.wire.NCWire;
@@ -46,8 +45,6 @@ public class OutPin extends Pin {
     public Pin[] destinations = new Pin[0];
     //for wire merger(don't want export from module whole wire merger package)
     public int weakState;
-    //for passive pin (don't lost it on optimisation)
-    public OutPin merger;
 
     public OutPin(String id, SchemaPart parent) {
         super(id, parent);
@@ -58,17 +55,11 @@ public class OutPin extends Pin {
         super(oldPin, variantId);
     }
 
-    @Override
-    public Pin copyState(IModelItem<Pin> oldPin) {
-        if (oldPin instanceof OutPin outPin) {
-            merger = outPin.merger;
-        }
-        return super.copyState(oldPin);
-    }
-
     public void addDestination(Pin pin) {
         assert pin != this;
-        destinations = Utils.addToArray(destinations, pin);
+        if (!(pin instanceof NCWire)) {
+            destinations = Utils.addToArray(destinations, pin);
+        }
     }
 
     public void addDestination(Bus bus, byte offset) {

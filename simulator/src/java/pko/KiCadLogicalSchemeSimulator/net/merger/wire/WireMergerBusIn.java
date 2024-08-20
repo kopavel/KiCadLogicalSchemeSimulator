@@ -102,6 +102,16 @@ public class WireMergerBusIn extends CorrectedInBus implements MergerInput<Bus> 
 
     @Override
     public void setHiImpedance() {
+        assert Log.debug(WireMergerBusIn.class,
+                "Pin merger setImpedance. before: Source:{} (state:{}, oldImpedance:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{}, hiImpedance:{})",
+                getName(),
+                state,
+                oldImpedance,
+                hiImpedance,
+                merger.getName(),
+                merger.state,
+                merger.strong,
+                merger.hiImpedance);
         assert !hiImpedance : "Already in hiImpedance:" + this + "; merger=" + merger.getName();
         if (merger.weakState != 0) {
             if (merger.state != (merger.weakState > 0)) {
@@ -110,15 +120,25 @@ public class WireMergerBusIn extends CorrectedInBus implements MergerInput<Bus> 
                     destination.setState(merger.state);
                 }
             }
-            merger.strong = false;
         } else {
             for (Pin destination : destinations) {
                 destination.setHiImpedance();
             }
             merger.hiImpedance = true;
         }
+        merger.strong = false;
         hiImpedance = true;
         oldImpedance = true;
+        assert Log.debug(WireMergerBusIn.class,
+                "Pin merger setImpedance. after: Source:{} (state:{}, oldImpedance:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{}, hiImpedance:{})",
+                getName(),
+                state,
+                oldImpedance,
+                hiImpedance,
+                merger.getName(),
+                merger.state,
+                merger.strong,
+                merger.hiImpedance);
     }
 
     @Override
@@ -132,7 +152,7 @@ public class WireMergerBusIn extends CorrectedInBus implements MergerInput<Bus> 
 
     @Override
     public WireMergerBusIn getOptimised() {
-        merger.sources.remove(this);
+//        merger.sources.remove(this);
         destinations = merger.destinations;
         return this;
     }

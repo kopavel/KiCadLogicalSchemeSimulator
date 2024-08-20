@@ -41,6 +41,8 @@ public abstract class Pin extends ModelItem<Pin> {
     public boolean state;
     @Getter
     public boolean strong = true;
+    //for passive pin (don't lost it on optimisation)
+    public OutPin merger;
 
     public Pin(Pin oldPin, String variantId) {
         this(oldPin.id, oldPin.parent);
@@ -59,10 +61,11 @@ public abstract class Pin extends ModelItem<Pin> {
         this.strong = oldPin.isStrong();
         this.state = oldPin.getState() != 0;
         this.hiImpedance = oldPin.isHiImpedance();
+        if (oldPin instanceof Pin pin) {
+            this.merger = pin.merger;
+        }
         return this;
     }
-
-    abstract public void setState(boolean newState);
 
     @Override
     public int getSize() {
@@ -73,6 +76,8 @@ public abstract class Pin extends ModelItem<Pin> {
     public long getState() {
         return state ? 1L : 0L;
     }
+
+    abstract public void setState(boolean newState);
 
     @Override
     public Pin getOptimised() {

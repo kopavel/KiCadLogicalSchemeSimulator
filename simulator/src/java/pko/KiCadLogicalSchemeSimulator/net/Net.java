@@ -32,7 +32,6 @@
 package pko.KiCadLogicalSchemeSimulator.net;
 import pko.KiCadLogicalSchemeSimulator.Simulator;
 import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
-import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
@@ -44,7 +43,9 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
 import pko.KiCadLogicalSchemeSimulator.net.bus.BusInInterconnect;
 import pko.KiCadLogicalSchemeSimulator.net.merger.bus.BusMerger;
+import pko.KiCadLogicalSchemeSimulator.net.merger.wire.PassiveInMerger;
 import pko.KiCadLogicalSchemeSimulator.net.merger.wire.WireMerger;
+import pko.KiCadLogicalSchemeSimulator.net.wire.NCWire;
 import pko.KiCadLogicalSchemeSimulator.net.wire.WireToBusesAdapter;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.Comp;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.Export;
@@ -198,39 +199,22 @@ public class Net {
                     IModelItem<?> source = schemaPart.getOutItem(pinName);
                     sourcesOffset.put(source, source.getAliasOffset(pinName));
                 }
-                case "passive" -> {
-                    if (schemaPart.passivePins.containsKey(pinName)) {
-                        passivePins.add(schemaPart.passivePins.get(pinName));
-                    } else {
-                        throw new RuntimeException("Unknown passive pin " + pinName + " in schema part " + schemaPart.id);
-                    }
-                }
-                case "power_in" -> { //ignore
-                }
+                case "passive" -> passivePins.add((PassivePin) schemaPart.getOutPin(pinName));
+                case "power_in" -> { /*ignore*/ }
                 default -> throw new RuntimeException("Unsupported pin type " + pinType);
             }
         });
         if (powerState != null) {
-            //if on a power rail – connect all passive pin to individual power out and don't add to any others nets.
-            passivePins.forEach(passivePin -> {
-                if (TRUE == powerState) {
-                    SchemaPart pwr = getSchemaPart("Power", "pwr_" + passivePin.getName(), "hi;strong");
-                    schemaParts.put(pwr.id, pwr);
-                    ((OutPin) pwr.getOutPin("OUT")).addDestination(passivePin);
-                } else if (FALSE == powerState) {
-                    SchemaPart gnd = getSchemaPart("Power", "gnd_" + passivePin.getName(), "strong");
-                    schemaParts.put(gnd.id, gnd);
-                    ((OutPin) gnd.getOutPin("OUT")).addDestination(passivePin);
-                }
-            });
+            //if on a power rail – connect all pin to individual power out and don't add to any others nets.
+            passivePins.forEach(passivePin -> passivePin.merger = new PassiveInMerger(passivePin, powerState));
             passivePins.clear();
         } else {
-            //If no destination pins, but has passive (no out only) pins – use one of it as destination. In other way passive pins don't get any changes.
+            //If no destination pins, but has passive (no out only) pins – use NcPin as destination. In other way passive pins don't get any changes.
             if ((destinationPins.isEmpty())) {
                 Optional<PassivePin> passivePin = passivePins.stream()
                         .filter(p -> !(p instanceof PassiveOutPin)).findAny();
                 if (passivePin.isPresent()) {
-                    destinationPins.add(passivePin.get());
+                    destinationPins.add(new NCWire(passivePin.get()));
                 } else if (destinationBusesOffsets.isEmpty()) {
                     sourcesOffset.forEach((out, offset) -> Log.warn(Net.class, "Unconnected Out:" + out.getName() + offset));
                 }
@@ -462,17 +446,6 @@ public class Net {
                  item.resend();
                  resend();
              });
-        schemaParts.values()
-                .stream()
-                .flatMap(p -> p.passivePins.values()
-                        .stream())
-                .filter(ModelItem::isHiImpedance)
-                .distinct()
-                .forEach(item -> {
-                    assert Log.debug(Net.class, "Resend pin {}", item);
-                    item.resend();
-                    resend();
-                });
         busMergers.values()
                 .stream()
                 .filter(i -> !i.isHiImpedance()).distinct().forEach(item -> {
@@ -552,23 +525,25 @@ public class Net {
         //If “offset” has any passive pin – signal need to be processed using wire merger.
         //Drop respective bus mask from bus sources bit, other way got shortcut.
         public void cleanBuses() {
-            offsets.forEach((pinsOffset, lists) -> {
-                if (!lists.passivePins.isEmpty()/*stream().anyMatch(p -> p.source != null)*/) {
-                    //clean up all buses mask
-                    buses.values()
-                            .stream()
-                            .flatMap(m -> m.entrySet()
-                                    .stream())
-                            .filter(o -> o.getKey() <= pinsOffset)
-                            .forEach(pair -> {
-                                long correctedMask = ~(1L << (pinsOffset - pair.getKey()));
-                                pair.setValue(pair.getValue() & correctedMask);
-                            });
-                    //remove empty offsets
-                    buses.values().forEach(map -> map.entrySet().removeIf(entry -> entry.getValue() == 0));
-                    buses.entrySet().removeIf(entry -> entry.getValue().isEmpty());
-                }
-            });
+            if (!buses.isEmpty()) {
+                offsets.forEach((pinsOffset, lists) -> {
+                    if (!lists.passivePins.isEmpty()/*stream().anyMatch(p -> p.source != null)*/) {
+                        //clean up all buses mask
+                        buses.values()
+                                .stream()
+                                .flatMap(m -> m.entrySet()
+                                        .stream())
+                                .filter(o -> o.getKey() <= pinsOffset)
+                                .forEach(pair -> {
+                                    long correctedMask = ~(1L << (pinsOffset - pair.getKey()));
+                                    pair.setValue(pair.getValue() & correctedMask);
+                                });
+                        //remove empty offsets
+                        buses.values().forEach(map -> map.entrySet().removeIf(entry -> entry.getValue() == 0));
+                        buses.entrySet().removeIf(entry -> entry.getValue().isEmpty());
+                    }
+                });
+            }
         }
     }
 }
