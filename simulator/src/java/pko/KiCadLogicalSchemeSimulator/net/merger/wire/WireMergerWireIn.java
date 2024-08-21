@@ -54,7 +54,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
     public void setState(boolean newState) {
         assert Log.debug(WireMergerWireIn.class,
                 "Pin merger change. before: newState:{}, Source:{} (state:{}, oldStrong:{}, strong:{}, oldImpedance:{}, hiImpedance:{}), Merger:{} (state:{}, " +
-                        "strong:{} hiImpedance:{})",
+                        "strong:{}, hiImpedance:{}, weakState:{})",
                 newState,
                 getName(),
                 state,
@@ -64,8 +64,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                 hiImpedance,
                 merger.getName(),
                 merger.state,
-                merger.strong,
-                merger.hiImpedance);
+                merger.strong, merger.hiImpedance, merger.weakState);
         boolean oldState = merger.state;
         boolean strengthChange = false;
         state = newState;
@@ -78,7 +77,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                         assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
                         return;
                     } else {
-                        throw new ShortcutException(((WireMerger) merger).passivePins);
+                        throw new ShortcutException(((WireMerger) merger).sources);
                     }
                 }
                 if (!oldImpedance) { // from weak
@@ -89,18 +88,19 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
             }
             merger.state = newState;
         } else { //to weak
-            if (merger.weakState != 0 && ((merger.weakState > 0) == newState)) { //opposite weak state
+            if (merger.weakState != 0 && ((merger.weakState > 0) != newState)) { //opposite weak state
                 if (Net.stabilizing) {
                     Net.forResend.add(this);
-                    assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
+                    assert Log.debug(this.getClass(), "Weak state shortcut on setting pin {}, try resend later", this);
                     return;
                 } else {
-                    throw new ShortcutException(((WireMerger) merger).passivePins);
+                    throw new ShortcutException(((WireMerger) merger).sources);
                 }
             }
             if (oldImpedance) { // from impedance
-                merger.strong = false;
-                strengthChange = true;
+                if (merger.hiImpedance) {
+                    merger.strong = false;
+                }
                 merger.weakState += (merger.weakState > 0 ? 1 : -1);
             } else if (oldStrong) { //from strong
                 merger.strong = false;
@@ -119,10 +119,12 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
             merger.hiImpedance = false;
         } else if (oldState != merger.state) {
             for (Pin destination : destinations) {
+                destination.strong = strong;
                 destination.setState(merger.state);
             }
         } else if (strengthChange) {
             for (Pin destination : ((WireMerger) merger).mergers) {
+                destination.strong = strong;
                 destination.setState(merger.state);
             }
         }
@@ -130,7 +132,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
         oldImpedance = false;
         assert Log.debug(WireMergerWireIn.class,
                 "Pin merger change. after: newState:{}, Source:{} (state:{}, oldStrong:{}, strong:{}, oldImpedance:{}, hiImpedance:{}), Merger:{} (state:{}, " +
-                        "strong:{} hiImpedance:{})",
+                        "strong:{}, hiImpedance:{}, weakState:{})",
                 newState,
                 getName(),
                 state,
@@ -140,15 +142,14 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                 hiImpedance,
                 merger.getName(),
                 merger.state,
-                merger.strong,
-                merger.hiImpedance);
+                merger.strong, merger.hiImpedance, merger.weakState);
     }
 
     @Override
     public void setHiImpedance() {
         assert Log.debug(WireMergerWireIn.class,
                 "Pin merger setImpedance. before: Source:{} (state:{}, oldStrong:{}, strong:{}, oldImpedance:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{} " +
-                        "hiImpedance:{})",
+                        "hiImpedance:{}, weakState:{})",
                 getName(),
                 state,
                 oldStrong,
@@ -157,18 +158,19 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                 hiImpedance,
                 merger.getName(),
                 merger.state,
-                merger.strong,
-                merger.hiImpedance);
-        assert !hiImpedance : "Already in hiImpedance:" + this + "; merger=" + merger.getName();
+                merger.strong, merger.hiImpedance, merger.weakState);
+        assert !oldImpedance : "Already in hiImpedance:" + this + "; merger=" + merger.getName();
         boolean oldState = merger.state;
         if (oldStrong) {
             if (merger.weakState == 0) {
                 merger.hiImpedance = true;
+                merger.strong = false;
                 for (Pin destination : destinations) {
                     destination.setHiImpedance();
                 }
             } else {
                 merger.state = merger.weakState > 0;
+                merger.strong = false;
                 if (oldState != merger.state) {
                     for (Pin destination : destinations) {
                         destination.setState(merger.state);
@@ -182,16 +184,16 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                     destination.setHiImpedance();
                 }
                 merger.hiImpedance = true;
+                merger.strong = false;
             }
         }
         hiImpedance = true;
         oldImpedance = true;
         strong = false;
         oldStrong = false;
-        merger.strong = false;
         assert Log.debug(WireMergerWireIn.class,
                 "Pin merger setImpedance. after: Source:{} (state:{}, oldStrong:{}, strong:{}, oldImpedance:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{} " +
-                        "hiImpedance:{})",
+                        "hiImpedance:{}, wakState:{})",
                 getName(),
                 state,
                 oldStrong,
@@ -200,8 +202,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                 hiImpedance,
                 merger.getName(),
                 merger.state,
-                merger.strong,
-                merger.hiImpedance);
+                merger.strong, merger.hiImpedance, merger.weakState);
     }
 
     @Override
@@ -215,7 +216,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
 
     @Override
     public WireMergerWireIn getOptimised() {
-        ((WireMerger) merger).sources.remove(this);
+//        ((WireMerger) merger).sources.remove(this);
         destinations = merger.destinations;
         return this;
     }

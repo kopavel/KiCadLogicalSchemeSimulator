@@ -43,6 +43,7 @@ public class PassiveInMerger extends OutPin {
         state = powerState;
         hiImpedance = false;
         merger = this;
+        strong = true;
     }
 
     @Override

@@ -36,6 +36,7 @@ import pko.KiCadLogicalSchemeSimulator.net.merger.wire.PassiveOutMerger;
 public class PassivePin extends OutPin {
     public PassivePin(String id, SchemaPart parent) {
         super(id, parent);
+        strong = false;
     }
 
     @Override

@@ -30,6 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.Switch;
+import pko.KiCadLogicalSchemeSimulator.api.ShortcutException;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.AbstractUiComponent;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.InteractiveSchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
@@ -78,7 +79,7 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
     }
 
     public void recalculate(Pin pin, Pin otherPin) {
-        if (!toggled || otherPin.merger.hiImpedance || (!otherPin.merger.strong && !pin.strong && pin.merger.weakState > 1)) {
+        if (!toggled || otherPin.merger.hiImpedance || (!otherPin.merger.strong && !pin.strong && Math.abs(pin.merger.weakState) > 1)) {
             if (!pin.hiImpedance) {
                 pin.setHiImpedance();
                 pin.hiImpedance = true;
@@ -86,13 +87,15 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
         } else if (otherPin.merger.strong) {
             if (!pin.merger.strong) {
                 pin.strong = true;
-                pin.hiImpedance = false;
                 pin.setState(otherPin.merger.state);
+                pin.hiImpedance = false;
+            } else if (!otherPin.strong && !pin.strong) {
+                throw new ShortcutException(pin1, pin2);
             }
-        } else {
+        } else if (pin.merger.weakState == 0 && (pin.strong || pin.hiImpedance)) {
             pin.strong = false;
-            pin.hiImpedance = false;
             pin.setState(otherPin.merger.state);
+            pin.hiImpedance = false;
         }
     }
 }
