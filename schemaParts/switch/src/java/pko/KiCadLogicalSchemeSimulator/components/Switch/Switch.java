@@ -72,30 +72,42 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
     @Override
     public void onPassivePinChange(Pin source) {
         if (pin1.merger == source) {
-            recalculate(pin1, pin2);
-        } else {
             recalculate(pin2, pin1);
+        } else {
+            recalculate(pin1, pin2);
         }
     }
 
     public void recalculate(Pin pin, Pin otherPin) {
-        if (!toggled || otherPin.merger.hiImpedance || (!otherPin.merger.strong && !pin.strong && Math.abs(pin.merger.weakState) > 1)) {
+        if (!toggled || otherPin.merger.hiImpedance) {
             if (!pin.hiImpedance) {
                 pin.setHiImpedance();
                 pin.hiImpedance = true;
             }
         } else if (otherPin.merger.strong) {
-            if (!pin.merger.strong) {
+            if (!otherPin.hiImpedance && otherPin.strong) {
+                if (!pin.hiImpedance) {
+                    pin.setHiImpedance();
+                    pin.hiImpedance = true;
+                }
+            } else if (!pin.merger.strong) {
                 pin.strong = true;
                 pin.setState(otherPin.merger.state);
                 pin.hiImpedance = false;
-            } else if (!otherPin.strong && !pin.strong) {
+            } else if (!pin1.strong && !pin2.strong) {
                 throw new ShortcutException(pin1, pin2);
             }
-        } else if (pin.merger.weakState == 0 && (pin.strong || pin.hiImpedance)) {
-            pin.strong = false;
-            pin.setState(otherPin.merger.state);
-            pin.hiImpedance = false;
+        } else {
+            if ((!otherPin.hiImpedance && !otherPin.strong && Math.abs(otherPin.merger.weakState) == 1) || pin.merger.strong) {
+                if (!pin.hiImpedance) {
+                    pin.setHiImpedance();
+                    pin.hiImpedance = true;
+                }
+            } else {
+                pin.strong = false;
+                pin.setState(otherPin.merger.state);
+                pin.hiImpedance = false;
+            }
         }
     }
 }

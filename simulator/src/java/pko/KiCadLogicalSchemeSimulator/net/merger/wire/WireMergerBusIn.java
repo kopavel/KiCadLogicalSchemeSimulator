@@ -33,6 +33,7 @@ package pko.KiCadLogicalSchemeSimulator.net.merger.wire;
 import pko.KiCadLogicalSchemeSimulator.api.ShortcutException;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.in.CorrectedInBus;
+import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.net.Net;
 import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
@@ -88,6 +89,9 @@ public class WireMergerBusIn extends CorrectedInBus implements MergerInput<Bus> 
         merger.strong = true;
         merger.hiImpedance = false;
         oldImpedance = false;
+        for (PassivePin passivePin : merger.passivePins) {
+            passivePin.parent.onPassivePinChange(this.merger);
+        }
         assert Log.debug(WireMergerBusIn.class,
                 "Pin merger change. after: newState:{}, Source:{} (state:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{}, hiImpedance:{})",
                 newState,
@@ -129,6 +133,9 @@ public class WireMergerBusIn extends CorrectedInBus implements MergerInput<Bus> 
         merger.strong = false;
         hiImpedance = true;
         oldImpedance = true;
+        for (PassivePin passivePin : merger.passivePins) {
+            passivePin.parent.onPassivePinChange(this.merger);
+        }
         assert Log.debug(WireMergerBusIn.class,
                 "Pin merger setImpedance. after: Source:{} (state:{}, oldImpedance:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{}, hiImpedance:{})",
                 getName(),

@@ -109,9 +109,6 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                 merger.state = merger.weakState > 0;
             }
         }
-        for (PassivePin passivePin : ((WireMerger) merger).passivePins) {
-            passivePin.parent.onPassivePinChange(this.merger);
-        }
         if (merger.hiImpedance) {
             for (Pin destination : destinations) {
                 destination.setHiImpedance();
@@ -130,6 +127,9 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
         }
         oldStrong = strong;
         oldImpedance = false;
+        for (PassivePin passivePin : ((WireMerger) merger).passivePins) {
+            passivePin.parent.onPassivePinChange(this.merger);
+        }
         assert Log.debug(WireMergerWireIn.class,
                 "Pin merger change. after: newState:{}, Source:{} (state:{}, oldStrong:{}, strong:{}, oldImpedance:{}, hiImpedance:{}), Merger:{} (state:{}, " +
                         "strong:{}, hiImpedance:{}, weakState:{})",
@@ -179,21 +179,23 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
             }
         } else {
             merger.weakState -= (merger.weakState > 0 ? 1 : -1);
-            if (merger.weakState == 0) {
+            if (merger.weakState == 0 && !merger.strong) {
                 for (Pin destination : destinations) {
                     destination.setHiImpedance();
                 }
                 merger.hiImpedance = true;
-                merger.strong = false;
             }
         }
         hiImpedance = true;
         oldImpedance = true;
         strong = false;
         oldStrong = false;
+        for (PassivePin passivePin : ((WireMerger) merger).passivePins) {
+            passivePin.parent.onPassivePinChange(this.merger);
+        }
         assert Log.debug(WireMergerWireIn.class,
                 "Pin merger setImpedance. after: Source:{} (state:{}, oldStrong:{}, strong:{}, oldImpedance:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{} " +
-                        "hiImpedance:{}, wakState:{})",
+                        "hiImpedance:{}, weakState:{})",
                 getName(),
                 state,
                 oldStrong,
