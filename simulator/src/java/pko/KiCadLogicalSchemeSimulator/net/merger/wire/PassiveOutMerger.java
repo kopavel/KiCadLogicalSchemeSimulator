@@ -34,17 +34,15 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.OutPin;
 
 public class PassiveOutMerger extends OutPin {
     OutPin source;
-    boolean oldState;
     boolean oldStrong;
 
     public PassiveOutMerger(OutPin source) {
         super(source, "PassiveOutMerger");
         this.source = source;
         this.merger = this;
-        oldState = source.state;
         oldStrong = source.strong;
         if (!oldStrong) {
-            weakState += oldState ? 1 : -1;
+            weakState += source.state ? 1 : -1;
         }
     }
 
@@ -57,7 +55,6 @@ public class PassiveOutMerger extends OutPin {
         } else if (!oldStrong) {
             weakState -= newState ? 1 : -1;
         }
-        oldState = newState;
         oldStrong = source.strong;
         super.setState(newState);
     }

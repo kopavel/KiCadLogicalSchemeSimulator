@@ -78,6 +78,7 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
         }
     }
 
+    //ToDo try to reduce IF statement count
     public void recalculate(Pin pin, Pin otherPin) {
         if (!toggled || otherPin.merger.hiImpedance) {
             if (!pin.hiImpedance) {

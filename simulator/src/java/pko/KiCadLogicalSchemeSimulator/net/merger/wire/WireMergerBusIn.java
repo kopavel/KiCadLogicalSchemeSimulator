@@ -37,6 +37,7 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.net.Net;
 import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
+import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 public class WireMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
@@ -51,6 +52,15 @@ public class WireMergerBusIn extends CorrectedInBus implements MergerInput<Bus> 
         this.merger = merger;
         oldImpedance = hiImpedance;
         destinations = merger.destinations;
+    }
+
+    /*Optimiser constructor unroll destination:destinations*/
+    public WireMergerBusIn(WireMergerBusIn oldBus, String variantId) {
+        super(oldBus, variantId);
+        mask = oldBus.mask;
+        merger = oldBus.merger;
+        oldImpedance = hiImpedance;
+        destinations = oldBus.destinations;
     }
 
     @Override
@@ -89,9 +99,11 @@ public class WireMergerBusIn extends CorrectedInBus implements MergerInput<Bus> 
         merger.strong = true;
         merger.hiImpedance = false;
         oldImpedance = false;
+        /*Optimiser block passivePins*///
         for (PassivePin passivePin : merger.passivePins) {
             passivePin.parent.onPassivePinChange(this.merger);
         }
+        /*Optimiser blockend passivePins*///
         assert Log.debug(WireMergerBusIn.class,
                 "Pin merger change. after: newState:{}, Source:{} (state:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{}, hiImpedance:{})",
                 newState,
@@ -117,25 +129,43 @@ public class WireMergerBusIn extends CorrectedInBus implements MergerInput<Bus> 
                 merger.strong,
                 merger.hiImpedance);
         assert !hiImpedance : "Already in hiImpedance:" + this + "; merger=" + merger.getName();
+        /*Optimiser block strongOnly*/
+        /*Optimiser block weakOnly*/
         if (merger.weakState != 0) {
+            /*Optimiser blockend weakOnly*/
+            /*Optimiser blockend strongOnly*/
+            /*Optimiser block weakOnly*/
             if (merger.state != (merger.weakState > 0)) {
                 merger.state = merger.weakState > 0;
                 for (Pin destination : destinations) {
                     destination.setState(merger.state);
                 }
             }
+            /*Optimiser blockend weakOnly*/
+            /*Optimiser block strongOnly*/
+            /*Optimiser block weakOnly*/
         } else {
+            /*Optimiser blockend weakOnly*/
+            /*Optimiser blockend strongOnly*/
+            /*Optimiser block strongOnly*/
             for (Pin destination : destinations) {
                 destination.setHiImpedance();
             }
             merger.hiImpedance = true;
+            /*Optimiser blockend strongOnly*/
+            /*Optimiser block strongOnly*/
+            /*Optimiser block weakOnly*/
         }
+        /*Optimiser blockend weakOnly*/
+        /*Optimiser blockend strongOnly*/
         merger.strong = false;
         hiImpedance = true;
         oldImpedance = true;
+        /*Optimiser block passivePins*///
         for (PassivePin passivePin : merger.passivePins) {
             passivePin.parent.onPassivePinChange(this.merger);
         }
+        /*Optimiser blockend passivePins*///
         assert Log.debug(WireMergerBusIn.class,
                 "Pin merger setImpedance. after: Source:{} (state:{}, oldImpedance:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{}, hiImpedance:{})",
                 getName(),
@@ -159,8 +189,22 @@ public class WireMergerBusIn extends CorrectedInBus implements MergerInput<Bus> 
 
     @Override
     public WireMergerBusIn getOptimised() {
-//        merger.sources.remove(this);
+        merger.sources.remove(this);
         destinations = merger.destinations;
-        return this;
+        for (int i = 0; i < destinations.length; i++) {
+            destinations[i] = destinations[i].getOptimised();
+        }
+        ClassOptimiser<WireMergerBusIn> optimiser = new ClassOptimiser<>(this).unroll(destinations.length);
+        if (merger.passivePins.isEmpty()) {
+            optimiser.cut("passivePins");
+            if (merger.weakState != 0) {
+                optimiser.cut("strongOnly");
+            } else {
+                optimiser.cut("weakOnly");
+            }
+        }
+        WireMergerBusIn pin = optimiser.build();
+        merger.sources.add(pin);
+        return pin;
     }
 }
