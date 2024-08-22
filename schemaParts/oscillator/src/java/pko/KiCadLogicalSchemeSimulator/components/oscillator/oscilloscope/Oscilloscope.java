@@ -48,6 +48,7 @@ import java.util.concurrent.TimeUnit;
 //ToDo search by pin changes
 //ToDo navigate to start/end
 //ToDo add 'time' tags
+//FixMe add passive pins menu
 public class Oscilloscope extends JFrame {
     public static final ResourceBundle localization = ResourceBundle.getBundle("i81n_clock/clock");
     final Diagram diagram;

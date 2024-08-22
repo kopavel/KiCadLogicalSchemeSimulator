@@ -50,7 +50,6 @@ import java.util.concurrent.TimeUnit;
 
 import static org.apache.commons.lang3.StringUtils.leftPad;
 
-//FixMe add passive pins menu
 public class SchemaPartMonitor extends JFrame {
     public final SchemaPart schemaPart;
     private final ScheduledExecutorService scheduler;
