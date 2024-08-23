@@ -104,7 +104,21 @@ public class DcTrigger extends SchemaPart {
                 public void setState(boolean newState) {
                     state = newState;
                     if (!state) {
-                        store();
+                        if (clockEnabled) {
+                            if (dPin.state) {
+                                if (iqOut.state) {
+                                    qOut.state = true;
+                                    qOut.setState(true);
+                                    iqOut.state = false;
+                                    iqOut.setState(false);
+                                }
+                            } else if (qOut.state) {
+                                qOut.state = false;
+                                qOut.setState(false);
+                                iqOut.state = true;
+                                iqOut.setState(true);
+                            }
+                        }
                     }
                 }
             });
@@ -114,7 +128,21 @@ public class DcTrigger extends SchemaPart {
                 public void setState(boolean newState) {
                     state = newState;
                     if (state) {
-                        store();
+                        if (clockEnabled) {
+                            if (dPin.state) {
+                                if (iqOut.state) {
+                                    qOut.state = true;
+                                    qOut.setState(true);
+                                    iqOut.state = false;
+                                    iqOut.setState(false);
+                                }
+                            } else if (qOut.state) {
+                                qOut.state = false;
+                                qOut.setState(false);
+                                iqOut.state = true;
+                                iqOut.setState(true);
+                            }
+                        }
                     }
                 }
             });
@@ -137,23 +165,5 @@ public class DcTrigger extends SchemaPart {
         iqOut.state = true;
         iqOut.hiImpedance = false;
         iqOut.setState(true);
-    }
-
-    private void store() {
-        if (clockEnabled) {
-            if (dPin.state) {
-                if (iqOut.state) {
-                    qOut.state = true;
-                    qOut.setState(true);
-                    iqOut.state = false;
-                    iqOut.setState(false);
-                }
-            } else if (qOut.state) {
-                qOut.state = false;
-                qOut.setState(false);
-                iqOut.state = true;
-                iqOut.setState(true);
-            }
-        }
     }
 }

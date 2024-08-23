@@ -80,11 +80,9 @@ public class Multiplexer extends SchemaPart {
                 public void setState(long newState) {
                     state = newState;
                     hiImpedance = false;
-                    if (number == nState) {
-                        if (outBus.state != newState) {
-                            outBus.state = newState;
-                            outBus.setState(newState);
-                        }
+                    if (number == nState && outBus.state != newState) {
+                        outBus.state = newState;
+                        outBus.setState(newState);
                     }
                 }
             });
@@ -109,8 +107,7 @@ public class Multiplexer extends SchemaPart {
                         } else {
                             throw new FloatingInException(inBus);
                         }
-                    }
-                    if (outBus.state != inBus.state) {
+                    } else if (outBus.state != inBus.state) {
                         outBus.state = inBus.state;
                         outBus.setState(inBus.state);
                     }

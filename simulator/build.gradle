@@ -83,7 +83,7 @@ run {
                  "-XX:+UseParallelGC",
                  "-XX:CompileThreshold=10",
                  "-XX:MaxInlineSize=64",
-                 "-XX:MaxInlineLevel=14",
+                 "-XX:MaxInlineLevel=5",
                  "-XX:ParallelGCThreads=1",
 //                 "--add-opens", "java.base/java.lang=KiCadLogicalSchemeSimulator.simulator",
                  "-Xmx2G",
