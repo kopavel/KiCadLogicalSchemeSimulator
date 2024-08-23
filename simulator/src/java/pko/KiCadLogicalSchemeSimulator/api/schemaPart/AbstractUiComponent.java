@@ -45,7 +45,7 @@ public abstract class AbstractUiComponent extends Component {
     public boolean hasStoredLayout;
     protected int titleHeight;
     protected Graphics2D g2d;
-    protected boolean sized;
+    public boolean sized;
     private int mouseX, mouseY;
 
     public AbstractUiComponent(String title, int size) {
