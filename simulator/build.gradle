@@ -76,6 +76,17 @@ application {
     tasks.named("startScripts") { it.enabled = false }
 }
 
+/*
+test {
+    useJUnitPlatform()
+    jvmArgs = [
+            '--module-path', classpath.asPath,
+            '--add-modules', "KiCadLogicalSchemeSimulator.simulator",
+            '--add-exports', 'KiCadLogicalSchemeSimulator.simulator/pko.KiCadLogicalSchemeSimulator.parsers.net=ALL-UNNAMED',
+    ]
+}
+*/
+
 run {
     def jvm_args = []
     jvm_args += ["-Dlog4j.configurationFile=${sourceSets.main.resources.srcDirs.first().absolutePath}/log4j2.xml",
@@ -119,12 +130,12 @@ tasks.register("runJmh", JavaExec) {
     mainClass = 'org.openjdk.jmh.Main'
     // Optional: Set JVM arguments
     jvmArgs = [
-            '--module-path', "$rootDir/distro/;$rootDir/distro/lib/",
+            '--module-path', classpath.asPath,//"$rootDir/distro/;$rootDir/distro/lib/",
             '--add-modules', "KiCadLogicalSchemeSimulator.simulator",
-            '--add-exports', 'KiCadLogicalSchemeSimulator.simulator/pko.KiCadLogicalSchemeSimulator.net.bus=ALL-UNNAMED', // Add this line
-            '--add-exports', 'KiCadLogicalSchemeSimulator.simulator/pko.KiCadLogicalSchemeSimulator.net.wire=ALL-UNNAMED', // Add this line
+            '--add-exports', 'KiCadLogicalSchemeSimulator.simulator/pko.KiCadLogicalSchemeSimulator.net.bus=ALL-UNNAMED',
+            '--add-exports', 'KiCadLogicalSchemeSimulator.simulator/pko.KiCadLogicalSchemeSimulator.net.wire=ALL-UNNAMED',
 /*
-            '--patch-module', "KiCadLogicalSchemeSimulator.simulator=$projectDir/optimised"
+            '--patch-module', "KiCadLogicalSchemeSimulator.simulator=$rootDir/stuff/work/optimised"
 */
     ]
     args = [

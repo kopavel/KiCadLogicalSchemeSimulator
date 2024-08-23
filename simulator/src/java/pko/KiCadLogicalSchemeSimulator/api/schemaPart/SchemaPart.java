@@ -109,7 +109,7 @@ public abstract class SchemaPart {
         pin.hiImpedance = false;
     }
 
-    public InBus addInBus(String pinId, int size, String... names) {
+    public CorrectedInBus addInBus(String pinId, int size, String... names) {
         return addInBus(new CorrectedInBus(pinId, this, size, names) {
             @Override
             public void setHiImpedance() {

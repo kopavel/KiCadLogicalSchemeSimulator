@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <symbolMap>
+	<lib name="Tests">
+		<symbol name="OutBus" symPartClass="TestOutBus"/>
+		<symbol name="InBus" symPartClass="TestInBus"/>
+		<symbol name="OutPin" symPartClass="TestOutPin"/>
+		<symbol name="InPin" symPartClass="TestInPin"/>
+	</lib>
 	<lib name="chip">
 		<symbol name="3OR" symPartClass="OrGate" symPartParam="size=3"/>
 		<symbol name="4OR" symPartClass="OrGate" symPartParam="size=4"/>

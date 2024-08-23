@@ -1,7 +1,5 @@
 (export (version "E")
   (design
-    (source "D:\\soft_a\\verilog\\KiCadLogicalSchemeSimulator\\stuff\\examples\\switch\\switch.kicad_sch")
-    (date "05/08/2024 19:08:32")
     (tool "Eeschema 7.0.9")
     (sheet (number "1") (name "/") (tstamps "/")
       (title_block

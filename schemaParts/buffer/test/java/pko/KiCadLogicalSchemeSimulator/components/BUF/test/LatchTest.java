@@ -29,75 +29,57 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.components.BUF;
+package pko.KiCadLogicalSchemeSimulator.components.BUF.test;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import pko.KiCadLogicalSchemeSimulator.api.pins.in.FloatingPinException;
-import pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
-import pko.KiCadLogicalSchemeSimulator.api.pins.out.TriStateOutPin;
+import pko.KiCadLogicalSchemeSimulator.api.FloatingInException;
+import pko.KiCadLogicalSchemeSimulator.test.schemaPartTester.NetTester;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class LatchTest {
-    final Buffer buffer;
-    final InPin dPin;
-    final TriStateOutPin qPin;
-    final InPin csPin;
-    final InPin wrPin;
+public class LatchTest extends NetTester {
+    @Override
+    protected String getNetFilePath() {
+        return "test/resources/buffer.net";
+    }
 
-    public LatchTest() {
-        buffer = new Buffer("buf", "size=1;latch");
-        dPin = buffer.inMap.get("D");
-        qPin = (TriStateOutPin) buffer.outMap.get("Q");
-        csPin = buffer.inMap.get("~{OE}");
-        wrPin = buffer.inMap.get("~{WR}");
-        InPin dest = new InPin("dest", buffer) {
-            @Override
-            public void onChange(long newState, boolean hiImpedance, boolean strong) {
-            }
-        };
-        qPin.addDestination(dest);
-        dPin.mask = 1;
-        dest.mask = 1;
-        buffer.initOuts();
-        csPin.onChange(1, false, true);
-        wrPin.onChange(1, false, true);
-        buffer.reset();
+    @Override
+    protected String getRootPath() {
+        return "../..";
     }
 
     @Test
     @DisplayName("Q pin should be in high-impedance state with Hi CS")
     void qPinHighImpedanceWithHighCs() {
-        csPin.onChange(1, false, true);
-        assertTrue(qPin.hiImpedance, "With Hi CS pin, Q must be in high-impedance state");
+        setPin("RegOe", true);
+        assertTrue(inBus("RegIn").hiImpedance, "With Hi CS pin, Q must be in high-impedance state");
     }
 
     @Test
     @DisplayName("Q pin should remain high-impedance with Hi CS and changing D pin")
     void qPinRemainsHighImpedanceWithHighCsAndChangingD() {
-        csPin.onChange(1, false, true);
-        dPin.onChange(1, true, true);
-        assertTrue(qPin.hiImpedance, "With Hi CS pin, Q must remain in high-impedance state when D pin changes");
+        setPin("RegOe", true);
+        setBus("RegOut", 1);
+        assertTrue(inBus("RegIn").hiImpedance, "With Hi CS pin, Q must remain in high-impedance state when D pin changes");
     }
 
     @Test
     @DisplayName("Latch should store and read correctly")
     void latchWriteAndRead() {
-        csPin.onChange(1, false, true);
-        dPin.state = 1;
-        dPin.onChange(1, false, true);
-        wrPin.onChange(0, false, true);
-        csPin.onChange(0, false, true);
-        assertEquals(1, qPin.state, "Q pin should reflect the state of D pin after OE falling edge");
-        csPin.onChange(1, false, true);
-        assertTrue(qPin.hiImpedance, "Q pin should be in high-impedance state after OE raising edge");
+        setPin("RegOe", true);
+        setBus("RegOut", 1);
+        setPin("RegWr", false);
+        setPin("RegOe", false);
+        assertEquals(1, inBus("RegIn").state, "Q pin should reflect the state of D pin after OE falling edge");
+        setPin("RegOe", true);
+        assertTrue(inBus("RegIn").hiImpedance, "Q pin should be in high-impedance state after OE raising edge");
     }
 
     @Test
     @DisplayName("Floating D pin should throw FloatingPinException")
     void floatingDPinThrowsException() {
-        assertThrows(FloatingPinException.class, () -> csPin.onChange(1, true, true), "Floating input must throw exception with Hi CS");
+        assertThrows(FloatingInException.class, () -> outPin("RegOe").setHiImpedance(), "Floating input must throw exception with Hi CS");
     }
 }

@@ -29,52 +29,20 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.components.AND;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
-import pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
+package pko.KiCadLogicalSchemeSimulator.components.tester;
+import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+public class TestOutPin extends SchemaPart {
+    public Pin pin;
 
-public class NandTest {
-    final AndGate gate;
-    final InPin inPin;
-    final OutPin out;
-
-    public NandTest() {
-        gate = new AndGate("AndGate", "size=2;reverse");
-        gate.initOuts();
-        inPin = gate.inMap.get("IN");
-        out = gate.outMap.get("OUT");
-        InPin dest = new InPin("dest", gate) {
-            @Override
-            public void onChange(long newState, boolean hiImpedance, boolean strong) {
-            }
-        };
-        inPin.mask = 3;
-        dest.mask = 1;
-        out.addDestination(dest);
+    protected TestOutPin(String id, String sParam) {
+        super(id, sParam);
+        addOutPin("Out");
     }
 
-    @Test
-    @DisplayName("Both input Lo - out Hi")
-    public void bothLo() {
-        inPin.onChange(0, false, true);
-        assertEquals(1, out.state, "With no input output need to be Lo");
-    }
-
-    @Test
-    @DisplayName("Only one input Hi - out Hi")
-    public void oneHi() {
-        inPin.onChange(1, false, true);
-        assertEquals(1, out.state, "With Hi on only one input output need to be Lo");
-    }
-
-    @Test
-    @DisplayName("Both input Hi - out Lo")
-    public void bothHi() {
-        inPin.onChange(3, false, true);
-        assertEquals(0, out.state, "With Hi on both inputs output need to be Hi");
+    @Override
+    public void initOuts() {
+        pin = getOutPin("Out");
     }
 }

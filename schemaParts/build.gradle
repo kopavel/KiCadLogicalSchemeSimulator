@@ -70,6 +70,7 @@ dependencies {
     runtimeOnly project(":schemaParts:shifter")
     runtimeOnly project(":schemaParts:stateMachine")
     runtimeOnly project(":schemaParts:switch")
+    runtimeOnly project(":schemaParts:tester")
     runtimeOnly project(":schemaParts:xor")
     runtimeOnly project(":schemaParts:z80")
 }
@@ -85,12 +86,15 @@ configure(subprojects) { subproject ->
                 srcDirs = ["test/java"]
             }
             resources {
-                srcDirs = []
+                srcDirs = ["test/resources"]
             }
         }
     }
     dependencies {
         implementation project(":simulator")
+        testImplementation project(":simulator").sourceSets.test.output
+        testRuntimeOnly project(":simulator")
+
     }
     tasks.named("jar") {
         destinationDirectory = file("$rootDir/distro/schemaParts")
@@ -103,6 +107,13 @@ configure(subprojects) { subproject ->
         useJUnitPlatform()
         testLogging {
             events "passed", "skipped", "failed"
+        }
+        doFirst {
+            jvmArgs = [
+                    '--module-path', classpath.asPath,
+                    '--add-modules', 'KiCadLogicalSchemeSimulator.simulator',
+                    '--add-exports', 'KiCadLogicalSchemeSimulator.simulator/pko.KiCadLogicalSchemeSimulator.parsers.net=ALL-UNNAMED',
+            ]
         }
     }
 

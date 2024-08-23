@@ -1,7 +1,5 @@
 (export (version "E")
   (design
-    (source "D:\\soft_a\\verilog\\KiCadLogicalSchemeSimulator\\stuff\\examples\\counters\\counters.kicad_sch")
-    (date "13/08/2024 23:09:19")
     (tool "Eeschema 7.0.9")
     (sheet (number "1") (name "/") (tstamps "/")
       (title_block
