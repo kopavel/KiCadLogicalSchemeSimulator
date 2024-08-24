@@ -92,9 +92,9 @@
 			<unit pinMap="2=IN0;3=IN1;4=IN0;5=IN1;1=OUT"/>
 			<unit pinMap="9=IN0;10=IN1;11=IN0;12=IN1;13=OUT"/>
 		</symbol>
-		<symbol name="4013" symPartClass="DcTrigger" symPartParam="">
-			<unit pinMap="5=D;3=C;1=Q;2=~{Q}"/>
-			<unit pinMap="9=D;11=C;13=Q;12=~{Q}"/>
+		<symbol name="4013" symPartClass="DcTrigger">
+			<unit pinMap="1=Q;2=~{Q};3=C;4=R;5=D;6=S"/>
+			<unit pinMap="8=S;9=D;10=R;11=C;12=~{Q};13=Q"/>
 		</symbol>
 		<symbol name="4017" symPartClass="JnCounter" symPartParam="size=10">
 			<unit pinMap="14=C;13=CI;15=R;3=Q0;2=Q1;4=Q2;7=Q3;10=Q4;1=Q5;5=Q6;7=Q7;9=Q8;11=Q9;12=CO"/>

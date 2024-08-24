@@ -51,7 +51,7 @@ public class DcTrigger extends SchemaPart {
             public void setState(boolean newState) {
                 state = newState;
                 clockEnabled = !(newState | sPin.state);
-                if (!newState) {
+                if (newState) {
                     if (!iqOut.state) {
                         iqOut.state = true;
                         iqOut.setState(true);
@@ -60,14 +60,14 @@ public class DcTrigger extends SchemaPart {
                         qOut.state = sPin.state;
                         qOut.setState(qOut.state);
                     }
-                } else if (!sPin.state) {
-                    if (!qOut.state) {
-                        qOut.state = true;
-                        qOut.setState(true);
-                    }
+                } else if (sPin.state) {
                     if (iqOut.state) {
                         iqOut.state = false;
                         iqOut.setState(false);
+                    }
+                    if (!qOut.state) {
+                        qOut.state = true;
+                        qOut.setState(true);
                     }
                 }
             }
@@ -77,7 +77,7 @@ public class DcTrigger extends SchemaPart {
             public void setState(boolean newState) {
                 state = newState;
                 clockEnabled = !(newState | rPin.state);
-                if (!newState) {
+                if (newState) {
                     if (!qOut.state) {
                         qOut.state = true;
                         qOut.setState(true);
@@ -87,8 +87,8 @@ public class DcTrigger extends SchemaPart {
                         iqOut.setState(rPin.state);
                     }
                 } else if (rPin.state) {
-                    if (!qOut.state) {
-                        qOut.state = true;
+                    if (qOut.state) {
+                        qOut.state = false;
                         qOut.setState(false);
                     }
                     if (!iqOut.state) {
