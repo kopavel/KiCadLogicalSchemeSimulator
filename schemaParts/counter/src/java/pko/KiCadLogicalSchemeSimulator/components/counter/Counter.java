@@ -66,16 +66,6 @@ public class Counter extends SchemaPart {
                     }
                 }
             });
-            addInPin(new NoFloatingInPin("R", this) {
-                @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    if (!state) {
-                        outBus.state = 0;
-                        outBus.setState(outBus.state);
-                    }
-                }
-            });
         } else {
             addInPin(new NoFloatingInPin("C", this) {
                 @Override
@@ -87,17 +77,17 @@ public class Counter extends SchemaPart {
                     }
                 }
             });
-            addInPin(new NoFloatingInPin("R", this) {
-                @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    if (state) {
-                        outBus.state = 0;
-                        outBus.setState(outBus.state);
-                    }
-                }
-            });
         }
+        addInPin(new NoFloatingInPin("R", this) {
+            @Override
+            public void setState(boolean newState) {
+                state = newState;
+                if (state) {
+                    outBus.state = 0;
+                    outBus.setState(outBus.state);
+                }
+            }
+        });
     }
 
     @Override
