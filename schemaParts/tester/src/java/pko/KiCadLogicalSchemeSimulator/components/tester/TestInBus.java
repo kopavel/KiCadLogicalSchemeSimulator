@@ -38,7 +38,13 @@ public class TestInBus extends SchemaPart {
 
     protected TestInBus(String id, String sParam) {
         super(id, sParam);
-        bus = addInBus("In", 8);
+        int size;
+        if (params.containsKey("size")) {
+            size = Integer.parseInt(params.get("size"));
+        } else {
+            size = 8;
+        }
+        bus = addInBus("In", size);
     }
 
     @Override

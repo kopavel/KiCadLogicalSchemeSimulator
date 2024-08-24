@@ -268,7 +268,7 @@ public class DCounter extends SchemaPart {
                 }
             });
         }
-        eState = !eReverse;
+        eState = eReverse;
     }
 
     @Override

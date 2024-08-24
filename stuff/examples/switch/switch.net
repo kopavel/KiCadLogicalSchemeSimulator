@@ -176,11 +176,6 @@
         (field (name "Value") "pull_up"))
       (pins
         (pin (num "1") (name "OUT") (type "tri_state")))))
-  (libraries
-    (library (logical "Switch")
-      (uri "C:\\Program Files\\KiCad\\7.0\\share\\kicad\\symbols\\/Switch.kicad_sym"))
-    (library (logical "chip")
-      (uri "C:/Users/kopavel/Documents/KiCad/7.0/symbols/chip.kicad_sym")))
   (nets
     (net (code "1") (name "Net-(DEC1-A0)")
       (node (ref "DEC1") (pin "1") (pinfunction "A0") (pintype "input"))

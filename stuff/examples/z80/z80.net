@@ -1013,9 +1013,6 @@
         (pin (num "37") (name "D5") (type "bidirectional"))
         (pin (num "38") (name "D6") (type "bidirectional"))
         (pin (num "39") (name "D7") (type "bidirectional")))))
-  (libraries
-    (library (logical "chip")
-      (uri "C:/Users/kopavel/Documents/KiCad/7.0/symbols/chip.kicad_sym")))
   (nets
     (net (code "9") (name "/A0")
       (node (ref "4REG1") (pin "1") (pinfunction "D0") (pintype "input"))

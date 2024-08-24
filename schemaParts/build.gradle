@@ -109,7 +109,7 @@ configure(subprojects) { subproject ->
             events "passed", "skipped", "failed"
         }
         doFirst {
-            jvmArgs = [
+            jvmArgs += [
                     '--module-path', classpath.asPath,
                     '--add-modules', 'KiCadLogicalSchemeSimulator.simulator',
                     '--add-exports', 'KiCadLogicalSchemeSimulator.simulator/pko.KiCadLogicalSchemeSimulator.parsers.net=ALL-UNNAMED',
