@@ -184,6 +184,8 @@ public class Net {
                         throw new RuntimeException("OUt pin on power rail");
                     }
                     IModelItem<?> source = schemaPart.getOutItem(pinName);
+                    assert source != null : "No pin named " + pinName + " in schema part " + schemaPart.id;
+                    assert source.getAliasOffset(pinName) != null : "No alias for pin " + pinName;
                     sourcesOffset.put(source, source.getAliasOffset(pinName));
                 }
                 case "bidirectional" -> {
@@ -197,6 +199,8 @@ public class Net {
                         default -> throw new IllegalStateException("Unexpected input type: " + destination.getClass().getName());
                     }
                     IModelItem<?> source = schemaPart.getOutItem(pinName);
+                    assert source != null : "No pin named " + pinName + " in schema part " + schemaPart.id;
+                    assert source.getAliasOffset(pinName) != null : "No alias for pin " + pinName;
                     sourcesOffset.put(source, source.getAliasOffset(pinName));
                 }
                 case "passive" -> passivePins.add((PassivePin) schemaPart.getOutPin(pinName));

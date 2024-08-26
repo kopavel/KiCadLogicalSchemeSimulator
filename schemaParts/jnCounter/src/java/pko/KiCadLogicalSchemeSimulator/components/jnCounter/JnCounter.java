@@ -36,10 +36,10 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
 
 public class JnCounter extends SchemaPart {
-    private final long coMax;
+    public final long coMax;
+    public long countMax = 1;
     private Bus outBus;
     private Pin carryOutPin;
-    private long countMax = 1;
     private boolean clockEnabled = true;
 
     protected JnCounter(String id, String sParam) {
@@ -56,12 +56,10 @@ public class JnCounter extends SchemaPart {
         if (pinAmount < 2) {
             throw new RuntimeException("Component " + id + " size must positive >=2 number");
         }
-        for (int i = 1; i < pinAmount; i++) {
-            countMax = countMax << 1;
-        }
-        coMax = countMax / 2;
+        countMax = (long) Math.pow(2, pinAmount);
+        coMax = (long) Math.pow(2, ((double) pinAmount / 2));
         addOutBus("Q", pinAmount);
-        addOutBus("CO", pinAmount);
+        addOutPin("CO");
         addInPin(new NoFloatingInPin("CI", this) {
             @Override
             public void setState(boolean newState) {
@@ -83,8 +81,8 @@ public class JnCounter extends SchemaPart {
                             }
                         } else {
                             outBus.state = outBus.state << 1;
-                            if (carryOutPin.state != outBus.state >= coMax) {
-                                carryOutPin.state = outBus.state >= coMax;
+                            if (carryOutPin.state != (outBus.state < coMax)) {
+                                carryOutPin.state = outBus.state < coMax;
                                 carryOutPin.setState(carryOutPin.state);
                             }
                         }
@@ -119,8 +117,8 @@ public class JnCounter extends SchemaPart {
                             }
                         } else {
                             outBus.state = outBus.state << 1;
-                            if (carryOutPin.state != outBus.state >= coMax) {
-                                carryOutPin.state = outBus.state >= coMax;
+                            if (carryOutPin.state != outBus.state < coMax) {
+                                carryOutPin.state = outBus.state < coMax;
                                 carryOutPin.setState(carryOutPin.state);
                             }
                         }
@@ -158,5 +156,8 @@ public class JnCounter extends SchemaPart {
         outBus.state = 1;
         outBus.hiImpedance = false;
         outBus.setState(1);
+        carryOutPin.state = true;
+        carryOutPin.setState(true);
+
     }
 }

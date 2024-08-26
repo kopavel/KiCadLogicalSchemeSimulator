@@ -106,7 +106,7 @@
 			<unit pinMap="10=CP;9=PL;11=DS;7=D0;6=D1;5=D2;4=D3;13=D4;14=D5;15=D6;1=D7;2=Q5;12=Q6;3=Q7"/>
 		</symbol>
 		<symbol name="4022" symPartClass="JnCounter" symPartParam="size=8">
-			<unit pinMap="14=C;13=CI;15=R;2=Q0;1=Q1;3=Q2;7=Q3;11=Q4;1=Q5;5=Q6;10=Q7;12=CO"/>
+			<unit pinMap="14=C;13=CI;15=R;2=Q0;1=Q1;3=Q2;7=Q3;11=Q4;4=Q5;5=Q6;10=Q7;12=CO"/>
 		</symbol>
 		<symbol name="4023" symPartClass="AndGate" symPartParam="size=3;reverse">
 			<unit pinMap="1=IN0;2=IN1;8=IN2;9=OUT"/>

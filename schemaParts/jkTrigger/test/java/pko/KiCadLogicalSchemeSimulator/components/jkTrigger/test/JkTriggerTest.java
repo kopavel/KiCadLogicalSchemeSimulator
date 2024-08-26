@@ -33,7 +33,6 @@ package pko.KiCadLogicalSchemeSimulator.components.jkTrigger.test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import pko.KiCadLogicalSchemeSimulator.components.jkTrigger.JkTrigger;
 import pko.KiCadLogicalSchemeSimulator.test.schemaPartTester.NetTester;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -42,13 +41,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class JkTriggerTest extends NetTester {
     @BeforeEach
     public void reset() {
-        JkTrigger trigger = (JkTrigger) net.schemaParts.get("U1_A");
-        trigger.reset();
+        net.schemaParts.get("U1_A").reset();
         setPin("R", false);
         setPin("S", false);
         setPin("J", false);
         setPin("K", false);
-
     }
 
     @Test
