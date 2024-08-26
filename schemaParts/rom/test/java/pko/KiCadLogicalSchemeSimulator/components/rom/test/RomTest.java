@@ -1,4 +1,4 @@
-package pko.KiCadLogicalSchemeSimulator.components.ram.test;/*
+/*
  * Copyright (c) 2024 Pavel Korzh
  *
  * All rights reserved.
@@ -29,17 +29,18 @@ package pko.KiCadLogicalSchemeSimulator.components.ram.test;/*
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-import org.junit.jupiter.api.BeforeEach;
+package pko.KiCadLogicalSchemeSimulator.components.rom.test;
 import org.junit.jupiter.api.Test;
 import pko.KiCadLogicalSchemeSimulator.test.schemaPartTester.NetTester;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class RamTest extends NetTester {
+public class RomTest extends NetTester {
     @Override
     protected String getNetFilePath() {
-        return "test/resources/ram.net";
+        return "test/resources/rom.net";
     }
 
     @Override
@@ -47,30 +48,15 @@ public class RamTest extends NetTester {
         return "../..";
     }
 
-    @BeforeEach
-    void reset() {
-        setPin("~{CS}", true);
-        setPin("~{OE}", true);
-        setPin("~{WE}", true);
-    }
-
     @Test
     void testMultipleWritesAndReads() {
-        long[] testValues = {0x00, 0xFF, 0xA5, 0x5A};
-        long[] testAddresses = {0x00, 0x01, 0xFF, 0x88};
+        setPin("~{CS}", true);
+        assertTrue(inBus("dBus").hiImpedance, "with Hi ~{CS} D bus must be in hiImpedance");
         setPin("~{CS}", false);
-        for (int i = 0; i < testValues.length; i++) {
-            setBus("aBus", testAddresses[i]);
-            setBus("dOut", testValues[i]);
-            setPin("~{WE}", false);
-            setPin("~{WE}", true);
-        }
-        outBus("dOut").setHiImpedance();
-        setPin("~{OE}", false);
-        assertFalse(inBus("dIn").hiImpedance, "with lo ~{OE} D bus must not be in hiImpedance");
-        for (int i = 0; i < testValues.length; i++) {
-            setBus("aBus", testAddresses[i]);
-            assertEquals(testValues[i], inBus("dIn").state, "The value read from RAM does not match the value written.");
+        assertFalse(inBus("dBus").hiImpedance, "with lo ~{CS} D bus must nod be in hiImpedance");
+        for (int i = 0; i < 5; i++) {
+            setBus("aBus", i);
+            assertEquals(i + 1, inBus("dBus").state, "The value read from ROM does not match the value from data file.");
         }
     }
 }

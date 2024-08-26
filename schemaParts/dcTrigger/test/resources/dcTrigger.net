@@ -1,7 +1,5 @@
 (export (version "E")
   (design
-    (source "D:\\soft_a\\verilog\\KiCadLogicalSchemeSimulator\\schemaParts\\dcTrigger\\test\\resources\\dcTrigger.kicad_sch")
-    (date "24/08/2024 23:00:47")
     (tool "Eeschema 7.0.9")
     (sheet (number "1") (name "/") (tstamps "/")
       (title_block
@@ -111,11 +109,6 @@
         (field (name "Value") "OutPin"))
       (pins
         (pin (num "1") (name "Out") (type "output")))))
-  (libraries
-    (library (logical "4xxx")
-      (uri "C:\\Program Files\\KiCad\\7.0\\share\\kicad\\symbols\\/4xxx.kicad_sym"))
-    (library (logical "Tests")
-      (uri "D:/soft_a/verilog/kikad/Tests/Tests.kicad_sym")))
   (nets
     (net (code "1") (name "Net-(C1-Out)")
       (node (ref "C1") (pin "1") (pinfunction "Out") (pintype "output"))

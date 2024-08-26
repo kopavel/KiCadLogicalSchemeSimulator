@@ -1,7 +1,5 @@
 (export (version "E")
   (design
-    (source "D:\\soft_a\\verilog\\KiCadLogicalSchemeSimulator\\schemaParts\\multiplexer\\test\\resources\\multiplexer.kicad_sch")
-    (date "26/08/2024 05:25:08")
     (tool "Eeschema 7.0.9")
     (sheet (number "1") (name "/") (tstamps "/")
       (title_block
@@ -95,11 +93,6 @@
         (pin (num "10") (name "B3") (type "input"))
         (pin (num "11") (name "QA") (type "output"))
         (pin (num "12") (name "QB") (type "output")))))
-  (libraries
-    (library (logical "Tests")
-      (uri "D:/soft_a/verilog/kikad/Tests/Tests.kicad_sym"))
-    (library (logical "chip")
-      (uri "C:/Users/kopavel/Documents/KiCad/7.0/symbols/chip.kicad_sym")))
   (nets
     (net (code "1") (name "Net-(MUX1-A0)")
       (node (ref "MUX1") (pin "3") (pinfunction "A0") (pintype "input"))

@@ -1,7 +1,5 @@
 (export (version "E")
   (design
-    (source "D:\\soft_a\\verilog\\KiCadLogicalSchemeSimulator\\schemaParts\\repeater\\test\\resources\\repeater.kicad_sch")
-    (date "26/08/2024 20:52:38")
     (tool "Eeschema 7.0.9")
     (sheet (number "1") (name "/") (tstamps "/")
       (title_block
@@ -89,11 +87,6 @@
       (pins
         (pin (num "") (name "IN") (type "input"))
         (pin (num "1") (name "OUT") (type "output")))))
-  (libraries
-    (library (logical "Tests")
-      (uri "D:/soft_a/verilog/kikad/Tests/Tests.kicad_sym"))
-    (library (logical "chip")
-      (uri "C:/Users/kopavel/Documents/KiCad/7.0/symbols/chip.kicad_sym")))
   (nets
     (net (code "1") (name "Net-(AMP1-IN)")
       (node (ref "AMP1") (pin "") (pinfunction "IN") (pintype "input"))

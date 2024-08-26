@@ -1,7 +1,5 @@
 (export (version "E")
   (design
-    (source "D:\\soft_a\\verilog\\KiCadLogicalSchemeSimulator\\schemaParts\\decoder\\test\\resources\\decoder.kicad_sch")
-    (date "26/08/2024 03:25:33")
     (tool "Eeschema 7.0.9")
     (sheet (number "1") (name "/") (tstamps "/")
       (title_block
@@ -141,11 +139,6 @@
         (pin (num "10") (name "Q6") (type "tri_state"))
         (pin (num "11") (name "Q7") (type "tri_state"))
         (pin (num "12") (name "~{CS}") (type "input")))))
-  (libraries
-    (library (logical "Tests")
-      (uri "D:/soft_a/verilog/kikad/Tests/Tests.kicad_sym"))
-    (library (logical "chip")
-      (uri "C:/Users/kopavel/Documents/KiCad/7.0/symbols/chip.kicad_sym")))
   (nets
     (net (code "1") (name "Net-(DEC1-A0)")
       (node (ref "DEC1") (pin "1") (pinfunction "A0") (pintype "input"))
