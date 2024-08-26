@@ -82,32 +82,32 @@ public class Ram extends SchemaPart {
         }
         int ramSize = (int) Math.pow(2, aSize);
         words = new long[ramSize];
-        aBus = addInBus(new CorrectedInBus("A", this, aSize) {
-            @Override
-            public void setHiImpedance() {
-                hiImpedance = true;
-                if (!csPin.state) {
-                    if (Net.stabilizing) {
-                        Net.forResend.add(this);
-                        assert Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
-                    } else {
-                        throw new FloatingInException(this);
-                    }
-                }
-            }
-
-            @Override
-            public void setState(long newState) {
-                state = newState;
-                if (!csPin.state) {
-                    out();
-                }
-                hiImpedance = false;
-            }
-        });
         addOutBus("D", size);
         dIn = addInBus("D", size);
         if (reverse) {
+            aBus = addInBus(new CorrectedInBus("A", this, aSize) {
+                @Override
+                public void setHiImpedance() {
+                    hiImpedance = true;
+                    if (!csPin.state) {
+                        if (Net.stabilizing) {
+                            Net.forResend.add(this);
+                            assert Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
+                        } else {
+                            throw new FloatingInException(this);
+                        }
+                    }
+                }
+
+                @Override
+                public void setState(long newState) {
+                    state = newState;
+                    if (!csPin.state) {
+                        rOut();
+                    }
+                    hiImpedance = false;
+                }
+            });
             csPin = addInPin(new NoFloatingInPin("~{CS}", this) {
                 @Override
                 public void setState(boolean newState) {
@@ -132,6 +132,29 @@ public class Ram extends SchemaPart {
                 }
             });
         } else {
+            aBus = addInBus(new CorrectedInBus("A", this, aSize) {
+                @Override
+                public void setHiImpedance() {
+                    hiImpedance = true;
+                    if (!csPin.state) {
+                        if (Net.stabilizing) {
+                            Net.forResend.add(this);
+                            assert Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
+                        } else {
+                            throw new FloatingInException(this);
+                        }
+                    }
+                }
+
+                @Override
+                public void setState(long newState) {
+                    state = newState;
+                    if (!csPin.state) {
+                        out();
+                    }
+                    hiImpedance = false;
+                }
+            });
             csPin = addInPin(new NoFloatingInPin("CS", this) {
                 @Override
                 public void setState(boolean newState) {
