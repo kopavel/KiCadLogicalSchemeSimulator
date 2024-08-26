@@ -95,7 +95,14 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                             } else {
                                 vSize = vPos + 1;
                                 Thread.ofVirtual().start(() -> SwingUtilities.invokeLater(() -> {
-                                    display.sized = true;
+                                    while (!display.sized) {
+                                        try {
+                                            //noinspection BusyWait
+                                            Thread.sleep(1);
+                                        } catch (InterruptedException e) {
+                                            throw new RuntimeException(e);
+                                        }
+                                    }
                                     //noinspection deprecation
                                     display.reshape(display.currentX, display.currentY, hSize * display.scaleFactor, vSize * display.scaleFactor);
                                 }));
