@@ -32,6 +32,7 @@
 		<symbol name="NAND" symPartClass="AndGate" symPartParam="size=2;reverse"/>
 		<symbol name="NOR" symPartClass="OrGate" symPartParam="size=2;reverse"/>
 		<symbol name="NOT" symPartClass="Repeater" symPartParam="reverse"/>
+		<symbol name="AMP" symPartClass="Repeater"/>
 		<symbol name="NXOR" symPartClass="XorGate" symPartParam="reverse"/>
 		<symbol name="OR" symPartClass="OrGate" symPartParam="size=2"/>
 		<symbol name="OSCILLATOR" symPartClass="Oscillator"/>

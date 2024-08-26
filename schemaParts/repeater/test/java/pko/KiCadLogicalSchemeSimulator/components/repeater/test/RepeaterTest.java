@@ -29,39 +29,40 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.components.repeater;
+package pko.KiCadLogicalSchemeSimulator.components.repeater.test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
-import pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
+import pko.KiCadLogicalSchemeSimulator.test.schemaPartTester.NetTester;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class RepeaterTest {
-    private final Repeater repeater;
-    private final InPin inPin;
-    private final OutPin outPin;
+public class RepeaterTest extends NetTester {
+    @BeforeEach
+    protected void reset() {
+        setPin("ampOut", false);
+        setPin("notOut", false);
+    }
 
-    public RepeaterTest() {
-        repeater = new Repeater("rep", "");
-        repeater.initOuts();
-        outPin = repeater.outMap.get("OUT");
-        inPin = repeater.inMap.get("IN");
-        InPin dest = new InPin("dest", repeater) {
-            @Override
-            public void onChange(long newState, boolean hiImpedance, boolean strong) {
-            }
-        };
-        dest.mask = 1;
-        outPin.addDestination(dest);
+    @Override
+    protected String getNetFilePath() {
+        return "test/resources/repeater.net";
+    }
+
+    @Override
+    protected String getRootPath() {
+        return "../..";
     }
 
     @Test
-    @DisplayName("inverter")
+    @DisplayName("repeater")
     void repeater() {
-        assertEquals(0, outPin.state, "with Lo in out must be Lo");
-        inPin.state = 1;
-        inPin.onChange(1, false, true);
-        assertEquals(1, outPin.state, "with Hi in out must be Hi");
+        assertTrue(inPin("notIn").state, "with Lo input NOT out must be Hi");
+        assertFalse(inPin("ampIn").state, "with Lo input repeater out must be Lo");
+        setPin("notOut", true);
+        setPin("ampOut", true);
+        assertFalse(inPin("notIn").state, "with Hi input NOT out must be Lo");
+        assertTrue(inPin("ampIn").state, "with Hi input repeater out must be Hi");
     }
 }
