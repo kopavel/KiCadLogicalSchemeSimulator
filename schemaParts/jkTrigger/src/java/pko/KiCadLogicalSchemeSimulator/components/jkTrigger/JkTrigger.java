@@ -109,7 +109,7 @@ public class JkTrigger extends SchemaPart {
                         if (jPin.state && kPin.state) {
                             qOut.setState(!qOut.state);
                             iqOut.setState(!iqOut.state);
-                        } else if (jPin.state || kPin.state) {
+                        } else if (jPin.state) {
                             if (!qOut.state) {
                                 qOut.state = true;
                                 qOut.setState(true);
@@ -117,6 +117,15 @@ public class JkTrigger extends SchemaPart {
                             if (iqOut.state) {
                                 iqOut.state = false;
                                 iqOut.setState(false);
+                            }
+                        } else if (kPin.state) {
+                            if (qOut.state) {
+                                qOut.state = false;
+                                qOut.setState(false);
+                            }
+                            if (!iqOut.state) {
+                                iqOut.state = true;
+                                iqOut.setState(true);
                             }
                         }
                     }
@@ -131,7 +140,7 @@ public class JkTrigger extends SchemaPart {
                         if (jPin.state && kPin.state) {
                             qOut.setState(!qOut.state);
                             iqOut.setState(!iqOut.state);
-                        } else if (jPin.state || kPin.state) {
+                        } else if (jPin.state) {
                             if (!qOut.state) {
                                 qOut.state = true;
                                 qOut.setState(true);
@@ -139,6 +148,15 @@ public class JkTrigger extends SchemaPart {
                             if (iqOut.state) {
                                 iqOut.state = false;
                                 iqOut.setState(false);
+                            }
+                        } else if (kPin.state) {
+                            if (qOut.state) {
+                                qOut.state = false;
+                                qOut.setState(false);
+                            }
+                            if (!iqOut.state) {
+                                iqOut.state = true;
+                                iqOut.setState(true);
                             }
                         }
                     }
@@ -157,5 +175,15 @@ public class JkTrigger extends SchemaPart {
         iqOut = getOutPin("~{Q}");
         iqOut.state = true;
         iqOut.hiImpedance = false;
+    }
+
+    @Override
+    public void reset() {
+        qOut.state = false;
+        qOut.setState(false);
+        qOut.hiImpedance = false;
+        iqOut.state = true;
+        iqOut.hiImpedance = false;
+        iqOut.setState(true);
     }
 }

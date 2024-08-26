@@ -119,8 +119,8 @@
 			<unit pinMap="11=IN0;12=IN1;13=IN2;10=OUT"/>
 		</symbol>
 		<symbol name="4027" symPartClass="JkTrigger" symPartParam="reverse">
-			<unit pinMap="6=J;3=C;5=K;1=Q;2=~{Q};7=R;4=S"/>
-			<unit pinMap="10=J;13=C;11=K;15=Q;14=~{Q};9=R;12=S"/>
+			<unit pinMap="6=J;3=C;5=K;1=Q;2=~{Q};7=S;4=R"/>
+			<unit pinMap="10=J;13=C;11=K;15=Q;14=~{Q};9=S;12=R"/>
 		</symbol>
 		<symbol name="4028" symPartClass="Decoder" symPartParam="size=4;reverse">
 			<unit pinMap="10=A0;13=A1;12=A2;11=A3;3=Q0;14=Q1;2=Q2;15=Q3;1=Q4;6=Q5;7=Q6;4=Q7;9=Q8;5=Q9"/>
