@@ -127,8 +127,12 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
             /*Optimiser bind nMask*/
             merger.state &= nMask;
             merger.state |= newState;
-            /*Optimiser bind mMask:merger.mask*/
-            if ((merger.strongPins | merger.weakPins) != merger.mask) {
+            if ((merger.strongPins
+                    /*Optimiser block noWeakPin*///
+                    | merger.weakPins
+                    /*Optimiser blockend noWeakPin*/
+                    /*Optimiser bind mMask:merger.mask*///
+            ) != merger.mask) {
                 if (!merger.hiImpedance) {
                     for (Bus destination : destinations) {
                         destination.setHiImpedance();
@@ -208,7 +212,12 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
             /*Optimiser bind mask*/
             merger.state |= merger.weakState & mask;
             /*Optimiser bind mMask:merger.mask*/
-            if ((merger.strongPins | merger.weakPins) != merger.mask) {
+            if ((merger.strongPins
+                    /*Optimiser block noWeakPin*///
+                    | merger.weakPins
+                    /*Optimiser blockend noWeakPin*/
+                    /*Optimiser bind mMask:merger.mask*///
+            ) != merger.mask) {
                 if (!merger.hiImpedance) {
                     for (Bus destination : destinations) {
                         destination.setHiImpedance();
@@ -252,14 +261,20 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
 
     @Override
     public BusMergerBusIn getOptimised() {
-        //ToDo in case ot "no passive pin" weak pins are known after build phase
+        //ToDo in case of "no passive pin" weakPins/weakState are known after build phase (incomplete)
         merger.sources.remove(this);
         destinations = merger.destinations;
         ClassOptimiser<BusMergerBusIn> optimiser = new ClassOptimiser<>(this).unroll(merger.destinations.length).bind("mask", mask);
         if (mask == merger.mask) {
             optimiser.cut("otherMask");
         } else {
-            optimiser.cut("sameMask").bind("nMask", nMask).bind("mMask", merger.mask);
+            optimiser.cut("sameMask").bind("nMask", nMask);
+            if (merger.hasPassivePin) {
+                optimiser.bind("mMask", merger.mask);
+            } else {
+                optimiser.cut("noWeakPin");
+                optimiser.bind("mMask", merger.mask & ~merger.weakPins);
+            }
         }
         BusMergerBusIn optimised = optimiser.build();
         merger.sources.add(optimised);

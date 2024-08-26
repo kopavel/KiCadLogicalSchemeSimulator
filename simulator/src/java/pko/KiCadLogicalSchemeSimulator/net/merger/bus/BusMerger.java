@@ -41,6 +41,7 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.PullPin;
 import pko.KiCadLogicalSchemeSimulator.net.Net;
 import pko.KiCadLogicalSchemeSimulator.net.bus.BusInInterconnect;
 import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
+import pko.KiCadLogicalSchemeSimulator.net.merger.wire.WireMerger;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
@@ -51,6 +52,7 @@ public class BusMerger extends OutBus {
     public long strongPins;
     public long weakPins;
     public long weakState;
+    public boolean hasPassivePin;
 
     public BusMerger(Bus destination) {
         super(destination.id, destination.parent, destination.size);
@@ -112,6 +114,9 @@ public class BusMerger extends OutBus {
             input.parent = pin.parent;
             pin.addDestination(input);
             processPin(pin, input, destinationMask);
+            if (pin instanceof WireMerger wireMerger && !wireMerger.passivePins.isEmpty()) {
+                hasPassivePin = true;
+            }
         }
     }
 
