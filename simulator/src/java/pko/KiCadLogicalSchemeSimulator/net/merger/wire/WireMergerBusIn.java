@@ -91,10 +91,16 @@ public class WireMergerBusIn extends CorrectedInBus implements MergerInput<Bus> 
             for (Pin destination : destinations) {
                 destination.setState(merger.state);
             }
-        } else if (merger.hiImpedance || !merger.strong) {
+        } else if (merger.hiImpedance) {
             for (Pin destination : destinations) {
                 destination.setState(merger.state);
             }
+            /*Optimiser block passivePins*/
+        } else if (!merger.strong) {
+            for (Pin destination : destinations) {
+                destination.setState(merger.state);
+            }
+            /*Optimiser blockend passivePins*/
         }
         merger.strong = true;
         merger.hiImpedance = false;

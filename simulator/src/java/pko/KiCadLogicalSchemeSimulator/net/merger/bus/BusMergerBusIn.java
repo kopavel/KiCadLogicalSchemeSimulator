@@ -79,6 +79,7 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
                 merger.weakState,
                 merger.weakPins,
                 merger.hiImpedance);
+        //ToDo in case if bus mask equal with destination mask - can be more optimal.
         state = newState;
         hiImpedance = false;
         long oldState = merger.state;
@@ -145,6 +146,7 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
                 merger.hiImpedance);
         assert !hiImpedance : "Already in hiImpedance:" + this + "; merger=" + merger.getName();
         long oldState = merger.state;
+        //ToDo in case if bus mask equal with destination mask - can be more optimal.
         /*Optimiser bind nMask*/
         merger.strongPins &= nMask;
         /*Optimiser bind nMask*/
