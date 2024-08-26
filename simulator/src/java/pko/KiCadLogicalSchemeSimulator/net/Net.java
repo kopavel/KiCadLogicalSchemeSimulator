@@ -283,11 +283,7 @@ public class Net {
             descriptor.cleanBuses();
             if (descriptor.useBusMerger()) {
                 //Connect a destination to multiple sources throe Merger
-                String busMergerHash = Utils.getHash(descriptor.offsets.values()
-                                .stream().flatMap(i -> i.pins.stream()).toList(),
-                        descriptor.offsets.values()
-                                .stream().flatMap(i -> i.passivePins.stream()).toList(),
-                        descriptor.buses.keySet());
+                String busMergerHash = descriptor.getHash();
                 if (busMergers.containsKey(busMergerHash)) {
                     //just connect to already created bus merger
                     busMergers.get(busMergerHash).addDestination(destination);
@@ -548,6 +544,20 @@ public class Net {
                     }
                 });
             }
+        }
+
+        public String getHash() {
+            StringBuilder sb = new StringBuilder();
+            offsets.forEach((offset, lists) -> {
+                sb.append(offset).append(':');
+                lists.passivePins.forEach(p -> sb.append(p.getName()).append(';'));
+                lists.pins.forEach(p -> sb.append(p.getName()).append(';'));
+            });
+            buses.forEach((bus, params) -> {
+                sb.append(bus.getName());
+                params.forEach((offset, mask) -> sb.append(offset).append(':').append(mask).append(';'));
+            });
+            return sb.toString();
         }
     }
 }

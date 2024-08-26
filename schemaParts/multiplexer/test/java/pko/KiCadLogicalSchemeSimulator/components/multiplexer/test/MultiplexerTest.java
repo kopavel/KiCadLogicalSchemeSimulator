@@ -29,53 +29,54 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.components.multiplexer;
+package pko.KiCadLogicalSchemeSimulator.components.multiplexer.test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import pko.KiCadLogicalSchemeSimulator.api.pins.in.InPin;
-import pko.KiCadLogicalSchemeSimulator.api.pins.out.OutPin;
+import pko.KiCadLogicalSchemeSimulator.test.schemaPartTester.NetTester;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class MultiplexerTest {
-    private final Multiplexer multiplexer;
-    private final InPin aPin;
-    private final InPin bPin;
-    private final InPin nPin;
-    private final OutPin qPin;
-
-    public MultiplexerTest() {
-        multiplexer = new Multiplexer("mpx", "size=8;nSize=1");
-        multiplexer.initOuts();
-        aPin = multiplexer.inMap.get("0");
-        bPin = multiplexer.inMap.get("1");
-        nPin = multiplexer.inMap.get("N");
-        qPin = multiplexer.outMap.get("Q");
-        InPin qDest = new InPin("qDest", multiplexer) {
-            @Override
-            public void onChange(long newState, boolean hiImpedance, boolean strong) {
-            }
-        };
-        qDest.mask = 0xff;
-        qPin.addDestination(qDest);
-    }
-
+public class MultiplexerTest extends NetTester {
     @Test
     @DisplayName("defaultState")
     public void defaultState() {
-        assertEquals(0, qPin.state, "default Q state must be 0");
+        assertFalse(inPin("Qa").state, "default Qa state must be 0");
+        assertFalse(inPin("Qb").state, "default Qb state must be 0");
     }
 
     @Test
-    @DisplayName("mutilex test")
     public void multiplexTest() {
-        aPin.state = 0x24;
-        aPin.onChange(aPin.state, false, true);
-        bPin.state = 0xAC;
-        bPin.onChange(bPin.state, false, true);
-        assertEquals(aPin.state, qPin.state, "with n=0 Q state must be equal with A pin state");
-        nPin.state = 1;
-        nPin.onChange(nPin.state, false, true);
-        assertEquals(bPin.state, qPin.state, "with n=1 Q state must be equal with B pin state");
+        setBus("aBus", 0b0101);
+        setBus("bBus", 0b1100);
+        assertTrue(inPin("Qa").state, "with n=0 Qa state must be equal with A 1 pin state");
+        assertFalse(inPin("Qb").state, "with n=0 Qb state must be equal with A 1 pin state");
+        setBus("nBus", 1);
+        assertFalse(inPin("Qa").state, "with n=1 Qa state must be equal with A 2 pin state");
+        assertFalse(inPin("Qb").state, "with n=1 Qb state must be equal with A 2 pin state");
+        setBus("nBus", 2);
+        assertTrue(inPin("Qa").state, "with n=2 Qa state must be equal with A 3 pin state");
+        assertTrue(inPin("Qb").state, "with n=2 Qb state must be equal with A 3 pin state");
+        setBus("nBus", 3);
+        assertFalse(inPin("Qa").state, "with n=3 Qa state must be equal with A 4 pin state");
+        assertTrue(inPin("Qb").state, "with n=3 Qb state must be equal with A 4 pin state");
+    }
+
+    @BeforeEach
+    protected void reset() {
+        setBus("aBus", 0);
+        setBus("bBus", 0);
+        setBus("nBus", 0);
+    }
+
+    @Override
+    protected String getNetFilePath() {
+        return "test/resources/multiplexer.net";
+    }
+
+    @Override
+    protected String getRootPath() {
+        return "../..";
     }
 }
