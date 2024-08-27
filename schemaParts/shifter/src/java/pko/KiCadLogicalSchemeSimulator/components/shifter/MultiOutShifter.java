@@ -31,14 +31,11 @@
  */
 package pko.KiCadLogicalSchemeSimulator.components.shifter;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.in.CorrectedInBus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
-
-import java.util.stream.IntStream;
 
 public class MultiOutShifter extends SchemaPart {
     private final InBus dBus;
@@ -59,21 +56,7 @@ public class MultiOutShifter extends SchemaPart {
         if (params.containsKey("qSize")) {
             qSize = Integer.parseInt(params.get("qSize"));
         }
-        dBus = addInBus(new CorrectedInBus("D", this, dSize) {
-            @Override
-            public void setHiImpedance() {
-                hiImpedance = true;
-            }
-
-            @Override
-            public void setState(long newState) {
-                state = newState;
-                if (!plInactive) {
-                    latch = dBus.state;
-                }
-                hiImpedance = false;
-            }
-        });
+        dBus = addInBus("D", dSize);
         boolean plReverse = params.containsKey("plReverse");
         outMask = Utils.getMaskForSize(dSize);
         hiDsMask = 1L << (dSize - 1);
@@ -98,7 +81,7 @@ public class MultiOutShifter extends SchemaPart {
                 @Override
                 public void setState(boolean newState) {
                     plInactive = !newState;
-                    if (!plInactive) {
+                    if (newState) {
                         latch = dBus.getState();
                         if (out.state != latch) {
                             out.state = latch;
@@ -116,7 +99,7 @@ public class MultiOutShifter extends SchemaPart {
                     if (!state && plInactive && latch != 0) {
                         latch = (latch << 1) & outMask;
                         if (dsPins.state) {
-                            latch = latch | 1;
+                            latch |= 1;
                         }
                         if (out.state != latch) {
                             out.state = latch;
@@ -132,7 +115,7 @@ public class MultiOutShifter extends SchemaPart {
                     if (!state && plInactive && latch != 0) {
                         latch = latch >> 1;
                         if (dsPins.state) {
-                            latch = latch | hiDsMask;
+                            latch |= hiDsMask;
                         }
                         if (out.state != latch) {
                             out.state = latch;
@@ -149,7 +132,7 @@ public class MultiOutShifter extends SchemaPart {
                     if (state && plInactive && latch != 0) {
                         latch = (latch << 1) & outMask;
                         if (dsPins.state) {
-                            latch = latch | 1;
+                            latch |= 1;
                         }
                         if (out.state != latch) {
                             out.state = latch;
@@ -165,7 +148,7 @@ public class MultiOutShifter extends SchemaPart {
                     if (state && plInactive && latch != 0) {
                         latch = latch >> 1;
                         if (dsPins.state) {
-                            latch = latch | hiDsMask;
+                            latch |= hiDsMask;
                         }
                         if (out.state != latch) {
                             out.state = latch;
@@ -175,9 +158,7 @@ public class MultiOutShifter extends SchemaPart {
                 }
             });
         }
-        addOutBus("Q", qSize,
-                IntStream.range(0, qSize).mapToObj(String::valueOf)
-                        .map(pos -> "Q" + pos).toArray(String[]::new));
+        addOutBus("Q", qSize);
     }
 
     @Override

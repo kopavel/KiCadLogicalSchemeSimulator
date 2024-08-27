@@ -30,7 +30,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.shifter;
-import pko.KiCadLogicalSchemeSimulator.api.bus.in.CorrectedInBus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
@@ -53,21 +52,7 @@ public class Shifter extends SchemaPart {
             throw new RuntimeException("Component " + id + " has no parameter \"size\"");
         }
         int dSize = Integer.parseInt(params.get("size"));
-        dBus = addInBus(new CorrectedInBus("D", this, dSize) {
-            @Override
-            public void setHiImpedance() {
-                hiImpedance = true;
-            }
-
-            @Override
-            public void setState(long newState) {
-                state = newState;
-                if (!plInactive) {
-                    latch = dBus.state;
-                }
-                hiImpedance = false;
-            }
-        });
+        dBus = addInBus("D", dSize);
         boolean plReverse = params.containsKey("plReverse");
         outMask = Utils.getMaskForSize(dSize);
         hiDsMask = 1L << (dSize - 1);
@@ -93,7 +78,7 @@ public class Shifter extends SchemaPart {
                 public void setState(boolean newState) {
                     state = newState;
                     plInactive = !newState;
-                    if (!plInactive) {
+                    if (newState) {
                         latch = dBus.state;
                         if (out.state == ((latch & 1) == 0)) {
                             out.state = ((latch & 1) != 0);
@@ -108,10 +93,10 @@ public class Shifter extends SchemaPart {
                 @Override
                 public void setState(boolean newState) {
                     state = newState;
-                    if (!state && plInactive && latch != 0) {
+                    if (!state && latch != 0 && plInactive) {
                         latch = (latch << 1) & outMask;
                         if (dsPins.state) {
-                            latch = latch | 1;
+                            latch |= 1;
                         }
                         if (out.state == ((latch & 1) == 0)) {
                             out.state = ((latch & 1) != 0);
@@ -124,16 +109,14 @@ public class Shifter extends SchemaPart {
                 @Override
                 public void setState(boolean newState) {
                     state = newState;
-                    if (!state) {
-                        if (plInactive && latch != 0) {
-                            latch = latch >> 1;
-                            if (dsPins.state) {
-                                latch = latch | hiDsMask;
-                            }
-                            if (out.state == ((latch & 1) == 0)) {
-                                out.state = ((latch & 1) != 0);
-                                out.setState(out.state);
-                            }
+                    if (!state && latch != 0 && plInactive) {
+                        latch = latch >> 1;
+                        if (dsPins.state) {
+                            latch |= hiDsMask;
+                        }
+                        if (out.state == ((latch & 1) == 0)) {
+                            out.state = ((latch & 1) != 0);
+                            out.setState(out.state);
                         }
                     }
                 }
@@ -143,7 +126,7 @@ public class Shifter extends SchemaPart {
                 @Override
                 public void setState(boolean newState) {
                     state = newState;
-                    if (state && plInactive && latch != 0) {
+                    if (state && latch != 0 && plInactive) {
                         latch = (latch << 1) & outMask;
                         if (dsPins.state) {
                             latch = latch | 1;
@@ -159,10 +142,10 @@ public class Shifter extends SchemaPart {
                 @Override
                 public void setState(boolean newState) {
                     state = newState;
-                    if (state && plInactive && latch != 0) {
+                    if (state && latch != 0 && plInactive) {
                         latch = latch >> 1;
                         if (dsPins.state) {
-                            latch = latch | hiDsMask;
+                            latch |= hiDsMask;
                         }
                         if (out.state == ((latch & 1) == 0)) {
                             out.state = ((latch & 1) != 0);
