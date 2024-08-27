@@ -2,7 +2,7 @@
 
 Some schema parts are interactive. Simulator create “representation” of that part on a “desc”.  
 They can be drugged across the desk and allow you to arrange it layout to complete device look.  
-Layout a stored throe a menu or at application exit in a file near '.net' or in KiKad project (if simulator started directly from iKiCad) with extension
+Layout a stored at application exit in a file near '.net' or in KiKad project (if simulator started directly from iKiCad) with extension
 `.sym_layout`.  
 Some interactive parts has additional interfaces/functionality if you click on it.
 
