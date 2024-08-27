@@ -148,8 +148,10 @@
 			<unit pinMap="11=IN;12=OUT"/>
 			<unit pinMap="14=IN;15=OUT"/>
 		</symbol>
-		<symbol name="4056" symPartClass="StateMachine" symPartParam="size=4;outSize=7;states=126,48,109,121,51,91,95,112,127,123,14,55,103,119,1,0">
-			<unit pinMap="5=IN0;3=IN1;3=IN2;4=IN3;1=S;6=R;9=OUT0;10=OUT1;11=OUT2;12=OUT3;13=OUT4;14=OUT5;15=OUT6"/>
+		<symbol name="4056"
+		        symPartClass="StateMachine"
+		        symPartParam="size=4;latch;outSize=7;states=126,48,109,121,51,91,95,112,127,123,14,55,103,119,1,0">
+			<unit pinMap="5=IN0;3=IN1;2=IN2;4=IN3;1=S;6=R;9=OUT0;10=OUT1;11=OUT2;12=OUT3;13=OUT4;15=OUT5;14=OUT6"/>
 		</symbol>
 		<symbol name="4069" symPartClass="Repeater" symPartParam="reverse">
 			<unit pinMap="1=IN;2=OUT"/>

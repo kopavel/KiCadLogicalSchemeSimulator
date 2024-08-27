@@ -131,31 +131,35 @@ public class StateMachine extends SchemaPart {
                 }
             }
         });
-        in = addInBus(new InBus("IN", this, inSize) {
-            @Override
-            public void setHiImpedance() {
-                if (sPin.state) {
-                    if (Net.stabilizing) {
-                        Net.forResend.add(this);
-                        assert Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
-                    } else {
-                        throw new FloatingInException(this);
+        if (params.containsKey("latch")) {
+            in = addInBus("IN", inSize);
+        } else {
+            in = addInBus(new InBus("IN", this, inSize) {
+                @Override
+                public void setHiImpedance() {
+                    if (sPin.state) {
+                        if (Net.stabilizing) {
+                            Net.forResend.add(this);
+                            assert Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
+                        } else {
+                            throw new FloatingInException(this);
+                        }
                     }
                 }
-            }
 
-            @Override
-            public void setState(long newState) {
-                if (sPin.state) {
-                    latch = (int) newState;
-                    long newOutState = (dPin.state ? 0 : states[latch]) ^ outMask;
-                    if (out.state != newOutState) {
-                        out.state = newOutState;
-                        out.setState(newOutState);
+                @Override
+                public void setState(long newState) {
+                    if (sPin.state) {
+                        latch = (int) newState;
+                        long newOutState = (dPin.state ? 0 : states[latch]) ^ outMask;
+                        if (out.state != newOutState) {
+                            out.state = newOutState;
+                            out.setState(newOutState);
+                        }
                     }
                 }
-            }
-        });
+            });
+        }
         in.useBitPresentation = true;
     }
 
