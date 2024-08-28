@@ -77,7 +77,7 @@ public class JavaCompiler {
                 paths.append(";").append(spiPath);
             });
 */
-            Log.info(JavaCompiler.class, "Use class path for compiler: {}", paths);
+            Log.debug(JavaCompiler.class, "Use class path for compiler: {}", paths);
             optionList = new ArrayList<>();
             optionList.add("-Xlint:none");
             optionList.add("-cp");
