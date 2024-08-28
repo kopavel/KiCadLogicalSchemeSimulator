@@ -32,12 +32,13 @@
 package pko.KiCadLogicalSchemeSimulator.components.stateMachine.test;
 import org.junit.jupiter.api.Test;
 import pko.KiCadLogicalSchemeSimulator.test.schemaPartTester.NetTester;
+import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class StateMachineTest extends NetTester {
-    byte[] states =
-            new byte[]{0b1111110, 0b0110000, 0b1101101, 0b1111001, 0b0110011, 0b1011011, 0b1011111, 0b1110000, 0b1111111, 0b1111011, 0b0001110, 0b0110111, 0b1100111,
+    long[] states =
+            new long[]{0b1111110, 0b0110000, 0b1101101, 0b1111001, 0b0110011, 0b1011011, 0b1011111, 0b1110000, 0b1111111, 0b1111011, 0b0001110, 0b0110111, 0b1100111,
                     0b1110111, 0b0000001, 0b0};
 
     @Override
@@ -52,6 +53,7 @@ public class StateMachineTest extends NetTester {
 
     @Test
     protected void testStates() {
+        long mask = Utils.getMaskForSize(7);
         for (int i = 0; i < states.length; i++) {
             setBus("in", i);
             if (i > 0) {
@@ -60,7 +62,7 @@ public class StateMachineTest extends NetTester {
             setPin("S", true);
             assertEquals(states[i], inBus("out").state, "State must change on strobe front");
             setPin("F", true);
-            assertEquals(~states[i], inBus("out").state, "State must be in reverse, if R is Hi");
+            assertEquals(states[i] ^ mask, inBus("out").state, "State must be in reverse, if R is Hi");
             setPin("F", false);
         }
     }

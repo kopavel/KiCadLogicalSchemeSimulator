@@ -38,6 +38,7 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
 import pko.KiCadLogicalSchemeSimulator.net.Net;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
+import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 public class StateMachine extends SchemaPart {
     private final long[] states;
@@ -47,6 +48,7 @@ public class StateMachine extends SchemaPart {
     private Bus out;
     private int latch;
     private long outMask;
+    private long mask;
 
     public StateMachine(String id, String sParam) {
         super(id, sParam);
@@ -68,6 +70,7 @@ public class StateMachine extends SchemaPart {
         } catch (NumberFormatException r) {
             throw new RuntimeException("Component " + id + " size must be positive number");
         }
+        mask = Utils.getMaskForSize(outSize);
         addOutBus("OUT", outSize);
         if (!params.containsKey("states")) {
             throw new RuntimeException("Component " + id + " has no parameter \"states\"");
@@ -115,7 +118,7 @@ public class StateMachine extends SchemaPart {
             public void setState(boolean newState) {
                 state = newState;
                 if (state) {
-                    outMask = -1;
+                    outMask = mask;
                     long newOutState = (dPin.state ? 0 : states[latch]) ^ outMask;
                     if (out.state != newOutState) {
                         out.state = newOutState;
@@ -166,7 +169,7 @@ public class StateMachine extends SchemaPart {
     @Override
     public void initOuts() {
         out = getOutBus("OUT");
-        out.state = reverse ? -1L : 0;
+        out.state = reverse ? mask : 0;
         out.useBitPresentation = true;
     }
 }
