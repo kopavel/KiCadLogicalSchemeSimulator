@@ -54,10 +54,12 @@ public class OrGate extends SchemaPart {
                     public void setState(boolean newState) {
                         state = newState;
                         if (newState) {
-                            inState |= mask;
-                            if (out.state) {
+                            if (inState == 0) {
+                                inState = mask;
                                 out.state = false;
                                 out.setState(false);
+                            } else {
+                                inState |= mask;
                             }
                         } else {
                             if ((inState == mask)) {
@@ -80,10 +82,12 @@ public class OrGate extends SchemaPart {
                     public void setState(boolean newState) {
                         state = newState;
                         if (newState) {
-                            inState |= mask;
-                            if (!out.state) {
+                            if (inState == 0) {
+                                inState = mask;
                                 out.state = true;
                                 out.setState(true);
+                            } else {
+                                inState |= mask;
                             }
                         } else {
                             if (inState == mask) {

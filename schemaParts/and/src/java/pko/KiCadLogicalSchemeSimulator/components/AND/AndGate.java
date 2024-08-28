@@ -54,16 +54,20 @@ public class AndGate extends SchemaPart {
                     public void setState(boolean newState) {
                         state = newState;
                         if (newState) {
-                            inState &= nMask;
-                            if (out.state == (inState == 0)) {
-                                out.state = inState != 0;
-                                out.setState(out.state);
+                            if ((inState == mask)) {
+                                inState = 0;
+                                out.state = false;
+                                out.setState(false);
+                            } else {
+                                inState &= nMask;
                             }
                         } else {
-                            inState |= mask;
-                            if (!out.state) {
+                            if (inState == 0) {
+                                inState = mask;
                                 out.state = true;
                                 out.setState(true);
+                            } else {
+                                inState |= mask;
                             }
                         }
                     }
@@ -78,16 +82,20 @@ public class AndGate extends SchemaPart {
                     public void setState(boolean newState) {
                         state = newState;
                         if (newState) {
-                            inState &= nMask;
-                            if (out.state == (inState != 0)) {
-                                out.state = inState == 0;
-                                out.setState(out.state);
+                            if (inState == mask) {
+                                inState = 0;
+                                out.state = true;
+                                out.setState(true);
+                            } else {
+                                inState &= nMask;
                             }
                         } else {
-                            inState |= mask;
-                            if (out.state) {
+                            if (inState == 0) {
+                                inState = mask;
                                 out.state = false;
                                 out.setState(false);
+                            } else {
+                                inState |= mask;
                             }
                         }
                     }
