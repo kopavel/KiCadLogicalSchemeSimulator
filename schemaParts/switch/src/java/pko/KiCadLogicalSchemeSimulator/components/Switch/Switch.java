@@ -36,6 +36,9 @@ import pko.KiCadLogicalSchemeSimulator.api.schemaPart.InteractiveSchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 
+import static pko.KiCadLogicalSchemeSimulator.components.Switch.Switch.MergerState.hiImpedance;
+import static pko.KiCadLogicalSchemeSimulator.components.Switch.Switch.MergerState.strong;
+
 public class Switch extends SchemaPart implements InteractiveSchemaPart {
     public boolean toggled;
     private Pin pin1;
@@ -65,50 +68,72 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
 
     public void toggle(boolean toggled) {
         this.toggled = toggled;
-        recalculate(pin1, pin2);
-        recalculate(pin2, pin1);
+        recalculate();
     }
 
     @Override
-    public void onPassivePinChange(Pin source) {
-        if (pin1.merger == source) {
-            recalculate(pin2, pin1);
-        } else {
-            recalculate(pin1, pin2);
+    public void onPassivePinChange(SchemaPart source) {
+        if (source != this) {
+            recalculate();
         }
     }
 
-    //ToDo try to reduce IF statement count
-    public void recalculate(Pin pin, Pin otherPin) {
-        if (!toggled || otherPin.merger.hiImpedance) {
-            if (!pin.hiImpedance) {
-                pin.setHiImpedance();
-                pin.hiImpedance = true;
+    public void recalculate() {
+        if (!toggled) {
+            if (!pin1.hiImpedance) {
+                pin1.setHiImpedance();
+                pin1.hiImpedance = true;
             }
-        } else if (otherPin.merger.strong) {
-            if (!otherPin.hiImpedance && otherPin.strong) {
-                if (!pin.hiImpedance) {
-                    pin.setHiImpedance();
-                    pin.hiImpedance = true;
-                }
-            } else if (!pin.merger.strong) {
-                pin.strong = true;
-                pin.setState(otherPin.merger.state);
-                pin.hiImpedance = false;
-            } else if (!pin1.strong && !pin2.strong) {
-                throw new ShortcutException(pin1, pin2);
+            if (!pin2.hiImpedance) {
+                pin2.setHiImpedance();
+                pin2.hiImpedance = true;
             }
         } else {
-            if ((!otherPin.hiImpedance && !otherPin.strong && Math.abs(otherPin.merger.weakState) == 1) || pin.merger.strong) {
-                if (!pin.hiImpedance) {
-                    pin.setHiImpedance();
-                    pin.hiImpedance = true;
-                }
+            MergerState pin1State = MergerState.calculate(pin1);
+            MergerState pin2State = MergerState.calculate(pin2);
+            if (pin1State == strong && pin2State == strong) {
+                throw new ShortcutException(pin1, pin2);
             } else {
-                pin.strong = false;
-                pin.setState(otherPin.merger.state);
-                pin.hiImpedance = false;
+                if (pin2State == hiImpedance || pin1State.compareTo(pin2State) >= 0) {
+                    if (!pin1.hiImpedance) {
+                        pin1.setHiImpedance();
+                        pin1.hiImpedance = true;
+                    }
+                } else {
+                    pin1.strong = pin2State == strong;
+                    pin1.setState(pin2.merger.state);
+                    pin1.hiImpedance = false;
+                }
+                if (pin1State == hiImpedance || pin2State.compareTo(pin1State) >= 0) {
+                    if (!pin2.hiImpedance) {
+                        pin2.setHiImpedance();
+                        pin2.hiImpedance = true;
+                    }
+                } else {
+                    pin2.strong = pin1State == strong;
+                    pin2.setState(pin1.merger.state);
+                    pin2.hiImpedance = false;
+                }
             }
+        }
+    }
+
+    enum MergerState implements Comparable<MergerState> {
+        hiImpedance,
+        weak,
+        strong;
+
+        public static MergerState calculate(Pin target) {
+            if (target.merger.hiImpedance) {
+                return hiImpedance;
+            }
+            if (target.merger.strong && !target.strong) {
+                return strong;
+            }
+            if ((target.strong || target.hiImpedance) ? target.merger.weakState != 0 : Math.abs(target.merger.weakState) > 1) {
+                return weak;
+            }
+            return hiImpedance;
         }
     }
 }

@@ -148,7 +148,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
         /*Optimiser block passivePins*/
         oldStrong = strong;
         for (PassivePin passivePin : ((WireMerger) merger).passivePins) {
-            passivePin.parent.onPassivePinChange(this.merger);
+            passivePin.parent.onPassivePinChange(this.parent);
         }
         /*Optimiser blockend passivePins*/
         assert Log.debug(WireMergerWireIn.class,
@@ -209,7 +209,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
         /*Optimiser block passivePins*/
         oldStrong = false;
         for (PassivePin passivePin : ((WireMerger) merger).passivePins) {
-            passivePin.parent.onPassivePinChange(this.merger);
+            passivePin.parent.onPassivePinChange(this.parent);
         }
         /*Optimiser blockend passivePins*/
         assert Log.debug(WireMergerWireIn.class,
