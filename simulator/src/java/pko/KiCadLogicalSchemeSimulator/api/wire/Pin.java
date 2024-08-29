@@ -100,8 +100,27 @@ public abstract class Pin extends ModelItem<Pin> {
         }
     }
 
+    public MergerState mergerState() {
+        if (merger.hiImpedance) {
+            return MergerState.hiImpedance;
+        }
+        if (merger.strong && !strong) {
+            return MergerState.strong;
+        }
+        if ((strong || hiImpedance) ? merger.weakState != 0 : Math.abs(merger.weakState) > 1) {
+            return MergerState.weak;
+        }
+        return MergerState.hiImpedance;
+    }
+
     @Override
     public String toString() {
         return state + ":" + strong + ":" + super.toString();
+    }
+
+    public enum MergerState implements Comparable<MergerState> {
+        hiImpedance,
+        weak,
+        strong;
     }
 }
