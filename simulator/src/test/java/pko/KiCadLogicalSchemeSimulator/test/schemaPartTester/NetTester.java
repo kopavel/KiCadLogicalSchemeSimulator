@@ -111,7 +111,11 @@ public abstract class NetTester {
                 .stream()
                 .map(ServiceLoader.Provider::get)
                 .collect(Collectors.toMap(spi -> spi.getSchemaPartClass().getSimpleName(), spi -> spi));
-        net = new Net(new NetFileParser().parse(getNetFilePath()), rootPath + "/stuff/kicad_symbols/SymbolsDescription.xml", rootPath + "/simulator/optimised");
+        net = new Net(new NetFileParser().parse(getNetFilePath()), new String[]{//
+                rootPath + "/stuff/kicad_symbols/kicad.sym_map",//
+                rootPath + "/stuff/kicad_symbols/chip.sym_map",//
+                rootPath + "/stuff/kicad_symbols/test.sym_map"//
+        }, rootPath + "/simulator/optimised");
 /*
         for (String part : net.schemaParts.keySet()) {
             System.out.println("load schema part " + part);

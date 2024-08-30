@@ -5,7 +5,7 @@
 			<option name="externalProjectPath" value="$PROJECT_DIR$"/>
 			<option name="externalSystemIdString" value="GRADLE"/>
 			<option name="scriptParameters"
-			        value="-PappArgs=&quot;-m=../../kicad_symbols/SymbolsDescription.xml,z80.net&quot; -PworkDir=&quot;/stuff/examples/z80&quot;"/>
+			        value="-PappArgs=&quot;-m=../../kicad_symbols/chip.sym_map,z80.net&quot; -PworkDir=&quot;/stuff/examples/z80&quot;"/>
 			<option name="taskDescriptions">
 				<list/>
 			</option>

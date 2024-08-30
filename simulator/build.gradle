@@ -76,6 +76,7 @@ jar {
     }
     exclude 'classpath.index'
 }
+
 application {
     group = "_build"
     mainModule = "KiCadLogicalSchemeSimulator.simulator"
@@ -106,7 +107,7 @@ run {
                  "-XX:MaxInlineLevel=5",
                  "-XX:ParallelGCThreads=1",
 //                 "--add-opens", "java.base/java.lang=KiCadLogicalSchemeSimulator.simulator",
-                 "-Xmx2G",
+                 "-Xmx2G"
     ]
     if (project.hasProperty('ea')) {
         jvm_args += ["-ea"]
@@ -116,7 +117,7 @@ run {
     }
     jvmArgs(jvm_args)
     if (project.hasProperty('appArgs')) {
-        def appArgsList = project.getProperties().get('appArgs').split(',')
+        def appArgsList = project.getProperties().get('appArgs').toString().split(",")
         appArgsList += ["-od", "$rootDir/simulator/optimised".toString()]
         args(appArgsList)
     }

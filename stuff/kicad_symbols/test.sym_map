@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<symbolMap>
+	<lib name="Tests">
+		<symbol name="OutBus" symPartClass="TestOutBus"/>
+		<symbol name="OutBus4x" symPartClass="TestOutBus" symPartParam="size=4"/>
+		<symbol name="InBus" symPartClass="TestInBus"/>
+		<symbol name="InBus4x" symPartClass="TestInBus" symPartParam="size=4"/>
+		<symbol name="OutPin" symPartClass="TestOutPin"/>
+		<symbol name="InPin" symPartClass="TestInPin"/>
+	</lib>
+</symbolMap>

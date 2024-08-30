@@ -1,55 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <symbolMap>
-	<lib name="Tests">
-		<symbol name="OutBus" symPartClass="TestOutBus"/>
-		<symbol name="OutBus4x" symPartClass="TestOutBus" symPartParam="size=4"/>
-		<symbol name="InBus" symPartClass="TestInBus"/>
-		<symbol name="InBus4x" symPartClass="TestInBus" symPartParam="size=4"/>
-		<symbol name="OutPin" symPartClass="TestOutPin"/>
-		<symbol name="InPin" symPartClass="TestInPin"/>
-	</lib>
-	<lib name="chip">
-		<symbol name="3OR" symPartClass="OrGate" symPartParam="size=3"/>
-		<symbol name="4OR" symPartClass="OrGate" symPartParam="size=4"/>
-		<symbol name="4REG" symPartClass="Buffer" symPartParam="size=4;latch"/>
-		<symbol name="5OR" symPartClass="OrGate" symPartParam="size=5"/>
-		<symbol name="6OR" symPartClass="OrGate" symPartParam="size=6"/>
-		<symbol name="7OR" symPartClass="OrGate" symPartParam="size=7"/>
-		<symbol name="8OR" symPartClass="OrGate" symPartParam="size=8"/>
-		<symbol name="8REG" symPartClass="Buffer" symPartParam="size=8;latch"/>
-		<symbol name="AND" symPartClass="AndGate" symPartParam="size=2"/>
-		<symbol name="BUF" symPartClass="Buffer" symPartParam="size=8"/>
-		<symbol name="COUNTER" symPartClass="Counter" symPartParam="size=4;reverse"/>
-		<symbol name="COUNTERx17" symPartClass="Counter" symPartParam="size=17;reverse"/>
-		<symbol name="DC_TRIGER" symPartClass="DcTrigger"/>
-		<symbol name="DECODE_3BIT" symPartClass="Decoder" symPartParam="size=3;reverse;outReverse">
-			<unit pinMap="1=A0;2=A1;3=A2;4=Q0;5=Q1;6=Q2;7=Q3;8=Q4;9=Q5;10=Q6;11=Q7;12=CS"/>
-		</symbol>
-		<symbol name="DISPLAY" symPartClass="Display" symPartParam="reverse"/>
-		<symbol name="LED" symPartClass="Led" symPartParam="size=30;onColor=#FF0000;offColor=#808080"/>
-		<symbol name="MULTIPLEXER" symPartClass="Multiplexer" symPartParam="size=2;nSize=2"/>
-		<symbol name="MULTIPLEXERx8" symPartClass="Multiplexer" symPartParam="size=8;nSize=2"/>
-		<symbol name="NAND" symPartClass="AndGate" symPartParam="size=2;reverse"/>
-		<symbol name="NOR" symPartClass="OrGate" symPartParam="size=2;reverse"/>
-		<symbol name="NOT" symPartClass="Repeater" symPartParam="reverse"/>
-		<symbol name="AMP" symPartClass="Repeater"/>
-		<symbol name="NXOR" symPartClass="XorGate" symPartParam="reverse"/>
-		<symbol name="OR" symPartClass="OrGate" symPartParam="size=2"/>
-		<symbol name="OSCILLATOR" symPartClass="Oscillator"/>
-		<symbol name="PULLDOWN" symPartClass="Power" symPartParam=""/>
-		<symbol name="PULLUP" symPartClass="Power" symPartParam="hi"/>
-		<symbol name="RAM1MB" symPartClass="Ram" symPartParam="aSize=20;size=8;reverse"/>
-		<symbol name="RAM64K" symPartClass="Ram" symPartParam="aSize=16;size=8;reverse"/>
-		<symbol name="RAM256" symPartClass="Ram" symPartParam="aSize=8;size=8;reverse"/>
-		<symbol name="ROM4K" symPartClass="Rom" symPartParam="aSize=12;size=8;reverse"/>
-		<symbol name="SDRAM64K" symPartClass="SdRam" symPartParam="aSize=8;size=8;reverse"/>
-		<symbol name="SHIFT" symPartClass="Shifter" symPartParam="size=8;plReverse">
-			<unit pinMap="1=D0;2=D1;3=D2;4=D3;5=D4;6=D5;7=D6;8=D7;9=Q;17=CN;18=PL"/>
-		</symbol>
-		<symbol name="SWITCH" symPartClass="Switch"/>
-		<symbol name="XOR" symPartClass="XorGate"/>
-		<symbol name="Z80CPU" symPartClass="Z80Cpu"/>
-	</lib>
 	<lib name="Diode">
 		<symbol name="BA157" symPartClass="Diode"/>
 		<symbol name="1.5KExxA" symPartClass="Diode">
@@ -143,7 +93,7 @@
 			<unit pinMap="3=A;4=K"/>
 		</symbol>
 		<symbol name="BAS16W" symPartClass="Diode"/>
-		<!-- ToDo to many no add, may be later -->
+		<!-- ToDo to many to add, may be later -->
 	</lib>
 	<lib name="CPU">
 		<symbol name="Z80CPU" symPartClass="Z80Cpu"/>

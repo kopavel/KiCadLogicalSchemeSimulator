@@ -67,7 +67,7 @@ public class Simulator implements Runnable {
     @CommandLine.Parameters(index = "0", arity = "1", description = "Path to KiCad NET file")
     public String netFilePath;
     @CommandLine.Option(names = {"-m", "--mapFile"}, description = "Path to KiCad symbol mapping file")
-    public String mapFile;
+    public String[] mapFiles;
 
     public static void main(String[] args) {
         new CommandLine(new Simulator()).execute(args);
@@ -180,8 +180,12 @@ public class Simulator implements Runnable {
             if (!new File(netFilePath).exists()) {
                 throw new Exception("Cant fine NET file " + netFilePath);
             }
-            if (mapFile != null && !new File(mapFile).exists()) {
-                throw new Exception("Can't fine Symbol map file " + mapFile);
+            if (mapFiles != null) {
+                for (String mapFile : mapFiles) {
+                    if (!new File(mapFile).exists()) {
+                        throw new Exception("Can't fine Symbol map file " + mapFile);
+                    }
+                }
             }
             netFilePathNoExtension = netFilePath.substring(0, netFilePath.lastIndexOf("."));
             loadLocale();
@@ -195,9 +199,9 @@ public class Simulator implements Runnable {
                 ui.setVisible(true);
             });
             if (netFilePath.endsWith("xml")) {
-                net = new Net(XmlParser.parse(netFilePath, Export.class), mapFile, optimisedDir);
+                net = new Net(XmlParser.parse(netFilePath, Export.class), mapFiles, optimisedDir);
             } else if (netFilePath.endsWith(".net")) {
-                net = new Net(new NetFileParser().parse(netFilePath), mapFile, optimisedDir);
+                net = new Net(new NetFileParser().parse(netFilePath), mapFiles, optimisedDir);
             } else {
                 throw new RuntimeException("Unsupported file extension. " + netFilePath);
             }

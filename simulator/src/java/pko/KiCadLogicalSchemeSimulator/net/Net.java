@@ -76,10 +76,13 @@ public class Net {
     private final Map<String, BusMerger> busMergers = new TreeMap<>();
     private final Map<String, OutPin> wires = new TreeMap<>();
 
-    public Net(Export export, String mapPath, String optimisedDir) throws IOException {
+    public Net(Export export, String[] mapPaths, String optimisedDir) throws IOException {
         this.optimisedDir = optimisedDir;
         Log.info(Net.class, "Start Net building");
-        SchemaPartMap schemaPartMap = parse(mapPath);
+        SchemaPartMap schemaPartMap = new SchemaPartMap();
+        for (String mapPath : mapPaths) {
+            parse(mapPath, schemaPartMap);
+        }
         export.getComponents().getComp().forEach((Comp component) -> createSchemaPart(component, schemaPartMap));
         export.getNets().getNet().forEach(this::groupSourcesByDestinations);
         buildNet();

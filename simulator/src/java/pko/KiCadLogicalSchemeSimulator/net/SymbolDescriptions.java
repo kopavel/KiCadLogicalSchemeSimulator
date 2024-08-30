@@ -13,10 +13,9 @@ import java.util.stream.Collectors;
 public class SymbolDescriptions {
     public static final Map<String, Map<String, PinMapDescriptor>> schemaPartPinMap = new TreeMap<>();
 
-    public static SchemaPartMap parse(String mapPath) throws IOException {
+    public static void parse(String mapPath, SchemaPartMap schemaPartMap) throws IOException {
         if (mapPath != null) {
             SymbolMap symbolMap = XmlParser.parse(mapPath, SymbolMap.class);
-            SchemaPartMap schemaPartMap = new SchemaPartMap();
             for (Library library : symbolMap.getLib()) {
                 SymbolLibMap lib = schemaPartMap.libs.computeIfAbsent(library.getName(), name -> new SymbolLibMap());
                 for (Symbol symbol : library.getSymbol()) {
@@ -31,9 +30,7 @@ public class SymbolDescriptions {
                     }
                 }
             }
-            return schemaPartMap;
         }
-        return null;
     }
 
     @SuppressWarnings("ClassCanBeRecord")
