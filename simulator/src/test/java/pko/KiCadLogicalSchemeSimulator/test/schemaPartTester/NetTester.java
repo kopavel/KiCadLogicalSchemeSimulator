@@ -68,7 +68,11 @@ public abstract class NetTester {
     }
 
     protected InPin inPin(String id) {
-        return (InPin) net.schemaParts.get(id + "1").inPins.get("In");
+        if (net.schemaParts.containsKey(id)) {
+            return (InPin) net.schemaParts.get(id).inPins.get("In");
+        } else {
+            return (InPin) net.schemaParts.get(id + "1").inPins.get("In");
+        }
     }
 
     protected InBus inBus(String id) {
@@ -80,7 +84,11 @@ public abstract class NetTester {
     }
 
     protected Pin outPin(String id) {
-        return (Pin) net.schemaParts.get(id + "1").outPins.get("Out");
+        if (net.schemaParts.containsKey(id)) {
+            return (Pin) net.schemaParts.get(id).outPins.get("Out");
+        } else {
+            return (Pin) net.schemaParts.get(id + "1").outPins.get("Out");
+        }
     }
 
     protected void setBus(String id, long state) {

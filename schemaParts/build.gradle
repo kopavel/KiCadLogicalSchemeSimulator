@@ -50,6 +50,7 @@ sourceSets {
 }
 dependencies {
     runtimeOnly project(":schemaParts:and")
+    runtimeOnly project(":schemaParts:busDriver")
     runtimeOnly project(":schemaParts:buffer")
     runtimeOnly project(":schemaParts:counter")
     runtimeOnly project(":schemaParts:dCounter")
