@@ -30,15 +30,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.Switch;
-import pko.KiCadLogicalSchemeSimulator.api.ShortcutException;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.AbstractUiComponent;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.InteractiveSchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-
-import static pko.KiCadLogicalSchemeSimulator.api.wire.Pin.MergerState;
-import static pko.KiCadLogicalSchemeSimulator.api.wire.Pin.MergerState.strong;
-import static pko.KiCadLogicalSchemeSimulator.api.wire.Pin.MergerState.weak;
 
 public class Switch extends SchemaPart implements InteractiveSchemaPart {
     public boolean toggled;
@@ -69,60 +64,36 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
 
     public void toggle(boolean toggled) {
         this.toggled = toggled;
-        recalculate();
+        recalculate(pin1, pin2);
+        recalculate(pin2, pin1);
     }
 
     @Override
-    public void onPassivePinChange(SchemaPart source) {
-        if (source != this) {
-            recalculate();
+    public void onPassivePinChange(Pin merger) {
+        if (pin1.merger != merger) {
+            recalculate(pin1, pin2);
+        } else {
+            recalculate(pin2, pin1);
         }
     }
 
-    public void recalculate() {
-        if (!toggled) {
-            if (!pin1.hiImpedance) {
-                pin1.setHiImpedance();
-                pin1.hiImpedance = true;
+    public void recalculate(Pin pin, Pin otherPin) {
+        if (!toggled || otherPin.merger.hiImpedance) {
+            if (!pin.hiImpedance) {
+                pin.setHiImpedance();
             }
-            if (!pin2.hiImpedance) {
-                pin2.setHiImpedance();
-                pin2.hiImpedance = true;
+        } else if (otherPin.merger.strong && !otherPin.strong) {
+            if (!pin.strong || pin.state != otherPin.merger.state) {
+                pin.strong = true;
+                pin.setState(otherPin.merger.state);
             }
-        } else {
-            MergerState pin1State = pin1.mergerState();
-            MergerState pin2State = pin2.mergerState();
-            if ((pin1State == strong && pin2State == strong) || (pin1.state != pin2.state && pin1State == weak && pin2State == weak)) {
-                throw new ShortcutException(pin1, pin2);
-            } else {
-                int dif = pin1State.compareTo(pin2State);
-                if (dif == 0) {
-                    if (!pin1.hiImpedance) {
-                        pin1.setHiImpedance();
-                        pin1.hiImpedance = true;
-                    }
-                    if (!pin2.hiImpedance) {
-                        pin2.setHiImpedance();
-                        pin2.hiImpedance = true;
-                    }
-                } else if (dif > 0) {
-                    if (!pin1.hiImpedance) {
-                        pin1.setHiImpedance();
-                        pin1.hiImpedance = true;
-                    }
-                    pin2.strong = pin1State == strong;
-                    pin2.setState(pin1.merger.state);
-                    pin2.hiImpedance = false;
-                } else {
-                    if (!pin2.hiImpedance) {
-                        pin2.setHiImpedance();
-                        pin2.hiImpedance = true;
-                    }
-                    pin1.strong = pin2State == strong;
-                    pin1.setState(pin2.merger.state);
-                    pin1.hiImpedance = false;
-                }
+        } else if ((otherPin.strong || otherPin.hiImpedance) ? otherPin.merger.weakState != 0 : Math.abs(otherPin.merger.weakState) > 1) {
+            if (pin.hiImpedance || pin.strong || pin.state != otherPin.merger.weakState > 0) {
+                pin.strong = false;
+                pin.setState(otherPin.merger.weakState > 0);
             }
+        } else if (!pin.hiImpedance) {
+            pin.setHiImpedance();
         }
     }
 }

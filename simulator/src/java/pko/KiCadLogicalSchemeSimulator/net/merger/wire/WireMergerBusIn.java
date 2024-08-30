@@ -107,7 +107,7 @@ public class WireMergerBusIn extends CorrectedInBus implements MergerInput<Bus> 
         oldImpedance = false;
         /*Optimiser block passivePins*///
         for (PassivePin passivePin : merger.passivePins) {
-            passivePin.parent.onPassivePinChange(this.parent);
+            passivePin.parent.onPassivePinChange(merger);
         }
         /*Optimiser blockend passivePins*///
         assert Log.debug(WireMergerBusIn.class,
@@ -169,7 +169,7 @@ public class WireMergerBusIn extends CorrectedInBus implements MergerInput<Bus> 
         oldImpedance = true;
         /*Optimiser block passivePins*///
         for (PassivePin passivePin : merger.passivePins) {
-            passivePin.parent.onPassivePinChange(this.parent);
+            passivePin.parent.onPassivePinChange(merger);
         }
         /*Optimiser blockend passivePins*///
         assert Log.debug(WireMergerBusIn.class,

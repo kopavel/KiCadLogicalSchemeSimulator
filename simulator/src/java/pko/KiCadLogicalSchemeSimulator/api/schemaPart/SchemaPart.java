@@ -193,7 +193,7 @@ public abstract class SchemaPart {
         return null;
     }
 
-    public void onPassivePinChange(SchemaPart source) {
+    public void onPassivePinChange(Pin merger) {
     }
 
     public abstract void initOuts();
