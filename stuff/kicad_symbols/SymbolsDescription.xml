@@ -50,6 +50,101 @@
 		<symbol name="XOR" symPartClass="XorGate"/>
 		<symbol name="Z80CPU" symPartClass="Z80Cpu"/>
 	</lib>
+	<lib name="Diode">
+		<symbol name="BA157" symPartClass="Diode"/>
+		<symbol name="1.5KExxA" symPartClass="Diode">
+			<unit pinMap="A2=A;A1=K"/>
+		</symbol>
+		<symbol name="1N47xxA" symPartClass="Diode"/>
+		<symbol name="1N47xxB" symPartClass="Diode"/>
+		<symbol name="1N62xxA" symPartClass="Diode">
+			<unit pinMap="A2=A;A1=K"/>
+		</symbol>
+		<symbol name="1N630xA" symPartClass="Diode">
+			<unit pinMap="A2=A;A1=K"/>
+		</symbol>
+		<symbol name="1N914" symPartClass="Diode"/>
+		<symbol name="1N914WT" symPartClass="Diode"/>
+		<symbol name="1N4001" symPartClass="Diode"/>
+		<symbol name="1N4002" symPartClass="Diode"/>
+		<symbol name="1N4003" symPartClass="Diode"/>
+		<symbol name="1N4004" symPartClass="Diode"/>
+		<symbol name="1N4005" symPartClass="Diode"/>
+		<symbol name="1N4006" symPartClass="Diode"/>
+		<symbol name="1N4007" symPartClass="Diode"/>
+		<symbol name="1N4148" symPartClass="Diode"/>
+		<symbol name="1N4148W" symPartClass="Diode"/>
+		<symbol name="1N4148WS" symPartClass="Diode"/>
+		<symbol name="1N4148WT" symPartClass="Diode"/>
+		<symbol name="1N4148WT" symPartClass="Diode"/>
+		<symbol name="1N4149" symPartClass="Diode"/>
+		<symbol name="1N4151" symPartClass="Diode"/>
+		<symbol name="1N4448" symPartClass="Diode"/>
+		<symbol name="1N4448W" symPartClass="Diode"/>
+		<symbol name="1N4448WS" symPartClass="Diode"/>
+		<symbol name="1N4448WT" symPartClass="Diode"/>
+		<symbol name="1N4448WT" symPartClass="Diode"/>
+		<symbol name="1N5400" symPartClass="Diode"/>
+		<symbol name="1N5401" symPartClass="Diode"/>
+		<symbol name="1N5402" symPartClass="Diode"/>
+		<symbol name="1N5403" symPartClass="Diode"/>
+		<symbol name="1N5404" symPartClass="Diode"/>
+		<symbol name="1N5405" symPartClass="Diode"/>
+		<symbol name="1N5406" symPartClass="Diode"/>
+		<symbol name="1N5407" symPartClass="Diode"/>
+		<symbol name="1N5408" symPartClass="Diode"/>
+		<symbol name="1N5711" symPartClass="Diode"/>
+		<symbol name="1N5711UR" symPartClass="Diode"/>
+		<symbol name="1N5712" symPartClass="Diode"/>
+		<symbol name="1N5712UR" symPartClass="Diode"/>
+		<symbol name="1N5817" symPartClass="Diode"/>
+		<symbol name="1N5818" symPartClass="Diode"/>
+		<symbol name="1N5819" symPartClass="Diode"/>
+		<symbol name="1N5819SW" symPartClass="Diode"/>
+		<symbol name="1N5820" symPartClass="Diode"/>
+		<symbol name="1N5822" symPartClass="Diode"/>
+		<symbol name="1N6263" symPartClass="Diode"/>
+		<symbol name="1N6857" symPartClass="Diode"/>
+		<symbol name="1N6857UR" symPartClass="Diode"/>
+		<symbol name="1N6858" symPartClass="Diode"/>
+		<symbol name="1N6858UR" symPartClass="Diode"/>
+		<symbol name="1N6858UR" symPartClass="Diode"/>
+		<symbol name="1SS355VM" symPartClass="Diode"/>
+		<symbol name="5KPxxA" symPartClass="Diode">
+			<unit pinMap="A2=A;A1=K"/>
+		</symbol>
+		<symbol name="B120-E3" symPartClass="Diode"/>
+		<symbol name="B130-E3" symPartClass="Diode"/>
+		<symbol name="B140-E3" symPartClass="Diode"/>
+		<symbol name="B150-E3" symPartClass="Diode"/>
+		<symbol name="B160-E3" symPartClass="Diode"/>
+		<symbol name="B220" symPartClass="Diode"/>
+		<symbol name="B230" symPartClass="Diode"/>
+		<symbol name="B240" symPartClass="Diode"/>
+		<symbol name="B250" symPartClass="Diode"/>
+		<symbol name="B260" symPartClass="Diode"/>
+		<symbol name="BA157" symPartClass="Diode"/>
+		<symbol name="BA158" symPartClass="Diode"/>
+		<symbol name="BA159" symPartClass="Diode"/>
+		<symbol name="BA243" symPartClass="Diode"/>
+		<symbol name="BA244" symPartClass="Diode"/>
+		<symbol name="BA282" symPartClass="Diode"/>
+		<symbol name="BA283" symPartClass="Diode"/>
+		<symbol name="BAR42FILM" symPartClass="Diode"/>
+		<symbol name="BAR43FILM" symPartClass="Diode"/>
+		<symbol name="BAS16TW" symPartClass="Diode">
+			<unit pinMap="1=A;6=K"/>
+			<unit pinMap="2=A;5=K"/>
+			<unit pinMap="3=A;4=K"/>
+		</symbol>
+		<symbol name="BAS16VY" symPartClass="Diode">
+			<unit pinMap="1=A;6=K"/>
+			<unit pinMap="2=A;5=K"/>
+			<unit pinMap="3=A;4=K"/>
+		</symbol>
+		<symbol name="BAS16W" symPartClass="Diode"/>
+		<!-- ToDo to many no add, may be later -->
+	</lib>
 	<lib name="CPU">
 		<symbol name="Z80CPU" symPartClass="Z80Cpu"/>
 	</lib>
