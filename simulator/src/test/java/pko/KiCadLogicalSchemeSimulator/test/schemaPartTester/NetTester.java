@@ -106,12 +106,12 @@ public abstract class NetTester {
     @BeforeAll
     void loadNet() throws Exception {
         String rootPath = getRootPath();
-        Simulator.optimisedDir = rootPath + "/stuff/work/optimised";
+        Simulator.optimisedDir = rootPath + "/simulator/optimised";
         Simulator.schemaPartSpiMap = ServiceLoader.load(SchemaPartSpi.class)
                 .stream()
                 .map(ServiceLoader.Provider::get)
                 .collect(Collectors.toMap(spi -> spi.getSchemaPartClass().getSimpleName(), spi -> spi));
-        net = new Net(new NetFileParser().parse(getNetFilePath()), rootPath + "/stuff/kicad_symbols/SymbolsDescription.xml", rootPath + "/stuff/work/optimised");
+        net = new Net(new NetFileParser().parse(getNetFilePath()), rootPath + "/stuff/kicad_symbols/SymbolsDescription.xml", rootPath + "/simulator/optimised");
 /*
         for (String part : net.schemaParts.keySet()) {
             System.out.println("load schema part " + part);
