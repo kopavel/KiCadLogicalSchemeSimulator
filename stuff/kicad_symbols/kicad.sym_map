@@ -295,6 +295,14 @@
 			<unit pinMap="8=IN0;9=IN1;10=OUT"/>
 			<unit pinMap="11=IN0;12=IN1;13=OUT"/>
 		</symbol>
+		<symbol name="74LS04" symPartClass="Repeater" symPartParam="reverse">
+			<unit pinMap="1=IN;2=OUT"/>
+			<unit pinMap="3=IN;4=OUT"/>
+			<unit pinMap="5=IN;6=OUT"/>
+			<unit pinMap="9=IN;8=OUT"/>
+			<unit pinMap="11=IN;10=OUT"/>
+			<unit pinMap="13=IN;12=OUT"/>
+		</symbol>
 	</lib>
 	<lib name="Switch">
 		<symbol name="SW_Push" symPartClass="Switch">
