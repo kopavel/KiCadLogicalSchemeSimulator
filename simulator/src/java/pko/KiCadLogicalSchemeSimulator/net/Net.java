@@ -378,7 +378,8 @@ public class Net {
             className = symbolDesc.clazz;
         }
         if (className == null || className.isBlank()) {
-            throw new RuntimeException("SchemaPart " + id + " has no parameter SymPartClass");
+            throw new RuntimeException("SchemaPart id:" + id + "(lib:" + component.getLibsource().getLib() + " part:" + component.getLibsource().getPart() +
+                    ") has no parameter SymPartClass");
         }
         String parameters = "";
         if (symbolDesc != null && symbolDesc.params != null && !symbolDesc.params.isBlank()) {
