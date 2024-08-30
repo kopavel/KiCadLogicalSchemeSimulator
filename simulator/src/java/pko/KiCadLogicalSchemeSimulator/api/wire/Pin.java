@@ -61,7 +61,7 @@ public abstract class Pin extends ModelItem<Pin> {
         this.strong = oldPin.isStrong();
         this.state = oldPin.getState() != 0;
         this.hiImpedance = oldPin.isHiImpedance();
-        if (oldPin instanceof Pin pin) {
+        if (oldPin instanceof Pin pin && this.merger == null) {
             this.merger = pin.merger;
         }
         return this;
@@ -100,27 +100,8 @@ public abstract class Pin extends ModelItem<Pin> {
         }
     }
 
-    public MergerState mergerState() {
-        if (merger.hiImpedance) {
-            return MergerState.hiImpedance;
-        }
-        if (merger.strong && !strong) {
-            return MergerState.strong;
-        }
-        if ((strong || hiImpedance) ? merger.weakState != 0 : Math.abs(merger.weakState) > 1) {
-            return MergerState.weak;
-        }
-        return MergerState.hiImpedance;
-    }
-
     @Override
     public String toString() {
         return state + ":" + strong + ":" + super.toString();
-    }
-
-    public enum MergerState implements Comparable<MergerState> {
-        hiImpedance,
-        weak,
-        strong;
     }
 }

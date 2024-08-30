@@ -12,6 +12,7 @@ Some interactive parts has additional interfaces/functionality if you click on i
 * [DCounter](dCounter%2FREADME.md) — Binary/decimal counter.
 * [DcTrigger](dcTrigger%2FREADME.md) — DC-trigger with R and S inputs.
 * [Decoder](decoder%2FREADME.md) — Binary decoder.
+* [Diode](diode%2FREADME.md) — Diode.
 * [Display](display%2FREADME.md) — Monochrome display.
 * [JkTrigger](jkTrigger%2FREADME.md) — JK trigger.
 * [JnCounter](jnCounter%2FREADME.md) — Johnson counter.
@@ -24,6 +25,7 @@ Some interactive parts has additional interfaces/functionality if you click on i
 * [Rom](rom/README.md) — ROM.
 * [SdRam](sdram/README.md) — Dynamic RAM.
 * [Shifter](shifter/README.md) — Bit shifter.
+* [Switch](Switch/README.md) — Interactive “normally opened” switch.
 * [StateMachine](stateMachine%2FREADME.md) — Logical state machine.
 * [XorGate](xor%2FREADME.md) — Logical XOR gate.
 * [Z80Cpu](z80%2FREADME.md) — Zilog Z80 CPU pin and timing level functionality.
