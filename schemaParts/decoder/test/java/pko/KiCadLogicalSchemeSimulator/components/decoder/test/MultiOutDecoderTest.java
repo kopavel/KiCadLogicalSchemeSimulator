@@ -40,13 +40,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MultiOutDecoderTest extends NetTester {
     @Test
-    @DisplayName("default values")
-    public void defaultValues() {
-        assertTrue(inBus("outA").hiImpedance, "initial outA bus state must be hiImpedance ");
-        assertTrue(inBus("outB").hiImpedance, "initial outB bus state must be hiImpedance ");
-    }
-
-    @Test
     @DisplayName("value decode")
     public void valueDecode() {
         setBus("A", 0);

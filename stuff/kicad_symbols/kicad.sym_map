@@ -311,6 +311,7 @@
 		<symbol name="74LS156" symPartClass="MultiOutDecoder" symPartParam="size=2;reverse;cs=N:R,R:R">
 			<unit pinMap="1=CSa0;2=CSa1;3=A1;4=Qa3;5=Qa2;6=Qa1;7=Qa0;9=Qb0;10=Qb1;11=Qb2;12=Qb3;13=A0;14=CSb0;15=CSb1"/>
 		</symbol>
+		<symbol name="74LS157" symPartClass="Multiplexer" symPartParam="size=4;nSize=1;reverse"/>
 		<symbol name="74LS367" symPartClass="BusDriver" symPartParam="size=4,2;reverse">
 			<unit pinMap="2=Ia0;3=Oa0;4=Ia1;5=Oa1;6=Ia2;7=Oa2;9=Oa3;10=Ia3;11=Ob0;12=Ib0;13=Ob1;14=Ib1;1=OEa;15=OEb;"/>
 		</symbol>
@@ -318,6 +319,9 @@
 			<unit pinMap="1=C;2=R;3=Q0;4=Q1;5=Q2;6=Q3"/>
 			<unit pinMap="13=C;12=R;11=Q0;10=Q1;9=Q2;8=Q3"/>
 		</symbol>
+	</lib>
+	<lib name="Memory_EPROM">
+		<symbol name="2764" symPartClass="Rom" symPartParam="aSize=13;size=8"/>
 	</lib>
 	<lib name="Switch">
 		<symbol name="SW_Push" symPartClass="Switch">

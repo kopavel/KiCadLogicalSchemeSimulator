@@ -61,7 +61,7 @@ public class Rom extends SchemaPart {
             throw new RuntimeException("Rom component need \"size\" parameter");
         }
         if (!sParam.contains("aSize")) {
-            throw new RuntimeException("Rom component need \"size\" parameter");
+            throw new RuntimeException("Rom component need \"aSize\" parameter");
         }
         try {
             size = Integer.parseInt(params.get("size"));

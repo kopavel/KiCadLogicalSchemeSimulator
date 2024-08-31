@@ -19,8 +19,8 @@
 		</symbol>
 		<symbol name="DISPLAY" symPartClass="Display" symPartParam="reverse"/>
 		<symbol name="LED" symPartClass="Led" symPartParam="size=30;onColor=#FF0000;offColor=#808080"/>
-		<symbol name="MULTIPLEXER" symPartClass="Multiplexer" symPartParam="size=2;nSize=2"/>
-		<symbol name="MULTIPLEXERx8" symPartClass="Multiplexer" symPartParam="size=8;nSize=2"/>
+		<symbol name="MULTIPLEXER" symPartClass="Multiplexer" symPartParam="size=2;nSize=2;reverse"/>
+		<symbol name="MULTIPLEXERx8" symPartClass="Multiplexer" symPartParam="size=8;nSize=2;reverse"/>
 		<symbol name="NAND" symPartClass="AndGate" symPartParam="size=2;reverse"/>
 		<symbol name="NOR" symPartClass="OrGate" symPartParam="size=2;reverse"/>
 		<symbol name="NOT" symPartClass="Repeater" symPartParam="reverse"/>
