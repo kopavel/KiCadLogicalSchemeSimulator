@@ -65,7 +65,7 @@ public class Multiplexer extends SchemaPart {
         for (int inNo = 0; inNo < partSize; inNo++) {
             List<String> aliases = new ArrayList<>();
             for (int part = 0; part < partsAmount; part++) {
-                aliases.add(String.valueOf((char) (((byte) 'A') + part)) + inNo);
+                aliases.add((char) ('A' + part) + "" + inNo);
             }
             int finalInNo = inNo;
             inBuses[inNo] = addInBus(new CorrectedInBus(String.valueOf(finalInNo), this, partsAmount, aliases.toArray(new String[0])) {
@@ -116,7 +116,7 @@ public class Multiplexer extends SchemaPart {
         }
         String[] aliases = new String[partsAmount];
         for (byte i = 0; i < partsAmount; i++) {
-            aliases[i] = 'Q' + String.valueOf((char) (((byte) 'A') + i));
+            aliases[i] = "Q" + (char) ('A' + i);
         }
         addOutBus("Q", partsAmount, aliases);
     }

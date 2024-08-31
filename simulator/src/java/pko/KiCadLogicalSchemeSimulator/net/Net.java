@@ -396,7 +396,7 @@ public class Net {
                 if (symbolDesc.units.size() == 1) {
                     name = id;
                 } else {
-                    name = id + "_" + (char) (((byte) 'A') + i);
+                    name = id + "_" + (char) ('A' + i);
                 }
                 SchemaPart schemaPart = getSchemaPart(className, name, parameters);
                 schemaParts.put(schemaPart.id, schemaPart);

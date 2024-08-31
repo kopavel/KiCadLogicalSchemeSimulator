@@ -55,11 +55,11 @@ public class BusDriver extends SchemaPart {
         ins = new InBus[partAmount];
         outs = new Bus[partAmount];
         for (int i = 0; i < partAmount; i++) {
-            ins[i] = addInBus("I" + ((char) (97 + i)), sizes[i]);
-            addOutBus("O" + ((char) (97 + i)), sizes[i]);
+            ins[i] = addInBus("I" + (char) ('a' + i), sizes[i]);
+            addOutBus("O" + (char) ('a' + i), sizes[i]);
             int finalI = i;
             if (reverse) {
-                addInPin(new NoFloatingInPin("OE" + ((char) (97 + finalI)), this) {
+                addInPin(new NoFloatingInPin("OE" + (char) ('a' + i), this) {
                     @Override
                     public void setState(boolean newState) {
                         if (newState) {
@@ -74,7 +74,7 @@ public class BusDriver extends SchemaPart {
                     }
                 }).state = true;
             } else {
-                addInPin(new NoFloatingInPin("OE" + ((char) (97 + finalI)), this) {
+                addInPin(new NoFloatingInPin("OE" + (char) ('a' + i), this) {
                     @Override
                     public void setState(boolean newState) {
                         if (newState) {
@@ -92,7 +92,7 @@ public class BusDriver extends SchemaPart {
     @Override
     public void initOuts() {
         for (int i = 0; i < partAmount; i++) {
-            outs[i] = getOutBus("O" + ((char) (97 + i)));
+            outs[i] = getOutBus("O" + (char) ('a' + i));
         }
     }
 }
