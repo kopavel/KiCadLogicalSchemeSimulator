@@ -308,6 +308,9 @@
 			<unit pinMap="9=IN0;10=IN1;8=OUT"/>
 			<unit pinMap="12=IN0;13=IN1;11=OUT"/>
 		</symbol>
+		<symbol name="74LS156" symPartClass="MultiOutDecoder" symPartParam="size=2;reverse;cs=N:R,R:R">
+			<unit pinMap="1=CSa0;2=CSa1;3=A1;4=Qa3;5=Qa2;6=Qa1;7=Qa0;9=Qb0;10=Qb1;11=Qb2;12=Qb3;13=A0;14=CSb0;15=CSb1"/>
+		</symbol>
 		<symbol name="74LS367" symPartClass="BusDriver" symPartParam="size=4,2;reverse">
 			<unit pinMap="2=Ia0;3=Oa0;4=Ia1;5=Oa1;6=Ia2;7=Oa2;9=Oa3;10=Ia3;11=Ob0;12=Ib0;13=Ob1;14=Ib1;1=OEa;15=OEb;"/>
 		</symbol>

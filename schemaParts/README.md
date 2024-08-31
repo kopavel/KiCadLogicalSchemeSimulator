@@ -18,6 +18,7 @@ Some interactive parts has additional interfaces/functionality if you click on i
 * [JnCounter](jnCounter%2FREADME.md) — Johnson counter.
 * [Led](led%2FREADME.md) — LED indicator.
 * [Multiplexer](multiplexer%2FREADME.md) — Multiplexer with a defined amount outputs and ways.
+* [MultiOutDecoder](decoder%2FMultiOutDecoder.md) — Decoder with multiple output pin groups.
 * [OrGate](or%2FREADME.md) — Logical OR gate.
 * [Oscillator](oscillator%2FREADME.md) — Oscillator with various modes of operation and oscilloscope.
 * [Power](power%2FREADME.md) — Static output, useful for a pull-up/pull-down resistors.

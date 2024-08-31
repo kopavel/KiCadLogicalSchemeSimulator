@@ -11,7 +11,7 @@ Implements binary decoder.
 
 - Qx, where x is a sequential number, starting from 0
 
-**Mandatory parameter `size`:** Specifies the number of input pins.  
+**Mandatory parameter `size`:** Specifies the input pins amount.
 
 **Optional parameters**:
 
