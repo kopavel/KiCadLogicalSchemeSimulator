@@ -1,7 +1,5 @@
 (export (version "E")
   (design
-    (source "D:\\soft_a\\verilog\\KiCadLogicalSchemeSimulator\\schemaParts\\xor\\test\\resources\\xor.kicad_sch")
-    (date "28/08/2024 12:12:12")
     (tool "Eeschema 7.0.9")
     (sheet (number "1") (name "/") (tstamps "/")
       (title_block
@@ -69,11 +67,6 @@
         (pin (num "1") (name "IN0") (type "input"))
         (pin (num "2") (name "IN1") (type "input"))
         (pin (num "3") (name "OUT") (type "output")))))
-  (libraries
-    (library (logical "Tests")
-      (uri "D:/soft_a/verilog/kikad/Tests/Tests.kicad_sym"))
-    (library (logical "chip")
-      (uri "C:/Users/kopavel/Documents/KiCad/7.0/symbols/chip.kicad_sym")))
   (nets
     (net (code "1") (name "Net-(InPin1-In)")
       (node (ref "InPin1") (pin "1") (pinfunction "In") (pintype "input"))

@@ -1,7 +1,5 @@
 (export (version "E")
   (design
-    (source "D:\\soft_a\\verilog\\KiCadLogicalSchemeSimulator\\schemaParts\\stateMachine\\test\\resources\\state.kicad_sch")
-    (date "27/08/2024 20:46:41")
     (tool "Eeschema 7.0.9")
     (sheet (number "1") (name "/") (tstamps "/")
       (title_block
@@ -128,13 +126,6 @@
         (field (name "Value") "pull_down"))
       (pins
         (pin (num "1") (name "OUT") (type "tri_state")))))
-  (libraries
-    (library (logical "4xxx")
-      (uri "C:\\Program Files\\KiCad\\7.0\\share\\kicad\\symbols\\/4xxx.kicad_sym"))
-    (library (logical "Tests")
-      (uri "D:/soft_a/verilog/kikad/Tests/Tests.kicad_sym"))
-    (library (logical "chip")
-      (uri "C:/Users/kopavel/Documents/KiCad/7.0/symbols/chip.kicad_sym")))
   (nets
     (net (code "1") (name "Net-(F1-Out)")
       (node (ref "F1") (pin "1") (pinfunction "Out") (pintype "output"))

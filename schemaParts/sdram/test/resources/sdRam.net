@@ -1,7 +1,5 @@
 (export (version "E")
   (design
-    (source "D:\\soft_a\\verilog\\KiCadLogicalSchemeSimulator\\schemaParts\\sdram\\test\\resources\\sdRam.kicad_sch")
-    (date "26/08/2024 21:22:54")
     (tool "Eeschema 7.0.9")
     (sheet (number "1") (name "/") (tstamps "/")
       (title_block
@@ -128,11 +126,6 @@
         (pin (num "26") (name "~{RAS}") (type "input"))
         (pin (num "27") (name "~{CAS}") (type "input"))
         (pin (num "28") (name "~{WE}") (type "input")))))
-  (libraries
-    (library (logical "Tests")
-      (uri "D:/soft_a/verilog/kikad/Tests/Tests.kicad_sym"))
-    (library (logical "chip")
-      (uri "C:/Users/kopavel/Documents/KiCad/7.0/symbols/chip.kicad_sym")))
   (nets
     (net (code "1") (name "Net-(SDRAM64K1-A0)")
       (node (ref "SDRAM64K1") (pin "1") (pinfunction "A0") (pintype "input"))

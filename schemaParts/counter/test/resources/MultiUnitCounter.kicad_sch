@@ -371,7 +371,7 @@
     (property "Datasheet" "" (at 114.3 68.58 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid 2bb3f2d4-8267-462f-abb0-e16fd203b66f))
+    (pin "1" (uuid 2bb3f2d4-8267-462f-abb0-e16fd203b670))
     (instances
       (project "MultiUnitCounter"
         (path "/dca00733-6e59-4b89-b3a6-bb50926963b6"
@@ -396,7 +396,7 @@
     (property "Datasheet" "" (at 114.3 78.74 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid 2bb3f2d4-8267-462f-abb0-e16fd203b66f))
+    (pin "1" (uuid 2bb3f2d4-8267-462f-abb0-e16fd203b671))
     (instances
       (project "MultiUnitCounter"
         (path "/dca00733-6e59-4b89-b3a6-bb50926963b6"
@@ -421,7 +421,7 @@
     (property "Datasheet" "" (at 114.3 76.2 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid 2bb3f2d4-8267-462f-abb0-e16fd203b66f))
+    (pin "1" (uuid 2bb3f2d4-8267-462f-abb0-e16fd203b672))
     (instances
       (project "MultiUnitCounter"
         (path "/dca00733-6e59-4b89-b3a6-bb50926963b6"

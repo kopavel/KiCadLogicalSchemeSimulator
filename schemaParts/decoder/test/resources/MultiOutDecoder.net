@@ -1,7 +1,5 @@
 (export (version "E")
   (design
-    (source "D:\\soft_a\\verilog\\KiCadLogicalSchemeSimulator\\schemaParts\\decoder\\test\\resources\\MultiOutDecoder.kicad_sch")
-    (date "31/08/2024 21:51:27")
     (tool "Eeschema 7.0.9")
     (sheet (number "1") (name "/") (tstamps "/")
       (title_block
@@ -108,11 +106,6 @@
       (pins
         (pin (num "0") (name "Out0") (type "output"))
         (pin (num "1") (name "Out1") (type "output")))))
-  (libraries
-    (library (logical "74xx")
-      (uri "C:\\Program Files\\KiCad\\7.0\\share\\kicad\\symbols\\/74xx.kicad_sym"))
-    (library (logical "Tests")
-      (uri "D:/soft_a/verilog/kikad/Tests/Tests.kicad_sym")))
   (nets
     (net (code "1") (name "Net-(A1-Out0)")
       (node (ref "A1") (pin "0") (pinfunction "Out0") (pintype "output"))
