@@ -5,4 +5,7 @@ Implements a DC-trigger functionality with R and S inputs.
 **Input names**: D, C, R ,S  
 **Output names**: Q, ~{Q}
 
-**Optional parameter `reverse`:** If provided, the `C` input is reversed (sensitive to negative front, positive otherwise).
+**Optional parameters **
+
+- `reverse`: If provided, the `C` input is reversed (sensitive to negative front, positive otherwise).
+- `setReverse` If provided, the `R` and `s` inputs are reversed (active on Lo). 
