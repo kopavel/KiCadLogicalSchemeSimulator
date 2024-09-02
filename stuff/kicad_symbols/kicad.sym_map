@@ -309,6 +309,9 @@
 		<symbol name="74LS92" symPartClass="MultiUnitCounter" symPartParam="sizes=1,3;reverse">
 			<unit pinMap="1=Cb;6=Ra;7=Rb;8=Qb2;9=Qb1;11=Qb0;12=Qa;14=Ca"/>
 		</symbol>
+		<symbol name="74LS93" symPartClass="MultiUnitCounter" symPartParam="sizes=1,3;reverse">
+			<unit pinMap="1=Cb;2=Ra;3=Rb;11=Qb2;8=Qb1;9=Qb0;12=Qa;14=Ca"/>
+		</symbol>
 		<symbol name="74LS32" symPartClass="OrGate" symPartParam="size=2">
 			<unit pinMap="1=IN0;2=IN1;3=OUT"/>
 			<unit pinMap="4=IN0;5=IN1;6=OUT"/>
