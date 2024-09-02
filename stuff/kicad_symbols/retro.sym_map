@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<symbolMap>
+	<lib name="retro">
+		<symbol name="MK4116" symPartClass="SingleBitSdRam" symPartParam="size=7;reverse">
+			<unit pinMap="2=Di;3=~{WR};3=A2;4=~{RAS};5=A0;6=A2;7=A1;10=A5;11=A4;12=A3;14=Do;15=~{CAS}"/>
+		</symbol>
+	</lib>
+</symbolMap>

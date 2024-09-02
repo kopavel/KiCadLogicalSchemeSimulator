@@ -29,11 +29,18 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+package pko.KiCadLogicalSchemeSimulator.components.sdram;
+import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
-import pko.KiCadLogicalSchemeSimulator.components.sdram.SdRamSpi;
-import pko.KiCadLogicalSchemeSimulator.components.sdram.SingleBitSdRamSpi;
 
-module KiCadLogicalSchemeSimulator.components.sdram {
-    requires KiCadLogicalSchemeSimulator.simulator;
-    provides SchemaPartSpi with SdRamSpi, SingleBitSdRamSpi;
+public class SingleBitSdRamSpi implements SchemaPartSpi {
+    @Override
+    public SchemaPart getSchemaPart(String id, String params) {
+        return new SingleBitSdRam(id, params);
+    }
+
+    @Override
+    public Class<? extends SchemaPart> getSchemaPartClass() {
+        return SingleBitSdRam.class;
+    }
 }

@@ -30,49 +30,41 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.sdram;
-import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
 
-public class SdRam extends SchemaPart {
-    private final long[] bytes;
+public class SingleBitSdRam extends SchemaPart {
+    private final boolean[] mem;
     private final InBus addrPin;
-    private final InBus dIn;
+    private final InPin dIn;
     private final InPin we;
     private final int module;
     private final int size;
-    private final int aSize;
-    private Bus dOut;
+    private Pin dOut;
     private int hiPart;
     private int addr;
 
-    protected SdRam(String id, String sParam) {
+    protected SingleBitSdRam(String id, String sParam) {
         super(id, sParam);
         if (!sParam.contains("size")) {
-            throw new RuntimeException("SdRam component " + id + " need \"size\" parameter");
+            throw new RuntimeException("Ram component need \"size\" parameter");
         }
         size = Integer.parseInt(params.get("size"));
-        if (size < 2) {
-            throw new RuntimeException("SdRam component " + id + " size must be larger, than 1");
+        if (size < 1) {
+            throw new RuntimeException("Component " + id + " must be positive number");
         }
-        if (size > 64) {
-            throw new RuntimeException("SdRam component " + id + " max size is 64");
+        if (size > 15) {
+            throw new RuntimeException("Component " + id + " max size is 15");
         }
-        if (!sParam.contains("aSize")) {
-            throw new RuntimeException("SdRam component " + id + " need \"aSize\" parameter");
-        }
-        aSize = Integer.parseInt(params.get("aSize"));
-        if (aSize > 15) {
-            throw new RuntimeException("SdRam component " + id + " max aSize is 15");
-        }
-        module = (int) Math.pow(2, aSize);
-        int ramSize = (int) Math.pow(2, aSize * 2);
-        bytes = new long[ramSize];
-        addrPin = addInBus("A", aSize);
-        addOutBus("D", size);
-        dIn = addInBus("D", size);
+        module = (int) Math.pow(2, size);
+        int ramSize = (int) Math.pow(2, size * 2);
+        mem = new boolean[ramSize];
+        addrPin = addInBus("A", size);
+        addOutPin("Dout");
+        dIn = addInPin("Din");
         if (reverse) {
             addInPin(new NoFloatingInPin("~{RAS}", this) {
                 @Override
@@ -95,13 +87,13 @@ public class SdRam extends SchemaPart {
                     } else {
                         addr = (int) (hiPart + addrPin.state);
                         if (we.state) {
-                            if (dOut.state != bytes[addr] || dOut.hiImpedance) {
-                                dOut.state = bytes[addr];
+                            if (dOut.state != mem[addr] || dOut.hiImpedance) {
+                                dOut.state = mem[addr];
                                 dOut.setState(dOut.state);
                                 dOut.hiImpedance = false;
                             }
                         } else {
-                            bytes[addr] = dIn.state;
+                            mem[addr] = dIn.state;
                         }
                     }
                 }
@@ -123,10 +115,10 @@ public class SdRam extends SchemaPart {
                     if (state) {
                         addr = (int) (hiPart + addrPin.state);
                         if (we.state) {
-                            bytes[addr] = dIn.state;
+                            mem[addr] = dIn.state;
                         } else {
-                            if (dOut.state != bytes[addr] || dOut.hiImpedance) {
-                                dOut.state = bytes[addr];
+                            if (dOut.state != mem[addr] || dOut.hiImpedance) {
+                                dOut.state = mem[addr];
                                 dOut.setState(dOut.state);
                                 dOut.hiImpedance = false;
                             }
@@ -145,11 +137,11 @@ public class SdRam extends SchemaPart {
 
     @Override
     public String extraState() {
-        return "A:" + String.format("%" + (int) Math.ceil(aSize / 4d) + "X", addr) + "\nD:" + String.format("%" + (int) Math.ceil(size / 4d) + "X", dIn.state);
+        return "A:" + String.format("%" + (int) Math.ceil(size / 4d) + "X", addr) + "\nD:" + dIn.state;
     }
 
     @Override
     public void initOuts() {
-        dOut = getOutBus("D");
+        dOut = getOutPin("Dout");
     }
 }
