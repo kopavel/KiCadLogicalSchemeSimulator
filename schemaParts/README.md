@@ -17,6 +17,7 @@ Some interactive parts has additional interfaces/functionality if you click on i
 * [JkTrigger](jkTrigger%2FREADME.md) — JK trigger.
 * [JnCounter](jnCounter%2FREADME.md) — Johnson counter.
 * [Led](led%2FREADME.md) — LED indicator.
+* [MaskedMultiplexer]( multiplexer%2FmaskedMultiplexer.md) — Multiplexer with a defined amount outputs and ways with masking inputs.
 * [Multiplexer](multiplexer%2FREADME.md) — Multiplexer with a defined amount outputs and ways.
 * [MultiOutDecoder](decoder%2FMultiOutDecoder.md) — Decoder with multiple output pin groups.
 * [OrGate](or%2FREADME.md) — Logical OR gate.

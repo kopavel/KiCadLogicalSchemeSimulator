@@ -46,7 +46,6 @@ public class Multiplexer extends SchemaPart {
     private final InBus[] inBuses;
     private int nState;
     private Bus outBus;
-    private boolean enabled;
 
     protected Multiplexer(String id, String sParam) {
         super(id, sParam);
@@ -63,58 +62,6 @@ public class Multiplexer extends SchemaPart {
         }
         int partSize = (int) Math.pow(2, nSize);
         inBuses = new InBus[partSize];
-        if (reverse) {
-            enabled = true;
-            addInPin(new NoFloatingInPin("OE", this) {
-                @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    enabled = !newState;
-                    if (enabled) {
-                        InBus inBus = inBuses[nState];
-                        if (inBus.hiImpedance) {
-                            if (Net.stabilizing) {
-                                Net.forResend.add(this);
-                                assert Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
-                            } else {
-                                throw new FloatingInException(inBus);
-                            }
-                        } else if (outBus.state != inBus.state) {
-                            outBus.state = inBus.state;
-                            outBus.setState(inBus.state);
-                        }
-                    } else if (!outBus.hiImpedance) {
-                        outBus.setHiImpedance();
-                        outBus.hiImpedance = true;
-                    }
-                }
-            });
-        } else {
-            addInPin(new NoFloatingInPin("OE", this) {
-                @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    enabled = newState;
-                    if (newState) {
-                        InBus inBus = inBuses[nState];
-                        if (inBus.hiImpedance) {
-                            if (Net.stabilizing) {
-                                Net.forResend.add(this);
-                                assert Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
-                            } else {
-                                throw new FloatingInException(inBus);
-                            }
-                        } else if (outBus.state != inBus.state) {
-                            outBus.state = inBus.state;
-                            outBus.setState(inBus.state);
-                        }
-                    } else if (!outBus.hiImpedance) {
-                        outBus.setHiImpedance();
-                        outBus.hiImpedance = true;
-                    }
-                }
-            });
-        }
         for (int inNo = 0; inNo < partSize; inNo++) {
             List<String> aliases = new ArrayList<>();
             for (int part = 0; part < partsAmount; part++) {
@@ -131,7 +78,7 @@ public class Multiplexer extends SchemaPart {
                 public void setState(long newState) {
                     state = newState;
                     hiImpedance = false;
-                    if (enabled && finalInNo == nState && outBus.state != newState) {
+                    if (finalInNo == nState /*&& outBus.state != newState*/) {
                         outBus.state = newState;
                         outBus.setState(newState);
                     }
@@ -150,19 +97,16 @@ public class Multiplexer extends SchemaPart {
                     } else {
                         nState &= nMask;
                     }
-                    if (enabled) {
-                        InBus inBus = inBuses[nState];
-                        if (inBus.hiImpedance) {
-                            if (Net.stabilizing) {
-                                Net.forResend.add(this);
-                                assert Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
-                            } else {
-                                throw new FloatingInException(inBus);
-                            }
-                        } else if (outBus.state != inBus.state) {
-                            outBus.state = inBus.state;
-                            outBus.setState(inBus.state);
+                    if (inBuses[nState].hiImpedance) {
+                        if (Net.stabilizing) {
+                            Net.forResend.add(this);
+                            assert Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
+                        } else {
+                            throw new FloatingInException(inBuses[nState]);
                         }
+                    } else if (outBus.state != inBuses[nState].state) {
+                        outBus.state = inBuses[nState].state;
+                        outBus.setState(outBus.state);
                     }
                 }
             });

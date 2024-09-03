@@ -6,6 +6,8 @@ Implements a multiplexer with a defined output amount and ways.
 
 - `[Ax, Bx, …]` where x is a sequential number, starting from 0.
 - `Nx` where x is a sequential number, starting from 0.
+- `OE` output enabled, if Lo — all parts output is in `Hi Impedance` state.
+- `OEx` where x is part `id` in range [a…z]. output enabled, if Lo — exact part output is in `Hi Impedance` state.
 
 **Output names**: Qc, where c is a 'way' identifier, like A, B, ... (QA, QB, ...)
 
