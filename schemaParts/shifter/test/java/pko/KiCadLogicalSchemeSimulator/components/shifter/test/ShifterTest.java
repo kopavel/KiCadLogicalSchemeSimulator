@@ -51,6 +51,7 @@ public class ShifterTest extends NetTester {
     protected void shifterTest() {
         setBus("dBus", 0b10011001);
         setPin("PL", true);
+        setPin("CP", true);
         setPin("PL", false);
         System.out.println(Long.toBinaryString(net.schemaParts.get("U1").outPins.get("Q").getState()));
         assertFalse(inPin(5).state, "after parallel load 5 pin must be Lo");

@@ -33,14 +33,14 @@ package pko.KiCadLogicalSchemeSimulator.components.shifter;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
 
-public class MultiOutShifterSpi implements SchemaPartSpi {
+public class SingleOutShifterSpi implements SchemaPartSpi {
     @Override
     public SchemaPart getSchemaPart(String id, String params) {
-        return new MultiOutShifter(id, params);
+        return new SingleOutShifter(id, params);
     }
 
     @Override
     public Class<? extends SchemaPart> getSchemaPartClass() {
-        return MultiOutShifter.class;
+        return SingleOutShifter.class;
     }
 }

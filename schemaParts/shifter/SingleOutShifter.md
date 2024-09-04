@@ -1,6 +1,6 @@
-## Shifter
+## SingleOutShifter
 
-Implements a bit shifter.
+Implements a bit shifter with single bit output.
 
 **Input names**:
 
@@ -14,11 +14,12 @@ Implements a bit shifter.
 
 **Output names**:
 
-- `Qx` - shifter outputs, where x a sequential number, starting from 0.
+- `Q` - shifter output.
 
 **Mandatory parameters:**
 
 - `size`: specifies size of shifter in bits.
+- `outPin`: specifies position/number for Q output, starting from 0.
 
 **Optional parameters:**
 
@@ -28,5 +29,5 @@ Implements a bit shifter.
 - `inhibitReverse`: if provided, the `CI` input reversed.
 
 **Example**  
-8-bit shifter with <span style="text-decoration: overline;">CP</span> : `size=8;reverse`.
+8-bit shifter with <span style="text-decoration: overline;">CP</span> and Q from the highest bit: `size=8;outPin=7;reverse`.
 

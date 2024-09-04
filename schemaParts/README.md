@@ -26,7 +26,8 @@ Some interactive parts has additional interfaces/functionality if you click on i
 * [Ram](ram/README.md) — Static RAM.
 * [Rom](rom/README.md) — ROM.
 * [SdRam](sdram/README.md) — Dynamic RAM.
-* [SigleBitSdRam](sdram/SingleBitSdRam.md) — Single bit Dynamic RAM.
+* [SingleBitSdRam](sdram/SingleBitSdRam.md) — Single bit Dynamic RAM.
+* [SingleOutShifter](shifter/SingleOutShifter.md) — Bit shifter with single bit output.
 * [Shifter](shifter/README.md) — Bit shifter.
 * [Switch](Switch/README.md) — Interactive “normally opened” switch.
 * [StateMachine](stateMachine%2FREADME.md) — Logical state machine.

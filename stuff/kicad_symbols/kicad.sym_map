@@ -148,7 +148,7 @@
 		<symbol name="4020" symPartClass="Counter" symPartParam="size=14;reverse">
 			<unit pinMap="10=C;11=R;9=Q0;7=Q3;5=Q4;4=Q5;6=Q6;13=Q7;12=Q8;14=Q9;15=Q10;1=Q11;2=Q12;3=Q13"/>
 		</symbol>
-		<symbol name="4021" symPartClass="MultiOutShifter" symPartParam="size=8">
+		<symbol name="4021" symPartClass="Shifter" symPartParam="size=8">
 			<unit pinMap="10=CP;9=PL;11=DS;7=D0;6=D1;5=D2;4=D3;13=D4;14=D5;15=D6;1=D7;2=Q5;12=Q6;3=Q7"/>
 		</symbol>
 		<symbol name="4022" symPartClass="JnCounter" symPartParam="size=8">
@@ -341,6 +341,9 @@
 		</symbol>
 		<symbol name="74LS157" symPartClass="MaskedMultiplexer" symPartParam="size=4;nSize=1;reverse">
 			<unit pinMap="2=A0;3=A1;5=B0;6=B1;11=C0;10=C1;14=D0;13=D1;1=N0;15=OE;4=QA;7=QB;9=QC;12=QD"/>
+		</symbol>
+		<symbol name="74LS166" symPartClass="SingleOutShifter" symPartParam="size=8;clearReverse;plReverse;outPin=7">
+			<unit pinMap="1=DS;2=D0;3=D1;4=D2;5=D3;6=CI;7=CP;9=R;10=D4;11=D5;12=D6;13=Q;14=D7;15=PL;"/>
 		</symbol>
 		<symbol name="74LS367" symPartClass="BusDriver" symPartParam="size=4,2;reverse">
 			<unit pinMap="2=Ia0;3=Oa0;4=Ia1;5=Oa1;6=Ia2;7=Oa2;9=Oa3;10=Ia3;11=Ob0;12=Ib0;13=Ob1;14=Ib1;1=OEa;15=OEb;"/>

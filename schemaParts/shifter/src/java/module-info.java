@@ -30,10 +30,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
-import pko.KiCadLogicalSchemeSimulator.components.shifter.MultiOutShifterSpi;
 import pko.KiCadLogicalSchemeSimulator.components.shifter.ShifterSpi;
+import pko.KiCadLogicalSchemeSimulator.components.shifter.SingleOutShifterSpi;
 
 module KiCadLogicalSchemeSimulator.components.shifter {
     requires KiCadLogicalSchemeSimulator.simulator;
-    provides SchemaPartSpi with ShifterSpi, MultiOutShifterSpi;
+    provides SchemaPartSpi with SingleOutShifterSpi, ShifterSpi;
 }
