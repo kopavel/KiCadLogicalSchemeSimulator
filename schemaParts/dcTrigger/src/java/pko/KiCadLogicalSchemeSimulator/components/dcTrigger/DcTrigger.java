@@ -162,7 +162,7 @@ public class DcTrigger extends SchemaPart {
                 @Override
                 public void setState(boolean newState) {
                     state = newState;
-                    if (!state && clockEnabled) {
+                    if (!newState && clockEnabled) {
                         if (dPin.state) {
                             if (iqOut.state) {
                                 qOut.state = true;
@@ -184,7 +184,7 @@ public class DcTrigger extends SchemaPart {
                 @Override
                 public void setState(boolean newState) {
                     state = newState;
-                    if (state && clockEnabled) {
+                    if (newState && clockEnabled) {
                         if (dPin.state) {
                             if (iqOut.state) {
                                 qOut.state = true;

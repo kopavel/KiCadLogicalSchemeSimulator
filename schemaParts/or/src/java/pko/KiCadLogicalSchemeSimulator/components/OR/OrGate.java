@@ -46,8 +46,8 @@ public class OrGate extends SchemaPart {
         }
         int pinAmount = Integer.parseInt(params.get("size"));
         for (int i = 0; i < pinAmount; i++) {
-            int mask = 1 << i;
-            int nMask = ~mask;
+            final int mask = 1 << i;
+            final int nMask = ~mask;
             if (reverse) {
                 addInPin(new NoFloatingInPin("IN" + i, this) {
                     @Override
