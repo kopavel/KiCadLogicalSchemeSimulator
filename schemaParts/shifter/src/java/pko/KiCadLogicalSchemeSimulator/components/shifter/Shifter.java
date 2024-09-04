@@ -143,7 +143,7 @@ public class Shifter extends SchemaPart {
                 @Override
                 public void setState(boolean newState) {
                     state = newState;
-                    if (clockEnabled && !newState) {
+                    if (!newState && clockEnabled) {
                         if (parallelLoad) {
                             latch = dBus.state;
                         } else {
@@ -165,7 +165,7 @@ public class Shifter extends SchemaPart {
                 @Override
                 public void setState(boolean newState) {
                     state = newState;
-                    if (clockEnabled && !newState) {
+                    if (!newState && clockEnabled) {
                         if (parallelLoad) {
                             latch = dBus.state;
                         } else {
@@ -188,7 +188,7 @@ public class Shifter extends SchemaPart {
                 @Override
                 public void setState(boolean newState) {
                     state = newState;
-                    if (clockEnabled && newState) {
+                    if (newState && clockEnabled) {
                         if (parallelLoad) {
                             latch = dBus.state;
                         } else {
@@ -210,7 +210,7 @@ public class Shifter extends SchemaPart {
                 @Override
                 public void setState(boolean newState) {
                     state = newState;
-                    if (clockEnabled && newState) {
+                    if (newState && clockEnabled) {
                         if (parallelLoad) {
                             latch = dBus.state;
                         } else {
