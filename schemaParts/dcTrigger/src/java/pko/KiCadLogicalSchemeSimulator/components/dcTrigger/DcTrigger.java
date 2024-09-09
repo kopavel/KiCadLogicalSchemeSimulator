@@ -51,9 +51,9 @@ public class DcTrigger extends SchemaPart {
                 @Override
                 public void setState(boolean newState) {
                     state = newState;
-                    clockEnabled = newState && !sPin.state;
+                    clockEnabled = newState && sPin.state;
                     if (newState) {
-                        if (sPin.state) {
+                        if (!sPin.state) {
                             if (iqOut.state) {
                                 iqOut.state = false;
                                 iqOut.setState(false);
@@ -68,8 +68,8 @@ public class DcTrigger extends SchemaPart {
                             iqOut.state = true;
                             iqOut.setState(true);
                         }
-                        if (qOut.state != sPin.state) {
-                            qOut.state = sPin.state;
+                        if (qOut.state == sPin.state) {
+                            qOut.state = !sPin.state;
                             qOut.setState(qOut.state);
                         }
                     }
@@ -79,9 +79,9 @@ public class DcTrigger extends SchemaPart {
                 @Override
                 public void setState(boolean newState) {
                     state = newState;
-                    clockEnabled = newState && !rPin.state;
+                    clockEnabled = newState && rPin.state;
                     if (newState) {
-                        if (rPin.state) {
+                        if (!rPin.state) {
                             if (qOut.state) {
                                 qOut.state = false;
                                 qOut.setState(false);
@@ -96,8 +96,8 @@ public class DcTrigger extends SchemaPart {
                             qOut.state = true;
                             qOut.setState(true);
                         }
-                        if (iqOut.state != rPin.state) {
-                            iqOut.state = rPin.state;
+                        if (iqOut.state == rPin.state) {
+                            iqOut.state = !rPin.state;
                             iqOut.setState(rPin.state);
                         }
                     }
@@ -164,17 +164,23 @@ public class DcTrigger extends SchemaPart {
                     state = newState;
                     if (!newState && clockEnabled) {
                         if (dPin.state) {
-                            if (iqOut.state) {
+                            if (!qOut.state) {
                                 qOut.state = true;
                                 qOut.setState(true);
+                            }
+                            if (iqOut.state) {
                                 iqOut.state = false;
                                 iqOut.setState(false);
                             }
-                        } else if (qOut.state) {
-                            qOut.state = false;
-                            qOut.setState(false);
-                            iqOut.state = true;
-                            iqOut.setState(true);
+                        } else {
+                            if (qOut.state) {
+                                qOut.state = false;
+                                qOut.setState(false);
+                            }
+                            if (!iqOut.state) {
+                                iqOut.state = true;
+                                iqOut.setState(true);
+                            }
                         }
                     }
                 }
@@ -186,17 +192,23 @@ public class DcTrigger extends SchemaPart {
                     state = newState;
                     if (newState && clockEnabled) {
                         if (dPin.state) {
-                            if (iqOut.state) {
+                            if (!qOut.state) {
                                 qOut.state = true;
                                 qOut.setState(true);
+                            }
+                            if (iqOut.state) {
                                 iqOut.state = false;
                                 iqOut.setState(false);
                             }
-                        } else if (qOut.state) {
-                            qOut.state = false;
-                            qOut.setState(false);
-                            iqOut.state = true;
-                            iqOut.setState(true);
+                        } else {
+                            if (qOut.state) {
+                                qOut.state = false;
+                                qOut.setState(false);
+                            }
+                            if (!iqOut.state) {
+                                iqOut.state = true;
+                                iqOut.setState(true);
+                            }
                         }
                     }
                 }

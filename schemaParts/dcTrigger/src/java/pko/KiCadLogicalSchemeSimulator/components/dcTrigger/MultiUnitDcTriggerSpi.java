@@ -29,11 +29,18 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+package pko.KiCadLogicalSchemeSimulator.components.dcTrigger;
+import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
-import pko.KiCadLogicalSchemeSimulator.components.dcTrigger.DcTriggerSpi;
-import pko.KiCadLogicalSchemeSimulator.components.dcTrigger.MultiUnitDcTriggerSpi;
 
-module KiCadLogicalSchemeSimulator.components.dcTrigger {
-    requires KiCadLogicalSchemeSimulator.simulator;
-    provides SchemaPartSpi with DcTriggerSpi, MultiUnitDcTriggerSpi;
+public class MultiUnitDcTriggerSpi implements SchemaPartSpi {
+    @Override
+    public SchemaPart getSchemaPart(String id, String params) {
+        return new MultiUnitDcTrigger(id, params);
+    }
+
+    @Override
+    public Class<? extends SchemaPart> getSchemaPartClass() {
+        return MultiUnitDcTrigger.class;
+    }
 }
