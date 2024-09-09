@@ -2,7 +2,18 @@
 <symbolMap>
 	<lib name="retro">
 		<symbol name="MK4116" symPartClass="SingleBitSdRam" symPartParam="size=7;reverse">
-			<unit pinMap="2=Di;3=~{WR};3=A2;4=~{RAS};5=A0;6=A2;7=A1;10=A5;11=A4;12=A3;14=Do;15=~{CAS}"/>
+			<unit pinMap="2=Din;3=~{WR};3=A2;4=~{RAS};5=A0;6=A2;7=A1;10=A5;11=A4;12=A3;14=Dout;15=~{CAS}"/>
+		</symbol>
+		<symbol name="MCM6670" symPartClass="Rom" symPartParam="size=5;aSize=10;reverse">
+			<unit pinMap="7=A0;6=A1;5=A2;4=A3;3=A4;2=A5;1=A6;8=A7;10=A8;11=A9;12=D0;13=D1;14=D2;15=D3;16=D4;17=~{CS}"/>
+		</symbol>
+		<symbol name="2102AN" symPartClass="Ram" symPartParam="size=5;aSize=10;reverse">
+			<unit pinMap="7=A0;6=A1;5=A2;4=A3;3=A4;2=A5;1=A6;8=A7;10=A8;11=A9;12=D0;13=D1;14=D2;15=D3;16=D4;17=~{CS}"/>
+		</symbol>
+	</lib>
+	<lib name="TRS80IUS">
+		<symbol name="2102AN" symPartClass="Ram" symPartParam="size=5;aSize=10;reverse">
+			<unit pinMap="7=A0;6=A1;5=A2;4=A3;3=A4;2=A5;1=A6;8=A7;10=A8;11=A9;12=D0;13=D1;14=D2;15=D3;16=D4;17=~{CS}"/>
 		</symbol>
 	</lib>
 </symbolMap>

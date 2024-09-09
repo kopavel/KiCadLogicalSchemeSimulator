@@ -96,7 +96,9 @@
 		<!-- ToDo to many to add, may be later -->
 	</lib>
 	<lib name="CPU">
-		<symbol name="Z80CPU" symPartClass="Z80Cpu"/>
+		<symbol name="Z80CPU" symPartClass="Z80Cpu">
+			<unit pinMap="26=~{RESET};6=CLK;17=~{NMI};16=~{INT};27=~{M1};28=~{RFSH};24=~{WAIT};18=~{HALT};21=~{RD};22=~{WR};19=~{MREQ};20=~{IORQ};25=~{BUSRQ};23=~{BUSACK};30=A0;31=A1;32=A2;33=A3;34=A4;35=A5;36=A6;37=A7;38=A8;39=A9;40=A10;1=A11;2=A12;3=A13;4=A14;5=A15;14=D0;15=D1;12=D2;8=D3;7=D4;9=D5;10=D6;13=D7"/>
+		</symbol>
 	</lib>
 	<lib name="Oscillator">
 		<symbol name="MAX7375AXR805" symPartClass="Oscillator" symPartParam="outName=CLOCK"/>
@@ -345,6 +347,12 @@
 		<symbol name="74LS166" symPartClass="SingleOutShifter" symPartParam="size=8;clearReverse;plReverse;outPin=7">
 			<unit pinMap="1=DS;2=D0;3=D1;4=D2;5=D3;6=CI;7=CP;9=R;10=D4;11=D5;12=D6;13=Q;14=D7;15=PL;"/>
 		</symbol>
+		<symbol name="74LS174" symPartClass="MultiUnitDcTrigger" symPartParam="size=6;setReverse;">
+			<unit pinMap="3=Da;4=Db;6=Dc;11=Dd;13=De;14=Df;9=C;1=R;2=Qa;5=Qb;7=Qc;10=Qd;12=Qe;15=Qf"/>
+		</symbol>
+		<symbol name="74LS175" symPartClass="MultiUnitDcTrigger" symPartParam="size=4;setReverse;">
+			<unit pinMap="4=Da;5=Db;12=Dc;13=Dd;9=C;1=R;2=Qa;3=~{Qa};7=Qb;6=~{Qb};10=Qc;11=~{Qc};15=Qd;14=~{Qd}"/>
+		</symbol>
 		<symbol name="74LS367" symPartClass="BusDriver" symPartParam="size=4,2;reverse">
 			<unit pinMap="2=Ia0;3=Oa0;4=Ia1;5=Oa1;6=Ia2;7=Oa2;9=Oa3;10=Ia3;11=Ob0;12=Ib0;13=Ob1;14=Ib1;1=OEa;15=OEb;"/>
 		</symbol>
@@ -354,7 +362,9 @@
 		</symbol>
 	</lib>
 	<lib name="Memory_EPROM">
-		<symbol name="2764" symPartClass="Rom" symPartParam="aSize=13;size=8"/>
+		<symbol name="2764" symPartClass="Rom" symPartParam="aSize=13;size=8;reverse">
+			<unit pinMap="10=A0;9=A1;8=A2;7=A3;6=A4;5=A5;4=A6;3=A7;25=A8;24=A9;21=A10;23=A11;2=A12;20=~{CS};11=D0;12=D1;13=D2;15=D3;16=D4;17=D5;18=D6;19=D7"/>
+		</symbol>
 	</lib>
 	<lib name="Switch">
 		<symbol name="SW_Push" symPartClass="Switch">
