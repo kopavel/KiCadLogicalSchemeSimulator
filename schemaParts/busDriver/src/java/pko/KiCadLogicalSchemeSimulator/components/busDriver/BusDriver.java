@@ -35,17 +35,19 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
+import pko.KiCadLogicalSchemeSimulator.net.Net;
+import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 import java.util.Arrays;
 
 public class BusDriver extends SchemaPart {
     private final Bus[] outs;
     private final InBus[] ins;
+    private final boolean[] oe;
     private final int partAmount;
 
     public BusDriver(String id, String sParam) {
         super(id, sParam);
-        addOutPin("OUT", false);
         if (!params.containsKey("size")) {
             throw new RuntimeException("Component " + id + " has no parameter \"size\"");
         }
@@ -53,23 +55,60 @@ public class BusDriver extends SchemaPart {
                 .map(Integer::parseInt).toArray(Integer[]::new);
         partAmount = sizes.length;
         ins = new InBus[partAmount];
+        oe = new boolean[partAmount];
         outs = new Bus[partAmount];
         for (int i = 0; i < partAmount; i++) {
-            ins[i] = addInBus("I" + (char) ('a' + i), sizes[i]);
-            addOutBus("O" + (char) ('a' + i), sizes[i]);
             int finalI = i;
+            ins[i] = addInBus(new InBus("I" + (char) ('a' + finalI), this, sizes[finalI]) {
+                @Override
+                public void setState(long newState) {
+                    state = newState;
+                    hiImpedance = false;
+                    if (oe[finalI]) {
+                        outs[finalI].state = newState;
+                        outs[finalI].setState(newState);
+                        outs[finalI].hiImpedance = false;
+                    }
+                }
+
+                @Override
+                public void setHiImpedance() {
+                    hiImpedance = true;
+                    if (oe[finalI]) {
+                        if (Net.stabilizing) {
+                            Net.forResend.add(this);
+                            assert Log.debug(this.getClass(), "Floating pin {}, try resend later", ins[finalI]);
+                        } else {
+                            throw new FloatingInException(ins[finalI]);
+                        }
+                    }
+                }
+            });
+            addOutBus("O" + (char) ('a' + i), sizes[i]);
             if (reverse) {
                 addInPin(new NoFloatingInPin("OE" + (char) ('a' + i), this) {
                     @Override
                     public void setState(boolean newState) {
+                        state = newState;
                         if (newState) {
-                            outs[finalI].setHiImpedance();
+                            oe[finalI] = false;
+                            if (!outs[finalI].hiImpedance) {
+                                outs[finalI].setHiImpedance();
+                                outs[finalI].hiImpedance = true;
+                            }
                         } else {
+                            oe[finalI] = true;
                             if (ins[finalI].hiImpedance) {
-                                throw new FloatingInException(outs[finalI]);
+                                if (Net.stabilizing) {
+                                    Net.forResend.add(this);
+                                    assert Log.debug(this.getClass(), "Floating pin {}, try resend later", ins[finalI]);
+                                } else {
+                                    throw new FloatingInException(ins[finalI]);
+                                }
                             }
                             outs[finalI].state = ins[finalI].state;
                             outs[finalI].setState(ins[finalI].state);
+                            outs[finalI].hiImpedance = false;
                         }
                     }
                 }).state = true;
@@ -77,11 +116,26 @@ public class BusDriver extends SchemaPart {
                 addInPin(new NoFloatingInPin("OE" + (char) ('a' + i), this) {
                     @Override
                     public void setState(boolean newState) {
+                        state = newState;
                         if (newState) {
+                            oe[finalI] = true;
+                            if (ins[finalI].hiImpedance) {
+                                if (Net.stabilizing) {
+                                    Net.forResend.add(this);
+                                    assert Log.debug(this.getClass(), "Floating pin {}, try resend later", ins[finalI]);
+                                } else {
+                                    throw new FloatingInException(ins[finalI]);
+                                }
+                            }
                             outs[finalI].state = ins[finalI].state;
                             outs[finalI].setState(ins[finalI].state);
+                            outs[finalI].hiImpedance = false;
                         } else {
-                            outs[finalI].setHiImpedance();
+                            oe[finalI] = false;
+                            if (!outs[finalI].hiImpedance) {
+                                outs[finalI].setHiImpedance();
+                                outs[finalI].hiImpedance = true;
+                            }
                         }
                     }
                 });
