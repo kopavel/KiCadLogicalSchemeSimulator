@@ -52,4 +52,9 @@ public class PullPin extends OutPin implements MergerInput<Pin> {
         }
         return this;
     }
+
+    @Override
+    public long getMask() {
+        return 0;
+    }
 }

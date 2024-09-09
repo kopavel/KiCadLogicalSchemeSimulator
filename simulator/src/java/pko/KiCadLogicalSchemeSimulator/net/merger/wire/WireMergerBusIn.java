@@ -30,6 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.net.merger.wire;
+import lombok.Getter;
 import pko.KiCadLogicalSchemeSimulator.api.ShortcutException;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.in.CorrectedInBus;
@@ -41,6 +42,7 @@ import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 public class WireMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
+    @Getter
     public long mask;
     public WireMerger merger;
     public Pin[] destinations;
@@ -65,7 +67,7 @@ public class WireMergerBusIn extends CorrectedInBus implements MergerInput<Bus> 
 
     @Override
     public void setState(long newState) {
-        assert Log.debug(WireMergerBusIn.class,
+        assert Log.debug(this.getClass(),
                 "Pin merger change. before: newState:{}, Source:{} (state:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{}, hiImpedance:{})",
                 newState,
                 getName(),
@@ -110,7 +112,7 @@ public class WireMergerBusIn extends CorrectedInBus implements MergerInput<Bus> 
             passivePin.parent.onPassivePinChange(merger);
         }
         /*Optimiser blockend passivePins*///
-        assert Log.debug(WireMergerBusIn.class,
+        assert Log.debug(this.getClass(),
                 "Pin merger change. after: newState:{}, Source:{} (state:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{}, hiImpedance:{})",
                 newState,
                 getName(),
@@ -124,7 +126,7 @@ public class WireMergerBusIn extends CorrectedInBus implements MergerInput<Bus> 
 
     @Override
     public void setHiImpedance() {
-        assert Log.debug(WireMergerBusIn.class,
+        assert Log.debug(this.getClass(),
                 "Pin merger setImpedance. before: Source:{} (state:{}, oldImpedance:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{}, hiImpedance:{})",
                 getName(),
                 state,
@@ -172,7 +174,7 @@ public class WireMergerBusIn extends CorrectedInBus implements MergerInput<Bus> 
             passivePin.parent.onPassivePinChange(merger);
         }
         /*Optimiser blockend passivePins*///
-        assert Log.debug(WireMergerBusIn.class,
+        assert Log.debug(this.getClass(),
                 "Pin merger setImpedance. after: Source:{} (state:{}, oldImpedance:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{}, hiImpedance:{})",
                 getName(),
                 state,

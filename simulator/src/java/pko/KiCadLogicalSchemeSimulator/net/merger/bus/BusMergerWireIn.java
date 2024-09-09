@@ -260,4 +260,9 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
         merger.sources.add(optimised);
         return optimised;
     }
+
+    @SuppressWarnings({"LombokGetterMayBeUsed", "RedundantSuppression"})
+    public long getMask() {
+        return this.mask;
+    }
 }

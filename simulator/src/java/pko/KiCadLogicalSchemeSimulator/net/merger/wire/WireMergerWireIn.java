@@ -245,4 +245,9 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
         ((WireMerger) merger).sources.add(pin);
         return pin;
     }
+
+    @Override
+    public long getMask() {
+        return 0;
+    }
 }

@@ -462,10 +462,17 @@ public class Net {
         for (int i = 0; i < resendTry && !forResend.isEmpty(); i++) {
             resend();
         }
-        if (!forResend.isEmpty()) {
-            throw new RuntimeException("Can't stabilize Net");
-        }
         stabilizing = false;
+        if (!forResend.isEmpty()) {
+            forResend.forEach(item -> {
+                try {
+                    item.resend();
+                } catch (Throwable e) {
+                    Log.error(Net.class, "Error at resend {}", item, e);
+                }
+            });
+            Log.error(Net.class, "!!! Can't stabilize Net !!!");
+        }
     }
 
     private void resend() {

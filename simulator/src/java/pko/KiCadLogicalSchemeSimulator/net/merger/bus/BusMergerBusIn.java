@@ -280,4 +280,9 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
         merger.sources.add(optimised);
         return optimised;
     }
+
+    @SuppressWarnings({"LombokGetterMayBeUsed", "RedundantSuppression"})
+    public long getMask() {
+        return this.mask;
+    }
 }

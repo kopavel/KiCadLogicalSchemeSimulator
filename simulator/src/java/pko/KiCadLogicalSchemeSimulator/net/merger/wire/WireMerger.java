@@ -47,7 +47,7 @@ import java.util.*;
 public class WireMerger extends OutPin {
     public final Set<PassivePin> passivePins = new TreeSet<>();
     public final Set<BusMergerWireIn> mergers = new TreeSet<>();
-    public Set<MergerInput<?>> sources = new TreeSet<>(Comparator.comparing(MergerInput::getName));
+    public Set<MergerInput<?>> sources = new TreeSet<>(Comparator.comparing(mergerInput -> mergerInput.getMask() + ":" + mergerInput.getName()));
 
     public WireMerger(Pin destination, List<OutPin> pins, List<PassivePin> passivePins, Map<OutBus, Long> buses) {
         super(destination.id, destination.parent);
