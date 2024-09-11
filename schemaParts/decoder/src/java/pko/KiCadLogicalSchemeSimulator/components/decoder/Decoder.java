@@ -30,13 +30,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.decoder;
-import pko.KiCadLogicalSchemeSimulator.api.FloatingInException;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.in.CorrectedInBus;
+import pko.KiCadLogicalSchemeSimulator.api.bus.in.NoFloatingCorrectedInBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
-import pko.KiCadLogicalSchemeSimulator.net.Net;
-import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 public class Decoder extends SchemaPart {
     private Bus outBus;
@@ -51,7 +49,7 @@ public class Decoder extends SchemaPart {
         int inSize = Integer.parseInt(params.get("size"));
         CorrectedInBus aBus;
         if (params.containsKey("outReverse")) {
-            aBus = addInBus(new CorrectedInBus("A", this, inSize) {
+            aBus = addInBus(new NoFloatingCorrectedInBus("A", this, inSize) {
                 @Override
                 public void setState(long newState) {
                     state = newState;
@@ -63,23 +61,9 @@ public class Decoder extends SchemaPart {
                     }
                     hiImpedance = false;
                 }
-
-                @Override
-                public void setHiImpedance() {
-                    assert !hiImpedance : "Already in hiImpedance:" + this;
-                    hiImpedance = true;
-                    if (csState) {
-                        if (Net.stabilizing) {
-                            Net.forResend.add(this);
-                            assert Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
-                        } else {
-                            throw new FloatingInException(this);
-                        }
-                    }
-                }
             });
         } else {
-            aBus = addInBus(new CorrectedInBus("A", this, inSize) {
+            aBus = addInBus(new NoFloatingCorrectedInBus("A", this, inSize) {
                 @Override
                 public void setState(long newState) {
                     state = newState;
@@ -93,37 +77,17 @@ public class Decoder extends SchemaPart {
                     }
                     hiImpedance = false;
                 }
-
-                @Override
-                public void setHiImpedance() {
-                    assert !hiImpedance : "Already in hiImpedance:" + this;
-                    hiImpedance = true;
-                    if (csState) {
-                        if (Net.stabilizing) {
-                            Net.forResend.add(this);
-                            assert Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
-                        } else {
-                            throw new FloatingInException(this);
-                        }
-                    }
-                }
             });
         }
         if (reverse) {
             addInPin(new NoFloatingInPin("CS", this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     csState = !newState;
                     if (csState) {
-                        if (aBus.hiImpedance) {
-                            if (Net.stabilizing) {
-                                Net.forResend.add(this);
-                                assert Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
-                            } else {
-                                throw new FloatingInException(aBus);
-                            }
-                        } else if (outBus.state != outState || outBus.hiImpedance) {
+                        if (!aBus.hiImpedance && (outBus.state != outState || outBus.hiImpedance)) {
                             outBus.state = outState;
                             outBus.setState(outState);
                             outBus.hiImpedance = false;
@@ -138,20 +102,16 @@ public class Decoder extends SchemaPart {
             addInPin(new NoFloatingInPin("CS", this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     csState = newState;
                     if (csState) {
-                        if (aBus.hiImpedance) {
-                            if (Net.stabilizing) {
-                                Net.forResend.add(this);
-                                assert Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
-                            } else {
-                                throw new FloatingInException(aBus);
+                        if (!aBus.hiImpedance) {
+                            if (outBus.state != outState || outBus.hiImpedance) {
+                                outBus.state = outState;
+                                outBus.setState(outState);
+                                outBus.hiImpedance = false;
                             }
-                        } else if (outBus.state != outState || outBus.hiImpedance) {
-                            outBus.state = outState;
-                            outBus.setState(outState);
-                            outBus.hiImpedance = false;
                         }
                     } else if (!outBus.hiImpedance) {
                         outBus.setHiImpedance();

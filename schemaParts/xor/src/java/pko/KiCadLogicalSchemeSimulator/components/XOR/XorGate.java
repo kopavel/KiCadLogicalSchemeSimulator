@@ -46,6 +46,7 @@ public class XorGate extends SchemaPart {
             in1 = addInPin(new NoFloatingInPin("IN0", this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     if (out.state != in1.state == in2.state) {
                         out.state = in1.state == in2.state;
@@ -56,6 +57,7 @@ public class XorGate extends SchemaPart {
             in2 = addInPin(new NoFloatingInPin("IN1", this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     if (out.state != in1.state == in2.state) {
                         out.state = in1.state == in2.state;
@@ -67,6 +69,7 @@ public class XorGate extends SchemaPart {
             in1 = addInPin(new NoFloatingInPin("IN0", this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     if (out.state == (in1.state == in2.state)) {
                         out.state = (in1.state != in2.state);
@@ -77,6 +80,7 @@ public class XorGate extends SchemaPart {
             in2 = addInPin(new NoFloatingInPin("IN1", this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     if (out.state == (in1.state == in2.state)) {
                         out.state = (in1.state != in2.state);

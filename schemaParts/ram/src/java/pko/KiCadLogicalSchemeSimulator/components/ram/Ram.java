@@ -30,15 +30,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.ram;
-import pko.KiCadLogicalSchemeSimulator.api.FloatingInException;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.in.CorrectedInBus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
+import pko.KiCadLogicalSchemeSimulator.api.bus.in.NoFloatingCorrectedInBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
-import pko.KiCadLogicalSchemeSimulator.net.Net;
-import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 public class Ram extends SchemaPart {
     private final long[] words;
@@ -85,20 +82,7 @@ public class Ram extends SchemaPart {
         addOutBus("D", size);
         dIn = addInBus("D", size);
         if (reverse) {
-            aBus = addInBus(new CorrectedInBus("A", this, aSize) {
-                @Override
-                public void setHiImpedance() {
-                    hiImpedance = true;
-                    if (!csPin.state) {
-                        if (Net.stabilizing) {
-                            Net.forResend.add(this);
-                            assert Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
-                        } else {
-                            throw new FloatingInException(this);
-                        }
-                    }
-                }
-
+            aBus = addInBus(new NoFloatingCorrectedInBus("A", this, aSize) {
                 @Override
                 public void setState(long newState) {
                     state = newState;
@@ -111,6 +95,7 @@ public class Ram extends SchemaPart {
             csPin = addInPin(new NoFloatingInPin("~{CS}", this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     rOut();
                 }
@@ -118,6 +103,7 @@ public class Ram extends SchemaPart {
             oePin = addInPin(new NoFloatingInPin("~{OE}", this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     rOut();
                 }
@@ -125,6 +111,7 @@ public class Ram extends SchemaPart {
             addInPin(new NoFloatingInPin("~{WE}", this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     if (!state && !csPin.state) {
                         words[(int) aBus.state] = dIn.state;
@@ -132,20 +119,7 @@ public class Ram extends SchemaPart {
                 }
             });
         } else {
-            aBus = addInBus(new CorrectedInBus("A", this, aSize) {
-                @Override
-                public void setHiImpedance() {
-                    hiImpedance = true;
-                    if (!csPin.state) {
-                        if (Net.stabilizing) {
-                            Net.forResend.add(this);
-                            assert Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
-                        } else {
-                            throw new FloatingInException(this);
-                        }
-                    }
-                }
-
+            aBus = addInBus(new NoFloatingCorrectedInBus("A", this, aSize) {
                 @Override
                 public void setState(long newState) {
                     state = newState;
@@ -158,6 +132,7 @@ public class Ram extends SchemaPart {
             csPin = addInPin(new NoFloatingInPin("CS", this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     out();
                 }
@@ -165,6 +140,7 @@ public class Ram extends SchemaPart {
             oePin = addInPin(new NoFloatingInPin("OE", this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     out();
                 }
@@ -172,6 +148,7 @@ public class Ram extends SchemaPart {
             addInPin(new NoFloatingInPin("WE", this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     if (state && csPin.state) {
                         words[(int) aBus.state] = dIn.state;

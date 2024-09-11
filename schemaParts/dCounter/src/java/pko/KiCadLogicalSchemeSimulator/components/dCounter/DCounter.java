@@ -61,6 +61,7 @@ public class DCounter extends SchemaPart {
             addInPin(new NoFloatingInPin("CI", this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     ciState = !newState;
                 }
@@ -109,6 +110,7 @@ public class DCounter extends SchemaPart {
             addInPin(new NoFloatingInPin("CI", this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     ciState = newState;
                 }
@@ -158,6 +160,7 @@ public class DCounter extends SchemaPart {
             @Override
             public void setState(long newState) {
                 state = newState;
+                hiImpedance = false;
                 if (!presetDisabled && resetInactive && outBus.state != newState) {
                     outBus.state = newState;
                     outBus.setState(newState);
@@ -167,6 +170,7 @@ public class DCounter extends SchemaPart {
         addInPin(new NoFloatingInPin("PE", this) {
             @Override
             public void setState(boolean newState) {
+                hiImpedance = false;
                 state = newState;
                 presetDisabled = !newState;
                 if (!presetDisabled && resetInactive && outBus.state != jBus.state) {
@@ -210,6 +214,7 @@ public class DCounter extends SchemaPart {
             addInPin(new NoFloatingInPin("C", this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     if (state) {
                         cState = false;
@@ -225,6 +230,7 @@ public class DCounter extends SchemaPart {
             addInPin(new NoFloatingInPin("C", this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     if (state) {
                         cState = true;
@@ -241,6 +247,7 @@ public class DCounter extends SchemaPart {
             addInPin(new NoFloatingInPin("E", this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     if (state) {
                         eState = false;
@@ -256,6 +263,7 @@ public class DCounter extends SchemaPart {
             addInPin(new NoFloatingInPin("E", this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     if (state) {
                         eState = true;

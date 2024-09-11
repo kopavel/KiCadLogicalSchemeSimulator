@@ -32,11 +32,9 @@
 package pko.KiCadLogicalSchemeSimulator.components.BUF.test;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import pko.KiCadLogicalSchemeSimulator.api.FloatingInException;
 import pko.KiCadLogicalSchemeSimulator.test.schemaPartTester.NetTester;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class LatchTest extends NetTester {
@@ -75,11 +73,5 @@ public class LatchTest extends NetTester {
         assertEquals(1, inBus("RegIn").state, "Q pin should reflect the state of D pin after OE falling edge");
         setPin("RegOe", true);
         assertTrue(inBus("RegIn").hiImpedance, "Q pin should be in high-impedance state after OE raising edge");
-    }
-
-    @Test
-    @DisplayName("Floating D pin should throw FloatingPinException")
-    void floatingDPinThrowsException() {
-        assertThrows(FloatingInException.class, () -> outPin("RegOe").setHiImpedance(), "Floating input must throw exception with Hi CS");
     }
 }

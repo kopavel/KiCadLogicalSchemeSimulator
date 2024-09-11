@@ -33,10 +33,7 @@ package pko.KiCadLogicalSchemeSimulator.components.OR.test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import pko.KiCadLogicalSchemeSimulator.api.FloatingInException;
 import pko.KiCadLogicalSchemeSimulator.test.schemaPartTester.NetTester;
-
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class OrTest extends NetTester {
     @Test
@@ -61,12 +58,6 @@ public class OrTest extends NetTester {
         setPin(1, true);
         setPin(2, true);
         Assertions.assertTrue(inPin(1).state, "With Hi on both inputs output needs to be Hi");
-    }
-
-    @Test
-    @DisplayName("Floating pin exception")
-    public void floatPin() {
-        assertThrows(FloatingInException.class, () -> outPin(2).setHiImpedance(), "Floating input must throw FloatingPinException");
     }
 
     @Override

@@ -30,11 +30,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.api.wire.in;
-import pko.KiCadLogicalSchemeSimulator.api.FloatingInException;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.net.Net;
-import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 public abstract class NoFloatingInPin extends InPin {
     public NoFloatingInPin(String id, SchemaPart parent) {
@@ -48,11 +45,5 @@ public abstract class NoFloatingInPin extends InPin {
 
     @Override
     public void setHiImpedance() {
-        if (Net.stabilizing) {
-            Net.forResend.add(this);
-            assert Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
-        } else {
-            throw new FloatingInException(this);
-        }
     }
 }

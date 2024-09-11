@@ -30,14 +30,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.multiplexer;
-import pko.KiCadLogicalSchemeSimulator.api.FloatingInException;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.in.CorrectedInBus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
-import pko.KiCadLogicalSchemeSimulator.net.Net;
-import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,6 +65,7 @@ public class MaskedMultiplexer extends SchemaPart {
             addInPin(new NoFloatingInPin("OE", this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     if (newState) {
                         outMask = 0;
@@ -75,19 +73,14 @@ public class MaskedMultiplexer extends SchemaPart {
                         outMask = -1;
                     }
                     InBus inBus = inBuses[nState];
-                    if (inBus.hiImpedance) {
-                        if (Net.stabilizing) {
-                            Net.forResend.add(this);
-                            assert Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
-                        } else {
-                            throw new FloatingInException(inBus);
+                    if (!inBus.hiImpedance) {
+                        if (newState && outBus.state != inBus.state) {
+                            outBus.state = inBus.state;
+                            outBus.setState(inBus.state);
+                        } else if (!newState && outBus.state != 0) {
+                            outBus.state = 0;
+                            outBus.setState(0);
                         }
-                    } else if (newState && outBus.state != inBus.state) {
-                        outBus.state = inBus.state;
-                        outBus.setState(inBus.state);
-                    } else if (!newState && outBus.state != 0) {
-                        outBus.state = 0;
-                        outBus.setState(0);
                     }
                 }
             });
@@ -97,6 +90,7 @@ public class MaskedMultiplexer extends SchemaPart {
                 addInPin(new NoFloatingInPin("OE" + (char) ('a' + i), this) {
                     @Override
                     public void setState(boolean newState) {
+                        hiImpedance = false;
                         state = newState;
                         if (newState) {
                             outMask &= nMask;
@@ -104,14 +98,7 @@ public class MaskedMultiplexer extends SchemaPart {
                             outMask |= mask;
                         }
                         InBus inBus = inBuses[nState];
-                        if (inBus.hiImpedance) {
-                            if (Net.stabilizing) {
-                                Net.forResend.add(this);
-                                assert Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
-                            } else {
-                                throw new FloatingInException(inBus);
-                            }
-                        } else if (outBus.state != (inBus.state & outMask)) {
+                        if (!inBus.hiImpedance && outBus.state != (inBus.state & outMask)) {
                             outBus.state = (inBus.state & outMask);
                             outBus.setState(outBus.state);
                         }
@@ -122,6 +109,7 @@ public class MaskedMultiplexer extends SchemaPart {
             addInPin(new NoFloatingInPin("OE", this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     if (newState) {
                         outMask = -1;
@@ -129,19 +117,14 @@ public class MaskedMultiplexer extends SchemaPart {
                         outMask = 0;
                     }
                     InBus inBus = inBuses[nState];
-                    if (inBus.hiImpedance) {
-                        if (Net.stabilizing) {
-                            Net.forResend.add(this);
-                            assert Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
-                        } else {
-                            throw new FloatingInException(inBus);
+                    if (!inBus.hiImpedance) {
+                        if (!newState && outBus.state != inBus.state) {
+                            outBus.state = inBus.state;
+                            outBus.setState(inBus.state);
+                        } else if (newState && outBus.state != 0) {
+                            outBus.state = 0;
+                            outBus.setState(0);
                         }
-                    } else if (!newState && outBus.state != inBus.state) {
-                        outBus.state = inBus.state;
-                        outBus.setState(inBus.state);
-                    } else if (newState && outBus.state != 0) {
-                        outBus.state = 0;
-                        outBus.setState(0);
                     }
                 }
             });
@@ -151,6 +134,7 @@ public class MaskedMultiplexer extends SchemaPart {
                 addInPin(new NoFloatingInPin("OE" + (char) ('a' + i), this) {
                     @Override
                     public void setState(boolean newState) {
+                        hiImpedance = false;
                         state = newState;
                         if (newState) {
                             outMask |= mask;
@@ -158,14 +142,7 @@ public class MaskedMultiplexer extends SchemaPart {
                             outMask &= nMask;
                         }
                         InBus inBus = inBuses[nState];
-                        if (inBus.hiImpedance) {
-                            if (Net.stabilizing) {
-                                Net.forResend.add(this);
-                                assert Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
-                            } else {
-                                throw new FloatingInException(inBus);
-                            }
-                        } else if (outBus.state != (inBus.state & outMask)) {
+                        if (!inBus.hiImpedance && outBus.state != (inBus.state & outMask)) {
                             outBus.state = (inBus.state & outMask);
                             outBus.setState(outBus.state);
                         }
@@ -202,20 +179,14 @@ public class MaskedMultiplexer extends SchemaPart {
             addInPin(new NoFloatingInPin("N" + i, this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     if (newState) {
                         nState |= mask;
                     } else {
                         nState &= nMask;
                     }
-                    if (inBuses[nState].hiImpedance) {
-                        if (Net.stabilizing) {
-                            Net.forResend.add(this);
-                            assert Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
-                        } else {
-                            throw new FloatingInException(inBuses[nState]);
-                        }
-                    } else if (outBus.state != (inBuses[nState].state & outMask)) {
+                    if (!inBuses[nState].hiImpedance && outBus.state != (inBuses[nState].state & outMask)) {
                         outBus.state = inBuses[nState].state & outMask;
                         outBus.setState(outBus.state);
                     }

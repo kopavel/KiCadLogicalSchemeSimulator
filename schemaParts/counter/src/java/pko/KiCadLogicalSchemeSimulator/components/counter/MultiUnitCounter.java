@@ -68,6 +68,7 @@ public class MultiUnitCounter extends SchemaPart {
                     addInPin(new NoFloatingInPin("C" + (char) ('a' + i), this) {
                         @Override
                         public void setState(boolean newState) {
+                            hiImpedance = false;
                             state = newState;
                             if (!state) {
                                 outPins[finalI].state = !outPins[finalI].state;
@@ -80,6 +81,7 @@ public class MultiUnitCounter extends SchemaPart {
                         @Override
                         public void setState(boolean newState) {
                             state = newState;
+                            hiImpedance = false;
                             if (state) {
                                 outPins[finalI].state = !outPins[finalI].state;
                                 outPins[finalI].setState(outPins[finalI].state);
@@ -91,6 +93,7 @@ public class MultiUnitCounter extends SchemaPart {
                     @Override
                     public void setState(boolean newState) {
                         state = newState;
+                        hiImpedance = false;
                         if (state) {
                             outPins[finalI].state = false;
                             outPins[finalI].setState(false);
@@ -105,6 +108,7 @@ public class MultiUnitCounter extends SchemaPart {
                         @Override
                         public void setState(boolean newState) {
                             state = newState;
+                            hiImpedance = false;
                             if (!state) {
                                 outBuses[finalI].state = (outBuses[finalI].state + 1) & countMask[finalI];
                                 outBuses[finalI].setState(outBuses[finalI].state);
@@ -116,6 +120,7 @@ public class MultiUnitCounter extends SchemaPart {
                         @Override
                         public void setState(boolean newState) {
                             state = newState;
+                            hiImpedance = false;
                             if (state) {
                                 outBuses[finalI].state = (outBuses[finalI].state + 1) & countMask[finalI];
                                 outBuses[finalI].setState(outBuses[finalI].state);
@@ -127,6 +132,7 @@ public class MultiUnitCounter extends SchemaPart {
                     @Override
                     public void setState(boolean newState) {
                         state = newState;
+                        hiImpedance = false;
                         if (state) {
                             outBuses[finalI].state = 0;
                             outBuses[finalI].setState(0);

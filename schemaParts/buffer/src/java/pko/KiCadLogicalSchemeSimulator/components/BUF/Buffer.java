@@ -30,14 +30,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.BUF;
-import pko.KiCadLogicalSchemeSimulator.api.FloatingInException;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
+import pko.KiCadLogicalSchemeSimulator.api.bus.in.NoFloatingInBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
-import pko.KiCadLogicalSchemeSimulator.net.Net;
-import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 public class Buffer extends SchemaPart {
     private final int busSize;
@@ -67,6 +65,7 @@ public class Buffer extends SchemaPart {
             oePin = addInPin(new NoFloatingInPin("~{OE}", this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     if (!state) {
                         if (qBus.state != latch || qBus.hiImpedance) {
@@ -84,6 +83,7 @@ public class Buffer extends SchemaPart {
                 @Override
                 public void setState(boolean newState) {
                     state = newState;
+                    hiImpedance = false;
                     if (!state) {
                         latch = dBus.state;
                         if (!oePin.state && (qBus.state != latch || qBus.hiImpedance)) {
@@ -100,6 +100,7 @@ public class Buffer extends SchemaPart {
                 @Override
                 public void setState(boolean newState) {
                     state = newState;
+                    hiImpedance = false;
                     if (!state) {
                         if (qBus.state != dBus.state || qBus.hiImpedance) {
                             qBus.state = dBus.state;
@@ -112,20 +113,7 @@ public class Buffer extends SchemaPart {
                     }
                 }
             });
-            dBus = addInBus(new InBus("D", this, busSize) {
-                @Override
-                public void setHiImpedance() {
-                    hiImpedance = true;
-                    if (!oePin.state) {
-                        if (Net.stabilizing) {
-                            Net.forResend.add(this);
-                            assert Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
-                        } else {
-                            throw new FloatingInException(this);
-                        }
-                    }
-                }
-
+            dBus = addInBus(new NoFloatingInBus("D", this, busSize) {
                 @Override
                 public void setState(long newState) {
                     state = newState;

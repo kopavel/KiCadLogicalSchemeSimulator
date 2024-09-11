@@ -30,14 +30,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.stateMachine;
-import pko.KiCadLogicalSchemeSimulator.api.FloatingInException;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
+import pko.KiCadLogicalSchemeSimulator.api.bus.in.NoFloatingInBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
-import pko.KiCadLogicalSchemeSimulator.net.Net;
-import pko.KiCadLogicalSchemeSimulator.tools.Log;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 public class StateMachine extends SchemaPart {
@@ -45,10 +43,10 @@ public class StateMachine extends SchemaPart {
     private final InBus in;
     private final InPin dPin;
     private final InPin sPin;
+    private final long mask;
     private Bus out;
     private int latch;
     private long outMask;
-    private long mask;
 
     public StateMachine(String id, String sParam) {
         super(id, sParam);
@@ -91,6 +89,7 @@ public class StateMachine extends SchemaPart {
         dPin = addInPin(new NoFloatingInPin("D", this) {
             @Override
             public void setState(boolean newState) {
+                hiImpedance = false;
                 state = newState;
                 long newOutState = (newState ? 0 : states[latch]) ^ outMask;
                 if (out.state != newOutState) {
@@ -102,6 +101,7 @@ public class StateMachine extends SchemaPart {
         sPin = addInPin(new NoFloatingInPin("S", this) {
             @Override
             public void setState(boolean newState) {
+                hiImpedance = false;
                 state = newState;
                 if (state) {
                     latch = (int) in.state;
@@ -116,6 +116,7 @@ public class StateMachine extends SchemaPart {
         addInPin(new NoFloatingInPin("R", this) {
             @Override
             public void setState(boolean newState) {
+                hiImpedance = false;
                 state = newState;
                 if (state) {
                     outMask = mask;
@@ -137,21 +138,10 @@ public class StateMachine extends SchemaPart {
         if (params.containsKey("latch")) {
             in = addInBus("IN", inSize);
         } else {
-            in = addInBus(new InBus("IN", this, inSize) {
-                @Override
-                public void setHiImpedance() {
-                    if (sPin.state) {
-                        if (Net.stabilizing) {
-                            Net.forResend.add(this);
-                            assert Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
-                        } else {
-                            throw new FloatingInException(this);
-                        }
-                    }
-                }
-
+            in = addInBus(new NoFloatingInBus("IN", this, inSize) {
                 @Override
                 public void setState(long newState) {
+                    hiImpedance = false;
                     if (sPin.state) {
                         latch = (int) newState;
                         long newOutState = (dPin.state ? 0 : states[latch]) ^ outMask;

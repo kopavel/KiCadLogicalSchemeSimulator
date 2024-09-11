@@ -30,14 +30,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.multiplexer;
-import pko.KiCadLogicalSchemeSimulator.api.FloatingInException;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.in.CorrectedInBus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
+import pko.KiCadLogicalSchemeSimulator.api.bus.in.NoFloatingCorrectedInBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
-import pko.KiCadLogicalSchemeSimulator.net.Net;
-import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,12 +65,7 @@ public class Multiplexer extends SchemaPart {
                 aliases.add((char) ('A' + part) + "" + inNo);
             }
             int finalInNo = inNo;
-            inBuses[inNo] = addInBus(new CorrectedInBus(String.valueOf(finalInNo), this, partsAmount, aliases.toArray(new String[0])) {
-                @Override
-                public void setHiImpedance() {
-                    hiImpedance = true;
-                }
-
+            inBuses[inNo] = addInBus(new NoFloatingCorrectedInBus(String.valueOf(finalInNo), this, partsAmount, aliases.toArray(new String[0])) {
                 @Override
                 public void setState(long newState) {
                     state = newState;
@@ -91,20 +83,14 @@ public class Multiplexer extends SchemaPart {
             addInPin(new NoFloatingInPin("N" + i, this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     if (newState) {
                         nState |= mask;
                     } else {
                         nState &= nMask;
                     }
-                    if (inBuses[nState].hiImpedance) {
-                        if (Net.stabilizing) {
-                            Net.forResend.add(this);
-                            assert Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
-                        } else {
-                            throw new FloatingInException(inBuses[nState]);
-                        }
-                    } else if (outBus.state != inBuses[nState].state) {
+                    if (!inBuses[nState].hiImpedance && outBus.state != inBuses[nState].state) {
                         outBus.state = inBuses[nState].state;
                         outBus.setState(outBus.state);
                     }

@@ -69,6 +69,7 @@ public class SingleBitSdRam extends SchemaPart {
             addInPin(new NoFloatingInPin("~{RAS}", this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     if (!state) {
                         hiPart = (int) (addrPin.state * module);
@@ -78,6 +79,7 @@ public class SingleBitSdRam extends SchemaPart {
             addInPin(new NoFloatingInPin("~{CAS}", this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     if (state) {
                         if (!dOut.hiImpedance) {
@@ -102,6 +104,7 @@ public class SingleBitSdRam extends SchemaPart {
             addInPin(new NoFloatingInPin("RAS", this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     if (state) {
                         hiPart = (int) (addrPin.state * module);
@@ -111,6 +114,7 @@ public class SingleBitSdRam extends SchemaPart {
             addInPin(new NoFloatingInPin("CAS", this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     if (state) {
                         addr = (int) (hiPart + addrPin.state);

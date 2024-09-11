@@ -65,6 +65,7 @@ public class MultiUnitDcTrigger extends SchemaPart {
             rPin = addInPin(new NoFloatingInPin("R", this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     clockEnabled = newState && sPin.state;
                     if (newState) {
@@ -97,6 +98,7 @@ public class MultiUnitDcTrigger extends SchemaPart {
             sPin = addInPin(new NoFloatingInPin("S", this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     clockEnabled = newState && rPin.state;
                     if (newState) {
@@ -130,6 +132,7 @@ public class MultiUnitDcTrigger extends SchemaPart {
             rPin = addInPin(new NoFloatingInPin("R", this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     clockEnabled = !newState && !sPin.state;
                     if (newState) {
@@ -160,6 +163,7 @@ public class MultiUnitDcTrigger extends SchemaPart {
             sPin = addInPin(new NoFloatingInPin("S", this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     clockEnabled = !newState && !rPin.state;
                     if (newState) {
@@ -192,6 +196,7 @@ public class MultiUnitDcTrigger extends SchemaPart {
             addInPin(new NoFloatingInPin("C", this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     if (!newState && clockEnabled) {
                         for (int i = 0; i < size; i++) {
@@ -222,6 +227,7 @@ public class MultiUnitDcTrigger extends SchemaPart {
             addInPin(new NoFloatingInPin("C", this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     if (newState && clockEnabled) {
                         for (int i = 0; i < size; i++) {

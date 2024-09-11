@@ -77,6 +77,7 @@ public class Z80Cpu extends SchemaPart {
         addInPin(new NoFloatingInPin("CLK", this) {
             @Override
             public void setState(boolean newState) {
+                hiImpedance = false;
                 state = newState;
                 if (state) {
                     if (M > 0) {
@@ -215,6 +216,7 @@ public class Z80Cpu extends SchemaPart {
         addInPin(new NoFloatingInPin("~{RESET}", this) {
             @Override
             public void setState(boolean newState) {
+                hiImpedance = false;
                 state = newState;
                 if (state) {
                     reset();

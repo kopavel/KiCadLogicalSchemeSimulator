@@ -47,6 +47,7 @@ public class OscilloscopePin extends NoFloatingInPin {
     public void setState(boolean newState) {
         wrapped.state = newState;
         wrapped.setState(newState);
+        wrapped.hiImpedance = false;
         oscilloscope.diagram.tick();
     }
 }

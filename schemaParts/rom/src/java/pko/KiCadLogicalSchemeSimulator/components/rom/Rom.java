@@ -30,13 +30,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.rom;
-import pko.KiCadLogicalSchemeSimulator.api.FloatingInException;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
+import pko.KiCadLogicalSchemeSimulator.api.bus.in.NoFloatingCorrectedInBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
-import pko.KiCadLogicalSchemeSimulator.net.Net;
-import pko.KiCadLogicalSchemeSimulator.tools.Log;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 import java.io.BufferedInputStream;
@@ -109,30 +106,15 @@ public class Rom extends SchemaPart {
         } catch (IOException e) {
             throw new RuntimeException("Can't load file " + file, e);
         }
-        addInBus(new InBus("A", this, aSize) {
-            @Override
-            public void setHiImpedance() {
-                hiImpedance = true;
-                if (csActive) {
-                    if (Net.stabilizing) {
-                        Net.forResend.add(this);
-                        assert Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
-                    } else {
-                        throw new FloatingInException(this);
-                    }
-                }
-            }
-
+        addInBus(new NoFloatingCorrectedInBus("A", this, aSize) {
             @Override
             public void setState(long newState) {
                 addr = (int) newState;
                 state = newState;
-                if (csActive) {
-                    if (outPin.state != words[addr]) {
-                        outPin.state = words[addr];
-                        outPin.setState(outPin.state);
-                        outPin.hiImpedance = false;
-                    }
+                if (csActive && outPin.state != words[addr]) {
+                    outPin.state = words[addr];
+                    outPin.setState(outPin.state);
+                    outPin.hiImpedance = false;
                 }
                 hiImpedance = false;
             }
@@ -142,6 +124,7 @@ public class Rom extends SchemaPart {
             addInPin(new NoFloatingInPin("~{CS}", this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     if (state) {
                         csActive = false;
@@ -163,6 +146,7 @@ public class Rom extends SchemaPart {
             addInPin(new NoFloatingInPin("CS", this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     csActive = state;
                     if (state) {

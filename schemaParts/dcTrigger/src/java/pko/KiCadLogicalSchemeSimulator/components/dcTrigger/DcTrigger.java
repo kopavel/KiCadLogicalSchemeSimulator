@@ -50,6 +50,7 @@ public class DcTrigger extends SchemaPart {
             rPin = addInPin(new NoFloatingInPin("R", this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     clockEnabled = newState && sPin.state;
                     if (newState) {
@@ -78,6 +79,7 @@ public class DcTrigger extends SchemaPart {
             sPin = addInPin(new NoFloatingInPin("S", this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     clockEnabled = newState && rPin.state;
                     if (newState) {
@@ -107,6 +109,7 @@ public class DcTrigger extends SchemaPart {
             rPin = addInPin(new NoFloatingInPin("R", this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     clockEnabled = !newState && !sPin.state;
                     if (newState) {
@@ -133,6 +136,7 @@ public class DcTrigger extends SchemaPart {
             sPin = addInPin(new NoFloatingInPin("S", this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     clockEnabled = !newState && !rPin.state;
                     if (newState) {
@@ -161,6 +165,7 @@ public class DcTrigger extends SchemaPart {
             addInPin(new NoFloatingInPin("C", this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     if (!newState && clockEnabled) {
                         if (dPin.state) {
@@ -189,6 +194,7 @@ public class DcTrigger extends SchemaPart {
             addInPin(new NoFloatingInPin("C", this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     if (newState && clockEnabled) {
                         if (dPin.state) {

@@ -64,6 +64,7 @@ public class JnCounter extends SchemaPart {
             @Override
             public void setState(boolean newState) {
                 state = newState;
+                hiImpedance = false;
                 clockEnabled = !state;
             }
         });
@@ -71,6 +72,7 @@ public class JnCounter extends SchemaPart {
             addInPin(new NoFloatingInPin("C", this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     if (!state && clockEnabled) {
                         if (outBus.state >= countMax) {
@@ -93,6 +95,7 @@ public class JnCounter extends SchemaPart {
             addInPin(new NoFloatingInPin("R", this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     clockEnabled = state;
                     if (!state) {
@@ -107,6 +110,7 @@ public class JnCounter extends SchemaPart {
             addInPin(new NoFloatingInPin("C", this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     if (state && clockEnabled) {
                         if (outBus.state >= countMax) {
@@ -129,6 +133,7 @@ public class JnCounter extends SchemaPart {
             addInPin(new NoFloatingInPin("R", this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     if (state) {
                         clockEnabled = false;

@@ -52,6 +52,7 @@ public class OrGate extends SchemaPart {
                 addInPin(new NoFloatingInPin("IN" + i, this) {
                     @Override
                     public void setState(boolean newState) {
+                        hiImpedance = false;
                         state = newState;
                         if (newState) {
                             if (inState == 0) {
@@ -80,6 +81,7 @@ public class OrGate extends SchemaPart {
                 addInPin(new NoFloatingInPin("IN" + i, this) {
                     @Override
                     public void setState(boolean newState) {
+                        hiImpedance = false;
                         state = newState;
                         if (newState) {
                             if (inState == 0) {

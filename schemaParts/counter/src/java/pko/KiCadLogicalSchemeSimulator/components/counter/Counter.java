@@ -60,6 +60,7 @@ public class Counter extends SchemaPart {
                 @Override
                 public void setState(boolean newState) {
                     state = newState;
+                    hiImpedance = false;
                     if (!state) {
                         outBus.state = (outBus.state + 1) & countMask;
                         outBus.setState(outBus.state);
@@ -71,6 +72,7 @@ public class Counter extends SchemaPart {
                 @Override
                 public void setState(boolean newState) {
                     state = newState;
+                    hiImpedance = false;
                     if (state) {
                         outBus.state = (outBus.state + 1) & countMask;
                         outBus.setState(outBus.state);
@@ -82,6 +84,7 @@ public class Counter extends SchemaPart {
             @Override
             public void setState(boolean newState) {
                 state = newState;
+                hiImpedance = false;
                 if (state) {
                     outBus.state = 0;
                     outBus.setState(outBus.state);

@@ -85,6 +85,7 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
             addInPin(new NoFloatingInPin("Clock", this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     if (!state) {
                         if (!vSync.state && !lastVSync) {
@@ -133,6 +134,7 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
             addInPin(new NoFloatingInPin("Clock", this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     if (!state) {
                         if (vSync.state && !lastVSync) {

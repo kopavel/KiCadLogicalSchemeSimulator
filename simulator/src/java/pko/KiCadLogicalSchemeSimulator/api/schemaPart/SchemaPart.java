@@ -129,6 +129,7 @@ public abstract class SchemaPart {
         return addInBus(new NoFloatingInBus(pinId, this, size, names) {
             @Override
             public void setState(long newState) {
+                hiImpedance = false;
                 state = newState;
             }
         });

@@ -32,10 +32,12 @@
 package pko.KiCadLogicalSchemeSimulator.components.BUF.test;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import pko.KiCadLogicalSchemeSimulator.api.FloatingInException;
 import pko.KiCadLogicalSchemeSimulator.test.schemaPartTester.NetTester;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BuffTest extends NetTester {
     @Override
@@ -80,8 +82,6 @@ public class BuffTest extends NetTester {
     void floatD() {
         setPin("BufCs", true);
         assertDoesNotThrow(() -> outBus("BufOut").setHiImpedance(), "Floating input must not throw exception with Hi CS");
-        setPin("BufCs", false);
-        assertThrows(FloatingInException.class, () -> outBus("BufOut").setHiImpedance(), "Floating input must throw exception with Lo CS");
     }
 
     @Test

@@ -30,13 +30,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.decoder;
-import pko.KiCadLogicalSchemeSimulator.api.FloatingInException;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.in.CorrectedInBus;
+import pko.KiCadLogicalSchemeSimulator.api.bus.in.NoFloatingCorrectedInBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
-import pko.KiCadLogicalSchemeSimulator.net.Net;
-import pko.KiCadLogicalSchemeSimulator.tools.Log;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 public class MultiOutDecoder extends SchemaPart {
@@ -69,7 +67,7 @@ public class MultiOutDecoder extends SchemaPart {
         long outMask = Utils.getMaskForSize(outSize);
         CorrectedInBus aBus;
         if (reverse) {
-            aBus = addInBus(new CorrectedInBus("A", this, inSize) {
+            aBus = addInBus(new NoFloatingCorrectedInBus("A", this, inSize) {
                 @Override
                 public void setState(long newState) {
                     state = newState;
@@ -83,25 +81,9 @@ public class MultiOutDecoder extends SchemaPart {
                     }
                     hiImpedance = false;
                 }
-
-                @Override
-                public void setHiImpedance() {
-                    assert !hiImpedance : "Already in hiImpedance:" + this;
-                    hiImpedance = true;
-                    for (long csState : csStates) {
-                        if (csState == 0) {
-                            if (Net.stabilizing) {
-                                Net.forResend.add(this);
-                                assert Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
-                            } else {
-                                throw new FloatingInException(this);
-                            }
-                        }
-                    }
-                }
             });
         } else {
-            aBus = addInBus(new CorrectedInBus("A", this, inSize) {
+            aBus = addInBus(new NoFloatingCorrectedInBus("A", this, inSize) {
                 @Override
                 public void setState(long newState) {
                     state = newState;
@@ -114,22 +96,6 @@ public class MultiOutDecoder extends SchemaPart {
                         }
                     }
                     hiImpedance = false;
-                }
-
-                @Override
-                public void setHiImpedance() {
-                    assert !hiImpedance : "Already in hiImpedance:" + this;
-                    hiImpedance = true;
-                    for (long csState : csStates) {
-                        if (csState == 0) {
-                            if (Net.stabilizing) {
-                                Net.forResend.add(this);
-                                assert Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
-                            } else {
-                                throw new FloatingInException(this);
-                            }
-                        }
-                    }
                 }
             });
         }
@@ -145,6 +111,7 @@ public class MultiOutDecoder extends SchemaPart {
                     addInPin(new NoFloatingInPin("CS" + (char) ('a' + finalI) + j, this) {
                         @Override
                         public void setState(boolean newState) {
+                            hiImpedance = false;
                             state = newState;
                             if (newState) {
                                 csStates[finalI] |= mask;
@@ -152,19 +119,10 @@ public class MultiOutDecoder extends SchemaPart {
                                 csStates[finalI] &= nMask;
                             }
                             if (csStates[finalI] == 0) {
-                                if (aBus.hiImpedance) {
-                                    if (Net.stabilizing) {
-                                        Net.forResend.add(this);
-                                        assert Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
-                                    } else {
-                                        throw new FloatingInException(aBus);
-                                    }
-                                } else {
-                                    if (outBuses[finalI].state != outState || outBuses[finalI].hiImpedance) {
-                                        outBuses[finalI].state = outState;
-                                        outBuses[finalI].setState(outState);
-                                        outBuses[finalI].hiImpedance = false;
-                                    }
+                                if (!aBus.hiImpedance && (outBuses[finalI].state != outState || outBuses[finalI].hiImpedance)) {
+                                    outBuses[finalI].state = outState;
+                                    outBuses[finalI].setState(outState);
+                                    outBuses[finalI].hiImpedance = false;
                                 }
                             } else {
                                 if (!outBuses[finalI].hiImpedance) {
@@ -179,6 +137,7 @@ public class MultiOutDecoder extends SchemaPart {
                     addInPin(new NoFloatingInPin("CS" + (char) ('a' + finalI) + j, this) {
                         @Override
                         public void setState(boolean newState) {
+                            hiImpedance = false;
                             state = newState;
                             if (newState) {
                                 csStates[finalI] &= nMask;
@@ -186,19 +145,10 @@ public class MultiOutDecoder extends SchemaPart {
                                 csStates[finalI] |= mask;
                             }
                             if (csStates[finalI] == 0) {
-                                if (aBus.hiImpedance) {
-                                    if (Net.stabilizing) {
-                                        Net.forResend.add(this);
-                                        assert Log.debug(this.getClass(), "Floating pin {}, try resend later", this);
-                                    } else {
-                                        throw new FloatingInException(aBus);
-                                    }
-                                } else {
-                                    if (outBuses[finalI].state != outState || outBuses[finalI].hiImpedance) {
-                                        outBuses[finalI].state = outState;
-                                        outBuses[finalI].setState(outState);
-                                        outBuses[finalI].hiImpedance = false;
-                                    }
+                                if (!aBus.hiImpedance && (outBuses[finalI].state != outState || outBuses[finalI].hiImpedance)) {
+                                    outBuses[finalI].state = outState;
+                                    outBuses[finalI].setState(outState);
+                                    outBuses[finalI].hiImpedance = false;
                                 }
                             } else {
                                 if (!outBuses[finalI].hiImpedance) {

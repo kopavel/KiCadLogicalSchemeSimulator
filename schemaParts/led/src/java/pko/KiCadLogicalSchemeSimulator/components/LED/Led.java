@@ -46,6 +46,7 @@ public class Led extends SchemaPart implements InteractiveSchemaPart {
         addInPin(new NoFloatingInPin("IN", this) {
             @Override
             public void setState(boolean newState) {
+                hiImpedance = false;
                 state = newState;
                 ledUiComponent.setState(state);
             }

@@ -43,6 +43,7 @@ public class Repeater extends SchemaPart {
             addInPin(new NoFloatingInPin("IN", this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     if (out.state == newState) {
                         out.state = !newState;
@@ -54,6 +55,7 @@ public class Repeater extends SchemaPart {
             addInPin(new NoFloatingInPin("IN", this) {
                 @Override
                 public void setState(boolean newState) {
+                    hiImpedance = false;
                     state = newState;
                     if (out.state != newState) {
                         out.state = newState;
