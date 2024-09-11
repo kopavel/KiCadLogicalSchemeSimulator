@@ -30,6 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.net.merger.bus;
+import lombok.Getter;
 import pko.KiCadLogicalSchemeSimulator.api.ShortcutException;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.in.CorrectedInBus;
@@ -39,6 +40,7 @@ import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
+    @Getter
     public long mask;
     public long nMask;
     public Bus[] destinations;
@@ -279,10 +281,5 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
         BusMergerBusIn optimised = optimiser.build();
         merger.sources.add(optimised);
         return optimised;
-    }
-
-    @SuppressWarnings({"LombokGetterMayBeUsed", "RedundantSuppression"})
-    public long getMask() {
-        return this.mask;
     }
 }

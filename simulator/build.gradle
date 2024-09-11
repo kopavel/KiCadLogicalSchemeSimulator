@@ -67,6 +67,8 @@ dependencies {
     testImplementation libs.jmh
     testAnnotationProcessor libs.jmh.annotations
     optimisedCompileOnly(project(":simulator"))
+    implementation libs.lombok
+    optimisedCompileOnly(libs.lombok)
 }
 
 jar {

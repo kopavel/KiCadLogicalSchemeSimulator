@@ -29,7 +29,6 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
 
 module KiCadLogicalSchemeSimulator.simulator {
     exports pko.KiCadLogicalSchemeSimulator.api.bus.in;
@@ -62,6 +61,7 @@ module KiCadLogicalSchemeSimulator.simulator {
     requires java.desktop;
     requires java.gui.forms.rt;
     requires java.xml.bind;
+    requires lombok;
     requires org.apache.commons.compress;
     requires org.apache.commons.lang3;
     requires org.apache.log4j;
@@ -72,6 +72,5 @@ module KiCadLogicalSchemeSimulator.simulator {
     requires org.apache.logging.log4j.slf4j.impl;
     requires org.apache.logging.log4j;
     requires org.tukaani.xz;
-    requires static lombok;
-    uses SchemaPartSpi;
+    uses pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
 }

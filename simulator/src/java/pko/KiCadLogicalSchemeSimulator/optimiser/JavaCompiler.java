@@ -31,6 +31,7 @@
  */
 package pko.KiCadLogicalSchemeSimulator.optimiser;
 import lombok.Getter;
+import lombok.Lombok;
 import pko.KiCadLogicalSchemeSimulator.Simulator;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
@@ -68,6 +69,11 @@ public class JavaCompiler {
                 path = path.substring(1);
             }
             StringBuilder paths = new StringBuilder(path);
+            if (System.getProperty("os.name").toLowerCase().contains("win")) {
+                paths.append(";").append(Lombok.class.getProtectionDomain().getCodeSource().getLocation().getFile().substring(1));
+            } else {
+                paths.append(":").append(Lombok.class.getProtectionDomain().getCodeSource().getLocation().getFile());
+            }
 /* don't need for now
             Simulator.schemaPartSpiMap.values().forEach(spi -> {
                 String spiPath = spi.getClass().getProtectionDomain().getCodeSource().getLocation().getFile();
