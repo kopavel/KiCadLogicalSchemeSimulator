@@ -30,7 +30,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.OR.test;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import pko.KiCadLogicalSchemeSimulator.test.schemaPartTester.NetTester;
@@ -41,7 +40,7 @@ public class OrTest extends NetTester {
     public void bothLo() {
         setPin(1, false);
         setPin(2, false);
-        Assertions.assertFalse(inPin(1).state, "With no input output needs to be Lo");
+        checkPin(1, false, "With no input output needs to be Lo");
     }
 
     @Test
@@ -49,7 +48,7 @@ public class OrTest extends NetTester {
     public void oneHi() {
         setPin(1, false);
         setPin(2, true);
-        Assertions.assertTrue(inPin(1).state, "With Hi on only one input output needs to be Hi");
+        checkPin(1, true, "With Hi on only one input output needs to be Hi");
     }
 
     @Test
@@ -57,7 +56,7 @@ public class OrTest extends NetTester {
     public void bothHi() {
         setPin(1, true);
         setPin(2, true);
-        Assertions.assertTrue(inPin(1).state, "With Hi on both inputs output needs to be Hi");
+        checkPin(1, true, "With Hi on both inputs output needs to be Hi");
     }
 
     @Override

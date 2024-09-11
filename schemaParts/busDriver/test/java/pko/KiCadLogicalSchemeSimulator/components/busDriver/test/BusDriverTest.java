@@ -33,9 +33,7 @@ package pko.KiCadLogicalSchemeSimulator.components.busDriver.test;
 import org.junit.jupiter.api.Test;
 import pko.KiCadLogicalSchemeSimulator.test.schemaPartTester.NetTester;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BusDriverTest extends NetTester {
     @Override
@@ -51,18 +49,18 @@ public class BusDriverTest extends NetTester {
     @Test
     protected void testBusDriver() {
         setBus("oA", 0b1010);
-        assertTrue(inBus("iA").hiImpedance, "Initial state of out bus iA must be hiImpedance");
-        assertTrue(inPin("iB0").hiImpedance, "Initial state of out pin iB0 must be hiImpedance");
-        assertTrue(inPin("iB1").hiImpedance, "Initial state of out pin iB1 must be hiImpedance");
+        checkBusImpedance("iA", "Initial state of out bus iA must be hiImpedance");
+        checkPinImpedance("iB0", "Initial state of out pin iB0 must be hiImpedance");
+        checkPinImpedance("iB1", "Initial state of out pin iB1 must be hiImpedance");
         setPin("OEa", false);
         assertFalse(inBus("iA").hiImpedance, "with OEa in Hi state of out bus iA must not be hiImpedance");
-        assertEquals(0b1010, inBus("iA").state, "with OEa in Lo state of out bus iA must 10");
+        checkBus("iA", 0b1010, "with OEa in Lo state of out bus iA must 10");
         setPin("oB0", true);
         setPin("oB1", false);
         setPin("OEb", false);
         assertFalse(inPin("iB0").hiImpedance, "with OEb in Hi state of out pin iB0 must not be hiImpedance");
         assertFalse(inPin("iB1").hiImpedance, "with OEb in Hi state of out pin iB1 must not be hiImpedance");
-        assertTrue(inPin("iB0").state, "with OEb in Lo state of out bus iB0 must true");
-        assertFalse(inPin("iB1").state, "with OEb in Lo state of out bus iB1 must false");
+        checkPin("iB0", true, "with OEb in Lo state of out bus iB0 must true");
+        checkPin("iB1", false, "with OEb in Lo state of out bus iB1 must false");
     }
 }

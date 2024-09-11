@@ -33,9 +33,6 @@ package pko.KiCadLogicalSchemeSimulator.components.shifter.test;
 import org.junit.jupiter.api.Test;
 import pko.KiCadLogicalSchemeSimulator.test.schemaPartTester.NetTester;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 public class ShifterTest extends NetTester {
     @Override
     protected String getNetFilePath() {
@@ -53,49 +50,47 @@ public class ShifterTest extends NetTester {
         setPin("PL", true);
         setPin("CP", true);
         setPin("PL", false);
-        System.out.println(Long.toBinaryString(net.schemaParts.get("U1").outPins.get("Q").getState()));
-        assertFalse(inPin(5).state, "after parallel load 5 pin must be Lo");
-        assertFalse(inPin(6).state, "after parallel load 6 pin must be Lo");
-        assertTrue(inPin(7).state, "after parallel load 7 pin must be Hi");
+        checkPin(5, false, "after parallel load 5 pin must be Lo");
+        checkPin(6, false, "after parallel load 6 pin must be Lo");
+        checkPin(7, true, "after parallel load 7 pin must be Hi");
         setPin("CP", true);
-        assertTrue(inPin(5).state, "after 1 shift 5 pin must be Hi");
-        assertFalse(inPin(6).state, "after 1 shift 6 pin must be Lo");
-        assertFalse(inPin(7).state, "after 1 shift 7 pin must be Lo");
+        checkPin(5, true, "after 1 shift 5 pin must be Hi");
+        checkPin(6, false, "after 1 shift 6 pin must be Lo");
+        checkPin(7, false, "after 1 shift 7 pin must be Lo");
         setPin("CP", true);
-        assertTrue(inPin(5).state, "after 2 shift 5 pin must be Lo");
-        assertTrue(inPin(6).state, "after 2 shift 6 pin must be Hi");
-        assertFalse(inPin(7).state, "after 2 shift 7 pin must be Lo");
+        checkPin(5, true, "after 2 shift 5 pin must be Lo");
+        checkPin(6, true, "after 2 shift 6 pin must be Hi");
+        checkPin(7, false, "after 2 shift 7 pin must be Lo");
         setPin("CP", true);
-        assertFalse(inPin(5).state, "after 3 shift 5 pin must be Lo");
-        assertTrue(inPin(6).state, "after 3 shift 6 pin must be Hi");
-        assertTrue(inPin(7).state, "after 3 shift 7 pin must be Hi");
+        checkPin(5, false, "after 3 shift 5 pin must be Lo");
+        checkPin(6, true, "after 3 shift 6 pin must be Hi");
+        checkPin(7, true, "after 3 shift 7 pin must be Hi");
         setPin("CP", true);
-        assertFalse(inPin(5).state, "after 4 shift 5 pin must be Lo");
-        assertFalse(inPin(6).state, "after 4 shift 6 pin must be Lo");
-        assertTrue(inPin(7).state, "after 4 shift 7 pin must be Hi");
+        checkPin(5, false, "after 4 shift 5 pin must be Lo");
+        checkPin(6, false, "after 4 shift 6 pin must be Lo");
+        checkPin(7, true, "after 4 shift 7 pin must be Hi");
         setPin("CP", true);
-        assertTrue(inPin(5).state, "after 5 shift 5 pin must be Hi");
-        assertFalse(inPin(6).state, "after 5 shift 6 pin must be Lo");
-        assertFalse(inPin(7).state, "after 5 shift 7 pin must be Lo");
+        checkPin(5, true, "after 5 shift 5 pin must be Hi");
+        checkPin(6, false, "after 5 shift 6 pin must be Lo");
+        checkPin(7, false, "after 5 shift 7 pin must be Lo");
         setPin("DS", true);
         for (int i = 0; i < 5; i++) {
             setPin("CP", true);
-            System.out.println(Long.toBinaryString(net.schemaParts.get("U1").outPins.get("Q").getState()));
         }
-        assertFalse(inPin(5).state, "after 10 shift with DS hi 5 pin must be Lo");
-        assertFalse(inPin(6).state, "after 10 shift with DS hi 6 pin must be Lo");
-        assertFalse(inPin(7).state, "after 10 shift with DS hi 7 pin must be Lo");
+        checkPin(5, false, "after 10 shift with DS hi 5 pin must be Lo");
+        checkPin(6, false, "after 10 shift with DS hi 6 pin must be Lo");
+        checkPin(7, false, "after 10 shift with DS hi 7 pin must be Lo");
         setPin("CP", true);
-        assertTrue(inPin(5).state, "after 11 shift 5 pin must be Hi");
-        assertFalse(inPin(6).state, "after 11 shift 6 pin must be Lo");
-        assertFalse(inPin(7).state, "after 11 shift 7 pin must be Lo");
+        checkPin(5, true, "after 11 shift 5 pin must be Hi");
+        checkPin(6, false, "after 11 shift 6 pin must be Lo");
+        checkPin(7, false, "after 11 shift 7 pin must be Lo");
         setPin("CP", true);
-        assertTrue(inPin(5).state, "after 12 shift 5 pin must be Hi");
-        assertTrue(inPin(6).state, "after 12 shift 6 pin must be Hi");
-        assertFalse(inPin(7).state, "after 12 shift 7 pin must be Lo");
+        checkPin(5, true, "after 12 shift 5 pin must be Hi");
+        checkPin(6, true, "after 12 shift 6 pin must be Hi");
+        checkPin(7, false, "after 12 shift 7 pin must be Lo");
         setPin("CP", true);
-        assertTrue(inPin(5).state, "after 13 shift 5 pin must be Hi");
-        assertTrue(inPin(6).state, "after 13 shift 6 pin must be Hi");
-        assertTrue(inPin(7).state, "after 13 shift 7 pin must be Hi");
+        checkPin(5, true, "after 13 shift 5 pin must be Hi");
+        checkPin(6, true, "after 13 shift 6 pin must be Hi");
+        checkPin(7, true, "after 13 shift 7 pin must be Hi");
     }
 }

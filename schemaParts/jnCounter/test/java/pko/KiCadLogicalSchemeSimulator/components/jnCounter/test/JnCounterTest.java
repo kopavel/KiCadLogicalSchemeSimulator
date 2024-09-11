@@ -35,10 +35,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import pko.KiCadLogicalSchemeSimulator.test.schemaPartTester.NetTester;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 public class JnCounterTest extends NetTester {
     @Override
     protected String getNetFilePath() {
@@ -59,24 +55,24 @@ public class JnCounterTest extends NetTester {
     @Test
     @DisplayName("Initial count is zero")
     void initialCountIsZero() {
-        assertEquals(1, inBus("qBus").state, "Initial count must be 1");
+        checkBus("qBus", 1, "Initial count must be 1");
     }
 
     @Test
     @DisplayName("Count increments on clock signal")
     void countIncrementsOnClock() {
-        assertTrue(inPin("Cout").state, "Carry out initial state must be 1");
+        checkPin("Cout", true, "Carry out initial state must be 1");
         for (int i = 0; i < 8; i++) {
-            assertEquals(Math.pow(2, i), inBus("qBus").state, "Count should increment on clock signal");
+            checkBus("qBus", (long) Math.pow(2, i), "Count should increment on clock signal");
             if (i < 4) {
-                assertTrue(inPin("Cout").state, "Carry out must be 1 when count are " + Math.pow(2, i) + "; i = " + i);
+                checkPin("Cout", true, "Carry out must be 1 when count are " + Math.pow(2, i) + "; i = " + i);
             } else {
-                assertFalse(inPin("Cout").state, "Carry out must be 0 when count are " + Math.pow(2, i) + "; i = " + i);
+                checkPin("Cout", false, "Carry out must be 0 when count are " + Math.pow(2, i) + "; i = " + i);
             }
             setPin("C", true);
         }
         setPin("C", true);
-        assertEquals(1, inBus("qBus").state, "Count should reset after reaching maximum");
+        checkBus("qBus", 1, "Count should reset after reaching maximum");
     }
 
     @Test
@@ -85,36 +81,36 @@ public class JnCounterTest extends NetTester {
         for (int i = 1; i <= 3; i++) {
             setPin("C", true);
         }
-        assertEquals(8, inBus("qBus").state, "Count should be 8 before reset");
+        checkBus("qBus", 8, "Count should be 8 before reset");
         setPin("R", true);
-        assertEquals(1, inBus("qBus").state, "Count should reset on rising edge of reset pin");
+        checkBus("qBus", 1, "Count should reset on rising edge of reset pin");
     }
 
     @Test
     @DisplayName("Count does not change on reset pin falling edge")
     void countDoesNotChangeOnResetFallingEdge() {
         setPin("C", true);
-        assertEquals(2, inBus("qBus").state, "Count should be 2 before reset");
+        checkBus("qBus", 2, "Count should be 2 before reset");
         setPin("R", false);
-        assertEquals(2, inBus("qBus").state, "Count should not change on falling edge of reset pin");
+        checkBus("qBus", 2, "Count should not change on falling edge of reset pin");
     }
 
     @Test
     @DisplayName("Count does not increment on clock falling edge")
     void countDoesNotIncrementOnClockFallingEdge() {
         setPin("C", true);
-        assertEquals(2, inBus("qBus").state, "Count should be 2 before test");
+        checkBus("qBus", 2, "Count should be 2 before test");
         setPin("C", false);
-        assertEquals(2, inBus("qBus").state, "Count should not increment on falling edge of clock signal");
+        checkBus("qBus", 2, "Count should not increment on falling edge of clock signal");
     }
 
     @Test
     @DisplayName("Count does not increment on Hi CarryIn")
     void countDoesNotIncrementOnHiCi() {
         setPin("C", true);
-        assertEquals(2, inBus("qBus").state, "Count should be 2 before test");
+        checkBus("qBus", 2, "Count should be 2 before test");
         setPin("Cin", true);
         setPin("C", true);
-        assertEquals(2, inBus("qBus").state, "Count should not increment on falling edge of clock signal");
+        checkBus("qBus", 2, "Count should not increment on falling edge of clock signal");
     }
 }

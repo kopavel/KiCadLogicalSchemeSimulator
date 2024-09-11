@@ -38,8 +38,6 @@ import pko.KiCadLogicalSchemeSimulator.components.dCounter.DCounter;
 import pko.KiCadLogicalSchemeSimulator.test.schemaPartTester.NetTester;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DCounterTest extends NetTester {
     @Override
@@ -67,13 +65,13 @@ public class DCounterTest extends NetTester {
     @DisplayName("Default counter behavior - count up, binary mode")
     void defaultCounterBehavior() {
         setPin("Cin", false);
-        assertEquals(0, inBus("qBus").state, "Initial state should be 0");
-        assertTrue(inPin("Cout").state, "Initial carry-out state should be 1");
+        checkBus("qBus", 0, "Initial state should be 0");
+        checkPin("Cout", true, "Initial carry-out state should be 1");
         for (int i = 0; i < 15; i++) {
-            assertEquals(i, inBus("qBus").state, "Output state should be equal to the count");
+            checkBus("qBus", i, "Output state should be equal to the count");
             setPin("CK", false);
         }
-        assertFalse(inPin("Cout").state, "Carry-out should be 0 after overflow");
+        checkPin("Cout", false, "Carry-out should be 0 after overflow");
     }
 
     @Test
@@ -87,12 +85,12 @@ public class DCounterTest extends NetTester {
         }
         rPin.state = false;
         rPin.setState(false);
-        assertEquals(15, inBus("qBus").state, "State should be preserved after reset pin set to 0");
-        assertFalse(inPin("Cout").state, "Carry-out should remain lo after reset pin set to 0");
+        checkBus("qBus", 15, "State should be preserved after reset pin set to 0");
+        checkPin("Cout", false, "Carry-out should remain lo after reset pin set to 0");
         rPin.state = true;
         rPin.setState(true);
-        assertEquals(0, inBus("qBus").state, "State should be reset to 0 after reset pin set to 1");
-        assertTrue(inPin("Cout").state, "Carry-out should reset to hi after reset pin set to 1");
+        checkBus("qBus", 0, "State should be reset to 0 after reset pin set to 1");
+        checkPin("Cout", true, "Carry-out should reset to hi after reset pin set to 1");
         rPin.state = false;
         rPin.setState(false);
     }
@@ -102,10 +100,10 @@ public class DCounterTest extends NetTester {
     void presetCounter() {
         setBus("jBus", 5);
         setPin("PE", true);
-        assertEquals(5, inBus("qBus").state, "State should be set to preset value when preset is enabled");
+        checkBus("qBus", 5, "State should be set to preset value when preset is enabled");
         setPin("PE", false);
         setBus("jBus", 0);
-        assertEquals(5, inBus("qBus").state, "State should be preserved when preset is disabled");
+        checkBus("qBus", 5, "State should be preserved when preset is disabled");
     }
 
     @Test
@@ -113,14 +111,14 @@ public class DCounterTest extends NetTester {
     void countDownBehavior() {
         setPin("Cin", false);
         setPin("UD", false);
-        assertEquals(0, inBus("qBus").state, "Initial state should be 0");
+        checkBus("qBus", 0, "Initial state should be 0");
         setPin("CK", false);
-        assertTrue(inPin("Cout").state, "Initial carry-out state should be 1");
+        checkPin("Cout", true, "Initial carry-out state should be 1");
         for (int i = 15; i > 0; i--) {
-            assertEquals(inBus("qBus").state, i, "Output state should be equal to the count");
+            checkBus("qBus", i, "Output state should be equal to the count");
             setPin("CK", false);
         }
-        assertFalse(inPin("Cout").state, "Carry-out should be 0 after underflow");
+        checkPin("Cout", false, "Carry-out should be 0 after underflow");
     }
 
     @Test
@@ -129,8 +127,8 @@ public class DCounterTest extends NetTester {
         DCounter counter = (DCounter) net.schemaParts.get("U1");
         setPin("Cin", true);
         // Initial state assertions
-        assertEquals(0, inBus("qBus").state, "Initial state should be 0");
-        assertTrue(inPin("Cout").state, "Initial carry-out state should be 1");
+        checkBus("qBus", 0, "Initial state should be 0");
+        checkPin("Cout", true, "Initial carry-out state should be 1");
         // Binary mode (default)
         assertEquals(15, counter.maxCount, "Maximum count should be 15 in binary mode");
         // Toggle to decimal mode
@@ -147,28 +145,28 @@ public class DCounterTest extends NetTester {
         setPin("Cin", false);
         setPin("UD", true);
         // Initial state assertions
-        assertEquals(0, inBus("qBus").state, "Initial state should be 0");
-        assertTrue(inPin("Cout").state, "Initial carry-out state should be 1");
+        checkBus("qBus", 0, "Initial state should be 0");
+        checkPin("Cout", true, "Initial carry-out state should be 1");
         // Counting up (default)
         for (int i = 0; i < 4; i++) {
             setPin("CK", false);
         }
-        assertEquals(inBus("qBus").state, 4, "Count should be equal 4");
+        checkBus("qBus", 4, "Count should be equal 4");
         // Toggle to count down mode
         setPin("UD", false);
         for (int i = 0; i < 2; i++) {
             setPin("CK", false);
         }
-        assertEquals(inBus("qBus").state, 2, "Count should be equal 2");
+        checkBus("qBus", 2, "Count should be equal 2");
         for (int i = 0; i < 3; i++) {
             setPin("CK", false);
         }
-        assertEquals(inBus("qBus").state, 15, "Count should be equal after underflow 15");
+        checkBus("qBus", 15, "Count should be equal after underflow 15");
         setPin("UD", true);
         setPin("CK", false);
-        assertEquals(inBus("qBus").state, 0, "Count should be equal 0 after overflow");
+        checkBus("qBus", 0, "Count should be equal 0 after overflow");
         setPin("Cin", true);
         setPin("CK", false);
-        assertEquals(inBus("qBus").state, 0, "Clock must be ignored with carry in set to Lo");
+        checkBus("qBus", 0, "Clock must be ignored with carry in set to Lo");
     }
 }

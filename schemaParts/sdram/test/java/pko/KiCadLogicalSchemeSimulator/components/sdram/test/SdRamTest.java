@@ -34,9 +34,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pko.KiCadLogicalSchemeSimulator.test.schemaPartTester.NetTester;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 public class SdRamTest extends NetTester {
     @BeforeEach
     public void reset() {
@@ -66,7 +63,7 @@ public class SdRamTest extends NetTester {
         long[] testValues = {0x00, 0xFF, 0xA5, 0x5A};
         long[] testAddresses = {0x00, 0x01, 0xee, 0x88};
         setPin("~{WE}", false);
-        assertTrue(inBus("dIn").hiImpedance, "with hi ~{CAS} or lo ~{WR} D bus must be in hiImpedance");
+        checkBusImpedance("dIn", "with hi ~{CAS} or lo ~{WR} D bus must be in hiImpedance");
         for (int i = 0; i < testValues.length; i++) {
             setBus("dOut", testValues[i]);
             setBus("aBus", testAddresses[i]);
@@ -76,13 +73,13 @@ public class SdRamTest extends NetTester {
         }
         outBus("dOut").setHiImpedance();
         setPin("~{WE}", true);
-        assertTrue(inBus("dIn").hiImpedance, "with hi ~{CAS} or lo ~{WR} D bus must be in hiImpedance");
+        checkBusImpedance("dIn", "with hi ~{CAS} or lo ~{WR} D bus must be in hiImpedance");
         for (int i = 0; i < testValues.length; i++) {
             setBus("aBus", testAddresses[i]);
             setPin("~{RAS}", false);
             setBus("aBus", testAddresses[i] + 1);
             setPin("~{CAS}", false);
-            assertEquals(testValues[i], inBus("dIn").state, "The value read from RAM does not match the value written.");
+            checkBus("dIn", testValues[i], "The value read from RAM does not match the value written.");
         }
     }
 }

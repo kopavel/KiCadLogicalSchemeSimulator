@@ -33,9 +33,7 @@ package pko.KiCadLogicalSchemeSimulator.components.rom.test;
 import org.junit.jupiter.api.Test;
 import pko.KiCadLogicalSchemeSimulator.test.schemaPartTester.NetTester;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RomTest extends NetTester {
     @Override
@@ -51,12 +49,12 @@ public class RomTest extends NetTester {
     @Test
     void testMultipleWritesAndReads() {
         setPin("~{CS}", true);
-        assertTrue(inBus("dBus").hiImpedance, "with Hi ~{CS} D bus must be in hiImpedance");
+        checkBusImpedance("dBus", "with Hi ~{CS} D bus must be in hiImpedance");
         setPin("~{CS}", false);
         assertFalse(inBus("dBus").hiImpedance, "with lo ~{CS} D bus must nod be in hiImpedance");
         for (int i = 0; i < 5; i++) {
             setBus("aBus", i);
-            assertEquals(i + 1, inBus("dBus").state, "The value read from ROM does not match the value from data file.");
+            checkBus("dBus", i + 1, "The value read from ROM does not match the value from data file.");
         }
     }
 }

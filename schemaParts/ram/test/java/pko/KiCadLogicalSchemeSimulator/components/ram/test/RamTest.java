@@ -33,9 +33,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pko.KiCadLogicalSchemeSimulator.test.schemaPartTester.NetTester;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RamTest extends NetTester {
     @Override
@@ -59,9 +57,9 @@ public class RamTest extends NetTester {
     void testMultipleWritesAndReads() {
         long[] testValues = {0x00, 0xFF, 0xA5, 0x5A};
         long[] testAddresses = {0x00, 0x01, 0xFF, 0x88};
-        assertTrue(inBus("dIn").hiImpedance, "with hi ~{CS} D bus must be in hiImpedance");
+        checkBusImpedance("dIn", "with hi ~{CS} D bus must be in hiImpedance");
         setPin("~{CS}", false);
-        assertTrue(inBus("dIn").hiImpedance, "with lo ~{CS} and hi ~{OE} D bus must be in hiImpedance");
+        checkBusImpedance("dIn", "with lo ~{CS} and hi ~{OE} D bus must be in hiImpedance");
         for (int i = 0; i < testValues.length; i++) {
             setBus("aBus", testAddresses[i]);
             setBus("dOut", testValues[i]);
@@ -72,10 +70,10 @@ public class RamTest extends NetTester {
         assertFalse(inBus("dIn").hiImpedance, "with lo ~{OE} D bus must not be in hiImpedance");
         for (int i = 0; i < testValues.length; i++) {
             setBus("aBus", testAddresses[i]);
-            assertEquals(testValues[i], inBus("dIn").state, "The value read from RAM does not match the value written.");
+            checkBus("dIn", testValues[i], "The value read from RAM does not match the value written.");
         }
         setPin("~{CS}", true);
-        assertTrue(inBus("dIn").hiImpedance, "with hi ~{CS} D bus must be in hiImpedance even with lo ~{OE}");
+        checkBusImpedance("dIn", "with hi ~{CS} D bus must be in hiImpedance even with lo ~{OE}");
         setPin("~{OE}", true);
         setBus("dOut", 0);
         for (int i = 0; i < testValues.length; i++) {
@@ -88,7 +86,7 @@ public class RamTest extends NetTester {
         assertFalse(inBus("dIn").hiImpedance, "with lo ~{CS} D bus must not be in hiImpedance");
         for (int i = 0; i < testValues.length; i++) {
             setBus("aBus", testAddresses[i]);
-            assertEquals(testValues[i], inBus("dIn").state, "With hi ~{CS} RAM should ignore write operation");
+            checkBus("dIn", testValues[i], "With hi ~{CS} RAM should ignore write operation");
         }
     }
 }

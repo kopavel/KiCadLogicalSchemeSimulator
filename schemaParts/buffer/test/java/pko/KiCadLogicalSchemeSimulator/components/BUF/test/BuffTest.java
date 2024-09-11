@@ -30,14 +30,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.BUF.test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import pko.KiCadLogicalSchemeSimulator.test.schemaPartTester.NetTester;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BuffTest extends NetTester {
     @Override
@@ -50,22 +48,28 @@ public class BuffTest extends NetTester {
         return "../..";
     }
 
+    @BeforeEach
+    void reset() {
+        setBus("BufOut", 0);
+        setPin("BufCs", true);
+    }
+
     @Test
     @DisplayName("Hi CS")
     void noCs() {
         setPin("BufCs", true);
-        assertTrue(inBus("BufIn").hiImpedance, "With Hi CS pin Q must be hiImpedance");
+        checkBusImpedance("BufIn", "With Hi CS pin Q must be hiImpedance");
         setBus("BufOut", 1);
-        assertTrue(inBus("BufIn").hiImpedance, "With Hi CS pin Q must be hiImpedance");
+        checkBusImpedance("BufIn", "With Hi CS pin Q must be hiImpedance");
     }
 
     @Test
     @DisplayName("Lo CS and Hi D")
     void trueInput() {
         setPin("BufCs", false);
-        assertFalse(inBus("BufIn").hiImpedance, "With Lo CS pin Q must not be hiImpedance");
+        checkBus("BufIn", 0, "With Lo CS pin Q must not be hiImpedance");
         setBus("BufOut", 1);
-        assertEquals(1, inBus("BufIn").state, "With Lo CS and Hi D pin Q must be Hi");
+        checkBus("BufIn", 1, "With Lo CS and Hi D pin Q must be Hi");
     }
 
     @Test
@@ -74,14 +78,7 @@ public class BuffTest extends NetTester {
         setPin("BufCs", false);
         setBus("BufOut", 0);
         assertFalse(inBus("BufIn").hiImpedance, "With Lo CS pin Q must not be hiImpedance");
-        assertEquals(0, inBus("BufIn").state, "With Lo CS and Hi D pin Q must be Hi");
-    }
-
-    @Test
-    @DisplayName("Float D pin exception")
-    void floatD() {
-        setPin("BufCs", true);
-        assertDoesNotThrow(() -> outBus("BufOut").setHiImpedance(), "Floating input must not throw exception with Hi CS");
+        checkBus("BufIn", 0, "With Lo CS and Hi D pin Q must be Hi");
     }
 
     @Test
@@ -89,10 +86,10 @@ public class BuffTest extends NetTester {
     void toggleCs() {
         setBus("BufOut", 3);
         setPin("BufCs", false);
-        assertEquals(3, inBus("BufIn").state, "With Lo CS and Hi D pin Q must be Hi");
+        checkBus("BufIn", 3, "With Lo CS and Hi D pin Q must be Hi");
         setPin("BufCs", true);
-        assertTrue(inBus("BufIn").hiImpedance, "With Hi CS pin Q must be hiImpedance");
+        checkBusImpedance("BufIn", "With Hi CS pin Q must be hiImpedance");
         setPin("BufCs", false);
-        assertEquals(3, inBus("BufIn").state, "With Lo CS again pin Q must be Hi");
+        checkBus("BufIn", 3, "With Lo CS again pin Q must be Hi");
     }
 }

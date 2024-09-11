@@ -34,7 +34,6 @@ import org.junit.jupiter.api.Test;
 import pko.KiCadLogicalSchemeSimulator.test.schemaPartTester.NetTester;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DiodeTest extends NetTester {
     String[] anodeIn =
@@ -109,41 +108,41 @@ public class DiodeTest extends NetTester {
                 }
             }
             switch (anodeState[i]) {
-                case "h" -> assertTrue(inPin("inA").hiImpedance, "With A=" + anodeIn[i] + " and k=" + cathodeIn[i] + " Anode must be in hiImpedance");
+                case "h" -> checkPinImpedance("inA", "With A=" + anodeIn[i] + " and k=" + cathodeIn[i] + " Anode must be in hiImpedance");
                 case "w0" -> {
                     assertFalse(inPin("inA").hiImpedance, "With A=" + anodeIn[i] + " and k=" + cathodeIn[i] + " Anode not to be in hiImpedance");
-                    assertFalse(inPin("inA").state, "With A=" + anodeIn[i] + " and k=" + cathodeIn[i] + " Anode must be weak Lo");
+                    checkPin("inA", false, "With A=" + anodeIn[i] + " and k=" + cathodeIn[i] + " Anode must be weak Lo");
                 }
                 case "w1" -> {
                     assertFalse(inPin("inA").hiImpedance, "With A=" + anodeIn[i] + " and k=" + cathodeIn[i] + " Anode not to be in hiImpedance");
-                    assertTrue(inPin("inA").state, "With A=" + anodeIn[i] + " and k=" + cathodeIn[i] + " Anode must be weak Hi");
+                    checkPin("inA", true, "With A=" + anodeIn[i] + " and k=" + cathodeIn[i] + " Anode must be weak Hi");
                 }
                 case "s0" -> {
                     assertFalse(inPin("inA").hiImpedance, "With A=" + anodeIn[i] + " and k=" + cathodeIn[i] + " Anode not to be in hiImpedance");
-                    assertFalse(inPin("inA").state, "With A=" + anodeIn[i] + " and k=" + cathodeIn[i] + " Anode must be strong Lo");
+                    checkPin("inA", false, "With A=" + anodeIn[i] + " and k=" + cathodeIn[i] + " Anode must be strong Lo");
                 }
                 case "s1" -> {
                     assertFalse(inPin("inA").hiImpedance, "With A=" + anodeIn[i] + " and k=" + cathodeIn[i] + " Anode not to be in hiImpedance");
-                    assertTrue(inPin("inA").state, "With A=" + anodeIn[i] + " and k=" + cathodeIn[i] + " Anode must be Strong Hi");
+                    checkPin("inA", true, "With A=" + anodeIn[i] + " and k=" + cathodeIn[i] + " Anode must be Strong Hi");
                 }
             }
             switch (cathodeState[i]) {
-                case "h" -> assertTrue(inPin("inK").hiImpedance, "With A=" + anodeIn[i] + " and k=" + cathodeIn[i] + " Cathode must be in hiImpedance");
+                case "h" -> checkPinImpedance("inK", "With A=" + anodeIn[i] + " and k=" + cathodeIn[i] + " Cathode must be in hiImpedance");
                 case "w0" -> {
                     assertFalse(inPin("inK").hiImpedance, "With A=" + anodeIn[i] + " and k=" + cathodeIn[i] + " Cathode not to be in hiImpedance");
-                    assertFalse(inPin("inK").state, "With A=" + anodeIn[i] + " and k=" + cathodeIn[i] + " Cathode must be weak Lo");
+                    checkPin("inK", false, "With A=" + anodeIn[i] + " and k=" + cathodeIn[i] + " Cathode must be weak Lo");
                 }
                 case "w1" -> {
                     assertFalse(inPin("inK").hiImpedance, "With A=" + anodeIn[i] + " and k=" + cathodeIn[i] + " Cathode not to be in hiImpedance");
-                    assertTrue(inPin("inK").state, "With A=" + anodeIn[i] + " and k=" + cathodeIn[i] + " Cathode must be weak Hi");
+                    checkPin("inK", true, "With A=" + anodeIn[i] + " and k=" + cathodeIn[i] + " Cathode must be weak Hi");
                 }
                 case "s0" -> {
                     assertFalse(inPin("inK").hiImpedance, "With A=" + anodeIn[i] + " and k=" + cathodeIn[i] + " Cathode not to be in hiImpedance");
-                    assertFalse(inPin("inK").state, "With A=" + anodeIn[i] + " and k=" + cathodeIn[i] + " Cathode must be strong Lo");
+                    checkPin("inK", false, "With A=" + anodeIn[i] + " and k=" + cathodeIn[i] + " Cathode must be strong Lo");
                 }
                 case "s1" -> {
                     assertFalse(inPin("inK").hiImpedance, "With A=" + anodeIn[i] + " and k=" + cathodeIn[i] + " Cathode not to be in hiImpedance");
-                    assertTrue(inPin("inK").state, "With A=" + anodeIn[i] + " and k=" + cathodeIn[i] + " Cathode must be Strong Hi");
+                    checkPin("inK", true, "With A=" + anodeIn[i] + " and k=" + cathodeIn[i] + " Cathode must be Strong Hi");
                 }
             }
         }

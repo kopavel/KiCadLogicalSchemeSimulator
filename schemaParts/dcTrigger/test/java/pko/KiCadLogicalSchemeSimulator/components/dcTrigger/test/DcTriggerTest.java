@@ -35,9 +35,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import pko.KiCadLogicalSchemeSimulator.test.schemaPartTester.NetTester;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 public class DcTriggerTest extends NetTester {
     @Override
     protected String getNetFilePath() {
@@ -61,48 +58,48 @@ public class DcTriggerTest extends NetTester {
     @Test
     @DisplayName("default")
     void defaultState() {
-        assertFalse(inPin("Q").state, "Default Q state must be 0");
-        assertTrue(inPin("~{Q}").state, "Default ~{Q} state must be 1;");
+        checkPin("Q", false, "Default Q state must be 0");
+        checkPin("~{Q}", true, "Default ~{Q} state must be 1;");
     }
 
     @Test
     @DisplayName("main states")
     void mainStates() {
         setPin("C", true);
-        assertFalse(inPin("Q").state, "after C pin raise  with Lo 'D' Q state must remain 0");
-        assertTrue(inPin("~{Q}").state, "after C pin raise with Lo 'D' ~{Q} state must remain 1");
+        checkPin("Q", false, "after C pin raise  with Lo 'D' Q state must remain 0");
+        checkPin("~{Q}", true, "after C pin raise with Lo 'D' ~{Q} state must remain 1");
         setPin("D", true);
         setPin("C", true);
-        assertTrue(inPin("Q").state, "after C pin raise with Hi 'D' Q state must be 1");
-        assertFalse(inPin("~{Q}").state, "after C pin raise with Hi 'D' ~{Q} state must be 0");
+        checkPin("Q", true, "after C pin raise with Hi 'D' Q state must be 1");
+        checkPin("~{Q}", false, "after C pin raise with Hi 'D' ~{Q} state must be 0");
         setPin("D", false);
         setPin("C", false);
-        assertTrue(inPin("Q").state, "after C pin fall Q state must be preserved");
-        assertFalse(inPin("~{Q}").state, "after C pin fall with Hi 'D' ~{Q} state must be preserved");
+        checkPin("Q", true, "after C pin fall Q state must be preserved");
+        checkPin("~{Q}", false, "after C pin fall with Hi 'D' ~{Q} state must be preserved");
         setPin("C", true);
-        assertFalse(inPin("Q").state, "after C pin raise with Lo 'D' Q state must be 0");
-        assertTrue(inPin("~{Q}").state, "after C pin raise with Lo 'D' ~{Q} state must be 1");
+        checkPin("Q", false, "after C pin raise with Lo 'D' Q state must be 0");
+        checkPin("~{Q}", true, "after C pin raise with Lo 'D' ~{Q} state must be 1");
     }
 
     @Test
     @DisplayName("RS states")
     void rsStates() {
         setPin("S", true);
-        assertTrue(inPin("Q").state, "after S pin set to Hi Q state must be 1");
-        assertFalse(inPin("~{Q}").state, "after S pin set to Hi 'D' ~{Q} state must be 0");
+        checkPin("Q", true, "after S pin set to Hi Q state must be 1");
+        checkPin("~{Q}", false, "after S pin set to Hi 'D' ~{Q} state must be 0");
         setPin("D", false);
         setPin("C", true);
-        assertTrue(inPin("Q").state, "with Hi S pin C pin state change must be ignored");
-        assertFalse(inPin("~{Q}").state, "with Hi S pin C pin state change must be ignored");
+        checkPin("Q", true, "with Hi S pin C pin state change must be ignored");
+        checkPin("~{Q}", false, "with Hi S pin C pin state change must be ignored");
         setPin("R", true);
-        assertTrue(inPin("Q").state, "after R pin set to Hi with S pin Hi too Q state must be 1");
-        assertTrue(inPin("~{Q}").state, "after R pin set to Hi with S pin Hi too ~{Q] state must be 1");
+        checkPin("Q", true, "after R pin set to Hi with S pin Hi too Q state must be 1");
+        checkPin("~{Q}", true, "after R pin set to Hi with S pin Hi too ~{Q] state must be 1");
         setPin("S", false);
-        assertFalse(inPin("Q").state, "after S pin set to Lo with Hi R  Q state must be 0");
-        assertTrue(inPin("~{Q}").state, "after S pin set to Lo with Hi R  ~{Q} state must be 0");
+        checkPin("Q", false, "after S pin set to Lo with Hi R  Q state must be 0");
+        checkPin("~{Q}", true, "after S pin set to Lo with Hi R  ~{Q} state must be 0");
         setPin("D", false);
         setPin("C", true);
-        assertFalse(inPin("Q").state, "with Hi R pin C pin state change must be ignored");
-        assertTrue(inPin("~{Q}").state, "with Hi R pin C pin state change must be ignored");
+        checkPin("Q", false, "with Hi R pin C pin state change must be ignored");
+        checkPin("~{Q}", true, "with Hi R pin C pin state change must be ignored");
     }
 }

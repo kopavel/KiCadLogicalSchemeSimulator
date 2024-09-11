@@ -35,10 +35,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import pko.KiCadLogicalSchemeSimulator.test.schemaPartTester.NetTester;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 public class MultiUnitCounterTest extends NetTester {
     @Override
     protected String getNetFilePath() {
@@ -63,8 +59,8 @@ public class MultiUnitCounterTest extends NetTester {
         setPin("Cb", false);
         setPin("Ra", true);
         setPin("Rb", true);
-        assertFalse(inPin("inA").state, "Count should reset on rising edge of reset pin");
-        assertEquals(0, inBus("inB").state, "Count should reset on rising edge of reset pin");
+        checkPin("inA", false, "Count should reset on rising edge of reset pin");
+        checkBus("inB", 0, "Count should reset on rising edge of reset pin");
     }
 
     @Test
@@ -72,35 +68,35 @@ public class MultiUnitCounterTest extends NetTester {
     void countIncrementsOnClock() {
         for (int i = 1; i <= 7; i++) {
             setPin("Cb", false);
-            assertEquals(i, inBus("inB").state, "Count should increment on clock signal");
+            checkBus("inB", i, "Count should increment on clock signal");
         }
         setPin("Cb", false);
-        assertEquals(0, inBus("inB").state, "Count should reset after reaching maximum");
+        checkBus("inB", 0, "Count should reset after reaching maximum");
         setPin("Ca", false);
-        assertTrue(inPin("inA").state, "Count should increment on clock signal");
+        checkPin("inA", true, "Count should increment on clock signal");
         setPin("Ca", false);
-        assertFalse(inPin("inA").state, "Count should reset after reaching maximum");
+        checkPin("inA", false, "Count should reset after reaching maximum");
     }
 
     @Test
     @DisplayName("Count does not change on reset pin falling edge")
     void countDoesNotChangeOnResetFallingEdge() {
         setPin("Cb", false);
-        assertEquals(1, inBus("inB").state, "Count should be 1 before reset");
+        checkBus("inB", 1, "Count should be 1 before reset");
         setPin("Rb", false);
-        assertEquals(1, inBus("inB").state, "Count should not change on falling edge of reset pin");
+        checkBus("inB", 1, "Count should not change on falling edge of reset pin");
         setPin("Ca", false);
-        assertTrue(inPin("inA").state, "Count should be 1 before reset");
+        checkPin("inA", true, "Count should be 1 before reset");
         setPin("Ra", false);
-        assertTrue(inPin("inA").state, "Count should not change on falling edge of reset pin");
+        checkPin("inA", true, "Count should not change on falling edge of reset pin");
     }
 
     @Test
     @DisplayName("Count does not increment on clock raising edge")
     void countDoesNotIncrementOnClockFallingEdge() {
         setPin("Ca", true);
-        assertFalse(inPin("inA").state, "Count should not increment on raising edge of clock signal");
+        checkPin("inA", false, "Count should not increment on raising edge of clock signal");
         setPin("Cb", true);
-        assertEquals(0, inBus("inB").state, "Count should not increment on raising edge of clock signal");
+        checkBus("inB", 0, "Count should not increment on raising edge of clock signal");
     }
 }

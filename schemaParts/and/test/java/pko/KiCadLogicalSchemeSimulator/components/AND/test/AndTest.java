@@ -34,16 +34,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import pko.KiCadLogicalSchemeSimulator.test.schemaPartTester.NetTester;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 public class AndTest extends NetTester {
     @Test
     @DisplayName("Both input Lo - out Lo")
     public void bothLo() {
         setPin(1, false);
         setPin(2, false);
-        assertFalse(inPin(1).state, "With no input output needs to be Lo");
+        checkPin(1, false, "With no input output needs to be Lo");
     }
 
     @Test
@@ -51,7 +48,7 @@ public class AndTest extends NetTester {
     public void oneHi() {
         setPin(1, false);
         setPin(2, true);
-        assertFalse(inPin(1).state, "With Hi on only one input output needs to be Lo");
+        checkPin(1, false, "With Hi on only one input output needs to be Lo");
     }
 
     @Test
@@ -59,7 +56,7 @@ public class AndTest extends NetTester {
     public void bothHi() {
         setPin(1, true);
         setPin(2, true);
-        assertTrue(inPin(1).state, "With Hi on both inputs output needs to be Hi");
+        checkPin(1, true, "With Hi on both inputs output needs to be Hi");
     }
 
     @Override

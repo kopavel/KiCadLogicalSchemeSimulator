@@ -33,9 +33,6 @@ package pko.KiCadLogicalSchemeSimulator.components.XOR.test;
 import org.junit.jupiter.api.Test;
 import pko.KiCadLogicalSchemeSimulator.test.schemaPartTester.NetTester;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 public class XorTest extends NetTester {
     @Override
     protected String getNetFilePath() {
@@ -49,12 +46,12 @@ public class XorTest extends NetTester {
 
     @Test
     protected void xorTest() {
-        assertFalse(inPin(1).state, "Initial out state must be Lo");
+        checkPin(1, false, "Initial out state must be Lo");
         setPin(1, true);
-        assertTrue(inPin(1).state, "With one input Hi output state must be Hi");
+        checkPin(1, true, "With one input Hi output state must be Hi");
         setPin(2, true);
-        assertFalse(inPin(1).state, "With both input Hi output state must be Lo");
+        checkPin(1, false, "With both input Hi output state must be Lo");
         setPin(1, false);
-        assertTrue(inPin(1).state, "With one input Hi output state must be Hi");
+        checkPin(1, true, "With one input Hi output state must be Hi");
     }
 }

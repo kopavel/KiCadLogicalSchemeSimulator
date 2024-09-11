@@ -34,9 +34,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import pko.KiCadLogicalSchemeSimulator.test.schemaPartTester.NetTester;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 public class LatchTest extends NetTester {
     @Override
     protected String getNetFilePath() {
@@ -52,7 +49,7 @@ public class LatchTest extends NetTester {
     @DisplayName("Q pin should be in high-impedance state with Hi CS")
     void qPinHighImpedanceWithHighCs() {
         setPin("RegOe", true);
-        assertTrue(inBus("RegIn").hiImpedance, "With Hi CS pin, Q must be in high-impedance state");
+        checkBusImpedance("RegIn", "With Hi CS pin, Q must be in high-impedance state");
     }
 
     @Test
@@ -60,7 +57,7 @@ public class LatchTest extends NetTester {
     void qPinRemainsHighImpedanceWithHighCsAndChangingD() {
         setPin("RegOe", true);
         setBus("RegOut", 1);
-        assertTrue(inBus("RegIn").hiImpedance, "With Hi CS pin, Q must remain in high-impedance state when D pin changes");
+        checkBusImpedance("RegIn", "With Hi CS pin, Q must remain in high-impedance state when D pin changes");
     }
 
     @Test
@@ -70,8 +67,8 @@ public class LatchTest extends NetTester {
         setBus("RegOut", 1);
         setPin("RegWr", false);
         setPin("RegOe", false);
-        assertEquals(1, inBus("RegIn").state, "Q pin should reflect the state of D pin after OE falling edge");
+        checkBus("RegIn", 1, "Q pin should reflect the state of D pin after OE falling edge");
         setPin("RegOe", true);
-        assertTrue(inBus("RegIn").hiImpedance, "Q pin should be in high-impedance state after OE raising edge");
+        checkBusImpedance("RegIn", "Q pin should be in high-impedance state after OE raising edge");
     }
 }

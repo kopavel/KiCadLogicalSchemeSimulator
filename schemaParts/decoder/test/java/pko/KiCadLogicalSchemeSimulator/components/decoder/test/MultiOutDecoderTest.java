@@ -34,9 +34,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import pko.KiCadLogicalSchemeSimulator.test.schemaPartTester.NetTester;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MultiOutDecoderTest extends NetTester {
     @Test
@@ -44,23 +42,23 @@ public class MultiOutDecoderTest extends NetTester {
     public void valueDecode() {
         setBus("A", 0);
         setBus("Eb", 0b11);
-        assertTrue(inBus("outA").hiImpedance, "without CS pins outA bus state must be hiImpedance ");
-        assertTrue(inBus("outB").hiImpedance, "without CS pins bus state must be hiImpedance ");
+        checkBusImpedance("outA", "without CS pins outA bus state must be hiImpedance ");
+        checkBusImpedance("outB", "without CS pins bus state must be hiImpedance ");
         setBus("Ea", 0b11);
-        assertTrue(inBus("outA").hiImpedance, "with partial CS pins state outA bus state must be hiImpedance ");
-        assertTrue(inBus("outB").hiImpedance, "without outB bus state must be hiImpedance ");
+        checkBusImpedance("outA", "with partial CS pins state outA bus state must be hiImpedance ");
+        checkBusImpedance("outB", "without outB bus state must be hiImpedance ");
         setBus("Ea", 0b01);
         assertFalse(inBus("outA").hiImpedance, "with CS pins set  outA bus state must not be hiImpedance ");
-        assertEquals(0b1110, inBus("outA").state, "outA bus state must be 0b1110");
-        assertTrue(inBus("outB").hiImpedance, "without outB bus state must be hiImpedance ");
+        checkBus("outA", 0b1110, "outA bus state must be 0b1110");
+        checkBusImpedance("outB", "without outB bus state must be hiImpedance ");
         setBus("Ea", 0b11);
         setBus("Eb", 0b10);
-        assertTrue(inBus("outA").hiImpedance, "with partial CS pins state outA bus state must be hiImpedance ");
-        assertTrue(inBus("outB").hiImpedance, "with partial CS pins state outB bus state must be hiImpedance ");
+        checkBusImpedance("outA", "with partial CS pins state outA bus state must be hiImpedance ");
+        checkBusImpedance("outB", "with partial CS pins state outB bus state must be hiImpedance ");
         setBus("Eb", 0b00);
-        assertTrue(inBus("outA").hiImpedance, "with partial CS pins state outA bus state must be hiImpedance ");
+        checkBusImpedance("outA", "with partial CS pins state outA bus state must be hiImpedance ");
         assertFalse(inBus("outB").hiImpedance, "with CS pins set  outB bus state must not be hiImpedance ");
-        assertEquals(0b1110, inBus("outB").state, "outB bus state must be 0b1110");
+        checkBus("outB", 0b1110, "outB bus state must be 0b1110");
     }
 
     @Override

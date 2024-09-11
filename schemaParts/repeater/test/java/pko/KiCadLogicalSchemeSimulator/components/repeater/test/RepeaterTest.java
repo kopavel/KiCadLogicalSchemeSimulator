@@ -35,9 +35,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import pko.KiCadLogicalSchemeSimulator.test.schemaPartTester.NetTester;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 public class RepeaterTest extends NetTester {
     @BeforeEach
     protected void reset() {
@@ -58,11 +55,11 @@ public class RepeaterTest extends NetTester {
     @Test
     @DisplayName("repeater")
     void repeater() {
-        assertTrue(inPin("notIn").state, "with Lo input NOT out must be Hi");
-        assertFalse(inPin("ampIn").state, "with Lo input repeater out must be Lo");
+        checkPin("notIn", true, "with Lo input NOT out must be Hi");
+        checkPin("ampIn", false, "with Lo input repeater out must be Lo");
         setPin("notOut", true);
         setPin("ampOut", true);
-        assertFalse(inPin("notIn").state, "with Hi input NOT out must be Lo");
-        assertTrue(inPin("ampIn").state, "with Hi input repeater out must be Hi");
+        checkPin("notIn", false, "with Hi input NOT out must be Lo");
+        checkPin("ampIn", true, "with Hi input repeater out must be Hi");
     }
 }

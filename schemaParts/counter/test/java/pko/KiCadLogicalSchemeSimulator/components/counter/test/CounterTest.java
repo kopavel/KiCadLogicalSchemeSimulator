@@ -35,8 +35,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import pko.KiCadLogicalSchemeSimulator.test.schemaPartTester.NetTester;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 public class CounterTest extends NetTester {
     @Override
     protected String getNetFilePath() {
@@ -58,7 +56,7 @@ public class CounterTest extends NetTester {
     void resetPinResetsCounter() {
         setPin("cPin", false);
         setPin("rPin", true);
-        assertEquals(0, inBus("qBus").state, "Count should reset on rising edge of reset pin");
+        checkBus("qBus", 0, "Count should reset on rising edge of reset pin");
     }
 
     @Test
@@ -66,25 +64,25 @@ public class CounterTest extends NetTester {
     void countIncrementsOnClock() {
         for (int i = 1; i <= 15; i++) {
             setPin("cPin", false);
-            assertEquals(i, inBus("qBus").state, "Count should increment on clock signal");
+            checkBus("qBus", i, "Count should increment on clock signal");
         }
         setPin("cPin", false);
-        assertEquals(0, inBus("qBus").state, "Count should reset after reaching maximum");
+        checkBus("qBus", 0, "Count should reset after reaching maximum");
     }
 
     @Test
     @DisplayName("Count does not change on reset pin falling edge")
     void countDoesNotChangeOnResetFallingEdge() {
         setPin("cPin", false);
-        assertEquals(1, inBus("qBus").state, "Count should be 1 before reset");
+        checkBus("qBus", 1, "Count should be 1 before reset");
         setPin("rPin", false);
-        assertEquals(1, inBus("qBus").state, "Count should not change on falling edge of reset pin");
+        checkBus("qBus", 1, "Count should not change on falling edge of reset pin");
     }
 
     @Test
     @DisplayName("Count does not increment on clock raising edge")
     void countDoesNotIncrementOnClockFallingEdge() {
         setPin("cPin", true);
-        assertEquals(0, inBus("qBus").state, "Count should not increment on raising edge of clock signal");
+        checkBus("qBus", 0, "Count should not increment on raising edge of clock signal");
     }
 }

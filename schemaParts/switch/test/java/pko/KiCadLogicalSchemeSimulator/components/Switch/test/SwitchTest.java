@@ -34,9 +34,6 @@ import org.junit.jupiter.api.Test;
 import pko.KiCadLogicalSchemeSimulator.components.Switch.Switch;
 import pko.KiCadLogicalSchemeSimulator.test.schemaPartTester.NetTester;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 public class SwitchTest extends NetTester {
     @Override
     protected String getNetFilePath() {
@@ -52,33 +49,33 @@ public class SwitchTest extends NetTester {
     protected void switchTest() {
         Switch sw1 = (Switch) net.schemaParts.get("SW1");
         Switch sw2 = (Switch) net.schemaParts.get("SW2");
-        assertTrue(inPin("Pull").state, "Initial 'Pull' state must be Hi");
-        assertTrue(inPin("Mid").hiImpedance, "Initial 'Mid' impedance must be True");
+        checkPin("Pull", true, "Initial 'Pull' state must be Hi");
+        checkPinImpedance("Mid", "Initial 'Mid' impedance must be True");
         sw1.toggle(true);
-        assertTrue(inPin("Pull").state, "With Sw1 on and Sw2 off 'Pull' state must remain Hi");
-        assertTrue(inPin("Mid").state, "With Sw1 on and Sw2 off 'Mid' state must be Hi");
+        checkPin("Pull", true, "With Sw1 on and Sw2 off 'Pull' state must remain Hi");
+        checkPin("Mid", true, "With Sw1 on and Sw2 off 'Mid' state must be Hi");
         sw1.toggle(false);
-        assertTrue(inPin("Pull").state, "After Sw1 off 'Pull' state must be Hi");
-        assertTrue(inPin("Mid").hiImpedance, "After Sw1 off 'Mid' impedance must be True");
+        checkPin("Pull", true, "After Sw1 off 'Pull' state must be Hi");
+        checkPinImpedance("Mid", "After Sw1 off 'Mid' impedance must be True");
         sw2.toggle(true);
-        assertTrue(inPin("Pull").state, "With Sw1 off and Sw2 on 'Pull' state must remain Hi");
-        assertFalse(inPin("Mid").state, "With Sw1 off and Sw2 on 'Mid' state must go Lo");
+        checkPin("Pull", true, "With Sw1 off and Sw2 on 'Pull' state must remain Hi");
+        checkPin("Mid", false, "With Sw1 off and Sw2 on 'Mid' state must go Lo");
         sw2.toggle(false);
-        assertTrue(inPin("Pull").state, "After Sw2 off 'Pull' state must be Hi");
-        assertTrue(inPin("Mid").hiImpedance, "After Sw2 off 'Mid' impedance must be True");
+        checkPin("Pull", true, "After Sw2 off 'Pull' state must be Hi");
+        checkPinImpedance("Mid", "After Sw2 off 'Mid' impedance must be True");
         sw1.toggle(true);
         sw2.toggle(true);
-        assertFalse(inPin("Pull").state, "After Sw1 go on and then Sw2 on 'Pull' state must be Lo");
-        assertFalse(inPin("Mid").state, "After Sw1 go on and then Sw2 on 'Mid' state must be Lo");
+        checkPin("Pull", false, "After Sw1 go on and then Sw2 on 'Pull' state must be Lo");
+        checkPin("Mid", false, "After Sw1 go on and then Sw2 on 'Mid' state must be Lo");
         sw1.toggle(false);
-        assertTrue(inPin("Pull").state, "After Sw1 go off with Sw2 on 'Pull' state must go Hi");
-        assertFalse(inPin("Mid").state, "After Sw1 go off with Sw2 on 'Mid' state must remain Lo");
+        checkPin("Pull", true, "After Sw1 go off with Sw2 on 'Pull' state must go Hi");
+        checkPin("Mid", false, "After Sw1 go off with Sw2 on 'Mid' state must remain Lo");
         sw1.toggle(true);
         sw2.toggle(false);
-        assertTrue(inPin("Pull").state, "After Sw1 go on but Sw2 go off 'Pull' state must remain Hi");
-        assertTrue(inPin("Mid").state, "After Sw1 go on but Sw2 go off 'Mid' state must go Hi");
+        checkPin("Pull", true, "After Sw1 go on but Sw2 go off 'Pull' state must remain Hi");
+        checkPin("Mid", true, "After Sw1 go on but Sw2 go off 'Mid' state must go Hi");
         sw2.toggle(true);
-        assertFalse(inPin("Pull").state, "After Sw2 go on with SW1 on 'Pull' state must be Lo");
-        assertFalse(inPin("Mid").state, "After Sw2 go on with SW1 on 'Mid' state must be Lo");
+        checkPin("Pull", false, "After Sw2 go on with SW1 on 'Pull' state must be Lo");
+        checkPin("Mid", false, "After Sw2 go on with SW1 on 'Mid' state must be Lo");
     }
 }

@@ -34,8 +34,6 @@ import org.junit.jupiter.api.Test;
 import pko.KiCadLogicalSchemeSimulator.test.schemaPartTester.NetTester;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 public class StateMachineTest extends NetTester {
     long[] states =
             new long[]{0b1111110, 0b0110000, 0b1101101, 0b1111001, 0b0110011, 0b1011011, 0b1011111, 0b1110000, 0b1111111, 0b1111011, 0b0001110, 0b0110111, 0b1100111,
@@ -57,12 +55,12 @@ public class StateMachineTest extends NetTester {
         for (int i = 0; i < states.length; i++) {
             setBus("in", i);
             if (i > 0) {
-                assertEquals(states[i - 1], inBus("out").state, "Out must be preserved until clock pulse");
+                checkBus("out", states[i - 1], "Out must be preserved until clock pulse");
             }
             setPin("S", true);
-            assertEquals(states[i], inBus("out").state, "State must change on strobe front");
+            checkBus("out", states[i], "State must change on strobe front");
             setPin("F", true);
-            assertEquals(states[i] ^ mask, inBus("out").state, "State must be in reverse, if R is Hi");
+            checkBus("out", states[i] ^ mask, "State must be in reverse, if R is Hi");
             setPin("F", false);
         }
     }

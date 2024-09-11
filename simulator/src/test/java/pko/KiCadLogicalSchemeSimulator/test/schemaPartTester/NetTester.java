@@ -44,6 +44,10 @@ import pko.KiCadLogicalSchemeSimulator.parsers.net.NetFileParser;
 import java.util.ServiceLoader;
 import java.util.stream.Collectors;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class NetTester {
     protected Net net;
@@ -109,6 +113,42 @@ public abstract class NetTester {
     protected void setPin(int id, boolean state) {
         outPin(id).state = state;
         outPin(id).setState(state);
+    }
+
+    protected void checkPin(int id, boolean state, String message) {
+        assertFalse(inPin(id).hiImpedance, "Pin " + id + " hiImpedance should be false");
+        assertEquals(state, inPin(id).state, message);
+    }
+
+    protected void checkPin(String id, boolean state, String message) {
+        assertFalse(inPin(id).hiImpedance, "Pin " + id + " hiImpedance should be false");
+        assertEquals(state, inPin(id).state, message);
+    }
+
+    protected void checkBus(int id, long state, String message) {
+        assertFalse(inBus(id).hiImpedance, "Bus " + id + " hiImpedance should be false");
+        assertEquals(state, inBus(id).state, message);
+    }
+
+    protected void checkBus(String id, long state, String message) {
+        assertFalse(inBus(id).hiImpedance, "Bus " + id + " hiImpedance should be false");
+        assertEquals(state, inBus(id).state, message);
+    }
+
+    protected void checkBusImpedance(int id, String message) {
+        assertTrue(inBus(id).hiImpedance, message);
+    }
+
+    protected void checkBusImpedance(String id, String message) {
+        assertTrue(inBus(id).hiImpedance, message);
+    }
+
+    protected void checkPinImpedance(int id, String message) {
+        assertTrue(inPin(id).hiImpedance, message);
+    }
+
+    protected void checkPinImpedance(String id, String message) {
+        assertTrue(inPin(id).hiImpedance, message);
     }
 
     @BeforeAll
