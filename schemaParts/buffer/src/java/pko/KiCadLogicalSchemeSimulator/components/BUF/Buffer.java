@@ -117,7 +117,7 @@ public class Buffer extends SchemaPart {
                 @Override
                 public void setState(long newState) {
                     state = newState;
-                    if (!oePin.state && (qBus.state != latch || qBus.hiImpedance)) {
+                    if (!oePin.state && (qBus.state != dBus.state || qBus.hiImpedance)) {
                         qBus.state = newState;
                         qBus.setState(newState);
                         qBus.hiImpedance = false;
