@@ -96,6 +96,7 @@ public class XorGate extends SchemaPart {
     public void initOuts() {
         out = getOutPin("OUT");
         out.state = (in1.state != in2.state);
+        out.hiImpedance = false;
     }
 
     @Override
