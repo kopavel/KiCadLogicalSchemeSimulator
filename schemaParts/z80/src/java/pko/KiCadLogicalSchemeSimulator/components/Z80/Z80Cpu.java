@@ -124,8 +124,8 @@ public class Z80Cpu extends SchemaPart {
                                 ioRequest = ioQueue.head;
                             }
                             aOut.state = ioRequest.address;
-                            aOut.setState(ioRequest.address);
                             aOut.hiImpedance = false;
+                            aOut.setState(ioRequest.address);
                             extraWait = ioRequest instanceof DeviceRequest;
                         } else if (T2) {
                             if (!inWait && ioRequest instanceof DeviceRequest) {
@@ -168,8 +168,8 @@ public class Z80Cpu extends SchemaPart {
                             }
                             if (ioRequest instanceof WriteRequest writeRequest) {
                                 dOut.state = writeRequest.payload;
-                                dOut.setState(writeRequest.payload);
                                 dOut.hiImpedance = false;
+                                dOut.setState(writeRequest.payload);
                                 needDataPinReset = true;
                             }
                         } else if (T2) {

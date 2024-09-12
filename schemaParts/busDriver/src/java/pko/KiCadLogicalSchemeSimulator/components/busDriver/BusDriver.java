@@ -64,8 +64,8 @@ public class BusDriver extends SchemaPart {
                     hiImpedance = false;
                     if (oe[finalI]) {
                         outs[finalI].state = newState;
-                        outs[finalI].setState(newState);
                         outs[finalI].hiImpedance = false;
+                        outs[finalI].setState(newState);
                     }
                 }
             });
@@ -86,8 +86,8 @@ public class BusDriver extends SchemaPart {
                             oe[finalI] = true;
                             if (!ins[finalI].hiImpedance) {
                                 outs[finalI].state = ins[finalI].state;
-                                outs[finalI].setState(ins[finalI].state);
                                 outs[finalI].hiImpedance = false;
+                                outs[finalI].setState(ins[finalI].state);
                             }
                         }
                     }
@@ -102,8 +102,8 @@ public class BusDriver extends SchemaPart {
                             oe[finalI] = true;
                             if (!ins[finalI].hiImpedance) {
                                 outs[finalI].state = ins[finalI].state;
-                                outs[finalI].setState(ins[finalI].state);
                                 outs[finalI].hiImpedance = false;
+                                outs[finalI].setState(ins[finalI].state);
                             }
                         } else {
                             oe[finalI] = false;

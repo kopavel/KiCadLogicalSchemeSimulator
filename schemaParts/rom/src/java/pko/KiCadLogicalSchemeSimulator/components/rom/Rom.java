@@ -113,8 +113,8 @@ public class Rom extends SchemaPart {
                 state = newState;
                 if (csActive && outPin.state != words[addr]) {
                     outPin.state = words[addr];
-                    outPin.setState(outPin.state);
                     outPin.hiImpedance = false;
+                    outPin.setState(outPin.state);
                 }
                 hiImpedance = false;
             }
@@ -136,8 +136,8 @@ public class Rom extends SchemaPart {
                         csActive = true;
                         if (outPin.hiImpedance || outPin.state != words[addr]) {
                             outPin.state = words[addr];
-                            outPin.setState(outPin.state);
                             outPin.hiImpedance = false;
+                            outPin.setState(outPin.state);
                         }
                     }
                 }
@@ -152,8 +152,8 @@ public class Rom extends SchemaPart {
                     if (state) {
                         if (outPin.hiImpedance || outPin.state != words[addr]) {
                             outPin.state = words[addr];
-                            outPin.setState(outPin.state);
                             outPin.hiImpedance = false;
+                            outPin.setState(outPin.state);
                         }
                     } else {
                         if (!outPin.hiImpedance) {

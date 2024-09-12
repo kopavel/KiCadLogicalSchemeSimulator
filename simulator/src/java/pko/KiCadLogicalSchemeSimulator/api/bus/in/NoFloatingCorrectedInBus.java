@@ -35,10 +35,10 @@ import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 public abstract class NoFloatingCorrectedInBus extends CorrectedInBus {
     public NoFloatingCorrectedInBus(String id, SchemaPart parent, int size, String... names) {
         super(id, parent, size, names);
-        hiImpedance = false;
     }
 
     @Override
     public void setHiImpedance() {
+        hiImpedance = true;
     }
 }

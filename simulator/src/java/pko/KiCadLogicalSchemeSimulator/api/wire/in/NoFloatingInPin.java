@@ -36,7 +36,6 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 public abstract class NoFloatingInPin extends InPin {
     public NoFloatingInPin(String id, SchemaPart parent) {
         super(id, parent);
-        hiImpedance = false;
     }
 
     public NoFloatingInPin(Pin oldPin, String variantId) {
@@ -45,5 +44,6 @@ public abstract class NoFloatingInPin extends InPin {
 
     @Override
     public void setHiImpedance() {
+        hiImpedance = true;
     }
 }

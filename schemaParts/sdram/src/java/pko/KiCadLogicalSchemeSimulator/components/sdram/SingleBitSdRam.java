@@ -91,8 +91,8 @@ public class SingleBitSdRam extends SchemaPart {
                         if (we.state) {
                             if (dOut.state != mem[addr] || dOut.hiImpedance) {
                                 dOut.state = mem[addr];
-                                dOut.setState(dOut.state);
                                 dOut.hiImpedance = false;
+                                dOut.setState(dOut.state);
                             }
                         } else {
                             mem[addr] = dIn.state;
@@ -123,8 +123,8 @@ public class SingleBitSdRam extends SchemaPart {
                         } else {
                             if (dOut.state != mem[addr] || dOut.hiImpedance) {
                                 dOut.state = mem[addr];
-                                dOut.setState(dOut.state);
                                 dOut.hiImpedance = false;
+                                dOut.setState(dOut.state);
                             }
                         }
                     } else {

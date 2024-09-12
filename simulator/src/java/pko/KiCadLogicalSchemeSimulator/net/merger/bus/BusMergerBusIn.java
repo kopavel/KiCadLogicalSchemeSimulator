@@ -181,6 +181,9 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
                 merger.weakState,
                 merger.weakPins,
                 merger.hiImpedance);
+        if (oldImpedance) {
+            return;
+        }
         assert !hiImpedance : "Already in hiImpedance:" + this + "; merger=" + merger.getName();
         /*Optimiser block sameMask*/
         /*Optimiser block otherMask*/
@@ -198,10 +201,10 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
                 }
             } else if (merger.weakState != merger.state || merger.hiImpedance) {
                 merger.state = merger.weakState;
+                merger.hiImpedance = false;
                 for (Bus destination : destinations) {
                     destination.setState(merger.state);
                 }
-                merger.hiImpedance = false;
             }
             /*Optimiser block otherMask*/
         } else {
@@ -227,10 +230,10 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
                     merger.hiImpedance = true;
                 }
             } else if (oldState != merger.state || merger.hiImpedance) {
+                merger.hiImpedance = false;
                 for (Bus destination : destinations) {
                     destination.setState(merger.state);
                 }
-                merger.hiImpedance = false;
             }
             /*Optimiser block sameMask*/
         }

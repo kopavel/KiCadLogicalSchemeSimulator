@@ -193,6 +193,9 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                 merger.weakState,
                 merger.weakPins,
                 merger.hiImpedance);
+        if (oldImpedance) {
+            return;
+        }
         assert !hiImpedance : "Already in hiImpedance:" + this + "; merger=" + merger.getName();
         long oldState = merger.state;
         if (oldStrong) {

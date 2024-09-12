@@ -130,12 +130,12 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
         }
         /*Optimiser blockend passivePins*/
         if (merger.hiImpedance || oldState != merger.state) {
+            merger.hiImpedance = false;
             for (Pin destination : destinations) {
                 destination.strong = strong;
-                destination.setState(merger.state);
                 destination.hiImpedance = false;
+                destination.setState(merger.state);
             }
-            merger.hiImpedance = false;
             /*Optimiser block passivePins*/
         } else if (strengthChange) {
             for (Pin destination : ((WireMerger) merger).mergers) {
@@ -174,7 +174,10 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                 strong,
                 oldImpedance,
                 hiImpedance, merger.getName(), merger.state, merger.strong, merger.hiImpedance, merger.weakState);
-        assert !oldImpedance : "Already in hiImpedance:" + this + "; merger=" + merger.getName();
+        if (oldImpedance) {
+            return;
+        }
+        assert !hiImpedance : "Already in hiImpedance:" + this + "; merger=" + merger.getName();
         boolean oldState = merger.state;
         if (oldStrong) {
             if (merger.weakState == 0) {

@@ -99,8 +99,8 @@ public class SdRam extends SchemaPart {
                         if (we.state) {
                             if (dOut.state != bytes[addr] || dOut.hiImpedance) {
                                 dOut.state = bytes[addr];
-                                dOut.setState(dOut.state);
                                 dOut.hiImpedance = false;
+                                dOut.setState(dOut.state);
                             }
                         } else {
                             bytes[addr] = dIn.state;
@@ -131,8 +131,8 @@ public class SdRam extends SchemaPart {
                         } else {
                             if (dOut.state != bytes[addr] || dOut.hiImpedance) {
                                 dOut.state = bytes[addr];
-                                dOut.setState(dOut.state);
                                 dOut.hiImpedance = false;
+                                dOut.setState(dOut.state);
                             }
                         }
                     } else {

@@ -56,8 +56,8 @@ public class Decoder extends SchemaPart {
                     outState = ~(1L << newState);
                     if (csState && (outBus.state != outState || outBus.hiImpedance)) {
                         outBus.state = outState;
-                        outBus.setState(outState);
                         outBus.hiImpedance = false;
+                        outBus.setState(outState);
                     }
                     hiImpedance = false;
                 }
@@ -71,8 +71,8 @@ public class Decoder extends SchemaPart {
                     if (csState) {
                         if (outBus.state != outState || outBus.hiImpedance) {
                             outBus.state = outState;
-                            outBus.setState(outState);
                             outBus.hiImpedance = false;
+                            outBus.setState(outState);
                         }
                     }
                     hiImpedance = false;
@@ -89,8 +89,8 @@ public class Decoder extends SchemaPart {
                     if (csState) {
                         if (!aBus.hiImpedance && (outBus.state != outState || outBus.hiImpedance)) {
                             outBus.state = outState;
-                            outBus.setState(outState);
                             outBus.hiImpedance = false;
+                            outBus.setState(outState);
                         }
                     } else if (!outBus.hiImpedance) {
                         outBus.setHiImpedance();
@@ -109,8 +109,8 @@ public class Decoder extends SchemaPart {
                         if (!aBus.hiImpedance) {
                             if (outBus.state != outState || outBus.hiImpedance) {
                                 outBus.state = outState;
-                                outBus.setState(outState);
                                 outBus.hiImpedance = false;
+                                outBus.setState(outState);
                             }
                         }
                     } else if (!outBus.hiImpedance) {

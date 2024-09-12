@@ -75,8 +75,8 @@ public class MultiOutDecoder extends SchemaPart {
                     for (int i = 0; i < outBuses.length; i++) {
                         if (csStates[i] == 0 && (outBuses[i].state != outState || outBuses[i].hiImpedance)) {
                             outBuses[i].state = outState;
-                            outBuses[i].setState(outState);
                             outBuses[i].hiImpedance = false;
+                            outBuses[i].setState(outState);
                         }
                     }
                     hiImpedance = false;
@@ -91,8 +91,8 @@ public class MultiOutDecoder extends SchemaPart {
                     for (int i = 0; i < outBuses.length; i++) {
                         if (csStates[i] == 0 && (outBuses[i].state != outState || outBuses[i].hiImpedance)) {
                             outBuses[i].state = outState;
-                            outBuses[i].setState(outState);
                             outBuses[i].hiImpedance = false;
+                            outBuses[i].setState(outState);
                         }
                     }
                     hiImpedance = false;
@@ -121,8 +121,8 @@ public class MultiOutDecoder extends SchemaPart {
                             if (csStates[finalI] == 0) {
                                 if (!aBus.hiImpedance && (outBuses[finalI].state != outState || outBuses[finalI].hiImpedance)) {
                                     outBuses[finalI].state = outState;
-                                    outBuses[finalI].setState(outState);
                                     outBuses[finalI].hiImpedance = false;
+                                    outBuses[finalI].setState(outState);
                                 }
                             } else {
                                 if (!outBuses[finalI].hiImpedance) {
@@ -147,8 +147,8 @@ public class MultiOutDecoder extends SchemaPart {
                             if (csStates[finalI] == 0) {
                                 if (!aBus.hiImpedance && (outBuses[finalI].state != outState || outBuses[finalI].hiImpedance)) {
                                     outBuses[finalI].state = outState;
-                                    outBuses[finalI].setState(outState);
                                     outBuses[finalI].hiImpedance = false;
+                                    outBuses[finalI].setState(outState);
                                 }
                             } else {
                                 if (!outBuses[finalI].hiImpedance) {

@@ -136,6 +136,9 @@ public class WireMergerBusIn extends CorrectedInBus implements MergerInput<Bus> 
                 merger.state,
                 merger.strong,
                 merger.hiImpedance);
+        if (oldImpedance) {
+            return;
+        }
         assert !hiImpedance : "Already in hiImpedance:" + this + "; merger=" + merger.getName();
         /*Optimiser block strongOnly*/
         /*Optimiser block weakOnly*/
