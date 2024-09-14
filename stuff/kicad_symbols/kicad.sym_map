@@ -320,8 +320,8 @@
 			<unit pinMap="12=IN0;13=IN1;11=OUT"/>
 		</symbol>
 		<symbol name="74LS74" symPartClass="DcTrigger" symPartParam="setReverse">
-			<unit pinMap="1=R;2=D;3=C;1=R;5=Q;6=~{Q}"/>
-			<unit pinMap="13=R;12=D;11=C;13=R;9=Q;8=~{Q}"/>
+			<unit pinMap="1=R;2=D;3=C;4=S;5=Q;6=~{Q}"/>
+			<unit pinMap="13=R;12=D;11=C;10=S;9=Q;8=~{Q}"/>
 		</symbol>
 		<symbol name="74LS92" symPartClass="MultiUnitCounter" symPartParam="sizes=1,3;reverse">
 			<unit pinMap="1=Cb;6=Ra;7=Rb;8=Qb2;9=Qb1;11=Qb0;12=Qa;14=Ca"/>
