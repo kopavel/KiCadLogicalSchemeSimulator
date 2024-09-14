@@ -304,12 +304,12 @@ public class ClassOptimiser<T> {
                                 if (unrollSize == 0) {
                                     throw new RuntimeException("iterator size not provided");
                                 }
-                                //inside iterator block - accumulate whole block
+                                //inside iterator block — accumulate whole block
                                 iteratorSource.append(line).append("\n");
                             } else if (lineOffset == iteratorOffset && !blockSource.isEmpty()) {
-                                //iterator block end - unroll it
+                                //iterator block end — unroll it
                                 for (int j = 0; j < unrollSize; j++) {
-                                    blockSource.append(iteratorSource.toString().replaceAll("\\b" + iteratorParams[0] + "\\b", iteratorParams[0] + j));
+                                    blockSource.append(iteratorSource.toString().replaceAll("(?<=\\W|^)" + iteratorParams[0] + "(?=\\W|$)", iteratorParams[0] + j));
                                 }
                                 iteratorOffset = -1;
                             }
