@@ -75,6 +75,7 @@ public class Net {
     private final Map<Bus, DestinationBusDescriptor> destinationBusDescriptors = new HashMap<>();
     private final Map<String, BusMerger> busMergers = new TreeMap<>();
     private final Map<String, OutPin> wires = new TreeMap<>();
+    private final Map<IModelItem<?>, IModelItem<?>> replacement = new HashMap<>();
 
     public Net(Export export, String[] mapPaths, String optimisedDir) throws IOException {
         this.optimisedDir = optimisedDir;
@@ -176,6 +177,9 @@ public class Net {
             switch (pinType) {
                 case "input" -> {
                     IModelItem<?> destination = schemaPart.getInItem(pinName);
+                    if (replacement.containsKey(destination)) {
+                        destination = replacement.get(destination);
+                    }
                     switch (destination) {
                         case InPin pin -> destinationPins.add(pin);
                         case InBus bus -> destinationBusesOffsets.computeIfAbsent(bus, p -> new TreeSet<>()).add(bus.getAliasOffset(pinName));
@@ -261,6 +265,7 @@ public class Net {
                 destinationOffsets.add(offset);
                 BusInInterconnect interconnect = new BusInInterconnect(destinationBus, interconnectMask, offset);
                 destinationBusDescriptors.put(interconnect, descriptor);
+                replacement.put(destinationBus, interconnect);
             }
             if (TRUE == powerState) {
                 SchemaPart pwr = getSchemaPart("Power", "pwr_" + destinationBus.getName(), "hi;strong");

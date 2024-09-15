@@ -168,6 +168,7 @@ public class MaskedMultiplexer extends SchemaPart {
                     hiImpedance = false;
                     if (finalInNo == nState /*&& outBus.state != (newState & outMask)*/) {
                         outBus.state = newState & outMask;
+                        outBus.hiImpedance = false;
                         outBus.setState(outBus.state);
                     }
                 }
@@ -188,6 +189,7 @@ public class MaskedMultiplexer extends SchemaPart {
                     }
                     if (!inBuses[nState].hiImpedance && outBus.state != (inBuses[nState].state & outMask)) {
                         outBus.state = inBuses[nState].state & outMask;
+                        outBus.hiImpedance = false;
                         outBus.setState(outBus.state);
                     }
                 }
