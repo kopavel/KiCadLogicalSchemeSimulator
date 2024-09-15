@@ -304,12 +304,12 @@
 			<unit pinMap="11=IN;10=OUT"/>
 			<unit pinMap="13=IN;12=OUT"/>
 		</symbol>
-		<symbol name="74LS11" symPartClass="OrGate" symPartParam="size=3">
+		<symbol name="74LS11" symPartClass="AndGate" symPartParam="size=3">
 			<unit pinMap="1=IN0;2=IN1;13=IN2;12=OUT"/>
 			<unit pinMap="3=IN0;4=IN1;5=IN2;6=OUT"/>
 			<unit pinMap="9=IN0;10=IN1;11=IN2;8=OUT"/>
 		</symbol>
-		<symbol name="74LS20" symPartClass="OrGate" symPartParam="size=4;reverse">
+		<symbol name="74LS20" symPartClass="AndGate" symPartParam="size=4;reverse">
 			<unit pinMap="1=IN0;2=IN1;4=IN2;5=IN3;6=OUT"/>
 			<unit pinMap="9=IN0;10=IN1;12=IN2;13=IN3;8=OUT"/>
 		</symbol>

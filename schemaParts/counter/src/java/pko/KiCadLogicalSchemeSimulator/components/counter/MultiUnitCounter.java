@@ -37,7 +37,6 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 public class MultiUnitCounter extends SchemaPart {
-    private final long[] countMask;
     private final Bus[] outBuses;
     private final Pin[] outPins;
     private final int[] sizes;
@@ -48,7 +47,6 @@ public class MultiUnitCounter extends SchemaPart {
             throw new RuntimeException("Component " + id + " has no parameter \"sizes\"");
         }
         String[] sSizes = params.get("sizes").split(",");
-        countMask = new long[sSizes.length];
         outBuses = new Bus[sSizes.length];
         outPins = new Pin[sSizes.length];
         sizes = new int[sSizes.length];
@@ -82,7 +80,7 @@ public class MultiUnitCounter extends SchemaPart {
                         public void setState(boolean newState) {
                             state = newState;
                             hiImpedance = false;
-                            if (state) {
+                            if (newState) {
                                 outPins[finalI].state = !outPins[finalI].state;
                                 outPins[finalI].setState(outPins[finalI].state);
                             }
@@ -101,7 +99,7 @@ public class MultiUnitCounter extends SchemaPart {
                     }
                 });
             } else {
-                countMask[i] = Utils.getMaskForSize(sizes[i]);
+                final long countMask = Utils.getMaskForSize(sizes[i]);
                 addOutBus("Q" + (char) ('a' + i), sizes[i]);
                 if (reverse) {
                     addInPin(new NoFloatingInPin("C" + (char) ('a' + finalI), this) {
@@ -110,7 +108,7 @@ public class MultiUnitCounter extends SchemaPart {
                             state = newState;
                             hiImpedance = false;
                             if (!state) {
-                                outBuses[finalI].state = (outBuses[finalI].state + 1) & countMask[finalI];
+                                outBuses[finalI].state = (outBuses[finalI].state + 1) & countMask;
                                 outBuses[finalI].setState(outBuses[finalI].state);
                             }
                         }
@@ -122,7 +120,7 @@ public class MultiUnitCounter extends SchemaPart {
                             state = newState;
                             hiImpedance = false;
                             if (state) {
-                                outBuses[finalI].state = (outBuses[finalI].state + 1) & countMask[finalI];
+                                outBuses[finalI].state = (outBuses[finalI].state + 1) & countMask;
                                 outBuses[finalI].setState(outBuses[finalI].state);
                             }
                         }
