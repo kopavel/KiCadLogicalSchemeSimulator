@@ -7,13 +7,13 @@
 		<symbol name="MCM6670" symPartClass="Rom" symPartParam="size=5;aSize=10;reverse">
 			<unit pinMap="7=A0;6=A1;5=A2;4=A3;3=A4;2=A5;1=A6;8=A7;10=A8;11=A9;12=D0;13=D1;14=D2;15=D3;16=D4;17=~{CS}"/>
 		</symbol>
-		<symbol name="2102AN" symPartClass="Ram" symPartParam="size=5;aSize=10;reverse">
-			<unit pinMap="7=A0;6=A1;5=A2;4=A3;3=A4;2=A5;1=A6;8=A7;10=A8;11=A9;12=D0;13=D1;14=D2;15=D3;16=D4;17=~{CS}"/>
+		<symbol name="2102AN" symPartClass="SingleBitRam" symPartParam="size=10;reverse">
+			<unit pinMap="8=A0;4=A1;5=A2;6=A3;7=A4;2=A5;1=A6;16=A7;15=A8;14=A9;11=Din;12=Dout;13=~{CS};3=~{WE}"/>
 		</symbol>
 	</lib>
 	<lib name="TRS80IUS">
-		<symbol name="2102AN" symPartClass="Ram" symPartParam="size=5;aSize=10;reverse">
-			<unit pinMap="7=A0;6=A1;5=A2;4=A3;3=A4;2=A5;1=A6;8=A7;10=A8;11=A9;12=D0;13=D1;14=D2;15=D3;16=D4;17=~{CS}"/>
+		<symbol name="2102AN" symPartClass="SingleBitRam" symPartParam="size=10;reverse">
+			<unit pinMap="8=A0;4=A1;5=A2;6=A3;7=A4;2=A5;1=A6;16=A7;15=A8;14=A9;11=Din;12=Dout;13=~{CS};3=~{WE}"/>
 		</symbol>
 	</lib>
 </symbolMap>

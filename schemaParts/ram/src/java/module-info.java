@@ -31,8 +31,9 @@
  */
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
 import pko.KiCadLogicalSchemeSimulator.components.ram.RamSpi;
+import pko.KiCadLogicalSchemeSimulator.components.ram.SingleBitRamSpi;
 
 module KiCadLogicalSchemeSimulator.components.ram {
     requires KiCadLogicalSchemeSimulator.simulator;
-    provides SchemaPartSpi with RamSpi;
+    provides SchemaPartSpi with RamSpi, SingleBitRamSpi;
 }

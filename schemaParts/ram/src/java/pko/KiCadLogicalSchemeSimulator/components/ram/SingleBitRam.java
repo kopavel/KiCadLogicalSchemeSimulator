@@ -146,7 +146,7 @@ public class SingleBitRam extends SchemaPart {
 
     @Override
     public void initOuts() {
-        dOut = getOutPin("D");
+        dOut = getOutPin("Dout");
     }
 
     @Override
