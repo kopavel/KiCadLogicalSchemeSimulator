@@ -51,34 +51,34 @@ public class JkTriggerTest extends NetTester {
         //Lo j and k - store
         checkPin("Q", false, "Default Q state must be 0");
         checkPin("~{Q}", true, "Default ~{Q} state must be 1;");
-        setPin("C", false);
+        setPin("C", true);
         checkPin("Q", false, "after C pin fall with Lo on 'J' and 'K' Q state must remain 0");
         checkPin("~{Q}", true, "after C pin fall with Lo on 'J' and 'K' ~{Q} state must remain 1");
-        setPin("C", false);
+        setPin("C", true);
         checkPin("Q", false, "after C pin fall with Lo on 'J' and 'K' Q state must remain 0");
         checkPin("~{Q}", true, "after C pin fall with Lo on 'J' and 'K' ~{Q} state must remain 1");
         //Hi j Lo k - set
         setPin("J", true);
-        setPin("C", false);
+        setPin("C", true);
         checkPin("Q", true, "after C pin fall with Hi on 'J' and Lo on 'K' Q state must be 1");
         checkPin("~{Q}", false, "after C pin fall with Hi on 'J' and Lo on 'K' ~{Q} state must be 0");
-        setPin("C", false);
+        setPin("C", true);
         checkPin("Q", true, "after C pin fall with Hi on 'J' and Lo on 'K' Q state must be 1");
         checkPin("~{Q}", false, "after C pin fall with Hi on 'J' and Lo on 'K' ~{Q} state must be 0");
         //Hi j and k - toggle
         setPin("K", true);
-        setPin("C", false);
+        setPin("C", true);
         checkPin("Q", false, "after C pin fall with Hi on 'J' and Lo on 'K' Q state must be toggled");
         checkPin("~{Q}", true, "after C pin fall with Hi on 'J' and Lo on 'K' ~{Q} state must be toggled");
-        setPin("C", false);
+        setPin("C", true);
         checkPin("Q", true, "after C pin fall with Hi on 'J' and Lo on 'K' Q state must be toggled");
         checkPin("~{Q}", false, "after C pin fall with Hi on 'J' and Lo on 'K' ~{Q} state must be toggled");
         //Lo j Hi k - reset
         setPin("J", false);
-        setPin("C", false);
+        setPin("C", true);
         checkPin("Q", false, "after C pin fall with Lo on 'J' and Hi on 'K' Q state must be reset");
         checkPin("~{Q}", true, "after C pin fall with Lo on 'J' and Hi on 'K' ~{Q} state must be toggled");
-        setPin("C", false);
+        setPin("C", true);
         checkPin("Q", false, "after C pin fall with Lo on 'J' and Hi on 'K' Q state must be reset");
         checkPin("~{Q}", true, "after C pin fall with Lo on 'J' and Hi on 'K' ~{Q} state must be toggled");
     }
@@ -91,7 +91,7 @@ public class JkTriggerTest extends NetTester {
         checkPin("~{Q}", false, "after S pin set to Hi 'D' ~{Q} state must be 0");
         setPin("J", true);
         setPin("K", true);
-        setPin("C", false);
+        setPin("C", true);
         checkPin("Q", true, "with Hi S pin C pin state change must be ignored");
         checkPin("~{Q}", false, "with Hi S pin C pin state change must be ignored");
         setPin("R", true);
@@ -100,7 +100,7 @@ public class JkTriggerTest extends NetTester {
         setPin("S", false);
         checkPin("Q", false, "after S pin set to Lo with Hi R  Q state must be 0");
         checkPin("~{Q}", true, "after S pin set to Lo with Hi R  ~{Q} state must be 0");
-        setPin("C", false);
+        setPin("C", true);
         checkPin("Q", false, "with Hi R pin C pin state change must be ignored");
         checkPin("~{Q}", true, "with Hi R pin C pin state change must be ignored");
     }
