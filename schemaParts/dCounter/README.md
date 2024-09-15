@@ -11,6 +11,7 @@ Implements a binary/decimal up/down counter with `PE`, `Carry in`, `Carry out` p
 - `UD` - Up (Hi) /Down (Lo) direction
 - `J` - Jam inputs
 - `R` - Reset
+- `E` - Clock enable
 
 **Output names**:
 
@@ -20,8 +21,9 @@ Implements a binary/decimal up/down counter with `PE`, `Carry in`, `Carry out` p
 **Optional parameters**
 
 - `reverse`:** If provided, the `C` input is reversed (sensitive to negative front, positive otherwise).
-- `carryReverse`:** If provided, the Carry input/output are reversed.
-- `bdReverse`:** If provided, the `BD` input is reversed.
+- `carryReverse`:** If provided, the Carry input/output reversed.
+- `bdReverse`:** If provided, the `BD` input reversed.
+- `eReverse`:** If provided, the `E` input reversed.
 
 For example, to describe a counter sensitive to the negative front on the input you would provide the following parameter: `reverse`.
  

@@ -145,7 +145,7 @@
 			<unit pinMap="8=S;9=D;10=R;11=C;12=~{Q};13=Q"/>
 		</symbol>
 		<symbol name="4017" symPartClass="JnCounter" symPartParam="size=10">
-			<unit pinMap="14=C;13=CI;15=R;3=Q0;2=Q1;4=Q2;7=Q3;10=Q4;1=Q5;5=Q6;7=Q7;9=Q8;11=Q9;12=CO"/>
+			<unit pinMap="14=C;13=CI;15=R;3=Q0;2=Q1;4=Q2;7=Q3;10=Q4;1=Q5;5=Q6;6=Q7;9=Q8;11=Q9;12=CO"/>
 		</symbol>
 		<symbol name="4020" symPartClass="Counter" symPartParam="size=14;reverse">
 			<unit pinMap="10=C;11=R;9=Q0;7=Q3;5=Q4;4=Q5;6=Q6;13=Q7;12=Q8;14=Q9;15=Q10;1=Q11;2=Q12;3=Q13"/>
@@ -166,7 +166,7 @@
 			<unit pinMap="3=IN0;4=IN1;5=IN2;6=OUT"/>
 			<unit pinMap="11=IN0;12=IN1;13=IN2;10=OUT"/>
 		</symbol>
-		<symbol name="4027" symPartClass="JkTrigger" symPartParam="reverse">
+		<symbol name="4027" symPartClass="JkTrigger" symPartParam="">
 			<unit pinMap="6=J;3=C;5=K;1=Q;2=~{Q};7=S;4=R"/>
 			<unit pinMap="10=J;13=C;11=K;15=Q;14=~{Q};9=S;12=R"/>
 		</symbol>
@@ -254,19 +254,19 @@
 			<unit pinMap="11=IN;12=OUT"/>
 			<unit pinMap="14=IN;15=OUT"/>
 		</symbol>
-		<symbol name="4510" symPartClass="DCounter" symPartParam="carryReverse;bdReverse;eReverse">
+		<symbol name="4510" symPartClass="DCounter" symPartParam="carryReverse;eReverse">
 			<unit pinMap="4=J0;12=J1;13=J2;3=J3;5=CI;10=UD;15=C;1=PE;9=R;6=Q0;11=Q1;14=Q2;2=Q3;7=CO"/>
 		</symbol>
-		<symbol name="4518" symPartClass="DCounter" symPartParam="carryReverse;bdReverse">
+		<symbol name="4518" symPartClass="DCounter" symPartParam="carryReverse">
 			<unit pinMap="1=C;7=R;2=E;3=Q0;4=Q1;5=Q2;6=Q3"/>
 			<unit pinMap="9=C;15=R;10=E;11=Q0;12=Q1;13=Q2;14=Q3"/>
 		</symbol>
-		<symbol name="4520" symPartClass="DCounter" symPartParam="carryReverse">
+		<symbol name="4520" symPartClass="DCounter" symPartParam="carryReverse;bdReverse">
 			<unit pinMap="1=C;7=R;2=E;3=Q0;4=Q1;5=Q2;6=Q3"/>
 			<unit pinMap="9=C;15=R;10=E;11=Q0;12=Q1;13=Q2;14=Q3"/>
 		</symbol>
 		<symbol name="4543" symPartClass="StateMachine" symPartParam="size=4;outSize=7;states=126,48,109,121,51,91,95,112,127,123,0,0,0,0,0,0">
-			<unit pinMap="5=IN0;3=IN1;3=IN2;4=IN3;7=D;1=S;6=R;9=OUT0;10=OUT1;11=OUT2;12=OUT3;13=OUT4;15=OUT5;14=OUT6"/>
+			<unit pinMap="5=IN0;3=IN1;2=IN2;4=IN3;7=D;1=S;6=R;9=OUT0;10=OUT1;11=OUT2;12=OUT3;13=OUT4;15=OUT5;14=OUT6"/>
 		</symbol>
 		<symbol name="40106" symPartClass="Repeater" symPartParam="reverse">
 			<unit pinMap="1=IN;2=OUT"/>

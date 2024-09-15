@@ -193,7 +193,7 @@ public class DCounter extends SchemaPart {
                     maxCount = !newState ? 15 : 9;
                 }
             });
-            maxCount = 9;
+            maxCount = 15;
         } else {
             addInPin(new InPin("BD", this) {
                 @Override
@@ -208,7 +208,7 @@ public class DCounter extends SchemaPart {
                     maxCount = newState ? 15 : 9;
                 }
             });
-            maxCount = 15;
+            maxCount = 9;
         }
         if (reverse) {
             addInPin(new NoFloatingInPin("C", this) {
