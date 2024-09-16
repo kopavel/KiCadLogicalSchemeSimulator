@@ -38,8 +38,10 @@ import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 public class OutBus extends Bus {
     private final Map<Byte, OffsetBus> corrected = new HashMap<>();
@@ -83,6 +85,7 @@ public class OutBus extends Bus {
         } else {
             destinations = Utils.addToArray(destinations, bus);
         }
+        sort();
     }
 
     public void addDestination(Pin pin, long mask) {
@@ -94,6 +97,7 @@ public class OutBus extends Bus {
                   destinations = Utils.addToArray(destinations, groupBus);
                   return groupBus;
               }).addDestination(new SimpleBusToWireAdapter(this, pin));
+        sort();
     }
 
     @Override
@@ -130,5 +134,13 @@ public class OutBus extends Bus {
             }
             return new ClassOptimiser<>(this).unroll(destinations.length).build();
         }
+    }
+
+    private void sort() {
+        destinations = Stream.concat(Arrays.stream(destinations)
+                        .filter(d -> !(d instanceof MaskGroupBus)),
+                Arrays.stream(destinations)
+                        .filter(d -> d instanceof MaskGroupBus)
+                        .map(d -> (MaskGroupBus) d).sorted(Comparator.comparingLong(d -> d.mask))).toArray(Bus[]::new);
     }
 }
