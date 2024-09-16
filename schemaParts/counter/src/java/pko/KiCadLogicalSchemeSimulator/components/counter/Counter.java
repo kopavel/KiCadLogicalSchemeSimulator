@@ -101,8 +101,10 @@ public class Counter extends SchemaPart {
 
     @Override
     public void reset() {
-        outBus.hiImpedance = false;
-        outBus.state = 0;
-        outBus.setState(0);
+        if (outBus.state > 0 || outBus.hiImpedance) {
+            outBus.hiImpedance = false;
+            outBus.state = 0;
+            outBus.setState(0);
+        }
     }
 }

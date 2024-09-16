@@ -157,10 +157,12 @@ public class MultiUnitCounter extends SchemaPart {
     public void reset() {
         for (int i = 0; i < sizes.length; i++) {
             if (sizes[i] == 1) {
-                outPins[i].hiImpedance = false;
-                outPins[i].state = false;
-                outPins[i].setState(false);
-            } else {
+                if (outPins[i].hiImpedance || outPins[i].state) {
+                    outPins[i].hiImpedance = false;
+                    outPins[i].state = false;
+                    outPins[i].setState(false);
+                }
+            } else if (outBuses[i].hiImpedance || outBuses[i].state > 0) {
                 outBuses[i].hiImpedance = false;
                 outBuses[i].state = 0;
                 outBuses[i].setState(0);
