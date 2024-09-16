@@ -206,11 +206,4 @@ public class MaskedMultiplexer extends SchemaPart {
     public void initOuts() {
         outBus = getOutBus("Q");
     }
-
-    @Override
-    public void reset() {
-        outBus.state = 0;
-        outBus.hiImpedance = false;
-        outBus.setState(0);
-    }
 }
