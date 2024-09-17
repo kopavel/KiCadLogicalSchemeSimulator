@@ -66,6 +66,7 @@ public class OscillatorUiComponent extends AbstractUiComponent {
         //noinspection resource
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this::repaint, 0, 1, TimeUnit.SECONDS);
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this::getFreq, 0, 1, TimeUnit.SECONDS);
+        parent.startIfDefault();
     }
 
     @Override

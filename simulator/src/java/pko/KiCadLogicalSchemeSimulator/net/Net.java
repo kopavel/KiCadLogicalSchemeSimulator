@@ -68,7 +68,7 @@ import static pko.KiCadLogicalSchemeSimulator.net.SymbolDescriptions.schemaPartP
 
 public class Net {
     public static final Queue<IModelItem<?>> forResend = new LinkedList<>();
-    public static boolean stabilizing;
+    public static volatile boolean stabilizing = true;
     public final Map<String, SchemaPart> schemaParts = new TreeMap<>();
     public final String optimisedDir;
     private final Map<Pin, DestinationWireDescriptor> destinationWireDescriptors = new HashMap<>();
@@ -436,7 +436,6 @@ public class Net {
     }
 
     private void stabilise() {
-        stabilizing = true;
         schemaParts.values()
                 .stream()
                 .flatMap(p -> p.outPins.values()
