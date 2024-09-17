@@ -35,6 +35,7 @@ import pko.KiCadLogicalSchemeSimulator.api.schemaPart.InteractiveSchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
+import pko.KiCadLogicalSchemeSimulator.net.Net;
 
 import javax.swing.*;
 import java.util.Arrays;
@@ -88,12 +89,12 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                     hiImpedance = false;
                     state = newState;
                     if (!state) {
-                        if (!vSync.state && !lastVSync) {
+                        if (!vSync.state && lastVSync) {
                             if (vSize != 0) {
                                 synchronized (refresh) {
                                     refresh.notifyAll();
                                 }
-                            } else {
+                            } else if (!Net.stabilizing) {
                                 vSize = vPos + 1;
                                 while (!display.sized) {
                                     try {
@@ -111,8 +112,8 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                             }
                             hPos = 0;
                             vPos = 0;
-                        } else if (!hSync.state && !lastHSync) {
-                            if (hSize == 0) {
+                        } else if (!hSync.state && lastHSync) {
+                            if (hSize == 0 && !Net.stabilizing) {
                                 hSize = hPos + 1;
                                 byte[] firstRow = Arrays.copyOf(ram[0], hSize);
                                 ram = new byte[2048][hSize];
@@ -125,8 +126,8 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                         byte data = (byte) (vIn.state ? 0xff : 0x0);
                         ram[vPos][hPos] = data;
                         hPos++;
-                        lastHSync = !hSync.state;
-                        lastVSync = !vSync.state;
+                        lastHSync = hSync.state;
+                        lastVSync = vSync.state;
                     }
                 }
             });
@@ -178,7 +179,7 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
 
     @Override
     public String extraState() {
-        fps = (fps * 0.9) + (1.0 * rows / vSize);
+        fps = (fps * 0.9) + ((double) rows / vSize);
         rows = 0;
         return "Width :" + hSize + "\nHeight:" + vSize + "\nFps:" + String.format("%.2f", fps);
     }
@@ -196,7 +197,7 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
     public void reset() {
         hPos = 0;
         vPos = 0;
-        lastVSync = true;
-        lastHSync = true;
+        lastVSync = false;
+        lastHSync = false;
     }
 }
