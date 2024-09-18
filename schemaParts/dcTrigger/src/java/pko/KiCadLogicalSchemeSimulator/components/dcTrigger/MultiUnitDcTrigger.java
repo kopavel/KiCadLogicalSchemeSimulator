@@ -280,5 +280,9 @@ public class MultiUnitDcTrigger extends SchemaPart {
             iqOut[i].hiImpedance = false;
             iqOut[i].setState(true);
         }
+        rPin.state = params.containsKey("setReverse");
+        rPin.hiImpedance = false;
+        sPin.state = params.containsKey("setReverse");
+        sPin.hiImpedance = false;
     }
 }

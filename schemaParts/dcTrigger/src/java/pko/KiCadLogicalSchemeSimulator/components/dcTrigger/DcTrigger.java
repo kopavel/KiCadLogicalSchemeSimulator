@@ -238,5 +238,9 @@ public class DcTrigger extends SchemaPart {
         iqOut.state = true;
         iqOut.hiImpedance = false;
         iqOut.setState(true);
+        rPin.state = params.containsKey("setReverse");
+        rPin.hiImpedance = false;
+        sPin.state = params.containsKey("setReverse");
+        sPin.hiImpedance = false;
     }
 }
