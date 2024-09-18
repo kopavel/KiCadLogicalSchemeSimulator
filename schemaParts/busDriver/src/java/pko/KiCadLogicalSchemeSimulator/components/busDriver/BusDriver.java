@@ -32,7 +32,7 @@
 package pko.KiCadLogicalSchemeSimulator.components.busDriver;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.in.NoFloatingInBus;
+import pko.KiCadLogicalSchemeSimulator.api.bus.in.NoFloatingCorrectedInBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
 
@@ -57,7 +57,7 @@ public class BusDriver extends SchemaPart {
         outs = new Bus[partAmount];
         for (int i = 0; i < partAmount; i++) {
             int finalI = i;
-            ins[i] = addInBus(new NoFloatingInBus("I" + (char) ('a' + finalI), this, sizes[finalI]) {
+            ins[i] = addInBus(new NoFloatingCorrectedInBus("I" + (char) ('a' + finalI), this, sizes[finalI]) {
                 @Override
                 public void setState(long newState) {
                     state = newState;
