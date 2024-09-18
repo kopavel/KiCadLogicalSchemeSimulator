@@ -36,6 +36,8 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 public class SingleBitSdRam extends SchemaPart {
     private final boolean[] mem;
     private final InBus addrPin;
@@ -62,6 +64,9 @@ public class SingleBitSdRam extends SchemaPart {
         module = (int) Math.pow(2, size);
         int ramSize = (int) Math.pow(2, size * 2);
         mem = new boolean[ramSize];
+        for (int i = 0; i < ramSize; i++) {
+            mem[i] = ThreadLocalRandom.current().nextBoolean();
+        }
         addrPin = addInBus("A", size);
         addOutPin("Dout");
         dIn = addInPin("Din");

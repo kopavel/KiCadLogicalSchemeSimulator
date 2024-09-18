@@ -10,10 +10,6 @@
 		<symbol name="2102AN" symPartClass="SingleBitRam" symPartParam="size=10;reverse">
 			<unit pinMap="8=A0;4=A1;5=A2;6=A3;7=A4;2=A5;1=A6;16=A7;15=A8;14=A9;11=Din;12=Dout;13=~{CS};3=~{WE}"/>
 		</symbol>
-	</lib>
-	<lib name="TRS80IUS">
-		<symbol name="2102AN" symPartClass="SingleBitRam" symPartParam="size=10;reverse">
-			<unit pinMap="8=A0;4=A1;5=A2;6=A3;7=A4;2=A5;1=A6;16=A7;15=A8;14=A9;11=Din;12=Dout;13=~{CS};3=~{WE}"/>
-		</symbol>
+		<symbol name="2102ANx8" symPartClass="Ram" symPartParam="size=8;aSize=10;reverse;separateOut"/>
 	</lib>
 </symbolMap>

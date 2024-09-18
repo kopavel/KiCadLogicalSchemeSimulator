@@ -36,6 +36,7 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.in.NoFloatingCorrectedInBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
+import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 public class Ram extends SchemaPart {
     private final long[] words;
@@ -53,7 +54,7 @@ public class Ram extends SchemaPart {
             throw new RuntimeException("Ram component need \"size\" parameter");
         }
         if (!sParam.contains("aSize")) {
-            throw new RuntimeException("Ram component need \"dSize\" parameter");
+            throw new RuntimeException("Ram component need \"aSize\" parameter");
         }
         try {
             size = Integer.parseInt(params.get("size"));
@@ -79,8 +80,12 @@ public class Ram extends SchemaPart {
         }
         int ramSize = (int) Math.pow(2, aSize);
         words = new long[ramSize];
+        long maskForSize = Utils.getMaskForSize(size);
+        for (int i = 0; i < ramSize; i++) {
+            words[i] = i & maskForSize;//ThreadLocalRandom.current().nextLong() & maskForSize;
+        }
         addOutBus("D", size);
-        dIn = addInBus("D", size);
+        dIn = addInBus(params.containsKey("separateOut") ? "Din" : "D", size);
         if (reverse) {
             aBus = addInBus(new NoFloatingCorrectedInBus("A", this, aSize) {
                 @Override

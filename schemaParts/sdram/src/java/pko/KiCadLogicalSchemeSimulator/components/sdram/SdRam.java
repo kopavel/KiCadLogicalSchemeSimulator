@@ -35,6 +35,9 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
+import pko.KiCadLogicalSchemeSimulator.tools.Utils;
+
+import java.util.concurrent.ThreadLocalRandom;
 
 public class SdRam extends SchemaPart {
     private final long[] bytes;
@@ -70,6 +73,10 @@ public class SdRam extends SchemaPart {
         module = (int) Math.pow(2, aSize);
         int ramSize = (int) Math.pow(2, aSize * 2);
         bytes = new long[ramSize];
+        long maskForSize = Utils.getMaskForSize(size);
+        for (int i = 0; i < ramSize; i++) {
+            bytes[i] = ThreadLocalRandom.current().nextLong() & maskForSize;
+        }
         addrPin = addInBus("A", aSize);
         addOutBus("D", size);
         dIn = addInBus("D", size);

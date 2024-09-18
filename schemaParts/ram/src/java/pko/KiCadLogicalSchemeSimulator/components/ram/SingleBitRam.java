@@ -37,6 +37,8 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 //FixMe make unittest
 public class SingleBitRam extends SchemaPart {
     private final boolean[] data;
@@ -65,6 +67,9 @@ public class SingleBitRam extends SchemaPart {
         }
         int ramSize = (int) Math.pow(2, size);
         data = new boolean[ramSize];
+        for (int i = 0; i < ramSize; i++) {
+            data[i] = ThreadLocalRandom.current().nextBoolean();
+        }
         addOutPin("Dout");
         dIn = addInPin("Din");
         if (reverse) {

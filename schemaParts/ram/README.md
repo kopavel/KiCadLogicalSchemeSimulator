@@ -4,17 +4,18 @@ Implements static RAM with a defined number of address inputs and data outputs.
 
 **Input names**:
 
-- Ax, where x is a sequential number, starting from 0.
+- A[x], where x is a sequential number, starting from 0.
 - CS (Chip Select)
 - WE (Write Enable)
 - OE (Output Enable)
 
-**Output names**: Dx, where x is a sequential number, starting from 0.
+**Output names**: D[x], where x is a sequential number, starting from 0.
 
 **Mandatory parameters**:
 
-- `size`: Specifies the number of output/data pins.
-- `aSize`: Specifies the number of address pins.
+- `size`: Specifies output/data pin amount.
+- `aSize`: Specifies address pin amount.
+- `separateOut`: If specified — D bus inputs are separated from Outputs and named Din[x], where x is a sequential number, starting from 0.
 
 **Optional parameter `reverse`**: If provided, the inputs CS, WE and OE are reversed, allowing for different configuration styles.
 
