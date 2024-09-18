@@ -229,6 +229,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
             }
         }
         hiImpedance = true;
+        oldImpedance = true;
         assert Log.debug(BusMergerWireIn.class,
                 "Bus merger setImpedance. after: Source:{} (state:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{}, " +
                         "hiImpedance:{})",
