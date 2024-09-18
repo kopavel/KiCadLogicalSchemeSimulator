@@ -347,7 +347,7 @@
 		<symbol name="74LS157" symPartClass="MaskedMultiplexer" symPartParam="size=4;nSize=1;reverse">
 			<unit pinMap="2=A0;3=A1;5=B0;6=B1;11=C0;10=C1;14=D0;13=D1;1=N0;15=OE;4=QA;7=QB;9=QC;12=QD"/>
 		</symbol>
-		<symbol name="74LS166" symPartClass="SingleOutShifter" symPartParam="size=8;clearReverse;plReverse;outPin=7">
+		<symbol name="74LS166" symPartClass="SingleOutShifter" symPartParam="size=8;clearReverse;plReverse;outPin=7;inhibitReverse">
 			<unit pinMap="1=DS;2=D0;3=D1;4=D2;5=D3;6=CI;7=CP;9=R;10=D4;11=D5;12=D6;13=Q;14=D7;15=PL;"/>
 		</symbol>
 		<symbol name="74LS174" symPartClass="MultiUnitDcTrigger" symPartParam="size=6;setReverse;">
