@@ -43,19 +43,14 @@ import java.util.Arrays;
 public class Display extends SchemaPart implements InteractiveSchemaPart {
     private final InPin vIn;
     private final DisplayUiComponent display;
-    private final InPin hSync;
-    private final InPin vSync;
     private final Object refresh = new Object();
     public byte[][] ram = new byte[1][4096];
     public int hSize;
     public int vSize;
     int rows;
     double fps;
-    //    private byte[] firstRow = new byte[4096];
     private int hPos;
     private int vPos;
-    private boolean lastVSync = true;
-    private boolean lastHSync = true;
 
     public Display(String id, String sParam) {
         super(id, sParam);
@@ -83,98 +78,119 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
             }
         });
         if (reverse) {
-            addInPin(new NoFloatingInPin("Clock", this) {
+            addInPin(new NoFloatingInPin("HSync", this) {
                 @Override
                 public void setState(boolean newState) {
-                    hiImpedance = false;
                     state = newState;
-                    if (!state) {
-                        if (!vSync.state && lastVSync) {
-                            if (vSize != 0) {
-                                synchronized (refresh) {
-                                    refresh.notifyAll();
-                                }
-                            } else if (!Net.stabilizing) {
-                                vSize = vPos + 1;
-                                while (!display.sized) {
-                                    try {
-                                        //noinspection BusyWait
-                                        Thread.sleep(1);
-                                    } catch (InterruptedException e) {
-                                        throw new RuntimeException(e);
-                                    }
-                                }
-                                Thread.ofVirtual().start(() -> SwingUtilities.invokeLater(() -> {
-                                    //noinspection deprecation
-                                    display.reshape(display.currentX, display.currentY, hSize * display.scaleFactor, vSize * display.scaleFactor);
-                                }));
-                                ram = Arrays.copyOf(ram, vSize);
-                            }
-                            hPos = 0;
-                            vPos = 0;
-                        } else if (!hSync.state && lastHSync) {
-                            if (hSize == 0 && !Net.stabilizing) {
-                                hSize = hPos + 1;
-                                byte[] firstRow = Arrays.copyOf(ram[0], hSize);
-                                ram = new byte[2048][hSize];
-                                ram[0] = firstRow;
-                            }
-                            hPos = 0;
-                            vPos++;
-                            rows++;
+                    hiImpedance = false;
+                    if (!newState) {
+                        if (hSize == 0 && !Net.stabilizing) {
+                            hSize = hPos + 1;
+                            byte[] firstRow = Arrays.copyOf(ram[0], hSize);
+                            ram = new byte[2048][hSize];
+                            ram[0] = firstRow;
                         }
-                        byte data = (byte) (vIn.state ? 0xff : 0x0);
-                        ram[vPos][hPos] = data;
-                        hPos++;
-                        lastHSync = hSync.state;
-                        lastVSync = vSync.state;
+                        hPos = 0;
+                        vPos++;
+                        rows++;
+                    }
+                }
+            });
+            addInPin(new NoFloatingInPin("VSync", this) {
+                @Override
+                public void setState(boolean newState) {
+                    state = newState;
+                    hiImpedance = false;
+                    if (!newState) {
+                        if (vSize != 0) {
+                            synchronized (refresh) {
+                                refresh.notifyAll();
+                            }
+                        } else if (!Net.stabilizing) {
+                            vSize = vPos + 1;
+                            while (!display.sized) {
+                                try {
+                                    //noinspection BusyWait
+                                    Thread.sleep(1);
+                                } catch (InterruptedException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+                            Thread.ofVirtual().start(() -> SwingUtilities.invokeLater(() -> {
+                                //noinspection deprecation
+                                display.reshape(display.currentX, display.currentY, hSize * display.scaleFactor, vSize * display.scaleFactor);
+                            }));
+                            ram = Arrays.copyOf(ram, vSize);
+                        }
+                        hPos = 0;
+                        vPos = 0;
                     }
                 }
             });
         } else {
-            addInPin(new NoFloatingInPin("Clock", this) {
+            addInPin(new NoFloatingInPin("HSync", this) {
                 @Override
                 public void setState(boolean newState) {
-                    hiImpedance = false;
                     state = newState;
-                    if (!state) {
-                        if (vSync.state && !lastVSync) {
-                            if (vSize == 0) {
-                                vSize = vPos + 2;
-                                SwingUtilities.invokeLater(() -> {
-                                    //noinspection deprecation
-                                    display.reshape(display.currentX, display.currentY, hSize * display.scaleFactor, vSize * display.scaleFactor);
-                                });
-                                ram = Arrays.copyOf(ram, vSize);
-                            } else {
-                                synchronized (refresh) {
-                                    refresh.notifyAll();
+                    hiImpedance = false;
+                    if (newState) {
+                        if (hSize == 0 && !Net.stabilizing) {
+                            hSize = hPos + 1;
+                            byte[] firstRow = Arrays.copyOf(ram[0], hSize);
+                            ram = new byte[2048][hSize];
+                            ram[0] = firstRow;
+                        }
+                        hPos = 0;
+                        vPos++;
+                        rows++;
+                    }
+                }
+            });
+            addInPin(new NoFloatingInPin("VSync", this) {
+                @Override
+                public void setState(boolean newState) {
+                    state = newState;
+                    hiImpedance = false;
+                    if (newState) {
+                        if (vSize != 0) {
+                            synchronized (refresh) {
+                                refresh.notifyAll();
+                            }
+                        } else if (!Net.stabilizing) {
+                            vSize = vPos + 1;
+                            while (!display.sized) {
+                                try {
+                                    //noinspection BusyWait
+                                    Thread.sleep(1);
+                                } catch (InterruptedException e) {
+                                    throw new RuntimeException(e);
                                 }
                             }
-                            hPos = 0;
-                            vPos = 0;
-                        } else if (hSync.state && !lastHSync) {
-                            if (hSize == 0) {
-                                hSize = hPos + 2;
-                                byte[] firstRow = Arrays.copyOf(ram[0], hSize);
-                                ram = new byte[2048][hSize];
-                                ram[0] = firstRow;
-                            }
-                            hPos = 0;
-                            vPos++;
-                            rows++;
+                            Thread.ofVirtual().start(() -> SwingUtilities.invokeLater(() -> {
+                                //noinspection deprecation
+                                display.reshape(display.currentX, display.currentY, hSize * display.scaleFactor, vSize * display.scaleFactor);
+                            }));
+                            ram = Arrays.copyOf(ram, vSize);
                         }
-                        hPos++;
-                        ram[vPos][hPos] = (byte) (vIn.state ? 0xff : 0x0);
-                        lastHSync = hSync.state;
-                        lastVSync = vSync.state;
+                        hPos = 0;
+                        vPos = 0;
                     }
                 }
             });
         }
+        addInPin(new NoFloatingInPin("Clock", this) {
+            @Override
+            public void setState(boolean newState) {
+                hiImpedance = false;
+                state = newState;
+                if (!state) {
+                    byte data = (byte) (vIn.state ? 0xff : 0x0);
+                    ram[vPos][hPos] = data;
+                    hPos++;
+                }
+            }
+        });
         vIn = addInPin("Vin");
-        hSync = addInPin("HSync");
-        vSync = addInPin("VSync");
     }
 
     @Override
@@ -197,7 +213,5 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
     public void reset() {
         hPos = 0;
         vPos = 0;
-        lastVSync = false;
-        lastHSync = false;
     }
 }
