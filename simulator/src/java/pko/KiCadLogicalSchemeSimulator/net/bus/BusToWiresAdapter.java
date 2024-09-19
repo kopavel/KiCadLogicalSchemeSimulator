@@ -33,7 +33,6 @@ package pko.KiCadLogicalSchemeSimulator.net.bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
@@ -59,10 +58,8 @@ public class BusToWiresAdapter extends OutBus {
     public void setState(long newState) {
         /*Optimiser bind mask*/
         if (maskState != (newState & mask)
-                /*Optimiser bind d:destinations[0] block noHiImp*///
-                || destinations[0].hiImpedance
-            /*Optimiser blockend noHiImp*///
-        ) {
+                /*Optimiser bind d:destinations[0]*///
+                || destinations[0].hiImpedance) {
             /*Optimiser bind mask*/
             maskState = newState & mask;
             /*Optimiser block dest*/
@@ -97,9 +94,6 @@ public class BusToWiresAdapter extends OutBus {
             ClassOptimiser<BusToWiresAdapter> optimiser = new ClassOptimiser<>(this).unroll(destinations.length).bind("mask", mask).bind("d", "destination0");
             if (destinations.length == 1) {
                 optimiser.bind("v", "maskState != 0").cut("dest");
-            }
-            if (Arrays.stream(destinations).allMatch(d -> d instanceof NoFloatingInPin)) {
-                optimiser.cut("noHiImp");
             }
             return optimiser.build();
         }

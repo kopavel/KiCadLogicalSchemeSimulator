@@ -38,6 +38,8 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 public class Ram extends SchemaPart {
     private final long[] words;
     private final InBus dIn;
@@ -82,7 +84,7 @@ public class Ram extends SchemaPart {
         words = new long[ramSize];
         long maskForSize = Utils.getMaskForSize(size);
         for (int i = 0; i < ramSize; i++) {
-            words[i] = i & maskForSize;//ThreadLocalRandom.current().nextLong() & maskForSize;
+            words[i] = ThreadLocalRandom.current().nextLong() & maskForSize;
         }
         addOutBus("D", size);
         dIn = addInBus(params.containsKey("separateOut") ? "Din" : "D", size);
