@@ -56,10 +56,8 @@ public class BusToWiresAdapter extends OutBus {
 
     @Override
     public void setState(long newState) {
-        /*Optimiser bind mask*/
-        if (maskState != (newState & mask)
-                /*Optimiser bind d:destinations[0]*///
-                || destinations[0].hiImpedance) {
+        /*Optimiser bind d:destinations[0] bind mask*/
+        if (destinations[0].hiImpedance || maskState != (newState & mask)) {
             /*Optimiser bind mask*/
             maskState = newState & mask;
             /*Optimiser block dest*/
@@ -92,7 +90,7 @@ public class BusToWiresAdapter extends OutBus {
                 destinations[i] = destinations[i].getOptimised();
             }
             ClassOptimiser<BusToWiresAdapter> optimiser = new ClassOptimiser<>(this).unroll(destinations.length).bind("mask", mask).bind("d", "destination0");
-            if (destinations.length == 1) {
+            if (destinations.length < 3) {
                 optimiser.bind("v", "maskState != 0").cut("dest");
             }
             return optimiser.build();
