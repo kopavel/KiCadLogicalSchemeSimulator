@@ -44,7 +44,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 public class OutBus extends Bus {
-    private final Map<Byte, OffsetBus> corrected = new HashMap<>();
+    private final Map<Long, Map<Byte, OffsetBus>> corrected = new HashMap<>();
     public Bus[] destinations = new Bus[0];
     public long mask;
 
@@ -61,8 +61,8 @@ public class OutBus extends Bus {
 
     public void addDestination(Bus bus, long mask, byte offset) {
         if (bus instanceof CorrectedInBus correctedBus && offset != 0) {
-            if (corrected.containsKey(offset)) {
-                corrected.get(offset).addDestination(bus);
+            if (corrected.containsKey(mask) && corrected.get(mask).containsKey(offset)) {
+                corrected.get(mask).get(offset).addDestination(bus);
                 return;
             } else {
                 if (offset > 0) {
@@ -70,7 +70,7 @@ public class OutBus extends Bus {
                 } else {
                     bus = new NegativeOffsetBus(this, correctedBus, offset);
                 }
-                corrected.put(offset, (OffsetBus) bus);
+                corrected.computeIfAbsent(mask, m -> new HashMap<>()).put(offset, (OffsetBus) bus);
             }
         }
         if (mask != this.mask) {
