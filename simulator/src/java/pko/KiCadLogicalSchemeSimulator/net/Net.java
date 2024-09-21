@@ -467,6 +467,7 @@ public class Net {
         }
         for (int i = 0; i < resendTry; i++) {
             schemaParts.values().forEach(SchemaPart::reset);
+            resend();
         }
         stabilizing = false;
         if (!forResend.isEmpty()) {
