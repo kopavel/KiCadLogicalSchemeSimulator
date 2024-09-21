@@ -15,6 +15,7 @@ Implements dynamic RAM with a defined number of address inputs and data outputs.
 
 - `size`: Specifies the number of output/data pins.
 - `aSize`: Specifies the number of address pins.
+- `separateOut`: If specified — D bus inputs are separated from Outputs and named Din[x], where x is a sequential number, starting from 0.
 
 **Optional parameter `reverse`**: If provided, the inputs RAS, CAS, and WE are reversed, allowing for different configuration styles.
 

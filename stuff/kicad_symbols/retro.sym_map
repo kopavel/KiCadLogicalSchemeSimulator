@@ -4,6 +4,7 @@
 		<symbol name="MK4116" symPartClass="SingleBitSdRam" symPartParam="size=7;reverse">
 			<unit pinMap="2=Din;3=~{WE};4=~{RAS};5=A0;6=A2;7=A1;10=A5;11=A4;12=A3;13=A6;14=Dout;15=~{CAS}"/>
 		</symbol>
+		<symbol name="MK4116x8" symPartClass="SdRam" symPartParam="size=8;aSize=7;reverse;separateOut"/>
 		<symbol name="MCM6670" symPartClass="Rom" symPartParam="size=5;aSize=10;reverse">
 			<unit pinMap="7=A3;6=A4;5=A5;4=A6;3=A7;2=A8;1=A9;8=A0;10=A1;11=A2;12=D0;13=D1;14=D2;15=D3;16=D4;17=~{CS}"/>
 		</symbol>

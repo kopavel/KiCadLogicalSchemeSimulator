@@ -79,7 +79,7 @@ public class SdRam extends SchemaPart {
         }
         addrPin = addInBus("A", aSize);
         addOutBus("D", size);
-        dIn = addInBus("D", size);
+        dIn = addInBus(params.containsKey("separateOut") ? "Din" : "D", size);
         if (reverse) {
             addInPin(new NoFloatingInPin("~{RAS}", this) {
                 @Override
