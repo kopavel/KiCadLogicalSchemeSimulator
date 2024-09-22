@@ -34,6 +34,7 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.in.NoFloatingCorrectedInBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
+import pko.KiCadLogicalSchemeSimulator.tools.Log;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 import java.io.BufferedInputStream;
@@ -89,6 +90,11 @@ public class Rom extends SchemaPart {
         }
         try (InputStream is = new BufferedInputStream(new FileInputStream(file))) {
             byte[] fileBytes = is.readAllBytes();
+            if (fileBytes.length > romSize) {
+                throw new RuntimeException("Rom component " + id + " file size (" + fileBytes.length + ") is bigger, then Rom size(" + romSize + ")");
+            } else if (fileBytes.length < romSize) {
+                Log.warn(Rom.class, "Rom component {} file size ({}) is smaller, then Rom size ({})", id, fileBytes.length, romSize);
+            }
             if (size < 9) {
                 for (int i = 0; i < fileBytes.length; i++) {
                     words[i] = fileBytes[i] & mask;
