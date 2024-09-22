@@ -43,6 +43,7 @@ public class DcTrigger extends SchemaPart {
     private Pin iqOut;
     private boolean clockEnabled = true;
 
+    //ToDo implement "no RS" trigger
     protected DcTrigger(String id, String sParam) {
         super(id, sParam);
         dPin = addInPin("D");

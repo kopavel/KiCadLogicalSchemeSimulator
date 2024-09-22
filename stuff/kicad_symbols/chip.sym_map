@@ -19,8 +19,12 @@
 		</symbol>
 		<symbol name="DISPLAY" symPartClass="Display" symPartParam="reverse"/>
 		<symbol name="LED" symPartClass="Led" symPartParam="size=30;onColor=#FF0000;offColor=#808080"/>
-		<symbol name="MULTIPLEXER" symPartClass="Multiplexer" symPartParam="size=2;nSize=2;reverse"/>
-		<symbol name="MULTIPLEXERx8" symPartClass="Multiplexer" symPartParam="size=8;nSize=2;reverse"/>
+		<symbol name="MUX2x4" symPartClass="Multiplexer" symPartParam="size=4;nSize=1;reverse"/>
+		<symbol name="MUX2x8" symPartClass="Multiplexer" symPartParam="size=8;nSize=1;reverse"/>
+		<symbol name="MUX2x10" symPartClass="Multiplexer" symPartParam="size=10;nSize=1;reverse"/>
+		<symbol name="MUX2x12" symPartClass="Multiplexer" symPartParam="size=12;nSize=1;reverse"/>
+		<symbol name="MUX4x2" symPartClass="Multiplexer" symPartParam="size=2;nSize=2;reverse"/>
+		<symbol name="MUX4x8" symPartClass="Multiplexer" symPartParam="size=8;nSize=2;reverse"/>
 		<symbol name="NAND" symPartClass="AndGate" symPartParam="size=2;reverse"/>
 		<symbol name="NOR" symPartClass="OrGate" symPartParam="size=2;reverse"/>
 		<symbol name="NOT" symPartClass="Repeater" symPartParam="reverse"/>
@@ -41,5 +45,6 @@
 		<symbol name="SWITCH" symPartClass="Switch"/>
 		<symbol name="XOR" symPartClass="XorGate"/>
 		<symbol name="Z80CPU" symPartClass="Z80Cpu"/>
+		<symbol name="KBD" symPartClass="Keyboard"/>
 	</lib>
 </symbolMap>

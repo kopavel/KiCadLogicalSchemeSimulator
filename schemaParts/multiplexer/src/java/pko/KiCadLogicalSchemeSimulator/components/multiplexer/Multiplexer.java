@@ -71,6 +71,7 @@ public class Multiplexer extends SchemaPart {
                     state = newState;
                     hiImpedance = false;
                     if (finalInNo == nState /*&& outBus.state != newState*/) {
+                        outBus.hiImpedance = false;
                         outBus.state = newState;
                         outBus.setState(newState);
                     }
@@ -92,6 +93,7 @@ public class Multiplexer extends SchemaPart {
                     }
                     if (!inBuses[nState].hiImpedance && outBus.state != inBuses[nState].state) {
                         outBus.state = inBuses[nState].state;
+                        outBus.hiImpedance = false;
                         outBus.setState(outBus.state);
                     }
                 }
