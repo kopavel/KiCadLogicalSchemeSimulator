@@ -58,9 +58,11 @@ public class BusMerger extends OutBus {
         super(destination.id, destination.parent, destination.size);
         variantId = destination.variantId == null ? "" : destination.variantId + ":";
         variantId += "merger";
-        if (destination instanceof BusInInterconnect interconnect) {
+        Bus d = destination;
+        while (d instanceof BusInInterconnect interconnect) {
             this.mask &= interconnect.inverseInterconnectMask;
             this.mask |= interconnect.senseMask;
+            d = interconnect.destination;
         }
         destinations = new Bus[]{destination};
     }

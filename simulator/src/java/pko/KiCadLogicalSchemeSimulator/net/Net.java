@@ -252,31 +252,36 @@ public class Net {
         //Process Bus destinations
         //
         destinationBusesOffsets.forEach((destinationBus, destinationOffsets) -> {
-            DestinationBusDescriptor descriptor = destinationBusDescriptors.computeIfAbsent(destinationBus, p -> new DestinationBusDescriptor());
-            if (destinationOffsets.size() > 1) {
-                // interconnected Bus pins
-                destinationBusDescriptors.remove(destinationBus);
-                long interconnectMask = 0;
-                for (Byte offset : destinationOffsets) {
-                    interconnectMask |= (1L << offset);
-                }
-                Byte offset = destinationOffsets.getFirst();
-                destinationOffsets.clear();
-                destinationOffsets.add(offset);
-                BusInInterconnect interconnect = new BusInInterconnect(destinationBus, interconnectMask, offset);
-                destinationBusDescriptors.put(interconnect, descriptor);
-                replacement.put(destinationBus, interconnect);
-            }
+            DestinationBusDescriptor descriptor =
+                    destinationBusDescriptors.computeIfAbsent((Bus) replacement.getOrDefault(destinationBus, destinationBus), p -> new DestinationBusDescriptor());
             if (TRUE == powerState) {
-                SchemaPart pwr = getSchemaPart("Power", "pwr_" + destinationBus.getName(), "hi;strong");
-                schemaParts.put(pwr.id, pwr);
-                descriptor.add(pwr.getOutItem("OUT"), (byte) 0, destinationOffsets.getFirst());
-                sourcesOffset.put(pwr.getOutItem("OUT"), (byte) 0);
+                for (Byte destinationOffset : destinationOffsets) {
+                    SchemaPart pwr = getSchemaPart("Power", "pwr_" + destinationBus.getName(), "hi;strong");
+                    schemaParts.put(pwr.id, pwr);
+                    descriptor.add(pwr.getOutItem("OUT"), (byte) 0, destinationOffset);
+                    sourcesOffset.put(pwr.getOutItem("OUT"), (byte) 0);
+                }
             } else if (FALSE == powerState) {
-                SchemaPart gnd = getSchemaPart("Power", "gnd_" + destinationBus.getName(), "strong");
-                schemaParts.put(gnd.id, gnd);
-                descriptor.add(gnd.getOutItem("OUT"), (byte) 0, destinationOffsets.getFirst());
+                for (Byte destinationOffset : destinationOffsets) {
+                    SchemaPart gnd = getSchemaPart("Power", "gnd_" + destinationBus.getName(), "strong");
+                    schemaParts.put(gnd.id, gnd);
+                    descriptor.add(gnd.getOutItem("OUT"), (byte) 0, destinationOffset);
+                }
             } else {
+                if (destinationOffsets.size() > 1) {
+                    // interconnected Bus pins
+                    destinationBusDescriptors.remove(destinationBus);
+                    long interconnectMask = 0;
+                    for (Byte offset : destinationOffsets) {
+                        interconnectMask |= (1L << offset);
+                    }
+                    Byte offset = destinationOffsets.getFirst();
+                    destinationOffsets.clear();
+                    destinationOffsets.add(offset);
+                    BusInInterconnect interconnect = new BusInInterconnect(destinationBus, interconnectMask, offset);
+                    destinationBusDescriptors.put(interconnect, descriptor);
+                    replacement.put(destinationBus, interconnect);
+                }
                 sourcesOffset.forEach((source, sourceOffset) -> descriptor.add(source, sourceOffset, destinationOffsets.getFirst()));
             }
             passivePins.forEach(passivePin -> descriptor.add(passivePin, (byte) 0, destinationOffsets.getFirst()));
