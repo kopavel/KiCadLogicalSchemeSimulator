@@ -101,6 +101,7 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
                 /*Optimiser bind mask*/
                 merger.strongPins = mask;
             }
+            oldImpedance = false;
             if (newState != merger.state || merger.hiImpedance) {
                 merger.state = newState;
                 merger.hiImpedance = false;
@@ -126,6 +127,7 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
                 /*Optimiser bind mask*/
                 merger.strongPins |= mask;
             }
+            oldImpedance = false;
             /*Optimiser bind nMask*/
             merger.state &= nMask;
             merger.state |= newState;
@@ -147,7 +149,6 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
         }
         /*Optimiser blockend sameMask*/
         /*Optimiser blockend otherMask*/
-        oldImpedance = false;
         assert Log.debug(BusMergerBusIn.class,
                 "Bus merger change. after: newState:{}, Source:{} (state:{},  hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{}, " +
                         "hiImpedance:{})\",",
@@ -165,7 +166,7 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
 
     @Override
     public void setHiImpedance() {
-        assert Log.debug(BusMergerBusIn.class,
+        assert Log.debug(this.getClass(),
                 "Bus merger setImpedance. before: Source:{} (state:{},  hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{}, " +
                         "hiImpedance:{})\",",
                 getName(),
@@ -234,7 +235,7 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
         /*Optimiser blockend otherMask*/
         hiImpedance = true;
         oldImpedance = true;
-        assert Log.debug(BusMergerBusIn.class,
+        assert Log.debug(this.getClass(),
                 "Bus merger setImpedance. after: Source:{} (state:{},  hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{}, " +
                         "hiImpedance:{})\",",
                 getName(),
