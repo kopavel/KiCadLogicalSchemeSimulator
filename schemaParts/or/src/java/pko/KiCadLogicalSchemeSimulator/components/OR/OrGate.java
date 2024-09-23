@@ -72,10 +72,6 @@ public class OrGate extends SchemaPart {
                             }
                         }
                     }
-
-                    @Override
-                    public void resend() {
-                    }
                 });
             } else {
                 addInPin(new NoFloatingInPin("IN" + i, this) {
@@ -100,10 +96,6 @@ public class OrGate extends SchemaPart {
                                 inState &= nMask;
                             }
                         }
-                    }
-
-                    @Override
-                    public void resend() {
                     }
                 });
             }

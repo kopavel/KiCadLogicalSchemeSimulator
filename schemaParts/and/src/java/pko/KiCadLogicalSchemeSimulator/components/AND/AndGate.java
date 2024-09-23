@@ -72,10 +72,6 @@ public class AndGate extends SchemaPart {
                             }
                         }
                     }
-
-                    @Override
-                    public void resend() {
-                    }
                 });
             } else {
                 addInPin(new NoFloatingInPin("IN" + i, this) {
@@ -100,10 +96,6 @@ public class AndGate extends SchemaPart {
                                 inState |= mask;
                             }
                         }
-                    }
-
-                    @Override
-                    public void resend() {
                     }
                 });
             }
