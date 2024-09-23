@@ -129,12 +129,8 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
             /*Optimiser bind nMask*/
             merger.state &= nMask;
             merger.state |= newState;
-            if ((merger.strongPins
-                    /*Optimiser block noWeakPin*///
-                    | merger.weakPins
-                    /*Optimiser blockend noWeakPin*/
-                    /*Optimiser bind mMask:merger.mask*///
-            ) != merger.mask) {
+            /*Optimiser bind mMask:merger.mask*///
+            if ((merger.strongPins | merger.weakPins) != merger.mask) {
                 if (!merger.hiImpedance) {
                     for (Bus destination : destinations) {
                         destination.setHiImpedance();
@@ -217,12 +213,7 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
             /*Optimiser bind mask*/
             merger.state |= merger.weakState & mask;
             /*Optimiser bind mMask:merger.mask*/
-            if ((merger.strongPins
-                    /*Optimiser block noWeakPin*///
-                    | merger.weakPins
-                    /*Optimiser blockend noWeakPin*/
-                    /*Optimiser bind mMask:merger.mask*///
-            ) != merger.mask) {
+            if ((merger.strongPins | merger.weakPins) != merger.mask) {
                 if (!merger.hiImpedance) {
                     for (Bus destination : destinations) {
                         destination.setHiImpedance();
@@ -232,6 +223,8 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
             } else if (oldState != merger.state || merger.hiImpedance) {
                 merger.hiImpedance = false;
                 for (Bus destination : destinations) {
+                    destination.hiImpedance = false;
+                    destination.state = merger.state;
                     destination.setState(merger.state);
                 }
             }
@@ -274,12 +267,7 @@ public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
             optimiser.cut("otherMask");
         } else {
             optimiser.cut("sameMask").bind("nMask", nMask);
-            if (merger.hasPassivePin) {
-                optimiser.bind("mMask", merger.mask);
-            } else {
-                optimiser.cut("noWeakPin");
-                optimiser.bind("mMask", merger.mask & ~merger.weakPins);
-            }
+            optimiser.bind("mMask", merger.mask);
         }
         BusMergerBusIn optimised = optimiser.build();
         merger.sources.add(optimised);
