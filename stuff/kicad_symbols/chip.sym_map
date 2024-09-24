@@ -19,6 +19,8 @@
 		</symbol>
 		<symbol name="DISPLAY" symPartClass="Display" symPartParam="reverse"/>
 		<symbol name="LED" symPartClass="Led" symPartParam="size=30;onColor=#FF0000;offColor=#808080"/>
+		<symbol name="MUX2x1" symPartClass="SingleBitMultiplexer" symPartParam="size=1;nSize=1;reverse"/>
+		<symbol name="MUX2x2" symPartClass="Multiplexer" symPartParam="size=2;nSize=1;reverse"/>
 		<symbol name="MUX2x4" symPartClass="Multiplexer" symPartParam="size=4;nSize=1;reverse"/>
 		<symbol name="MUX2x8" symPartClass="Multiplexer" symPartParam="size=8;nSize=1;reverse"/>
 		<symbol name="MUX2x10" symPartClass="Multiplexer" symPartParam="size=10;nSize=1;reverse"/>
