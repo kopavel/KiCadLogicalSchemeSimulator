@@ -44,7 +44,7 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
     private final InPin vIn;
     private final DisplayUiComponent display;
     private final Object refresh = new Object();
-    public byte[][] ram = new byte[1][4096];
+    public byte[][] ram = new byte[10][4096];
     public int hSize;
     public int vSize;
     int rows;
