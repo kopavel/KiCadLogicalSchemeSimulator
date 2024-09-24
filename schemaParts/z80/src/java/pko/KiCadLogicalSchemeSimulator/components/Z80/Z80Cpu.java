@@ -67,6 +67,7 @@ public class Z80Cpu extends SchemaPart {
     private boolean T3;
     private boolean T4;
     private boolean M1;
+    private boolean nmiTriggered;
     private boolean extraWait;
     private boolean needDataPinReset;
     private boolean needRefreshPinReset;
@@ -83,10 +84,27 @@ public class Z80Cpu extends SchemaPart {
                     if (M > 0) {
                         if (T4 || (!M1 && T3)) {
                             T = 1;
-                            ioQueue.poll();
-//                Log.trace(Z80Cpu.class, "cpuDone is {}", cpuDone);
-                            if (ioQueue.head == null) {
-                                M = 1;
+                            if (needRefreshPinReset) {
+                                refreshPin.state = true;
+                                refreshPin.setState(true);
+                                needRefreshPinReset = false;
+                            }
+                            if (needDataPinReset) {
+                                if (!dOut.hiImpedance) {
+                                    dOut.setHiImpedance();
+                                    dOut.hiImpedance = true;
+                                }
+                                needDataPinReset = false;
+                            }
+                            ioQueue.next();
+                            if (ioQueue.request == null) {
+                                if (nmiTriggered) {
+                                    nmiTriggered = false;
+                                    cpu.processNMI();
+                                    M++;
+                                } else {
+                                    M = 1;
+                                }
                             } else {
                                 M++;
                             }
@@ -102,26 +120,13 @@ public class Z80Cpu extends SchemaPart {
                         T3 = T == 3;
                         T4 = T == 4;
                         M1 = M == 1;
-//        Log.trace(Z80Cpu.class, "Set pins at {},{}", M, T);
-                        Request ioRequest = ioQueue.head;
+                        Request ioRequest = ioQueue.request;
                         if (T1) {
-                            if (needRefreshPinReset) {
-                                refreshPin.state = true;
-                                refreshPin.setState(true);
-                                needRefreshPinReset = false;
-                            }
-                            if (needDataPinReset) {
-                                if (!dOut.hiImpedance) {
-                                    dOut.setHiImpedance();
-                                    dOut.hiImpedance = true;
-                                }
-                                needDataPinReset = false;
-                            }
                             if (M1) {
                                 m1Pin.state = false;
                                 m1Pin.setState(false);
                                 cpu.executeOneInstruction();
-                                ioRequest = ioQueue.head;
+                                ioRequest = ioQueue.request;
                             }
                             aOut.state = ioRequest.address;
                             aOut.hiImpedance = false;
@@ -141,6 +146,7 @@ public class Z80Cpu extends SchemaPart {
                             }
                         } else if (T3) {
                             if (M1) {
+                                //noinspection DataFlowIssue
                                 ((ReadRequest) ioRequest).callback.accept((int) dIn.getState());
                                 rdPin.state = true;
                                 rdPin.setState(true);
@@ -156,7 +162,7 @@ public class Z80Cpu extends SchemaPart {
                     }
                 } else {
                     if (M > 0) {
-                        Request ioRequest = ioQueue.head;
+                        Request ioRequest = ioQueue.request;
                         if (T1) {
                             if (ioRequest instanceof MemoryRequest) {
                                 mReqPin.state = false;
@@ -223,7 +229,14 @@ public class Z80Cpu extends SchemaPart {
                 }
             }
         });
-        addInPin("~{NMI}");
+        addInPin(new NoFloatingInPin("~{NMI}", this) {
+            @Override
+            public void setState(boolean newState) {
+                if (!newState) {
+                    nmiTriggered = true;
+                }
+            }
+        });
         addInPin("~{INT}");
         waitPin = addInPin("~{WAIT}");
         addInPin("~{BUSRQ}");
@@ -274,7 +287,6 @@ public class Z80Cpu extends SchemaPart {
     }
 
     public void reset() {
-//            Log.trace(Z80Cpu.class, "reset");
         T = 0;
         M = 0;
         cpu.reset();
