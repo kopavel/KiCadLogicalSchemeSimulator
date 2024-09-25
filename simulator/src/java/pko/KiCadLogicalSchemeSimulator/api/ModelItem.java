@@ -38,7 +38,8 @@ public abstract class ModelItem<T> implements IModelItem<T> {
     public String id;
     public SchemaPart parent;
     public String variantId;
-    public boolean hiImpedance = true;
+    public boolean hiImpedance;
+    public boolean triState;
 
     protected ModelItem(String id, SchemaPart parent) {
         this.id = id;
@@ -46,7 +47,7 @@ public abstract class ModelItem<T> implements IModelItem<T> {
     }
 
     @Override
-    public ModelItem<T> getOptimised() {
+    public ModelItem<T> getOptimised(boolean keepSetters) {
         return this;
     }
 
@@ -59,7 +60,8 @@ public abstract class ModelItem<T> implements IModelItem<T> {
         return hiImpedance + ":" + getName() + (variantId == null ? "" : ":" + variantId) + ":" + super.toString();
     }
 
-    public abstract void setHiImpedance();
+    public void setHiImpedance() {
+    }
 
     @Override
     public int compareTo(IModelItem<T> other) {

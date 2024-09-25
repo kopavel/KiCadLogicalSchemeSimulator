@@ -60,7 +60,6 @@ public abstract class Pin extends ModelItem<Pin> {
     public Pin copyState(IModelItem<Pin> oldPin) {
         this.strong = oldPin.isStrong();
         this.state = oldPin.getState() != 0;
-        this.hiImpedance = oldPin.isHiImpedance();
         if (oldPin instanceof Pin pin && this.merger == null) {
             this.merger = pin.merger;
         }
@@ -80,7 +79,7 @@ public abstract class Pin extends ModelItem<Pin> {
     abstract public void setState(boolean newState);
 
     @Override
-    public Pin getOptimised() {
+    public Pin getOptimised(boolean keepSetters) {
         return this;
     }
 

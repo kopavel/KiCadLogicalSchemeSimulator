@@ -55,11 +55,9 @@ public class SingleBitMultiplexer extends SchemaPart {
             inPins[inNo] = addInPin(new InPin(String.valueOf(finalInNo), this) {
                 @Override
                 public void setState(boolean newState) {
-                    state = newState;
                     hiImpedance = false;
+                    state = newState;
                     if (finalInNo == nState /*&& outBus.state != newState*/) {
-                        outPin.hiImpedance = false;
-                        outPin.state = newState;
                         outPin.setState(newState);
                     }
                 }
@@ -79,9 +77,7 @@ public class SingleBitMultiplexer extends SchemaPart {
                         nState &= nMask;
                     }
                     if (!inPins[nState].hiImpedance && outPin.state != inPins[nState].state) {
-                        outPin.state = inPins[nState].state;
-                        outPin.hiImpedance = false;
-                        outPin.setState(outPin.state);
+                        outPin.setState(inPins[nState].state);
                     }
                 }
             });

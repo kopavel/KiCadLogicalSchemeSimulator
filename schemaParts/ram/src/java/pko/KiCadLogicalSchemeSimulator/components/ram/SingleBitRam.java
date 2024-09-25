@@ -69,7 +69,7 @@ public class SingleBitRam extends SchemaPart {
         for (int i = 0; i < ramSize; i++) {
             data[i] = ThreadLocalRandom.current().nextBoolean();
         }
-        addOutPin("Dout");
+        addTriStateOutPin("Dout");
         dIn = addInPin("Din");
         if (reverse) {
             aBus = addInBus(new InBus("A", this, size) {
@@ -79,13 +79,11 @@ public class SingleBitRam extends SchemaPart {
                     if (!csPin.state) {
                         rOut();
                     }
-                    hiImpedance = false;
                 }
             });
             csPin = addInPin(new InPin("~{CS}", this) {
                 @Override
                 public void setState(boolean newState) {
-                    hiImpedance = false;
                     state = newState;
                     rOut();
                 }
@@ -93,7 +91,6 @@ public class SingleBitRam extends SchemaPart {
             oePin = addInPin(new InPin("~{OE}", this) {
                 @Override
                 public void setState(boolean newState) {
-                    hiImpedance = false;
                     state = newState;
                     rOut();
                 }
@@ -101,7 +98,6 @@ public class SingleBitRam extends SchemaPart {
             addInPin(new InPin("~{WE}", this) {
                 @Override
                 public void setState(boolean newState) {
-                    hiImpedance = false;
                     state = newState;
                     if (!state && !csPin.state) {
                         data[(int) aBus.state] = dIn.state;
@@ -116,13 +112,11 @@ public class SingleBitRam extends SchemaPart {
                     if (!csPin.state) {
                         out();
                     }
-                    hiImpedance = false;
                 }
             });
             csPin = addInPin(new InPin("CS", this) {
                 @Override
                 public void setState(boolean newState) {
-                    hiImpedance = false;
                     state = newState;
                     out();
                 }
@@ -130,7 +124,6 @@ public class SingleBitRam extends SchemaPart {
             oePin = addInPin(new InPin("OE", this) {
                 @Override
                 public void setState(boolean newState) {
-                    hiImpedance = false;
                     state = newState;
                     out();
                 }
@@ -138,7 +131,6 @@ public class SingleBitRam extends SchemaPart {
             addInPin(new InPin("WE", this) {
                 @Override
                 public void setState(boolean newState) {
-                    hiImpedance = false;
                     state = newState;
                     if (state && csPin.state) {
                         data[(int) aBus.state] = dIn.state;
@@ -161,14 +153,11 @@ public class SingleBitRam extends SchemaPart {
     private void out() {
         if (oePin.state && csPin.state) {
             if (dOut.state != data[(int) aBus.state] || dOut.hiImpedance) {
-                dOut.state = data[(int) aBus.state];
-                dOut.hiImpedance = false;
-                dOut.setState(dOut.state);
+                dOut.setState(data[(int) aBus.state]);
             }
         } else {
             if (!dOut.hiImpedance) {
                 dOut.setHiImpedance();
-                dOut.hiImpedance = true;
             }
         }
     }
@@ -177,13 +166,10 @@ public class SingleBitRam extends SchemaPart {
         if (oePin.state | csPin.state) {
             if (!dOut.hiImpedance) {
                 dOut.setHiImpedance();
-                dOut.hiImpedance = true;
             }
         } else {
             if (dOut.state != data[(int) aBus.state] || dOut.hiImpedance) {
-                dOut.state = data[(int) aBus.state];
-                dOut.hiImpedance = false;
-                dOut.setState(dOut.state);
+                dOut.setState(data[(int) aBus.state]);
             }
         }
     }

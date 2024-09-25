@@ -59,6 +59,7 @@ public class OutBus extends Bus {
     }
 
     public void addDestination(Bus bus, long mask, byte offset) {
+        bus.triState = triState;
         if (offset != 0) {
             if (corrected.containsKey(mask) && corrected.get(mask).containsKey(offset)) {
                 corrected.get(mask).get(offset).addDestination(bus);
@@ -88,6 +89,7 @@ public class OutBus extends Bus {
     }
 
     public void addDestination(Pin pin, long mask) {
+        pin.triState = triState;
         Arrays.stream(destinations)
                 .filter(d -> d instanceof MaskGroupBus)
                 .map(d -> ((MaskGroupBus) d))
@@ -101,6 +103,7 @@ public class OutBus extends Bus {
 
     @Override
     public void setState(long newState) {
+        state = newState;
         for (Bus destination : destinations) {
             destination.setState(state);
         }
@@ -108,10 +111,7 @@ public class OutBus extends Bus {
 
     @Override
     public void setHiImpedance() {
-        assert !hiImpedance : "Already in hiImpedance:" + this;
-        for (Bus destination : destinations) {
-            destination.setHiImpedance();
-        }
+        throw new RuntimeException("setImpedance on non tri-state OutBus");
     }
 
     @Override
@@ -122,16 +122,17 @@ public class OutBus extends Bus {
     }
 
     @Override
-    public Bus getOptimised() {
+    public Bus getOptimised(boolean keepSetters) {
         if (destinations.length == 0) {
             return new NCBus(this);
         } else if (destinations.length == 1) {
-            return destinations[0].getOptimised().copyState(this);
+            return destinations[0].getOptimised(true).copyState(this);
         } else {
             for (int i = 0; i < destinations.length; i++) {
-                destinations[i] = destinations[i].getOptimised();
+                destinations[i] = destinations[i].getOptimised(false);
             }
-            return new ClassOptimiser<>(this).unroll(destinations.length).build();
+            ClassOptimiser<OutBus> optimiser = new ClassOptimiser<>(this).unroll(destinations.length);
+            return optimiser.build();
         }
     }
 

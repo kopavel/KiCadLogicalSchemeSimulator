@@ -74,7 +74,7 @@ public class ClassOptimiser<T> {
         for (int i = 0; i < 5; i++) {
             out.addDestination(new SimpleBusToWireAdapter(out, schemaPart.addInPin("in" + i)));
         }
-        IModelItem<?> opt = out.getOptimised();
+        IModelItem<?> opt = out.getOptimised(true);
     }
 
     public ClassOptimiser<T> unroll(int size) {
@@ -109,6 +109,9 @@ public class ClassOptimiser<T> {
     @SuppressWarnings("unchecked")
     public T build() {
         try {
+            if (suffix.isBlank()) {
+                return oldInstance;
+            }
             String optimizedClassName = oldInstance.getClass().getSimpleName() + suffix;
             Class<?> dynamicClass;
             try {
@@ -190,6 +193,7 @@ public class ClassOptimiser<T> {
                             String oldItemName = null;
                             Map<String, String> bindPatterns = new HashMap<>();
                             String[] params = line.substring(line.indexOf("/*Optimiser ") + 12, line.lastIndexOf("*/")).split(" ");
+                            param_loop:
                             while (i < params.length) {
                                 String command = params[i++];
                                 switch (command) {
@@ -197,10 +201,11 @@ public class ClassOptimiser<T> {
                                         preserveBlock = true;
                                         String blockName = params[i++];
                                         if (cutList.contains(blockName)) {
-                                            line = lines.next();
-                                            while (!line.contains("/*Optimiser blockend " + blockName + "*/")) {
+                                            do {
                                                 line = lines.next();
-                                            }
+                                            } while (!line.contains("/*Optimiser ") ||
+                                                    !(line.contains("blockend " + blockName + "*/") || line.contains("blockend " + blockName + " ")));
+                                            break param_loop;//block removed — don't process more params
                                         }
                                     }
                                     case "constructor" -> {

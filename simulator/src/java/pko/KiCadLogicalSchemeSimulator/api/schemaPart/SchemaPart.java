@@ -34,6 +34,7 @@ import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
+import pko.KiCadLogicalSchemeSimulator.api.bus.TriStateOutBus;
 import pko.KiCadLogicalSchemeSimulator.api.wire.*;
 
 import java.util.HashMap;
@@ -67,13 +68,21 @@ public abstract class SchemaPart {
         return addInPin(new InPin(pinId, this) {
             @Override
             public void setHiImpedance() {
-                assert !hiImpedance : "Already in hiImpedance:" + this;
                 hiImpedance = true;
             }
 
             @Override
             public void setState(boolean newState) {
                 hiImpedance = false;
+                state = newState;
+            }
+        });
+    }
+
+    public InPin addNoFloatingInPin(String pinId) {
+        return addInPin(new InPin(pinId, this) {
+            @Override
+            public void setState(boolean newState) {
                 state = newState;
             }
         });
@@ -100,24 +109,22 @@ public abstract class SchemaPart {
         addOutPin(pinId);
         OutPin pin = (OutPin) outPins.get(pinId);
         pin.state = state;
-        pin.hiImpedance = false;
+    }
+
+    public void addTriStateOutPin(String pinId) {
+        outPins.put(pinId, new TriStateOutPin(pinId, this));
+    }
+
+    public void addTriStateOutPin(String pinId, boolean state) {
+        addTriStateOutPin(pinId);
+        OutPin pin = (OutPin) outPins.get(pinId);
+        pin.state = state;
     }
 
     public InBus addInBus(String pinId, int size, String... names) {
         return addInBus(new InBus(pinId, this, size, names) {
             @Override
             public void setState(long newState) {
-                state = newState;
-                hiImpedance = false;
-            }
-        });
-    }
-
-    public InBus addNoFloatInBus(String pinId, int size, String... names) {
-        return addInBus(new InBus(pinId, this, size, names) {
-            @Override
-            public void setState(long newState) {
-                hiImpedance = false;
                 state = newState;
             }
         });
@@ -133,6 +140,21 @@ public abstract class SchemaPart {
 
     public void addOutBus(String pinId, int size, String... names) {
         OutBus pin = new OutBus(pinId, this, size, names);
+        outPins.put(pinId, pin);
+        for (String alias : pin.aliasOffsets.keySet()) {
+            outPins.put(alias, pin);
+        }
+    }
+
+    public void addTriStateOutBus(String pinId, int size, long state, String... names) {
+        addTriStateOutBus(pinId, size, names);
+        OutBus pin = (OutBus) outPins.get(pinId);
+        pin.state = state;
+        pin.hiImpedance = false;
+    }
+
+    public void addTriStateOutBus(String pinId, int size, String... names) {
+        TriStateOutBus pin = new TriStateOutBus(pinId, this, size, names);
         outPins.put(pinId, pin);
         for (String alias : pin.aliasOffsets.keySet()) {
             outPins.put(alias, pin);
@@ -188,7 +210,7 @@ public abstract class SchemaPart {
     public abstract void initOuts();
 
     public <T> void replaceOut(IModelItem<T> outPin) {
-        IModelItem<T> newOutPin = outPin.getOptimised();
+        IModelItem<T> newOutPin = outPin.getOptimised(true);
         if (outPin != newOutPin) {
             newOutPin.copyState(outPin);
             outPins.put(outPin.getId(), newOutPin);

@@ -44,7 +44,7 @@ import java.io.InputStream;
 
 public class Rom extends SchemaPart {
     private final long[] words;
-    private Bus outPin;
+    private Bus dBus;
     private int addr;
     private boolean csActive;
     private int size;
@@ -115,35 +115,28 @@ public class Rom extends SchemaPart {
         addInBus(new InBus("A", this, aSize) {
             @Override
             public void setState(long newState) {
-                addr = (int) newState;
                 state = newState;
-                if (csActive && outPin.state != words[addr]) {
-                    outPin.state = words[addr];
-                    outPin.hiImpedance = false;
-                    outPin.setState(outPin.state);
+                addr = (int) newState;
+                if (csActive && dBus.state != words[addr]) {
+                    dBus.setState(words[addr]);
                 }
-                hiImpedance = false;
             }
         });
-        addOutBus("D", size);
+        addTriStateOutBus("D", size);
         if (reverse) {
             addInPin(new InPin("~{CS}", this) {
                 @Override
                 public void setState(boolean newState) {
-                    hiImpedance = false;
                     state = newState;
                     if (state) {
                         csActive = false;
-                        if (!outPin.hiImpedance) {
-                            outPin.setHiImpedance();
-                            outPin.hiImpedance = true;
+                        if (!dBus.hiImpedance) {
+                            dBus.setHiImpedance();
                         }
                     } else {
                         csActive = true;
-                        if (outPin.hiImpedance || outPin.state != words[addr]) {
-                            outPin.state = words[addr];
-                            outPin.hiImpedance = false;
-                            outPin.setState(outPin.state);
+                        if (dBus.hiImpedance || dBus.state != words[addr]) {
+                            dBus.setState(words[addr]);
                         }
                     }
                 }
@@ -152,19 +145,15 @@ public class Rom extends SchemaPart {
             addInPin(new InPin("CS", this) {
                 @Override
                 public void setState(boolean newState) {
-                    hiImpedance = false;
                     state = newState;
                     csActive = state;
                     if (state) {
-                        if (outPin.hiImpedance || outPin.state != words[addr]) {
-                            outPin.state = words[addr];
-                            outPin.hiImpedance = false;
-                            outPin.setState(outPin.state);
+                        if (dBus.hiImpedance || dBus.state != words[addr]) {
+                            dBus.setState(words[addr]);
                         }
                     } else {
-                        if (!outPin.hiImpedance) {
-                            outPin.setHiImpedance();
-                            outPin.hiImpedance = true;
+                        if (!dBus.hiImpedance) {
+                            dBus.setHiImpedance();
                         }
                     }
                 }
@@ -174,7 +163,7 @@ public class Rom extends SchemaPart {
 
     @Override
     public void initOuts() {
-        outPin = getOutBus("D");
+        dBus = getOutBus("D");
     }
 
     @Override

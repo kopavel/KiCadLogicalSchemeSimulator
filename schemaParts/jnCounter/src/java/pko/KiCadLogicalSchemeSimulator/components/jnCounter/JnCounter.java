@@ -64,7 +64,6 @@ public class JnCounter extends SchemaPart {
             @Override
             public void setState(boolean newState) {
                 state = newState;
-                hiImpedance = false;
                 clockEnabled = !state;
             }
         });
@@ -72,20 +71,17 @@ public class JnCounter extends SchemaPart {
             addInPin(new InPin("C", this) {
                 @Override
                 public void setState(boolean newState) {
-                    hiImpedance = false;
                     state = newState;
                     if (!state && clockEnabled) {
                         if (outBus.state >= countMax) {
                             outBus.state = 1;
                             if (carryOutPin.state) {
-                                carryOutPin.state = false;
                                 carryOutPin.setState(false);
                             }
                         } else {
                             outBus.state = outBus.state << 1;
                             if (carryOutPin.state != (outBus.state < coMax)) {
-                                carryOutPin.state = outBus.state < coMax;
-                                carryOutPin.setState(carryOutPin.state);
+                                carryOutPin.setState(outBus.state < coMax);
                             }
                         }
                         outBus.setState(outBus.state);
@@ -95,13 +91,11 @@ public class JnCounter extends SchemaPart {
             addInPin(new InPin("R", this) {
                 @Override
                 public void setState(boolean newState) {
-                    hiImpedance = false;
                     state = newState;
                     clockEnabled = state;
                     if (!state) {
                         if (outBus.state != 1) {
-                            outBus.state = 1;
-                            outBus.setState(outBus.state);
+                            outBus.setState(1);
                         }
                     }
                 }
@@ -110,20 +104,17 @@ public class JnCounter extends SchemaPart {
             addInPin(new InPin("C", this) {
                 @Override
                 public void setState(boolean newState) {
-                    hiImpedance = false;
                     state = newState;
                     if (state && clockEnabled) {
                         if (outBus.state >= countMax) {
                             outBus.state = 1;
                             if (carryOutPin.state) {
-                                carryOutPin.state = false;
                                 carryOutPin.setState(false);
                             }
                         } else {
                             outBus.state = outBus.state << 1;
                             if (carryOutPin.state != outBus.state < coMax) {
-                                carryOutPin.state = outBus.state < coMax;
-                                carryOutPin.setState(carryOutPin.state);
+                                carryOutPin.setState(outBus.state < coMax);
                             }
                         }
                         outBus.setState(outBus.state);
@@ -133,13 +124,11 @@ public class JnCounter extends SchemaPart {
             addInPin(new InPin("R", this) {
                 @Override
                 public void setState(boolean newState) {
-                    hiImpedance = false;
                     state = newState;
                     if (state) {
                         clockEnabled = false;
                         if (outBus.state != 1) {
-                            outBus.state = 1;
-                            outBus.setState(outBus.state);
+                            outBus.setState(1);
                         }
                     } else {
                         clockEnabled = true;
@@ -158,10 +147,7 @@ public class JnCounter extends SchemaPart {
 
     @Override
     public void reset() {
-        outBus.state = 1;
-        outBus.hiImpedance = false;
         outBus.setState(1);
-        carryOutPin.state = true;
         carryOutPin.setState(true);
     }
 }

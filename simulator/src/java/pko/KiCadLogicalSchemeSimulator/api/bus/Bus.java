@@ -101,12 +101,11 @@ public abstract class Bus extends ModelItem<Bus> {
     @Override
     public Bus copyState(IModelItem<Bus> oldBus) {
         this.state = oldBus.getState();
-        this.hiImpedance = oldBus.isHiImpedance();
         return this;
     }
 
     @Override
-    public Bus getOptimised() {
+    public Bus getOptimised(boolean keepSetters) {
         return this;
     }
 

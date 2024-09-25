@@ -57,7 +57,6 @@ public class DCounterTest extends NetTester {
         counter.reset();
         setPin("UD", true);
         setPin("BD", true);
-        rPin.state = false;
         rPin.setState(false);
     }
 
@@ -83,15 +82,12 @@ public class DCounterTest extends NetTester {
         for (int i = 0; i < 15; i++) {
             setPin("CK", false);
         }
-        rPin.state = false;
         rPin.setState(false);
         checkBus("qBus", 15, "State should be preserved after reset pin set to 0");
         checkPin("Cout", false, "Carry-out should remain lo after reset pin set to 0");
-        rPin.state = true;
         rPin.setState(true);
         checkBus("qBus", 0, "State should be reset to 0 after reset pin set to 1");
         checkPin("Cout", true, "Carry-out should reset to hi after reset pin set to 1");
-        rPin.state = false;
         rPin.setState(false);
     }
 

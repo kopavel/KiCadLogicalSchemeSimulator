@@ -29,31 +29,63 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.net.bus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
+package pko.KiCadLogicalSchemeSimulator.api.bus;
+import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
+import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.net.bus.NCBus;
+import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 
-public class NCBus extends OutBus {
-    public NCBus(OutBus outPin) {
-        super(outPin.id, outPin.parent, outPin.size);
-        aliasOffsets.clear();
-        aliasOffsets.putAll(outPin.aliasOffsets);
+public class TriStateOutBus extends OutBus {
+    public TriStateOutBus(String id, SchemaPart parent, int size, String... names) {
+        super(id, parent, size, names);
+        hiImpedance = true;
+        triState = true;
+    }
+
+    /*Optimiser constructor unroll destination:destinations*/
+    public TriStateOutBus(TriStateOutBus oldBus, String variantId) {
+        super(oldBus, variantId);
+        hiImpedance = oldBus.hiImpedance;
+        triState = oldBus.triState;
     }
 
     @Override
     public void setState(long newState) {
+        hiImpedance = false;
+        state = newState;
+        for (Bus destination : destinations) {
+            destination.setState(state);
+        }
     }
 
     @Override
     public void setHiImpedance() {
+        assert !hiImpedance : "Already in hiImpedance:" + this;
+        hiImpedance = true;
+        for (Bus destination : destinations) {
+            destination.setHiImpedance();
+        }
     }
 
     @Override
-    public void resend() {
+    public Bus copyState(IModelItem<Bus> oldBus) {
+        super.copyState(oldBus);
+        hiImpedance = oldBus.isHiImpedance();
+        return this;
     }
 
     @Override
     public Bus getOptimised(boolean keepSetters) {
-        return this;
+        if (destinations.length == 0) {
+            return new NCBus(this);
+        } else if (destinations.length == 1) {
+            return destinations[0].getOptimised(true).copyState(this);
+        } else {
+            for (int i = 0; i < destinations.length; i++) {
+                destinations[i] = destinations[i].getOptimised(false);
+            }
+            ClassOptimiser<TriStateOutBus> optimiser = new ClassOptimiser<>(this).unroll(destinations.length);
+            return optimiser.build();
+        }
     }
 }

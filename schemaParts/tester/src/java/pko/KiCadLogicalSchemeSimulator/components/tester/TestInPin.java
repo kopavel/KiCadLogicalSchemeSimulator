@@ -38,7 +38,21 @@ public class TestInPin extends SchemaPart {
 
     protected TestInPin(String id, String sParam) {
         super(id, sParam);
-        pin = addInPin("In");
+        pin = addInPin(new InPin("In", this) {
+            @Override
+            public void setHiImpedance() {
+                hiImpedance = true;
+            }
+
+            @Override
+            public void setState(boolean newState) {
+                hiImpedance = false;
+                state = newState;
+            }
+        });
+        pin.hiImpedance = true;
+        pin.triState = true;
+
     }
 
     @Override

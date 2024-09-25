@@ -45,22 +45,18 @@ public class XorGate extends SchemaPart {
             in1 = addInPin(new InPin("IN0", this) {
                 @Override
                 public void setState(boolean newState) {
-                    hiImpedance = false;
                     state = newState;
-                    if (out.state != in1.state == in2.state) {
-                        out.state = in1.state == in2.state;
-                        out.setState(out.state);
+                    if (out.state != (in1.state == in2.state)) {
+                        out.setState(in1.state == in2.state);
                     }
                 }
             });
             in2 = addInPin(new InPin("IN1", this) {
                 @Override
                 public void setState(boolean newState) {
-                    hiImpedance = false;
                     state = newState;
-                    if (out.state != in1.state == in2.state) {
-                        out.state = in1.state == in2.state;
-                        out.setState(out.state);
+                    if (out.state != (in1.state == in2.state)) {
+                        out.setState(in1.state == in2.state);
                     }
                 }
             });
@@ -68,22 +64,18 @@ public class XorGate extends SchemaPart {
             in1 = addInPin(new InPin("IN0", this) {
                 @Override
                 public void setState(boolean newState) {
-                    hiImpedance = false;
                     state = newState;
                     if (out.state == (in1.state == in2.state)) {
-                        out.state = (in1.state != in2.state);
-                        out.setState(out.state);
+                        out.setState(in1.state != in2.state);
                     }
                 }
             });
             in2 = addInPin(new InPin("IN1", this) {
                 @Override
                 public void setState(boolean newState) {
-                    hiImpedance = false;
                     state = newState;
                     if (out.state == (in1.state == in2.state)) {
-                        out.state = (in1.state != in2.state);
-                        out.setState(out.state);
+                        out.setState(in1.state != in2.state);
                     }
                 }
             });
@@ -94,8 +86,7 @@ public class XorGate extends SchemaPart {
     @Override
     public void initOuts() {
         out = getOutPin("OUT");
-        out.state = (in1.state != in2.state);
-        out.hiImpedance = false;
+        out.setState(in1.state != in2.state);
     }
 
     @Override

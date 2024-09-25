@@ -68,7 +68,6 @@ public class Shifter extends SchemaPart {
             addInPin(new InPin("PL", this) {
                 @Override
                 public void setState(boolean newState) {
-                    hiImpedance = false;
                     state = newState;
                     parallelLoad = !newState;
                 }
@@ -77,7 +76,6 @@ public class Shifter extends SchemaPart {
             addInPin(new InPin("PL", this) {
                 @Override
                 public void setState(boolean newState) {
-                    hiImpedance = false;
                     state = newState;
                     parallelLoad = newState;
                 }
@@ -89,7 +87,6 @@ public class Shifter extends SchemaPart {
             rPin = addInPin(new InPin("R", this) {
                 @Override
                 public void setState(boolean newState) {
-                    hiImpedance = false;
                     state = newState;
                     if (!newState) {
                         clockEnabled = false;
@@ -103,7 +100,6 @@ public class Shifter extends SchemaPart {
             rPin = addInPin(new InPin("R", this) {
                 @Override
                 public void setState(boolean newState) {
-                    hiImpedance = false;
                     state = newState;
                     if (newState) {
                         clockEnabled = ciPin.state ^ inhibitReverse;
@@ -120,7 +116,6 @@ public class Shifter extends SchemaPart {
             ciPin = addInPin(new InPin("CI", this) {
                 @Override
                 public void setState(boolean newState) {
-                    hiImpedance = false;
                     state = newState;
                     if (newState) {
                         clockEnabled = false;
@@ -133,7 +128,6 @@ public class Shifter extends SchemaPart {
             ciPin = addInPin(new InPin("CI", this) {
                 @Override
                 public void setState(boolean newState) {
-                    hiImpedance = false;
                     state = newState;
                     if (newState) {
                         clockEnabled = rPin.state ^ clearReverse;
@@ -147,7 +141,6 @@ public class Shifter extends SchemaPart {
             addInPin(new InPin("CP", this) {
                 @Override
                 public void setState(boolean newState) {
-                    hiImpedance = false;
                     state = newState;
                     if (!newState && clockEnabled) {
                         if (parallelLoad) {
@@ -161,7 +154,6 @@ public class Shifter extends SchemaPart {
                             }
                         }
                         if (out.state != latch) {
-                            out.state = latch;
                             out.setState(latch);
                         }
                     }
@@ -170,7 +162,6 @@ public class Shifter extends SchemaPart {
             addInPin(new InPin("CN", this) {
                 @Override
                 public void setState(boolean newState) {
-                    hiImpedance = false;
                     state = newState;
                     if (!newState && clockEnabled) {
                         if (parallelLoad) {
@@ -184,7 +175,6 @@ public class Shifter extends SchemaPart {
                             }
                         }
                         if (out.state != latch) {
-                            out.state = latch;
                             out.setState(latch);
                         }
                     }
@@ -194,7 +184,6 @@ public class Shifter extends SchemaPart {
             addInPin(new InPin("CP", this) {
                 @Override
                 public void setState(boolean newState) {
-                    hiImpedance = false;
                     state = newState;
                     if (newState && clockEnabled) {
                         if (parallelLoad) {
@@ -208,7 +197,6 @@ public class Shifter extends SchemaPart {
                             }
                         }
                         if (out.state != latch) {
-                            out.state = latch;
                             out.setState(latch);
                         }
                     }
@@ -217,7 +205,6 @@ public class Shifter extends SchemaPart {
             addInPin(new InPin("CN", this) {
                 @Override
                 public void setState(boolean newState) {
-                    hiImpedance = false;
                     state = newState;
                     if (newState && clockEnabled) {
                         if (parallelLoad) {
@@ -231,7 +218,6 @@ public class Shifter extends SchemaPart {
                             }
                         }
                         if (out.state != latch) {
-                            out.state = latch;
                             out.setState(latch);
                         }
                     }
@@ -254,8 +240,6 @@ public class Shifter extends SchemaPart {
     @Override
     public void reset() {
         latch = 0;
-        out.state = 0;
-        out.hiImpedance = false;
         out.setState(0);
     }
 }

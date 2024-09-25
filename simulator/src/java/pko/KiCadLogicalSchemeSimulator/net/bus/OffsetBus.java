@@ -40,6 +40,7 @@ public class OffsetBus extends OutBus {
 
     public OffsetBus(OutBus outBus, Bus destination, byte offset) {
         super(outBus, "offset" + offset);
+        triState = outBus.triState;
         if (offset == 0) {
             throw new RuntimeException("Offset must not be 0");
         }
@@ -51,11 +52,17 @@ public class OffsetBus extends OutBus {
     public OffsetBus(OffsetBus oldBus, String variantId) {
         super(oldBus, variantId);
         offset = oldBus.offset;
+        triState = oldBus.triState;
         destinations = oldBus.destinations;
     }
 
     @Override
     public void setState(long newState) {
+        /*Optimiser block setters block iSetter*/
+        hiImpedance = false;
+        /*Optimiser blockend iSetter*/
+        state = newState;
+        /*Optimiser blockend setters*/
         for (Bus destination : destinations) {
             /*Optimiser bind offset*/
             destination.setState(newState << offset);
@@ -64,6 +71,9 @@ public class OffsetBus extends OutBus {
 
     @Override
     public void setHiImpedance() {
+        /*Optimiser block setters block iSetter*/
+        hiImpedance = true;
+        /*Optimiser blockend iSetter blockend setters*/
         for (Bus destination : destinations) {
             destination.setHiImpedance();
         }
@@ -74,10 +84,17 @@ public class OffsetBus extends OutBus {
     }
 
     @Override
-    public Bus getOptimised() {
+    public Bus getOptimised(boolean keepSetters) {
         for (int i = 0; i < destinations.length; i++) {
-            destinations[i] = destinations[i].getOptimised();
+            destinations[i] = destinations[i].getOptimised(false);
         }
-        return new ClassOptimiser<>(this).unroll(destinations.length).bind("offset", offset).build();
+        ClassOptimiser<OffsetBus> optimiser = new ClassOptimiser<>(this).unroll(destinations.length).bind("offset", offset);
+        if (!keepSetters) {
+            optimiser.cut("setters");
+        }
+        if (!triState) {
+            optimiser.cut("iSetter");
+        }
+        return optimiser.build();
     }
 }

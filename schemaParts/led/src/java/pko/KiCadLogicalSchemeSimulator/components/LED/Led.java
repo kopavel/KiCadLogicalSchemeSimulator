@@ -45,8 +45,13 @@ public class Led extends SchemaPart implements InteractiveSchemaPart {
         super(id, sParams);
         addInPin(new InPin("IN", this) {
             @Override
+            public void setHiImpedance() {
+                state = false;
+                ledUiComponent.setState(false);
+            }
+
+            @Override
             public void setState(boolean newState) {
-                hiImpedance = false;
                 state = newState;
                 ledUiComponent.setState(state);
             }

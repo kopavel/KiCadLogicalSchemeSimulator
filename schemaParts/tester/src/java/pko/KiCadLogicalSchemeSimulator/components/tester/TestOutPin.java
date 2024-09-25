@@ -38,7 +38,7 @@ public class TestOutPin extends SchemaPart {
 
     protected TestOutPin(String id, String sParam) {
         super(id, sParam);
-        addOutPin("Out");
+        addTriStateOutPin("Out");
     }
 
     @Override

@@ -85,8 +85,10 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                 merger.weakPins,
                 merger.hiImpedance);
         long oldState = merger.state;
-        state = newState;
+        /*Optimiser block setters*/
         hiImpedance = false;
+        state = newState;
+        /*Optimiser blockend setters*/
         if (strong) { //to strong
             if (oldImpedance || !oldStrong) { //from hiImpedance or weak
                 /*Optimiser bind mask*/
@@ -161,6 +163,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
             }
         }
         oldStrong = strong;
+        //Fixme use hiImpedance variable?
         oldImpedance = false;
         assert Log.debug(BusMergerWireIn.class,
                 "Bus merger change. after: newState:{},  Source:{} (state:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, " +
@@ -228,7 +231,9 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                 destination.setState(merger.state);
             }
         }
+        /*Optimiser block setters*/
         hiImpedance = true;
+        /*Optimiser blockend setters*/
         oldImpedance = true;
         assert Log.debug(BusMergerWireIn.class,
                 "Bus merger setImpedance. after: Source:{} (state:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{}, " +
@@ -255,14 +260,18 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
     }
 
     @Override
-    public BusMergerWireIn getOptimised() {
+    public BusMergerWireIn getOptimised(boolean keepSetters) {
         if (getClass() == BusMergerWireIn.class) {
             return this;
         }
         merger.sources.remove(this);
         destinations = merger.destinations;
-        BusMergerWireIn optimised =
-                new ClassOptimiser<>(this).unroll(merger.destinations.length).bind("mask", mask).bind("nMask", nMask).bind("mMask", merger.mask).build();
+        ClassOptimiser<BusMergerWireIn> optimiser =
+                new ClassOptimiser<>(this).unroll(merger.destinations.length).bind("mask", mask).bind("nMask", nMask).bind("mMask", merger.mask);
+        if (!keepSetters) {
+            optimiser.cut("setters");
+        }
+        BusMergerWireIn optimised = optimiser.build();
         merger.sources.add(optimised);
         return optimised;
     }

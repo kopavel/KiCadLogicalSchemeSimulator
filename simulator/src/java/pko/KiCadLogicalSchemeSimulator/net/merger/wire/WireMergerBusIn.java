@@ -77,8 +77,10 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus> {
                 merger.state,
                 merger.strong,
                 merger.hiImpedance);
-        state = newState;
+        /*Optimiser block setters*/
         hiImpedance = false;
+        state = newState;
+        /*Optimiser blockend setters*/
         if (oldImpedance && merger.strong) { // merger not in hiImpedance or weak
             if (Net.stabilizing) {
                 Net.forResend.add(this);
@@ -139,7 +141,6 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus> {
         if (oldImpedance) {
             return;
         }
-        assert !hiImpedance : "Already in hiImpedance:" + this + "; merger=" + merger.getName();
         /*Optimiser block strongOnly*/
         /*Optimiser block weakOnly*/
         if (merger.weakState != 0) {
@@ -170,7 +171,9 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus> {
         /*Optimiser blockend weakOnly*/
         /*Optimiser blockend strongOnly*/
         merger.strong = false;
+        /*Optimiser block setters*/
         hiImpedance = true;
+        /*Optimiser blockend setters*/
         oldImpedance = true;
         /*Optimiser block passivePins*///
         for (PassivePin passivePin : merger.passivePins) {
@@ -199,11 +202,11 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus> {
     }
 
     @Override
-    public WireMergerBusIn getOptimised() {
+    public WireMergerBusIn getOptimised(boolean keepSetters) {
         merger.sources.remove(this);
         destinations = merger.destinations;
         for (int i = 0; i < destinations.length; i++) {
-            destinations[i] = destinations[i].getOptimised();
+            destinations[i] = destinations[i].getOptimised(false);
         }
         ClassOptimiser<WireMergerBusIn> optimiser = new ClassOptimiser<>(this).unroll(destinations.length);
         if (merger.passivePins.isEmpty()) {
@@ -213,6 +216,9 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus> {
             } else {
                 optimiser.cut("weakOnly");
             }
+        }
+        if (!keepSetters) {
+            optimiser.cut("setters");
         }
         WireMergerBusIn pin = optimiser.build();
         merger.sources.add(pin);

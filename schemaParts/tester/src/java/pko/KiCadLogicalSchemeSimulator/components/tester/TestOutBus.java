@@ -44,7 +44,7 @@ public class TestOutBus extends SchemaPart {
         } else {
             size = 8;
         }
-        addOutBus("Out", size);
+        addTriStateOutBus("Out", size);
     }
 
     @Override

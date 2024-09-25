@@ -52,6 +52,7 @@ public class WireToBusesAdapter extends OutPin {
         super(oldPin, variantId);
         destinations = oldPin.destinations;
         mask = oldPin.mask;
+        triState = oldPin.triState;
     }
 
     public void addDestination(Bus bus) {
@@ -65,6 +66,11 @@ public class WireToBusesAdapter extends OutPin {
 
     @Override
     public void setState(boolean newState) {
+        /*Optimiser block setters block iSetter*/
+        hiImpedance = false;
+        /*Optimiser blockend iSetter*/
+        state = newState;
+        /*Optimiser blockend setters*/
         for (Bus destination : destinations) {
             /*Optimiser bind mask*/
             destination.setState(newState ? mask : 0L);
@@ -73,21 +79,30 @@ public class WireToBusesAdapter extends OutPin {
 
     @Override
     public void setHiImpedance() {
-        assert !hiImpedance : "Already in hiImpedance:" + this;
+        /*Optimiser block setters block iSetter*/
+        hiImpedance = true;
+        /*Optimiser blockend iSetter blockend setters*/
         for (Bus destination : destinations) {
             destination.setHiImpedance();
         }
     }
 
     @Override
-    public Pin getOptimised() {
+    public Pin getOptimised(boolean keepSetters) {
         if (destinations.length == 0) {
             throw new RuntimeException("unconnected WireToBusesAdapter " + getName());
         } else {
             for (int i = 0; i < destinations.length; i++) {
-                destinations[i] = destinations[i].getOptimised();
+                destinations[i] = destinations[i].getOptimised(false);
             }
-            return new ClassOptimiser<>(this).unroll(destinations.length).bind("mask", mask).build();
+            ClassOptimiser<WireToBusesAdapter> optimiser = new ClassOptimiser<>(this).unroll(destinations.length).bind("mask", mask);
+            if (!keepSetters) {
+                optimiser.cut("setters");
+            }
+            if (!triState) {
+                optimiser.cut("iSetter");
+            }
+            return optimiser.build();
         }
     }
 }

@@ -81,7 +81,6 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                 @Override
                 public void setState(boolean newState) {
                     state = newState;
-                    hiImpedance = false;
                     if (!newState) {
                         if (hSize == 0 && !Net.stabilizing) {
                             hSize = hPos + 2;
@@ -99,7 +98,6 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                 @Override
                 public void setState(boolean newState) {
                     state = newState;
-                    hiImpedance = false;
                     if (!newState) {
                         if (vSize != 0) {
                             synchronized (refresh) {
@@ -131,7 +129,6 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                 @Override
                 public void setState(boolean newState) {
                     state = newState;
-                    hiImpedance = false;
                     if (newState) {
                         if (hSize == 0 && !Net.stabilizing) {
                             hSize = hPos + 2;
@@ -149,7 +146,6 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                 @Override
                 public void setState(boolean newState) {
                     state = newState;
-                    hiImpedance = false;
                     if (newState) {
                         if (vSize != 0) {
                             synchronized (refresh) {
@@ -180,7 +176,6 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
         addInPin(new InPin("Clock", this) {
             @Override
             public void setState(boolean newState) {
-                hiImpedance = false;
                 state = newState;
                 if (!state) {
                     byte data = (byte) (vIn.state ? 0xff : 0x0);

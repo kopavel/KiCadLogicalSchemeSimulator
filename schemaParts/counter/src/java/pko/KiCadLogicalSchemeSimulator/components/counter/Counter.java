@@ -60,10 +60,8 @@ public class Counter extends SchemaPart {
                 @Override
                 public void setState(boolean newState) {
                     state = newState;
-                    hiImpedance = false;
-                    if (!state) {
-                        outBus.state = (outBus.state + 1) & countMask;
-                        outBus.setState(outBus.state);
+                    if (!newState) {
+                        outBus.setState((outBus.state + 1) & countMask);
                     }
                 }
             });
@@ -72,10 +70,8 @@ public class Counter extends SchemaPart {
                 @Override
                 public void setState(boolean newState) {
                     state = newState;
-                    hiImpedance = false;
                     if (state) {
-                        outBus.state = (outBus.state + 1) & countMask;
-                        outBus.setState(outBus.state);
+                        outBus.setState((outBus.state + 1) & countMask);
                     }
                 }
             });
@@ -84,10 +80,8 @@ public class Counter extends SchemaPart {
             @Override
             public void setState(boolean newState) {
                 state = newState;
-                hiImpedance = false;
                 if (state) {
-                    outBus.state = 0;
-                    outBus.setState(outBus.state);
+                    outBus.setState(0);
                 }
             }
         });
@@ -102,8 +96,6 @@ public class Counter extends SchemaPart {
     @Override
     public void reset() {
         if (outBus.state > 0 || outBus.hiImpedance) {
-            outBus.hiImpedance = false;
-            outBus.state = 0;
             outBus.setState(0);
         }
     }

@@ -54,11 +54,8 @@ public class Decoder extends SchemaPart {
                     state = newState;
                     outState = ~(1L << newState);
                     if (csState && (outBus.state != outState || outBus.hiImpedance)) {
-                        outBus.state = outState;
-                        outBus.hiImpedance = false;
                         outBus.setState(outState);
                     }
-                    hiImpedance = false;
                 }
             });
         } else {
@@ -69,12 +66,9 @@ public class Decoder extends SchemaPart {
                     outState = 1L << state;
                     if (csState) {
                         if (outBus.state != outState || outBus.hiImpedance) {
-                            outBus.state = outState;
-                            outBus.hiImpedance = false;
                             outBus.setState(outState);
                         }
                     }
-                    hiImpedance = false;
                 }
             });
         }
@@ -82,18 +76,14 @@ public class Decoder extends SchemaPart {
             addInPin(new InPin("CS", this) {
                 @Override
                 public void setState(boolean newState) {
-                    hiImpedance = false;
                     state = newState;
                     csState = !newState;
                     if (csState) {
                         if (!aBus.hiImpedance && (outBus.state != outState || outBus.hiImpedance)) {
-                            outBus.state = outState;
-                            outBus.hiImpedance = false;
                             outBus.setState(outState);
                         }
                     } else if (!outBus.hiImpedance) {
                         outBus.setHiImpedance();
-                        outBus.hiImpedance = true;
                     }
                 }
             });
@@ -101,26 +91,22 @@ public class Decoder extends SchemaPart {
             addInPin(new InPin("CS", this) {
                 @Override
                 public void setState(boolean newState) {
-                    hiImpedance = false;
                     state = newState;
                     csState = newState;
                     if (csState) {
                         if (!aBus.hiImpedance) {
                             if (outBus.state != outState || outBus.hiImpedance) {
-                                outBus.state = outState;
-                                outBus.hiImpedance = false;
                                 outBus.setState(outState);
                             }
                         }
                     } else if (!outBus.hiImpedance) {
                         outBus.setHiImpedance();
-                        outBus.hiImpedance = true;
                     }
                 }
             });
         }
         int outSize = (int) Math.pow(2, inSize);
-        addOutBus("Q", outSize);
+        addTriStateOutBus("Q", outSize);
         csState = reverse;
     }
 

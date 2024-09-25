@@ -44,17 +44,10 @@ public abstract class InPin extends Pin {
     public InPin(String id, SchemaPart parent, boolean state) {
         super(id, parent);
         this.state = state;
-        hiImpedance = false;
     }
 
     @Override
-    public void setHiImpedance() {
-        assert !hiImpedance : "Already in hiImpedance:" + this;
-        hiImpedance = true;
-    }
-
-    @Override
-    public InPin getOptimised() {
+    public InPin getOptimised(boolean keepSetters) {
         return this;
     }
 }

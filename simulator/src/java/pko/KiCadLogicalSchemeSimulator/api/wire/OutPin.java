@@ -67,6 +67,7 @@ public class OutPin extends Pin {
             adapters.get(offset).addDestination(bus);
         } else {
             WireToBusesAdapter adapter = new WireToBusesAdapter(this.id, this.parent, bus, offset);
+            adapter.triState = triState;
             adapters.put(offset, adapter);
             addDestination(adapter);
         }
@@ -74,6 +75,7 @@ public class OutPin extends Pin {
 
     @Override
     public void setState(boolean newState) {
+        state = newState;
         for (Pin destination : destinations) {
             destination.setState(state);
         }
@@ -81,33 +83,27 @@ public class OutPin extends Pin {
 
     @Override
     public void setHiImpedance() {
-        assert !hiImpedance : "Already in hiImpedance:" + this;
-        for (Pin destination : destinations) {
-            destination.setHiImpedance();
-        }
+        throw new RuntimeException("setImpedance on non tri-state OutPin");
     }
 
     public void resend() {
         if (!hiImpedance) {
             setState(state);
-        } else {
-            //noinspection ConstantValue,AssertWithSideEffects
-            assert !(hiImpedance = false);
-            setHiImpedance();
         }
     }
 
     @Override
-    public Pin getOptimised() {
+    public Pin getOptimised(boolean keepSetters) {
         if (destinations.length == 0) {
             return new NCWire(this);
         } else if (destinations.length == 1) {
-            return destinations[0].getOptimised().copyState(this);
+            return destinations[0].getOptimised(true).copyState(this);
         } else {
             for (int i = 0; i < destinations.length; i++) {
-                destinations[i] = destinations[i].getOptimised();
+                destinations[i] = destinations[i].getOptimised(false);
             }
-            return new ClassOptimiser<>(this).unroll(destinations.length).build();
+            ClassOptimiser<OutPin> optimiser = new ClassOptimiser<>(this).unroll(destinations.length);
+            return optimiser.build();
         }
     }
 }

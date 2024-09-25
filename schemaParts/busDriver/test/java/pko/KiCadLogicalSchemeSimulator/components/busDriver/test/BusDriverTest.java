@@ -49,6 +49,8 @@ public class BusDriverTest extends NetTester {
     @Test
     protected void testBusDriver() {
         setBus("oA", 0b1010);
+        setPin("OEa", true);
+        setPin("OEb", true);
         checkBusImpedance("iA", "Initial state of out bus iA must be hiImpedance");
         checkPinImpedance("iB0", "Initial state of out pin iB0 must be hiImpedance");
         checkPinImpedance("iB1", "Initial state of out pin iB1 must be hiImpedance");

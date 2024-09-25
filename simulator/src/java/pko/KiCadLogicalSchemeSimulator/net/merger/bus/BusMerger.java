@@ -137,9 +137,9 @@ public class BusMerger extends OutBus {
     }
 
     @Override
-    public Bus getOptimised() {
+    public Bus getOptimised(boolean keepSetters) {
         for (int i = 0; i < destinations.length; i++) {
-            destinations[i] = destinations[i].getOptimised();
+            destinations[i] = destinations[i].getOptimised(false);
         }
         return this;
     }

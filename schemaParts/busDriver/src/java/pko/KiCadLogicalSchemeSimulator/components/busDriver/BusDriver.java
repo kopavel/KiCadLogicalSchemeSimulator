@@ -60,34 +60,25 @@ public class BusDriver extends SchemaPart {
                 @Override
                 public void setState(long newState) {
                     state = newState;
-                    hiImpedance = false;
                     if (oe[finalI]) {
-                        outs[finalI].state = newState;
-                        outs[finalI].hiImpedance = false;
                         outs[finalI].setState(newState);
                     }
                 }
             });
-            addOutBus("O" + (char) ('a' + i), sizes[i]);
+            addTriStateOutBus("O" + (char) ('a' + i), sizes[i]);
             if (reverse) {
                 addInPin(new InPin("OE" + (char) ('a' + i), this) {
                     @Override
                     public void setState(boolean newState) {
                         state = newState;
-                        hiImpedance = false;
                         if (newState) {
                             oe[finalI] = false;
                             if (!outs[finalI].hiImpedance) {
                                 outs[finalI].setHiImpedance();
-                                outs[finalI].hiImpedance = true;
                             }
                         } else {
                             oe[finalI] = true;
-                            if (!ins[finalI].hiImpedance) {
-                                outs[finalI].state = ins[finalI].state;
-                                outs[finalI].hiImpedance = false;
-                                outs[finalI].setState(ins[finalI].state);
-                            }
+                            outs[finalI].setState(ins[finalI].state);
                         }
                     }
                 }).state = true;
@@ -95,20 +86,14 @@ public class BusDriver extends SchemaPart {
                 addInPin(new InPin("OE" + (char) ('a' + i), this) {
                     @Override
                     public void setState(boolean newState) {
-                        hiImpedance = false;
                         state = newState;
                         if (newState) {
                             oe[finalI] = true;
-                            if (!ins[finalI].hiImpedance) {
-                                outs[finalI].state = ins[finalI].state;
-                                outs[finalI].hiImpedance = false;
-                                outs[finalI].setState(ins[finalI].state);
-                            }
+                            outs[finalI].setState(ins[finalI].state);
                         } else {
                             oe[finalI] = false;
                             if (!outs[finalI].hiImpedance) {
                                 outs[finalI].setHiImpedance();
-                                outs[finalI].hiImpedance = true;
                             }
                         }
                     }

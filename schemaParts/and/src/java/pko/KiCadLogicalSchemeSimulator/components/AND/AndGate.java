@@ -53,11 +53,9 @@ public class AndGate extends SchemaPart {
                     @Override
                     public void setState(boolean newState) {
                         state = newState;
-                        hiImpedance = false;
                         if (newState) {
                             if ((inState == mask)) {
                                 inState = 0;
-                                out.state = false;
                                 out.setState(false);
                             } else {
                                 inState &= nMask;
@@ -65,7 +63,6 @@ public class AndGate extends SchemaPart {
                         } else {
                             if (inState == 0) {
                                 inState = mask;
-                                out.state = true;
                                 out.setState(true);
                             } else {
                                 inState |= mask;
@@ -78,11 +75,9 @@ public class AndGate extends SchemaPart {
                     @Override
                     public void setState(boolean newState) {
                         state = newState;
-                        hiImpedance = false;
                         if (newState) {
                             if (inState == mask) {
                                 inState = 0;
-                                out.state = true;
                                 out.setState(true);
                             } else {
                                 inState &= nMask;
@@ -90,7 +85,6 @@ public class AndGate extends SchemaPart {
                         } else {
                             if (inState == 0) {
                                 inState = mask;
-                                out.state = false;
                                 out.setState(false);
                             } else {
                                 inState |= mask;

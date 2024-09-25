@@ -44,7 +44,20 @@ public class TestInBus extends SchemaPart {
         } else {
             size = 8;
         }
-        bus = addInBus("In", size);
+        bus = addInBus(new InBus("In", this, size) {
+            @Override
+            public void setHiImpedance() {
+                hiImpedance = true;
+            }
+
+            @Override
+            public void setState(long newState) {
+                hiImpedance = false;
+                state = newState;
+            }
+        });
+        bus.hiImpedance = true;
+        bus.triState = true;
     }
 
     @Override

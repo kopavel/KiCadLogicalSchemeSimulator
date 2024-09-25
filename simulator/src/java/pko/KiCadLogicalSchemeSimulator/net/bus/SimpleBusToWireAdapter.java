@@ -32,6 +32,7 @@
 package pko.KiCadLogicalSchemeSimulator.net.bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
+import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 
 public class SimpleBusToWireAdapter extends OutBus {
     public Pin destination;
@@ -39,21 +40,44 @@ public class SimpleBusToWireAdapter extends OutBus {
     public SimpleBusToWireAdapter(OutBus parent, Pin destination) {
         super(parent, "BusToWire");
         this.destination = destination;
+        triState = parent.triState;
+    }
+
+    /*Optimiser constructor*/
+    public SimpleBusToWireAdapter(SimpleBusToWireAdapter oldPin, String variantId) {
+        super(oldPin, variantId);
+        destination = oldPin.destination;
+        triState = oldPin.triState;
     }
 
     @Override
     public void setState(long newState) {
+        /*Optimiser block setters block iSetter*/
+        hiImpedance = false;
+        /*Optimiser blockend iSetter*/
+        state = newState;
+        /*Optimiser blockend setters*/
         destination.setState(newState != 0);
     }
 
     @Override
     public void setHiImpedance() {
+        /*Optimiser block setters block iSetter*/
+        hiImpedance = true;
+        /*Optimiser blockend iSetter blockend setters*/
         destination.setHiImpedance();
     }
 
     @Override
-    public SimpleBusToWireAdapter getOptimised() {
-        destination = destination.getOptimised();
-        return this;
+    public SimpleBusToWireAdapter getOptimised(boolean keepSetters) {
+        destination = destination.getOptimised(false);
+        ClassOptimiser<SimpleBusToWireAdapter> optimiser = new ClassOptimiser<>(this);
+        if (!keepSetters) {
+            optimiser.cut("setters");
+        }
+        if (!triState) {
+            optimiser.cut("iSetter");
+        }
+        return optimiser.build();
     }
 }

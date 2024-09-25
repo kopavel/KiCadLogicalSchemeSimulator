@@ -46,6 +46,7 @@ public class PassiveInMerger extends OutPin {
         strong = true;
     }
 
+    //FiXme why no dest set and where setHiImpedance?
     @Override
     public void setState(boolean newState) {
         if (source.strong) {
@@ -54,7 +55,7 @@ public class PassiveInMerger extends OutPin {
     }
 
     @Override
-    public Pin getOptimised() {
+    public Pin getOptimised(boolean keepSetters) {
         return this;
     }
 }

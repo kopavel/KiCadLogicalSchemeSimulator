@@ -163,8 +163,7 @@ public class SingleOutShifter extends SchemaPart {
                             }
                         }
                         if (out.state == ((latch & outMask) == 0)) {
-                            out.state = ((latch & outMask) != 0);
-                            out.setState(out.state);
+                            out.setState((latch & outMask) != 0);
                         }
                     }
                 }
@@ -186,8 +185,7 @@ public class SingleOutShifter extends SchemaPart {
                             }
                         }
                         if (out.state == ((latch & outMask) == 0)) {
-                            out.state = ((latch & outMask) != 0);
-                            out.setState(out.state);
+                            out.setState((latch & outMask) != 0);
                         }
                     }
                 }
@@ -210,8 +208,7 @@ public class SingleOutShifter extends SchemaPart {
                             }
                         }
                         if (out.state == ((latch & outMask) == 0)) {
-                            out.state = ((latch & outMask) != 0);
-                            out.setState(out.state);
+                            out.setState((latch & outMask) != 0);
                         }
                     }
                 }
@@ -233,8 +230,7 @@ public class SingleOutShifter extends SchemaPart {
                             }
                         }
                         if (out.state == ((latch & outMask) == 0)) {
-                            out.state = ((latch & outMask) != 0);
-                            out.setState(out.state);
+                            out.setState((latch & outMask) != 0);
                         }
                     }
                 }
@@ -256,8 +252,6 @@ public class SingleOutShifter extends SchemaPart {
     @Override
     public void reset() {
         latch = 0;
-        out.state = false;
-        out.hiImpedance = false;
         out.setState(false);
     }
 }

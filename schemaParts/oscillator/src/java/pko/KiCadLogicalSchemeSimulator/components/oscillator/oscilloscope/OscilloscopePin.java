@@ -45,8 +45,6 @@ public class OscilloscopePin extends InPin {
 
     @Override
     public void setState(boolean newState) {
-        wrapped.state = newState;
-        wrapped.hiImpedance = false;
         wrapped.setState(newState);
         oscilloscope.diagram.tick();
     }

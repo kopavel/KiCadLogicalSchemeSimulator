@@ -77,13 +77,12 @@ public class SdRam extends SchemaPart {
             bytes[i] = ThreadLocalRandom.current().nextLong() & maskForSize;
         }
         addrPin = addInBus("A", aSize);
-        addOutBus("D", size);
+        addTriStateOutBus("D", size);
         dIn = addInBus(params.containsKey("separateOut") ? "Din" : "D", size);
         if (reverse) {
             addInPin(new InPin("~{RAS}", this) {
                 @Override
                 public void setState(boolean newState) {
-                    hiImpedance = false;
                     state = newState;
                     if (!state) {
                         hiPart = (int) (addrPin.state * module);
@@ -93,20 +92,16 @@ public class SdRam extends SchemaPart {
             addInPin(new InPin("~{CAS}", this) {
                 @Override
                 public void setState(boolean newState) {
-                    hiImpedance = false;
                     state = newState;
                     if (state) {
                         if (!dOut.hiImpedance) {
                             dOut.setHiImpedance();
-                            dOut.hiImpedance = true;
                         }
                     } else {
                         addr = (int) (hiPart + addrPin.state);
                         if (we.state) {
                             if (dOut.state != bytes[addr] || dOut.hiImpedance) {
-                                dOut.state = bytes[addr];
-                                dOut.hiImpedance = false;
-                                dOut.setState(dOut.state);
+                                dOut.setState(bytes[addr]);
                             }
                         } else {
                             bytes[addr] = dIn.state;
@@ -118,7 +113,6 @@ public class SdRam extends SchemaPart {
             addInPin(new InPin("RAS", this) {
                 @Override
                 public void setState(boolean newState) {
-                    hiImpedance = false;
                     state = newState;
                     if (state) {
                         hiPart = (int) (addrPin.state * module);
@@ -128,7 +122,6 @@ public class SdRam extends SchemaPart {
             addInPin(new InPin("CAS", this) {
                 @Override
                 public void setState(boolean newState) {
-                    hiImpedance = false;
                     state = newState;
                     if (state) {
                         addr = (int) (hiPart + addrPin.state);
@@ -136,15 +129,12 @@ public class SdRam extends SchemaPart {
                             bytes[addr] = dIn.state;
                         } else {
                             if (dOut.state != bytes[addr] || dOut.hiImpedance) {
-                                dOut.state = bytes[addr];
-                                dOut.hiImpedance = false;
-                                dOut.setState(dOut.state);
+                                dOut.setState(bytes[addr]);
                             }
                         }
                     } else {
                         if (!dOut.hiImpedance) {
                             dOut.setHiImpedance();
-                            dOut.hiImpedance = true;
                         }
                     }
                 }

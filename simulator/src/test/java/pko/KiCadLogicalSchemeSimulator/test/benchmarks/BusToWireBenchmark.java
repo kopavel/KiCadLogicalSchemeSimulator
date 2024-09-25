@@ -65,7 +65,7 @@ public class BusToWireBenchmark {
             for (int i = 0; i < 5; i++) {
                 ((MaskGroupBus) out).addDestination(new SimpleBusToWireAdapter((OutBus) out, testPart.addInPin("in" + i)));
             }
-            out = out.getOptimised();
+            out = out.getOptimised(true);
         }
     }
 }

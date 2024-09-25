@@ -32,10 +32,12 @@
 package pko.KiCadLogicalSchemeSimulator.net.bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
+import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 
 public class NegativeOffsetBus extends OffsetBus {
     public NegativeOffsetBus(OutBus outBus, Bus destination, byte offset) {
         super(outBus, destination, (byte) -offset);
+        triState = outBus.triState;
         if (offset == 0) {
             throw new RuntimeException("Offset must not be 0");
         }
@@ -45,13 +47,45 @@ public class NegativeOffsetBus extends OffsetBus {
     /*Optimiser constructor unroll destination:destinations*/
     public NegativeOffsetBus(NegativeOffsetBus oldBus, String variantId) {
         super(oldBus, variantId);
+        triState = oldBus.triState;
     }
 
     @Override
     public void setState(long newState) {
+        /*Optimiser block setters block iSetter*/
+        hiImpedance = false;
+        /*Optimiser blockend iSetter*/
+        state = newState;
+        /*Optimiser blockend setters*/
         for (Bus destination : destinations) {
             /*Optimiser bind offset*/
             destination.setState(newState >> offset);
         }
+    }
+
+    @SuppressWarnings("RedundantMethodOverride")
+    @Override
+    public void setHiImpedance() {
+        /*Optimiser block setters block iSetter*/
+        hiImpedance = true;
+        /*Optimiser blockend iSetter blockend setters*/
+        for (Bus destination : destinations) {
+            destination.setHiImpedance();
+        }
+    }
+
+    @Override
+    public Bus getOptimised(boolean keepSetters) {
+        for (int i = 0; i < destinations.length; i++) {
+            destinations[i] = destinations[i].getOptimised(false);
+        }
+        ClassOptimiser<NegativeOffsetBus> optimiser = new ClassOptimiser<>(this).unroll(destinations.length).bind("offset", offset);
+        if (!keepSetters) {
+            optimiser.cut("setters");
+        }
+        if (!triState) {
+            optimiser.cut("iSetter");
+        }
+        return optimiser.build();
     }
 }

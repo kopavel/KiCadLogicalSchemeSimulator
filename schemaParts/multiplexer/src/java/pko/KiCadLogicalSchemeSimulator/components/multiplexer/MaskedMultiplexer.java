@@ -64,7 +64,6 @@ public class MaskedMultiplexer extends SchemaPart {
             addInPin(new InPin("OE", this) {
                 @Override
                 public void setState(boolean newState) {
-                    hiImpedance = false;
                     state = newState;
                     if (newState) {
                         outMask = 0;
@@ -72,14 +71,10 @@ public class MaskedMultiplexer extends SchemaPart {
                         outMask = -1;
                     }
                     InBus inBus = inBuses[nState];
-                    if (!inBus.hiImpedance) {
-                        if (newState && outBus.state != inBus.state) {
-                            outBus.state = inBus.state;
-                            outBus.setState(inBus.state);
-                        } else if (!newState && outBus.state != 0) {
-                            outBus.state = 0;
-                            outBus.setState(0);
-                        }
+                    if (newState && outBus.state != inBus.state) {
+                        outBus.setState(inBus.state);
+                    } else if (!newState && outBus.state != 0) {
+                        outBus.setState(0);
                     }
                 }
             });
@@ -89,7 +84,6 @@ public class MaskedMultiplexer extends SchemaPart {
                 addInPin(new InPin("OE" + (char) ('a' + i), this) {
                     @Override
                     public void setState(boolean newState) {
-                        hiImpedance = false;
                         state = newState;
                         if (newState) {
                             outMask &= nMask;
@@ -97,9 +91,8 @@ public class MaskedMultiplexer extends SchemaPart {
                             outMask |= mask;
                         }
                         InBus inBus = inBuses[nState];
-                        if (!inBus.hiImpedance && outBus.state != (inBus.state & outMask)) {
-                            outBus.state = (inBus.state & outMask);
-                            outBus.setState(outBus.state);
+                        if (outBus.state != (inBus.state & outMask)) {
+                            outBus.setState(inBus.state & outMask);
                         }
                     }
                 });
@@ -108,7 +101,6 @@ public class MaskedMultiplexer extends SchemaPart {
             addInPin(new InPin("OE", this) {
                 @Override
                 public void setState(boolean newState) {
-                    hiImpedance = false;
                     state = newState;
                     if (newState) {
                         outMask = -1;
@@ -116,14 +108,10 @@ public class MaskedMultiplexer extends SchemaPart {
                         outMask = 0;
                     }
                     InBus inBus = inBuses[nState];
-                    if (!inBus.hiImpedance) {
-                        if (!newState && outBus.state != inBus.state) {
-                            outBus.state = inBus.state;
-                            outBus.setState(inBus.state);
-                        } else if (newState && outBus.state != 0) {
-                            outBus.state = 0;
-                            outBus.setState(0);
-                        }
+                    if (!newState && outBus.state != inBus.state) {
+                        outBus.setState(inBus.state);
+                    } else if (newState && outBus.state != 0) {
+                        outBus.setState(0);
                     }
                 }
             });
@@ -133,7 +121,6 @@ public class MaskedMultiplexer extends SchemaPart {
                 addInPin(new InPin("OE" + (char) ('a' + i), this) {
                     @Override
                     public void setState(boolean newState) {
-                        hiImpedance = false;
                         state = newState;
                         if (newState) {
                             outMask |= mask;
@@ -141,9 +128,8 @@ public class MaskedMultiplexer extends SchemaPart {
                             outMask &= nMask;
                         }
                         InBus inBus = inBuses[nState];
-                        if (!inBus.hiImpedance && outBus.state != (inBus.state & outMask)) {
-                            outBus.state = (inBus.state & outMask);
-                            outBus.setState(outBus.state);
+                        if (outBus.state != (inBus.state & outMask)) {
+                            outBus.setState(inBus.state & outMask);
                         }
                     }
                 });
@@ -157,18 +143,10 @@ public class MaskedMultiplexer extends SchemaPart {
             int finalInNo = inNo;
             inBuses[inNo] = addInBus(new InBus(String.valueOf(finalInNo), this, partsAmount, aliases.toArray(new String[0])) {
                 @Override
-                public void setHiImpedance() {
-                    hiImpedance = true;
-                }
-
-                @Override
                 public void setState(long newState) {
                     state = newState;
-                    hiImpedance = false;
                     if (finalInNo == nState /*&& outBus.state != (newState & outMask)*/) {
-                        outBus.state = newState & outMask;
-                        outBus.hiImpedance = false;
-                        outBus.setState(outBus.state);
+                        outBus.setState(newState & outMask);
                     }
                 }
             });
@@ -179,17 +157,14 @@ public class MaskedMultiplexer extends SchemaPart {
             addInPin(new InPin("N" + i, this) {
                 @Override
                 public void setState(boolean newState) {
-                    hiImpedance = false;
                     state = newState;
                     if (newState) {
                         nState |= mask;
                     } else {
                         nState &= nMask;
                     }
-                    if (!inBuses[nState].hiImpedance && outBus.state != (inBuses[nState].state & outMask)) {
-                        outBus.state = inBuses[nState].state & outMask;
-                        outBus.hiImpedance = false;
-                        outBus.setState(outBus.state);
+                    if (outBus.state != (inBuses[nState].state & outMask)) {
+                        outBus.setState(inBuses[nState].state & outMask);
                     }
                 }
             });

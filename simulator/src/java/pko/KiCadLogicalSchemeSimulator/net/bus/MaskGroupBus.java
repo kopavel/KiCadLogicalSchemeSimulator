@@ -43,19 +43,27 @@ public class MaskGroupBus extends OutBus {
     public MaskGroupBus(OutBus source, long mask, String variantId) {
         super(source, variantId + ":mask" + mask);
         this.mask = mask;
+        triState = source.triState;
     }
 
     /*Optimiser constructor unroll destination:destinations*/
     public MaskGroupBus(OutBus source, String variantId) {
         super(source, variantId);
+        triState = source.triState;
     }
 
     public void addDestination(Bus bus) {
+        bus.triState = triState;
         destinations = Utils.addToArray(destinations, bus);
     }
 
     @Override
     public void setState(long newState) {
+        /*Optimiser block setters block iSetter*/
+        hiImpedance = false;
+        /*Optimiser blockend iSetter*/
+        state = newState;
+        /*Optimiser blockend setters*/
         /*Optimiser bind d:destinations[0] bind mask*/
         if (maskState != (newState & mask) || destinations[0].hiImpedance) {
             /*Optimiser bind mask*/
@@ -68,23 +76,33 @@ public class MaskGroupBus extends OutBus {
 
     @Override
     public void setHiImpedance() {
+        /*Optimiser block setters block iSetter*/
+        hiImpedance = true;
+        /*Optimiser blockend iSetter blockend setters*/
         for (Bus destination : destinations) {
             destination.setHiImpedance();
         }
     }
 
     @Override
-    public Bus getOptimised() {
+    public Bus getOptimised(boolean keepSetters) {
         if (destinations.length == 0) {
             throw new RuntimeException("unconnected MaskGroupBus " + getName());
         } else {
             for (int i = 0; i < destinations.length; i++) {
-                destinations[i] = destinations[i].getOptimised();
+                destinations[i] = destinations[i].getOptimised(false);
             }
             if (Arrays.stream(destinations).allMatch(d -> d instanceof SimpleBusToWireAdapter)) {
-                return new BusToWiresAdapter(this, destinations, mask).getOptimised();
+                return new BusToWiresAdapter(this, destinations, mask).getOptimised(keepSetters);
             } else {
-                return new ClassOptimiser<>(this).unroll(destinations.length).bind("mask", mask).bind("d", "destination0").build();
+                ClassOptimiser<MaskGroupBus> optimiser = new ClassOptimiser<>(this).unroll(destinations.length).bind("mask", mask).bind("d", "destination0");
+                if (!keepSetters) {
+                    optimiser.cut("setters");
+                }
+                if (!triState) {
+                    optimiser.cut("iSetter");
+                }
+                return optimiser.build();
             }
         }
     }

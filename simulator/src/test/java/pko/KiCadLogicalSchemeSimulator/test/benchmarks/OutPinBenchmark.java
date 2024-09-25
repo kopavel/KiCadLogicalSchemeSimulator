@@ -63,7 +63,7 @@ public class OutPinBenchmark {
             for (int i = 0; i < 5; i++) {
                 ((OutPin) out).addDestination(testPart.addInPin("in" + i));
             }
-            out = out.getOptimised();
+            out = out.getOptimised(true);
         }
     }
 }

@@ -54,30 +54,45 @@ public class BusInInterconnect extends InBus {
         senseMask = oldBus.senseMask;
         inverseInterconnectMask = oldBus.inverseInterconnectMask;
         destination = oldBus.destination;
+        triState = oldBus.triState;
     }
 
     @Override
     public void setState(long newState) {
+        /*Optimiser block setters block iSetter*/
+        hiImpedance = false;
+        /*Optimiser blockend iSetter*/
+        state = newState;
+        /*Optimiser blockend setters*/
         /*Optimiser bind interconnectMask*/
         if ((newState & interconnectMask) != 0) {
             /*Optimiser bind interconnectMask*/
-            destination.state = newState | interconnectMask;
-            destination.setState(destination.state);
+            destination.setState(newState | interconnectMask);
         } else {
             /*Optimiser bind inverseInterconnectMask*/
-            destination.state = newState & inverseInterconnectMask;
-            destination.setState(destination.state);
+            destination.setState(newState & inverseInterconnectMask);
         }
     }
 
     @Override
     public void setHiImpedance() {
+        /*Optimiser block setters block iSetter*/
+        hiImpedance = true;
+        /*Optimiser blockend iSetter blockend setters*/
         destination.setHiImpedance();
     }
 
     @Override
-    public InBus getOptimised() {
-        destination = destination.getOptimised();
-        return new ClassOptimiser<>(this).bind("interconnectMask", interconnectMask).bind("inverseInterconnectMask", inverseInterconnectMask).build();
+    public InBus getOptimised(boolean keepSetters) {
+        destination = destination.getOptimised(false);
+        ClassOptimiser<BusInInterconnect> optimiser =
+                new ClassOptimiser<>(this).bind("interconnectMask", interconnectMask).bind("inverseInterconnectMask", inverseInterconnectMask);
+        if (!keepSetters) {
+            optimiser.cut("setters");
+        }
+        if (!triState) {
+            optimiser.cut("iSetter");
+        }
+        return optimiser.build();
     }
 }

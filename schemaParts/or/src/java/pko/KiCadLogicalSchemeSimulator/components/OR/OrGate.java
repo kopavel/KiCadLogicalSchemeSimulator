@@ -52,12 +52,10 @@ public class OrGate extends SchemaPart {
                 addInPin(new InPin("IN" + i, this) {
                     @Override
                     public void setState(boolean newState) {
-                        hiImpedance = false;
                         state = newState;
                         if (newState) {
                             if (inState == 0) {
                                 inState = mask;
-                                out.state = false;
                                 out.setState(false);
                             } else {
                                 inState |= mask;
@@ -65,7 +63,6 @@ public class OrGate extends SchemaPart {
                         } else {
                             if ((inState == mask)) {
                                 inState = 0;
-                                out.state = true;
                                 out.setState(true);
                             } else {
                                 inState &= nMask;
@@ -77,12 +74,10 @@ public class OrGate extends SchemaPart {
                 addInPin(new InPin("IN" + i, this) {
                     @Override
                     public void setState(boolean newState) {
-                        hiImpedance = false;
                         state = newState;
                         if (newState) {
                             if (inState == 0) {
                                 inState = mask;
-                                out.state = true;
                                 out.setState(true);
                             } else {
                                 inState |= mask;
@@ -90,7 +85,6 @@ public class OrGate extends SchemaPart {
                         } else {
                             if (inState == mask) {
                                 inState = 0;
-                                out.state = false;
                                 out.setState(false);
                             } else {
                                 inState &= nMask;
@@ -109,7 +103,7 @@ public class OrGate extends SchemaPart {
             int i = Integer.parseInt(pin.getId().substring(2));
             int mask = 1 << i;
             int nMask = ~mask;
-            if (!pin.isHiImpedance() && pin.getState() != 0) {
+            if (pin.getState() != 0) {
                 if (pin.getState() != 0) {
                     inState |= mask;
                 } else {

@@ -29,40 +29,67 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.net.wire;
-import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.api.wire.OutPin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
+package pko.KiCadLogicalSchemeSimulator.api.wire;
+import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
+import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.net.wire.NCWire;
+import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 
-public class NCWire extends OutPin {
-    public NCWire(OutPin outPin) {
-        super(outPin, "NC");
+public class TriStateOutPin extends OutPin {
+    public TriStateOutPin(String id, SchemaPart parent) {
+        super(id, parent);
+        hiImpedance = true;
+    }
+
+    /*Optimiser constructor unroll destination:destinations*/
+    public TriStateOutPin(TriStateOutPin oldPin, String variantId) {
+        super(oldPin, variantId);
+        hiImpedance = oldPin.hiImpedance;
     }
 
     @Override
-    public void addDestination(Pin pin) {
-        throw new UnsupportedOperationException("Can't add destination to NC Out Pin");
-    }
-
-    @Override
-    public void addDestination(Bus bus, byte offset) {
-        throw new UnsupportedOperationException("Can't add destination to NC Out Pin");
+    public Pin copyState(IModelItem<Pin> oldPin) {
+        super.copyState(oldPin);
+        hiImpedance = oldPin.isHiImpedance();
+        return this;
     }
 
     @Override
     public void setState(boolean newState) {
+        hiImpedance = false;
+        state = newState;
+        for (Pin destination : destinations) {
+            destination.setState(state);
+        }
     }
 
     @Override
     public void setHiImpedance() {
+        assert !hiImpedance : "Already in hiImpedance:" + this;
+        hiImpedance = true;
+        for (Pin destination : destinations) {
+            destination.setHiImpedance();
+        }
     }
 
-    @Override
     public void resend() {
+        if (!hiImpedance) {
+            setState(state);
+        }
     }
 
     @Override
     public Pin getOptimised(boolean keepSetters) {
-        return this;
+        if (destinations.length == 0) {
+            return new NCWire(this);
+        } else if (destinations.length == 1) {
+            return destinations[0].getOptimised(keepSetters).copyState(this);
+        } else {
+            for (int i = 0; i < destinations.length; i++) {
+                destinations[i] = destinations[i].getOptimised(false);
+            }
+            ClassOptimiser<TriStateOutPin> optimiser = new ClassOptimiser<>(this).unroll(destinations.length);
+            return optimiser.build();
+        }
     }
 }

@@ -84,7 +84,7 @@ public class Ram extends SchemaPart {
         for (int i = 0; i < ramSize; i++) {
             words[i] = ThreadLocalRandom.current().nextLong() & maskForSize;
         }
-        addOutBus("D", size);
+        addTriStateOutBus("D", size);
         dIn = addInBus(params.containsKey("separateOut") ? "Din" : "D", size);
         if (reverse) {
             aBus = addInBus(new InBus("A", this, aSize) {
@@ -94,13 +94,11 @@ public class Ram extends SchemaPart {
                     if (!csPin.state) {
                         rOut();
                     }
-                    hiImpedance = false;
                 }
             });
             csPin = addInPin(new InPin("~{CS}", this) {
                 @Override
                 public void setState(boolean newState) {
-                    hiImpedance = false;
                     state = newState;
                     rOut();
                 }
@@ -108,7 +106,6 @@ public class Ram extends SchemaPart {
             oePin = addInPin(new InPin("~{OE}", this) {
                 @Override
                 public void setState(boolean newState) {
-                    hiImpedance = false;
                     state = newState;
                     rOut();
                 }
@@ -116,7 +113,6 @@ public class Ram extends SchemaPart {
             addInPin(new InPin("~{WE}", this) {
                 @Override
                 public void setState(boolean newState) {
-                    hiImpedance = false;
                     state = newState;
                     if (!state && !csPin.state) {
                         words[(int) aBus.state] = dIn.state;
@@ -131,13 +127,11 @@ public class Ram extends SchemaPart {
                     if (!csPin.state) {
                         out();
                     }
-                    hiImpedance = false;
                 }
             });
             csPin = addInPin(new InPin("CS", this) {
                 @Override
                 public void setState(boolean newState) {
-                    hiImpedance = false;
                     state = newState;
                     out();
                 }
@@ -145,7 +139,6 @@ public class Ram extends SchemaPart {
             oePin = addInPin(new InPin("OE", this) {
                 @Override
                 public void setState(boolean newState) {
-                    hiImpedance = false;
                     state = newState;
                     out();
                 }
@@ -153,7 +146,6 @@ public class Ram extends SchemaPart {
             addInPin(new InPin("WE", this) {
                 @Override
                 public void setState(boolean newState) {
-                    hiImpedance = false;
                     state = newState;
                     if (state && csPin.state) {
                         words[(int) aBus.state] = dIn.state;
@@ -177,15 +169,10 @@ public class Ram extends SchemaPart {
     private void out() {
         if (oePin.state && csPin.state) {
             if (dOut.state != words[(int) aBus.state] || dOut.hiImpedance) {
-                dOut.state = words[(int) aBus.state];
-                dOut.hiImpedance = false;
-                dOut.setState(dOut.state);
+                dOut.setState(words[(int) aBus.state]);
             }
-        } else {
-            if (!dOut.hiImpedance) {
-                dOut.setHiImpedance();
-                dOut.hiImpedance = true;
-            }
+        } else if (!dOut.hiImpedance) {
+            dOut.setHiImpedance();
         }
     }
 
@@ -193,14 +180,9 @@ public class Ram extends SchemaPart {
         if (oePin.state | csPin.state) {
             if (!dOut.hiImpedance) {
                 dOut.setHiImpedance();
-                dOut.hiImpedance = true;
             }
-        } else {
-            if (dOut.state != words[(int) aBus.state] || dOut.hiImpedance) {
-                dOut.state = words[(int) aBus.state];
-                dOut.hiImpedance = false;
-                dOut.setState(dOut.state);
-            }
+        } else if (dOut.state != words[(int) aBus.state] || dOut.hiImpedance) {
+            dOut.setState(words[(int) aBus.state]);
         }
     }
 }

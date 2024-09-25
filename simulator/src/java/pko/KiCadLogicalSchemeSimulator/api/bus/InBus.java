@@ -42,13 +42,7 @@ public abstract class InBus extends Bus {
     }
 
     @Override
-    public void setHiImpedance() {
-        assert !hiImpedance : "Already in hiImpedance:" + this;
-        hiImpedance = true;
-    }
-
-    @Override
-    public InBus getOptimised() {
+    public InBus getOptimised(boolean keepSetters) {
         return this;
     }
 }

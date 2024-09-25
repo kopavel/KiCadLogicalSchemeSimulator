@@ -68,10 +68,7 @@ public class Multiplexer extends SchemaPart {
                 @Override
                 public void setState(long newState) {
                     state = newState;
-                    hiImpedance = false;
                     if (finalInNo == nState /*&& outBus.state != newState*/) {
-                        outBus.hiImpedance = false;
-                        outBus.state = newState;
                         outBus.setState(newState);
                     }
                 }
@@ -83,17 +80,14 @@ public class Multiplexer extends SchemaPart {
             addInPin(new InPin("N" + i, this) {
                 @Override
                 public void setState(boolean newState) {
-                    hiImpedance = false;
                     state = newState;
                     if (newState) {
                         nState |= mask;
                     } else {
                         nState &= nMask;
                     }
-                    if (!inBuses[nState].hiImpedance && outBus.state != inBuses[nState].state) {
-                        outBus.state = inBuses[nState].state;
-                        outBus.hiImpedance = false;
-                        outBus.setState(outBus.state);
+                    if (outBus.state != inBuses[nState].state) {
+                        outBus.setState(inBuses[nState].state);
                     }
                 }
             });

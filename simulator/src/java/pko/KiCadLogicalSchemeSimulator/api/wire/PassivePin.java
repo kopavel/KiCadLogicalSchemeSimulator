@@ -37,15 +37,16 @@ public class PassivePin extends OutPin {
     public PassivePin(String id, SchemaPart parent) {
         super(id, parent);
         strong = false;
+        hiImpedance = true;
     }
 
     @Override
-    public Pin getOptimised() {
+    public Pin getOptimised(boolean keepSetters) {
         if (merger == null) {
             merger = new PassiveOutMerger(this);
             return merger;
         } else {
-            return super.getOptimised();
+            return super.getOptimised(keepSetters);
         }
     }
 }

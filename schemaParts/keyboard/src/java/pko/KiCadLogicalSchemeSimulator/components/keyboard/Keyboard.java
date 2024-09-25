@@ -67,14 +67,11 @@ public class Keyboard extends SchemaPart implements InteractiveSchemaPart {
             @Override
             public void setState(boolean newState) {
                 state = newState;
-                hiImpedance = false;
                 if (newState) {
-                    out.hiImpedance = true;
                     out.setHiImpedance();
                 } else {
                     if (out.state != busMap[(int) in.state] || out.hiImpedance) {
-                        out.state = busMap[(int) in.state];
-                        out.setState(out.state);
+                        out.setState(busMap[(int) in.state]);
                     }
                 }
             }
@@ -83,14 +80,12 @@ public class Keyboard extends SchemaPart implements InteractiveSchemaPart {
             @Override
             public void setState(long newState) {
                 state = newState;
-                hiImpedance = false;
                 if (!enable.state && (out.state != busMap[(int) newState] || out.hiImpedance)) {
-                    out.state = busMap[(int) newState];
-                    out.setState(out.state);
+                    out.setState(busMap[(int) newState]);
                 }
             }
         });
-        addOutBus("Out", 8);
+        addTriStateOutBus("Out", 8);
         addOutPin("Ev");
         keyboardUiComponent = new KeyboardUiComponent(id, 50, this);
     }
@@ -115,7 +110,6 @@ public class Keyboard extends SchemaPart implements InteractiveSchemaPart {
     public void initOuts() {
         out = getOutBus("Out");
         event = getOutPin("Ev");
-        event.hiImpedance = false;
     }
 
     @Override

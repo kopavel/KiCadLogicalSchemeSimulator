@@ -66,11 +66,9 @@ public class MultiUnitCounter extends SchemaPart {
                     addInPin(new InPin("C" + (char) ('a' + i), this) {
                         @Override
                         public void setState(boolean newState) {
-                            hiImpedance = false;
                             state = newState;
                             if (!state) {
-                                outPins[finalI].state = !outPins[finalI].state;
-                                outPins[finalI].setState(outPins[finalI].state);
+                                outPins[finalI].setState(!outPins[finalI].state);
                             }
                         }
                     });
@@ -79,10 +77,8 @@ public class MultiUnitCounter extends SchemaPart {
                         @Override
                         public void setState(boolean newState) {
                             state = newState;
-                            hiImpedance = false;
                             if (newState) {
-                                outPins[finalI].state = !outPins[finalI].state;
-                                outPins[finalI].setState(outPins[finalI].state);
+                                outPins[finalI].setState(!outPins[finalI].state);
                             }
                         }
                     });
@@ -91,9 +87,7 @@ public class MultiUnitCounter extends SchemaPart {
                     @Override
                     public void setState(boolean newState) {
                         state = newState;
-                        hiImpedance = false;
                         if (state) {
-                            outPins[finalI].state = false;
                             outPins[finalI].setState(false);
                         }
                     }
@@ -106,10 +100,8 @@ public class MultiUnitCounter extends SchemaPart {
                         @Override
                         public void setState(boolean newState) {
                             state = newState;
-                            hiImpedance = false;
                             if (!state) {
-                                outBuses[finalI].state = (outBuses[finalI].state + 1) & countMask;
-                                outBuses[finalI].setState(outBuses[finalI].state);
+                                outBuses[finalI].setState((outBuses[finalI].state + 1) & countMask);
                             }
                         }
                     });
@@ -118,10 +110,8 @@ public class MultiUnitCounter extends SchemaPart {
                         @Override
                         public void setState(boolean newState) {
                             state = newState;
-                            hiImpedance = false;
                             if (state) {
-                                outBuses[finalI].state = (outBuses[finalI].state + 1) & countMask;
-                                outBuses[finalI].setState(outBuses[finalI].state);
+                                outBuses[finalI].setState((outBuses[finalI].state + 1) & countMask);
                             }
                         }
                     });
@@ -130,9 +120,7 @@ public class MultiUnitCounter extends SchemaPart {
                     @Override
                     public void setState(boolean newState) {
                         state = newState;
-                        hiImpedance = false;
                         if (state) {
-                            outBuses[finalI].state = 0;
                             outBuses[finalI].setState(0);
                         }
                     }
@@ -157,14 +145,10 @@ public class MultiUnitCounter extends SchemaPart {
     public void reset() {
         for (int i = 0; i < sizes.length; i++) {
             if (sizes[i] == 1) {
-                if (outPins[i].hiImpedance || outPins[i].state) {
-                    outPins[i].hiImpedance = false;
-                    outPins[i].state = false;
+                if (outPins[i].state) {
                     outPins[i].setState(false);
                 }
-            } else if (outBuses[i].hiImpedance || outBuses[i].state > 0) {
-                outBuses[i].hiImpedance = false;
-                outBuses[i].state = 0;
+            } else if (outBuses[i].state > 0) {
                 outBuses[i].setState(0);
             }
         }

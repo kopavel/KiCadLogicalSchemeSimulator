@@ -58,22 +58,18 @@ public class Buffer extends SchemaPart {
         if (busSize > 64) {
             throw new RuntimeException("Component " + id + " size  must be less then 64");
         }
-        addOutBus("Q", busSize);
+        addTriStateOutBus("Q", busSize);
         if (params.containsKey("latch")) {
             oePin = addInPin(new InPin("~{OE}", this) {
                 @Override
                 public void setState(boolean newState) {
-                    hiImpedance = false;
                     state = newState;
                     if (!state) {
                         if (qBus.state != latch || qBus.hiImpedance) {
-                            qBus.state = latch;
-                            qBus.hiImpedance = false;
-                            qBus.setState(qBus.state);
+                            qBus.setState(latch);
                         }
                     } else if (!qBus.hiImpedance) {
                         qBus.setHiImpedance();
-                        qBus.hiImpedance = true;
                     }
                 }
             });
@@ -81,12 +77,9 @@ public class Buffer extends SchemaPart {
                 @Override
                 public void setState(boolean newState) {
                     state = newState;
-                    hiImpedance = false;
                     if (!state) {
                         latch = dBus.state;
                         if (!oePin.state && (qBus.state != latch || qBus.hiImpedance)) {
-                            qBus.state = latch;
-                            qBus.hiImpedance = false;
                             qBus.setState(latch);
                         }
                     }
@@ -98,16 +91,12 @@ public class Buffer extends SchemaPart {
                 @Override
                 public void setState(boolean newState) {
                     state = newState;
-                    hiImpedance = false;
                     if (!state) {
                         if (qBus.state != dBus.state || qBus.hiImpedance) {
-                            qBus.state = dBus.state;
-                            qBus.hiImpedance = false;
-                            qBus.setState(qBus.state);
+                            qBus.setState(dBus.state);
                         }
                     } else if (!qBus.hiImpedance) {
                         qBus.setHiImpedance();
-                        qBus.hiImpedance = true;
                     }
                 }
             });
@@ -116,11 +105,8 @@ public class Buffer extends SchemaPart {
                 public void setState(long newState) {
                     state = newState;
                     if (!oePin.state && (qBus.state != dBus.state || qBus.hiImpedance)) {
-                        qBus.state = newState;
-                        qBus.hiImpedance = false;
                         qBus.setState(newState);
                     }
-                    hiImpedance = false;
                 }
             });
         }

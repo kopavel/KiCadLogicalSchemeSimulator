@@ -45,10 +45,12 @@ public class BusToWiresAdapter extends OutBus {
     /*Optimiser constructor unroll destination:destinations*/
     public BusToWiresAdapter(BusToWiresAdapter oldBus, String variantId) {
         super(oldBus, variantId);
+        triState = oldBus.triState;
     }
 
     public BusToWiresAdapter(OutBus outBus, Bus[] wires, long mask) {
         super(outBus, "BusToWire");
+        triState = outBus.triState;
         this.mask = mask;
         destinations = Arrays.stream(wires)
                 .map(w -> ((SimpleBusToWireAdapter) w).destination).toArray(Pin[]::new);
@@ -56,12 +58,22 @@ public class BusToWiresAdapter extends OutBus {
 
     @Override
     public void setState(long newState) {
-        /*Optimiser bind d:destinations[0] bind mask*/
-        if (destinations[0].hiImpedance || maskState != (newState & mask)) {
-            /*Optimiser bind mask*/
-            maskState = newState & mask;
+        /*Optimiser block setters block iSetter*/
+        hiImpedance = false;
+        /*Optimiser blockend iSetter*/
+        state = newState;
+        /*Optimiser blockend setters*/
+        /*Optimiser  bind mask*/
+        final long newMaskState = newState & mask;
+        if (
+            /*Optimiser block iSetter*/
+            /*Optimiser bind d:destinations[0]*/
+                destinations[0].hiImpedance ||
+                        /*Optimiser blockend iSetter*///
+                        maskState != newMaskState) {
+            maskState = newMaskState;
             /*Optimiser block dest*/
-            final boolean dState = maskState != 0;
+            final boolean dState = newMaskState != 0;
             /*Optimiser blockend dest*/
             for (Pin destination : destinations) {
                 /*Optimiser bind v:dState*/
@@ -72,6 +84,9 @@ public class BusToWiresAdapter extends OutBus {
 
     @Override
     public void setHiImpedance() {
+        /*Optimiser block setters block iSetter*/
+        hiImpedance = true;
+        /*Optimiser blockend iSetter blockend setters*/
         for (Pin destination : destinations) {
             destination.setHiImpedance();
         }
@@ -82,16 +97,22 @@ public class BusToWiresAdapter extends OutBus {
     }
 
     @Override
-    public BusToWiresAdapter getOptimised() {
+    public BusToWiresAdapter getOptimised(boolean keepSetters) {
         if (destinations.length == 0) {
             throw new RuntimeException("unconnected BusToWiresAdapter " + getName());
         } else {
             for (int i = 0; i < destinations.length; i++) {
-                destinations[i] = destinations[i].getOptimised();
+                destinations[i] = destinations[i].getOptimised(false);
             }
             ClassOptimiser<BusToWiresAdapter> optimiser = new ClassOptimiser<>(this).unroll(destinations.length).bind("mask", mask).bind("d", "destination0");
-            if (destinations.length < 3) {
-                optimiser.bind("v", "maskState != 0").cut("dest");
+            if (destinations.length == 1) {
+                optimiser.bind("v", "newMaskState != 0").cut("dest");
+            }
+            if (!keepSetters) {
+                optimiser.cut("setters");
+            }
+            if (!triState) {
+                optimiser.cut("iSetter");
             }
             return optimiser.build();
         }

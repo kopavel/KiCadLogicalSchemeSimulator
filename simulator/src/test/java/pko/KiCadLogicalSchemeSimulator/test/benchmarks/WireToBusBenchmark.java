@@ -60,7 +60,7 @@ public class WireToBusBenchmark {
                 }
             };
             out = new WireToBusesAdapter("OUT", testPart, testPart.addInBus("in", 2), (byte) 2);
-            out = out.getOptimised();
+            out = out.getOptimised(true);
         }
     }
 }
