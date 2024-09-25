@@ -32,8 +32,8 @@
 package pko.KiCadLogicalSchemeSimulator.components.counter;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 public class MultiUnitCounter extends SchemaPart {
@@ -63,7 +63,7 @@ public class MultiUnitCounter extends SchemaPart {
             if (sizes[i] == 1) {
                 addOutPin("Q" + (char) ('a' + i));
                 if (reverse) {
-                    addInPin(new NoFloatingInPin("C" + (char) ('a' + i), this) {
+                    addInPin(new InPin("C" + (char) ('a' + i), this) {
                         @Override
                         public void setState(boolean newState) {
                             hiImpedance = false;
@@ -75,7 +75,7 @@ public class MultiUnitCounter extends SchemaPart {
                         }
                     });
                 } else {
-                    addInPin(new NoFloatingInPin("C" + (char) ('a' + i), this) {
+                    addInPin(new InPin("C" + (char) ('a' + i), this) {
                         @Override
                         public void setState(boolean newState) {
                             state = newState;
@@ -87,7 +87,7 @@ public class MultiUnitCounter extends SchemaPart {
                         }
                     });
                 }
-                addInPin(new NoFloatingInPin("R" + (char) ('a' + i), this) {
+                addInPin(new InPin("R" + (char) ('a' + i), this) {
                     @Override
                     public void setState(boolean newState) {
                         state = newState;
@@ -102,7 +102,7 @@ public class MultiUnitCounter extends SchemaPart {
                 final long countMask = Utils.getMaskForSize(sizes[i]);
                 addOutBus("Q" + (char) ('a' + i), sizes[i]);
                 if (reverse) {
-                    addInPin(new NoFloatingInPin("C" + (char) ('a' + finalI), this) {
+                    addInPin(new InPin("C" + (char) ('a' + finalI), this) {
                         @Override
                         public void setState(boolean newState) {
                             state = newState;
@@ -114,7 +114,7 @@ public class MultiUnitCounter extends SchemaPart {
                         }
                     });
                 } else {
-                    addInPin(new NoFloatingInPin("C" + (char) ('a' + i), this) {
+                    addInPin(new InPin("C" + (char) ('a' + i), this) {
                         @Override
                         public void setState(boolean newState) {
                             state = newState;
@@ -126,7 +126,7 @@ public class MultiUnitCounter extends SchemaPart {
                         }
                     });
                 }
-                addInPin(new NoFloatingInPin("R" + (char) ('a' + i), this) {
+                addInPin(new InPin("R" + (char) ('a' + i), this) {
                     @Override
                     public void setState(boolean newState) {
                         state = newState;

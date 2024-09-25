@@ -31,11 +31,9 @@
  */
 package pko.KiCadLogicalSchemeSimulator.components.stateMachine;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.in.NoFloatingInBus;
+import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 public class StateMachine extends SchemaPart {
@@ -86,7 +84,7 @@ public class StateMachine extends SchemaPart {
         } catch (NumberFormatException r) {
             throw new RuntimeException("Component " + id + " state must be positive number");
         }
-        dPin = addInPin(new NoFloatingInPin("D", this) {
+        dPin = addInPin(new InPin("D", this) {
             @Override
             public void setState(boolean newState) {
                 hiImpedance = false;
@@ -98,7 +96,7 @@ public class StateMachine extends SchemaPart {
                 }
             }
         });
-        sPin = addInPin(new NoFloatingInPin("S", this) {
+        sPin = addInPin(new InPin("S", this) {
             @Override
             public void setState(boolean newState) {
                 hiImpedance = false;
@@ -113,7 +111,7 @@ public class StateMachine extends SchemaPart {
                 }
             }
         });
-        addInPin(new NoFloatingInPin("R", this) {
+        addInPin(new InPin("R", this) {
             @Override
             public void setState(boolean newState) {
                 hiImpedance = false;
@@ -138,7 +136,7 @@ public class StateMachine extends SchemaPart {
         if (params.containsKey("latch")) {
             in = addInBus("IN", inSize);
         } else {
-            in = addInBus(new NoFloatingInBus("IN", this, inSize) {
+            in = addInBus(new InBus("IN", this, inSize) {
                 @Override
                 public void setState(long newState) {
                     hiImpedance = false;

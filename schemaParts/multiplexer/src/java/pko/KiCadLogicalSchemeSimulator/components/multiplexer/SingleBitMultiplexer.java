@@ -31,9 +31,8 @@
  */
 package pko.KiCadLogicalSchemeSimulator.components.multiplexer;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
 
 public class SingleBitMultiplexer extends SchemaPart {
     private final InPin[] inPins;
@@ -53,7 +52,7 @@ public class SingleBitMultiplexer extends SchemaPart {
         inPins = new InPin[partSize];
         for (int inNo = 0; inNo < partSize; inNo++) {
             int finalInNo = inNo;
-            inPins[inNo] = addInPin(new NoFloatingInPin(String.valueOf(finalInNo), this) {
+            inPins[inNo] = addInPin(new InPin(String.valueOf(finalInNo), this) {
                 @Override
                 public void setState(boolean newState) {
                     state = newState;
@@ -69,7 +68,7 @@ public class SingleBitMultiplexer extends SchemaPart {
         for (int i = 0; i < size; i++) {
             int mask = 1 << i;
             int nMask = ~mask;
-            addInPin(new NoFloatingInPin("N" + i, this) {
+            addInPin(new InPin("N" + i, this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;

@@ -30,11 +30,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.tester;
-import pko.KiCadLogicalSchemeSimulator.api.bus.in.CorrectedInBus;
+import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 
 public class TestInBus extends SchemaPart {
-    public CorrectedInBus bus;
+    public InBus bus;
 
     protected TestInBus(String id, String sParam) {
         super(id, sParam);

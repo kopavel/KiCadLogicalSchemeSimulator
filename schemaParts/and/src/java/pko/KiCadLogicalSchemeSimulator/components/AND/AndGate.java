@@ -31,8 +31,8 @@
  */
 package pko.KiCadLogicalSchemeSimulator.components.AND;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
 
 public class AndGate extends SchemaPart {
     private Pin out;
@@ -49,7 +49,7 @@ public class AndGate extends SchemaPart {
             int mask = 1 << i;
             int nMask = ~mask;
             if (reverse) {
-                addInPin(new NoFloatingInPin("IN" + i, this) {
+                addInPin(new InPin("IN" + i, this) {
                     @Override
                     public void setState(boolean newState) {
                         state = newState;
@@ -74,7 +74,7 @@ public class AndGate extends SchemaPart {
                     }
                 });
             } else {
-                addInPin(new NoFloatingInPin("IN" + i, this) {
+                addInPin(new InPin("IN" + i, this) {
                     @Override
                     public void setState(boolean newState) {
                         state = newState;

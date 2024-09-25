@@ -31,8 +31,8 @@
  */
 package pko.KiCadLogicalSchemeSimulator.components.repeater;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
 
 public class Repeater extends SchemaPart {
     private Pin out;
@@ -40,7 +40,7 @@ public class Repeater extends SchemaPart {
     public Repeater(String id, String sParam) {
         super(id, sParam);
         if (reverse) {
-            addInPin(new NoFloatingInPin("IN", this) {
+            addInPin(new InPin("IN", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -52,7 +52,7 @@ public class Repeater extends SchemaPart {
                 }
             });
         } else {
-            addInPin(new NoFloatingInPin("IN", this) {
+            addInPin(new InPin("IN", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;

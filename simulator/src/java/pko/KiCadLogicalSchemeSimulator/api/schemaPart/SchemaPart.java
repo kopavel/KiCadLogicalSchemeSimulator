@@ -32,15 +32,9 @@
 package pko.KiCadLogicalSchemeSimulator.api.schemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
+import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.in.CorrectedInBus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.in.NoFloatingInBus;
-import pko.KiCadLogicalSchemeSimulator.api.wire.OutPin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.PullPin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -109,14 +103,8 @@ public abstract class SchemaPart {
         pin.hiImpedance = false;
     }
 
-    public CorrectedInBus addInBus(String pinId, int size, String... names) {
-        return addInBus(new CorrectedInBus(pinId, this, size, names) {
-            @Override
-            public void setHiImpedance() {
-                assert !hiImpedance : "Already in hiImpedance:" + this;
-                hiImpedance = true;
-            }
-
+    public InBus addInBus(String pinId, int size, String... names) {
+        return addInBus(new InBus(pinId, this, size, names) {
             @Override
             public void setState(long newState) {
                 state = newState;
@@ -126,7 +114,7 @@ public abstract class SchemaPart {
     }
 
     public InBus addNoFloatInBus(String pinId, int size, String... names) {
-        return addInBus(new NoFloatingInBus(pinId, this, size, names) {
+        return addInBus(new InBus(pinId, this, size, names) {
             @Override
             public void setState(long newState) {
                 hiImpedance = false;

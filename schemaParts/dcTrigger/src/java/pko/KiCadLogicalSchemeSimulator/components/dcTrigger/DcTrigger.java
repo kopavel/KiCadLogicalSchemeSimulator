@@ -31,9 +31,8 @@
  */
 package pko.KiCadLogicalSchemeSimulator.components.dcTrigger;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
 
 public class DcTrigger extends SchemaPart {
     private final InPin dPin;
@@ -48,7 +47,7 @@ public class DcTrigger extends SchemaPart {
         super(id, sParam);
         dPin = addInPin("D");
         if (params.containsKey("setReverse")) {
-            rPin = addInPin(new NoFloatingInPin("R", this) {
+            rPin = addInPin(new InPin("R", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -77,7 +76,7 @@ public class DcTrigger extends SchemaPart {
                     }
                 }
             });
-            sPin = addInPin(new NoFloatingInPin("S", this) {
+            sPin = addInPin(new InPin("S", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -107,7 +106,7 @@ public class DcTrigger extends SchemaPart {
                 }
             });
         } else {
-            rPin = addInPin(new NoFloatingInPin("R", this) {
+            rPin = addInPin(new InPin("R", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -134,7 +133,7 @@ public class DcTrigger extends SchemaPart {
                     }
                 }
             });
-            sPin = addInPin(new NoFloatingInPin("S", this) {
+            sPin = addInPin(new InPin("S", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -163,7 +162,7 @@ public class DcTrigger extends SchemaPart {
             });
         }
         if (reverse) {
-            addInPin(new NoFloatingInPin("C", this) {
+            addInPin(new InPin("C", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -192,7 +191,7 @@ public class DcTrigger extends SchemaPart {
                 }
             });
         } else {
-            addInPin(new NoFloatingInPin("C", this) {
+            addInPin(new InPin("C", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;

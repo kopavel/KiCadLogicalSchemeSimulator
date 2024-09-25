@@ -33,7 +33,7 @@ package pko.KiCadLogicalSchemeSimulator.components.dCounter.test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.components.dCounter.DCounter;
 import pko.KiCadLogicalSchemeSimulator.test.schemaPartTester.NetTester;
 

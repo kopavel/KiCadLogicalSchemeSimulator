@@ -31,10 +31,9 @@
  */
 package pko.KiCadLogicalSchemeSimulator.components.sdram;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
+import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 import java.util.concurrent.ThreadLocalRandom;
@@ -81,7 +80,7 @@ public class SdRam extends SchemaPart {
         addOutBus("D", size);
         dIn = addInBus(params.containsKey("separateOut") ? "Din" : "D", size);
         if (reverse) {
-            addInPin(new NoFloatingInPin("~{RAS}", this) {
+            addInPin(new InPin("~{RAS}", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -91,7 +90,7 @@ public class SdRam extends SchemaPart {
                     }
                 }
             });
-            addInPin(new NoFloatingInPin("~{CAS}", this) {
+            addInPin(new InPin("~{CAS}", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -116,7 +115,7 @@ public class SdRam extends SchemaPart {
                 }
             });
         } else {
-            addInPin(new NoFloatingInPin("RAS", this) {
+            addInPin(new InPin("RAS", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -126,7 +125,7 @@ public class SdRam extends SchemaPart {
                     }
                 }
             });
-            addInPin(new NoFloatingInPin("CAS", this) {
+            addInPin(new InPin("CAS", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;

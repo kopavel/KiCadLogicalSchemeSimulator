@@ -29,11 +29,26 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.api.wire;
+package pko.KiCadLogicalSchemeSimulator.api.bus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 
-public abstract class PassiveOutPin extends PassivePin {
-    public PassiveOutPin(String id, SchemaPart parent) {
-        super(id, parent);
+public abstract class InBus extends Bus {
+    public InBus(String id, SchemaPart parent, int size, String... names) {
+        super(id, parent, size, names);
+    }
+
+    public InBus(Bus source, String variantId) {
+        super(source, variantId);
+    }
+
+    @Override
+    public void setHiImpedance() {
+        assert !hiImpedance : "Already in hiImpedance:" + this;
+        hiImpedance = true;
+    }
+
+    @Override
+    public InBus getOptimised() {
+        return this;
     }
 }

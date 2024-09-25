@@ -31,10 +31,9 @@
  */
 package pko.KiCadLogicalSchemeSimulator.components.multiplexer;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.in.NoFloatingCorrectedInBus;
+import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,7 +64,7 @@ public class Multiplexer extends SchemaPart {
                 aliases.add((char) ('A' + part) + "" + inNo);
             }
             int finalInNo = inNo;
-            inBuses[inNo] = addInBus(new NoFloatingCorrectedInBus(String.valueOf(finalInNo), this, partsAmount, aliases.toArray(new String[0])) {
+            inBuses[inNo] = addInBus(new InBus(String.valueOf(finalInNo), this, partsAmount, aliases.toArray(new String[0])) {
                 @Override
                 public void setState(long newState) {
                     state = newState;
@@ -81,7 +80,7 @@ public class Multiplexer extends SchemaPart {
         for (int i = 0; i < nSize; i++) {
             int mask = 1 << i;
             int nMask = ~mask;
-            addInPin(new NoFloatingInPin("N" + i, this) {
+            addInPin(new InPin("N" + i, this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;

@@ -30,11 +30,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.sdram;
-import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
+import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -71,7 +70,7 @@ public class SingleBitSdRam extends SchemaPart {
         addOutPin("Dout");
         dIn = addInPin("Din");
         if (reverse) {
-            addInPin(new NoFloatingInPin("~{RAS}", this) {
+            addInPin(new InPin("~{RAS}", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -81,7 +80,7 @@ public class SingleBitSdRam extends SchemaPart {
                     }
                 }
             });
-            addInPin(new NoFloatingInPin("~{CAS}", this) {
+            addInPin(new InPin("~{CAS}", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -106,7 +105,7 @@ public class SingleBitSdRam extends SchemaPart {
                 }
             });
         } else {
-            addInPin(new NoFloatingInPin("RAS", this) {
+            addInPin(new InPin("RAS", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -116,7 +115,7 @@ public class SingleBitSdRam extends SchemaPart {
                     }
                 }
             });
-            addInPin(new NoFloatingInPin("CAS", this) {
+            addInPin(new InPin("CAS", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;

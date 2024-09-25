@@ -31,7 +31,7 @@
  */
 package pko.KiCadLogicalSchemeSimulator.components.tester;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 
 public class TestInPin extends SchemaPart {
     public InPin pin;

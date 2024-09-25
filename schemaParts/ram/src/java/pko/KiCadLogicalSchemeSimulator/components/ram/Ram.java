@@ -31,11 +31,9 @@
  */
 package pko.KiCadLogicalSchemeSimulator.components.ram;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.in.NoFloatingCorrectedInBus;
+import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 import java.util.concurrent.ThreadLocalRandom;
@@ -89,7 +87,7 @@ public class Ram extends SchemaPart {
         addOutBus("D", size);
         dIn = addInBus(params.containsKey("separateOut") ? "Din" : "D", size);
         if (reverse) {
-            aBus = addInBus(new NoFloatingCorrectedInBus("A", this, aSize) {
+            aBus = addInBus(new InBus("A", this, aSize) {
                 @Override
                 public void setState(long newState) {
                     state = newState;
@@ -99,7 +97,7 @@ public class Ram extends SchemaPart {
                     hiImpedance = false;
                 }
             });
-            csPin = addInPin(new NoFloatingInPin("~{CS}", this) {
+            csPin = addInPin(new InPin("~{CS}", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -107,7 +105,7 @@ public class Ram extends SchemaPart {
                     rOut();
                 }
             });
-            oePin = addInPin(new NoFloatingInPin("~{OE}", this) {
+            oePin = addInPin(new InPin("~{OE}", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -115,7 +113,7 @@ public class Ram extends SchemaPart {
                     rOut();
                 }
             });
-            addInPin(new NoFloatingInPin("~{WE}", this) {
+            addInPin(new InPin("~{WE}", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -126,7 +124,7 @@ public class Ram extends SchemaPart {
                 }
             });
         } else {
-            aBus = addInBus(new NoFloatingCorrectedInBus("A", this, aSize) {
+            aBus = addInBus(new InBus("A", this, aSize) {
                 @Override
                 public void setState(long newState) {
                     state = newState;
@@ -136,7 +134,7 @@ public class Ram extends SchemaPart {
                     hiImpedance = false;
                 }
             });
-            csPin = addInPin(new NoFloatingInPin("CS", this) {
+            csPin = addInPin(new InPin("CS", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -144,7 +142,7 @@ public class Ram extends SchemaPart {
                     out();
                 }
             });
-            oePin = addInPin(new NoFloatingInPin("OE", this) {
+            oePin = addInPin(new InPin("OE", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -152,7 +150,7 @@ public class Ram extends SchemaPart {
                     out();
                 }
             });
-            addInPin(new NoFloatingInPin("WE", this) {
+            addInPin(new InPin("WE", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;

@@ -31,10 +31,9 @@
  */
 package pko.KiCadLogicalSchemeSimulator.components.busDriver;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.in.NoFloatingCorrectedInBus;
+import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 
 import java.util.Arrays;
 
@@ -57,7 +56,7 @@ public class BusDriver extends SchemaPart {
         outs = new Bus[partAmount];
         for (int i = 0; i < partAmount; i++) {
             int finalI = i;
-            ins[i] = addInBus(new NoFloatingCorrectedInBus("I" + (char) ('a' + finalI), this, sizes[finalI]) {
+            ins[i] = addInBus(new InBus("I" + (char) ('a' + finalI), this, sizes[finalI]) {
                 @Override
                 public void setState(long newState) {
                     state = newState;
@@ -71,7 +70,7 @@ public class BusDriver extends SchemaPart {
             });
             addOutBus("O" + (char) ('a' + i), sizes[i]);
             if (reverse) {
-                addInPin(new NoFloatingInPin("OE" + (char) ('a' + i), this) {
+                addInPin(new InPin("OE" + (char) ('a' + i), this) {
                     @Override
                     public void setState(boolean newState) {
                         state = newState;
@@ -93,7 +92,7 @@ public class BusDriver extends SchemaPart {
                     }
                 }).state = true;
             } else {
-                addInPin(new NoFloatingInPin("OE" + (char) ('a' + i), this) {
+                addInPin(new InPin("OE" + (char) ('a' + i), this) {
                     @Override
                     public void setState(boolean newState) {
                         hiImpedance = false;

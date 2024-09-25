@@ -31,9 +31,8 @@
  */
 package pko.KiCadLogicalSchemeSimulator.components.XOR;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
 
 public class XorGate extends SchemaPart {
     private final InPin in1;
@@ -43,7 +42,7 @@ public class XorGate extends SchemaPart {
     protected XorGate(String id, String sParam) {
         super(id, sParam);
         if (reverse) {
-            in1 = addInPin(new NoFloatingInPin("IN0", this) {
+            in1 = addInPin(new InPin("IN0", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -54,7 +53,7 @@ public class XorGate extends SchemaPart {
                     }
                 }
             });
-            in2 = addInPin(new NoFloatingInPin("IN1", this) {
+            in2 = addInPin(new InPin("IN1", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -66,7 +65,7 @@ public class XorGate extends SchemaPart {
                 }
             });
         } else {
-            in1 = addInPin(new NoFloatingInPin("IN0", this) {
+            in1 = addInPin(new InPin("IN0", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -77,7 +76,7 @@ public class XorGate extends SchemaPart {
                     }
                 }
             });
-            in2 = addInPin(new NoFloatingInPin("IN1", this) {
+            in2 = addInPin(new InPin("IN1", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;

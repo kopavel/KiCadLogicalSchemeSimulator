@@ -31,11 +31,10 @@
  */
 package pko.KiCadLogicalSchemeSimulator.components.ram;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.in.NoFloatingCorrectedInBus;
+import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -73,7 +72,7 @@ public class SingleBitRam extends SchemaPart {
         addOutPin("Dout");
         dIn = addInPin("Din");
         if (reverse) {
-            aBus = addInBus(new NoFloatingCorrectedInBus("A", this, size) {
+            aBus = addInBus(new InBus("A", this, size) {
                 @Override
                 public void setState(long newState) {
                     state = newState;
@@ -83,7 +82,7 @@ public class SingleBitRam extends SchemaPart {
                     hiImpedance = false;
                 }
             });
-            csPin = addInPin(new NoFloatingInPin("~{CS}", this) {
+            csPin = addInPin(new InPin("~{CS}", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -91,7 +90,7 @@ public class SingleBitRam extends SchemaPart {
                     rOut();
                 }
             });
-            oePin = addInPin(new NoFloatingInPin("~{OE}", this) {
+            oePin = addInPin(new InPin("~{OE}", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -99,7 +98,7 @@ public class SingleBitRam extends SchemaPart {
                     rOut();
                 }
             });
-            addInPin(new NoFloatingInPin("~{WE}", this) {
+            addInPin(new InPin("~{WE}", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -110,7 +109,7 @@ public class SingleBitRam extends SchemaPart {
                 }
             });
         } else {
-            aBus = addInBus(new NoFloatingCorrectedInBus("A", this, size) {
+            aBus = addInBus(new InBus("A", this, size) {
                 @Override
                 public void setState(long newState) {
                     state = newState;
@@ -120,7 +119,7 @@ public class SingleBitRam extends SchemaPart {
                     hiImpedance = false;
                 }
             });
-            csPin = addInPin(new NoFloatingInPin("CS", this) {
+            csPin = addInPin(new InPin("CS", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -128,7 +127,7 @@ public class SingleBitRam extends SchemaPart {
                     out();
                 }
             });
-            oePin = addInPin(new NoFloatingInPin("OE", this) {
+            oePin = addInPin(new InPin("OE", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -136,7 +135,7 @@ public class SingleBitRam extends SchemaPart {
                     out();
                 }
             });
-            addInPin(new NoFloatingInPin("WE", this) {
+            addInPin(new InPin("WE", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;

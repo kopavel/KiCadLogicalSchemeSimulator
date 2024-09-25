@@ -31,10 +31,9 @@
  */
 package pko.KiCadLogicalSchemeSimulator.components.multiplexer;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.in.CorrectedInBus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
+import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +61,7 @@ public class MaskedMultiplexer extends SchemaPart {
         inBuses = new InBus[partSize];
         if (reverse) {
             outMask = -1;
-            addInPin(new NoFloatingInPin("OE", this) {
+            addInPin(new InPin("OE", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -87,7 +86,7 @@ public class MaskedMultiplexer extends SchemaPart {
             for (int i = 0; i < partSize; i++) {
                 long mask = 1L << i;
                 long nMask = ~mask;
-                addInPin(new NoFloatingInPin("OE" + (char) ('a' + i), this) {
+                addInPin(new InPin("OE" + (char) ('a' + i), this) {
                     @Override
                     public void setState(boolean newState) {
                         hiImpedance = false;
@@ -106,7 +105,7 @@ public class MaskedMultiplexer extends SchemaPart {
                 });
             }
         } else {
-            addInPin(new NoFloatingInPin("OE", this) {
+            addInPin(new InPin("OE", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -131,7 +130,7 @@ public class MaskedMultiplexer extends SchemaPart {
             for (int i = 0; i < partSize; i++) {
                 long mask = 1L << i;
                 long nMask = ~mask;
-                addInPin(new NoFloatingInPin("OE" + (char) ('a' + i), this) {
+                addInPin(new InPin("OE" + (char) ('a' + i), this) {
                     @Override
                     public void setState(boolean newState) {
                         hiImpedance = false;
@@ -156,7 +155,7 @@ public class MaskedMultiplexer extends SchemaPart {
                 aliases.add((char) ('A' + part) + "" + inNo);
             }
             int finalInNo = inNo;
-            inBuses[inNo] = addInBus(new CorrectedInBus(String.valueOf(finalInNo), this, partsAmount, aliases.toArray(new String[0])) {
+            inBuses[inNo] = addInBus(new InBus(String.valueOf(finalInNo), this, partsAmount, aliases.toArray(new String[0])) {
                 @Override
                 public void setHiImpedance() {
                     hiImpedance = true;
@@ -177,7 +176,7 @@ public class MaskedMultiplexer extends SchemaPart {
         for (int i = 0; i < nSize; i++) {
             int mask = 1 << i;
             int nMask = ~mask;
-            addInPin(new NoFloatingInPin("N" + i, this) {
+            addInPin(new InPin("N" + i, this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;

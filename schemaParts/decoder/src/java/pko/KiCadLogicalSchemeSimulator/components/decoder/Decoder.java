@@ -31,10 +31,9 @@
  */
 package pko.KiCadLogicalSchemeSimulator.components.decoder;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.in.CorrectedInBus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.in.NoFloatingCorrectedInBus;
+import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 
 public class Decoder extends SchemaPart {
     private Bus outBus;
@@ -47,9 +46,9 @@ public class Decoder extends SchemaPart {
             throw new RuntimeException("Component " + id + " has no parameter \"size\"");
         }
         int inSize = Integer.parseInt(params.get("size"));
-        CorrectedInBus aBus;
+        InBus aBus;
         if (params.containsKey("outReverse")) {
-            aBus = addInBus(new NoFloatingCorrectedInBus("A", this, inSize) {
+            aBus = addInBus(new InBus("A", this, inSize) {
                 @Override
                 public void setState(long newState) {
                     state = newState;
@@ -63,7 +62,7 @@ public class Decoder extends SchemaPart {
                 }
             });
         } else {
-            aBus = addInBus(new NoFloatingCorrectedInBus("A", this, inSize) {
+            aBus = addInBus(new InBus("A", this, inSize) {
                 @Override
                 public void setState(long newState) {
                     state = newState;
@@ -80,7 +79,7 @@ public class Decoder extends SchemaPart {
             });
         }
         if (reverse) {
-            addInPin(new NoFloatingInPin("CS", this) {
+            addInPin(new InPin("CS", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -99,7 +98,7 @@ public class Decoder extends SchemaPart {
                 }
             });
         } else {
-            addInPin(new NoFloatingInPin("CS", this) {
+            addInPin(new InPin("CS", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;

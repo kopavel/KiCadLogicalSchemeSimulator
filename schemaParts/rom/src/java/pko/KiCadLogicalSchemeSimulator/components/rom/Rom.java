@@ -31,9 +31,9 @@
  */
 package pko.KiCadLogicalSchemeSimulator.components.rom;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.in.NoFloatingCorrectedInBus;
+import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
@@ -112,7 +112,7 @@ public class Rom extends SchemaPart {
         } catch (IOException e) {
             throw new RuntimeException("Can't load file " + file, e);
         }
-        addInBus(new NoFloatingCorrectedInBus("A", this, aSize) {
+        addInBus(new InBus("A", this, aSize) {
             @Override
             public void setState(long newState) {
                 addr = (int) newState;
@@ -127,7 +127,7 @@ public class Rom extends SchemaPart {
         });
         addOutBus("D", size);
         if (reverse) {
-            addInPin(new NoFloatingInPin("~{CS}", this) {
+            addInPin(new InPin("~{CS}", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -149,7 +149,7 @@ public class Rom extends SchemaPart {
                 }
             });
         } else {
-            addInPin(new NoFloatingInPin("CS", this) {
+            addInPin(new InPin("CS", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;

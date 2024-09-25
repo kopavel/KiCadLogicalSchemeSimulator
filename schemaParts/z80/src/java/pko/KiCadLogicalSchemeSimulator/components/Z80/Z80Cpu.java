@@ -39,11 +39,10 @@ import com.codingrodent.microprocessor.io.queue.ReadRequest;
 import com.codingrodent.microprocessor.io.queue.Request;
 import com.codingrodent.microprocessor.io.queue.WriteRequest;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
+import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
 
 public class Z80Cpu extends SchemaPart {
     private final Z80Core cpu;
@@ -75,7 +74,7 @@ public class Z80Cpu extends SchemaPart {
     public Z80Cpu(String id) {
         super(id, null);
         cpu = new Z80Core(ioQueue);
-        addInPin(new NoFloatingInPin("CLK", this) {
+        addInPin(new InPin("CLK", this) {
             @Override
             public void setState(boolean newState) {
                 hiImpedance = false;
@@ -219,7 +218,7 @@ public class Z80Cpu extends SchemaPart {
                 }
             }
         });
-        addInPin(new NoFloatingInPin("~{RESET}", this) {
+        addInPin(new InPin("~{RESET}", this) {
             @Override
             public void setState(boolean newState) {
                 hiImpedance = false;
@@ -229,7 +228,7 @@ public class Z80Cpu extends SchemaPart {
                 }
             }
         });
-        addInPin(new NoFloatingInPin("~{NMI}", this) {
+        addInPin(new InPin("~{NMI}", this) {
             @Override
             public void setState(boolean newState) {
                 if (!newState) {

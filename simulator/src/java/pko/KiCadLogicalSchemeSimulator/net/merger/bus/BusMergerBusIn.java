@@ -33,13 +33,13 @@ package pko.KiCadLogicalSchemeSimulator.net.merger.bus;
 import lombok.Getter;
 import pko.KiCadLogicalSchemeSimulator.api.ShortcutException;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.in.CorrectedInBus;
+import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.net.Net;
 import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
-public class BusMergerBusIn extends CorrectedInBus implements MergerInput<Bus> {
+public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
     @Getter
     public long mask;
     public long nMask;

@@ -31,9 +31,8 @@
  */
 package pko.KiCadLogicalSchemeSimulator.components.jkTrigger;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
 
 public class JkTrigger extends SchemaPart {
     private final InPin jPin;
@@ -48,7 +47,7 @@ public class JkTrigger extends SchemaPart {
         super(id, sParam);
         jPin = addInPin("J");
         kPin = addInPin("K");
-        rPin = addInPin(new NoFloatingInPin("R", this) {
+        rPin = addInPin(new InPin("R", this) {
             @Override
             public void setState(boolean newState) {
                 hiImpedance = false;
@@ -75,7 +74,7 @@ public class JkTrigger extends SchemaPart {
                 }
             }
         });
-        sPin = addInPin(new NoFloatingInPin("S", this) {
+        sPin = addInPin(new InPin("S", this) {
             @Override
             public void setState(boolean newState) {
                 hiImpedance = false;
@@ -103,7 +102,7 @@ public class JkTrigger extends SchemaPart {
             }
         });
         if (reverse) {
-            addInPin(new NoFloatingInPin("C", this) {
+            addInPin(new InPin("C", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -135,7 +134,7 @@ public class JkTrigger extends SchemaPart {
                 }
             });
         } else {
-            addInPin(new NoFloatingInPin("C", this) {
+            addInPin(new InPin("C", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;

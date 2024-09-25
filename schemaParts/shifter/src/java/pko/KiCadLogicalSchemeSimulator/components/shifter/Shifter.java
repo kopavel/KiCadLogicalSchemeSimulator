@@ -31,10 +31,9 @@
  */
 package pko.KiCadLogicalSchemeSimulator.components.shifter;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
+import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 public class Shifter extends SchemaPart {
@@ -66,7 +65,7 @@ public class Shifter extends SchemaPart {
         hiDsMask = 1L << (dSize - 1);
         dsPins = addInPin("DS");
         if (params.containsKey("plReverse")) {
-            addInPin(new NoFloatingInPin("PL", this) {
+            addInPin(new InPin("PL", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -75,7 +74,7 @@ public class Shifter extends SchemaPart {
                 }
             });
         } else {
-            addInPin(new NoFloatingInPin("PL", this) {
+            addInPin(new InPin("PL", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -87,7 +86,7 @@ public class Shifter extends SchemaPart {
         clearReverse = params.containsKey("clearReverse");
         if (clearReverse) {
             clockEnabled = false;
-            rPin = addInPin(new NoFloatingInPin("R", this) {
+            rPin = addInPin(new InPin("R", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -101,7 +100,7 @@ public class Shifter extends SchemaPart {
                 }
             });
         } else {
-            rPin = addInPin(new NoFloatingInPin("R", this) {
+            rPin = addInPin(new InPin("R", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -118,7 +117,7 @@ public class Shifter extends SchemaPart {
         inhibitReverse = params.containsKey("inhibitReverse");
         if (inhibitReverse) {
             clockEnabled = false;
-            ciPin = addInPin(new NoFloatingInPin("CI", this) {
+            ciPin = addInPin(new InPin("CI", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -131,7 +130,7 @@ public class Shifter extends SchemaPart {
                 }
             });
         } else {
-            ciPin = addInPin(new NoFloatingInPin("CI", this) {
+            ciPin = addInPin(new InPin("CI", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -145,7 +144,7 @@ public class Shifter extends SchemaPart {
             });
         }
         if (reverse) {
-            addInPin(new NoFloatingInPin("CP", this) {
+            addInPin(new InPin("CP", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -168,7 +167,7 @@ public class Shifter extends SchemaPart {
                     }
                 }
             });
-            addInPin(new NoFloatingInPin("CN", this) {
+            addInPin(new InPin("CN", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -192,7 +191,7 @@ public class Shifter extends SchemaPart {
                 }
             });
         } else {
-            addInPin(new NoFloatingInPin("CP", this) {
+            addInPin(new InPin("CP", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -215,7 +214,7 @@ public class Shifter extends SchemaPart {
                     }
                 }
             });
-            addInPin(new NoFloatingInPin("CN", this) {
+            addInPin(new InPin("CN", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;

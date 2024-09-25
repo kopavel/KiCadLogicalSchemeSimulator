@@ -31,11 +31,9 @@
  */
 package pko.KiCadLogicalSchemeSimulator.components.BUF;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.in.NoFloatingInBus;
+import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 
 public class Buffer extends SchemaPart {
     private final int busSize;
@@ -62,7 +60,7 @@ public class Buffer extends SchemaPart {
         }
         addOutBus("Q", busSize);
         if (params.containsKey("latch")) {
-            oePin = addInPin(new NoFloatingInPin("~{OE}", this) {
+            oePin = addInPin(new InPin("~{OE}", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -79,7 +77,7 @@ public class Buffer extends SchemaPart {
                     }
                 }
             });
-            addInPin(new NoFloatingInPin("~{WR}", this) {
+            addInPin(new InPin("~{WR}", this) {
                 @Override
                 public void setState(boolean newState) {
                     state = newState;
@@ -96,7 +94,7 @@ public class Buffer extends SchemaPart {
             });
             dBus = addInBus("D", busSize);
         } else {
-            oePin = addInPin(new NoFloatingInPin("~{CS}", this) {
+            oePin = addInPin(new InPin("~{CS}", this) {
                 @Override
                 public void setState(boolean newState) {
                     state = newState;
@@ -113,7 +111,7 @@ public class Buffer extends SchemaPart {
                     }
                 }
             });
-            dBus = addInBus(new NoFloatingInBus("D", this, busSize) {
+            dBus = addInBus(new InBus("D", this, busSize) {
                 @Override
                 public void setState(long newState) {
                     state = newState;

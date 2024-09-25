@@ -32,10 +32,9 @@
 package pko.KiCadLogicalSchemeSimulator.net.bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.in.CorrectedInBus;
 
 public class NegativeOffsetBus extends OffsetBus {
-    public NegativeOffsetBus(OutBus outBus, CorrectedInBus destination, byte offset) {
+    public NegativeOffsetBus(OutBus outBus, Bus destination, byte offset) {
         super(outBus, destination, (byte) -offset);
         if (offset == 0) {
             throw new RuntimeException("Offset must not be 0");

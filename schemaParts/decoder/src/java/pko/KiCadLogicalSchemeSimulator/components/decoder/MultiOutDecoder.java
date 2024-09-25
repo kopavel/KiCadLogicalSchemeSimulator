@@ -31,10 +31,9 @@
  */
 package pko.KiCadLogicalSchemeSimulator.components.decoder;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.in.CorrectedInBus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.in.NoFloatingCorrectedInBus;
+import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 public class MultiOutDecoder extends SchemaPart {
@@ -65,9 +64,9 @@ public class MultiOutDecoder extends SchemaPart {
             }
         }
         long outMask = Utils.getMaskForSize(outSize);
-        CorrectedInBus aBus;
+        InBus aBus;
         if (reverse) {
-            aBus = addInBus(new NoFloatingCorrectedInBus("A", this, inSize) {
+            aBus = addInBus(new InBus("A", this, inSize) {
                 @Override
                 public void setState(long newState) {
                     state = newState;
@@ -83,7 +82,7 @@ public class MultiOutDecoder extends SchemaPart {
                 }
             });
         } else {
-            aBus = addInBus(new NoFloatingCorrectedInBus("A", this, inSize) {
+            aBus = addInBus(new InBus("A", this, inSize) {
                 @Override
                 public void setState(long newState) {
                     state = newState;
@@ -108,7 +107,7 @@ public class MultiOutDecoder extends SchemaPart {
                 int mask = 1 << j;
                 int nMask = ~mask & fullMask;
                 if (csReverse) {
-                    addInPin(new NoFloatingInPin("CS" + (char) ('a' + finalI) + j, this) {
+                    addInPin(new InPin("CS" + (char) ('a' + finalI) + j, this) {
                         @Override
                         public void setState(boolean newState) {
                             hiImpedance = false;
@@ -134,7 +133,7 @@ public class MultiOutDecoder extends SchemaPart {
                     });
                 } else {
                     csStates[finalI] |= mask;
-                    addInPin(new NoFloatingInPin("CS" + (char) ('a' + finalI) + j, this) {
+                    addInPin(new InPin("CS" + (char) ('a' + finalI) + j, this) {
                         @Override
                         public void setState(boolean newState) {
                             hiImpedance = false;

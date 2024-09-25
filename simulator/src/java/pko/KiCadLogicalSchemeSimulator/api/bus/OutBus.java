@@ -30,7 +30,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.api.bus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.in.CorrectedInBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.net.bus.*;
@@ -60,15 +59,15 @@ public class OutBus extends Bus {
     }
 
     public void addDestination(Bus bus, long mask, byte offset) {
-        if (bus instanceof CorrectedInBus correctedBus && offset != 0) {
+        if (offset != 0) {
             if (corrected.containsKey(mask) && corrected.get(mask).containsKey(offset)) {
                 corrected.get(mask).get(offset).addDestination(bus);
                 return;
             } else {
                 if (offset > 0) {
-                    bus = new OffsetBus(this, correctedBus, offset);
+                    bus = new OffsetBus(this, bus, offset);
                 } else {
-                    bus = new NegativeOffsetBus(this, correctedBus, offset);
+                    bus = new NegativeOffsetBus(this, bus, offset);
                 }
                 corrected.computeIfAbsent(mask, m -> new HashMap<>()).put(offset, (OffsetBus) bus);
             }

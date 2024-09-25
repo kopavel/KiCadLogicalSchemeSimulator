@@ -33,8 +33,7 @@ package pko.KiCadLogicalSchemeSimulator.components.display;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.AbstractUiComponent;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.InteractiveSchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.net.Net;
 
 import javax.swing.*;
@@ -78,7 +77,7 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
             }
         });
         if (reverse) {
-            addInPin(new NoFloatingInPin("HSync", this) {
+            addInPin(new InPin("HSync", this) {
                 @Override
                 public void setState(boolean newState) {
                     state = newState;
@@ -96,7 +95,7 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                     }
                 }
             });
-            addInPin(new NoFloatingInPin("VSync", this) {
+            addInPin(new InPin("VSync", this) {
                 @Override
                 public void setState(boolean newState) {
                     state = newState;
@@ -128,7 +127,7 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                 }
             });
         } else {
-            addInPin(new NoFloatingInPin("HSync", this) {
+            addInPin(new InPin("HSync", this) {
                 @Override
                 public void setState(boolean newState) {
                     state = newState;
@@ -146,7 +145,7 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                     }
                 }
             });
-            addInPin(new NoFloatingInPin("VSync", this) {
+            addInPin(new InPin("VSync", this) {
                 @Override
                 public void setState(boolean newState) {
                     state = newState;
@@ -178,7 +177,7 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                 }
             });
         }
-        addInPin(new NoFloatingInPin("Clock", this) {
+        addInPin(new InPin("Clock", this) {
             @Override
             public void setState(boolean newState) {
                 hiImpedance = false;

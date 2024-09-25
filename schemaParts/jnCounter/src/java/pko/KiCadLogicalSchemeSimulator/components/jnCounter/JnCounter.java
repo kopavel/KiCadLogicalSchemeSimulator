@@ -32,8 +32,8 @@
 package pko.KiCadLogicalSchemeSimulator.components.jnCounter;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
 
 public class JnCounter extends SchemaPart {
     public final long coMax;
@@ -60,7 +60,7 @@ public class JnCounter extends SchemaPart {
         coMax = (long) Math.pow(2, ((double) pinAmount / 2));
         addOutBus("Q", pinAmount);
         addOutPin("CO");
-        addInPin(new NoFloatingInPin("CI", this) {
+        addInPin(new InPin("CI", this) {
             @Override
             public void setState(boolean newState) {
                 state = newState;
@@ -69,7 +69,7 @@ public class JnCounter extends SchemaPart {
             }
         });
         if (reverse) {
-            addInPin(new NoFloatingInPin("C", this) {
+            addInPin(new InPin("C", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -92,7 +92,7 @@ public class JnCounter extends SchemaPart {
                     }
                 }
             });
-            addInPin(new NoFloatingInPin("R", this) {
+            addInPin(new InPin("R", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -107,7 +107,7 @@ public class JnCounter extends SchemaPart {
                 }
             });
         } else {
-            addInPin(new NoFloatingInPin("C", this) {
+            addInPin(new InPin("C", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -130,7 +130,7 @@ public class JnCounter extends SchemaPart {
                     }
                 }
             });
-            addInPin(new NoFloatingInPin("R", this) {
+            addInPin(new InPin("R", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -163,6 +163,5 @@ public class JnCounter extends SchemaPart {
         outBus.setState(1);
         carryOutPin.state = true;
         carryOutPin.setState(true);
-
     }
 }

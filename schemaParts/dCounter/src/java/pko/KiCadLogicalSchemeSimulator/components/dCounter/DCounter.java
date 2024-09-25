@@ -31,12 +31,10 @@
  */
 package pko.KiCadLogicalSchemeSimulator.components.dCounter;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.in.NoFloatingInBus;
+import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
 
 public class DCounter extends SchemaPart {
     private final InBus jBus;
@@ -58,7 +56,7 @@ public class DCounter extends SchemaPart {
         addOutBus("Q", 4);
         addOutPin("CO");
         if (params.containsKey("carryReverse")) {
-            addInPin(new NoFloatingInPin("CI", this) {
+            addInPin(new InPin("CI", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -107,7 +105,7 @@ public class DCounter extends SchemaPart {
                 }
             });
         } else {
-            addInPin(new NoFloatingInPin("CI", this) {
+            addInPin(new InPin("CI", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -156,7 +154,7 @@ public class DCounter extends SchemaPart {
                 }
             });
         }
-        jBus = addInBus(new NoFloatingInBus("J", this, 4) {
+        jBus = addInBus(new InBus("J", this, 4) {
             @Override
             public void setState(long newState) {
                 state = newState;
@@ -167,7 +165,7 @@ public class DCounter extends SchemaPart {
                 }
             }
         });
-        addInPin(new NoFloatingInPin("PE", this) {
+        addInPin(new InPin("PE", this) {
             @Override
             public void setState(boolean newState) {
                 hiImpedance = false;
@@ -211,7 +209,7 @@ public class DCounter extends SchemaPart {
             maxCount = 9;
         }
         if (reverse) {
-            addInPin(new NoFloatingInPin("C", this) {
+            addInPin(new InPin("C", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -227,7 +225,7 @@ public class DCounter extends SchemaPart {
                 }
             });
         } else {
-            addInPin(new NoFloatingInPin("C", this) {
+            addInPin(new InPin("C", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -244,7 +242,7 @@ public class DCounter extends SchemaPart {
             });
         }
         if (eReverse) {
-            addInPin(new NoFloatingInPin("E", this) {
+            addInPin(new InPin("E", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;
@@ -260,7 +258,7 @@ public class DCounter extends SchemaPart {
                 }
             });
         } else {
-            addInPin(new NoFloatingInPin("E", this) {
+            addInPin(new InPin("E", this) {
                 @Override
                 public void setState(boolean newState) {
                     hiImpedance = false;

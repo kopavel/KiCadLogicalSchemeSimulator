@@ -33,14 +33,13 @@ package pko.KiCadLogicalSchemeSimulator.net;
 import pko.KiCadLogicalSchemeSimulator.Simulator;
 import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
+import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.OutPin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.PassiveOutPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
 import pko.KiCadLogicalSchemeSimulator.net.bus.BusInInterconnect;
 import pko.KiCadLogicalSchemeSimulator.net.merger.bus.BusMerger;
 import pko.KiCadLogicalSchemeSimulator.net.merger.wire.PassiveInMerger;
@@ -222,8 +221,7 @@ public class Net {
         } else {
             //If no destination pins, but has passive (no out only) pins – use NcPin as destination. In other way passive pins don't get any changes.
             if ((destinationPins.isEmpty())) {
-                Optional<PassivePin> passivePin = passivePins.stream()
-                        .filter(p -> !(p instanceof PassiveOutPin)).findAny();
+                Optional<PassivePin> passivePin = passivePins.stream().findAny();
                 if (passivePin.isPresent()) {
                     destinationPins.add(new NCWire(passivePin.get()));
                 } else if (destinationBusesOffsets.isEmpty()) {

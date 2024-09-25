@@ -32,7 +32,7 @@
 package pko.KiCadLogicalSchemeSimulator.components.counter;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 public class Counter extends SchemaPart {
@@ -56,7 +56,7 @@ public class Counter extends SchemaPart {
         countMask = Utils.getMaskForSize(pinAmount);
         addOutBus("Q", pinAmount);
         if (reverse) {
-            addInPin(new NoFloatingInPin("C", this) {
+            addInPin(new InPin("C", this) {
                 @Override
                 public void setState(boolean newState) {
                     state = newState;
@@ -68,7 +68,7 @@ public class Counter extends SchemaPart {
                 }
             });
         } else {
-            addInPin(new NoFloatingInPin("C", this) {
+            addInPin(new InPin("C", this) {
                 @Override
                 public void setState(boolean newState) {
                     state = newState;
@@ -80,7 +80,7 @@ public class Counter extends SchemaPart {
                 }
             });
         }
-        addInPin(new NoFloatingInPin("R", this) {
+        addInPin(new InPin("R", this) {
             @Override
             public void setState(boolean newState) {
                 state = newState;

@@ -29,16 +29,32 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.api.bus.in;
-import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
+package pko.KiCadLogicalSchemeSimulator.api.wire;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 
-public abstract class CorrectedInBus extends InBus {
-    public CorrectedInBus(String id, SchemaPart parent, int size, String... names) {
-        super(id, parent, size, names);
+public abstract class InPin extends Pin {
+    public InPin(String id, SchemaPart parent) {
+        super(id, parent);
     }
 
-    public CorrectedInBus(Bus oldBus, String variantId) {
-        super(oldBus, variantId);
+    public InPin(Pin oldPin, String variantId) {
+        super(oldPin, variantId);
+    }
+
+    public InPin(String id, SchemaPart parent, boolean state) {
+        super(id, parent);
+        this.state = state;
+        hiImpedance = false;
+    }
+
+    @Override
+    public void setHiImpedance() {
+        assert !hiImpedance : "Already in hiImpedance:" + this;
+        hiImpedance = true;
+    }
+
+    @Override
+    public InPin getOptimised() {
+        return this;
     }
 }

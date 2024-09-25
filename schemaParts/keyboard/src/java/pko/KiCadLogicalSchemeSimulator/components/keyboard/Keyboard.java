@@ -32,14 +32,12 @@
 package pko.KiCadLogicalSchemeSimulator.components.keyboard;
 import lombok.AllArgsConstructor;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.in.InBus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.in.NoFloatingCorrectedInBus;
+import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.AbstractUiComponent;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.InteractiveSchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -65,7 +63,7 @@ public class Keyboard extends SchemaPart implements InteractiveSchemaPart {
             int cMask = 1 << (keyDesc[1].charAt(1) - '0');
             keyDescriptors.put(keyDesc[0], new KeyDescriptor(rMask, cMask, ~cMask));
         }
-        enable = addInPin(new NoFloatingInPin("En", this) {
+        enable = addInPin(new InPin("En", this) {
             @Override
             public void setState(boolean newState) {
                 state = newState;
@@ -81,7 +79,7 @@ public class Keyboard extends SchemaPart implements InteractiveSchemaPart {
                 }
             }
         });
-        in = addInBus(new NoFloatingCorrectedInBus("In", this, 8) {
+        in = addInBus(new InBus("In", this, 8) {
             @Override
             public void setState(long newState) {
                 state = newState;

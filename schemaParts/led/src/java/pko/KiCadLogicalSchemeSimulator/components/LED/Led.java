@@ -33,7 +33,7 @@ package pko.KiCadLogicalSchemeSimulator.components.LED;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.AbstractUiComponent;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.InteractiveSchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.NoFloatingInPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.tools.UiTools;
 
 import java.awt.*;
@@ -43,7 +43,7 @@ public class Led extends SchemaPart implements InteractiveSchemaPart {
 
     protected Led(String id, String sParams) {
         super(id, sParams);
-        addInPin(new NoFloatingInPin("IN", this) {
+        addInPin(new InPin("IN", this) {
             @Override
             public void setState(boolean newState) {
                 hiImpedance = false;

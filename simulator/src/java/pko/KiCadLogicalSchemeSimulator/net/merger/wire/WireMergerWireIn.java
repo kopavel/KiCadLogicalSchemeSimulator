@@ -31,9 +31,9 @@
  */
 package pko.KiCadLogicalSchemeSimulator.net.merger.wire;
 import pko.KiCadLogicalSchemeSimulator.api.ShortcutException;
+import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.in.InPin;
 import pko.KiCadLogicalSchemeSimulator.net.Net;
 import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
@@ -70,8 +70,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                 state,
                 oldStrong,
                 strong,
-                oldImpedance,
-                hiImpedance, merger.getName(), merger.state, merger.strong, merger.hiImpedance, merger.weakState);
+                oldImpedance, hiImpedance, merger.getName(), merger.state, merger.strong, merger.hiImpedance, merger.weakState);
         boolean oldState = merger.state;
         /*Optimiser block passivePins*/
         boolean strengthChange = false;
@@ -159,8 +158,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                 state,
                 oldStrong,
                 strong,
-                oldImpedance,
-                hiImpedance, merger.getName(), merger.state, merger.strong, merger.hiImpedance, merger.weakState);
+                oldImpedance, hiImpedance, merger.getName(), merger.state, merger.strong, merger.hiImpedance, merger.weakState);
     }
 
     @Override
@@ -172,8 +170,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                 state,
                 oldStrong,
                 strong,
-                oldImpedance,
-                hiImpedance, merger.getName(), merger.state, merger.strong, merger.hiImpedance, merger.weakState);
+                oldImpedance, hiImpedance, merger.getName(), merger.state, merger.strong, merger.hiImpedance, merger.weakState);
         if (oldImpedance) {
             return;
         }
@@ -220,8 +217,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                 state,
                 oldStrong,
                 strong,
-                oldImpedance,
-                hiImpedance, merger.getName(), merger.state, merger.strong, merger.hiImpedance, merger.weakState);
+                oldImpedance, hiImpedance, merger.getName(), merger.state, merger.strong, merger.hiImpedance, merger.weakState);
     }
 
     @Override
