@@ -148,16 +148,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                 }
             }
         }
-        /*Optimiser bind mMask:merger.mask*/
-        if ((merger.strongPins | merger.weakPins) != merger.mask) {
-            if (!merger.hiImpedance) {
-                for (Bus destination : destinations) {
-                    destination.setHiImpedance();
-                }
-                merger.hiImpedance = true;
-            }
-        } else if (oldState != merger.state || merger.hiImpedance) {
-            merger.hiImpedance = false;
+        if (oldState != merger.state) {
             for (Bus destination : destinations) {
                 destination.setState(merger.state);
             }
@@ -215,16 +206,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                 merger.state &= nMask;
             }
         }
-        /*Optimiser bind mMask:merger.mask*/
-        if ((merger.strongPins | merger.weakPins) != merger.mask) {
-            if (!merger.hiImpedance) {
-                for (Bus destination : destinations) {
-                    destination.setHiImpedance();
-                }
-                merger.hiImpedance = true;
-            }
-        } else if (oldState != merger.state || merger.hiImpedance) {
-            merger.hiImpedance = false;
+        if (oldState != merger.state) {
             for (Bus destination : destinations) {
                 destination.setState(merger.state);
             }
@@ -267,8 +249,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                 destinations[i].triState = true;
             }
         }
-        ClassOptimiser<BusMergerWireIn> optimiser =
-                new ClassOptimiser<>(this).unroll(merger.destinations.length).bind("mask", mask).bind("nMask", nMask).bind("mMask", merger.mask);
+        ClassOptimiser<BusMergerWireIn> optimiser = new ClassOptimiser<>(this).unroll(merger.destinations.length).bind("mask", mask).bind("nMask", nMask);
         if (!keepSetters) {
             optimiser.cut("setters");
         }

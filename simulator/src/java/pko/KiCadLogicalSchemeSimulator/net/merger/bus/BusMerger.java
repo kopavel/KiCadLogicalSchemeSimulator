@@ -59,7 +59,6 @@ public class BusMerger extends OutBus {
         super(destination.id, destination.parent, destination.size);
         variantId = destination.variantId == null ? "" : destination.variantId + ":";
         variantId += "merger";
-        hiImpedance = true;
         Bus d = destination;
         while (d instanceof BusInInterconnect interconnect) {
             this.mask &= interconnect.inverseInterconnectMask;
@@ -100,7 +99,6 @@ public class BusMerger extends OutBus {
             state |= bus.state;
             strongPins |= destinationMask;
         }
-        hiImpedance = (strongPins | weakPins) != mask;
     }
 
     public void addSource(OutPin pin, byte offset) {
@@ -111,7 +109,6 @@ public class BusMerger extends OutBus {
                 weakState |= destinationMask;
             }
             sources.add(pullPin);
-            hiImpedance = (strongPins | weakPins) != mask;
         } else {
             BusMergerWireIn input = new BusMergerWireIn(destinationMask, this);
             input.id = pin.id;
@@ -185,6 +182,5 @@ public class BusMerger extends OutBus {
                 }
             }
         }
-        hiImpedance = (strongPins | weakPins) != mask;
     }
 }
