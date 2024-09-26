@@ -47,6 +47,7 @@ import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 import java.util.*;
 
+//FixMe check sources triState??
 public class BusMerger extends OutBus {
     public Set<MergerInput<?>> sources = new TreeSet<>(Comparator.comparing(mergerInput -> mergerInput.getMask() + ":" + mergerInput.getName()));
     public long strongPins;
@@ -58,6 +59,7 @@ public class BusMerger extends OutBus {
         super(destination.id, destination.parent, destination.size);
         variantId = destination.variantId == null ? "" : destination.variantId + ":";
         variantId += "merger";
+        hiImpedance = true;
         Bus d = destination;
         while (d instanceof BusInInterconnect interconnect) {
             this.mask &= interconnect.inverseInterconnectMask;

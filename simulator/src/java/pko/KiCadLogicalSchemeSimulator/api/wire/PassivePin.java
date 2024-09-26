@@ -38,6 +38,7 @@ public class PassivePin extends OutPin {
         super(id, parent);
         strong = false;
         hiImpedance = true;
+        triState = true;
     }
 
     @Override

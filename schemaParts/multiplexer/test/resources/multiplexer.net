@@ -34,7 +34,7 @@
       (tstamps "0e084eb6-3364-4f54-80b6-20c9851c243d"))
     (comp (ref "MUX1")
       (value "MUX")
-      (libsource (lib "chip") (part "MULTIPLEXER") (description ""))
+      (libsource (lib "chip") (part "MUX4x2") (description ""))
       (property (name "Sheetname") (value ""))
       (property (name "Sheetfile") (value "multiplexer.kicad_sch"))
       (sheetpath (names "/") (tstamps "/"))
@@ -76,7 +76,7 @@
         (pin (num "1") (name "Out1") (type "output"))
         (pin (num "2") (name "Out2") (type "output"))
         (pin (num "3") (name "Out3") (type "output"))))
-    (libpart (lib "chip") (part "MULTIPLEXER")
+    (libpart (lib "chip") (part "MUX4x2")
       (fields
         (field (name "Reference") "MUX")
         (field (name "Value") "MUX"))

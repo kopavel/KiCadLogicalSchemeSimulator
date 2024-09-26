@@ -50,12 +50,12 @@ public class TestInPin extends SchemaPart {
                 state = newState;
             }
         });
-        pin.hiImpedance = true;
-        pin.triState = true;
-
     }
 
     @Override
     public void initOuts() {
+        if (pin.triState) {
+            pin.hiImpedance = true;
+        }
     }
 }

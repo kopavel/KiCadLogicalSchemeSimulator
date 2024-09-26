@@ -39,12 +39,14 @@ public class TriStateOutPin extends OutPin {
     public TriStateOutPin(String id, SchemaPart parent) {
         super(id, parent);
         hiImpedance = true;
+        triState = true;
     }
 
     /*Optimiser constructor unroll destination:destinations*/
     public TriStateOutPin(TriStateOutPin oldPin, String variantId) {
         super(oldPin, variantId);
         hiImpedance = oldPin.hiImpedance;
+        triState = oldPin.triState;
     }
 
     @Override
@@ -69,12 +71,6 @@ public class TriStateOutPin extends OutPin {
         hiImpedance = true;
         for (Pin destination : destinations) {
             destination.setHiImpedance();
-        }
-    }
-
-    public void resend() {
-        if (!hiImpedance) {
-            setState(state);
         }
     }
 

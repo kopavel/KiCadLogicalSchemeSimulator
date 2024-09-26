@@ -55,6 +55,7 @@ public class WireMerger extends OutPin {
         variantId += "merger";
         destinations = new Pin[]{destination};
         strong = false;
+        hiImpedance = true;
         if (destination instanceof PassivePin passivePin) {
             passivePin.merger = this;
         }
@@ -95,6 +96,7 @@ public class WireMerger extends OutPin {
                     throw new ShortcutException(sources);
                 }
             }
+            hiImpedance = false;
             state = (bus.state & mask) != 0;
         }
     }

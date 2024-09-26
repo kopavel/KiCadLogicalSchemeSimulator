@@ -56,11 +56,12 @@ public class TestInBus extends SchemaPart {
                 state = newState;
             }
         });
-        bus.hiImpedance = true;
-        bus.triState = true;
     }
 
     @Override
     public void initOuts() {
+        if (bus.triState) {
+            bus.hiImpedance = true;
+        }
     }
 }

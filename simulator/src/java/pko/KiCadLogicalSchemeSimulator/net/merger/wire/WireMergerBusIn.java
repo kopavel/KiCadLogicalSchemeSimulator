@@ -63,6 +63,7 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus> {
         merger = oldBus.merger;
         oldImpedance = hiImpedance;
         destinations = oldBus.destinations;
+        triState = oldBus.triState;
     }
 
     @Override
@@ -207,6 +208,9 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus> {
         destinations = merger.destinations;
         for (int i = 0; i < destinations.length; i++) {
             destinations[i] = destinations[i].getOptimised(false);
+            if (triState) {
+                destinations[i].triState = true;
+            }
         }
         ClassOptimiser<WireMergerBusIn> optimiser = new ClassOptimiser<>(this).unroll(destinations.length);
         if (merger.passivePins.isEmpty()) {

@@ -175,6 +175,9 @@ public class ClassOptimiser<T> {
         try {
             for (Iterator<String> lines = source.iterator(); lines.hasNext(); ) {
                 String line = lines.next();
+                if (line.contains("getOptimised(boolean keepSetters)")) {
+                    resultSource.append(line).append("\n").append("return this;\n}");
+                }
                 int lineOffset = countLeadingSpaces(line);
                 if (line.startsWith("import ") || line.startsWith("package ")) {
                     resultSource.append(line).append("\n");

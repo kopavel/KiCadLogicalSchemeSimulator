@@ -64,6 +64,7 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
         merger = oldPin.merger;
         destinations = merger.destinations;
         oldImpedance = hiImpedance;
+        triState = oldPin.triState;
     }
 
     @Override
@@ -264,6 +265,12 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
         //ToDo in case of "no passive pin" weakPins/weakState are known after build phase (incomplete)
         merger.sources.remove(this);
         destinations = merger.destinations;
+        for (int i = 0; i < destinations.length; i++) {
+            destinations[i] = destinations[i].getOptimised(false);
+            if (triState) {
+                destinations[i].triState = true;
+            }
+        }
         ClassOptimiser<BusMergerBusIn> optimiser = new ClassOptimiser<>(this).unroll(merger.destinations.length).bind("mask", mask);
         if (mask == merger.mask) {
             optimiser.cut("otherMask");

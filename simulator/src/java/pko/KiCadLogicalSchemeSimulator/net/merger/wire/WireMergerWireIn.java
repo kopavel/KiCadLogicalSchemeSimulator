@@ -58,6 +58,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
         oldStrong = oldPin.oldStrong;
         oldImpedance = oldPin.oldImpedance;
         merger = oldPin.merger;
+        triState = oldPin.triState;
     }
 
     @Override
@@ -231,6 +232,9 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
         destinations = merger.destinations;
         for (int i = 0; i < destinations.length; i++) {
             destinations[i] = destinations[i].getOptimised(false);
+            if (triState) {
+                destinations[i].triState = true;
+            }
         }
         ClassOptimiser<WireMergerWireIn> optimiser = new ClassOptimiser<>(this).unroll(destinations.length);
         if (((WireMerger) merger).passivePins.isEmpty()) {

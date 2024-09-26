@@ -66,6 +66,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
         merger = oldPin.merger;
         destinations = merger.destinations;
         oldImpedance = hiImpedance;
+        triState = oldPin.triState;
     }
 
     @Override
@@ -266,6 +267,12 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
         }
         merger.sources.remove(this);
         destinations = merger.destinations;
+        for (int i = 0; i < destinations.length; i++) {
+            destinations[i] = destinations[i].getOptimised(false);
+            if (triState) {
+                destinations[i].triState = true;
+            }
+        }
         ClassOptimiser<BusMergerWireIn> optimiser =
                 new ClassOptimiser<>(this).unroll(merger.destinations.length).bind("mask", mask).bind("nMask", nMask).bind("mMask", merger.mask);
         if (!keepSetters) {

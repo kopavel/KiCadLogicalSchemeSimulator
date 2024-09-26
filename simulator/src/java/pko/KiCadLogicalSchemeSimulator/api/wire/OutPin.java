@@ -57,12 +57,14 @@ public class OutPin extends Pin {
 
     public void addDestination(Pin pin) {
         assert pin != this;
+        pin.triState = triState;
         if (!(pin instanceof NCWire)) {
             destinations = Utils.addToArray(destinations, pin);
         }
     }
 
     public void addDestination(Bus bus, byte offset) {
+        bus.triState = triState;
         if (adapters.containsKey(offset)) {
             adapters.get(offset).addDestination(bus);
         } else {
