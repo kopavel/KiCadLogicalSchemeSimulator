@@ -45,14 +45,12 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
     public long nMask;
     public Bus[] destinations;
     public BusMerger merger;
-    public boolean oldImpedance;
 
     public BusMergerBusIn(Bus source, long mask, BusMerger merger) {
         super(source, "BMergeBIn");
         this.mask = mask;
         this.merger = merger;
         nMask = ~mask;
-        oldImpedance = hiImpedance;
         destinations = merger.destinations;
     }
 
@@ -63,13 +61,12 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
         nMask = oldPin.nMask;
         merger = oldPin.merger;
         destinations = merger.destinations;
-        oldImpedance = hiImpedance;
         triState = oldPin.triState;
     }
 
     @Override
     public void setState(long newState) {
-        assert Log.debug(BusMergerBusIn.class,
+        assert Log.debug(this.getClass(),
                 "Bus merger change. before: newState:{}, Source:{} (state:{},  hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{}, " +
                         "hiImpedance:{})\",",
                 newState,
@@ -84,27 +81,27 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
                 merger.hiImpedance);
         //ToDo in case if bus mask equal with destination mask - can be more optimal.
         /*Optimiser block setters*/
-        hiImpedance = false;
         state = newState;
         /*Optimiser blockend setters*/
         /*Optimiser block sameMask*/
         /*Optimiser block otherMask*/
         if (mask == merger.mask) {
             /*Optimiser blockend otherMask*/
-            if (oldImpedance) {
+            if (hiImpedance) {
                 if (merger.strongPins != 0) {
                     if (Net.stabilizing) {
                         Net.forResend.add(this);
                         assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
                         return;
                     } else {
+                        hiImpedance = false;
                         throw new ShortcutException(merger.sources);
                     }
                 }
                 /*Optimiser bind mask*/
                 merger.strongPins = mask;
             }
-            oldImpedance = false;
+            hiImpedance = false;
             if (newState != merger.state || merger.hiImpedance) {
                 merger.state = newState;
                 merger.hiImpedance = false;
@@ -116,7 +113,7 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
         } else {
             /*Optimiser blockend sameMask*/
             long oldState = merger.state;
-            if (oldImpedance) {
+            if (hiImpedance) {
                 /*Optimiser bind mask*/
                 if ((merger.strongPins & mask) != 0) {
                     if (Net.stabilizing) {
@@ -130,7 +127,7 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
                 /*Optimiser bind mask*/
                 merger.strongPins |= mask;
             }
-            oldImpedance = false;
+            hiImpedance = false;
             /*Optimiser bind nMask*/
             merger.state &= nMask;
             merger.state |= newState;
@@ -152,7 +149,7 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
         }
         /*Optimiser blockend sameMask*/
         /*Optimiser blockend otherMask*/
-        assert Log.debug(BusMergerBusIn.class,
+        assert Log.debug(this.getClass(),
                 "Bus merger change. after: newState:{}, Source:{} (state:{},  hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{}, " +
                         "hiImpedance:{})\",",
                 newState,
@@ -181,7 +178,7 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
                 merger.weakState,
                 merger.weakPins,
                 merger.hiImpedance);
-        if (oldImpedance) {
+        if (hiImpedance) {
             return;
         }
         /*Optimiser block sameMask*/
@@ -233,10 +230,7 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
         }
         /*Optimiser blockend sameMask*/
         /*Optimiser blockend otherMask*/
-        /*Optimiser block setters*/
         hiImpedance = true;
-        /*Optimiser blockend setters*/
-        oldImpedance = true;
         assert Log.debug(this.getClass(),
                 "Bus merger setImpedance. after: Source:{} (state:{},  hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{}, " +
                         "hiImpedance:{})\",",
@@ -255,7 +249,7 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
     public void resend() {
         if (!hiImpedance) {
             setState(state);
-        } else if (!oldImpedance) {
+        } else {
             setHiImpedance();
         }
     }

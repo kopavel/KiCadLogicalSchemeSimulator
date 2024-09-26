@@ -46,13 +46,11 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus> {
     public long mask;
     public WireMerger merger;
     public Pin[] destinations;
-    public boolean oldImpedance;
 
     public WireMergerBusIn(Bus source, long mask, WireMerger merger) {
         super(source, "PMergeBIn");
         this.mask = mask;
         this.merger = merger;
-        oldImpedance = hiImpedance;
         destinations = merger.destinations;
     }
 
@@ -61,7 +59,6 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus> {
         super(oldBus, variantId);
         mask = oldBus.mask;
         merger = oldBus.merger;
-        oldImpedance = hiImpedance;
         destinations = oldBus.destinations;
         triState = oldBus.triState;
     }
@@ -79,15 +76,15 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus> {
                 merger.strong,
                 merger.hiImpedance);
         /*Optimiser block setters*/
-        hiImpedance = false;
         state = newState;
         /*Optimiser blockend setters*/
-        if (oldImpedance && merger.strong) { // merger not in hiImpedance or weak
+        if (hiImpedance && merger.strong) { // merger not in hiImpedance or weak
             if (Net.stabilizing) {
                 Net.forResend.add(this);
                 assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
                 return;
             } else {
+                hiImpedance = false;
                 throw new ShortcutException(merger.sources);
             }
         }
@@ -109,7 +106,7 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus> {
         }
         merger.strong = true;
         merger.hiImpedance = false;
-        oldImpedance = false;
+        hiImpedance = false;
         /*Optimiser block passivePins*///
         for (PassivePin passivePin : merger.passivePins) {
             passivePin.parent.onPassivePinChange(merger);
@@ -132,14 +129,13 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus> {
         assert Log.debug(this.getClass(),
                 "Pin merger setImpedance. before: Source:{} (state:{}, oldImpedance:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{}, hiImpedance:{})",
                 getName(),
-                state,
-                oldImpedance,
+                state, hiImpedance,
                 hiImpedance,
                 merger.getName(),
                 merger.state,
                 merger.strong,
                 merger.hiImpedance);
-        if (oldImpedance) {
+        if (hiImpedance) {
             return;
         }
         /*Optimiser block strongOnly*/
@@ -172,10 +168,7 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus> {
         /*Optimiser blockend weakOnly*/
         /*Optimiser blockend strongOnly*/
         merger.strong = false;
-        /*Optimiser block setters*/
         hiImpedance = true;
-        /*Optimiser blockend setters*/
-        oldImpedance = true;
         /*Optimiser block passivePins*///
         for (PassivePin passivePin : merger.passivePins) {
             passivePin.parent.onPassivePinChange(merger);
@@ -184,8 +177,7 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus> {
         assert Log.debug(this.getClass(),
                 "Pin merger setImpedance. after: Source:{} (state:{}, oldImpedance:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{}, hiImpedance:{})",
                 getName(),
-                state,
-                oldImpedance,
+                state, hiImpedance,
                 hiImpedance,
                 merger.getName(),
                 merger.state,
@@ -197,7 +189,7 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus> {
     public void resend() {
         if (!hiImpedance) {
             setState(state);
-        } else if (!oldImpedance) {
+        } else {
             setHiImpedance();
         }
     }

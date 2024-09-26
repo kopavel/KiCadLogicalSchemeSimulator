@@ -61,7 +61,7 @@ public class OrGate extends SchemaPart {
                                 inState |= mask;
                             }
                         } else {
-                            if ((inState == mask)) {
+                            if (inState == mask) {
                                 inState = 0;
                                 out.setState(true);
                             } else {

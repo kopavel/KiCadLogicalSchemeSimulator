@@ -148,7 +148,7 @@ public class BusMerger extends OutBus {
 
     private void processPin(Pin pin, BusMergerWireIn input, long destinationMask) {
         input.oldStrong = pin.strong;
-        input.oldImpedance = pin.hiImpedance;
+        input.hiImpedance = pin.hiImpedance;
         input.id = pin.id;
         input.parent = pin.parent;
         input.copyState(pin);
