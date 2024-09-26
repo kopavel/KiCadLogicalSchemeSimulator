@@ -100,15 +100,8 @@ public class AndGate extends SchemaPart {
     public void initOuts() {
         out = getOutPin("OUT");
         inPins.values().forEach(pin -> {
-            int i = Integer.parseInt(pin.getId().substring(2));
-            int mask = 1 << i;
-            int nMask = ~mask;
-            if (!pin.isHiImpedance() && pin.getState() != 0) {
-                if (pin.getState() == 0) {
-                    inState |= mask;
-                } else {
-                    inState &= nMask;
-                }
+            if (pin.isHiImpedance() || pin.getState() == 0) {
+                inState |= (1 << Integer.parseInt(pin.getId().substring(2)));
             }
         });
         out.state = inState == 0 ? nReverse : reverse;
