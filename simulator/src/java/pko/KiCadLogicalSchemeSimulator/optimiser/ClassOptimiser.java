@@ -112,6 +112,9 @@ public class ClassOptimiser<T> {
             if (suffix.isBlank()) {
                 return oldInstance;
             }
+            if (!noAssert) {
+                suffix += "_ae";
+            }
             String optimizedClassName = oldInstance.getClass().getSimpleName() + suffix;
             Class<?> dynamicClass;
             try {
