@@ -256,20 +256,23 @@ public class Z80Cpu extends SchemaPart {
                 "\naF  :" + String.format("%06d", Integer.parseInt(Integer.toBinaryString(cpu.getRegisterValue(CPUConstants.RegisterNames.F_ALT)))) + //
                 "\naBC :" + String.format("%04x", cpu.getRegisterValue(CPUConstants.RegisterNames.BC_ALT)) +//
                 "\naDE :" + String.format("%04x", cpu.getRegisterValue(CPUConstants.RegisterNames.DE_ALT)) +//
-                "\nI   :" + String.format("%02x", cpu.getRegisterValue(CPUConstants.RegisterNames.I));
+                "\nI   :" + String.format("%02x", cpu.getRegisterValue(CPUConstants.RegisterNames.I)) +//
+                "\nNMI triggered:" + nmiTriggered +//
+                "\nM   :" + M +//
+                "\nT   :" + T;
     }
 
     public void reset() {
         T = 0;
         M = 0;
         cpu.reset();
-        if (!mReqPin.state) {
+        if (mReqPin.hiImpedance || !mReqPin.state) {
             mReqPin.setState(true);
         }
-        if (!rdPin.state) {
+        if (rdPin.hiImpedance || !rdPin.state) {
             rdPin.setState(true);
         }
-        if (!wrPin.state) {
+        if (wrPin.hiImpedance || !wrPin.state) {
             wrPin.setState(true);
         }
         if (!aOut.hiImpedance) {
@@ -278,24 +281,16 @@ public class Z80Cpu extends SchemaPart {
         if (!dOut.hiImpedance) {
             dOut.setHiImpedance();
         }
-        if (!rdPin.state) {
-            rdPin.setState(true);
-        }
-        if (!wrPin.state) {
-            wrPin.setState(true);
-        }
-        if (!mReqPin.state) {
-            mReqPin.setState(true);
-        }
-        if (!ioReqPin.state) {
+        if (ioReqPin.hiImpedance || !ioReqPin.state) {
             ioReqPin.setState(true);
         }
-        if (!m1Pin.state) {
+        if (m1Pin.hiImpedance || !m1Pin.state) {
             m1Pin.setState(true);
         }
-        if (!refreshPin.state) {
+        if (refreshPin.hiImpedance || !refreshPin.state) {
             refreshPin.setState(true);
         }
         M = 1;
+        nmiTriggered = false;
     }
 }
