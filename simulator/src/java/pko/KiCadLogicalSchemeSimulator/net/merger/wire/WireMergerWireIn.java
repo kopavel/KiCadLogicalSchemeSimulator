@@ -97,6 +97,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                         assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
                         return;
                     } else {
+                        hiImpedance = false;
                         throw new ShortcutException(((WireMerger) merger).sources);
                     }
                 }

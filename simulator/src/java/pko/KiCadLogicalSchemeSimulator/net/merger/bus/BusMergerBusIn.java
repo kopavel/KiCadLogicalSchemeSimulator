@@ -121,6 +121,7 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
                         assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
                         return;
                     } else {
+                        hiImpedance = false;
                         throw new ShortcutException(merger.sources);
                     }
                 }
