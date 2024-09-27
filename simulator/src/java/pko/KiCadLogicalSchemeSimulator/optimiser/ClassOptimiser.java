@@ -134,7 +134,8 @@ public class ClassOptimiser<T> {
                     Log.trace(JavaCompiler.class, "Return instance");
                     dynamicClass = Class.forName(oldInstance.getClass().getName() + suffix);
                 } else {
-                    Log.error(JavaCompiler.class, "Optimised class compile was not successful, fall back to generic class");
+                    Log.error(JavaCompiler.class,
+                            "Optimised class compile was not successful, fall back to generic class, file name:" + oldInstance.getClass().getName() + suffix);
                     return oldInstance;
                 }
             }
