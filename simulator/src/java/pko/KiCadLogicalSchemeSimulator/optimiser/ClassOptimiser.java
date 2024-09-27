@@ -287,10 +287,12 @@ public class ClassOptimiser<T> {
                                         .append(" {\n");
                             blockOffset = -1;
                             blockSource = new StringBuilder();
+                            preserveBlock = false;
                         } else if (!line.trim().isBlank() && blockOffset < 0 && lineOffset > 0) {
                             //block begin
                             blockOffset = lineOffset;
                             blockSource = new StringBuilder(line).append("\n");
+                            preserveBlock = false;
                         } else if (lineOffset <= blockOffset && !line.isBlank()) {
                             //block end
                             if (line.trim().equals("}")) {
