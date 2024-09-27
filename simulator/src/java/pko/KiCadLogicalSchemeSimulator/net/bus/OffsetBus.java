@@ -64,20 +64,33 @@ public class OffsetBus extends OutBus {
         state = newState;
         /*Optimiser blockend setters*/
         for (Bus destination : destinations) {
-            /*Optimiser bind offset*/
-            destination.setState(newState << offset);
+            /*Optimiser block positive block negative*/
+            if (offset > 0) {
+                /*Optimiser blockend negative*/
+                /*Optimiser bind offset*/
+                destination.setState(newState << offset);
+                /*Optimiser block negative*/
+            } else {
+                /*Optimiser blockend positive*/
+                /*Optimiser bind offset:-offset*/
+                destination.setState(newState >> -offset);
+                /*Optimiser block positive*/
+            }
+            /*Optimiser blockend positive blockend negative*/
         }
     }
 
+    /*Optimiser block iSetter*/
     @Override
     public void setHiImpedance() {
-        /*Optimiser block setters block iSetter*/
+        /*Optimiser block setters*/
         hiImpedance = true;
-        /*Optimiser blockend iSetter blockend setters*/
+        /*Optimiser blockend setters*/
         for (Bus destination : destinations) {
             destination.setHiImpedance();
         }
     }
+    /*Optimiser blockend iSetter*/
 
     public void addDestination(Bus item) {
         destinations = Utils.addToArray(destinations, item);
@@ -88,7 +101,14 @@ public class OffsetBus extends OutBus {
         for (int i = 0; i < destinations.length; i++) {
             destinations[i] = destinations[i].getOptimised(false);
         }
-        ClassOptimiser<OffsetBus> optimiser = new ClassOptimiser<>(this).unroll(destinations.length).bind("offset", offset);
+        ClassOptimiser<OffsetBus> optimiser = new ClassOptimiser<>(this).unroll(destinations.length);
+        if (offset > 0) {
+            optimiser.bind("offset", offset);
+            optimiser.cut("negative");
+        } else {
+            optimiser.bind("offset", -offset);
+            optimiser.cut("positive");
+        }
         if (!keepSetters) {
             optimiser.cut("setters");
         }
