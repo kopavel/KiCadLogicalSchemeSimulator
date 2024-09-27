@@ -44,6 +44,7 @@ import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 import java.util.*;
 
+//FixME if there is no BusMerger in destinations - cut out hiImpedance processing
 public class WireMerger extends OutPin {
     public final Set<PassivePin> passivePins = new TreeSet<>();
     public final Set<BusMergerWireIn> mergers = new TreeSet<>();

@@ -60,13 +60,11 @@ public class AndGate extends SchemaPart {
                             } else {
                                 inState &= nMask;
                             }
+                        } else if (inState == 0) {
+                            inState = mask;
+                            out.setState(true);
                         } else {
-                            if (inState == 0) {
-                                inState = mask;
-                                out.setState(true);
-                            } else {
-                                inState |= mask;
-                            }
+                            inState |= mask;
                         }
                     }
                 });
@@ -82,13 +80,11 @@ public class AndGate extends SchemaPart {
                             } else {
                                 inState &= nMask;
                             }
+                        } else if (inState == 0) {
+                            inState = mask;
+                            out.setState(false);
                         } else {
-                            if (inState == 0) {
-                                inState = mask;
-                                out.setState(false);
-                            } else {
-                                inState |= mask;
-                            }
+                            inState |= mask;
                         }
                     }
                 });

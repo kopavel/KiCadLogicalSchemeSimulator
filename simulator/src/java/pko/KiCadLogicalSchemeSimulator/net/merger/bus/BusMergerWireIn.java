@@ -71,7 +71,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
     public void setState(boolean newState) {
         assert Log.debug(BusMergerWireIn.class,
                 "Bus merger change. before: newState:{},  Source:{} (state:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, " +
-                        "weakState:{}, weakPins:{}, hiImpedance:{})",
+                        "weakState:{}, weakPins:{})",
                 newState,
                 getName(),
                 state,
@@ -79,10 +79,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                 hiImpedance,
                 merger.getName(),
                 merger.state,
-                merger.strongPins,
-                merger.weakState,
-                merger.weakPins,
-                merger.hiImpedance);
+                merger.strongPins, merger.weakState, merger.weakPins);
         long oldState = merger.state;
         /*Optimiser block setters*/
         state = newState;
@@ -157,7 +154,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
         hiImpedance = false;
         assert Log.debug(BusMergerWireIn.class,
                 "Bus merger change. after: newState:{},  Source:{} (state:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, " +
-                        "weakState:{}, weakPins:{}, hiImpedance:{})",
+                        "weakState:{}, weakPins:{})",
                 newState,
                 getName(),
                 state,
@@ -165,17 +162,13 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                 hiImpedance,
                 merger.getName(),
                 merger.state,
-                merger.strongPins,
-                merger.weakState,
-                merger.weakPins,
-                merger.hiImpedance);
+                merger.strongPins, merger.weakState, merger.weakPins);
     }
 
     @Override
     public void setHiImpedance() {
         assert Log.debug(BusMergerWireIn.class,
-                "Bus merger setImpedance. before: Source:{} (state:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{}, " +
-                        "hiImpedance:{})",
+                "Bus merger setImpedance. before: Source:{} (state:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{})",
                 getName(),
                 state,
                 strong,
@@ -184,8 +177,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                 merger.state,
                 merger.strongPins,
                 merger.weakState,
-                merger.weakPins,
-                merger.hiImpedance);
+                merger.weakPins);
         if (hiImpedance) {
             return;
         }
@@ -213,8 +205,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
         }
         hiImpedance = true;
         assert Log.debug(BusMergerWireIn.class,
-                "Bus merger setImpedance. after: Source:{} (state:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{}, " +
-                        "hiImpedance:{})",
+                "Bus merger setImpedance. after: Source:{} (state:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{})",
                 getName(),
                 state,
                 strong,
@@ -223,8 +214,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                 merger.state,
                 merger.strongPins,
                 merger.weakState,
-                merger.weakPins,
-                merger.hiImpedance);
+                merger.weakPins);
     }
 
     @Override

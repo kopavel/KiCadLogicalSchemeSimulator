@@ -70,7 +70,7 @@ public class Net {
     private final Map<Pin, DestinationWireDescriptor> destinationWireDescriptors = new HashMap<>();
     private final Map<Bus, DestinationBusDescriptor> destinationBusDescriptors = new HashMap<>();
     private final Map<String, BusMerger> busMergers = new TreeMap<>();
-    private final Map<String, OutPin> wires = new TreeMap<>();
+    private final Map<String, OutPin> wireMergers = new TreeMap<>();
     private final Map<IModelItem<?>, IModelItem<?>> replacement = new HashMap<>();
 
     public Net(Export export, String[] mapPaths, String optimisedDir) throws IOException {
@@ -97,19 +97,19 @@ public class Net {
                     .stream()
                     .map(String::valueOf)
                     .collect(Collectors.joining(":"));
-            if (wires.containsKey(mergerHash)) {
+            if (wireMergers.containsKey(mergerHash)) {
                 //Use old merger.
-                OutPin oldMerger = wires.get(mergerHash);
+                OutPin oldMerger = wireMergers.get(mergerHash);
                 oldMerger.addDestination(destination);
                 retVal = oldMerger;
             } else {
                 //collect merger as wire
                 WireMerger newMerger = new WireMerger(destination, pins, passivePins, buses);
                 retVal = newMerger;
-                wires.put(mergerHash, newMerger);
+                wireMergers.put(mergerHash, newMerger);
                 if (!passivePins.isEmpty()) {
                     //Bus merger use passive but not regular pins throe wire merger. Index by passive pins either.
-                    wires.put(Utils.getHash(passivePins), newMerger);
+                    wireMergers.put(Utils.getHash(passivePins), newMerger);
                 }
             }
         } else {
@@ -308,9 +308,9 @@ public class Net {
                     descriptor.offsets.forEach((offset, lists) -> {
                         //search already processed wires
                         String passiveHash = Utils.getHash(lists.passivePins);
-                        if (!passiveHash.isBlank() && wires.containsKey(passiveHash)) {
+                        if (!passiveHash.isBlank() && wireMergers.containsKey(passiveHash)) {
                             //if found by passive pins – connect it and don't process further.
-                            busMerger.addSource(wires.get(passiveHash), offset);
+                            busMerger.addSource(wireMergers.get(passiveHash), offset);
                         } else {
                             //process unprocessed wire
                             busMerger.addSource(Net.this, lists.pins, lists.passivePins, offset);
@@ -365,9 +365,8 @@ public class Net {
                 }
             }
         });
-        for (OutPin wire : wires.values()) {
-            //FixMe true or false??
-            wire.getOptimised(false);
+        for (OutPin wireMerger : wireMergers.values()) {
+            wireMerger.getOptimised(false);
         }
         for (OutBus merger : busMergers.values()) {
             merger.getOptimised(false);
@@ -462,7 +461,7 @@ public class Net {
                     item.resend();
                     resend();
                 });
-        wires.values()
+        wireMergers.values()
                 .stream()
                 .filter(i -> !i.isHiImpedance()).distinct().forEach(item -> {
                  assert Log.debug(Net.class, "Resend pin {}", item);
