@@ -264,7 +264,6 @@ public class Z80Cpu extends SchemaPart {
 
     public void reset() {
         T = 0;
-        M = 0;
         cpu.reset();
         if (mReqPin.hiImpedance || !mReqPin.state) {
             mReqPin.setState(true);
@@ -291,6 +290,13 @@ public class Z80Cpu extends SchemaPart {
             refreshPin.setState(true);
         }
         M = 1;
+        T1 = false;
+        T2 = false;
+        T3 = false;
+        T4 = false;
+        M1 = true;
+        needDataPinReset = false;
+        needRefreshPinReset = false;
         nmiTriggered = false;
     }
 }
