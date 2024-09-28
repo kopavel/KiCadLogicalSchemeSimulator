@@ -138,4 +138,15 @@ public class Utils {
         }
         return input;
     }
+
+    public static <T> boolean notContain(T[] array, T item) {
+        if (array != null) {
+            for (T t : array) {
+                if (t.equals(item)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 }

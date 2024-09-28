@@ -36,11 +36,9 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.OutPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.PullPin;
-import pko.KiCadLogicalSchemeSimulator.net.Net;
 import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
 import pko.KiCadLogicalSchemeSimulator.net.merger.bus.BusMergerWireIn;
 import pko.KiCadLogicalSchemeSimulator.net.wire.NCWire;
-import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 import java.util.*;
 
@@ -89,13 +87,7 @@ public class WireMerger extends OutPin {
         sources.add(input);
         if (!bus.hiImpedance) {
             if (!hiImpedance) {
-                if (Net.stabilizing) {
-                    Net.forResend.add(this);
-                    assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
-                    return;
-                } else {
-                    throw new ShortcutException(sources);
-                }
+                throw new ShortcutException(sources);
             }
             hiImpedance = false;
             state = (bus.state & mask) != 0;
@@ -131,13 +123,7 @@ public class WireMerger extends OutPin {
             sources.add(input);
             if (!pin.hiImpedance) {
                 if (!hiImpedance && strong) {
-                    if (Net.stabilizing) {
-                        Net.forResend.add(this);
-                        assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
-                        return;
-                    } else {
-                        throw new ShortcutException(sources);
-                    }
+                    throw new ShortcutException(sources);
                 }
                 strong = true;
                 state = pin.state;

@@ -32,12 +32,14 @@
 package pko.KiCadLogicalSchemeSimulator.net.bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
+import pko.KiCadLogicalSchemeSimulator.net.Net;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 import java.util.Arrays;
 
 public class MaskGroupBus extends OutBus {
+    public long queueState;
     protected long maskState;
 
     public MaskGroupBus(OutBus source, long mask, String variantId) {
@@ -64,25 +66,95 @@ public class MaskGroupBus extends OutBus {
         /*Optimiser blockend iSetter*/
         state = newState;
         /*Optimiser blockend setters*/
-        /*Optimiser bind d:destinations[0] bind mask*/
-        if (maskState != (newState & mask) || destinations[0].hiImpedance) {
-            /*Optimiser bind mask*/
-            maskState = newState & mask;
-            for (Bus destination : destinations) {
-                destination.setState(maskState);
+        /*Optimiser  bind mask*/
+        final long newMaskState = newState & mask;
+        if (
+            /*Optimiser block iSetter*/
+            /*Optimiser bind d:destinations[0]*/
+                destinations[0].hiImpedance ||
+                        /*Optimiser blockend iSetter*///
+                        maskState != newMaskState) {
+            /*Optimiser block setters*/
+            if (processing) {
+                if (hasQueue) {
+                    if (Net.stabilizing) {
+                        return;
+                    }
+                    recurseError();
+                }
+                hasQueue = true;
+                /*Optimiser bind v:dState*/
+                queueState = newMaskState;
+            } else {
+                processing = true;
+                /*Optimiser blockend setters*/
+                maskState = newMaskState;
+                for (Bus destination : destinations) {
+                    destination.setState(maskState);
+                }
+                /*Optimiser block setters block recurse*/
+                while (hasQueue) {
+                    hasQueue = false;
+                    /*Optimiser block iSetter*/
+                    if (hiImpedance) {
+                        for (Bus destination : destinations) {
+                            destination.setHiImpedance();
+                        }
+                    } else {
+                        /*Optimiser blockend iSetter*/
+                        for (Bus destination : destinations) {
+                            destination.setState(queueState);
+                        }
+                        /*Optimiser block iSetter*/
+                    }
+                    /*Optimiser blockend iSetter*/
+                }
+                /*Optimiser blockend recurse*/
+                processing = false;
             }
+            /*Optimiser blockend setters*/
         }
     }
 
+    /*Optimiser block iSetter*/
     @Override
     public void setHiImpedance() {
-        /*Optimiser block setters block iSetter*/
+        /*Optimiser block setters*/
         hiImpedance = true;
-        /*Optimiser blockend iSetter blockend setters*/
-        for (Bus destination : destinations) {
-            destination.setHiImpedance();
+        if (processing) {
+            if (hasQueue) {
+                if (Net.stabilizing) {
+                    hasQueue = false;
+                    return;
+                }
+                recurseError();
+            }
+            hasQueue = true;
+        } else {
+            processing = true;
+            /*Optimiser blockend setters*/
+            for (Bus destination : destinations) {
+                destination.setHiImpedance();
+            }
+            /*Optimiser block setters block recurse*/
+            while (hasQueue) {
+                hasQueue = false;
+                if (hiImpedance) {
+                    for (Bus destination : destinations) {
+                        destination.setHiImpedance();
+                    }
+                } else {
+                    for (Bus destination : destinations) {
+                        destination.setState(queueState);
+                    }
+                }
+            }
+            /*Optimiser blockend recurse*/
+            processing = false;
         }
+        /*Optimiser blockend setters*/
     }
+    /*Optimiser blockend iSetter*/
 
     @Override
     public Bus getOptimised(boolean keepSetters) {

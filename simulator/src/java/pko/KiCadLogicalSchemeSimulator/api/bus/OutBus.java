@@ -30,9 +30,14 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.api.bus;
+import pko.KiCadLogicalSchemeSimulator.Simulator;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.net.bus.*;
+import pko.KiCadLogicalSchemeSimulator.net.Net;
+import pko.KiCadLogicalSchemeSimulator.net.bus.MaskGroupBus;
+import pko.KiCadLogicalSchemeSimulator.net.bus.NCBus;
+import pko.KiCadLogicalSchemeSimulator.net.bus.OffsetBus;
+import pko.KiCadLogicalSchemeSimulator.net.bus.SimpleBusToWireAdapter;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
@@ -65,11 +70,7 @@ public class OutBus extends Bus {
                 corrected.get(mask).get(offset).addDestination(bus);
                 return;
             } else {
-                if (offset > 0) {
-                    bus = new OffsetBus(this, bus, offset);
-                } else {
-                    bus = new NegativeOffsetBus(this, bus, offset);
-                }
+                bus = new OffsetBus(this, bus, offset);
                 corrected.computeIfAbsent(mask, m -> new HashMap<>()).put(offset, (OffsetBus) bus);
             }
         }
@@ -104,8 +105,29 @@ public class OutBus extends Bus {
     @Override
     public void setState(long newState) {
         state = newState;
-        for (Bus destination : destinations) {
-            destination.setState(state);
+        if (processing) {
+            if (hasQueue) {
+                if (Net.stabilizing) {
+                    hasQueue = false;
+                    return;
+                }
+                recurseError();
+            }
+            hasQueue = true;
+        } else {
+            processing = true;
+            for (Bus destination : destinations) {
+                destination.setState(newState);
+            }
+            /*Optimiser block recurse*/
+            while (hasQueue) {
+                hasQueue = false;
+                for (Bus destination : destinations) {
+                    destination.setState(state);
+                }
+            }
+            /*Optimiser blockend recurse*/
+            processing = false;
         }
     }
 
@@ -132,6 +154,9 @@ public class OutBus extends Bus {
                 destinations[i] = destinations[i].getOptimised(false);
             }
             ClassOptimiser<OutBus> optimiser = new ClassOptimiser<>(this).unroll(destinations.length);
+            if (!Simulator.recursive && Utils.notContain(Simulator.recursiveOuts, getName())) {
+                optimiser.cut("recurse");
+            }
             return optimiser.build();
         }
     }

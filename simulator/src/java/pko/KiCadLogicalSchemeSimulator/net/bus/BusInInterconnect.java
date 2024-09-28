@@ -74,13 +74,15 @@ public class BusInInterconnect extends InBus {
         }
     }
 
+    /*Optimiser block iSetter*/
     @Override
     public void setHiImpedance() {
-        /*Optimiser block setters block iSetter*/
+        /*Optimiser block setters*/
         hiImpedance = true;
-        /*Optimiser blockend iSetter blockend setters*/
+        /*Optimiser blockend setters*/
         destination.setHiImpedance();
     }
+    /*Optimiser blockend iSetter*/
 
     @Override
     public InBus getOptimised(boolean keepSetters) {

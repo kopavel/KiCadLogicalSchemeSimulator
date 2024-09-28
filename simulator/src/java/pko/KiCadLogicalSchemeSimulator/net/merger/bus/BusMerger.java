@@ -87,13 +87,7 @@ public class BusMerger extends OutBus {
         sources.add(input);
         if (!bus.hiImpedance) {
             if ((strongPins & destinationMask) != 0) {
-                if (Net.stabilizing) {
-                    Net.forResend.add(this);
-                    assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
-                    return;
-                } else {
-                    throw new ShortcutException(sources);
-                }
+                throw new ShortcutException(sources);
             }
             state |= bus.state;
             strongPins |= destinationMask;
@@ -152,13 +146,7 @@ public class BusMerger extends OutBus {
         if (!pin.hiImpedance) {
             if (pin.strong) {
                 if ((strongPins & destinationMask) != 0) {
-                    if (Net.stabilizing) {
-                        Net.forResend.add(this);
-                        assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
-                        return;
-                    } else {
-                        throw new ShortcutException(sources);
-                    }
+                    throw new ShortcutException(sources);
                 }
                 strongPins |= destinationMask;
                 if (pin.state) {

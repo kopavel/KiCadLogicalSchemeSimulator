@@ -464,10 +464,10 @@ public class Net {
         wireMergers.values()
                 .stream()
                 .filter(i -> !i.isHiImpedance()).distinct().forEach(item -> {
-                 assert Log.debug(Net.class, "Resend pin {}", item);
-                 item.resend();
-                 resend();
-             });
+                       assert Log.debug(Net.class, "Resend pin {}", item);
+                       item.resend();
+                       resend();
+                   });
         busMergers.values()
                 .stream()
                 .filter(i -> !i.isHiImpedance()).distinct().forEach(item -> {

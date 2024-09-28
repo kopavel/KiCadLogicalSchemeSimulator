@@ -30,9 +30,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.net.bus;
+import pko.KiCadLogicalSchemeSimulator.Simulator;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
+import pko.KiCadLogicalSchemeSimulator.net.Net;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
@@ -41,6 +43,7 @@ import java.util.Arrays;
 public class BusToWiresAdapter extends OutBus {
     public Pin[] destinations = new Pin[0];
     public long maskState;
+    public boolean queueState;
 
     /*Optimiser constructor unroll destination:destinations*/
     public BusToWiresAdapter(BusToWiresAdapter oldBus, String variantId) {
@@ -72,25 +75,89 @@ public class BusToWiresAdapter extends OutBus {
                         /*Optimiser blockend iSetter*///
                         maskState != newMaskState) {
             maskState = newMaskState;
-            /*Optimiser block dest*/
-            final boolean dState = newMaskState != 0;
-            /*Optimiser blockend dest*/
-            for (Pin destination : destinations) {
-                /*Optimiser bind v:dState*/
-                destination.setState(dState);
+            /*Optimiser block setters*/
+            if (processing) {
+                if (hasQueue) {
+                    if (Net.stabilizing) {
+                        return;
+                    }
+                    recurseError();
+                }
+                hasQueue = true;
+                queueState = newMaskState != 0;
+            } else {
+                processing = true;
+                /*Optimiser blockend setters*/
+                /*Optimiser block dest*/
+                final boolean dState = newMaskState != 0;
+                /*Optimiser blockend dest*/
+                for (Pin destination : destinations) {
+                    /*Optimiser bind v:dState*/
+                    destination.setState(dState);
+                }
+                /*Optimiser block setters block recurse*/
+                while (hasQueue) {
+                    hasQueue = false;
+                    /*Optimiser block iSetter*/
+                    if (hiImpedance) {
+                        for (Pin destination : destinations) {
+                            destination.setHiImpedance();
+                        }
+                    } else {
+                        /*Optimiser blockend iSetter*/
+                        for (Pin destination : destinations) {
+                            destination.setState(queueState);
+                        }
+                        /*Optimiser block iSetter*/
+                    }
+                    /*Optimiser blockend iSetter*/
+                }
+                /*Optimiser blockend recurse*/
+                processing = false;
             }
+            /*Optimiser blockend setters*/
         }
     }
 
+    /*Optimiser block iSetter*/
     @Override
     public void setHiImpedance() {
-        /*Optimiser block setters block iSetter*/
+        /*Optimiser block setters*/
         hiImpedance = true;
-        /*Optimiser blockend iSetter blockend setters*/
-        for (Pin destination : destinations) {
-            destination.setHiImpedance();
+        if (processing) {
+            if (hasQueue) {
+                if (Net.stabilizing) {
+                    hasQueue = false;
+                    return;
+                }
+                recurseError();
+            }
+            hasQueue = true;
+        } else {
+            processing = true;
+            /*Optimiser blockend setters*/
+            for (Pin destination : destinations) {
+                destination.setHiImpedance();
+            }
+            /*Optimiser block setters block recurse*/
+            while (hasQueue) {
+                hasQueue = false;
+                if (hiImpedance) {
+                    for (Pin destination : destinations) {
+                        destination.setHiImpedance();
+                    }
+                } else {
+                    for (Pin destination : destinations) {
+                        destination.setState(queueState);
+                    }
+                }
+            }
+            /*Optimiser blockend recurse*/
+            processing = false;
         }
+        /*Optimiser blockend setters*/
     }
+    /*Optimiser blockend iSetter*/
 
     public void addDestination(Pin pin) {
         destinations = Utils.addToArray(destinations, pin);
@@ -113,6 +180,9 @@ public class BusToWiresAdapter extends OutBus {
             }
             if (!triState) {
                 optimiser.cut("iSetter");
+            }
+            if (!Simulator.recursive && Utils.notContain(Simulator.recursiveOuts, getName())) {
+                optimiser.cut("recurse");
             }
             return optimiser.build();
         }

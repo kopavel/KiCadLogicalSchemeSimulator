@@ -30,21 +30,19 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.api.wire;
-import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
+import pko.KiCadLogicalSchemeSimulator.Simulator;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.net.Net;
 import pko.KiCadLogicalSchemeSimulator.net.wire.NCWire;
-import pko.KiCadLogicalSchemeSimulator.net.wire.WireToBusesAdapter;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class OutPin extends Pin {
-    private final Map<Byte, WireToBusesAdapter> adapters = new HashMap<>();
     public Pin[] destinations = new Pin[0];
     //for wire merger(don't want export from module whole wire merger package)
     public int weakState;
+    public boolean processing;
+    public boolean hasQueue;
 
     public OutPin(String id, SchemaPart parent) {
         super(id, parent);
@@ -63,23 +61,32 @@ public class OutPin extends Pin {
         }
     }
 
-    public void addDestination(Bus bus, byte offset) {
-        bus.triState = triState;
-        if (adapters.containsKey(offset)) {
-            adapters.get(offset).addDestination(bus);
-        } else {
-            WireToBusesAdapter adapter = new WireToBusesAdapter(this.id, this.parent, bus, offset);
-            adapter.triState = triState;
-            adapters.put(offset, adapter);
-            addDestination(adapter);
-        }
-    }
-
     @Override
     public void setState(boolean newState) {
         state = newState;
-        for (Pin destination : destinations) {
-            destination.setState(state);
+        if (processing) {
+            if (hasQueue) {
+                if (Net.stabilizing) {
+                    hasQueue = false;
+                    return;
+                }
+                recurseError();
+            }
+            hasQueue = true;
+        } else {
+            processing = true;
+            for (Pin destination : destinations) {
+                destination.setState(state);
+            }
+            /*Optimiser block recurse*/
+            while (hasQueue) {
+                hasQueue = false;
+                for (Pin destination : destinations) {
+                    destination.setState(state);
+                }
+            }
+            /*Optimiser blockend recurse*/
+            processing = false;
         }
     }
 
@@ -105,6 +112,9 @@ public class OutPin extends Pin {
                 destinations[i] = destinations[i].getOptimised(false);
             }
             ClassOptimiser<OutPin> optimiser = new ClassOptimiser<>(this).unroll(destinations.length);
+            if (!Simulator.recursive && Utils.notContain(Simulator.recursiveOuts, getName())) {
+                optimiser.cut("recurse");
+            }
             return optimiser.build();
         }
     }

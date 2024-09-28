@@ -64,6 +64,11 @@ public class Simulator implements Runnable {
     public static Net net;
     @CommandLine.Option(names = {"-od", "--optimisedDir"}, description = "Cache directory path for generated optimised classes")
     public static String optimisedDir = "optimised";
+    @CommandLine.Option(names = {"-r", "--recursive"}, description = "Enable recursive event processing, slower simulation")
+    public static boolean recursive;
+    @CommandLine.Option(names = {"-ro",
+            "--recursiveOut"}, description = "Enable recursive event processing for specific part output only, can be specified multiple times, slower simulation")
+    public static String[] recursiveOuts;
     @CommandLine.Parameters(index = "0", arity = "1", description = "Path to KiCad NET file")
     public String netFilePath;
     @CommandLine.Option(names = {"-m", "--mapFile"}, description = "Path to KiCad symbol mapping file")

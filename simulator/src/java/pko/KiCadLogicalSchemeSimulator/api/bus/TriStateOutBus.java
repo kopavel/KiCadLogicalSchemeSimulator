@@ -30,10 +30,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.api.bus;
+import pko.KiCadLogicalSchemeSimulator.Simulator;
 import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.net.Net;
 import pko.KiCadLogicalSchemeSimulator.net.bus.NCBus;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
+import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 public class TriStateOutBus extends OutBus {
     public TriStateOutBus(String id, SchemaPart parent, int size, String... names) {
@@ -53,8 +56,35 @@ public class TriStateOutBus extends OutBus {
     public void setState(long newState) {
         hiImpedance = false;
         state = newState;
-        for (Bus destination : destinations) {
-            destination.setState(state);
+        if (processing) {
+            if (hasQueue) {
+                if (Net.stabilizing) {
+                    hasQueue = false;
+                    return;
+                }
+                recurseError();
+            }
+            hasQueue = true;
+        } else {
+            processing = true;
+            for (Bus destination : destinations) {
+                destination.setState(newState);
+            }
+            /*Optimiser block recurse*/
+            while (hasQueue) {
+                hasQueue = false;
+                if (hiImpedance) {
+                    for (Bus destination : destinations) {
+                        destination.setHiImpedance();
+                    }
+                } else {
+                    for (Bus destination : destinations) {
+                        destination.setState(state);
+                    }
+                }
+            }
+            /*Optimiser blockend recurse*/
+            processing = false;
         }
     }
 
@@ -62,8 +92,35 @@ public class TriStateOutBus extends OutBus {
     public void setHiImpedance() {
         assert !hiImpedance : "Already in hiImpedance:" + this;
         hiImpedance = true;
-        for (Bus destination : destinations) {
-            destination.setHiImpedance();
+        if (processing) {
+            if (hasQueue) {
+                if (Net.stabilizing) {
+                    hasQueue = false;
+                    return;
+                }
+                recurseError();
+            }
+            hasQueue = true;
+        } else {
+            processing = true;
+            for (Bus destination : destinations) {
+                destination.setHiImpedance();
+            }
+            /*Optimiser block recurse*/
+            while (hasQueue) {
+                hasQueue = false;
+                if (hiImpedance) {
+                    for (Bus destination : destinations) {
+                        destination.setHiImpedance();
+                    }
+                } else {
+                    for (Bus destination : destinations) {
+                        destination.setState(state);
+                    }
+                }
+            }
+            /*Optimiser blockend recurse*/
+            processing = false;
         }
     }
 
@@ -85,6 +142,9 @@ public class TriStateOutBus extends OutBus {
                 destinations[i] = destinations[i].getOptimised(false);
             }
             ClassOptimiser<TriStateOutBus> optimiser = new ClassOptimiser<>(this).unroll(destinations.length);
+            if (!Simulator.recursive && Utils.notContain(Simulator.recursiveOuts, getName())) {
+                optimiser.cut("recurse");
+            }
             return optimiser.build();
         }
     }

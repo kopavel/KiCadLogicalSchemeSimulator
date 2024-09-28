@@ -110,7 +110,7 @@ public class JavaCompiler {
                                    Class.forName(entry.getKey());
                                    Log.warn(JavaCompiler.class, "Class {} already loaded", srcClass.getName());
                                } catch (ClassNotFoundException ignore) {
-                                   Log.debug(JavaCompiler.class, "Load class {}", entry.getKey());
+                                   Log.debug(JavaCompiler.class, "Cache and load dynamically optimised class {}", entry.getKey());
                                    loadClass(srcClass, entry.getValue().toByteArray());
                                }
                                storeClass(entry.getKey(), entry.getValue().toByteArray());

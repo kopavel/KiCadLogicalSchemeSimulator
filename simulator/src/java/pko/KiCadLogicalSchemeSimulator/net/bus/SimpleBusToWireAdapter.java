@@ -60,13 +60,15 @@ public class SimpleBusToWireAdapter extends OutBus {
         destination.setState(newState != 0);
     }
 
+    /*Optimiser block iSetter*/
     @Override
     public void setHiImpedance() {
-        /*Optimiser block setters block iSetter*/
+        /*Optimiser block setters*/
         hiImpedance = true;
-        /*Optimiser blockend iSetter blockend setters*/
+        /*Optimiser blockend setters*/
         destination.setHiImpedance();
     }
+    /*Optimiser blockend iSetter*/
 
     @Override
     public SimpleBusToWireAdapter getOptimised(boolean keepSetters) {

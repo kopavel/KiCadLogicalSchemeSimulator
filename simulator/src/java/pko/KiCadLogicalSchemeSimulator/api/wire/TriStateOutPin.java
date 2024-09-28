@@ -30,10 +30,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.api.wire;
+import pko.KiCadLogicalSchemeSimulator.Simulator;
 import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.net.Net;
 import pko.KiCadLogicalSchemeSimulator.net.wire.NCWire;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
+import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 public class TriStateOutPin extends OutPin {
     public TriStateOutPin(String id, SchemaPart parent) {
@@ -60,8 +63,35 @@ public class TriStateOutPin extends OutPin {
     public void setState(boolean newState) {
         hiImpedance = false;
         state = newState;
-        for (Pin destination : destinations) {
-            destination.setState(state);
+        if (processing) {
+            if (hasQueue) {
+                if (Net.stabilizing) {
+                    hasQueue = false;
+                    return;
+                }
+                recurseError();
+            }
+            hasQueue = true;
+        } else {
+            processing = true;
+            for (Pin destination : destinations) {
+                destination.setState(state);
+            }
+            /*Optimiser block recurse*/
+            while (hasQueue) {
+                hasQueue = false;
+                if (hiImpedance) {
+                    for (Pin destination : destinations) {
+                        destination.setHiImpedance();
+                    }
+                } else {
+                    for (Pin destination : destinations) {
+                        destination.setState(state);
+                    }
+                }
+            }
+            /*Optimiser blockend recurse*/
+            processing = false;
         }
     }
 
@@ -69,8 +99,35 @@ public class TriStateOutPin extends OutPin {
     public void setHiImpedance() {
         assert !hiImpedance : "Already in hiImpedance:" + this;
         hiImpedance = true;
-        for (Pin destination : destinations) {
-            destination.setHiImpedance();
+        if (processing) {
+            if (hasQueue) {
+                if (Net.stabilizing) {
+                    hasQueue = false;
+                    return;
+                }
+                recurseError();
+            }
+            hasQueue = true;
+        } else {
+            processing = true;
+            for (Pin destination : destinations) {
+                destination.setHiImpedance();
+            }
+            /*Optimiser block recurse*/
+            while (hasQueue) {
+                hasQueue = false;
+                if (hiImpedance) {
+                    for (Pin destination : destinations) {
+                        destination.setHiImpedance();
+                    }
+                } else {
+                    for (Pin destination : destinations) {
+                        destination.setState(state);
+                    }
+                }
+            }
+            /*Optimiser blockend recurse*/
+            processing = false;
         }
     }
 
@@ -85,6 +142,9 @@ public class TriStateOutPin extends OutPin {
                 destinations[i] = destinations[i].getOptimised(false);
             }
             ClassOptimiser<TriStateOutPin> optimiser = new ClassOptimiser<>(this).unroll(destinations.length);
+            if (!Simulator.recursive && Utils.notContain(Simulator.recursiveOuts, getName())) {
+                optimiser.cut("recurse");
+            }
             return optimiser.build();
         }
     }
