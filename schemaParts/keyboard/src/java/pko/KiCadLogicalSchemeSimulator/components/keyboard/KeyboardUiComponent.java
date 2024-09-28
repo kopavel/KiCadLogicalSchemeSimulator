@@ -30,34 +30,56 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.keyboard;
+import pko.KiCadLogicalSchemeSimulator.Simulator;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.AbstractUiComponent;
 
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.ArrayList;
+import java.util.List;
 
-public class KeyboardUiComponent extends AbstractUiComponent {
+public class KeyboardUiComponent extends AbstractUiComponent implements KeyListener {
     public final Keyboard parent;
-    public volatile KeyboardUi ui;
+    private final List<String> keys = new ArrayList<>();
+    private String label;
 
     public KeyboardUiComponent(String title, int size, Keyboard parent) {
         super(title, size);
         this.parent = parent;
-        addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (ui == null) {
-                    synchronized (parent) {
-                        if (ui == null) {
-                            ui = new KeyboardUi(KeyboardUiComponent.this);
-                        }
-                    }
-                }
-                ui.setVisible(true);
-            }
-        });
+        label = "No key pressed";
+        Simulator.ui.addKeyListener(this);
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        String keyText = KeyEvent.getKeyText(e.getKeyCode());
+        if (!keys.contains(keyText)) {
+            keys.add(keyText);
+            label = String.join(" ", keys);
+            parent.keyEvent(keyText, true);
+            repaint();
+        }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        String keyText = KeyEvent.getKeyText(e.getKeyCode());
+        keys.remove(keyText);
+        if (keys.isEmpty()) {
+            label = "No key pressed";
+        } else {
+            label = String.join(" ", keys);
+        }
+        parent.keyEvent(keyText, false);
+        repaint();
     }
 
     @Override
     protected void draw() {
+        g2d.drawString(label, 0, titleHeight * 2);
     }
 }

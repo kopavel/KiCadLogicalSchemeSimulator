@@ -42,6 +42,7 @@ module KiCadLogicalSchemeSimulator.simulator {
     exports pko.KiCadLogicalSchemeSimulator.tools.ringBuffers;
     exports pko.KiCadLogicalSchemeSimulator.tools;
     exports pko.KiCadLogicalSchemeSimulator;
+    exports pko.KiCadLogicalSchemeSimulator.ui.main;
     opens pko.KiCadLogicalSchemeSimulator.net;
     opens pko.KiCadLogicalSchemeSimulator.optimiser;
     opens pko.KiCadLogicalSchemeSimulator.parsers.pojo.symbolMap;

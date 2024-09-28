@@ -87,7 +87,7 @@ public class Keyboard extends SchemaPart implements InteractiveSchemaPart {
         });
         addTriStateOutBus("Out", 8);
         addOutPin("Ev");
-        keyboardUiComponent = new KeyboardUiComponent(id, 50, this);
+        keyboardUiComponent = new KeyboardUiComponent(id, 125, this);
     }
 
     public void keyEvent(String text, boolean pressed) {
