@@ -137,7 +137,7 @@ public class OscillatorUi extends JFrame {
     public void setVisible(boolean b) {
         super.setVisible(b);
         if (b) {
-            SwingUtilities.invokeLater(() -> freqTextField.setText(String.valueOf(parent.parent.getClockFreq())));
+            SwingUtilities.invokeLater(() -> freqTextField.setText(String.valueOf(((int) parent.parent.getClockFreq()) * 1000)));
         }
     }
 
