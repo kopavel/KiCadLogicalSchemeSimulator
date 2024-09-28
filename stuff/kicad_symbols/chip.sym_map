@@ -10,6 +10,7 @@
 		<symbol name="8OR" symPartClass="OrGate" symPartParam="size=8"/>
 		<symbol name="8REG" symPartClass="Buffer" symPartParam="size=8;latch"/>
 		<symbol name="AND" symPartClass="AndGate" symPartParam="size=2"/>
+		<symbol name="4AND" symPartClass="AndGate" symPartParam="size=4"/>
 		<symbol name="BUF" symPartClass="Buffer" symPartParam="size=8"/>
 		<symbol name="BUFx1" symPartClass="SingleBitBuffer"/>
 		<symbol name="COUNTER" symPartClass="Counter" symPartParam="size=4;reverse"/>
@@ -23,6 +24,7 @@
 		<symbol name="MUX2x1" symPartClass="SingleBitMultiplexer" symPartParam="size=1;nSize=1;reverse"/>
 		<symbol name="MUX2x2" symPartClass="Multiplexer" symPartParam="size=2;nSize=1;reverse"/>
 		<symbol name="MUX2x4" symPartClass="Multiplexer" symPartParam="size=4;nSize=1;reverse"/>
+		<symbol name="MUX2x7" symPartClass="Multiplexer" symPartParam="size=7;nSize=1;reverse"/>
 		<symbol name="MUX2x8" symPartClass="Multiplexer" symPartParam="size=8;nSize=1;reverse"/>
 		<symbol name="MUX2x10" symPartClass="Multiplexer" symPartParam="size=10;nSize=1;reverse"/>
 		<symbol name="MUX2x12" symPartClass="Multiplexer" symPartParam="size=12;nSize=1;reverse"/>

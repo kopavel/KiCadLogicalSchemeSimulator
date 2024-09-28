@@ -83,7 +83,7 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                     state = newState;
                     if (!newState) {
                         if (hSize == 0 && !Net.stabilizing) {
-                            hSize = hPos + 2;
+                            hSize = hPos + 3;
                             byte[] firstRow = Arrays.copyOf(ram[0], hSize);
                             ram = new byte[2048][hSize];
                             ram[0] = firstRow;
@@ -104,7 +104,7 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                                 refresh.notifyAll();
                             }
                         } else if (!Net.stabilizing) {
-                            vSize = vPos + 1;
+                            vSize = vPos + 2;
                             while (!display.sized) {
                                 try {
                                     //noinspection BusyWait
@@ -131,7 +131,7 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                     state = newState;
                     if (newState) {
                         if (hSize == 0 && !Net.stabilizing) {
-                            hSize = hPos + 2;
+                            hSize = hPos + 3;
                             byte[] firstRow = Arrays.copyOf(ram[0], hSize);
                             ram = new byte[2048][hSize];
                             ram[0] = firstRow;
@@ -152,7 +152,7 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                                 refresh.notifyAll();
                             }
                         } else if (!Net.stabilizing) {
-                            vSize = vPos + 1;
+                            vSize = vPos + 2;
                             while (!display.sized) {
                                 try {
                                     //noinspection BusyWait

@@ -57,7 +57,8 @@ tasks.register("copyStuff", Copy) {
                 "$rootDir/stuff/scripts/start.sh",
                 "$rootDir/stuff/scripts/simulate.py",
                 "$rootDir/stuff/kicad_symbols/kicad.sym_map",
-                "$rootDir/stuff/kicad_symbols/chip.sym_map"
+                "$rootDir/stuff/kicad_symbols/chip.sym_map",
+                "$rootDir/stuff/kicad_symbols/retro.sym_map"
         ]
     }
     into "$rootDir/distro"
