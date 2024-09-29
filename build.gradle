@@ -37,18 +37,26 @@ plugins {
 
 group 'pko'
 version '0.1'
+project.ext.deleteEmptyDirsRecursively = { dir ->
+    if (dir.exists() && dir.isDirectory()) {
+        dir.eachDir { subDir ->
+            project.ext.deleteEmptyDirsRecursively(subDir) // Recursive call for subdirectories
+        }
+        if (dir.listFiles().length == 0) {
+            println("Deleting empty directory: ${dir.absolutePath}")
+            dir.delete()
+        }
+    }
+}
+
 tasks.register("cleanBuild", Delete).configure() {
-    delete fileTree(dir: "$rootDir/distro/")
     doLast {
-        fileTree(dir: "$rootDir/distro/").visit { it.file.delete() }
+        delete fileTree(dir: "$rootDir/distro/")
+        project.ext.deleteEmptyDirsRecursively(file("$rootDir/distro/"))
     }
 }
 
 tasks.register("copyToLib", Copy) {
-    into "$rootDir/distro/lib/"
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-}
-tasks.register("copyStuff", Copy) {
     from {
         [
                 "$rootDir/stuff/scripts/run.bat",
@@ -63,6 +71,19 @@ tasks.register("copyStuff", Copy) {
     }
     into "$rootDir/distro"
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    def filesToCopy = subprojects.collect { subproject ->
+        return subproject.configurations.runtimeClasspath.files
+    }.flatten()
+    from(filesToCopy) {
+        // Exclude JAR outputs from subprojects
+        subprojects.each { subproject ->
+            subprojects.jar.each { it.outputs.files.each { exclude it.getName() } }
+        }
+        into "lib"  // Change this to your desired output directory
+    }
+    onlyIf {
+        subprojects.any { it.tasks.jar.state.executed }
+    }
 }
 
 configure(subprojects) {
@@ -101,16 +122,12 @@ configure(subprojects) {
     plugins.withType(JavaPlugin).configureEach() {
         tasks.named("jar") {
             mustRunAfter rootProject.tasks.named("cleanBuild")
-            mustRunAfter rootProject.tasks.named("copyStuff")
         }
         tasks.named('assemble') {
             dependsOn(rootProject.tasks.named('copyToLib'))
-            dependsOn(rootProject.tasks.named('copyStuff'))
         }
         rootProject.tasks.named("copyToLib") {
-            from(configurations.runtimeClasspath) {
-                rootProject.subprojects.jar.each { it.outputs.files.each { exclude it.getName() } }
-            }
+            mustRunAfter tasks.named('jar')
         }
     }
     tasks.named('assemble') {
