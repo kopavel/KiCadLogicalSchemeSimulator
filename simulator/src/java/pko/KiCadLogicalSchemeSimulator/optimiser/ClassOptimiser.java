@@ -342,7 +342,7 @@ public class ClassOptimiser<T> {
     private void loadSource(Class<?> sourceClass) {
         try (InputStream is = sourceClass.getResourceAsStream(sourceClass.getSimpleName() + ".java")) {
             if (is == null) {
-                throw new RuntimeException("Can't fins source for class " + sourceClass.getName());
+                throw new RuntimeException("Can't find source for class " + sourceClass.getName());
             }
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
                 source = reader.lines().toList();

@@ -17,6 +17,8 @@
 /stuff/examples/**/#auto_saved_files#
 /stuff/examples/counters/counters.xml
 /stuff/examples/switch/switch.xml
+/stuff/examples/trs80/TRS80I.xml
+/stuff/examples/trs80/*.bin
 /.profileconfig.json
 /**/optimised/
 /**/#auto_saved_files#

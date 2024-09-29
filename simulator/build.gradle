@@ -165,3 +165,4 @@ tasks.register("runJmh", JavaExec) {
             "pko.KiCadLogicalSchemeSimulator.test.benchmarks.BusToWireBenchmark.optimiser"//
     ]
 }
+apply from: "$rootDir/gradle/examples.gradle"
