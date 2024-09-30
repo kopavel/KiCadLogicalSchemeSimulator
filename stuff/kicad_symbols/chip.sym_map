@@ -3,15 +3,21 @@
 	<lib name="chip">
 		<symbol name="3OR" symPartClass="OrGate" symPartParam="size=3"/>
 		<symbol name="4OR" symPartClass="OrGate" symPartParam="size=4"/>
-		<symbol name="4REG" symPartClass="Buffer" symPartParam="size=4;latch"/>
+		<symbol name="4REG" symPartClass="Buffer" symPartParam="size=4;latch;reverse">
+			<unit pinMap="17=WR;18=OE"/>
+		</symbol>
 		<symbol name="5OR" symPartClass="OrGate" symPartParam="size=5"/>
 		<symbol name="6OR" symPartClass="OrGate" symPartParam="size=6"/>
 		<symbol name="7OR" symPartClass="OrGate" symPartParam="size=7"/>
 		<symbol name="8OR" symPartClass="OrGate" symPartParam="size=8"/>
-		<symbol name="8REG" symPartClass="Buffer" symPartParam="size=8;latch"/>
+		<symbol name="8REG" symPartClass="Buffer" symPartParam="size=8;latch;reverse">
+			<unit pinMap="17=WR;18=OE"/>
+		</symbol>
 		<symbol name="AND" symPartClass="AndGate" symPartParam="size=2"/>
 		<symbol name="4AND" symPartClass="AndGate" symPartParam="size=4"/>
-		<symbol name="BUF" symPartClass="Buffer" symPartParam="size=8"/>
+		<symbol name="BUF" symPartClass="Buffer" symPartParam="size=8;reverse">
+			<unit pinMap="17=CS"/>
+		</symbol>
 		<symbol name="BUFx1" symPartClass="SingleBitBuffer"/>
 		<symbol name="COUNTER" symPartClass="Counter" symPartParam="size=4;reverse"/>
 		<symbol name="COUNTERx17" symPartClass="Counter" symPartParam="size=17;reverse"/>

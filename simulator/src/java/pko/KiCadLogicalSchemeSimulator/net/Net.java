@@ -158,17 +158,19 @@ public class Net {
         }
         net.getNode().forEach(node -> {
             Map<String, PinMapDescriptor> pinMap = schemaPartPinMap.get(node.getRef());
-            String pinName;
-            SchemaPart schemaPart;
+            String pinName = null;
+            SchemaPart schemaPart = null;
             if (pinMap != null) {
                 PinMapDescriptor pinMapDescriptor = pinMap.get(node.getPin());
-                if (pinMapDescriptor == null) {
-                    //ignore unmapped pins (power one?)
-                    return;
+                if (pinMapDescriptor != null) {
+                    pinName = pinMapDescriptor.pinName;
+                    if ("NC".equals(pinName)) {
+                        return;
+                    }
+                    schemaPart = pinMapDescriptor.schemaPart;
                 }
-                pinName = pinMapDescriptor.pinName;
-                schemaPart = pinMapDescriptor.schemaPart;
-            } else {
+            }
+            if (schemaPart == null || pinName == null) {
                 pinName = node.getPinfunction();
                 schemaPart = this.schemaParts.get(node.getRef());
             }
@@ -323,7 +325,7 @@ public class Net {
             } else {
                 //use direct connect to destination
                 if (descriptor.buses.isEmpty()) {
-                    throw new RuntimeException("Impossible single wire-to-bus connection ");
+                    throw new RuntimeException("Impossible single wire-to-bus connection for destination " + destination.getName());
 /*
                     //pin-to-bus
                     //search if wire already processed
