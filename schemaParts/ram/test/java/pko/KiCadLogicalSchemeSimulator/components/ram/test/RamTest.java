@@ -57,9 +57,9 @@ public class RamTest extends NetTester {
     void testMultipleWritesAndReads() {
         long[] testValues = {0x00, 0xFF, 0xA5, 0x5A};
         long[] testAddresses = {0x00, 0x01, 0xFF, 0x88};
-        checkBusImpedance("dIn", "with hi ~{CS} D bus must be in hiImpedance");
+        checkBusImpedance("RAM1", "D", "with hi ~{CS} D bus must be in hiImpedance");
         setPin("~{CS}", false);
-        checkBusImpedance("dIn", "with lo ~{CS} and hi ~{OE} D bus must be in hiImpedance");
+        checkBusImpedance("RAM1", "D", "with lo ~{CS} and hi ~{OE} D bus must be in hiImpedance");
         for (int i = 0; i < testValues.length; i++) {
             setBus("aBus", testAddresses[i]);
             setBus("dOut", testValues[i]);
@@ -73,7 +73,7 @@ public class RamTest extends NetTester {
             checkBus("dIn", testValues[i], "The value read from RAM does not match the value written.");
         }
         setPin("~{CS}", true);
-        checkBusImpedance("dIn", "with hi ~{CS} D bus must be in hiImpedance even with lo ~{OE}");
+        checkBusImpedance("RAM1", "D", "with hi ~{CS} D bus must be in hiImpedance even with lo ~{OE}");
         setPin("~{OE}", true);
         setBus("dOut", 0);
         for (int i = 0; i < testValues.length; i++) {

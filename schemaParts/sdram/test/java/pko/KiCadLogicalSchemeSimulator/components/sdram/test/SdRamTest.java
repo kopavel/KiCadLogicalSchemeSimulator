@@ -63,7 +63,7 @@ public class SdRamTest extends NetTester {
         long[] testValues = {0x00, 0xFF, 0xA5, 0x5A};
         long[] testAddresses = {0x00, 0x01, 0xee, 0x88};
         setPin("~{WE}", false);
-        checkBusImpedance("dIn", "with hi ~{CAS} or lo ~{WR} D bus must be in hiImpedance");
+        checkBusImpedance("SDRAM64K1", "D", "with hi ~{CAS} or lo ~{WR} D bus must be in hiImpedance");
         for (int i = 0; i < testValues.length; i++) {
             setBus("dOut", testValues[i]);
             setBus("aBus", testAddresses[i]);
@@ -72,8 +72,8 @@ public class SdRamTest extends NetTester {
             setPin("~{CAS}", false);
         }
         outBus("dOut").setHiImpedance();
+        checkBusImpedance("SDRAM64K1", "D", "with hi ~{CAS} or lo ~{WR} D bus must be in hiImpedance");
         setPin("~{WE}", true);
-        checkBusImpedance("dIn", "with hi ~{CAS} or lo ~{WR} D bus must be in hiImpedance");
         for (int i = 0; i < testValues.length; i++) {
             setBus("aBus", testAddresses[i]);
             setPin("~{RAS}", false);

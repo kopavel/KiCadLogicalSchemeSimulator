@@ -139,6 +139,10 @@ public abstract class NetTester {
         assertTrue(inBus(id).hiImpedance, message);
     }
 
+    protected void checkBusImpedance(String partId, String id, String message) {
+        assertTrue(net.schemaParts.get(partId).outPins.get(id).isHiImpedance(), message);
+    }
+
     protected void checkPinImpedance(int id, String message) {
         assertTrue(inPin(id).hiImpedance, message);
     }
