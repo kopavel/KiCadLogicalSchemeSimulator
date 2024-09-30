@@ -34,7 +34,6 @@ import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 
-//Fixme readme
 public class SingleBitBuffer extends SchemaPart {
     private final InPin dPin;
     private final InPin oePin;
