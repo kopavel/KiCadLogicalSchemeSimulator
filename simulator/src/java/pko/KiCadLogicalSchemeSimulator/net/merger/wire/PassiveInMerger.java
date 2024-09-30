@@ -31,13 +31,14 @@
  */
 package pko.KiCadLogicalSchemeSimulator.net.merger.wire;
 import pko.KiCadLogicalSchemeSimulator.api.ShortcutException;
-import pko.KiCadLogicalSchemeSimulator.api.wire.OutPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.TriStateOutPin;
 
-public class PassiveInMerger extends OutPin {
-    OutPin source;
+public class PassiveInMerger extends TriStateOutPin {
+    PassivePin source;
 
-    public PassiveInMerger(OutPin source, Boolean powerState) {
+    public PassiveInMerger(PassivePin source, Boolean powerState) {
         super(source, "PassiveInMerger");
         this.source = source;
         state = powerState;
@@ -46,12 +47,15 @@ public class PassiveInMerger extends OutPin {
         strong = true;
     }
 
-    //FiXme why no dest set and where setHiImpedance?
     @Override
     public void setState(boolean newState) {
         if (source.strong) {
             throw new ShortcutException(source);
         }
+    }
+
+    @Override
+    public void setHiImpedance() {
     }
 
     @Override

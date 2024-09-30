@@ -33,7 +33,7 @@ package pko.KiCadLogicalSchemeSimulator.api.wire;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.net.merger.wire.PassiveOutMerger;
 
-public class PassivePin extends OutPin {
+public class PassivePin extends TriStateOutPin {
     public PassivePin(String id, SchemaPart parent) {
         super(id, parent);
         strong = false;
