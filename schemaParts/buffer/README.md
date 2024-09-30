@@ -2,22 +2,40 @@
 
 Implements BUFFER/LATCH functionality.
 
-**Input names**: Dx, where x a sequential number, starting from 0.  
-**Output names**: Qx, where x a sequential number, starting from 0.
+### Pins
 
-**Mandatory parameter `size`:** Specifies the number of input/output pins.  
-**Optional parameter `latch`:** If provided, the schema part is a latch; otherwise, it's a buffer.
+#### Input names;
 
-This schema part has two modes, both with `<size>` number of inputs and outputs:
+- `Dx` Data input bus  
+  x - Data input number in range [0…64].
+- `CS` Chip select.   
+  Only in buffer mode.
+  - `Hi` transfers input bus state to output bus.
+  - `Lo` output bus go to “High impedance” mode.
+- `WR` Write.  
+  Only in latch mode
+  - On falling edge data from input bus stored internally in the latch.
+- `OE` Output enable.  
+  Only in latch mode
+  - `Hi` transfers latch state to output bus.
+  - `Lo` output bus go to “High impedance” mode.
 
-1. **Buffer Mode:** Additionally has a <span style="text-decoration: overline;">CS</span> input: Chip select.
-    - At `Lo` state, directly transfers inputs to outputs.
-    - At `Hi` state, outputs are in "High impedance" mode.
+#### Output names:
 
-2. **Latch Mode:** Additionally has two input pins:
-    - <span style="text-decoration: overline;">WR</span> input: Write. At negative front, data from inputs are stored internally in the latch.
-    - <span style="text-decoration: overline;">OE</span> input: Output enable.
-        - At `Lo` state, transfers latch stored states to outputs.
-        - At `Hi` state, outputs are in "High impedance" mode.
+- `Qx` Data output bus
+  x — Data output number in range [0…64].
 
-For example, to create an 8-input latch, you would provide the following parameters: `size=8;latch`.
+### Parameters
+
+#### Mandatory parameters:
+
+- `size` Data bus width in range [0…64]
+
+#### Optional parameters:
+
+- `latch` - latch mode
+- `reverse` - reverse WR, OE and CS inputs.
+
+### Example:
+
+8 bit width latch with `OE` active on `Lo` and `WR` sensitive to falling edge: `size=8;latch;reverse`.

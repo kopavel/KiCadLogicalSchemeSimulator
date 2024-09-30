@@ -2,21 +2,38 @@
 
 Implements Single bit BUFFER/LATCH functionality.
 
-**Input name:** D.  
-**Output name:** Q.
+### Pins
 
-**Optional parameter `latch`:** If provided, the schema part work as latch; otherwise — a buffer.
+#### Input names;
 
-This schema part has two modes:
+- `D` Data input pin
+- `CS` Chip select.   
+  Only in buffer mode.
+  - `Hi` transfers input pin state to output pin.
+  - `Lo` output pin go to “High impedance” mode.
+- `WR` Write.  
+  Only in latch mode
+  - On falling edge data from input stored internally in the latch.
+- `OE` Output enable.  
+  Only in latch mode
+  - `Hi` transfers latch state to output pin.
+  - `Lo` output pin go to “High impedance” mode.
 
-1. **Buffer Mode:** Additionally has a <span style="text-decoration: overline;">CS</span> input: Chip select.
-    - At `Lo` state, directly transfers input to output.
-    - At `Hi` state, output go to “High impedance” mode.
+#### Output names:
 
-2. **Latch Mode:** Additionally has two input pins:
-    - <span style="text-decoration: overline;">WR</span> input: Write. At negative front, data from input are stored internally in the latch.
-    - <span style="text-decoration: overline;">OE</span> input: Output enable.
-        - At `Lo` state, transfers latch stored states to output.
-        - At `Hi` state, output go to “High impedance” mode.
+- `Q` Data output pin
 
-For a latch provide the following parameters: `latch`.
+### Parameters
+
+#### Mandatory parameters:
+
+- none
+
+#### Optional parameters:
+
+- `latch` - latch mode
+- `reverse` - reverse WR, OE and CS inputs.
+
+### Example:
+
+Latch with `OE` active on `Lo` and `WR` sensitive to falling edge: `latch;reverse`.
