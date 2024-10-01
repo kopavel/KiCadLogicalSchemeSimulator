@@ -42,7 +42,8 @@ import pko.KiCadLogicalSchemeSimulator.net.wire.NCWire;
 
 import java.util.*;
 
-//FixME if there is no BusMerger in destinations - cut out hiImpedance processing
+//Todo if there is no BusMerger in destinations - cut out hiImpedance processing
+//Todo with one source only and only weak others - use simpler "Weak pin" implementation
 public class WireMerger extends OutPin {
     public final Set<PassivePin> passivePins = new TreeSet<>();
     public final Set<BusMergerWireIn> mergers = new TreeSet<>();

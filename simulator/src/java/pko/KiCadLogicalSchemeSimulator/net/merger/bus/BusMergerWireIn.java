@@ -41,8 +41,6 @@ import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
-    protected final long fMask;
-    protected final long fnMask;
     @Getter
     public long mask;
     public long nMask;
@@ -57,8 +55,6 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
         nMask = ~mask;
         this.merger = merger;
         destinations = merger.destinations;
-        fMask = mask;
-        fnMask = ~mask;
     }
 
     /*Optimiser constructor unroll destination:destinations*/
@@ -69,8 +65,6 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
         merger = oldPin.merger;
         destinations = merger.destinations;
         triState = oldPin.triState;
-        fMask = oldPin.fMask;
-        fnMask = oldPin.fnMask;
     }
 
     @Override
@@ -94,7 +88,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                     hiImpedance ||
                             /*Optimiser blockend iSetter*/
                             !oldStrong) { //from hiImpedance or weak
-                /*Optimiser bind mask*/
+                /*Optimiser bind m:mask*/
                 if ((merger.strongPins & mask) != 0) { //strong pins shortcut
                     if (Net.stabilizing) {
                         Net.forResend.add(this);
@@ -110,27 +104,27 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                 /*Optimiser block iSetter*/
                 if (!hiImpedance) { // from weak
                     /*Optimiser blockend iSetter*/
-                    /*Optimiser bind nmask*/
+                    /*Optimiser bind nm:nMask*/
                     merger.weakState &= nMask;
-                    /*Optimiser bind nmask*/
+                    /*Optimiser bind nm:nMask*/
                     merger.weakPins &= nMask;
                     /*Optimiser block iSetter*/
                 } else {
                     hiImpedance = false;
                 }
                 /*Optimiser blockend iSetter*/
-                /*Optimiser bind mask*/
+                /*Optimiser bind m:mask*/
                 merger.strongPins |= mask;
             }
             if (newState) {
-                /*Optimiser bind mask*/
+                /*Optimiser bind m:mask*/
                 mergerState |= mask;
             } else {
-                /*Optimiser bind nMask*/
+                /*Optimiser bind nm:nMask*/
                 mergerState &= nMask;
             }
         } else { //to weak
-            /*Optimiser bind mask*/
+            /*Optimiser bind m:mask*/
             if ((merger.weakPins & mask) != 0 && ((merger.weakState & mask) == 0) == newState) { //opposite weak state
                 if (Net.stabilizing) {
                     Net.forResend.add(this);
@@ -145,24 +139,24 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
             }
             /*Optimiser block iSetter*/
             if (hiImpedance) { // from impedance
-                /*Optimiser bind mask*/
+                /*Optimiser bind m:mask*/
                 merger.weakPins |= mask;
                 hiImpedance = false;
             } else
                 /*Optimiser blockend iSetter*/
                 if (oldStrong) { //from strong
-                    /*Optimiser bind nMask*/
+                    /*Optimiser bind nm:nMask*/
                     merger.strongPins &= nMask;
-                    /*Optimiser bind mask*/
+                    /*Optimiser bind m:mask*/
                     merger.weakPins |= mask;
                 }
-            /*Optimiser bind mask*/
+            /*Optimiser bind m:mask*/
             if ((merger.strongPins & mask) == 0) {
                 if (newState) {
-                    /*Optimiser bind mask*/
+                    /*Optimiser bind m:mask*/
                     mergerState |= mask;
                 } else {
-                    /*Optimiser bind nMask*/
+                    /*Optimiser bind nm:nMask*/
                     mergerState &= nMask;
                 }
             }
@@ -240,18 +234,18 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
         }
         long mergerState = merger.state;
         if (oldStrong) {
-            /*Optimiser bind nMask*/
+            /*Optimiser bind nm:nMask*/
             merger.strongPins &= nMask;
-            /*Optimiser bind nMask*/
+            /*Optimiser bind nm:nMask*/
             mergerState &= nMask;
-            /*Optimiser bind mask*/
+            /*Optimiser bind m:mask*/
             mergerState |= merger.weakState & mask;
         } else {
-            /*Optimiser bind nMask*/
+            /*Optimiser bind nm:nMask*/
             merger.weakPins &= nMask;
-            /*Optimiser bind mask*/
+            /*Optimiser bind m:mask*/
             if ((merger.strongPins & mask) != 0) {
-                /*Optimiser bind nMask*/
+                /*Optimiser bind nm:nMask*/
                 mergerState &= nMask;
             }
         }
@@ -330,7 +324,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                 destinations[i].triState = true;
             }
         }
-        ClassOptimiser<BusMergerWireIn> optimiser = new ClassOptimiser<>(this).unroll(merger.destinations.length).bind("mask", "fMask").bind("nMask", "fnMask");
+        ClassOptimiser<BusMergerWireIn> optimiser = new ClassOptimiser<>(this).unroll(merger.destinations.length).bind("m", mask).bind("nm", nMask);
         if (!keepSetters) {
             optimiser.cut("setters");
         }

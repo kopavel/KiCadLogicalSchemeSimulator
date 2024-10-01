@@ -95,6 +95,7 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
                         throw new ShortcutException(merger.sources);
                     }
                 }
+                /*Optimiser bind m:mask*/
                 merger.strongPins = mask;
             }
             /*Optimiser blockend iSetter*/
@@ -147,6 +148,7 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
             /*Optimiser block iSetter*/
             if (hiImpedance) {
                 hiImpedance = false;
+                /*Optimiser bind m:mask*/
                 if ((merger.strongPins & mask) != 0) {
                     if (Net.stabilizing) {
                         Net.forResend.add(this);
@@ -156,10 +158,14 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
                         throw new ShortcutException(merger.sources);
                     }
                 }
+                /*Optimiser bind m:mask*/
                 merger.strongPins |= mask;
             }
             /*Optimiser blockend iSetter*/
+            /*Optimiser bind nm:nMask*/
             mergerState &= nMask;
+            //ToDo if we are after maskGroup - don't use mask here
+            /*Optimiser bind m:mask*/
             mergerState |= newState & mask;
             if (mergerState != merger.state) {
                 merger.state = mergerState;
@@ -281,8 +287,11 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
         } else {
             /*Optimiser blockend sameMask*/
             long mergerState = merger.state;
+            /*Optimiser bind nm:nMask*/
             merger.strongPins &= nMask;
+            /*Optimiser bind nm:nMask*/
             mergerState &= nMask;
+            /*Optimiser bind m:mask*/
             mergerState |= merger.weakState & mask;
             if (mergerState != merger.state) {
                 merger.state = mergerState;
@@ -359,11 +368,11 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
                 destinations[i].triState = true;
             }
         }
-        ClassOptimiser<BusMergerBusIn> optimiser = new ClassOptimiser<>(this).unroll(merger.destinations.length);
+        ClassOptimiser<BusMergerBusIn> optimiser = new ClassOptimiser<>(this).unroll(merger.destinations.length).bind("m", mask);
         if (mask == merger.mask) {
             optimiser.cut("otherMask");
         } else {
-            optimiser.cut("sameMask");
+            optimiser.cut("sameMask").bind("nm", nMask);
         }
         if (!keepSetters) {
             optimiser.cut("setters");

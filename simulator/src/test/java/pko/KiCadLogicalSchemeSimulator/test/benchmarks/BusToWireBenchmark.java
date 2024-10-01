@@ -31,11 +31,9 @@
  */
 package pko.KiCadLogicalSchemeSimulator.test.benchmarks;
 import org.openjdk.jmh.annotations.*;
-import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.net.bus.MaskGroupBus;
-import pko.KiCadLogicalSchemeSimulator.net.bus.SimpleBusToWireAdapter;
+import pko.KiCadLogicalSchemeSimulator.net.bus.BusToWiresAdapter;
 
 import java.util.concurrent.TimeUnit;
 
@@ -52,7 +50,7 @@ public class BusToWireBenchmark {
 
     @State(Scope.Thread)
     public static class StateForOptimiser {
-        Bus out;
+        BusToWiresAdapter out;
 
         @Setup(Level.Trial)
         public void setUp() {
@@ -61,10 +59,10 @@ public class BusToWireBenchmark {
                 public void initOuts() {
                 }
             };
-            out = new MaskGroupBus(new OutBus("test", testPart, 4), "test");
-            for (int i = 0; i < 5; i++) {
-                ((MaskGroupBus) out).addDestination(new SimpleBusToWireAdapter((OutBus) out, testPart.addInPin("in" + i)));
-            }
+            out = new BusToWiresAdapter(new OutBus("test", testPart, 4), 2);
+//            for (int i = 0; i < 5; i++) {
+            out.addDestination(testPart.addInPin("IN"));
+//            }
             out = out.getOptimised(true);
         }
     }

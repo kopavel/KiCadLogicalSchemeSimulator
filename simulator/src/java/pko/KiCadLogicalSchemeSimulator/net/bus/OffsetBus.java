@@ -37,7 +37,6 @@ import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 public class OffsetBus extends OutBus {
     protected final byte offset;
-    protected final byte nOffset;
 
     public OffsetBus(OutBus outBus, Bus destination, byte offset) {
         super(outBus, "offset" + offset);
@@ -47,7 +46,6 @@ public class OffsetBus extends OutBus {
         }
         destinations = new Bus[]{destination};
         this.offset = offset;
-        nOffset = (byte) -offset;
     }
 
     /*Optimiser constructor unroll destination:destinations*/
@@ -56,7 +54,6 @@ public class OffsetBus extends OutBus {
         offset = oldBus.offset;
         triState = oldBus.triState;
         destinations = oldBus.destinations;
-        nOffset = oldBus.nOffset;
     }
 
     @Override
@@ -83,12 +80,12 @@ public class OffsetBus extends OutBus {
                 /*Optimiser block positive block negative*/
                 if (offset > 0) {
                     /*Optimiser blockend negative*/
-                    /*Optimiser bind offset*/
+                    /*Optimiser bind o:offset*/
                     destination.setState(newState << offset);
                     /*Optimiser block negative*/
                 } else {
                     /*Optimiser blockend positive*/
-                    /*Optimiser bind offset:-offset*/
+                    /*Optimiser bind o:-offset*/
                     destination.setState(newState >> -offset);
                     /*Optimiser block positive*/
                 }
@@ -108,12 +105,12 @@ public class OffsetBus extends OutBus {
                         /*Optimiser block positive block negative*/
                         if (offset > 0) {
                             /*Optimiser blockend negative*/
-                            /*Optimiser bind offset*/
+                            /*Optimiser bind o:offset*/
                             destination.setState(state << offset);
                             /*Optimiser block negative*/
                         } else {
                             /*Optimiser blockend positive*/
-                            /*Optimiser bind offset:-offset*/
+                            /*Optimiser bind o:-offset*/
                             destination.setState(state >> -offset);
                             /*Optimiser block positive*/
                         }
@@ -163,12 +160,12 @@ public class OffsetBus extends OutBus {
                         /*Optimiser block positive block negative*/
                         if (offset > 0) {
                             /*Optimiser blockend negative*/
-                            /*Optimiser bind offset*/
+                            /*Optimiser bind o:offset*/
                             destination.setState(state << offset);
                             /*Optimiser block negative*/
                         } else {
                             /*Optimiser blockend positive*/
-                            /*Optimiser bind offset:-offset*/
+                            /*Optimiser bind o:-offset*/
                             destination.setState(state >> -offset);
                             /*Optimiser block positive*/
                         }
@@ -194,9 +191,10 @@ public class OffsetBus extends OutBus {
         }
         ClassOptimiser<OffsetBus> optimiser = new ClassOptimiser<>(this).unroll(destinations.length);
         if (offset > 0) {
+            optimiser.bind("o", offset);
             optimiser.cut("negative");
         } else {
-            optimiser.bind("offset", "nOffset");
+            optimiser.bind("o", -offset);
             optimiser.cut("positive");
         }
         if (!keepSetters) {

@@ -131,18 +131,16 @@ run {
         }
     } else {
         workingDir = "$rootDir/stuff/work"
-
     }
 }
 tasks.register("runJmh", JavaExec) {
     group = 'Benchmark'
     description = 'Run JMH benchmarks'
-
     classpath = sourceSets.test.runtimeClasspath
     mainClass = 'org.openjdk.jmh.Main'
     // Optional: Set JVM arguments
     jvmArgs = [
-            '--module-path', classpath.asPath,//"$rootDir/distro/;$rootDir/distro/lib/",
+            '--module-path', "$rootDir/distro/;$rootDir/distro/lib/",
             '--add-modules', "KiCadLogicalSchemeSimulator.simulator",
             '--add-exports', 'KiCadLogicalSchemeSimulator.simulator/pko.KiCadLogicalSchemeSimulator.net.bus=ALL-UNNAMED',
             '--add-exports', 'KiCadLogicalSchemeSimulator.simulator/pko.KiCadLogicalSchemeSimulator.net.wire=ALL-UNNAMED',

@@ -31,11 +31,6 @@
  */
 package pko.KiCadLogicalSchemeSimulator.optimiser;
 import pko.KiCadLogicalSchemeSimulator.Simulator;
-import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
-import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
-import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.net.bus.MaskGroupBus;
-import pko.KiCadLogicalSchemeSimulator.net.bus.SimpleBusToWireAdapter;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 import java.io.*;
@@ -62,19 +57,6 @@ public class ClassOptimiser<T> {
         this.oldInstance = oldInstance;
         //noinspection AssertWithSideEffects,ConstantValue
         assert !(noAssert = false);
-    }
-
-    public static void main(String[] args) {
-        SchemaPart schemaPart = new SchemaPart("Test", "") {
-            @Override
-            public void initOuts() {
-            }
-        };
-        MaskGroupBus out = new MaskGroupBus(new OutBus("test", schemaPart, 4), "test");
-        for (int i = 0; i < 5; i++) {
-            out.addDestination(new SimpleBusToWireAdapter(out, schemaPart.addInPin("in" + i)));
-        }
-        IModelItem<?> opt = out.getOptimised(true);
     }
 
     public ClassOptimiser<T> unroll(int size) {

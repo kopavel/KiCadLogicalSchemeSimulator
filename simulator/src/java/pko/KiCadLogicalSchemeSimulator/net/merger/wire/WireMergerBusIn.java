@@ -41,6 +41,7 @@ import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
+//Todo if source are MaskGroup and we are only one destination - path throe MaskGroup and use mask here directly
 public class WireMergerBusIn extends InBus implements MergerInput<Bus> {
     @Getter
     public long mask;
