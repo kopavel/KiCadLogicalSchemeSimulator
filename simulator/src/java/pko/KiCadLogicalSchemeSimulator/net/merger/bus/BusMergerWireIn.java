@@ -41,6 +41,8 @@ import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
+    protected final long fMask;
+    protected final long fnMask;
     @Getter
     public long mask;
     public long nMask;
@@ -55,6 +57,8 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
         nMask = ~mask;
         this.merger = merger;
         destinations = merger.destinations;
+        fMask = mask;
+        fnMask = ~mask;
     }
 
     /*Optimiser constructor unroll destination:destinations*/
@@ -65,6 +69,8 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
         merger = oldPin.merger;
         destinations = merger.destinations;
         triState = oldPin.triState;
+        fMask = oldPin.fMask;
+        fnMask = oldPin.fnMask;
     }
 
     @Override
@@ -77,8 +83,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                 state,
                 strong,
                 hiImpedance,
-                merger.getName(),
-                merger.state, merger.strongPins, merger.weakState, merger.weakPins);
+                merger.getName(), merger.state, merger.strongPins, merger.weakState, merger.weakPins);
         long mergerState = merger.state;
         /*Optimiser block setters*/
         state = newState;
@@ -166,13 +171,16 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
             merger.state = mergerState;
             /*Optimiser block setters*/
             if (processing) {
+                /*Optimiser block recurse*/
                 if (hasQueue) {
-                    if (Net.stabilizing) {
+                    /*Optimiser blockend recurse*/
+                    if (recurseError()) {
                         return;
                     }
-                    recurseError();
+                    /*Optimiser block recurse*/
                 }
                 hasQueue = true;
+                /*Optimiser blockend recurse*/
             } else {
                 processing = true;
                 /*Optimiser blockend setters*/
@@ -210,8 +218,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                 state,
                 strong,
                 hiImpedance,
-                merger.getName(),
-                merger.state, merger.strongPins, merger.weakState, merger.weakPins);
+                merger.getName(), merger.state, merger.strongPins, merger.weakState, merger.weakPins);
     }
 
     /*Optimiser block iSetter*/
@@ -252,14 +259,16 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
             merger.state = mergerState;
             /*Optimiser block setters*/
             if (processing) {
+                /*Optimiser block recurse*/
                 if (hasQueue) {
-                    if (Net.stabilizing) {
-                        hasQueue = false;
+                    /*Optimiser blockend recurse*/
+                    if (recurseError()) {
                         return;
                     }
-                    recurseError();
+                    /*Optimiser block recurse*/
                 }
                 hasQueue = true;
+                /*Optimiser blockend recurse*/
             } else {
                 processing = true;
                 /*Optimiser blockend setters*/
@@ -321,7 +330,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                 destinations[i].triState = true;
             }
         }
-        ClassOptimiser<BusMergerWireIn> optimiser = new ClassOptimiser<>(this).unroll(merger.destinations.length).bind("mask", mask).bind("nMask", nMask);
+        ClassOptimiser<BusMergerWireIn> optimiser = new ClassOptimiser<>(this).unroll(merger.destinations.length).bind("mask", "fMask").bind("nMask", "fnMask");
         if (!keepSetters) {
             optimiser.cut("setters");
         }

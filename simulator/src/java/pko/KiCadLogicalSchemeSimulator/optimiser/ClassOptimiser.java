@@ -177,7 +177,7 @@ public class ClassOptimiser<T> {
         StringBuilder iteratorSource = new StringBuilder();
         StringBuilder blockSource = new StringBuilder();
         try {
-            for (Iterator<String> lines = source.iterator(); lines.hasNext(); ) {
+            for (ListIterator<String> lines = source.listIterator(); lines.hasNext(); ) {
                 String line = lines.next();
                 if (line.contains("getOptimised(boolean keepSetters)")) {
                     resultSource.append(line).append("\n").append("return this;\n}");
@@ -226,6 +226,10 @@ public class ClassOptimiser<T> {
                                         String superLine = lines.next();//"super" are here
                                         lineOffset = countLeadingSpaces(superLine);
                                         blockSource.append(superLine).append("\n");
+                                        while (!line.trim().equals("}")) { //skip all constructor definition, all are in "super"
+                                            line = lines.next();
+                                        }
+                                        line = lines.previous();
                                     }
                                     case "unroll" -> {
                                         iteratorParams = params[i++].split(":");
@@ -245,7 +249,13 @@ public class ClassOptimiser<T> {
                                                        .append(j)
                                                        .append("];\n");
                                             //add before constructor;
-                                            resultSource.append(blockTab).append(iteratorItemType).append(" ").append(iteratorParams[0]).append(j).append(";\n");
+                                            resultSource.append(blockTab)
+                                                        .append("private final ")
+                                                        .append(iteratorItemType)
+                                                        .append(" ")
+                                                        .append(iteratorParams[0])
+                                                        .append(j)
+                                                        .append(";\n");
                                         }
                                     }
                                     case "bind" -> {

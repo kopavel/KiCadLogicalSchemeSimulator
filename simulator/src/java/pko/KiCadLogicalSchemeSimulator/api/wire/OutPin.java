@@ -32,7 +32,6 @@
 package pko.KiCadLogicalSchemeSimulator.api.wire;
 import pko.KiCadLogicalSchemeSimulator.Simulator;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.net.Net;
 import pko.KiCadLogicalSchemeSimulator.net.wire.NCWire;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
@@ -65,12 +64,8 @@ public class OutPin extends Pin {
     public void setState(boolean newState) {
         state = newState;
         if (processing) {
-            if (hasQueue) {
-                if (Net.stabilizing) {
-                    hasQueue = false;
-                    return;
-                }
-                recurseError();
+            if (hasQueue && recurseError()) {
+                return;
             }
             hasQueue = true;
         } else {

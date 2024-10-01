@@ -32,13 +32,13 @@
 package pko.KiCadLogicalSchemeSimulator.net.bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
-import pko.KiCadLogicalSchemeSimulator.net.Net;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 import java.util.Arrays;
 
 public class MaskGroupBus extends OutBus {
+    protected final long fMask;
     public long queueState;
     protected long maskState;
 
@@ -46,12 +46,14 @@ public class MaskGroupBus extends OutBus {
         super(source, variantId + ":mask" + mask);
         this.mask = mask;
         triState = source.triState;
+        fMask = mask;
     }
 
     /*Optimiser constructor unroll destination:destinations*/
     public MaskGroupBus(OutBus source, String variantId) {
         super(source, variantId);
         triState = source.triState;
+        fMask = source.mask;
     }
 
     public void addDestination(Bus bus) {
@@ -76,15 +78,17 @@ public class MaskGroupBus extends OutBus {
                         maskState != newMaskState) {
             /*Optimiser block setters*/
             if (processing) {
+                /*Optimiser block recurse*/
                 if (hasQueue) {
-                    if (Net.stabilizing) {
+                    /*Optimiser blockend recurse*/
+                    if (recurseError()) {
                         return;
                     }
-                    recurseError();
+                    /*Optimiser block recurse*/
                 }
                 hasQueue = true;
-                /*Optimiser bind v:dState*/
                 queueState = newMaskState;
+                /*Optimiser blockend recurse*/
             } else {
                 processing = true;
                 /*Optimiser blockend setters*/
@@ -122,14 +126,16 @@ public class MaskGroupBus extends OutBus {
         /*Optimiser block setters*/
         hiImpedance = true;
         if (processing) {
+            /*Optimiser block recurse*/
             if (hasQueue) {
-                if (Net.stabilizing) {
-                    hasQueue = false;
+                /*Optimiser blockend recurse*/
+                if (recurseError()) {
                     return;
                 }
-                recurseError();
+                /*Optimiser block recurse*/
             }
             hasQueue = true;
+            /*Optimiser blockend recurse*/
         } else {
             processing = true;
             /*Optimiser blockend setters*/
@@ -161,13 +167,13 @@ public class MaskGroupBus extends OutBus {
         if (destinations.length == 0) {
             throw new RuntimeException("unconnected MaskGroupBus " + getName());
         } else {
-            for (int i = 0; i < destinations.length; i++) {
-                destinations[i] = destinations[i].getOptimised(false);
-            }
             if (Arrays.stream(destinations).allMatch(d -> d instanceof SimpleBusToWireAdapter)) {
                 return new BusToWiresAdapter(this, destinations, mask).getOptimised(keepSetters);
             } else {
-                ClassOptimiser<MaskGroupBus> optimiser = new ClassOptimiser<>(this).unroll(destinations.length).bind("mask", mask).bind("d", "destination0");
+                for (int i = 0; i < destinations.length; i++) {
+                    destinations[i] = destinations[i].getOptimised(false);
+                }
+                ClassOptimiser<MaskGroupBus> optimiser = new ClassOptimiser<>(this).unroll(destinations.length).bind("mask", "fMask").bind("d", "destination0");
                 if (!keepSetters) {
                     optimiser.cut("setters");
                 }

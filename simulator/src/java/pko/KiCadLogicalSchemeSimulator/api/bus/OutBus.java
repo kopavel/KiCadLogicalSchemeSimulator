@@ -33,7 +33,6 @@ package pko.KiCadLogicalSchemeSimulator.api.bus;
 import pko.KiCadLogicalSchemeSimulator.Simulator;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.net.Net;
 import pko.KiCadLogicalSchemeSimulator.net.bus.MaskGroupBus;
 import pko.KiCadLogicalSchemeSimulator.net.bus.NCBus;
 import pko.KiCadLogicalSchemeSimulator.net.bus.OffsetBus;
@@ -106,12 +105,8 @@ public class OutBus extends Bus {
     public void setState(long newState) {
         state = newState;
         if (processing) {
-            if (hasQueue) {
-                if (Net.stabilizing) {
-                    hasQueue = false;
-                    return;
-                }
-                recurseError();
+            if (hasQueue && recurseError()) {
+                return;
             }
             hasQueue = true;
         } else {

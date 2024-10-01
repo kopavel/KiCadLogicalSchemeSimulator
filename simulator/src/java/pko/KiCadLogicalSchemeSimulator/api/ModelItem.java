@@ -33,6 +33,7 @@ package pko.KiCadLogicalSchemeSimulator.api;
 import lombok.Getter;
 import pko.KiCadLogicalSchemeSimulator.Simulator;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.net.Net;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
@@ -74,14 +75,18 @@ public abstract class ModelItem<T> implements IModelItem<T> {
         return getName().compareTo(other.getName());
     }
 
-    public void recurseError() {
-        if (!Simulator.recursive && Utils.notContain(Simulator.recursiveOuts, getName())) {
+    public boolean recurseError() {
+        if (Net.stabilizing) {
+            hasQueue = false;
+            return true;
+        } else if (!Simulator.recursive && Utils.notContain(Simulator.recursiveOuts, getName())) {
             if (!reportedRecurse) {
                 Log.error(this.getClass(),
                         "Recursive event loop detected, enable recurse, passing -r parameter to simulator, for specific out only pass -ro={}",
                         getName());
                 reportedRecurse = true;
             }
+            return false;
         } else {
             throw new RuntimeException("Recursive event loop detected, need implement fair queue");
         }

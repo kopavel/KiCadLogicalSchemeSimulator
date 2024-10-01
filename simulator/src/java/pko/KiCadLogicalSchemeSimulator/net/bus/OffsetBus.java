@@ -32,12 +32,12 @@
 package pko.KiCadLogicalSchemeSimulator.net.bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
-import pko.KiCadLogicalSchemeSimulator.net.Net;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 public class OffsetBus extends OutBus {
-    protected byte offset;
+    protected final byte offset;
+    protected final byte nOffset;
 
     public OffsetBus(OutBus outBus, Bus destination, byte offset) {
         super(outBus, "offset" + offset);
@@ -47,6 +47,7 @@ public class OffsetBus extends OutBus {
         }
         destinations = new Bus[]{destination};
         this.offset = offset;
+        nOffset = (byte) -offset;
     }
 
     /*Optimiser constructor unroll destination:destinations*/
@@ -55,6 +56,7 @@ public class OffsetBus extends OutBus {
         offset = oldBus.offset;
         triState = oldBus.triState;
         destinations = oldBus.destinations;
+        nOffset = oldBus.nOffset;
     }
 
     @Override
@@ -64,13 +66,16 @@ public class OffsetBus extends OutBus {
         /*Optimiser blockend iSetter*/
         state = newState;
         if (processing) {
+            /*Optimiser block recurse*/
             if (hasQueue) {
-                if (Net.stabilizing) {
+                /*Optimiser blockend recurse*/
+                if (recurseError()) {
                     return;
                 }
-                recurseError();
+                /*Optimiser block recurse*/
             }
             hasQueue = true;
+            /*Optimiser blockend recurse*/
         } else {
             processing = true;
             /*Optimiser blockend setters*/
@@ -130,14 +135,16 @@ public class OffsetBus extends OutBus {
         /*Optimiser block setters*/
         hiImpedance = true;
         if (processing) {
+            /*Optimiser block recurse*/
             if (hasQueue) {
-                if (Net.stabilizing) {
-                    hasQueue = false;
+                /*Optimiser blockend recurse*/
+                if (recurseError()) {
                     return;
                 }
-                recurseError();
+                /*Optimiser block recurse*/
             }
             hasQueue = true;
+            /*Optimiser blockend recurse*/
         } else {
             processing = true;
             /*Optimiser blockend setters*/
@@ -187,10 +194,9 @@ public class OffsetBus extends OutBus {
         }
         ClassOptimiser<OffsetBus> optimiser = new ClassOptimiser<>(this).unroll(destinations.length);
         if (offset > 0) {
-            optimiser.bind("offset", offset);
             optimiser.cut("negative");
         } else {
-            optimiser.bind("offset", -offset);
+            optimiser.bind("offset", "nOffset");
             optimiser.cut("positive");
         }
         if (!keepSetters) {
