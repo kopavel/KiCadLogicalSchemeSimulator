@@ -31,10 +31,13 @@
  */
 package pko.KiCadLogicalSchemeSimulator.net.bus;
 import pko.KiCadLogicalSchemeSimulator.Simulator;
+import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
+
+import java.util.Arrays;
 
 public class BusToWiresAdapter extends OutBus {
     public Pin[] destinations = new Pin[0];
@@ -47,12 +50,13 @@ public class BusToWiresAdapter extends OutBus {
         triState = oldBus.triState;
     }
 
-    public BusToWiresAdapter(OutBus outBus, long mask) {
+    public BusToWiresAdapter(OutBus outBus, Bus[] wires, long mask) {
         super(outBus, "BusToWire");
         triState = outBus.triState;
         this.mask = mask;
+        destinations = Arrays.stream(wires)
+                .map(w -> ((SimpleBusToWireAdapter) w).destination).toArray(Pin[]::new);
     }
-
     @Override
     public void setState(long newState) {
         /*Optimiser block setters block iSetter*/

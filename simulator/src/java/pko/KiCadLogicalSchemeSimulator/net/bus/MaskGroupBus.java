@@ -35,6 +35,8 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
+import java.util.Arrays;
+
 public class MaskGroupBus extends OutBus {
     public long queueState;
     protected long maskState;
@@ -160,6 +162,8 @@ public class MaskGroupBus extends OutBus {
     public Bus getOptimised(boolean keepSetters) {
         if (destinations.length == 0) {
             throw new RuntimeException("unconnected MaskGroupBus " + getName());
+        } else if (Arrays.stream(destinations).allMatch(d -> d instanceof SimpleBusToWireAdapter)) {
+            return new BusToWiresAdapter(this, destinations, mask).getOptimised(keepSetters);
         } else {
             for (int i = 0; i < destinations.length; i++) {
                 destinations[i] = destinations[i].getOptimised(false);
