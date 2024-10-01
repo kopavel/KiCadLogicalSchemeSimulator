@@ -32,6 +32,7 @@
 package pko.KiCadLogicalSchemeSimulator.optimiser;
 import lombok.Getter;
 import lombok.Lombok;
+import org.apache.logging.log4j.Logger;
 import pko.KiCadLogicalSchemeSimulator.Simulator;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
@@ -71,8 +72,11 @@ public class JavaCompiler {
             StringBuilder paths = new StringBuilder(path);
             if (System.getProperty("os.name").toLowerCase().contains("win")) {
                 paths.append(";").append(Lombok.class.getProtectionDomain().getCodeSource().getLocation().getFile().substring(1));
+                paths.append(";").append(Logger.class.getProtectionDomain().getCodeSource().getLocation().getFile().substring(1));
+
             } else {
                 paths.append(":").append(Lombok.class.getProtectionDomain().getCodeSource().getLocation().getFile());
+                paths.append(":").append(Logger.class.getProtectionDomain().getCodeSource().getLocation().getFile());
             }
 /* don't need for now
             Simulator.schemaPartSpiMap.values().forEach(spi -> {
@@ -122,11 +126,10 @@ public class JavaCompiler {
         } else {
             Log.error(JavaCompiler.class, "Can't compile source");
             for (final Diagnostic<? extends JavaFileObject> diagnostic : diagnostics.getDiagnostics()) {
-                Log.error(JavaCompiler.class,
-                        "{} at {}:{} -> {}",
+                Log.error(JavaCompiler.class, "{} at {}:{} {} \n   {}",
                         diagnostic.getKind(),
                         diagnostic.getLineNumber(),
-                        diagnostic.getColumnNumber(),
+                        diagnostic.getColumnNumber(), diagnostic.getSource().getName(),
                         diagnostic.getMessage(Locale.getDefault()));
             }
             return false;
