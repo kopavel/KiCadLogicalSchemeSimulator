@@ -1,16 +1,31 @@
 ## Binary Counter
 
-Implements a binary counter with a defined number of outputs.
+Binary counter with a defined amount of outputs.
 
-**Input names**:
+### Pins
 
-- `C` - counter input
-- `R` - reset input
+#### Input names:
 
-**Output names**: Qx, where x is a sequential number, starting from 0.
+- `C` clock input.  
+  sensible to raising edge.
+- `R` reset input
 
-**Mandatory parameter `size`:** Specifies the number of output pins.  
-**Optional parameter `reverse`:** If provided, the `C` input is reversed (sensitive to negative front, positive otherwise).
+#### Output names:
 
-For example, to describe a 4-output counter sensitive to the negative front on the input you would provide the following parameters: `size=4;reverse`.
+- `Qx` outputs.  
+  x — sequential number in range [0…size-1].
+
+### Parameters
+
+#### Mandatory parameters:
+
+- `size` amount of output pins.
+
+#### Optional parameters:
+
+- `reverse` `C` input sensible to falling edge.
+
+### Example
+
+4-output counter, sensible to the negative front on the `C` input: `size=4;reverse`.
  

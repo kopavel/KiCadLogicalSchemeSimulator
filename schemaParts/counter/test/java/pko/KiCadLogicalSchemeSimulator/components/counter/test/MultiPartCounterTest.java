@@ -35,10 +35,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import pko.KiCadLogicalSchemeSimulator.test.schemaPartTester.NetTester;
 
-public class MultiUnitCounterTest extends NetTester {
+public class MultiPartCounterTest extends NetTester {
     @Override
     protected String getNetFilePath() {
-        return "test/resources/MultiUnitCounter.net";
+        return "test/resources/MultiPartCounter.net";
     }
 
     @Override

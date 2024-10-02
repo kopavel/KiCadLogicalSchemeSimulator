@@ -31,9 +31,9 @@
  */
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
 import pko.KiCadLogicalSchemeSimulator.components.counter.CounterSpi;
-import pko.KiCadLogicalSchemeSimulator.components.counter.MultiUnitCounterSpi;
+import pko.KiCadLogicalSchemeSimulator.components.counter.MultiPartCounterSpi;
 
 module KiCadLogicalSchemeSimulator.components.counter {
     requires KiCadLogicalSchemeSimulator.simulator;
-    provides SchemaPartSpi with CounterSpi, MultiUnitCounterSpi;
+    provides SchemaPartSpi with CounterSpi, MultiPartCounterSpi;
 }

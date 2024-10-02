@@ -33,14 +33,14 @@ package pko.KiCadLogicalSchemeSimulator.components.counter;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
 
-public class MultiUnitCounterSpi implements SchemaPartSpi {
+public class MultiPartCounterSpi implements SchemaPartSpi {
     @Override
     public SchemaPart getSchemaPart(String id, String params) {
-        return new MultiUnitCounter(id, params);
+        return new MultiPartCounter(id, params);
     }
 
     @Override
     public Class<? extends SchemaPart> getSchemaPartClass() {
-        return MultiUnitCounter.class;
+        return MultiPartCounter.class;
     }
 }

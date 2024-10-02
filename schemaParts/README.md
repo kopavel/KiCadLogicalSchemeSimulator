@@ -20,6 +20,7 @@ Some interactive parts has additional interfaces/functionality if you click on i
 * [MaskedMultiplexer]( multiplexer%2FmaskedMultiplexer.md) — Multiplexer with a defined amount outputs and ways with masking inputs.
 * [Multiplexer](multiplexer%2FREADME.md) — Multiplexer with a defined amount outputs and ways.
 * [MultiOutDecoder](decoder%2FMultiOutDecoder.md) — Decoder with multiple output pin groups.
+* [MultiPartConter](counter%2FMultiPartCounter.md) — Multipart binary counter.
 * [OrGate](or%2FREADME.md) — Logical OR gate.
 * [Oscillator](oscillator%2FREADME.md) — Oscillator with various modes of operation and oscilloscope.
 * [Power](power%2FREADME.md) — Static output, useful for a pull-up/pull-down resistors.

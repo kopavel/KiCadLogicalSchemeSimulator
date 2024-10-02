@@ -1,17 +1,15 @@
-## AND gate
-
-Implements logical AND gate functionality.
+## Logical AND gate
 
 ### Pins
 
 #### Input names:
 
-- `INx` Gate input  
-  x — input number in range[0…63]
+- `INx` Gate input.  
+  x — input number in range[0…size-1].
 
 #### Output names:
 
-- `OUT` Gate output
+- `OUT` Gate output.
 
 ### Parameters
 
@@ -19,10 +17,10 @@ Implements logical AND gate functionality.
 
 - `size` amount of input pins.
 
-#### Optional parameters
+#### Optional parameters:
 
 - `reverse` reverse output for NAND gate.
 
-### Example:
+### Example
 
 2-input NAND gate: `size=2;reverse`

@@ -1,23 +1,34 @@
 ## Bus Driver
 
-Implements a bus driver with a defined parts amount and pins amount in each part.
+Multipart bus driver (buffer) with a defined pins amount in each part.
 
-**Input names**:
+### Pins
 
-- `OEx` - Output enabled for specific part  
-  x — part name in range [a…z].
-- `Ixn` - input for specific part  
+#### Input names:
+
+- `OEx` Output enabled  
+  x — specific part number in range [a…z].
+- `Ixn` - inputs  
   x — part name in range [a…z].  
-  n — input number in specific part.
+  n — specific part input number in range [0…partSize-1].
 
-**Output names**:
+#### Output names:
 
-- `Oxn` - output for specific parts  
+- `Oxn` outputs  
   x — part name in range [a…z].  
-  n — input number in specific part.
+  n — specific part input number in range [0…partSize-1].
 
-**Mandatory parameter: `size`**: Specifies pin amount in each part as coma separated list.  
-**Optional parameter `reverse`:** If provided, the `OEx` inputs are reversed.
+### Parameters
 
-For example, for two part driver, where part `A` has 4 pins and part `B` has 2 pins provide: `size=4,2`
+#### Mandatory parameters:
+
+- `size` Pin amount in range [0…63] for each part as coma separated list.
+
+#### Optional parameters:
+
+- `reverse` reverse `OEx` inputs
+
+### Example
+
+Two part driver, where part `A` has 4 pins and part `B` has 2 pins: `size=4,2`
  

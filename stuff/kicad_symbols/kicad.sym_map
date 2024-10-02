@@ -375,11 +375,11 @@
 			<unit pinMap="13=R;12=D;11=C;10=S;9=Q;8=~{Q}"/>
 			<unit pinMap="7=NC;14=NC"/>
 		</symbol>
-		<symbol name="74LS92" symPartClass="MultiUnitCounter" symPartParam="sizes=1,3;reverse">
+		<symbol name="74LS92" symPartClass="MultiPartCounter" symPartParam="size=1,3;reverse">
 			<unit pinMap="1=Cb;6=Ra;7=Rb;8=Qb2;9=Qb1;11=Qb0;12=Qa;14=Ca"/>
 			<unit pinMap="5=NC;10=NC"/>
 		</symbol>
-		<symbol name="74LS93" symPartClass="MultiUnitCounter" symPartParam="sizes=1,3;reverse">
+		<symbol name="74LS93" symPartClass="MultiPartCounter" symPartParam="size=1,3;reverse">
 			<unit pinMap="1=Cb;2=Ra;3=Rb;11=Qb2;8=Qb1;9=Qb0;12=Qa;14=Ca"/>
 			<unit pinMap="5=NC;10=NC"/>
 		</symbol>

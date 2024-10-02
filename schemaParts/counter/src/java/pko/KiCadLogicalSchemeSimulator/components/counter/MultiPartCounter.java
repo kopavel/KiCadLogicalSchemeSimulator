@@ -36,17 +36,17 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
-public class MultiUnitCounter extends SchemaPart {
+public class MultiPartCounter extends SchemaPart {
     private final Bus[] outBuses;
     private final Pin[] outPins;
     private final int[] sizes;
 
-    protected MultiUnitCounter(String id, String sParam) {
+    protected MultiPartCounter(String id, String sParam) {
         super(id, sParam);
-        if (!params.containsKey("sizes")) {
-            throw new RuntimeException("Component " + id + " has no parameter \"sizes\"");
+        if (!params.containsKey("size")) {
+            throw new RuntimeException("Component " + id + " has no parameter \"size\"");
         }
-        String[] sSizes = params.get("sizes").split(",");
+        String[] sSizes = params.get("size").split(",");
         outBuses = new Bus[sSizes.length];
         outPins = new Pin[sSizes.length];
         sizes = new int[sSizes.length];
@@ -72,6 +72,15 @@ public class MultiUnitCounter extends SchemaPart {
                             }
                         }
                     });
+                    addInPin(new InPin("R" + (char) ('a' + i), this) {
+                        @Override
+                        public void setState(boolean newState) {
+                            state = newState;
+                            if (!state) {
+                                outPins[finalI].setState(false);
+                            }
+                        }
+                    });
                 } else {
                     addInPin(new InPin("C" + (char) ('a' + i), this) {
                         @Override
@@ -82,16 +91,16 @@ public class MultiUnitCounter extends SchemaPart {
                             }
                         }
                     });
-                }
-                addInPin(new InPin("R" + (char) ('a' + i), this) {
-                    @Override
-                    public void setState(boolean newState) {
-                        state = newState;
-                        if (state) {
-                            outPins[finalI].setState(false);
+                    addInPin(new InPin("R" + (char) ('a' + i), this) {
+                        @Override
+                        public void setState(boolean newState) {
+                            state = newState;
+                            if (state) {
+                                outPins[finalI].setState(false);
+                            }
                         }
-                    }
-                });
+                    });
+                }
             } else {
                 final long countMask = Utils.getMaskForSize(sizes[i]);
                 addOutBus("Q" + (char) ('a' + i), sizes[i]);
@@ -105,6 +114,15 @@ public class MultiUnitCounter extends SchemaPart {
                             }
                         }
                     });
+                    addInPin(new InPin("R" + (char) ('a' + i), this) {
+                        @Override
+                        public void setState(boolean newState) {
+                            state = newState;
+                            if (!state) {
+                                outBuses[finalI].setState(0);
+                            }
+                        }
+                    });
                 } else {
                     addInPin(new InPin("C" + (char) ('a' + i), this) {
                         @Override
@@ -115,16 +133,16 @@ public class MultiUnitCounter extends SchemaPart {
                             }
                         }
                     });
-                }
-                addInPin(new InPin("R" + (char) ('a' + i), this) {
-                    @Override
-                    public void setState(boolean newState) {
-                        state = newState;
-                        if (state) {
-                            outBuses[finalI].setState(0);
+                    addInPin(new InPin("R" + (char) ('a' + i), this) {
+                        @Override
+                        public void setState(boolean newState) {
+                            state = newState;
+                            if (state) {
+                                outBuses[finalI].setState(0);
+                            }
                         }
-                    }
-                });
+                    });
+                }
             }
         }
     }
