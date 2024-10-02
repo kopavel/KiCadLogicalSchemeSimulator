@@ -63,10 +63,16 @@ public class TriStateOutPin extends OutPin {
         hiImpedance = false;
         state = newState;
         if (processing) {
-            if (hasQueue && recurseError()) {
-                return;
+            /*Optimiser block recurse*/
+            if (hasQueue) {
+                /*Optimiser blockEnd recurse*/
+                if (recurseError()) {
+                    return;
+                }
+                /*Optimiser block recurse*/
             }
             hasQueue = true;
+            /*Optimiser blockEnd recurse*/
         } else {
             processing = true;
             for (Pin destination : destinations) {
@@ -85,7 +91,7 @@ public class TriStateOutPin extends OutPin {
                     }
                 }
             }
-            /*Optimiser blockend recurse*/
+            /*Optimiser blockEnd recurse*/
             processing = false;
         }
     }
@@ -95,10 +101,16 @@ public class TriStateOutPin extends OutPin {
         assert !hiImpedance : "Already in hiImpedance:" + this;
         hiImpedance = true;
         if (processing) {
-            if (hasQueue && recurseError()) {
-                return;
+            /*Optimiser block recurse*/
+            if (hasQueue) {
+                /*Optimiser blockEnd recurse*/
+                if (recurseError()) {
+                    return;
+                }
+                /*Optimiser block recurse*/
             }
             hasQueue = true;
+            /*Optimiser blockEnd recurse*/
         } else {
             processing = true;
             for (Pin destination : destinations) {
@@ -117,7 +129,7 @@ public class TriStateOutPin extends OutPin {
                     }
                 }
             }
-            /*Optimiser blockend recurse*/
+            /*Optimiser blockEnd recurse*/
             processing = false;
         }
     }

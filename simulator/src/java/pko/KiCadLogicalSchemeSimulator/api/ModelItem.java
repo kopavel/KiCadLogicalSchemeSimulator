@@ -46,6 +46,8 @@ public abstract class ModelItem<T> implements IModelItem<T> {
     public boolean triState;
     public boolean processing;
     public boolean hasQueue;
+    public boolean groupedByMask;
+    public boolean groupedByOffset;
     private boolean reportedRecurse;
 
     protected ModelItem(String id, SchemaPart parent) {
@@ -90,5 +92,9 @@ public abstract class ModelItem<T> implements IModelItem<T> {
         } else {
             throw new RuntimeException("Recursive event loop detected, need implement fair queue");
         }
+    }
+
+    public boolean useFullOptimiser() {
+        return false;
     }
 }

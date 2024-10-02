@@ -33,10 +33,10 @@ package pko.KiCadLogicalSchemeSimulator.api.bus;
 import pko.KiCadLogicalSchemeSimulator.Simulator;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
+import pko.KiCadLogicalSchemeSimulator.net.bus.BusToWiresAdapter;
 import pko.KiCadLogicalSchemeSimulator.net.bus.MaskGroupBus;
 import pko.KiCadLogicalSchemeSimulator.net.bus.NCBus;
 import pko.KiCadLogicalSchemeSimulator.net.bus.OffsetBus;
-import pko.KiCadLogicalSchemeSimulator.net.bus.SimpleBusToWireAdapter;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
@@ -90,14 +90,22 @@ public class OutBus extends Bus {
 
     public void addDestination(Pin pin, long mask) {
         pin.triState = triState;
-        Arrays.stream(destinations)
+        MaskGroupBus maskGroup = Arrays.stream(destinations)
                 .filter(d -> d instanceof MaskGroupBus)
                 .map(d -> ((MaskGroupBus) d))
                 .filter(d -> d.mask == mask).findFirst().orElseGet(() -> {
-                  MaskGroupBus groupBus = new MaskGroupBus(this, mask, "Mask" + mask);
-                  destinations = Utils.addToArray(destinations, groupBus);
-                  return groupBus;
-              }).addDestination(new SimpleBusToWireAdapter(this, pin));
+                    MaskGroupBus groupBus = new MaskGroupBus(this, mask, "Mask" + mask);
+                    destinations = Utils.addToArray(destinations, groupBus);
+                    return groupBus;
+                });
+        BusToWiresAdapter bus = Arrays.stream(maskGroup.destinations)
+                .filter(d -> d instanceof BusToWiresAdapter)
+                .map(d -> (BusToWiresAdapter) d).findFirst().orElseGet(() -> {
+                    BusToWiresAdapter busToWiresAdapter = new BusToWiresAdapter(this, mask);
+                    maskGroup.destinations = Utils.addToArray(maskGroup.destinations, busToWiresAdapter);
+                    return busToWiresAdapter;
+                });
+        bus.addDestination(pin);
         sort();
     }
 
@@ -105,10 +113,16 @@ public class OutBus extends Bus {
     public void setState(long newState) {
         state = newState;
         if (processing) {
-            if (hasQueue && recurseError()) {
-                return;
+            /*Optimiser block recurse*/
+            if (hasQueue) {
+                /*Optimiser blockEnd recurse*/
+                if (recurseError()) {
+                    return;
+                }
+                /*Optimiser block recurse*/
             }
             hasQueue = true;
+            /*Optimiser blockEnd recurse*/
         } else {
             processing = true;
             for (Bus destination : destinations) {
@@ -121,7 +135,7 @@ public class OutBus extends Bus {
                     destination.setState(state);
                 }
             }
-            /*Optimiser blockend recurse*/
+            /*Optimiser blockEnd recurse*/
             processing = false;
         }
     }

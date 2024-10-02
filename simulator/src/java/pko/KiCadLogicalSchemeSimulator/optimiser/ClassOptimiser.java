@@ -147,26 +147,32 @@ public class ClassOptimiser<T> {
         });
     }
 
+    //ToDo `if` support
     private String process() {
+        Set<String> blocks = new HashSet<>();
+        Map<String, String> bindPatterns = new HashMap<>();
         String iteratorPattern = null;
         String[] iteratorParams = null;
-        boolean preserveBlock = false;
+        boolean preserveFunction = false;
         boolean inAsserts = false;
         boolean inComment = false;
-        int blockOffset = -1;
+        int functionOffset = -1;
         int iteratorOffset = -1;
         StringBuilder resultSource = new StringBuilder();
         StringBuilder iteratorSource = new StringBuilder();
-        StringBuilder blockSource = new StringBuilder();
+        StringBuilder functionSource = new StringBuilder();
         try {
             for (ListIterator<String> lines = source.listIterator(); lines.hasNext(); ) {
                 String line = lines.next();
+                //override getOptimised
                 if (line.contains("getOptimised(boolean keepSetters)")) {
                     resultSource.append(line).append("\n").append("return this;\n}");
                 }
                 int lineOffset = countLeadingSpaces(line);
+                //Copy imports
                 if (line.startsWith("import ") || line.startsWith("package ")) {
                     resultSource.append(line).append("\n");
+                    //skip asserts
                 } else if (noAssert && line.trim().startsWith("assert")) {
                     if (!line.contains(";")) {
                         inAsserts = true; //multiline assert
@@ -175,153 +181,158 @@ public class ClassOptimiser<T> {
                     if (line.contains(";")) {
                         inAsserts = false; //multiline assert end
                     }
-                } else {
-                    if (!line.trim().startsWith("//")) {
-                        if (line.contains("/*Optimiser ")) {
-                            int i = 0;
-                            String oldItemName = null;
-                            Map<String, String> bindPatterns = new HashMap<>();
-                            String[] params = line.substring(line.indexOf("/*Optimiser ") + 12, line.lastIndexOf("*/")).split(" ");
-                            param_loop:
-                            while (i < params.length) {
-                                String command = params[i++];
-                                switch (command) {
-                                    case "block" -> {
-                                        preserveBlock = true;
-                                        String blockName = params[i++];
-                                        if (cutList.contains(blockName)) {
-                                            do {
-                                                line = lines.next();
-                                            } while (!line.contains("/*Optimiser ") ||
-                                                    !(line.contains("blockend " + blockName + "*/") || line.contains("blockend " + blockName + " ")));
-                                            break param_loop;//block removed — don't process more params
-                                        }
+                    //Skip single row comments
+                } else if (!line.trim().startsWith("//")) {
+                    //process optimiser instructions
+                    if (line.contains("/*Optimiser ")) {
+                        int i = 0;
+                        String oldItemName = null;
+                        String[] params = line.substring(line.indexOf("/*Optimiser ") + 12, line.lastIndexOf("*/")).split(" ");
+                        while (i < params.length) {
+                            String command = params[i++];
+                            switch (command) {
+                                case "block" -> {
+                                    String blockName = params[i++];
+                                    blocks.add(blockName);
+                                }
+                                case "blockEnd" -> {
+                                    String blockName = params[i++];
+                                    blocks.remove(blockName);
+                                }
+                                case "constructor" -> {
+                                    preserveFunction = true;
+                                    functionOffset = countLeadingSpaces(line);
+                                    line = lines.next();//load constructor definition
+                                    int paramNamePos = line.indexOf(' ', line.indexOf('('));
+                                    oldItemName = line.substring(paramNamePos, line.indexOf(",", paramNamePos));
+                                    functionSource.append(line.replace(oldInstance.getClass().getSimpleName() + "(",
+                                            oldInstance.getClass().getSimpleName() + suffix + "(")).append("\n");
+                                    String superLine = lines.next();//"super" are here
+                                    lineOffset = countLeadingSpaces(superLine);
+                                    functionSource.append(superLine).append("\n");
+                                    while (!line.trim().equals("}")) { //skip all constructor definition, all are in "super"
+                                        line = lines.next();
                                     }
-                                    case "constructor" -> {
-                                        preserveBlock = true;
-                                        blockOffset = countLeadingSpaces(line);
-                                        line = lines.next();//load constructor definition
-                                        int paramNamePos = line.indexOf(' ', line.indexOf('('));
-                                        oldItemName = line.substring(paramNamePos, line.indexOf(",", paramNamePos));
-                                        blockSource.append(line.replace(oldInstance.getClass().getSimpleName() + "(",
-                                                oldInstance.getClass().getSimpleName() + suffix + "(")).append("\n");
-                                        String superLine = lines.next();//"super" are here
-                                        lineOffset = countLeadingSpaces(superLine);
-                                        blockSource.append(superLine).append("\n");
-                                        while (!line.trim().equals("}")) { //skip all constructor definition, all are in "super"
-                                            line = lines.next();
-                                        }
-                                        line = lines.previous();
-                                    }
-                                    case "unroll" -> {
-                                        iteratorParams = params[i++].split(":");
-                                        String iteratorItemType = getField(oldInstance.getClass(), iteratorParams[1]).getType().getComponentType().getSimpleName();
-                                        iteratorPattern = "for (" + iteratorItemType + " " + iteratorParams[0] + " : " + iteratorParams[1] + ") {";
-                                        String lineTab = " ".repeat(lineOffset);
-                                        String blockTab = " ".repeat(blockOffset);
-                                        for (int j = 0; j < unrollSize; j++) {
-                                            blockSource.append(lineTab)
-                                                       .append(iteratorParams[0])
-                                                       .append(j)
-                                                       .append(" = ")
-                                                       .append(oldItemName)
-                                                       .append(".")
-                                                       .append(iteratorParams[1])
-                                                       .append("[")
-                                                       .append(j)
-                                                       .append("];\n");
-                                            //add before constructor;
-                                            resultSource.append(blockTab)
-                                                        .append("private final ")
-                                                        .append(iteratorItemType)
-                                                        .append(" ")
-                                                        .append(iteratorParams[0])
-                                                        .append(j)
-                                                        .append(";\n");
-                                        }
-                                    }
-                                    case "bind" -> {
-                                        String[] bindParams = params[i++].split(":");
-                                        String bindName = bindParams[0];
-                                        String bindPattern;
-                                        if (bindParams.length == 2) {
-                                            bindPattern = regexEscape(bindParams[1]);
-                                        } else {
-                                            bindPattern = regexEscape(bindName);
-                                        }
-                                        bindPatterns.put(bindPattern, bindName);
+                                    line = lines.previous();
+                                }
+                                case "unroll" -> {
+                                    iteratorParams = params[i++].split(":");
+                                    String iteratorItemType = getField(oldInstance.getClass(), iteratorParams[1]).getType().getComponentType().getSimpleName();
+                                    iteratorPattern = "for (" + iteratorItemType + " " + iteratorParams[0] + " : " + iteratorParams[1] + ") {";
+                                    String lineTab = " ".repeat(lineOffset);
+                                    String blockTab = " ".repeat(functionOffset);
+                                    for (int j = 0; j < unrollSize; j++) {
+                                        //add destination variables initialisation
+                                        functionSource.append(lineTab)
+                                                      .append(iteratorParams[0])
+                                                      .append(j)
+                                                      .append(" = ")
+                                                      .append(oldItemName)
+                                                      .append(".")
+                                                      .append(iteratorParams[1])
+                                                      .append("[")
+                                                      .append(j)
+                                                      .append("];\n");
+                                        //add destination variable definitions
+                                        resultSource.append(blockTab)
+                                                    .append("private final ")
+                                                    .append(iteratorItemType)
+                                                    .append(" ")
+                                                    .append(iteratorParams[0])
+                                                    .append(j)
+                                                    .append(";\n");
                                     }
                                 }
+                                case "bind" -> {
+                                    String[] bindParams = params[i++].split(":");
+                                    String bindName = bindParams[0];
+                                    String bindPattern;
+                                    if (bindParams.length == 2) {
+                                        bindPattern = regexEscape(bindParams[1]);
+                                    } else {
+                                        bindPattern = regexEscape(bindName);
+                                    }
+                                    bindPatterns.put(bindPattern, bindName);
+                                }
                             }
+                        }
+                        //skip block comments
+                    } else if (line.trim().startsWith("/*") || inComment) {
+                        inComment = !line.contains("*/");
+                        // class definition
+                    } else if (line.contains("public class " + oldInstance.getClass().getSimpleName())) {
+                        //rename class definition
+                        resultSource.append("public class ")
+                                    .append(oldInstance.getClass().getSimpleName())
+                                    .append(suffix)
+                                    .append(" extends ")
+                                    .append(oldInstance.getClass().getSimpleName())
+                                    .append(" {\n");
+                        functionOffset = -1;
+                        functionSource = new StringBuilder();
+                        preserveFunction = false;
+                    } else if (!line.trim().isBlank() && functionOffset < 0 && lineOffset > 0) {
+                        //block begin
+                        functionOffset = lineOffset;
+                        functionSource = new StringBuilder(line).append("\n");
+                        preserveFunction = false;
+                    } else if (lineOffset <= functionOffset && !line.isBlank()) {
+                        //function end
+                        if (line.trim().equals("}")) {
+                            functionSource.append(line).append("\n");
+                            if (preserveFunction) {
+                                resultSource.append("\n").append(functionSource);
+                            }
+                            functionOffset = -1;
+                            functionSource = new StringBuilder();
+                        } else {
+                            //non function block — ignore and initialize new one.
+                            functionOffset = lineOffset;
+                            functionSource = new StringBuilder(line).append("\n");
+                        }
+                        preserveFunction = false;
+                    } else {
+                        //cut blocks
+                        if (blocks.stream()
+                                .anyMatch(b -> cutList.contains(b))) {
+                            preserveFunction = true;
+                        } else if (iteratorPattern != null && line.contains(iteratorPattern)) {
+                            //find iterator body — skip iterator definition
+                            iteratorOffset = lineOffset;
+                            preserveFunction = true;
+                            iteratorSource = new StringBuilder();
+                        } else if (lineOffset == iteratorOffset && !functionSource.isEmpty()) {
+                            //iterator block end — unroll it
+                            for (int j = 0; j < unrollSize; j++) {
+                                functionSource.append(iteratorSource.toString().replaceAll("(?<=\\W|^)" + iteratorParams[0] + "(?=\\W|$)", iteratorParams[0] + j));
+                            }
+                            iteratorOffset = -1;
+                        } else {
+                            //binds
                             if (!bindPatterns.isEmpty()) {
-                                line = lines.next();
+                                String oldLine = line;
                                 for (Map.Entry<String, String> bind : bindPatterns.entrySet()) {
                                     if (binds.containsKey(bind.getValue())) {
                                         line = line.replaceAll("(?<=\\W|^)" + bind.getKey() + "(?=\\W|$)", binds.get(bind.getValue()));
                                     }
                                 }
-                                if (iteratorOffset > -1) {
+                                if (!line.equals(oldLine)) {
+                                    preserveFunction = true;
+                                }
+                            }
+                            if (iteratorOffset > -1) {
+                                if (lineOffset > iteratorOffset) {
+                                    //inside iterator block — accumulate whole block
+                                    if (unrollSize == 0) {
+                                        throw new RuntimeException("iterator size not provided");
+                                    }
                                     iteratorSource.append(line).append("\n");
-                                } else {
-                                    blockSource.append(line).append("\n");
                                 }
-                                preserveBlock = true;
-                            }
-                        } else if (line.trim().startsWith("/*") || inComment) {
-                            inComment = !line.contains("*/");
-                        } else if (line.contains("public class " + oldInstance.getClass().getSimpleName())) {
-                            //rename class definition
-                            resultSource.append("public class ")
-                                        .append(oldInstance.getClass().getSimpleName())
-                                        .append(suffix)
-                                        .append(" extends ")
-                                        .append(oldInstance.getClass().getSimpleName())
-                                        .append(" {\n");
-                            blockOffset = -1;
-                            blockSource = new StringBuilder();
-                            preserveBlock = false;
-                        } else if (!line.trim().isBlank() && blockOffset < 0 && lineOffset > 0) {
-                            //block begin
-                            blockOffset = lineOffset;
-                            blockSource = new StringBuilder(line).append("\n");
-                            preserveBlock = false;
-                        } else if (lineOffset <= blockOffset && !line.isBlank()) {
-                            //block end
-                            if (line.trim().equals("}")) {
-                                blockSource.append(line).append("\n");
-                                if (preserveBlock) {
-                                    resultSource.append("\n").append(blockSource);
-                                }
-                                blockOffset = -1;
-                                blockSource = new StringBuilder();
                             } else {
-                                //new block after "one line" block
-                                blockOffset = lineOffset;
-                                blockSource = new StringBuilder(line).append("\n");
+                                functionSource.append(line).append("\n");
                             }
-                            preserveBlock = false;
-                        } else if (iteratorPattern != null && line.contains(iteratorPattern)) {
-                            //find iterator body - skip iterator definition
-                            iteratorOffset = lineOffset;
-                            preserveBlock = true;
-                            iteratorSource = new StringBuilder();
-                        } else if (iteratorOffset > -1) {
-                            if (lineOffset > iteratorOffset) {
-                                if (unrollSize == 0) {
-                                    throw new RuntimeException("iterator size not provided");
-                                }
-                                //inside iterator block — accumulate whole block
-                                iteratorSource.append(line).append("\n");
-                            } else if (lineOffset == iteratorOffset && !blockSource.isEmpty()) {
-                                //iterator block end — unroll it
-                                for (int j = 0; j < unrollSize; j++) {
-                                    blockSource.append(iteratorSource.toString().replaceAll("(?<=\\W|^)" + iteratorParams[0] + "(?=\\W|$)", iteratorParams[0] + j));
-                                }
-                                iteratorOffset = -1;
-                            }
-                        } else {
-                            blockSource.append(line).append("\n");
                         }
+                        bindPatterns.clear();
                     }
                 }
             }

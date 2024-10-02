@@ -64,10 +64,16 @@ public class OutPin extends Pin {
     public void setState(boolean newState) {
         state = newState;
         if (processing) {
-            if (hasQueue && recurseError()) {
-                return;
+            /*Optimiser block recurse*/
+            if (hasQueue) {
+                /*Optimiser blockEnd recurse*/
+                if (recurseError()) {
+                    return;
+                }
+                /*Optimiser block recurse*/
             }
             hasQueue = true;
+            /*Optimiser blockEnd recurse*/
         } else {
             processing = true;
             for (Pin destination : destinations) {
@@ -80,7 +86,7 @@ public class OutPin extends Pin {
                     destination.setState(state);
                 }
             }
-            /*Optimiser blockend recurse*/
+            /*Optimiser blockEnd recurse*/
             processing = false;
         }
     }

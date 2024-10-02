@@ -56,10 +56,16 @@ public class TriStateOutBus extends OutBus {
         hiImpedance = false;
         state = newState;
         if (processing) {
-            if (hasQueue && recurseError()) {
-                return;
+            /*Optimiser block recurse*/
+            if (hasQueue) {
+                /*Optimiser blockEnd recurse*/
+                if (recurseError()) {
+                    return;
+                }
+                /*Optimiser block recurse*/
             }
             hasQueue = true;
+            /*Optimiser blockEnd recurse*/
         } else {
             processing = true;
             for (Bus destination : destinations) {
@@ -78,7 +84,7 @@ public class TriStateOutBus extends OutBus {
                     }
                 }
             }
-            /*Optimiser blockend recurse*/
+            /*Optimiser blockEnd recurse*/
             processing = false;
         }
     }
@@ -88,10 +94,16 @@ public class TriStateOutBus extends OutBus {
         assert !hiImpedance : "Already in hiImpedance:" + this;
         hiImpedance = true;
         if (processing) {
-            if (hasQueue && recurseError()) {
-                return;
+            /*Optimiser block recurse*/
+            if (hasQueue) {
+                /*Optimiser blockEnd recurse*/
+                if (recurseError()) {
+                    return;
+                }
+                /*Optimiser block recurse*/
             }
             hasQueue = true;
+            /*Optimiser blockEnd recurse*/
         } else {
             processing = true;
             for (Bus destination : destinations) {
@@ -110,7 +122,7 @@ public class TriStateOutBus extends OutBus {
                     }
                 }
             }
-            /*Optimiser blockend recurse*/
+            /*Optimiser blockEnd recurse*/
             processing = false;
         }
     }

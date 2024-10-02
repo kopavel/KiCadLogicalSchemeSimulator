@@ -31,13 +31,10 @@
  */
 package pko.KiCadLogicalSchemeSimulator.net.bus;
 import pko.KiCadLogicalSchemeSimulator.Simulator;
-import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
-
-import java.util.Arrays;
 
 public class BusToWiresAdapter extends OutBus {
     public Pin[] destinations = new Pin[0];
@@ -50,53 +47,50 @@ public class BusToWiresAdapter extends OutBus {
         triState = oldBus.triState;
     }
 
-    public BusToWiresAdapter(OutBus outBus, Bus[] wires, long mask) {
+    public BusToWiresAdapter(OutBus outBus, long mask) {
         super(outBus, "BusToWire");
         triState = outBus.triState;
         this.mask = mask;
-        destinations = Arrays.stream(wires)
-                .map(w -> ((SimpleBusToWireAdapter) w).destination).toArray(Pin[]::new);
     }
+
     @Override
     public void setState(long newState) {
         /*Optimiser block setters block iSetter*/
         hiImpedance = false;
-        /*Optimiser blockend iSetter*/
+        /*Optimiser blockEnd iSetter*/
         state = newState;
-        /*Optimiser blockend setters*/
-        /*Optimiser bind m:mask*/
+        /*Optimiser blockEnd setters block mask bind m:mask*/
         final long newMaskState = newState & mask;
         if (
-            /*Optimiser block iSetter*/
-            /*Optimiser bind d:destinations[0]*/
+            /*Optimiser block iSetter bind d:destinations[0]*/
                 destinations[0].hiImpedance ||
-                        /*Optimiser blockend iSetter*///
+                        /*Optimiser blockEnd iSetter */
                         maskState != newMaskState) {
             maskState = newMaskState;
-            /*Optimiser block setters*/
+            /*Optimiser blockEnd mask block setters block allRecurse*/
             if (processing) {
                 /*Optimiser block recurse*/
                 if (hasQueue) {
-                    /*Optimiser blockend recurse*/
+                    /*Optimiser blockEnd recurse*/
                     if (recurseError()) {
                         return;
                     }
                     /*Optimiser block recurse*/
                 }
                 hasQueue = true;
+                /*Optimiser bind nState:newMaskState*/
                 queueState = newMaskState != 0;
-                /*Optimiser blockend recurse*/
+                /*Optimiser blockEnd recurse*/
             } else {
                 processing = true;
-                /*Optimiser blockend setters*/
-                /*Optimiser block dest*/
+                /*Optimiser blockEnd setters  blockEnd allRecurse block dest bind nState:newMaskState*/
                 final boolean dState = newMaskState != 0;
-                /*Optimiser blockend dest*/
+                /*Optimiser blockEnd dest*/
                 for (Pin destination : destinations) {
                     /*Optimiser bind v:dState*/
                     destination.setState(dState);
                 }
-                /*Optimiser block setters block recurse*/
+                /*Optimiser block setters block recurse block allRecurse*/
                 while (hasQueue) {
                     hasQueue = false;
                     /*Optimiser block iSetter*/
@@ -105,19 +99,20 @@ public class BusToWiresAdapter extends OutBus {
                             destination.setHiImpedance();
                         }
                     } else {
-                        /*Optimiser blockend iSetter*/
+                        /*Optimiser blockEnd iSetter*/
                         for (Pin destination : destinations) {
                             destination.setState(queueState);
                         }
                         /*Optimiser block iSetter*/
                     }
-                    /*Optimiser blockend iSetter*/
+                    /*Optimiser blockEnd iSetter*/
                 }
-                /*Optimiser blockend recurse*/
+                /*Optimiser blockEnd recurse*/
                 processing = false;
             }
-            /*Optimiser blockend setters*/
+            /*Optimiser block mask blockEnd setters blockEnd allRecurse*/
         }
+        /*Optimiser blockEnd mask*/
     }
 
     /*Optimiser block iSetter*/
@@ -125,24 +120,25 @@ public class BusToWiresAdapter extends OutBus {
     public void setHiImpedance() {
         /*Optimiser block setters*/
         hiImpedance = true;
+        /*Optimiser block allRecurse*/
         if (processing) {
             /*Optimiser block recurse*/
             if (hasQueue) {
-                /*Optimiser blockend recurse*/
+                /*Optimiser blockEnd recurse*/
                 if (recurseError()) {
                     return;
                 }
                 /*Optimiser block recurse*/
             }
             hasQueue = true;
-            /*Optimiser blockend recurse*/
+            /*Optimiser blockEnd recurse*/
         } else {
             processing = true;
-            /*Optimiser blockend setters*/
+            /*Optimiser blockEnd setters blockEnd allRecurse*/
             for (Pin destination : destinations) {
                 destination.setHiImpedance();
             }
-            /*Optimiser block setters block recurse*/
+            /*Optimiser block setters block recurse block allRecurse*/
             while (hasQueue) {
                 hasQueue = false;
                 if (hiImpedance) {
@@ -155,12 +151,13 @@ public class BusToWiresAdapter extends OutBus {
                     }
                 }
             }
-            /*Optimiser blockend recurse*/
+            /*Optimiser blockEnd recurse*/
             processing = false;
+            /*Optimiser blockEnd allRecurse*/
         }
-        /*Optimiser blockend setters*/
+        /*Optimiser blockEnd setters*/
     }
-    /*Optimiser blockend iSetter*/
+    /*Optimiser blockEnd iSetter*/
 
     public void addDestination(Pin pin) {
         destinations = Utils.addToArray(destinations, pin);
@@ -175,19 +172,34 @@ public class BusToWiresAdapter extends OutBus {
                 destinations[i] = destinations[i].getOptimised(false);
             }
             ClassOptimiser<BusToWiresAdapter> optimiser = new ClassOptimiser<>(this).unroll(destinations.length).bind("m", mask).bind("d", "destination0");
-            if (destinations.length == 1) {
-                optimiser.bind("v", "newMaskState != 0").cut("dest");
-            }
             if (!keepSetters) {
                 optimiser.cut("setters");
             }
             if (!triState) {
                 optimiser.cut("iSetter");
             }
+            if (destinations.length < 2) {
+                optimiser.cut("allRecurse");
+            }
             if (!Simulator.recursive && Utils.notContain(Simulator.recursiveOuts, getName())) {
                 optimiser.cut("recurse");
             }
+            if (groupedByMask) {
+                optimiser.cut("mask").bind("nState", "newState");
+                if (destinations.length == 1) {
+                    optimiser.bind("v", "newState != 0").cut("dest");
+                }
+            } else {
+                if (destinations.length == 1) {
+                    optimiser.bind("v", "newMaskState != 0").cut("dest");
+                }
+            }
             return optimiser.build();
         }
+    }
+
+    @Override
+    public boolean useFullOptimiser() {
+        return true;
     }
 }

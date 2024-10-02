@@ -80,10 +80,9 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
                 merger.weakPins);
         /*Optimiser block setters*/
         state = newState;
-        /*Optimiser blockend setters*/
-        /*Optimiser block sameMask block otherMask*/
+        /*Optimiser blockEnd setters block sameMask block otherMask*/
         if (mask == merger.mask) {
-            /*Optimiser block iSetter blockend otherMask*/
+            /*Optimiser block iSetter blockEnd otherMask*/
             if (hiImpedance) {
                 hiImpedance = false;
                 if (merger.strongPins != 0) {
@@ -98,24 +97,24 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
                 /*Optimiser bind m:mask*/
                 merger.strongPins = mask;
             }
-            /*Optimiser blockend iSetter*/
+            /*Optimiser blockEnd iSetter*/
             if (newState != merger.state) {
                 merger.state = newState;
                 /*Optimiser block setters*/
                 if (processing) {
                     /*Optimiser block recurse*/
                     if (hasQueue) {
-                        /*Optimiser blockend recurse*/
+                        /*Optimiser blockEnd recurse*/
                         if (recurseError()) {
                             return;
                         }
                         /*Optimiser block recurse*/
                     }
                     hasQueue = true;
-                    /*Optimiser blockend recurse*/
+                    /*Optimiser blockEnd recurse*/
                 } else {
                     processing = true;
-                    /*Optimiser blockend setters*/
+                    /*Optimiser blockEnd setters*/
                     for (Bus destination : destinations) {
                         destination.setState(newState);
                     }
@@ -128,22 +127,22 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
                                 destination.setHiImpedance();
                             }
                         } else {
-                            /*Optimiser blockend iSetter*/
+                            /*Optimiser blockEnd iSetter*/
                             for (Bus destination : destinations) {
                                 destination.setState(state);
                             }
                             /*Optimiser block iSetter*/
                         }
-                        /*Optimiser blockend iSetter*/
+                        /*Optimiser blockEnd iSetter*/
                     }
-                    /*Optimiser blockend recurse*/
+                    /*Optimiser blockEnd recurse*/
                     processing = false;
                 }
-                /*Optimiser blockend setters*/
+                /*Optimiser blockEnd setters*/
             }
             /*Optimiser block otherMask*/
         } else {
-            /*Optimiser blockend sameMask*/
+            /*Optimiser blockEnd sameMask*/
             long mergerState = merger.state;
             /*Optimiser block iSetter*/
             if (hiImpedance) {
@@ -161,8 +160,7 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
                 /*Optimiser bind m:mask*/
                 merger.strongPins |= mask;
             }
-            /*Optimiser blockend iSetter*/
-            /*Optimiser bind nm:nMask*/
+            /*Optimiser blockEnd iSetter bind nm:nMask*/
             mergerState &= nMask;
             //ToDo if we are after maskGroup - don't use mask here
             /*Optimiser bind m:mask*/
@@ -173,17 +171,17 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
                 if (processing) {
                     /*Optimiser block recurse*/
                     if (hasQueue) {
-                        /*Optimiser blockend recurse*/
+                        /*Optimiser blockEnd recurse*/
                         if (recurseError()) {
                             return;
                         }
                         /*Optimiser block recurse*/
                     }
                     hasQueue = true;
-                    /*Optimiser blockend recurse*/
+                    /*Optimiser blockEnd recurse*/
                 } else {
                     processing = true;
-                    /*Optimiser blockend setters*/
+                    /*Optimiser blockEnd setters*/
                     for (Bus destination : destinations) {
                         destination.setState(mergerState);
                     }
@@ -196,22 +194,22 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
                                 destination.setHiImpedance();
                             }
                         } else {
-                            /*Optimiser blockend iSetter*/
+                            /*Optimiser blockEnd iSetter*/
                             for (Bus destination : destinations) {
                                 destination.setState(merger.state);
                             }
                             /*Optimiser block iSetter*/
                         }
-                        /*Optimiser blockend iSetter*/
+                        /*Optimiser blockEnd iSetter*/
                     }
-                    /*Optimiser blockend recurse*/
+                    /*Optimiser blockEnd recurse*/
                     processing = false;
                 }
-                /*Optimiser blockend setters*/
+                /*Optimiser blockEnd setters*/
             }
             /*Optimiser block sameMask*/
         }
-        /*Optimiser blockend sameMask blockend otherMask*/
+        /*Optimiser blockEnd sameMask blockEnd otherMask*/
         assert Log.debug(this.getClass(),
                 "Bus merger change. after: newState:{}, Source:{} (state:{},  hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{})",
                 newState,
@@ -243,7 +241,7 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
         }
         /*Optimiser block sameMask block otherMask*/
         if (mask == merger.mask) {
-            /*Optimiser blockend otherMask*/
+            /*Optimiser blockEnd otherMask*/
             merger.strongPins = 0;
             if (merger.weakState != merger.state) {
                 merger.state = merger.weakState;
@@ -251,17 +249,17 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
                 if (processing) {
                     /*Optimiser block recurse*/
                     if (hasQueue) {
-                        /*Optimiser blockend recurse*/
+                        /*Optimiser blockEnd recurse*/
                         if (recurseError()) {
                             return;
                         }
                         /*Optimiser block recurse*/
                     }
                     hasQueue = true;
-                    /*Optimiser blockend recurse*/
+                    /*Optimiser blockEnd recurse*/
                 } else {
                     processing = true;
-                    /*Optimiser blockend setters*/
+                    /*Optimiser blockEnd setters*/
                     for (Bus destination : destinations) {
                         destination.setState(merger.state);
                     }
@@ -278,14 +276,14 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
                             }
                         }
                     }
-                    /*Optimiser blockend recurse*/
+                    /*Optimiser blockEnd recurse*/
                     processing = false;
                 }
-                /*Optimiser blockend setters*/
+                /*Optimiser blockEnd setters*/
             }
             /*Optimiser block otherMask*/
         } else {
-            /*Optimiser blockend sameMask*/
+            /*Optimiser blockEnd sameMask*/
             long mergerState = merger.state;
             /*Optimiser bind nm:nMask*/
             merger.strongPins &= nMask;
@@ -299,17 +297,17 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
                 if (processing) {
                     /*Optimiser block recurse*/
                     if (hasQueue) {
-                        /*Optimiser blockend recurse*/
+                        /*Optimiser blockEnd recurse*/
                         if (recurseError()) {
                             return;
                         }
                         /*Optimiser block recurse*/
                     }
                     hasQueue = true;
-                    /*Optimiser blockend recurse*/
+                    /*Optimiser blockEnd recurse*/
                 } else {
                     processing = true;
-                    /*Optimiser blockend setters*/
+                    /*Optimiser blockEnd setters*/
                     for (Bus destination : destinations) {
                         destination.setState(mergerState);
                     }
@@ -326,14 +324,14 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
                             }
                         }
                     }
-                    /*Optimiser blockend recurse*/
+                    /*Optimiser blockEnd recurse*/
                     processing = false;
                 }
-                /*Optimiser blockend setters*/
+                /*Optimiser blockEnd setters*/
             }
             /*Optimiser block sameMask*/
         }
-        /*Optimiser blockend sameMask blockend otherMask*/
+        /*Optimiser blockEnd sameMask blockEnd otherMask*/
         hiImpedance = true;
         assert Log.debug(this.getClass(),
                 "Bus merger setImpedance. after: Source:{} (state:{},  hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{})",
@@ -346,7 +344,7 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
                 merger.weakState,
                 merger.weakPins);
     }
-    /*Optimiser blockend iSetter*/
+    /*Optimiser blockEnd iSetter*/
 
     @Override
     public void resend() {

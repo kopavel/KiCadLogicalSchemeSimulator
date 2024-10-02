@@ -60,36 +60,34 @@ public class OffsetBus extends OutBus {
     public void setState(long newState) {
         /*Optimiser block setters block iSetter*/
         hiImpedance = false;
-        /*Optimiser blockend iSetter*/
+        /*Optimiser blockEnd iSetter*/
         state = newState;
         if (processing) {
             /*Optimiser block recurse*/
             if (hasQueue) {
-                /*Optimiser blockend recurse*/
+                /*Optimiser blockEnd recurse*/
                 if (recurseError()) {
                     return;
                 }
                 /*Optimiser block recurse*/
             }
             hasQueue = true;
-            /*Optimiser blockend recurse*/
+            /*Optimiser blockEnd recurse*/
         } else {
             processing = true;
-            /*Optimiser blockend setters*/
+            /*Optimiser blockEnd setters*/
             for (Bus destination : destinations) {
                 /*Optimiser block positive block negative*/
                 if (offset > 0) {
-                    /*Optimiser blockend negative*/
-                    /*Optimiser bind o:offset*/
+                    /*Optimiser blockEnd negative bind o:offset*/
                     destination.setState(newState << offset);
                     /*Optimiser block negative*/
                 } else {
-                    /*Optimiser blockend positive*/
-                    /*Optimiser bind o:-offset*/
+                    /*Optimiser blockEnd positive bind o:-offset*/
                     destination.setState(newState >> -offset);
                     /*Optimiser block positive*/
                 }
-                /*Optimiser blockend positive blockend negative*/
+                /*Optimiser blockEnd positive blockEnd negative*/
             }
             /*Optimiser block setters block recurse*/
             while (hasQueue) {
@@ -100,30 +98,28 @@ public class OffsetBus extends OutBus {
                         destination.setHiImpedance();
                     }
                 } else {
-                    /*Optimiser blockend iSetter*/
+                    /*Optimiser blockEnd iSetter*/
                     for (Bus destination : destinations) {
                         /*Optimiser block positive block negative*/
                         if (offset > 0) {
-                            /*Optimiser blockend negative*/
-                            /*Optimiser bind o:offset*/
+                            /*Optimiser blockEnd negative bind o:offset*/
                             destination.setState(state << offset);
                             /*Optimiser block negative*/
                         } else {
-                            /*Optimiser blockend positive*/
-                            /*Optimiser bind o:-offset*/
+                            /*Optimiser blockEnd positive bind o:-offset*/
                             destination.setState(state >> -offset);
                             /*Optimiser block positive*/
                         }
-                        /*Optimiser blockend positive blockend negative*/
+                        /*Optimiser blockEnd positive blockEnd negative*/
                     }
                     /*Optimiser block iSetter*/
                 }
-                /*Optimiser blockend iSetter*/
+                /*Optimiser blockEnd iSetter*/
             }
-            /*Optimiser blockend recurse*/
+            /*Optimiser blockEnd recurse*/
             processing = false;
         }
-        /*Optimiser blockend setters*/
+        /*Optimiser blockEnd setters*/
     }
 
     /*Optimiser block iSetter*/
@@ -134,17 +130,17 @@ public class OffsetBus extends OutBus {
         if (processing) {
             /*Optimiser block recurse*/
             if (hasQueue) {
-                /*Optimiser blockend recurse*/
+                /*Optimiser blockEnd recurse*/
                 if (recurseError()) {
                     return;
                 }
                 /*Optimiser block recurse*/
             }
             hasQueue = true;
-            /*Optimiser blockend recurse*/
+            /*Optimiser blockEnd recurse*/
         } else {
             processing = true;
-            /*Optimiser blockend setters*/
+            /*Optimiser blockEnd setters*/
             for (Bus destination : destinations) {
                 destination.setHiImpedance();
             }
@@ -159,26 +155,24 @@ public class OffsetBus extends OutBus {
                     for (Bus destination : destinations) {
                         /*Optimiser block positive block negative*/
                         if (offset > 0) {
-                            /*Optimiser blockend negative*/
-                            /*Optimiser bind o:offset*/
+                            /*Optimiser blockEnd negative bind o:offset*/
                             destination.setState(state << offset);
                             /*Optimiser block negative*/
                         } else {
-                            /*Optimiser blockend positive*/
-                            /*Optimiser bind o:-offset*/
+                            /*Optimiser blockEnd positive bind o:-offset*/
                             destination.setState(state >> -offset);
                             /*Optimiser block positive*/
                         }
-                        /*Optimiser blockend positive blockend negative*/
+                        /*Optimiser blockEnd positive blockEnd negative*/
                     }
                 }
             }
-            /*Optimiser blockend recurse*/
+            /*Optimiser blockEnd recurse*/
             processing = false;
         }
-        /*Optimiser blockend setters*/
+        /*Optimiser blockEnd setters*/
     }
-    /*Optimiser blockend iSetter*/
+    /*Optimiser blockEnd iSetter*/
 
     public void addDestination(Bus item) {
         destinations = Utils.addToArray(destinations, item);
