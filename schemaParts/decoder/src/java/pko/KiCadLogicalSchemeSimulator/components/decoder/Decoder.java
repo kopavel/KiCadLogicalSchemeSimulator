@@ -48,6 +48,7 @@ public class Decoder extends SchemaPart {
         int inSize = Integer.parseInt(params.get("size"));
         InBus aBus;
         if (params.containsKey("outReverse")) {
+            outState = ~1;
             aBus = addInBus(new InBus("A", this, inSize) {
                 @Override
                 public void setState(long newState) {
@@ -59,6 +60,7 @@ public class Decoder extends SchemaPart {
                 }
             });
         } else {
+            outState = 1;
             aBus = addInBus(new InBus("A", this, inSize) {
                 @Override
                 public void setState(long newState) {
