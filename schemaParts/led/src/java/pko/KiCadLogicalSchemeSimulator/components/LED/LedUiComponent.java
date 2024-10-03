@@ -30,7 +30,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.LED;
-import lombok.Setter;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.AbstractUiComponent;
 
 import java.awt.*;
@@ -42,8 +41,7 @@ public class LedUiComponent extends AbstractUiComponent {
     private final Color on;
     private final Color off;
     private Ellipse2D circle;
-    @Setter
-    private boolean state;
+    public boolean state;
 
     public LedUiComponent(int size, Color on, Color off, String title) {
         super(title, size);

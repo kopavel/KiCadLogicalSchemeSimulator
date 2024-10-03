@@ -44,9 +44,7 @@ public class Repeater extends SchemaPart {
                 @Override
                 public void setState(boolean newState) {
                     state = newState;
-                    if (out.state == newState) {
-                        out.setState(!newState);
-                    }
+                    out.setState(!newState);
                 }
             });
         } else {
@@ -54,9 +52,7 @@ public class Repeater extends SchemaPart {
                 @Override
                 public void setState(boolean newState) {
                     state = newState;
-                    if (out.state != newState) {
-                        out.setState(newState);
-                    }
+                    out.setState(newState);
                 }
             });
         }
