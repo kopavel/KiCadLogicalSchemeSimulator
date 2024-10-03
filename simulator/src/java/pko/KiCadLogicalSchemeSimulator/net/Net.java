@@ -414,16 +414,21 @@ public class Net {
             for (int i = 0; i < symbolDesc.units.size(); i++) {
                 String unit = symbolDesc.units.get(i);
                 String name;
-                if (symbolDesc.units.size() == 1) {
+                if (symbolDesc.units.stream()
+                        .filter(u -> !u.startsWith("power;")).count() == 1) {
                     name = id;
                 } else {
                     name = id + "_" + (char) ('A' + i);
                 }
                 SchemaPart schemaPart = getSchemaPart(className, name, parameters);
-                schemaParts.put(schemaPart.id, schemaPart);
                 for (String pinMapInfo : unit.split(";")) {
-                    String[] mapInfo = pinMapInfo.split("=");
-                    schemaPartPinMap.computeIfAbsent(id, s -> new HashMap<>()).put(mapInfo[0], new PinMapDescriptor(mapInfo[1], schemaPart));
+                    if (!pinMapInfo.equals("power")) {
+                        String[] mapInfo = pinMapInfo.split("=");
+                        schemaPartPinMap.computeIfAbsent(id, s -> new HashMap<>()).put(mapInfo[0], new PinMapDescriptor(mapInfo[1], schemaPart));
+                    }
+                }
+                if (!unit.startsWith("power;")) {
+                    schemaParts.put(schemaPart.id, schemaPart);
                 }
             }
         }

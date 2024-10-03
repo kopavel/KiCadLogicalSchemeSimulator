@@ -91,7 +91,7 @@ public class ClassOptimiser<T> {
     @SuppressWarnings("unchecked")
     public T build() {
         try {
-            if (suffix.isBlank()) {
+            if (suffix.isBlank() || Simulator.noOptimiser) {
                 return oldInstance;
             }
             if (!noAssert) {

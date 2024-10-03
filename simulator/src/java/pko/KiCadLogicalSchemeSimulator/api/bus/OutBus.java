@@ -112,6 +112,7 @@ public class OutBus extends Bus {
     @Override
     public void setState(long newState) {
         state = newState;
+        /*Optimiser block allRecurse*/
         if (processing) {
             /*Optimiser block recurse*/
             if (hasQueue) {
@@ -125,10 +126,11 @@ public class OutBus extends Bus {
             /*Optimiser blockEnd recurse*/
         } else {
             processing = true;
+            /*Optimiser blockEnd allRecurse*/
             for (Bus destination : destinations) {
                 destination.setState(newState);
             }
-            /*Optimiser block recurse*/
+            /*Optimiser block recurse block allRecurse*/
             while (hasQueue) {
                 hasQueue = false;
                 for (Bus destination : destinations) {
@@ -138,6 +140,7 @@ public class OutBus extends Bus {
             /*Optimiser blockEnd recurse*/
             processing = false;
         }
+        /*Optimiser blockEnd allRecurse*/
     }
 
     @Override
@@ -163,7 +166,9 @@ public class OutBus extends Bus {
                 destinations[i] = destinations[i].getOptimised(false);
             }
             ClassOptimiser<OutBus> optimiser = new ClassOptimiser<>(this).unroll(destinations.length);
-            if (!Simulator.recursive && Utils.notContain(Simulator.recursiveOuts, getName())) {
+            if (Simulator.noRecursive) {
+                optimiser.cut("allRecurse");
+            } else if (!Simulator.recursive && Utils.notContain(Simulator.recursiveOuts, getName())) {
                 optimiser.cut("recurse");
             }
             return optimiser.build();

@@ -87,7 +87,7 @@ public class MaskGroupBus extends OutBus {
                 /*Optimiser blockEnd setters*/
                 maskState = newMaskState;
                 for (Bus destination : destinations) {
-                    destination.setState(maskState);
+                    destination.setState(newMaskState);
                 }
                 /*Optimiser block setters block recurse*/
                 while (hasQueue) {
@@ -160,10 +160,10 @@ public class MaskGroupBus extends OutBus {
         if (destinations.length == 0) {
             throw new RuntimeException("unconnected MaskGroupBus " + getName());
         } else if (destinations.length == 1 && destinations[0].useFullOptimiser()) {
+            destinations[0].groupByMask = mask;
             return destinations[0].getOptimised(keepSetters);
         } else {
             for (int i = 0; i < destinations.length; i++) {
-                destinations[i].groupedByMask = true;
                 destinations[i] = destinations[i].getOptimised(false);
             }
             ClassOptimiser<MaskGroupBus> optimiser = new ClassOptimiser<>(this).unroll(destinations.length).bind("m", mask).bind("d", "destination0");

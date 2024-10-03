@@ -44,4 +44,6 @@ import lombok.Setter;
 public class Unit {
     @XmlAttribute
     String pinMap;
+    @XmlAttribute
+    boolean power;
 }

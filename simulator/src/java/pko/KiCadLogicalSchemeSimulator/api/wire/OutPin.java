@@ -77,7 +77,7 @@ public class OutPin extends Pin {
         } else {
             processing = true;
             for (Pin destination : destinations) {
-                destination.setState(state);
+                destination.setState(newState);
             }
             /*Optimiser block recurse*/
             while (hasQueue) {

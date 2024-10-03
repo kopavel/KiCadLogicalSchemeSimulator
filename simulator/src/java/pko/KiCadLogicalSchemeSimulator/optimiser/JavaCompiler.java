@@ -73,7 +73,6 @@ public class JavaCompiler {
             if (System.getProperty("os.name").toLowerCase().contains("win")) {
                 paths.append(";").append(Lombok.class.getProtectionDomain().getCodeSource().getLocation().getFile().substring(1));
                 paths.append(";").append(Logger.class.getProtectionDomain().getCodeSource().getLocation().getFile().substring(1));
-
             } else {
                 paths.append(":").append(Lombok.class.getProtectionDomain().getCodeSource().getLocation().getFile());
                 paths.append(":").append(Logger.class.getProtectionDomain().getCodeSource().getLocation().getFile());
@@ -126,11 +125,17 @@ public class JavaCompiler {
         } else {
             Log.error(JavaCompiler.class, "Can't compile source");
             for (final Diagnostic<? extends JavaFileObject> diagnostic : diagnostics.getDiagnostics()) {
-                Log.error(JavaCompiler.class, "{} at {}:{} {} \n   {}",
-                        diagnostic.getKind(),
-                        diagnostic.getLineNumber(),
-                        diagnostic.getColumnNumber(), diagnostic.getSource().getName(),
-                        diagnostic.getMessage(Locale.getDefault()));
+                if (diagnostic.getPosition() >= 0) {
+                    Log.error(JavaCompiler.class,
+                            "{} at {}:{} {} \n   {}",
+                            diagnostic.getKind(),
+                            diagnostic.getLineNumber(),
+                            diagnostic.getColumnNumber(),
+                            diagnostic.getSource().getName(),
+                            diagnostic.getMessage(Locale.getDefault()));
+                } else {
+                    Log.error(JavaCompiler.class, "{}: {}", diagnostic.getKind(), diagnostic.getMessage(Locale.getDefault()));
+                }
             }
             return false;
         }

@@ -66,6 +66,10 @@ public class Simulator implements Runnable {
     public static String optimisedDir = "optimised";
     @CommandLine.Option(names = {"-r", "--recursive"}, description = "Enable recursive event processing, slower simulation")
     public static boolean recursive;
+    @CommandLine.Option(names = {"-rd", "--recursive-disabled"}, description = "Disable recursive support completely, some speedup")
+    public static boolean noRecursive;
+    @CommandLine.Option(names = {"-do", "--disable-optimiser"}, description = "Disable code optimiser")
+    public static boolean noOptimiser;
     @CommandLine.Option(names = {"-ro",
             "--recursiveOut"}, description = "Enable recursive event processing for specific part output only, can be specified multiple times, slower simulation")
     public static String[] recursiveOuts;

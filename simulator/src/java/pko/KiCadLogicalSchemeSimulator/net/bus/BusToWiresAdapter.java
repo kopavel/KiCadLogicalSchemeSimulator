@@ -171,20 +171,21 @@ public class BusToWiresAdapter extends OutBus {
             for (int i = 0; i < destinations.length; i++) {
                 destinations[i] = destinations[i].getOptimised(false);
             }
-            ClassOptimiser<BusToWiresAdapter> optimiser = new ClassOptimiser<>(this).unroll(destinations.length).bind("m", mask).bind("d", "destination0");
+            ClassOptimiser<BusToWiresAdapter> optimiser = new ClassOptimiser<>(this).unroll(destinations.length).bind("m", mask);
             if (!keepSetters) {
                 optimiser.cut("setters");
             }
             if (!triState) {
                 optimiser.cut("iSetter");
+            } else {
+                optimiser.bind("d", "destination0");
             }
-            if (destinations.length < 2) {
+            if (destinations.length < 2 || Simulator.noRecursive) {
                 optimiser.cut("allRecurse");
-            }
-            if (!Simulator.recursive && Utils.notContain(Simulator.recursiveOuts, getName())) {
+            } else if (!Simulator.recursive && Utils.notContain(Simulator.recursiveOuts, getName())) {
                 optimiser.cut("recurse");
             }
-            if (groupedByMask) {
+            if (groupByMask == 0) {
                 optimiser.cut("mask").bind("nState", "newState");
                 if (destinations.length == 1) {
                     optimiser.bind("v", "newState != 0").cut("dest");
