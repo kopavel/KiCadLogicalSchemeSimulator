@@ -45,6 +45,7 @@ import static pko.KiCadLogicalSchemeSimulator.tools.Utils.countLeadingSpaces;
 import static pko.KiCadLogicalSchemeSimulator.tools.Utils.regexEscape;
 
 public class ClassOptimiser<T> {
+    private static final Map<String, Class<?>> dynamicClasses = new HashMap<>();
     private final Map<String, String> binds = new HashMap<>();
     private final T oldInstance;
     List<String> cutList = new ArrayList<>();
@@ -98,27 +99,30 @@ public class ClassOptimiser<T> {
                 suffix += "_ae";
             }
             String optimizedClassName = oldInstance.getClass().getSimpleName() + suffix;
-            Class<?> dynamicClass;
-            try {
-                dynamicClass = Class.forName(oldInstance.getClass().getName() + suffix);
-            } catch (ClassNotFoundException ignored) {
-                Log.trace(JavaCompiler.class, "Load source for {}", oldInstance.getClass().getSimpleName());
-                loadSource(oldInstance.getClass());
-                Log.trace(JavaCompiler.class, "Process");
-                String optimisedSource = process();
-                Log.trace(JavaCompiler.class, "Compile");
+            String optimizedFullClassName = oldInstance.getClass().getPackageName() + ".optimised." + oldInstance.getClass().getSimpleName() + suffix;
+            Class<?> dynamicClass = dynamicClasses.get(optimizedFullClassName);
+            if (dynamicClass == null) {
                 try {
-                    storeSrc(oldInstance.getClass().getName() + suffix, optimisedSource);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                if (JavaCompiler.compileJavaSource(oldInstance.getClass(), optimizedClassName, optimisedSource)) {
-                    Log.trace(JavaCompiler.class, "Return instance");
-                    dynamicClass = Class.forName(oldInstance.getClass().getName() + suffix);
-                } else {
-                    Log.error(JavaCompiler.class,
-                            "Optimised class compile was not successful, fall back to generic class, file name:" + oldInstance.getClass().getName() + suffix);
-                    return oldInstance;
+                    dynamicClass = Class.forName(optimizedFullClassName);
+                } catch (ClassNotFoundException ignored) {
+                    Log.trace(JavaCompiler.class, "Load source for {}", oldInstance.getClass().getSimpleName());
+                    loadSource(oldInstance.getClass());
+                    Log.trace(JavaCompiler.class, "Process");
+                    String optimisedSource = process();
+                    Log.trace(JavaCompiler.class, "Compile");
+                    try {
+                        storeSrc(optimizedFullClassName, optimisedSource);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    dynamicClass = JavaCompiler.compileJavaSource(oldInstance.getClass(), optimizedFullClassName, optimizedClassName, optimisedSource);
+                    if (dynamicClass == null) {
+                        Log.error(JavaCompiler.class, "Optimised class compile was not successful, fall back to generic class, file name:" + optimizedFullClassName);
+                        return oldInstance;
+                    } else {
+                        Log.trace(JavaCompiler.class, "Return instance");
+                        dynamicClasses.put(optimizedFullClassName, dynamicClass);
+                    }
                 }
             }
             // Create an instance and invoke the overridden method
@@ -170,8 +174,13 @@ public class ClassOptimiser<T> {
                 }
                 int lineOffset = countLeadingSpaces(line);
                 //Copy imports
-                if (line.startsWith("import ") || line.startsWith("package ")) {
+                if (line.startsWith("import ")) {
                     resultSource.append(line).append("\n");
+                    //skip asserts
+                } else if (line.startsWith("package ")) {
+                    line = line.replace(";", ".optimised;");
+                    resultSource.append(line).append("\n");
+                    resultSource.append("import ").append(oldInstance.getClass().getPackageName()).append(".*;\n");
                     //skip asserts
                 } else if (noAssert && line.trim().startsWith("assert")) {
                     if (!line.contains(";")) {

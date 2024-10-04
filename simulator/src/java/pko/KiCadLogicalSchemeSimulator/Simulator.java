@@ -50,6 +50,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.*;
@@ -58,6 +59,7 @@ import java.util.stream.Collectors;
 @CommandLine.Command(name = "", description = "Start Kicad scheme interactive simulation")
 public class Simulator implements Runnable {
     private static final Map<String, SchemaPartMonitor> monitoredParts = new HashMap<>();
+    private static final Method addReadsMethod;
     public static Map<String, SchemaPartSpi> schemaPartSpiMap;
     public static MainUI ui;
     public static String netFilePathNoExtension;
@@ -73,6 +75,14 @@ public class Simulator implements Runnable {
     @CommandLine.Option(names = {"-ro",
             "--recursiveOut"}, description = "Enable recursive event processing for specific part output only, can be specified multiple times, slower simulation")
     public static String[] recursiveOuts;
+    static {
+        try {
+            addReadsMethod = Module.class.getDeclaredMethod("implAddReads", Module.class);
+            addReadsMethod.setAccessible(true);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+    }
     @CommandLine.Parameters(index = "0", arity = "1", description = "Path to KiCad NET file")
     public String netFilePath;
     @CommandLine.Option(names = {"-m", "--mapFile"}, description = "Path to KiCad symbol mapping file")
@@ -186,6 +196,19 @@ public class Simulator implements Runnable {
                     .stream()
                     .map(ServiceLoader.Provider::get)
                     .collect(Collectors.toMap(spi -> spi.getSchemaPartClass().getSimpleName(), spi -> spi));
+            Module module = Simulator.class.getModule();
+            schemaPartSpiMap.values()
+                    .stream()
+                    .map(Object::getClass)
+                    .map(Class::getModule).forEach(spiModule -> {
+                                if (!module.getName().equals(spiModule.getName())) {
+                                    try {
+                                        addReadsMethod.invoke(module, spiModule);
+                                    } catch (IllegalAccessException | InvocationTargetException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                }
+                            });
             if (!new File(netFilePath).exists()) {
                 throw new Exception("Cant fine NET file " + netFilePath);
             }

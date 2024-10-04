@@ -44,6 +44,10 @@ module KiCadLogicalSchemeSimulator.simulator {
     exports pko.KiCadLogicalSchemeSimulator;
     exports pko.KiCadLogicalSchemeSimulator.ui.main;
     opens pko.KiCadLogicalSchemeSimulator.net;
+    opens pko.KiCadLogicalSchemeSimulator.net.bus;
+    opens pko.KiCadLogicalSchemeSimulator.net.wire;
+    opens pko.KiCadLogicalSchemeSimulator.net.merger.bus;
+    opens pko.KiCadLogicalSchemeSimulator.net.merger.wire;
     opens pko.KiCadLogicalSchemeSimulator.optimiser;
     opens pko.KiCadLogicalSchemeSimulator.parsers.pojo.symbolMap;
     opens pko.KiCadLogicalSchemeSimulator.parsers.pojo;

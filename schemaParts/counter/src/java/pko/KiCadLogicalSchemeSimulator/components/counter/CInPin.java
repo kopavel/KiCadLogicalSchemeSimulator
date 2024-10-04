@@ -31,57 +31,51 @@
  */
 package pko.KiCadLogicalSchemeSimulator.components.counter;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
-import pko.KiCadLogicalSchemeSimulator.tools.Utils;
+import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 
-public class Counter extends SchemaPart {
-    public CInPin in;
-    private Bus outBus;
-    private boolean enabled = true;
+public class CInPin extends InPin {
+    public final boolean reverse;
+    public final long countMask;
+    public Bus out;
 
-    protected Counter(String id, String sParam) {
-        super(id, sParam);
-        if (!params.containsKey("size")) {
-            throw new RuntimeException("Component " + id + " has no parameter \"size\"");
-        }
-        int pinAmount;
-        try {
-            pinAmount = Integer.parseInt(params.get("size"));
-        } catch (NumberFormatException r) {
-            throw new RuntimeException("Component " + id + " size must be positive number");
-        }
-        if (pinAmount < 1) {
-            throw new RuntimeException("Component " + id + " size must be positive number");
-        }
-        long countMask = Utils.getMaskForSize(pinAmount);
-        addOutBus("Q", pinAmount);
-        in = addInPin(new CInPin("C", this, reverse, countMask));
-        addInPin(new InPin("R", this) {
-            @Override
-            public void setState(boolean newState) {
-                state = newState;
-                if (state) {
-                    enabled = false;
-                    outBus.setState(0);
-                } else {
-                    enabled = false;
-                }
-            }
-        });
+    public CInPin(String id, Counter parent, boolean reverse, long countMask) {
+        super(id, parent);
+        out = parent.getOutBus("Q");
+        this.reverse = reverse;
+        this.countMask = countMask;
+    }
+
+    /*Optimiser constructor*/
+    public CInPin(CInPin oldPin, String variantId) {
+        super(oldPin, variantId);
+        this.reverse = oldPin.reverse;
+        this.countMask = oldPin.countMask;
+        this.out = oldPin.out;
     }
 
     @Override
-    public void initOuts() {
-        outBus = getOutBus("Q");
-        outBus.useBitPresentation = true;
-        in.out = outBus;
+    public void setState(boolean newState) {
+        state = newState;
+        /*Optimiser bind newState*/
+        if (newState
+                /*Optimiser block reverse*///
+                ^ reverse
+            /*Optimiser blockEnd reverse*///
+        ) {
+            /*Optimiser bind countMask*///
+            out.setState((out.state + 1) & countMask);
+        }
     }
 
     @Override
-    public void reset() {
-        if (outBus.state > 0 || outBus.hiImpedance) {
-            outBus.setState(0);
+    public InPin getOptimised(boolean keepSetters) {
+        ClassOptimiser<CInPin> optimiser = new ClassOptimiser<>(this).cut("reverse").bind("countMask", countMask);
+        if (reverse) {
+            optimiser.bind("newState", "!newState");
         }
+        CInPin build = optimiser.build();
+        ((Counter) parent).in = build;
+        return build;
     }
 }

@@ -108,7 +108,7 @@ run {
                  "-XX:MaxInlineSize=64",
                  "-XX:MaxInlineLevel=5",
                  "-XX:ParallelGCThreads=1",
-//                 "--add-opens", "java.base/java.lang=KiCadLogicalSchemeSimulator.simulator",
+                 "--add-opens", "java.base/java.lang=KiCadLogicalSchemeSimulator.simulator",
                  "-Xmx2G"
     ]
     if (project.hasProperty('ea')) {
@@ -140,7 +140,7 @@ tasks.register("runJmh", JavaExec) {
     mainClass = 'org.openjdk.jmh.Main'
     // Optional: Set JVM arguments
     jvmArgs = [
-            '--module-path', "$rootDir/distro/;$rootDir/distro/lib/",
+            '--module-path', "$rootDir/distro/;$rootDir/distro/lib/;$rootDir/distro/schemaParts/",
             '--add-modules', "KiCadLogicalSchemeSimulator.simulator",
             '--add-exports', 'KiCadLogicalSchemeSimulator.simulator/pko.KiCadLogicalSchemeSimulator.net.bus=ALL-UNNAMED',
             '--add-exports', 'KiCadLogicalSchemeSimulator.simulator/pko.KiCadLogicalSchemeSimulator.net.wire=ALL-UNNAMED',
@@ -160,7 +160,8 @@ tasks.register("runJmh", JavaExec) {
 //            "pko.KiCadLogicalSchemeSimulator.test.benchmarks.MaskGroupBenchmark.optimiser",//
 //            "pko.KiCadLogicalSchemeSimulator.test.benchmarks.OffsetBusBenchmark.optimiser",//
 //            "pko.KiCadLogicalSchemeSimulator.test.benchmarks.WireToBusBenchmark.optimiser",//
-            "pko.KiCadLogicalSchemeSimulator.test.benchmarks.BusToWireBenchmark.optimiser"//
+            //"pko.KiCadLogicalSchemeSimulator.test.benchmarks.BusToWireBenchmark.optimiser",//
+            "pko.KiCadLogicalSchemeSimulator.test.benchmarks.CounterBenchmark.counter"//
     ]
 }
 apply from: "$rootDir/gradle/examples.gradle"

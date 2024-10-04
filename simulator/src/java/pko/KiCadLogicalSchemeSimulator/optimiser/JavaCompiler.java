@@ -38,29 +38,17 @@ import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 import javax.tools.*;
 import java.io.*;
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Method;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 
 public class JavaCompiler {
-    private static final Method defineClassMethod;
-    private static final Method privateLookupInMethod;
-    private static final MethodHandles.Lookup lookup;
     private static final javax.tools.JavaCompiler compiler;
     private static final List<String> optionList;
-    //    private static final Module currentModule;
-//    private static final Method addReadsMethod;
+    private static final DynamicClassLoader classLoader = new DynamicClassLoader(ClassLoader.getSystemClassLoader());
     static {
         try {
-            lookup = MethodHandles.lookup();
-            //          currentModule = JavaCompiler.class.getModule();
-            privateLookupInMethod = MethodHandles.class.getDeclaredMethod("privateLookupIn", Class.class, MethodHandles.Lookup.class);
-            privateLookupInMethod.setAccessible(true);
-            defineClassMethod = MethodHandles.Lookup.class.getDeclaredMethod("defineClass", byte[].class);
-            defineClassMethod.setAccessible(true);
             compiler = ToolProvider.getSystemJavaCompiler();
             if (compiler == null) {
                 throw new IllegalStateException("No Java compiler available");
@@ -77,7 +65,6 @@ public class JavaCompiler {
                 paths.append(":").append(Lombok.class.getProtectionDomain().getCodeSource().getLocation().getFile());
                 paths.append(":").append(Logger.class.getProtectionDomain().getCodeSource().getLocation().getFile());
             }
-/* don't need for now
             Simulator.schemaPartSpiMap.values().forEach(spi -> {
                 String spiPath = spi.getClass().getProtectionDomain().getCodeSource().getLocation().getFile();
                 if (System.getProperty("os.name").toLowerCase().contains("win") && spiPath.startsWith("/")) {
@@ -85,20 +72,17 @@ public class JavaCompiler {
                 }
                 paths.append(";").append(spiPath);
             });
-*/
             Log.debug(JavaCompiler.class, "Use class path for compiler: {}", paths);
             optionList = new ArrayList<>();
             optionList.add("-Xlint:none");
             optionList.add("-cp");
             optionList.add(paths.toString());
             optionList.add("-proc:none");
-//            addReadsMethod = Module.class.getDeclaredMethod("implAddReads", Module.class);
-//            addReadsMethod.setAccessible(true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
-    public static boolean compileJavaSource(Class<?> srcClass, String className, String sourceCode) {
+    public static Class<?> compileJavaSource(Class<?> srcClass, String classPath, String className, String sourceCode) {
         Log.trace(JavaCompiler.class, "Compile source \n{}", sourceCode);
         InMemoryJavaFileManager fileManager = new InMemoryJavaFileManager(compiler.getStandardFileManager(null, null, null));
         JavaFileObject javaFileObject = new InMemoryJavaFileObject(className, sourceCode);
@@ -106,6 +90,7 @@ public class JavaCompiler {
         final DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
         javax.tools.JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, diagnostics, optionList, null, javaFileObjects);
         if (task.call()) {
+            Class<?>[] retClass = new Class[1];
             fileManager.getClassBytes().entrySet()
                     .stream().sorted(Map.Entry.<String, ByteArrayOutputStream>comparingByKey().reversed()).forEach(entry -> {
                            try {
@@ -114,14 +99,14 @@ public class JavaCompiler {
                                    Log.warn(JavaCompiler.class, "Class {} already loaded", srcClass.getName());
                                } catch (ClassNotFoundException ignore) {
                                    Log.debug(JavaCompiler.class, "Cache and load dynamically optimised class {}", entry.getKey());
-                                   loadClass(srcClass, entry.getValue().toByteArray());
+                                   retClass[0] = classLoader.defineClassInPackage(classPath, entry.getValue().toByteArray());
                                }
                                storeClass(entry.getKey(), entry.getValue().toByteArray());
                            } catch (Exception e) {
                                throw new RuntimeException(e);
                            }
                        });
-            return true;
+            return retClass[0];
         } else {
             Log.error(JavaCompiler.class, "Can't compile source");
             for (final Diagnostic<? extends JavaFileObject> diagnostic : diagnostics.getDiagnostics()) {
@@ -137,11 +122,11 @@ public class JavaCompiler {
                     Log.error(JavaCompiler.class, "{}: {}", diagnostic.getKind(), diagnostic.getMessage(Locale.getDefault()));
                 }
             }
-            return false;
+            return null;
         }
     }
 
-    private static void storeClass(String className, byte[] byteArray) throws IOException {
+    private static void storeClass(String className, byte[] byteArray) {
         Thread.ofVirtual().start(() -> {
             String path = Simulator.optimisedDir + File.separator + className.replace(".", File.separator) + ".class";
             String dirPath = path.substring(0, path.lastIndexOf(File.separator));
@@ -154,17 +139,6 @@ public class JavaCompiler {
                 throw new RuntimeException(e);
             }
         });
-    }
-
-    private static void loadClass(Class<?> srcClass, byte[] byteCode) throws Exception {
-/*
-        if (!JavaCompiler.currentModule.getName().equals(srcClass.getModule().getName())) {
-            addReadsMethod.invoke(JavaCompiler.currentModule, srcClass.getModule());
-        }
-*/
-        MethodHandles.Lookup privateLookup = (MethodHandles.Lookup) privateLookupInMethod.invoke(null, srcClass, lookup);
-        //noinspection PrimitiveArrayArgumentToVarargsMethod
-        defineClassMethod.invoke(privateLookup, byteCode);
     }
 
     static class InMemoryJavaFileObject extends SimpleJavaFileObject {
