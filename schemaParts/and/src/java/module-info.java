@@ -32,7 +32,7 @@
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
 import pko.KiCadLogicalSchemeSimulator.components.AND.AndGateSpi;
 
-module KiCadLogicalSchemeSimulator.components.And {
+open module KiCadLogicalSchemeSimulator.components.And {
     requires KiCadLogicalSchemeSimulator.simulator;
     provides SchemaPartSpi with AndGateSpi;
 }

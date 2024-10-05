@@ -37,9 +37,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class OrGate extends SchemaPart {
+    private final Map<String, OrGateIn> ins = new HashMap<>();
     public Pin out;
     public long inState;
-    private Map<String, OrGateIn> ins = new HashMap<>();
 
     public OrGate(String id, String sParam) {
         super(id, sParam);
@@ -69,6 +69,7 @@ public class OrGate extends SchemaPart {
     public void replaceIn(String id, OrGateIn pin) {
         ins.put(id, pin);
     }
+
     @Override
     public String extraState() {
         return reverse ? "reverse" : null;

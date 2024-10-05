@@ -31,12 +31,15 @@
  */
 package pko.KiCadLogicalSchemeSimulator.components.AND;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class AndGate extends SchemaPart {
+    private final Map<String, AndGateIn> ins = new HashMap<>();
+    public long inState;
     private Pin out;
-    private int inState;
 
     public AndGate(String id, String sParam) {
         super(id, sParam);
@@ -47,60 +50,24 @@ public class AndGate extends SchemaPart {
         int pinAmount = Integer.parseInt(params.get("size"));
         for (int i = 0; i < pinAmount; i++) {
             int mask = 1 << i;
-            int nMask = ~mask;
-            if (reverse) {
-                addInPin(new InPin("IN" + i, this) {
-                    @Override
-                    public void setState(boolean newState) {
-                        state = newState;
-                        if (newState) {
-                            if ((inState == mask)) {
-                                inState = 0;
-                                out.setState(false);
-                            } else {
-                                inState &= nMask;
-                            }
-                        } else if (inState == 0) {
-                            inState = mask;
-                            out.setState(true);
-                        } else {
-                            inState |= mask;
-                        }
-                    }
-                });
-            } else {
-                addInPin(new InPin("IN" + i, this) {
-                    @Override
-                    public void setState(boolean newState) {
-                        state = newState;
-                        if (newState) {
-                            if (inState == mask) {
-                                inState = 0;
-                                out.setState(true);
-                            } else {
-                                inState &= nMask;
-                            }
-                        } else if (inState == 0) {
-                            inState = mask;
-                            out.setState(false);
-                        } else {
-                            inState |= mask;
-                        }
-                    }
-                });
-            }
+            ins.put("IN" + i, addInPin(new AndGateIn("IN" + i, this, mask)));
         }
     }
 
     @Override
     public void initOuts() {
         out = getOutPin("OUT");
-        inPins.values().forEach(pin -> {
+        ins.values().forEach(pin -> {
             if (pin.isHiImpedance() || pin.getState() == 0) {
-                inState |= (1 << Integer.parseInt(pin.getId().substring(2)));
+                inState |= (1L << Long.parseLong(pin.getId().substring(2)));
             }
+            pin.out = out;
         });
         out.state = inState == 0 ? nReverse : reverse;
+    }
+
+    public void replaceIn(String id, AndGateIn pin) {
+        ins.put(id, pin);
     }
 
     @Override
