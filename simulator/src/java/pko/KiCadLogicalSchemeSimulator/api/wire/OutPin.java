@@ -54,6 +54,7 @@ public class OutPin extends Pin {
 
     public void addDestination(Pin pin) {
         assert pin != this;
+        pin.used = true;
         pin.triState = triState;
         if (!(pin instanceof NCWire)) {
             destinations = Utils.addToArray(destinations, pin);
@@ -64,9 +65,8 @@ public class OutPin extends Pin {
     public void setState(boolean newState) {
         state = newState;
         if (processing) {
-            /*Optimiser block recurse*/
+            /*Optimiser line recurse*/
             if (hasQueue) {
-                /*Optimiser blockEnd recurse*/
                 if (recurseError()) {
                     return;
                 }

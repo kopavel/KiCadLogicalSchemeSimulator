@@ -52,28 +52,26 @@ public class MaskGroupBus extends OutBus {
     }
 
     public void addDestination(Bus bus) {
+        bus.used = true;
         bus.triState = triState;
         destinations = Utils.addToArray(destinations, bus);
     }
 
     @Override
     public void setState(long newState) {
-        /*Optimiser block setters block iSetter*/
+        /*Optimiser block setters line iSetter*/
         hiImpedance = false;
-        /*Optimiser blockEnd iSetter*/
         state = newState;
         /*Optimiser blockEnd setters bind m:mask*/
         final long newMaskState = newState & mask;
         if (
-            /*Optimiser block iSetter bind d:destinations[0]*/
-                destinations[0].hiImpedance ||
-                        /*Optimiser blockEnd iSetter*///
+            /*Optimiser line iSetter bind d:destinations[0]*/
+                destinations[0].hiImpedance ||//
                         maskState != newMaskState) {
             /*Optimiser block setters*/
             if (processing) {
-                /*Optimiser block recurse*/
+                /*Optimiser line recurse*/
                 if (hasQueue) {
-                    /*Optimiser blockEnd recurse*/
                     if (recurseError()) {
                         return;
                     }
@@ -102,9 +100,8 @@ public class MaskGroupBus extends OutBus {
                         for (Bus destination : destinations) {
                             destination.setState(queueState);
                         }
-                        /*Optimiser block iSetter*/
+                        /*Optimiser line iSetter*/
                     }
-                    /*Optimiser blockEnd iSetter*/
                 }
                 /*Optimiser blockEnd recurse*/
                 processing = false;
@@ -119,9 +116,8 @@ public class MaskGroupBus extends OutBus {
         /*Optimiser block setters*/
         hiImpedance = true;
         if (processing) {
-            /*Optimiser block recurse*/
+            /*Optimiser line recurse*/
             if (hasQueue) {
-                /*Optimiser blockEnd recurse*/
                 if (recurseError()) {
                     return;
                 }
@@ -161,7 +157,7 @@ public class MaskGroupBus extends OutBus {
             throw new RuntimeException("unconnected MaskGroupBus " + getName());
         } else if (destinations.length == 1 && destinations[0].useFullOptimiser()) {
             destinations[0].groupByMask = mask;
-            return destinations[0].getOptimised(keepSetters);
+            return destinations[0].getOptimised(keepSetters).copyState(destinations[0]);
         } else {
             for (int i = 0; i < destinations.length; i++) {
                 destinations[i] = destinations[i].getOptimised(false);

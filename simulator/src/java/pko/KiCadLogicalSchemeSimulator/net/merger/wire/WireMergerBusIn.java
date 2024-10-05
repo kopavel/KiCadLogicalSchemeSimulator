@@ -76,9 +76,9 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus> {
                 merger.state,
                 merger.strong,
                 merger.hiImpedance);
-        /*Optimiser block setters*/
+        /*Optimiser line setters*/
         state = newState;
-        /*Optimiser blockEnd setters block iSetter*/
+        /*Optimiser block iSetter*/
         if (hiImpedance) {
             hiImpedance = false;
             if (merger.strong) { // merger not in hiImpedance or weak
@@ -143,9 +143,8 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus> {
         if (hiImpedance) {
             return;
         }
-        /*Optimiser block strongOnly block weakOnly*/
+        /*Optimiser line strongOnly block weakOnly*/
         if (merger.weakState != 0) {
-            /*Optimiser blockEnd strongOnly */
             if (merger.state != (merger.weakState > 0)) {
                 merger.state = merger.weakState > 0;
                 for (Pin destination : destinations) {
@@ -159,9 +158,9 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus> {
                 destination.setHiImpedance();
             }
             merger.hiImpedance = true;
-            /*Optimiser block weakOnly*/
+            /*Optimiser line weakOnly*/
         }
-        /*Optimiser blockEnd weakOnly blockEnd strongOnly*/
+        /*Optimiser blockEnd strongOnly*/
         merger.strong = false;
         hiImpedance = true;
         /*Optimiser block passivePins*///

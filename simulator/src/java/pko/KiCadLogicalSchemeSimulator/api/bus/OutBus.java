@@ -63,6 +63,7 @@ public class OutBus extends Bus {
     }
 
     public void addDestination(Bus bus, long mask, byte offset) {
+        bus.used = true;
         bus.triState = triState;
         if (offset != 0) {
             if (corrected.containsKey(mask) && corrected.get(mask).containsKey(offset)) {
@@ -89,6 +90,7 @@ public class OutBus extends Bus {
     }
 
     public void addDestination(Pin pin, long mask) {
+        pin.used = true;
         pin.triState = triState;
         MaskGroupBus maskGroup = Arrays.stream(destinations)
                 .filter(d -> d instanceof MaskGroupBus)
@@ -114,9 +116,8 @@ public class OutBus extends Bus {
         state = newState;
         /*Optimiser block allRecurse*/
         if (processing) {
-            /*Optimiser block recurse*/
+            /*Optimiser line recurse*/
             if (hasQueue) {
-                /*Optimiser blockEnd recurse*/
                 if (recurseError()) {
                     return;
                 }

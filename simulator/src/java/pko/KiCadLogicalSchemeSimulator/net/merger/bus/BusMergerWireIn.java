@@ -75,17 +75,14 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                 newState,
                 getName(),
                 state,
-                strong,
-                hiImpedance, merger.getName(), merger.state, merger.strongPins, merger.weakState, merger.weakPins);
+                strong, hiImpedance, merger.getName(), merger.state, merger.strongPins, merger.weakState, merger.weakPins);
         long mergerState = merger.state;
-        /*Optimiser block setters*/
+        /*Optimiser line setters*/
         state = newState;
-        /*Optimiser blockEnd setters*/
         if (strong) { //to strong
             if (
-                /*Optimiser block iSetter*/
-                    hiImpedance ||
-                            /*Optimiser blockEnd iSetter*/
+                /*Optimiser line iSetter*/
+                    hiImpedance ||//
                             !oldStrong) { //from hiImpedance or weak
                 /*Optimiser bind m:mask*/
                 if ((merger.strongPins & mask) != 0) { //strong pins shortcut
@@ -94,15 +91,14 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                         assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
                         return;
                     } else {
-                        /*Optimiser block iSetter*/
+                        /*Optimiser line iSetter*/
                         hiImpedance = false;
-                        /*Optimiser blockEnd iSetter*/
                         throw new ShortcutException(merger.sources);
                     }
                 }
-                /*Optimiser block iSetter*/
+                /*Optimiser line iSetter*/
                 if (!hiImpedance) { // from weak
-                    /*Optimiser blockEnd iSetter bind nm:nMask*/
+                    /*Optimiser bind nm:nMask*/
                     merger.weakState &= nMask;
                     /*Optimiser bind nm:nMask*/
                     merger.weakPins &= nMask;
@@ -128,9 +124,8 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                     assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
                     return;
                 } else {
-                    /*Optimiser block iSetter*/
+                    /*Optimiser line iSetter*/
                     hiImpedance = false;
-                    /*Optimiser blockEnd iSetter*/
                     throw new ShortcutException(merger.sources);
                 }
             }
@@ -162,9 +157,8 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
             merger.state = mergerState;
             /*Optimiser block setters*/
             if (processing) {
-                /*Optimiser block recurse*/
+                /*Optimiser line recurse*/
                 if (hasQueue) {
-                    /*Optimiser blockEnd recurse*/
                     if (recurseError()) {
                         return;
                     }
@@ -191,9 +185,8 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                         for (Bus destination : destinations) {
                             destination.setState(merger.state);
                         }
-                        /*Optimiser block iSetter*/
+                        /*Optimiser line iSetter*/
                     }
-                    /*Optimiser blockEnd iSetter*/
                 }
                 /*Optimiser blockEnd recurse*/
                 processing = false;
@@ -207,8 +200,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                 newState,
                 getName(),
                 state,
-                strong,
-                hiImpedance, merger.getName(), merger.state, merger.strongPins, merger.weakState, merger.weakPins);
+                strong, hiImpedance, merger.getName(), merger.state, merger.strongPins, merger.weakState, merger.weakPins);
     }
 
     /*Optimiser block iSetter*/
@@ -249,9 +241,8 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
             merger.state = mergerState;
             /*Optimiser block setters*/
             if (processing) {
-                /*Optimiser block recurse*/
+                /*Optimiser line recurse*/
                 if (hasQueue) {
-                    /*Optimiser blockEnd recurse*/
                     if (recurseError()) {
                         return;
                     }

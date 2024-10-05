@@ -77,17 +77,16 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                 merger.hiImpedance,
                 merger.weakState);
         boolean oldState = merger.state;
-        /*Optimiser block passivePins*/
+        /*Optimiser line passivePins*/
         boolean strengthChange = false;
-        /*Optimiser blockEnd passivePins block setters*/
+        /*Optimiser line setters*/
         state = newState;
-        /*Optimiser blockEnd setters block passivePins*/
+        /*Optimiser line passivePins*/
         if (strong) { //to strong
-            /*Optimiser blockEnd passivePins block hiAndPassive*/
+            /*Optimiser block hiAndPassive*/
             if (hiImpedance
-                    /*Optimiser block passivePins*///
-                    || !oldStrong
-                /*Optimiser blockEnd passivePins*///
+                    /*Optimiser line passivePins*///
+                    || !oldStrong//
             ) { //from hiImpedance or weak
                 if (merger.strong) { //strong pins shortcut
                     if (Net.stabilizing) {
@@ -95,15 +94,13 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                         assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
                         return;
                     } else {
-                        /*Optimiser block iSetter*/
+                        /*Optimiser line iSetter*/
                         hiImpedance = false;
-                        /*Optimiser blockEnd iSetter*/
                         throw new ShortcutException(((WireMerger) merger).sources);
                     }
                 }
-                /*Optimiser block passivePins block iSetter*/
+                /*Optimiser block passivePins line iSetter*/
                 if (!hiImpedance) { // from weak
-                    /*Optimiser blockEnd iSetter*/
                     merger.weakState -= (merger.weakState > 0 ? 1 : -1);
                     /*Optimiser block iSetter*/
                 } else {
@@ -124,9 +121,8 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                     assert Log.debug(this.getClass(), "Weak state shortcut on setting pin {}, try resend later", this);
                     return;
                 } else {
-                    /*Optimiser block iSetter*/
+                    /*Optimiser line iSetter*/
                     hiImpedance = false;
-                    /*Optimiser blockEnd iSetter*/
                     throw new ShortcutException(((WireMerger) merger).sources);
                 }
             }

@@ -48,6 +48,7 @@ public abstract class ModelItem<T> implements IModelItem<T> {
     public boolean hasQueue;
     public long groupByMask;
     public byte groupedByOffset;
+    public boolean used;
     private boolean reportedRecurse;
 
     protected ModelItem(String id, SchemaPart parent) {

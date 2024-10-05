@@ -63,9 +63,8 @@ public class TriStateOutPin extends OutPin {
         hiImpedance = false;
         state = newState;
         if (processing) {
-            /*Optimiser block recurse*/
+            /*Optimiser line recurse*/
             if (hasQueue) {
-                /*Optimiser blockEnd recurse*/
                 if (recurseError()) {
                     return;
                 }
@@ -101,9 +100,8 @@ public class TriStateOutPin extends OutPin {
         assert !hiImpedance : "Already in hiImpedance:" + this;
         hiImpedance = true;
         if (processing) {
-            /*Optimiser block recurse*/
+            /*Optimiser line recurse*/
             if (hasQueue) {
-                /*Optimiser blockEnd recurse*/
                 if (recurseError()) {
                     return;
                 }

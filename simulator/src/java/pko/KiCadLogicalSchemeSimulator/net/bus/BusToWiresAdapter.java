@@ -55,9 +55,8 @@ public class BusToWiresAdapter extends OutBus {
 
     @Override
     public void setState(long newState) {
-        /*Optimiser block setters block iSetter*/
+        /*Optimiser block setters line iSetter*/
         hiImpedance = false;
-        /*Optimiser blockEnd iSetter*/
         state = newState;
         /*Optimiser blockEnd setters block mask bind m:mask*/
         final long newMaskState = newState & mask;
@@ -69,9 +68,8 @@ public class BusToWiresAdapter extends OutBus {
             maskState = newMaskState;
             /*Optimiser blockEnd mask block setters block allRecurse*/
             if (processing) {
-                /*Optimiser block recurse*/
+                /*Optimiser line recurse*/
                 if (hasQueue) {
-                    /*Optimiser blockEnd recurse*/
                     if (recurseError()) {
                         return;
                     }
@@ -83,9 +81,8 @@ public class BusToWiresAdapter extends OutBus {
                 /*Optimiser blockEnd recurse*/
             } else {
                 processing = true;
-                /*Optimiser blockEnd setters  blockEnd allRecurse block dest bind nState:newMaskState*/
+                /*Optimiser blockEnd setters  blockEnd allRecurse line dest bind nState:newMaskState*/
                 final boolean dState = newMaskState != 0;
-                /*Optimiser blockEnd dest*/
                 for (Pin destination : destinations) {
                     /*Optimiser bind v:dState*/
                     destination.setState(dState);
@@ -103,16 +100,14 @@ public class BusToWiresAdapter extends OutBus {
                         for (Pin destination : destinations) {
                             destination.setState(queueState);
                         }
-                        /*Optimiser block iSetter*/
+                        /*Optimiser line iSetter*/
                     }
-                    /*Optimiser blockEnd iSetter*/
                 }
                 /*Optimiser blockEnd recurse*/
                 processing = false;
             }
-            /*Optimiser block mask blockEnd setters blockEnd allRecurse*/
+            /*Optimiser line mask blockEnd setters blockEnd allRecurse*/
         }
-        /*Optimiser blockEnd mask*/
     }
 
     /*Optimiser block iSetter*/
@@ -122,9 +117,8 @@ public class BusToWiresAdapter extends OutBus {
         hiImpedance = true;
         /*Optimiser block allRecurse*/
         if (processing) {
-            /*Optimiser block recurse*/
+            /*Optimiser line recurse*/
             if (hasQueue) {
-                /*Optimiser blockEnd recurse*/
                 if (recurseError()) {
                     return;
                 }
@@ -160,6 +154,7 @@ public class BusToWiresAdapter extends OutBus {
     /*Optimiser blockEnd iSetter*/
 
     public void addDestination(Pin pin) {
+        pin.used = true;
         destinations = Utils.addToArray(destinations, pin);
     }
 

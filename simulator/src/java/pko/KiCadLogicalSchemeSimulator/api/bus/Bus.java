@@ -55,6 +55,7 @@ public abstract class Bus extends ModelItem<Bus> {
         useBitPresentation = oldBus.useBitPresentation;
         state = oldBus.state;
         hiImpedance = oldBus.hiImpedance;
+        used = oldBus.used;
     }
 
     public Bus(String id, SchemaPart parent, int size, String... aliases) {
@@ -101,6 +102,7 @@ public abstract class Bus extends ModelItem<Bus> {
     @Override
     public Bus copyState(IModelItem<Bus> oldBus) {
         this.state = oldBus.getState();
+        this.used = true;
         return this;
     }
 

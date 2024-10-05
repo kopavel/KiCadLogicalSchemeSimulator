@@ -50,6 +50,7 @@ public abstract class Pin extends ModelItem<Pin> {
         state = oldPin.state;
         strong = oldPin.strong;
         hiImpedance = oldPin.hiImpedance;
+        used = oldPin.used;
     }
 
     public Pin(String id, SchemaPart parent) {

@@ -59,9 +59,8 @@ public class BusInInterconnect extends InBus {
 
     @Override
     public void setState(long newState) {
-        /*Optimiser block setters block iSetter*/
+        /*Optimiser block setters line iSetter*/
         hiImpedance = false;
-        /*Optimiser blockEnd iSetter*/
         state = newState;
         /*Optimiser blockEnd setters bind interconnectMask*/
         if ((newState & interconnectMask) != 0) {
@@ -76,9 +75,8 @@ public class BusInInterconnect extends InBus {
     /*Optimiser block iSetter*/
     @Override
     public void setHiImpedance() {
-        /*Optimiser block setters*/
+        /*Optimiser line setters*/
         hiImpedance = true;
-        /*Optimiser blockEnd setters*/
         destination.setHiImpedance();
     }
     /*Optimiser blockEnd iSetter*/

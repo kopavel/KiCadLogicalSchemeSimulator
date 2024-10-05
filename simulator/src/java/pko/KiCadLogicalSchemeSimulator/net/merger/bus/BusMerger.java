@@ -68,6 +68,7 @@ public class BusMerger extends OutBus {
     }
 
     public void addDestination(Bus item) {
+        item.used = true;
         switch (item) {
             case BusInInterconnect interconnect -> {
                 this.mask &= interconnect.inverseInterconnectMask;

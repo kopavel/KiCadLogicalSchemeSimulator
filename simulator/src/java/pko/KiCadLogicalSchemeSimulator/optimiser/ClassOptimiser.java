@@ -154,6 +154,7 @@ public class ClassOptimiser<T> {
     //ToDo `if` support
     private String process() {
         Set<String> blocks = new HashSet<>();
+        Set<String> cutLines = new HashSet<>();
         Map<String, String> bindPatterns = new HashMap<>();
         String iteratorPattern = null;
         String[] iteratorParams = null;
@@ -200,6 +201,10 @@ public class ClassOptimiser<T> {
                         while (i < params.length) {
                             String command = params[i++];
                             switch (command) {
+                                case "line" -> {
+                                    String lineName = params[i++];
+                                    cutLines.add(lineName);
+                                }
                                 case "block" -> {
                                     String blockName = params[i++];
                                     blocks.add(blockName);
@@ -301,8 +306,12 @@ public class ClassOptimiser<T> {
                         }
                         preserveFunction = false;
                     } else {
-                        //cut blocks
-                        if (blocks.stream()
+                        //cut lines
+                        if (cutLines.stream()
+                                .anyMatch(b -> cutList.contains(b))) {
+                            preserveFunction = true;
+                            //cut blocks
+                        } else if (blocks.stream()
                                 .anyMatch(b -> cutList.contains(b))) {
                             preserveFunction = true;
                         } else if (iteratorPattern != null && line.contains(iteratorPattern)) {
@@ -342,6 +351,7 @@ public class ClassOptimiser<T> {
                             }
                         }
                         bindPatterns.clear();
+                        cutLines.clear();
                     }
                 }
             }
