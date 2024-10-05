@@ -5,7 +5,7 @@
 			<option name="externalProjectPath" value="$PROJECT_DIR$"/>
 			<option name="externalSystemIdString" value="GRADLE"/>
 			<option name="scriptParameters"
-			        value="-PappArgs=&quot;-ro=VCNT_CHAR2_Q,-ro=VCNT_CHAR_LINE1_Q,-ro=VCNT_ROW1_Q,-m=../../kicad_symbols/kicad.sym_map,-m=../../kicad_symbols/chip.sym_map,-m=../../kicad_symbols/retro.sym_map,TRS80I.net&quot; -PworkDir=&quot;/stuff/examples/trs80&quot;"/>
+			        value="-PappArgs=&quot;-rd,-ro=VCNT_CHAR2_Q,-ro=VCNT_CHAR_LINE1_Q,-ro=VCNT_ROW1_Q,-m=../../kicad_symbols/kicad.sym_map,-m=../../kicad_symbols/chip.sym_map,-m=../../kicad_symbols/retro.sym_map,TRS80I.net&quot; -PworkDir=&quot;/stuff/examples/trs80&quot;"/>
 			<option name="taskDescriptions">
 				<list/>
 			</option>

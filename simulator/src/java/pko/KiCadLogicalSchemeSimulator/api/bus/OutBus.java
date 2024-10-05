@@ -167,10 +167,12 @@ public class OutBus extends Bus {
                 destinations[i] = destinations[i].getOptimised(false);
             }
             ClassOptimiser<OutBus> optimiser = new ClassOptimiser<>(this).unroll(destinations.length);
-            if (Simulator.noRecursive) {
-                optimiser.cut("allRecurse");
-            } else if (!Simulator.recursive && Utils.notContain(Simulator.recursiveOuts, getName())) {
-                optimiser.cut("recurse");
+            if (!Simulator.recursive && Utils.notContain(Simulator.recursiveOuts, getName())) {
+                if (Simulator.noRecursive) {
+                    optimiser.cut("allRecurse");
+                } else {
+                    optimiser.cut("recurse");
+                }
             }
             return optimiser.build();
         }
