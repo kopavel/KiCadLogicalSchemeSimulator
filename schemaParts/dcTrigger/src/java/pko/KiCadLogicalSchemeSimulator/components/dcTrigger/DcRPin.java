@@ -31,18 +31,24 @@
  */
 package pko.KiCadLogicalSchemeSimulator.components.dcTrigger;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 
-//FixMe not "optimiser free"
 public class DcRPin extends InPin {
     public final boolean reverse;
     public final DcTrigger parent;
+    public InPin sPin;
+    public Pin qOut;
+    public Pin iqOut;
 
     public DcRPin(String id, DcTrigger parent, boolean reverse) {
         super(id, parent);
-        this.reverse = reverse;
         this.parent = parent;
+        this.reverse = reverse;
         state = reverse;
+        sPin = parent.sPin;
+        qOut = parent.qOut;
+        iqOut = parent.iqOut;
     }
 
     /*Optimiser constructor*/
@@ -51,6 +57,9 @@ public class DcRPin extends InPin {
         reverse = oldPin.reverse;
         parent = oldPin.parent;
         state = oldPin.state;
+        sPin = oldPin.sPin;
+        qOut = oldPin.qOut;
+        iqOut = oldPin.iqOut;
     }
 
     @Override
@@ -58,37 +67,43 @@ public class DcRPin extends InPin {
         state = newState;
         parent.clockEnabled =
                 /*Optimiser line noReverse*/
-                !//
+                !
+                        /*Optimiser line o*/
+                        reverse ^//
                         (newState
                                 /*Optimiser line noS*///
-                                && parent.sPin.state//
+                                && sPin.state//
                         );
         //
         if (
-            /*Optimiser line reverse*/
-                !//
+            /*Optimiser line o*/
+                reverse ^//
+                        /*Optimiser bind n:newState */
                         newState) {
-            if (!parent.iqOut.state) {
-                parent.iqOut.setState(true);
+            if (!iqOut.state) {
+                iqOut.setState(true);
                 /*Optimiser block noS*/
             }
             if (
                 /*Optimiser line noReverse*/
                     !//
-                            parent.sPin.state) {
+                            /*Optimiser line o*/
+                            reverse ^//
+                            sPin.state) {
                 /*Optimiser blockEnd noS*/
-                parent.qOut.setState(false);
+                qOut.setState(false);
             }
             /*Optimiser block noS*/
         } else if (
-            /*Optimiser line reverse*/
-                !//
-                        parent.sPin.state) {
-            if (parent.iqOut.state) {
-                parent.iqOut.setState(false);
+            /*Optimiser line o*/
+                reverse ^//
+                        /*Optimiser bind s:parent.sPin.state*/
+                        sPin.state) {
+            if (iqOut.state) {
+                iqOut.setState(false);
             }
-            if (!parent.qOut.state) {
-                parent.qOut.setState(true);
+            if (!qOut.state) {
+                qOut.setState(true);
             }
             /*Optimiser blockEnd noS*/
         }
@@ -96,9 +111,9 @@ public class DcRPin extends InPin {
 
     @Override
     public InPin getOptimised(boolean keepSetters) {
-        ClassOptimiser<DcRPin> optimiser = new ClassOptimiser<>(this);
+        ClassOptimiser<DcRPin> optimiser = new ClassOptimiser<>(this).cut("o");
         if (reverse) {
-            optimiser.cut("noReverse");
+            optimiser.cut("noReverse").bind("n", "!newState").bind("s", "!sPin.state");
         } else {
             optimiser.cut("reverse");
         }
@@ -107,6 +122,7 @@ public class DcRPin extends InPin {
         }
         DcRPin build = optimiser.build();
         parent.rPin = build;
+        parent.sPin.rPin = build;
         return build;
     }
 }

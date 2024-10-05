@@ -36,8 +36,9 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 
 public class DcTrigger extends SchemaPart {
     public final InPin dPin;
-    public InPin rPin;
-    public InPin sPin;
+    public DcRPin rPin;
+    public DcSPin sPin;
+    public DcCPin cPin;
     public Pin qOut;
     public Pin iqOut;
     public boolean clockEnabled = true;
@@ -47,7 +48,7 @@ public class DcTrigger extends SchemaPart {
         dPin = addInPin("D");
         rPin = addInPin(new DcRPin("R", this, params.containsKey("setReverse")));
         sPin = addInPin(new DcSPin("S", this, params.containsKey("setReverse")));
-        addInPin(new DcCPin("C", this));
+        cPin = addInPin(new DcCPin("C", this));
         addOutPin("Q", false);
         addOutPin("~{Q}", true);
     }
@@ -56,6 +57,12 @@ public class DcTrigger extends SchemaPart {
     public void initOuts() {
         qOut = getOutPin("Q");
         iqOut = getOutPin("~{Q}");
+        rPin.qOut = qOut;
+        rPin.iqOut = iqOut;
+        sPin.qOut = qOut;
+        sPin.iqOut = iqOut;
+        cPin.qOut = qOut;
+        cPin.iqOut = iqOut;
     }
 
     @Override
