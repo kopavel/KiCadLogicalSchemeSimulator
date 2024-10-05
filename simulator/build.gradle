@@ -67,6 +67,7 @@ dependencies {
     testImplementation libs.jmh
     testAnnotationProcessor libs.jmh.annotations
     optimisedCompileOnly(project(":simulator"))
+    optimisedCompileOnly(project(path: ':schemaParts', configuration: 'default'))
     implementation libs.lombok
     optimisedCompileOnly(libs.lombok)
 }
