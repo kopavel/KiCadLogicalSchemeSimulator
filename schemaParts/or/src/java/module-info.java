@@ -32,7 +32,7 @@
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
 import pko.KiCadLogicalSchemeSimulator.components.OR.OrGateSpi;
 
-module KiCadLogicalSchemeSimulator.components.OR {
+open module KiCadLogicalSchemeSimulator.components.OR {
     requires KiCadLogicalSchemeSimulator.simulator;
     provides SchemaPartSpi with OrGateSpi;
 }

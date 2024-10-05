@@ -38,7 +38,6 @@ import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 public class OutPin extends Pin {
     public Pin[] destinations = new Pin[0];
-    //for wire merger(don't want export from module whole wire merger package)
     public int weakState;
     public boolean processing;
     public boolean hasQueue;

@@ -29,74 +29,66 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.components.dcTrigger;
+package pko.KiCadLogicalSchemeSimulator.components.OR;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 
-//FixMe not "optimiser free"
-public class DcCPin extends InPin {
-    public final DcTrigger parent;
+public class OrGateIn extends InPin {
+    public final OrGate parent;
+    public final long mask;
+    public final long nMask;
+    public Pin out;
 
-    public DcCPin(String id, DcTrigger parent) {
+    public OrGateIn(String id, OrGate parent, long mask) {
         super(id, parent);
         this.parent = parent;
+        this.mask = mask;
+        this.nMask = ~mask;
+        out = parent.getOutPin("OUT");
     }
 
     /*Optimiser constructor*/
-    public DcCPin(DcCPin oldPin, String variantId) {
+    public OrGateIn(OrGateIn oldPin, String variantId) {
         super(oldPin, variantId);
         parent = oldPin.parent;
+        mask = oldPin.mask;
+        nMask = oldPin.nMask;
+        out = oldPin.out;
     }
 
     @Override
     public void setState(boolean newState) {
         state = newState;
-        if (
-            /*Optimiser line reverse*/
-                !//
-                        newState
-                        /*Optimiser line anyRS*///
-                        && parent.clockEnabled//
-        ) {
-            if (parent.dPin.state) {
-                if (!parent.qOut.state) {
-                    parent.qOut.setState(true);
-                    /*Optimiser block bothRS block anyRS*/
-                }
-                if (parent.iqOut.state) {
-                    /*Optimiser blockEnd bothRS  blockEnd anyRS*/
-                    parent.iqOut.setState(false);
-                }
+        if (newState) {
+            if (parent.inState == 0) {
+                /*Optimiser bind mask*/
+                parent.inState = mask;
+                /*Optimiser bind t:true*/
+                out.setState(true);
             } else {
-                if (parent.qOut.state) {
-                    parent.qOut.setState(false);
-                    /*Optimiser block bothRS  block anyRS*/
-                }
-                if (!parent.iqOut.state) {
-                    /*Optimiser blockEnd bothRS  blockEnd anyRS*/
-                    parent.iqOut.setState(true);
-                }
+                /*Optimiser bind mask*/
+                parent.inState |= mask;
             }
+            /*Optimiser bind mask*/
+        } else if (parent.inState == mask) {
+            parent.inState = 0;
+            /*Optimiser bind f:false*/
+            out.setState(false);
+        } else {
+            /*Optimiser bind nMask*/
+            parent.inState &= nMask;
         }
     }
 
     @Override
     public InPin getOptimised(boolean keepSetters) {
-        boolean anyRs = parent.rPin.used || parent.sPin.used;
-        boolean bothRs = parent.rPin.used && parent.sPin.used;
-        if (parent.reverse && bothRs) {
-            return this;
-        } else {
-            ClassOptimiser<DcCPin> optimiser = new ClassOptimiser<>(this);
-            if (!parent.reverse) {
-                optimiser.cut("reverse");
-            }
-            if (!anyRs) {
-                optimiser.cut("anyRS");
-            } else if (!bothRs) {
-                optimiser.cut("bothRS");
-            }
-            return optimiser.build();
+        ClassOptimiser<OrGateIn> optimiser = new ClassOptimiser<>(this).bind("mask", mask).bind("nMask", nMask);
+        if (parent.reverse) {
+            optimiser.bind("t", "false").bind("f", "true");
         }
+        OrGateIn build = optimiser.build();
+        parent.replaceIn(id, build);
+        return build;
     }
 }
