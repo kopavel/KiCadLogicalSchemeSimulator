@@ -55,25 +55,25 @@ public class DcCPin extends InPin {
             /*Optimiser line reverse*/
                 !//
                         newState
-                        /*Optimiser line RS*///
+                        /*Optimiser line anyRS*///
                         && parent.clockEnabled//
         ) {
             if (parent.dPin.state) {
                 if (!parent.qOut.state) {
                     parent.qOut.setState(true);
-                    /*Optimiser block RS*/
+                    /*Optimiser block bothRS*/
                 }
                 if (parent.iqOut.state) {
-                    /*Optimiser blockEnd RS*/
+                    /*Optimiser blockEnd bothRS*/
                     parent.iqOut.setState(false);
                 }
             } else {
                 if (parent.qOut.state) {
                     parent.qOut.setState(false);
-                    /*Optimiser block RS*/
+                    /*Optimiser block bothRS*/
                 }
                 if (!parent.iqOut.state) {
-                    /*Optimiser blockEnd RS*/
+                    /*Optimiser blockEnd bothRS*/
                     parent.iqOut.setState(true);
                 }
             }
@@ -82,16 +82,20 @@ public class DcCPin extends InPin {
 
     @Override
     public InPin getOptimised(boolean keepSetters) {
-        boolean hasRs = parent.rPin.used || parent.sPin.used;
-        if (parent.reverse && hasRs) {
+        boolean anyRs = parent.rPin.used || parent.sPin.used;
+        boolean bothRs = parent.rPin.used && parent.sPin.used;
+        if (parent.reverse && bothRs) {
             return this;
         } else {
             ClassOptimiser<DcCPin> optimiser = new ClassOptimiser<>(this);
             if (!parent.reverse) {
                 optimiser.cut("reverse");
             }
-            if (!hasRs) {
-                optimiser.cut("RS");
+            if (!anyRs) {
+                optimiser.cut("anyRS");
+            }
+            if (!bothRs) {
+                optimiser.cut("bothRS");
             }
             return optimiser.build();
         }
