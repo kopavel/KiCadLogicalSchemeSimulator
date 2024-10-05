@@ -46,7 +46,7 @@ public abstract class SchemaPart {
     public final Map<String, IModelItem<?>> inPins = new HashMap<>();
     public final Map<String, IModelItem<?>> outPins = new HashMap<>();
     protected final Map<String, String> params = new HashMap<>();
-    protected final boolean reverse;
+    public final boolean reverse;
     protected final boolean nReverse;
     public Map<Integer, String> pinNumberMap;
 

@@ -35,165 +35,21 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 
 public class DcTrigger extends SchemaPart {
-    private final InPin dPin;
-    private final InPin rPin;
-    private final InPin sPin;
-    private Pin qOut;
-    private Pin iqOut;
-    private boolean clockEnabled = true;
+    public final InPin dPin;
+    public InPin rPin;
+    public InPin sPin;
+    public Pin qOut;
+    public Pin iqOut;
+    public boolean clockEnabled = true;
 
-    //ToDo implement "no RS" trigger or use optimiser to detect "unconnected" r/s pins
     protected DcTrigger(String id, String sParam) {
         super(id, sParam);
         dPin = addInPin("D");
-        if (params.containsKey("setReverse")) {
-            rPin = addInPin(new InPin("R", this) {
-                @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    clockEnabled = newState && sPin.state;
-                    if (newState) {
-                        if (!sPin.state) {
-                            if (iqOut.state) {
-                                iqOut.setState(false);
-                            }
-                            if (!qOut.state) {
-                                qOut.setState(true);
-                            }
-                        }
-                    } else {
-                        if (!iqOut.state) {
-                            iqOut.setState(true);
-                        }
-                        if (qOut.state == sPin.state) {
-                            qOut.setState(!sPin.state);
-                        }
-                    }
-                }
-            });
-            sPin = addInPin(new InPin("S", this) {
-                @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    clockEnabled = newState && rPin.state;
-                    if (newState) {
-                        if (!rPin.state) {
-                            if (qOut.state) {
-                                qOut.setState(false);
-                            }
-                            if (!iqOut.state) {
-                                iqOut.setState(true);
-                            }
-                        }
-                    } else {
-                        if (!qOut.state) {
-                            qOut.setState(true);
-                        }
-                        if (iqOut.state == rPin.state) {
-                            iqOut.setState(!rPin.state);
-                        }
-                    }
-                }
-            });
-        } else {
-            rPin = addInPin(new InPin("R", this) {
-                @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    clockEnabled = !newState && !sPin.state;
-                    if (newState) {
-                        if (!iqOut.state) {
-                            iqOut.setState(true);
-                        }
-                        if (qOut.state != sPin.state) {
-                            qOut.setState(sPin.state);
-                        }
-                    } else if (sPin.state) {
-                        if (iqOut.state) {
-                            iqOut.state = false;
-                            iqOut.setState(false);
-                        }
-                        if (!qOut.state) {
-                            qOut.state = true;
-                            qOut.setState(true);
-                        }
-                    }
-                }
-            });
-            sPin = addInPin(new InPin("S", this) {
-                @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    clockEnabled = !newState && !rPin.state;
-                    if (newState) {
-                        if (!qOut.state) {
-                            qOut.setState(true);
-                        }
-                        if (iqOut.state != rPin.state) {
-                            iqOut.setState(rPin.state);
-                        }
-                    } else if (rPin.state) {
-                        if (qOut.state) {
-                            qOut.setState(false);
-                        }
-                        if (!iqOut.state) {
-                            iqOut.setState(true);
-                        }
-                    }
-                }
-            });
-        }
-        if (reverse) {
-            addInPin(new InPin("C", this) {
-                @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    if (!newState && clockEnabled) {
-                        if (dPin.state) {
-                            if (!qOut.state) {
-                                qOut.setState(true);
-                            }
-                            if (iqOut.state) {
-                                iqOut.setState(false);
-                            }
-                        } else {
-                            if (qOut.state) {
-                                qOut.setState(false);
-                            }
-                            if (!iqOut.state) {
-                                iqOut.setState(true);
-                            }
-                        }
-                    }
-                }
-            });
-        } else {
-            addInPin(new InPin("C", this) {
-                @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    if (newState && clockEnabled) {
-                        if (dPin.state) {
-                            if (!qOut.state) {
-                                qOut.setState(true);
-                            }
-                            if (iqOut.state) {
-                                iqOut.setState(false);
-                            }
-                        } else {
-                            if (qOut.state) {
-                                qOut.setState(false);
-                            }
-                            if (!iqOut.state) {
-                                iqOut.setState(true);
-                            }
-                        }
-                    }
-                }
-            });
-        }
-        addOutPin("Q", true);
-        addOutPin("~{Q}", false);
+        rPin = addInPin(new DcRPin("R", this, params.containsKey("setReverse")));
+        sPin = addInPin(new DcSPin("S", this, params.containsKey("setReverse")));
+        addInPin(new DcCPin("C", this));
+        addOutPin("Q", false);
+        addOutPin("~{Q}", true);
     }
 
     @Override
@@ -204,9 +60,9 @@ public class DcTrigger extends SchemaPart {
 
     @Override
     public void reset() {
-        qOut.setState(false);
-        iqOut.setState(true);
-        rPin.state = params.containsKey("setReverse");
-        sPin.state = params.containsKey("setReverse");
+        if (clockEnabled) {
+            qOut.setState(false);
+            iqOut.setState(true);
+        }
     }
 }
