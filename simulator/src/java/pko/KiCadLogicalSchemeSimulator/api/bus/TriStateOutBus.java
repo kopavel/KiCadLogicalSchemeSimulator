@@ -55,6 +55,7 @@ public class TriStateOutBus extends OutBus {
     public void setState(long newState) {
         hiImpedance = false;
         state = newState;
+        /*Optimiser block allRecurse*/
         if (processing) {
             /*Optimiser line recurse*/
             if (hasQueue) {
@@ -67,10 +68,11 @@ public class TriStateOutBus extends OutBus {
             /*Optimiser blockEnd recurse*/
         } else {
             processing = true;
+            /*Optimiser blockEnd allRecurse*/
             for (Bus destination : destinations) {
                 destination.setState(newState);
             }
-            /*Optimiser block recurse*/
+            /*Optimiser block recurse block allRecurse*/
             while (hasQueue) {
                 hasQueue = false;
                 if (hiImpedance) {
@@ -86,12 +88,14 @@ public class TriStateOutBus extends OutBus {
             /*Optimiser blockEnd recurse*/
             processing = false;
         }
+        /*Optimiser blockEnd allRecurse*/
     }
 
     @Override
     public void setHiImpedance() {
         assert !hiImpedance : "Already in hiImpedance:" + this;
         hiImpedance = true;
+        /*Optimiser block allRecurse*/
         if (processing) {
             /*Optimiser line recurse*/
             if (hasQueue) {
@@ -104,10 +108,11 @@ public class TriStateOutBus extends OutBus {
             /*Optimiser blockEnd recurse*/
         } else {
             processing = true;
+            /*Optimiser blockEnd allRecurse*/
             for (Bus destination : destinations) {
                 destination.setHiImpedance();
             }
-            /*Optimiser block recurse*/
+            /*Optimiser block recurse block allRecurse*/
             while (hasQueue) {
                 hasQueue = false;
                 if (hiImpedance) {
@@ -123,6 +128,7 @@ public class TriStateOutBus extends OutBus {
             /*Optimiser blockEnd recurse*/
             processing = false;
         }
+        /*Optimiser blockEnd allRecurse*/
     }
 
     @Override
@@ -143,7 +149,9 @@ public class TriStateOutBus extends OutBus {
                 destinations[i] = destinations[i].getOptimised(false);
             }
             ClassOptimiser<TriStateOutBus> optimiser = new ClassOptimiser<>(this).unroll(destinations.length);
-            if (!Simulator.recursive && Utils.notContain(Simulator.recursiveOuts, getName())) {
+            if (Simulator.noRecursive) {
+                optimiser.cut("allRecurse");
+            } else if (!Simulator.recursive && Utils.notContain(Simulator.recursiveOuts, getName())) {
                 optimiser.cut("recurse");
             }
             return optimiser.build();

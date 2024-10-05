@@ -63,6 +63,7 @@ public class OutPin extends Pin {
     @Override
     public void setState(boolean newState) {
         state = newState;
+        /*Optimiser block allRecurse*/
         if (processing) {
             /*Optimiser line recurse*/
             if (hasQueue) {
@@ -75,10 +76,11 @@ public class OutPin extends Pin {
             /*Optimiser blockEnd recurse*/
         } else {
             processing = true;
+            /*Optimiser blockEnd allRecurse*/
             for (Pin destination : destinations) {
                 destination.setState(newState);
             }
-            /*Optimiser block recurse*/
+            /*Optimiser block recurse block allRecurse*/
             while (hasQueue) {
                 hasQueue = false;
                 for (Pin destination : destinations) {
@@ -88,6 +90,7 @@ public class OutPin extends Pin {
             /*Optimiser blockEnd recurse*/
             processing = false;
         }
+        /*Optimiser blockEnd allRecurse*/
     }
 
     @Override
@@ -112,7 +115,9 @@ public class OutPin extends Pin {
                 destinations[i] = destinations[i].getOptimised(false);
             }
             ClassOptimiser<OutPin> optimiser = new ClassOptimiser<>(this).unroll(destinations.length);
-            if (!Simulator.recursive && Utils.notContain(Simulator.recursiveOuts, getName())) {
+            if (Simulator.noRecursive) {
+                optimiser.cut("allRecurse");
+            } else if (!Simulator.recursive && Utils.notContain(Simulator.recursiveOuts, getName())) {
                 optimiser.cut("recurse");
             }
             return optimiser.build();
