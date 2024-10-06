@@ -92,16 +92,17 @@ public class JavaCompiler {
         if (task.call()) {
             Class<?>[] retClass = new Class[1];
             fileManager.getClassBytes().entrySet()
-                    .stream().sorted(Map.Entry.<String, ByteArrayOutputStream>comparingByKey().reversed()).forEach(entry -> {
+                    .stream()
+                    .filter(e -> e.getKey().contains(".optimised.")).sorted(Map.Entry.<String, ByteArrayOutputStream>comparingByKey().reversed()).forEach(entry -> {
                            try {
                                try {
                                    Class.forName(entry.getKey());
-                                   Log.warn(JavaCompiler.class, "Class {} already loaded", className);
+                                   Log.warn(JavaCompiler.class, "Class {} already loaded", entry.getKey());
                                } catch (ClassNotFoundException ignore) {
                                    Log.debug(JavaCompiler.class, "Cache and load dynamically optimised class {}", entry.getKey());
+                                   storeClass(entry.getKey(), entry.getValue().toByteArray());
                                    retClass[0] = classLoader.defineClassInPackage(classPath, entry.getValue().toByteArray());
                                }
-                               storeClass(entry.getKey(), entry.getValue().toByteArray());
                            } catch (Exception e) {
                                throw new RuntimeException(e);
                            }
