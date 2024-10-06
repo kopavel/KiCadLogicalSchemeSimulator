@@ -30,28 +30,45 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.repeater;
-import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
+import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 
-public class Repeater extends SchemaPart {
-    public RepeaterInPin inPin;
+public class RepeaterInPin extends InPin {
+    private final Repeater parent;
+    public Pin out;
 
-    public Repeater(String id, String sParam) {
-        super(id, sParam);
-        addOutPin("OUT", false);
-        inPin = addInPin(new RepeaterInPin("IN", this));
+    /*Optimiser constructor*/
+    public RepeaterInPin(RepeaterInPin oldPin, String variantId) {
+        super(oldPin, variantId);
+        this.out = oldPin.out;
+        parent = oldPin.parent;
+    }
+
+    public RepeaterInPin(String id, Repeater parent) {
+        super(id, parent);
+        out = parent.getOutPin("OUT");
+        this.parent = parent;
     }
 
     @Override
-    public void initOuts() {
-        Pin out = getOutPin("OUT");
-        inPin.out = out;
-        //FixMe what is faster? == or ^?
-        out.state = reverse ^ inPin.state;
+    public void setState(boolean newState) {
+        state = newState;
+        out.setState(
+                /*Optimiser line r*///
+                !//
+                        newState);
     }
 
     @Override
-    public String extraState() {
-        return reverse ? "reverse" : null;
+    public InPin getOptimised(boolean keepSetters) {
+        if (parent.reverse) {
+            return this;
+        } else {
+            ClassOptimiser<RepeaterInPin> optimiser = new ClassOptimiser<>(this).cut("r");
+            RepeaterInPin build = optimiser.build();
+            parent.inPin = build;
+            return build;
+        }
     }
 }

@@ -32,7 +32,7 @@
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
 import pko.KiCadLogicalSchemeSimulator.components.repeater.RepeaterSpi;
 
-module KiCadLogicalSchemeSimulator.components.repeater {
+open module KiCadLogicalSchemeSimulator.components.repeater {
     requires KiCadLogicalSchemeSimulator.simulator;
     provides SchemaPartSpi with RepeaterSpi;
 }
