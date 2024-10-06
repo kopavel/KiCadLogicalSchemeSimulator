@@ -31,6 +31,7 @@
  */
 package pko.KiCadLogicalSchemeSimulator.api.bus;
 import pko.KiCadLogicalSchemeSimulator.Simulator;
+import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.net.bus.BusToWiresAdapter;
@@ -50,6 +51,8 @@ public class OutBus extends Bus {
     private final Map<Long, Map<Byte, OffsetBus>> corrected = new HashMap<>();
     public Bus[] destinations = new Bus[0];
     public long mask;
+    public long powerState;
+    public long strongState;
 
     public OutBus(String id, SchemaPart parent, int size, String... names) {
         super(id, parent, size, names);
@@ -60,6 +63,20 @@ public class OutBus extends Bus {
     public OutBus(OutBus oldBus, String variantId) {
         super(oldBus, variantId);
         mask = oldBus.mask;
+        hiImpedance = oldBus.hiImpedance;
+        triState = oldBus.triState;
+    }
+
+    public void addWeakSource(Pin powerPin, long mask) {
+        if ((strongState & mask) > 0) {
+            throw new RuntimeException("Shortcut. Can't add source " + powerPin + " to " + this);
+        }
+        if (powerPin.strong) {
+            strongState |= mask;
+        }
+        if (powerPin.state) {
+            powerState |= mask;
+        }
     }
 
     public void addDestination(Bus bus, long mask, byte offset) {
@@ -113,6 +130,9 @@ public class OutBus extends Bus {
 
     @Override
     public void setState(long newState) {
+        strongState |= mask;
+        /*Optimiser line ts*/
+        hiImpedance = false;
         state = newState;
         /*Optimiser block allRecurse*/
         if (processing) {
@@ -134,8 +154,17 @@ public class OutBus extends Bus {
             /*Optimiser block recurse block allRecurse*/
             while (hasQueue) {
                 hasQueue = false;
-                for (Bus destination : destinations) {
-                    destination.setState(state);
+                /*Optimiser block ts*/
+                if (hiImpedance) {
+                    for (Bus destination : destinations) {
+                        destination.setHiImpedance();
+                    }
+                } else {
+                    /*Optimiser blockEnd ts*/
+                    for (Bus destination : destinations) {
+                        destination.setState(state);
+                    }
+                    /*Optimiser line ts*/
                 }
             }
             /*Optimiser blockEnd recurse*/
@@ -146,7 +175,55 @@ public class OutBus extends Bus {
 
     @Override
     public void setHiImpedance() {
-        throw new RuntimeException("setImpedance on non tri-state OutBus");
+        /*Optimiser line ts block noTs*/
+        if (!triState) {
+            throw new RuntimeException("setImpedance on non tri-state OutBus");
+            /*Optimiser block ts*/
+        }
+        /*Optimiser blockEnd noTs*/
+        assert !hiImpedance : "Already in hiImpedance:" + this;
+        hiImpedance = true;
+        /*Optimiser block allRecurse*/
+        if (processing) {
+            /*Optimiser line recurse*/
+            if (hasQueue) {
+                if (recurseError()) {
+                    return;
+                }
+                /*Optimiser block recurse*/
+            }
+            hasQueue = true;
+            /*Optimiser blockEnd recurse*/
+        } else {
+            processing = true;
+            /*Optimiser blockEnd allRecurse*/
+            for (Bus destination : destinations) {
+                destination.setHiImpedance();
+            }
+            /*Optimiser block recurse block allRecurse*/
+            while (hasQueue) {
+                hasQueue = false;
+                if (hiImpedance) {
+                    for (Bus destination : destinations) {
+                        destination.setHiImpedance();
+                    }
+                } else {
+                    for (Bus destination : destinations) {
+                        destination.setState(state);
+                    }
+                }
+            }
+            /*Optimiser blockEnd recurse*/
+            processing = false;
+        }
+        /*Optimiser blockEnd allRecurse blockEnd ts*/
+    }
+
+    @Override
+    public Bus copyState(IModelItem<Bus> oldBus) {
+        super.copyState(oldBus);
+        hiImpedance = oldBus.isHiImpedance();
+        return this;
     }
 
     @Override
@@ -160,18 +237,23 @@ public class OutBus extends Bus {
     public Bus getOptimised(boolean keepSetters) {
         if (destinations.length == 0) {
             return new NCBus(this);
-        } else if (destinations.length == 1) {
+        } else if (destinations.length == 1 && powerState == 0) {
             return destinations[0].getOptimised(true).copyState(this);
         } else {
             for (int i = 0; i < destinations.length; i++) {
                 destinations[i] = destinations[i].getOptimised(false);
             }
-            ClassOptimiser<OutBus> optimiser = new ClassOptimiser<>(this).unroll(destinations.length);
+            ClassOptimiser<OutBus> optimiser = new ClassOptimiser<>(this, OutBus.class).unroll(destinations.length);
             if (!Simulator.recursive && Utils.notContain(Simulator.recursiveOuts, getName())) {
                 if (Simulator.noRecursive) {
                     optimiser.cut("allRecurse");
                 } else {
                     optimiser.cut("recurse");
+                }
+                if (triState) {
+                    optimiser.cut("noTs");
+                } else {
+                    optimiser.cut("ts");
                 }
             }
             return optimiser.build();

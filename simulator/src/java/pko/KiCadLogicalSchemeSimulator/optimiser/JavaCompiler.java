@@ -82,7 +82,7 @@ public class JavaCompiler {
             throw new RuntimeException(e);
         }
     }
-    public static Class<?> compileJavaSource(Class<?> srcClass, String classPath, String className, String sourceCode) {
+    public static Class<?> compileJavaSource(String classPath, String className, String sourceCode) {
         Log.trace(JavaCompiler.class, "Compile source \n{}", sourceCode);
         InMemoryJavaFileManager fileManager = new InMemoryJavaFileManager(compiler.getStandardFileManager(null, null, null));
         JavaFileObject javaFileObject = new InMemoryJavaFileObject(className, sourceCode);
@@ -96,7 +96,7 @@ public class JavaCompiler {
                            try {
                                try {
                                    Class.forName(entry.getKey());
-                                   Log.warn(JavaCompiler.class, "Class {} already loaded", srcClass.getName());
+                                   Log.warn(JavaCompiler.class, "Class {} already loaded", className);
                                } catch (ClassNotFoundException ignore) {
                                    Log.debug(JavaCompiler.class, "Cache and load dynamically optimised class {}", entry.getKey());
                                    retClass[0] = classLoader.defineClassInPackage(classPath, entry.getValue().toByteArray());

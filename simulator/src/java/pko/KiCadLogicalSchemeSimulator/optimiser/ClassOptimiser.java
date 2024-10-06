@@ -48,6 +48,7 @@ public class ClassOptimiser<T> {
     private static final Map<String, Class<?>> dynamicClasses = new HashMap<>();
     private final Map<String, String> binds = new HashMap<>();
     private final T oldInstance;
+    private final Class<?> sourceClass;
     List<String> cutList = new ArrayList<>();
     private String suffix = "";
     private List<String> source;
@@ -55,7 +56,12 @@ public class ClassOptimiser<T> {
     private boolean noAssert = true;
 
     public ClassOptimiser(T oldInstance) {
+        this(oldInstance, oldInstance.getClass());
+    }
+
+    public ClassOptimiser(T oldInstance, Class<?> sourceClass) {
         this.oldInstance = oldInstance;
+        this.sourceClass = sourceClass;
         //noinspection AssertWithSideEffects,ConstantValue
         assert !(noAssert = false);
     }
@@ -98,15 +104,14 @@ public class ClassOptimiser<T> {
             if (!noAssert) {
                 suffix += "_ae";
             }
-            String optimizedClassName = oldInstance.getClass().getSimpleName() + suffix;
-            String optimizedFullClassName = oldInstance.getClass().getPackageName() + ".optimised." + oldInstance.getClass().getSimpleName() + suffix;
+            String optimizedClassName = sourceClass.getSimpleName() + suffix;
+            String optimizedFullClassName = sourceClass.getPackageName() + ".optimised." + sourceClass.getSimpleName() + suffix;
             Class<?> dynamicClass = dynamicClasses.get(optimizedFullClassName);
             if (dynamicClass == null) {
                 try {
                     dynamicClass = Class.forName(optimizedFullClassName);
                 } catch (ClassNotFoundException ignored) {
-                    Log.trace(JavaCompiler.class, "Load source for {}", oldInstance.getClass().getSimpleName());
-                    loadSource(oldInstance.getClass());
+                    loadSource();
                     Log.trace(JavaCompiler.class, "Process");
                     String optimisedSource = process();
                     Log.trace(JavaCompiler.class, "Compile");
@@ -115,7 +120,7 @@ public class ClassOptimiser<T> {
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
-                    dynamicClass = JavaCompiler.compileJavaSource(oldInstance.getClass(), optimizedFullClassName, optimizedClassName, optimisedSource);
+                    dynamicClass = JavaCompiler.compileJavaSource(optimizedFullClassName, optimizedClassName, optimisedSource);
                     if (dynamicClass == null) {
                         Log.error(JavaCompiler.class, "Optimised class compile was not successful, fall back to generic class, file name:" + optimizedFullClassName);
                         return oldInstance;
@@ -181,7 +186,7 @@ public class ClassOptimiser<T> {
                 } else if (line.startsWith("package ")) {
                     line = line.replace(";", ".optimised;");
                     resultSource.append(line).append("\n");
-                    resultSource.append("import ").append(oldInstance.getClass().getPackageName()).append(".*;\n");
+                    resultSource.append("import ").append(sourceClass.getPackageName()).append(".*;\n");
                     //skip asserts
                 } else if (noAssert && line.trim().startsWith("assert")) {
                     if (!line.contains(";")) {
@@ -219,19 +224,21 @@ public class ClassOptimiser<T> {
                                     line = lines.next();//load constructor definition
                                     int paramNamePos = line.indexOf(' ', line.indexOf('('));
                                     oldItemName = line.substring(paramNamePos, line.indexOf(",", paramNamePos));
-                                    functionSource.append(line.replace(oldInstance.getClass().getSimpleName() + "(",
-                                            oldInstance.getClass().getSimpleName() + suffix + "(")).append("\n");
-                                    String superLine = lines.next();//"super" are here
+                                    functionSource.append(line.replace(sourceClass.getSimpleName() + "(", sourceClass.getSimpleName() + suffix + "(")).append("\n");
+                                    String superLine = lines.next();//"super" here
                                     lineOffset = countLeadingSpaces(superLine);
                                     functionSource.append(superLine).append("\n");
-                                    while (!line.trim().equals("}")) { //skip all constructor definition, all are in "super"
+                                    while (!line.trim().equals("}")) { //skip all constructor definition, all in "super"
                                         line = lines.next();
                                     }
                                     line = lines.previous();
                                 }
                                 case "unroll" -> {
                                     iteratorParams = params[i++].split(":");
-                                    String iteratorItemType = getField(oldInstance.getClass(), iteratorParams[1]).getType().getComponentType().getSimpleName();
+                                    if (iteratorParams.length == 0) {
+                                        throw new RuntimeException("No iterator params specified in class " + sourceClass);
+                                    }
+                                    String iteratorItemType = getField(sourceClass, iteratorParams[1]).getType().getComponentType().getSimpleName();
                                     iteratorPattern = "for (" + iteratorItemType + " " + iteratorParams[0] + " : " + iteratorParams[1] + ") {";
                                     String lineTab = " ".repeat(lineOffset);
                                     String blockTab = " ".repeat(functionOffset);
@@ -274,13 +281,11 @@ public class ClassOptimiser<T> {
                     } else if (line.trim().startsWith("/*") || inComment) {
                         inComment = !line.contains("*/");
                         // class definition
-                    } else if (line.contains("public class " + oldInstance.getClass().getSimpleName())) {
+                    } else if (line.contains("public class " + sourceClass.getSimpleName())) {
                         //rename class definition
-                        resultSource.append("public class ")
-                                    .append(oldInstance.getClass().getSimpleName())
+                        resultSource.append("public class ").append(sourceClass.getSimpleName())
                                     .append(suffix)
-                                    .append(" extends ")
-                                    .append(oldInstance.getClass().getSimpleName())
+                                    .append(" extends ").append(sourceClass.getSimpleName())
                                     .append(" {\n");
                         functionOffset = -1;
                         functionSource = new StringBuilder();
@@ -322,6 +327,7 @@ public class ClassOptimiser<T> {
                         } else if (lineOffset == iteratorOffset && !functionSource.isEmpty()) {
                             //iterator block end — unroll it
                             for (int j = 0; j < unrollSize; j++) {
+                                //noinspection DataFlowIssue
                                 functionSource.append(iteratorSource.toString().replaceAll("(?<=\\W|^)" + iteratorParams[0] + "(?=\\W|$)", iteratorParams[0] + j));
                             }
                             iteratorOffset = -1;
@@ -361,7 +367,8 @@ public class ClassOptimiser<T> {
         }
     }
 
-    private void loadSource(Class<?> sourceClass) {
+    private void loadSource() {
+        Log.trace(JavaCompiler.class, "Load source for {}", sourceClass.getSimpleName());
         try (InputStream is = sourceClass.getResourceAsStream(sourceClass.getSimpleName() + ".java")) {
             if (is == null) {
                 throw new RuntimeException("Can't find source for class " + sourceClass.getName());

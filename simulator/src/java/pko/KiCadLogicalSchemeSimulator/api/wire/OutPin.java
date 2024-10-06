@@ -31,6 +31,7 @@
  */
 package pko.KiCadLogicalSchemeSimulator.api.wire;
 import pko.KiCadLogicalSchemeSimulator.Simulator;
+import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.net.wire.NCWire;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
@@ -49,6 +50,8 @@ public class OutPin extends Pin {
     /*Optimiser constructor unroll destination:destinations*/
     public OutPin(OutPin oldPin, String variantId) {
         super(oldPin, variantId);
+        hiImpedance = oldPin.hiImpedance;
+        triState = oldPin.triState;
     }
 
     public void addDestination(Pin pin) {
@@ -62,6 +65,8 @@ public class OutPin extends Pin {
 
     @Override
     public void setState(boolean newState) {
+        /*Optimiser line ts*/
+        hiImpedance = false;
         state = newState;
         /*Optimiser block allRecurse*/
         if (processing) {
@@ -83,8 +88,17 @@ public class OutPin extends Pin {
             /*Optimiser block recurse block allRecurse*/
             while (hasQueue) {
                 hasQueue = false;
-                for (Pin destination : destinations) {
-                    destination.setState(state);
+                /*Optimiser block ts*/
+                if (hiImpedance) {
+                    for (Pin destination : destinations) {
+                        destination.setHiImpedance();
+                    }
+                } else {
+                    /*Optimiser blockEnd ts*/
+                    for (Pin destination : destinations) {
+                        destination.setState(state);
+                    }
+                    /*Optimiser line ts*/
                 }
             }
             /*Optimiser blockEnd recurse*/
@@ -95,13 +109,61 @@ public class OutPin extends Pin {
 
     @Override
     public void setHiImpedance() {
-        throw new RuntimeException("setImpedance on non tri-state OutPin");
+        /*Optimiser line ts block noTs*/
+        if (!triState) {
+            throw new RuntimeException("setImpedance on non tri-state OutPin");
+            /*Optimiser block ts*/
+        }
+        /*Optimiser blockEnd noTs*/
+        assert !hiImpedance : "Already in hiImpedance:" + this;
+        hiImpedance = true;
+        /*Optimiser block allRecurse*/
+        if (processing) {
+            /*Optimiser line recurse*/
+            if (hasQueue) {
+                if (recurseError()) {
+                    return;
+                }
+                /*Optimiser block recurse*/
+            }
+            hasQueue = true;
+            /*Optimiser blockEnd recurse*/
+        } else {
+            processing = true;
+            /*Optimiser blockEnd allRecurse*/
+            for (Pin destination : destinations) {
+                destination.setHiImpedance();
+            }
+            /*Optimiser block recurse block allRecurse*/
+            while (hasQueue) {
+                hasQueue = false;
+                if (hiImpedance) {
+                    for (Pin destination : destinations) {
+                        destination.setHiImpedance();
+                    }
+                } else {
+                    for (Pin destination : destinations) {
+                        destination.setState(state);
+                    }
+                }
+            }
+            /*Optimiser blockEnd recurse*/
+            processing = false;
+        }
+        /*Optimiser blockEnd allRecurse blockEnd ts*/
     }
 
     public void resend() {
         if (!hiImpedance) {
             setState(state);
         }
+    }
+
+    @Override
+    public Pin copyState(IModelItem<Pin> oldPin) {
+        super.copyState(oldPin);
+        hiImpedance = oldPin.isHiImpedance();
+        return this;
     }
 
     @Override
@@ -114,13 +176,18 @@ public class OutPin extends Pin {
             for (int i = 0; i < destinations.length; i++) {
                 destinations[i] = destinations[i].getOptimised(false);
             }
-            ClassOptimiser<OutPin> optimiser = new ClassOptimiser<>(this).unroll(destinations.length);
+            ClassOptimiser<OutPin> optimiser = new ClassOptimiser<>(this, OutPin.class).unroll(destinations.length);
             if (!Simulator.recursive && Utils.notContain(Simulator.recursiveOuts, getName())) {
                 if (Simulator.noRecursive) {
                     optimiser.cut("allRecurse");
                 } else {
                     optimiser.cut("recurse");
                 }
+            }
+            if (triState) {
+                optimiser.cut("noTs");
+            } else {
+                optimiser.cut("ts");
             }
             return optimiser.build();
         }
