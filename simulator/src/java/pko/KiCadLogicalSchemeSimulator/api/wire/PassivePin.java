@@ -37,8 +37,6 @@ public class PassivePin extends TriStateOutPin {
     public PassivePin(String id, SchemaPart parent) {
         super(id, parent);
         strong = false;
-        hiImpedance = true;
-        triState = true;
     }
 
     @Override
