@@ -68,6 +68,7 @@ public class OrGate extends SchemaPart {
 
     public void replaceIn(String id, OrGateIn pin) {
         ins.put(id, pin);
+        inPins.put(id, pin);
     }
 
     @Override

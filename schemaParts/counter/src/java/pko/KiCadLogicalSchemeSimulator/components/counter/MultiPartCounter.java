@@ -32,14 +32,19 @@
 package pko.KiCadLogicalSchemeSimulator.components.counter;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.tools.Utils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MultiPartCounter extends SchemaPart {
+    public final MultiPartCIn[] cIns;
+    public final Map<String, MultiPartRIn> rIns = new HashMap<>();
     private final Bus[] outBuses;
     private final Pin[] outPins;
     private final int[] sizes;
+    public long resetState;
+    public boolean clockEnabled = true;
 
     protected MultiPartCounter(String id, String sParam) {
         super(id, sParam);
@@ -47,9 +52,12 @@ public class MultiPartCounter extends SchemaPart {
             throw new RuntimeException("Component " + id + " has no parameter \"size\"");
         }
         String[] sSizes = params.get("size").split(",");
+        String[] skip = params.getOrDefault("skip", "").split(",");
+        int resetAmount = Integer.parseInt(params.getOrDefault("resetAmount", "1"));
         outBuses = new Bus[sSizes.length];
         outPins = new Pin[sSizes.length];
         sizes = new int[sSizes.length];
+        cIns = new MultiPartCIn[sSizes.length];
         for (int i = 0; i < sSizes.length; i++) {
             try {
                 sizes[i] = Integer.parseInt(sSizes[i]);
@@ -59,91 +67,16 @@ public class MultiPartCounter extends SchemaPart {
             if (sizes[i] < 1) {
                 throw new RuntimeException("Component " + id + " sizes part No " + i + " must be positive number");
             }
-            int finalI = i;
             if (sizes[i] == 1) {
                 addOutPin("Q" + (char) ('a' + i));
-                if (reverse) {
-                    addInPin(new InPin("C" + (char) ('a' + i), this) {
-                        @Override
-                        public void setState(boolean newState) {
-                            state = newState;
-                            if (!state) {
-                                outPins[finalI].setState(!outPins[finalI].state);
-                            }
-                        }
-                    });
-                    addInPin(new InPin("R" + (char) ('a' + i), this) {
-                        @Override
-                        public void setState(boolean newState) {
-                            state = newState;
-                            if (!state) {
-                                outPins[finalI].setState(false);
-                            }
-                        }
-                    });
-                } else {
-                    addInPin(new InPin("C" + (char) ('a' + i), this) {
-                        @Override
-                        public void setState(boolean newState) {
-                            state = newState;
-                            if (newState) {
-                                outPins[finalI].setState(!outPins[finalI].state);
-                            }
-                        }
-                    });
-                    addInPin(new InPin("R" + (char) ('a' + i), this) {
-                        @Override
-                        public void setState(boolean newState) {
-                            state = newState;
-                            if (state) {
-                                outPins[finalI].setState(false);
-                            }
-                        }
-                    });
-                }
             } else {
-                final long countMask = Utils.getMaskForSize(sizes[i]);
                 addOutBus("Q" + (char) ('a' + i), sizes[i]);
-                if (reverse) {
-                    addInPin(new InPin("C" + (char) ('a' + finalI), this) {
-                        @Override
-                        public void setState(boolean newState) {
-                            state = newState;
-                            if (!state) {
-                                outBuses[finalI].setState((outBuses[finalI].state + 1) & countMask);
-                            }
-                        }
-                    });
-                    addInPin(new InPin("R" + (char) ('a' + i), this) {
-                        @Override
-                        public void setState(boolean newState) {
-                            state = newState;
-                            if (!state) {
-                                outBuses[finalI].setState(0);
-                            }
-                        }
-                    });
-                } else {
-                    addInPin(new InPin("C" + (char) ('a' + i), this) {
-                        @Override
-                        public void setState(boolean newState) {
-                            state = newState;
-                            if (state) {
-                                outBuses[finalI].setState((outBuses[finalI].state + 1) & countMask);
-                            }
-                        }
-                    });
-                    addInPin(new InPin("R" + (char) ('a' + i), this) {
-                        @Override
-                        public void setState(boolean newState) {
-                            state = newState;
-                            if (state) {
-                                outBuses[finalI].setState(0);
-                            }
-                        }
-                    });
-                }
             }
+            int max = Integer.parseInt((skip.length - 1 < i || skip[i].isBlank()) ? "0" : skip[i]);
+            cIns[i] = addInPin(new MultiPartCIn("C" + (char) ('a' + i), this, reverse, sizes[i], i, max));
+        }
+        for (int i = 0; i < resetAmount; i++) {
+            rIns.put("R" + i, addInPin(new MultiPartRIn("R" + i, this, params.containsKey("resetReverse"), i)));
         }
     }
 
@@ -151,12 +84,19 @@ public class MultiPartCounter extends SchemaPart {
     public void initOuts() {
         for (int i = 0; i < sizes.length; i++) {
             if (sizes[i] == 1) {
-                outPins[i] = getOutPin("Q" + (char) +('a' + i));
+                outPins[i] = getOutPin("Q" + (char) ('a' + i));
+                cIns[i].outPin = outPins[i];
             } else {
-                outBuses[i] = getOutBus("Q" + (char) +('a' + i));
+                outBuses[i] = getOutBus("Q" + (char) ('a' + i));
                 outBuses[i].useBitPresentation = true;
+                cIns[i].outBus = outBuses[i];
             }
         }
+        rIns.values().forEach(pin -> {
+            if (pin.isHiImpedance() || pin.getState() == 0) {
+                resetState |= (1L << pin.no);
+            }
+        });
     }
 
     @Override

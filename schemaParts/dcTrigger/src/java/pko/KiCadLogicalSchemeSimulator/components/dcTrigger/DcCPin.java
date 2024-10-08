@@ -110,6 +110,7 @@ public class DcCPin extends InPin {
             }
             DcCPin build = optimiser.build();
             parent.cPin = build;
+            parent.inPins.put(id, build);
             return build;
         }
     }

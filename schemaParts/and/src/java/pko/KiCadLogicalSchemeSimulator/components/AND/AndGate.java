@@ -68,6 +68,8 @@ public class AndGate extends SchemaPart {
 
     public void replaceIn(String id, AndGateIn pin) {
         ins.put(id, pin);
+        inPins.put(id, pin);
+
     }
 
     @Override

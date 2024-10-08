@@ -9,9 +9,10 @@ Multipart binary counter with a defined amount of outputs.
 - `Cp`- clock input.  
   p - part ID in range [a…z]  
   sensible to raising edge.
-- `Rp`- reset input
-  p - part ID in range [a…z]  
-  sensible to raising edge.
+- `Rx`- reset inputs  
+  x - number in range [0…reset_amount-1]
+  sensible to raising edge.  
+  multiple pins combined in `AND` principal.
 
 #### Output names:
 
@@ -27,7 +28,12 @@ Multipart binary counter with a defined amount of outputs.
 
 #### Optional parameters:
 
-- `reverse`- `C` and `R` inputs sensible to falling edge.
+- `skip`- skip mask for each part as coma separated list.  
+  if according bits are high - skip one count  
+  0 or empty - no skip.
+- `resetAmount`- Reset pin amount in range [0…63].
+- `reverse`- `C` input sensible to falling edge.
+- `resetReverse`- `R` inputs sensible to falling edge.
 
 ### Example
 

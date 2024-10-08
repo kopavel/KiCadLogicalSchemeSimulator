@@ -68,6 +68,7 @@ public class RepeaterInPin extends InPin {
             ClassOptimiser<RepeaterInPin> optimiser = new ClassOptimiser<>(this).cut("r");
             RepeaterInPin build = optimiser.build();
             parent.inPin = build;
+            parent.inPins.put(id, build);
             return build;
         }
     }

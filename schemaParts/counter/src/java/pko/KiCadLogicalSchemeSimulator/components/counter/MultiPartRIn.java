@@ -30,28 +30,37 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.counter;
-import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 
-public class CInPin extends InPin {
+public class MultiPartRIn extends InPin {
     public final boolean reverse;
-    public final long countMask;
-    public Bus out;
+    public final MultiPartCIn[] cIns;
+    public final MultiPartCounter parent;
+    public final long mask;
+    public final long nMask;
+    public final int no;
 
-    public CInPin(String id, Counter parent, boolean reverse, long countMask) {
+    public MultiPartRIn(String id, MultiPartCounter parent, boolean reverse, int no) {
         super(id, parent);
-        out = parent.getOutBus("Q");
+        this.parent = parent;
         this.reverse = reverse;
-        this.countMask = countMask;
+        cIns = parent.cIns;
+        mask = 1L << no;
+        nMask = 1L << no;
+        this.no = no;
     }
 
-    /*Optimiser constructor*/
-    public CInPin(CInPin oldPin, String variantId) {
+    @SuppressWarnings("unused")
+    /*Optimiser constructor unroll cIn:cIns*///
+    public MultiPartRIn(MultiPartRIn oldPin, String variantId) {
         super(oldPin, variantId);
-        this.reverse = oldPin.reverse;
-        this.countMask = oldPin.countMask;
-        this.out = oldPin.out;
+        reverse = oldPin.reverse;
+        parent = oldPin.parent;
+        cIns = oldPin.cIns;
+        mask = oldPin.mask;
+        nMask = oldPin.nMask;
+        no = oldPin.no;
     }
 
     @Override
@@ -59,23 +68,47 @@ public class CInPin extends InPin {
         state = newState;
         /*Optimiser bind newState*/
         if (newState
-                /*Optimiser block reverse*///
-                ^ reverse
-            /*Optimiser blockEnd reverse*///
+                /*Optimiser line o*///
+                ^ reverse//
         ) {
-            /*Optimiser bind countMask*///
-            out.setState((out.state + 1) & countMask);
+            /*Optimiser bind mask block and*/
+            if (parent.resetState == mask) {
+                parent.resetState = 0;
+                /*Optimiser blockEnd and*/
+                for (MultiPartCIn cIn : cIns) {
+                    cIn.reset();
+                }
+                /*Optimiser block and*/
+            } else {
+                /*Optimiser bind nMask*/
+                parent.resetState &= nMask;
+            }
+        } else if (parent.resetState == 0) {
+            /*Optimiser bind mask*/
+            parent.resetState = mask;
+            for (MultiPartCIn cIn : cIns) {
+                cIn.reset();
+            }
+        } else {
+            /*Optimiser bind mask*/
+            parent.resetState |= mask;
         }
+        /*Optimiser blockEnd and*/
     }
 
     @Override
     public InPin getOptimised(boolean keepSetters) {
-        ClassOptimiser<CInPin> optimiser = new ClassOptimiser<>(this).cut("reverse").bind("countMask", countMask);
+        ClassOptimiser<MultiPartRIn> optimiser = new ClassOptimiser<>(this).cut("o").unroll(parent.cIns.length);
+        if (parent.rIns.size() == 1) {
+            optimiser.cut("and");
+        } else {
+            optimiser.bind("mask", mask).bind("nMask", nMask);
+        }
         if (reverse) {
             optimiser.bind("newState", "!newState");
         }
-        CInPin build = optimiser.build();
-        ((Counter) parent).in = build;
+        MultiPartRIn build = optimiser.build();
+        parent.rIns.put(id, build);
         parent.inPins.put(id, build);
         return build;
     }
