@@ -69,13 +69,13 @@ public class DcCPin extends InPin {
                         && parent.clockEnabled//
         ) {
             if (dPin.state) {
-                if (!qOut.state) {
-                    qOut.setState(true);
+                if (iqOut.state) {
+                    iqOut.setState(false);
                     /*Optimiser block bothRS block anyRS*/
                 }
-                if (iqOut.state) {
+                if (!qOut.state) {
                     /*Optimiser blockEnd bothRS  blockEnd anyRS*/
-                    iqOut.setState(false);
+                    qOut.setState(true);
                 }
             } else {
                 if (qOut.state) {

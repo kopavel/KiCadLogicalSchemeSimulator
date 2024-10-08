@@ -34,6 +34,7 @@ import pko.KiCadLogicalSchemeSimulator.api.schemaPart.AbstractUiComponent;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.InteractiveSchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.net.Net;
 
 import javax.swing.*;
@@ -50,9 +51,11 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
     double fps;
     private int hPos;
     private int vPos;
+    private byte[] row;
 
     public Display(String id, String sParam) {
         super(id, sParam);
+        row = ram[vPos];
         try {
             if (params.containsKey("scale")) {
                 int scale = Integer.parseInt(params.get("scale"));
@@ -90,6 +93,7 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                         }
                         hPos = 0;
                         vPos++;
+                        row = ram[vPos];
                         rows++;
                     }
                 }
@@ -121,6 +125,7 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                         }
                         hPos = 0;
                         vPos = 0;
+                        row = ram[vPos];
                     }
                 }
             });
@@ -138,6 +143,7 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                         }
                         hPos = 0;
                         vPos++;
+                        row = ram[vPos];
                         rows++;
                     }
                 }
@@ -169,22 +175,23 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                         }
                         hPos = 0;
                         vPos = 0;
+                        row = ram[vPos];
                     }
                 }
             });
         }
+        vIn = addInPin("Vin");
         addInPin(new InPin("Clock", this) {
+            final Pin in = vIn;
+
             @Override
             public void setState(boolean newState) {
                 state = newState;
-                if (!state) {
-                    byte data = (byte) (vIn.state ? 0xff : 0x0);
-                    ram[vPos][hPos] = data;
-                    hPos++;
+                if (!newState) {
+                    row[hPos++] = (byte) (in.state ? 0xff : 0x0);
                 }
             }
         });
-        vIn = addInPin("Vin");
     }
 
     @Override
@@ -208,5 +215,6 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
         hPos = 0;
         vPos = 0;
         ram = new byte[1][4096];
+        row = ram[vPos];
     }
 }
