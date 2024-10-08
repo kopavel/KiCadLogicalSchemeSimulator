@@ -1,11 +1,35 @@
 ## DC-trigger
 
-Implements a DC-trigger functionality with R and S inputs.
+DC-trigger with R and S inputs.
 
-**Input names**: D, C, R ,S  
-**Output names**: Q, ~{Q}
+### Pins
 
-**Optional parameters **
+#### Input names:
 
-- `reverse`: If provided, the `C` input is reversed (sensitive to negative front, positive otherwise).
-- `setReverse` If provided, the `R` and `s` inputs are reversed (active on Lo). 
+- `D`- data
+- `C`- clock  
+  sensible to raising edge.
+- `R`- reset  
+  active on `Hi`
+- `S`- set  
+  active on `Hi`
+
+#### Output names:
+
+- `Q`- output
+- `~{Q}`- reverse output
+
+### Parameters
+
+#### Mandatory parameters:
+
+- none
+
+#### Optional parameters:
+
+- `reverse`- `C` sensitive to falling edge.
+- `setReverse` `R` and `s` active on `Lo`.
+
+### Example
+
+DcTrigger with `R` and `S` active on `Lo`: `setReverse` 

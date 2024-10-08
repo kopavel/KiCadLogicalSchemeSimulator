@@ -4,22 +4,22 @@
 
 #### Input names:
 
-- `INx` Gate input.  
-  x — input number in range[0…size-1].
+- `INx`- Gate input.  
+  x - input number in range[0…size-1].
 
 #### Output names:
 
-- `OUT` Gate output.
+- `OUT`- Gate output.
 
 ### Parameters
 
 #### Mandatory parameters:
 
-- `size` amount of input pins.
+- `size`- amount of input pins.
 
 #### Optional parameters:
 
-- `reverse` reverse output for NAND gate.
+- `reverse`- reverse output for NAND gate.
 
 ### Example
 

@@ -6,24 +6,24 @@ Binary counter with a defined amount of outputs.
 
 #### Input names:
 
-- `C` clock input.  
+- `C`- clock input.  
   sensible to raising edge.
-- `R` reset input
+- `R`- reset input
 
 #### Output names:
 
-- `Qx` outputs.  
-  x — sequential number in range [0…size-1].
+- `Qx`- outputs.  
+  x - sequential number in range [0…size-1].
 
 ### Parameters
 
 #### Mandatory parameters:
 
-- `size` amount of output pins.
+- `size`- amount of output pins.
 
 #### Optional parameters:
 
-- `reverse` `C` input sensible to falling edge.
+- `reverse`- `C` input sensible to falling edge.
 
 ### Example
 
