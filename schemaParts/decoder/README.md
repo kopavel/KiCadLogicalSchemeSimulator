@@ -2,18 +2,30 @@
 
 Implements binary decoder.
 
-**Input names**:
+### Pins
 
-- Ax, where x is a sequential number, starting from 0;
-- `CS` - chip select
+#### Input names:
 
-**Output names**:
+- `Ax`- inputs  
+  x - a sequential number in range [0…size-2]
+- `CS`- chip select
 
-- Qx, where x is a sequential number, starting from 0
+#### Output names:
 
-**Mandatory parameter `size`:** Specifies the input pins amount.
+- Qx - outputs  
+  x - sequential number in range [0...2^size-1]
 
-**Optional parameters**:
+### Parameters
 
-- `reverse`: If provided, the `CS` input are reversed.
-- `outReverse`: If provided, the outputs are reversed.
+#### Mandatory parameters:
+
+`size`- input pins amount in range [1…6].
+
+#### Optional parameters:
+
+- `reverse`- `CS` input reversed.
+- `outReverse`- outputs reversed.
+
+### Example
+
+2 input decoder with `CS` and output reversed: `size=2;reverse;outReverse`

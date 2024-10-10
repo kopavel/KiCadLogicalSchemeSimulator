@@ -28,7 +28,7 @@ DC-trigger with R and S inputs.
 #### Optional parameters:
 
 - `reverse`- `C` sensitive to falling edge.
-- `setReverse` `R` and `s` active on `Lo`.
+- `setReverse`- `R` and `s` active on `Lo`.
 
 ### Example
 
