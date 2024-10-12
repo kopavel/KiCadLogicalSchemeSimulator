@@ -5,7 +5,7 @@ Supports two usage methods: directly from KiCad or standalone, using a schema fi
 
 Focuses on performance and simplicity of the net schema part API, allowing easy implementation of custom schema part behaviors for simulation.
 
-[Here is more info](stuff%2Fkicad_symbols%2FREADME.md) about the supported schema part list and how to configure KiCad symbols mapping for the simulator.
+[Here is more info](stuff/kicad_symbols/README.md) about the supported schema part list and how to configure KiCad symbols mapping for the simulator.
 
 ## Building
 
@@ -50,9 +50,9 @@ located under the menu Tools->"Generate Legacy Bill of Materials...". That can b
 After launching the project, the simulator builds the simulation net and displays all "interactive" schema parts, such as LEDs, displays, or oscillators, on the
 desk. Parts can be arranged freely, and the layout is saved near the Netlist file in a file with the `.sym_layout` extension.
 
-For a detailed description of components, see [more information](schemaParts%2FREADME.md).
+For a detailed description of components, see [more information](schemaParts/README.md).
 
-For schema debugging purposes, an [oscilloscope](schemaParts%2Foscillator%2FOSCILLOSCOPE.md) from the [oscillator](schemaParts%2Foscillator%2FREADME.md) component
+For schema debugging purposes, an [oscilloscope](schemaParts/oscillator/OSCILLOSCOPE.md) from the [oscillator](schemaParts/oscillator/README.md) component
 can be used. Alternatively, schema part monitoring is available from the main interface menu.
 
 After selecting a target schema part, its pin representation appears on the screen, showing the current signal on each pin. Optionally, for certain schema parts,

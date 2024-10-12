@@ -39,7 +39,6 @@ import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 public class OffsetBus extends OutBus {
     protected final byte offset;
     public long maskState;
-    public boolean queueState;
 
     public OffsetBus(OutBus outBus, Bus destination, byte offset) {
         super(outBus, "offset" + offset);

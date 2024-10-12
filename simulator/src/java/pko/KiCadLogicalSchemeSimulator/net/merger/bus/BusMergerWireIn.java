@@ -43,8 +43,8 @@ import pko.KiCadLogicalSchemeSimulator.tools.Log;
 public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
     @Getter
     public long mask;
-    public long nMask;
-    public BusMerger merger;
+    public final long nMask;
+    public final BusMerger merger;
     public boolean oldStrong;
     public Bus[] destinations;
 

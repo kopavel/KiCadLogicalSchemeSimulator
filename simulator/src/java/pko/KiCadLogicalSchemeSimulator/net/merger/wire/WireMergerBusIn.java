@@ -45,7 +45,7 @@ import pko.KiCadLogicalSchemeSimulator.tools.Log;
 public class WireMergerBusIn extends InBus implements MergerInput<Bus> {
     @Getter
     public long mask;
-    public WireMerger merger;
+    public final WireMerger merger;
     public Pin[] destinations;
 
     public WireMergerBusIn(Bus source, long mask, WireMerger merger) {

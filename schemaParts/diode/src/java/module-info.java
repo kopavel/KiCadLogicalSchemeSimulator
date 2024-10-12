@@ -34,6 +34,5 @@ import pko.KiCadLogicalSchemeSimulator.components.diode.DiodeSpi;
 
 module KiCadLogicalSchemeSimulator.components.Diode {
     requires KiCadLogicalSchemeSimulator.simulator;
-    requires java.desktop;
     provides SchemaPartSpi with DiodeSpi;
 }

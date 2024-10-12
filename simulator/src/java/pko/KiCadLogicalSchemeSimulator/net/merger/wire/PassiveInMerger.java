@@ -36,7 +36,7 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.TriStateOutPin;
 
 public class PassiveInMerger extends TriStateOutPin {
-    PassivePin source;
+    final PassivePin source;
 
     public PassiveInMerger(PassivePin source, Boolean powerState) {
         super(source, "PassiveInMerger");

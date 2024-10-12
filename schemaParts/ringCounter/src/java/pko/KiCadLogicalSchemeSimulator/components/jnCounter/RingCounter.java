@@ -37,7 +37,7 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 
 public class RingCounter extends SchemaPart {
     public final long coMax;
-    public long countMax = 1;
+    public final long countMax;
     private Bus outBus;
     private Pin carryOutPin;
     private boolean clockEnabled = true;

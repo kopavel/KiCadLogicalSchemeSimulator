@@ -33,7 +33,7 @@ package pko.KiCadLogicalSchemeSimulator.net.merger.wire;
 import pko.KiCadLogicalSchemeSimulator.api.wire.OutPin;
 
 public class PassiveOutMerger extends OutPin {
-    OutPin source;
+    final OutPin source;
     boolean oldStrong;
 
     public PassiveOutMerger(OutPin source) {

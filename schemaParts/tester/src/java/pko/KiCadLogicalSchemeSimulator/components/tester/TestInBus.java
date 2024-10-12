@@ -34,7 +34,7 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 
 public class TestInBus extends SchemaPart {
-    public InBus bus;
+    public final InBus bus;
 
     protected TestInBus(String id, String sParam) {
         super(id, sParam);

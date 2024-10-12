@@ -48,7 +48,7 @@ import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 import java.util.*;
 
 public class BusMerger extends OutBus {
-    public Set<MergerInput<?>> sources = new TreeSet<>(Comparator.comparing(mergerInput -> mergerInput.getMask() + ":" + mergerInput.getName()));
+    public final Set<MergerInput<?>> sources = new TreeSet<>(Comparator.comparing(mergerInput -> mergerInput.getMask() + ":" + mergerInput.getName()));
     public long strongPins;
     public long weakPins;
     public long weakState;

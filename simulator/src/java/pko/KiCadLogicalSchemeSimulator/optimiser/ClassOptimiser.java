@@ -46,10 +46,10 @@ import static pko.KiCadLogicalSchemeSimulator.tools.Utils.regexEscape;
 
 public class ClassOptimiser<T> {
     private static final Map<String, Class<?>> dynamicClasses = new HashMap<>();
+    final List<String> cutList = new ArrayList<>();
     private final Map<String, String> binds = new HashMap<>();
     private final T oldInstance;
     private final Class<?> sourceClass;
-    List<String> cutList = new ArrayList<>();
     private String suffix = "";
     private List<String> source;
     private int unrollSize;
@@ -115,11 +115,7 @@ public class ClassOptimiser<T> {
                     Log.trace(JavaCompiler.class, "Process");
                     String optimisedSource = process();
                     Log.trace(JavaCompiler.class, "Compile");
-                    try {
-                        storeSrc(optimizedFullClassName, optimisedSource);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
+                    storeSrc(optimizedFullClassName, optimisedSource);
                     dynamicClass = JavaCompiler.compileJavaSource(optimizedFullClassName, optimizedClassName, optimisedSource);
                     if (dynamicClass == null) {
                         Log.error(JavaCompiler.class, "Optimised class compile was not successful, fall back to generic class, file name:" + optimizedFullClassName);
@@ -141,7 +137,7 @@ public class ClassOptimiser<T> {
         }
     }
 
-    private static void storeSrc(String className, String source) throws IOException {
+    private static void storeSrc(String className, String source) {
         Thread.ofVirtual().start(() -> {
             String srcPath = Simulator.optimisedDir + File.separator + className.replace(".", File.separator) + ".java";
             String dirPath = srcPath.substring(0, srcPath.lastIndexOf(File.separator));
@@ -228,7 +224,7 @@ public class ClassOptimiser<T> {
                                     String superLine = lines.next();//"super" here
                                     lineOffset = countLeadingSpaces(superLine);
                                     functionSource.append(superLine).append("\n");
-                                    while (!line.trim().equals("}")) { //skip all constructor definition, all in "super"
+                                    while (!line.trim().equals("}")) { //skip all constructor definition, all in `super`
                                         line = lines.next();
                                     }
                                     line = lines.previous();
@@ -284,8 +280,7 @@ public class ClassOptimiser<T> {
                     } else if (line.contains("public class " + sourceClass.getSimpleName())) {
                         //rename class definition
                         resultSource.append("public class ").append(sourceClass.getSimpleName())
-                                    .append(suffix)
-                                    .append(" extends ").append(sourceClass.getSimpleName())
+                                    .append(suffix).append(" extends ").append(sourceClass.getSimpleName())
                                     .append(" {\n");
                         functionOffset = -1;
                         functionSource = new StringBuilder();
@@ -313,11 +308,11 @@ public class ClassOptimiser<T> {
                     } else {
                         //cut lines
                         if (cutLines.stream()
-                                .anyMatch(b -> cutList.contains(b))) {
+                                .anyMatch(cutList::contains)) {
                             preserveFunction = true;
                             //cut blocks
                         } else if (blocks.stream()
-                                .anyMatch(b -> cutList.contains(b))) {
+                                .anyMatch(cutList::contains)) {
                             preserveFunction = true;
                         } else if (iteratorPattern != null && line.contains(iteratorPattern)) {
                             //find iterator body — skip iterator definition

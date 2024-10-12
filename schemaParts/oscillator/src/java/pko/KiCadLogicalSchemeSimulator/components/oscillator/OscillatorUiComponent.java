@@ -37,13 +37,14 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.DecimalFormat;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class OscillatorUiComponent extends AbstractUiComponent {
     public final Oscillator parent;
+    public final DecimalFormat formatter = new DecimalFormat("#,###");
     public volatile OscillatorUi ui;
     public double freq = 0;
-    public DecimalFormat formatter = new DecimalFormat("#,###");
     private long lastTicks;
 
     public OscillatorUiComponent(int size, String title, Oscillator parent) {
@@ -64,8 +65,9 @@ public class OscillatorUiComponent extends AbstractUiComponent {
         });
         setBackground(Color.white);
         //noinspection resource
-        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this::repaint, 0, 1, TimeUnit.SECONDS);
-        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this::getFreq, 0, 1, TimeUnit.SECONDS);
+        ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+        executor.scheduleAtFixedRate(this::repaint, 0, 1, TimeUnit.SECONDS);
+        executor.scheduleAtFixedRate(this::getFreq, 0, 1, TimeUnit.SECONDS);
         parent.startIfDefault();
     }
 

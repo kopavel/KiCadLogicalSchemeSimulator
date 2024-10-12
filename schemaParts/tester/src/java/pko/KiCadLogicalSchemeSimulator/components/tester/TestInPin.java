@@ -34,7 +34,7 @@ import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 
 public class TestInPin extends SchemaPart {
-    public InPin pin;
+    public final InPin pin;
 
     protected TestInPin(String id, String sParam) {
         super(id, sParam);

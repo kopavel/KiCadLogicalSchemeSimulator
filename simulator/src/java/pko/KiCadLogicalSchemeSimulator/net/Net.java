@@ -326,36 +326,6 @@ public class Net {
                 //use direct connect to destination
                 if (descriptor.buses.isEmpty()) {
                     throw new RuntimeException("Impossible single wire-to-bus connection for destination " + destination.getName());
-/*
-                    //pin-to-bus
-                    //search if wire already processed
-                    descriptor.offsets.forEach((offset, lists) -> {
-                        //search already processed wires
-                        String passiveHash = Utils.getHash(lists.passivePins);
-                        if (wires.containsKey(passiveHash)) {
-                            //if found by passive pins – connect it and don't process further.
-                            wires.get(passiveHash).addDestination(destination, offset);
-                        } else {
-                            String wireHash = Utils.getHash(lists.pins);
-                            if (wires.containsKey(wireHash)) {
-                                //if found by usual pins (complete wire merger) – connect it and don't process further.
-                                wires.get(wireHash).addDestination(destination, offset);
-                            } else {
-                                //process unprocessed wire
-                                if (lists.pins.size() > 1) {
-                                    //use wire merger
-                                    WireToBusesAdapter adapter = new WireToBusesAdapter(null, null, destination, offset);
-                                    Pin src = processWire(adapter, lists.pins, lists.passivePins, Collections.emptyMap());
-                                    adapter.id = src.id;
-                                    adapter.parent = src.parent;
-                                } else {
-                                    //use direct wire connect
-                                    lists.pins.getFirst().addDestination(destination, offset);
-                                }
-                            }
-                        }
-                    });
-*/
                 } else {
                     //bus-to-bus connection
                     descriptor.buses.forEach((source, offsetMap) -> offsetMap.forEach((offset, mask) -> {
@@ -513,8 +483,8 @@ public class Net {
     }
 
     private static class BusPinsOffset {
-        public List<OutPin> pins = new ArrayList<>();
-        public List<PassivePin> passivePins = new ArrayList<>();
+        public final List<OutPin> pins = new ArrayList<>();
+        public final List<PassivePin> passivePins = new ArrayList<>();
     }
 
     public static class DestinationWireDescriptor {
@@ -539,13 +509,13 @@ public class Net {
 
     private static class DestinationBusDescriptor {
         //Bus, offset, mask
-        public HashMap<OutBus, Map<Byte, Long>> buses = new HashMap<>();
+        public final HashMap<OutBus, Map<Byte, Long>> buses = new HashMap<>();
         //Pin, offset
-        public HashMap<Byte, BusPinsOffset> offsets = new HashMap<>();
+        public final HashMap<Byte, BusPinsOffset> offsets = new HashMap<>();
 
         public boolean useBusMerger() {
             return buses.values()
-                    .stream().mapToLong(Map::size).sum() + offsets.values().size() > 1;
+                    .stream().mapToLong(Map::size).sum() + offsets.size() > 1;
         }
 
         public void add(IModelItem<?> item, byte sourceOffset, byte destinationOffset) {

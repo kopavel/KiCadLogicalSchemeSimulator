@@ -35,6 +35,5 @@ import pko.KiCadLogicalSchemeSimulator.components.LED.LedSpi;
 module KiCadLogicalSchemeSimulator.components.Led {
     requires KiCadLogicalSchemeSimulator.simulator;
     requires java.desktop;
-    requires static lombok;
     provides SchemaPartSpi with LedSpi;
 }

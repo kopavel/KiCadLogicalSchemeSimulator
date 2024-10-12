@@ -45,7 +45,7 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
     public final long mask;
     public final long nMask;
     public Bus[] destinations;
-    public BusMerger merger;
+    public final BusMerger merger;
 
     public BusMergerBusIn(Bus source, long mask, BusMerger merger) {
         super(source, "BMergeBIn");

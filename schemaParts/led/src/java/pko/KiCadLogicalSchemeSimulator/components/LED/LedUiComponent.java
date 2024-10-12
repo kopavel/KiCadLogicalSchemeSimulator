@@ -65,7 +65,7 @@ public class LedUiComponent extends AbstractUiComponent {
         }
         g2d.setColor(state ? on : off);
         g2d.fill(circle);
-        // Draw the circle's border
+        // Draw the circle border
         g2d.setColor(Color.black);
         g2d.draw(circle);
     }
