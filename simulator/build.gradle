@@ -147,6 +147,7 @@ tasks.register("runJmh", JavaExec) {
             '--add-modules', "KiCadLogicalSchemeSimulator.simulator",
             '--add-exports', 'KiCadLogicalSchemeSimulator.simulator/pko.KiCadLogicalSchemeSimulator.net.bus=ALL-UNNAMED',
             '--add-exports', 'KiCadLogicalSchemeSimulator.simulator/pko.KiCadLogicalSchemeSimulator.net.wire=ALL-UNNAMED',
+            '--add-opens', 'java.base/java.lang=KiCadLogicalSchemeSimulator.simulator',
 /*
             '--patch-module', "KiCadLogicalSchemeSimulator.simulator=$rootDir/simulator/optimised"
 */

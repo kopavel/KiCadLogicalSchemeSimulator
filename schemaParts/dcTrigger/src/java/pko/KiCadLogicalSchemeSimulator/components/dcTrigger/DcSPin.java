@@ -72,7 +72,7 @@ public class DcSPin extends InPin {
                         reverse ^//
                         (newState
                                 /*Optimiser line noR*///
-                                && rPin.state//
+                                || rPin.state//
                         );
         //
         if (

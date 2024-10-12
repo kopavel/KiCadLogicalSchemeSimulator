@@ -72,7 +72,7 @@ public class DcRPin extends InPin {
                         reverse ^//
                         (newState
                                 /*Optimiser line noS*///
-                                && sPin.state//
+                                || sPin.state//
                         );
         //
         if (
