@@ -59,7 +59,7 @@ dependencies {
     runtimeOnly project(":schemaParts:display")
     runtimeOnly project(":schemaParts:diode")
     runtimeOnly project(":schemaParts:jkTrigger")
-    runtimeOnly project(":schemaParts:jnCounter")
+    runtimeOnly project(":schemaParts:ringCounter")
     runtimeOnly project(":schemaParts:keyboard")
     runtimeOnly project(":schemaParts:led")
     runtimeOnly project(":schemaParts:multiplexer")

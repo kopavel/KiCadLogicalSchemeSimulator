@@ -35,7 +35,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import pko.KiCadLogicalSchemeSimulator.test.schemaPartTester.NetTester;
 
-public class JnCounterTest extends NetTester {
+public class RingCounterTest extends NetTester {
     @Override
     protected String getNetFilePath() {
         return "test/resources/jnCounter.net";

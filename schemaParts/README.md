@@ -15,7 +15,6 @@ Some interactive parts has additional interfaces/functionality if you click on i
 * [Diode](diode%2FREADME.md) — Diode.
 * [Display](display%2FREADME.md) — Monochrome display.
 * [JkTrigger](jkTrigger%2FREADME.md) — JK trigger.
-* [JnCounter](jnCounter%2FREADME.md) — Johnson counter.
 * [Led](led%2FREADME.md) — LED indicator.
 * [MaskedMultiplexer]( multiplexer%2FmaskedMultiplexer.md) — Multiplexer with a defined amount outputs and ways with masking inputs.
 * [Multiplexer](multiplexer%2FREADME.md) — Multiplexer with a defined amount outputs and ways.
@@ -25,6 +24,7 @@ Some interactive parts has additional interfaces/functionality if you click on i
 * [Oscillator](oscillator%2FREADME.md) — Oscillator with various modes of operation and oscilloscope.
 * [Power](power%2FREADME.md) — Static output, useful for a pull-up/pull-down resistors.
 * [Ram](ram/README.md) — Static RAM.
+* [RingCounter](ringCounter%2FREADME.md) — Ring counter.
 * [Rom](rom/README.md) — ROM.
 * [SdRam](sdram/README.md) — Dynamic RAM.
 * [SingleBitSdRam](sdram/SingleBitSdRam.md) — Single bit Dynamic RAM.

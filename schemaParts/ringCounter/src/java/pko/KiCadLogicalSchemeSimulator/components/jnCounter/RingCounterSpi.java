@@ -33,14 +33,14 @@ package pko.KiCadLogicalSchemeSimulator.components.jnCounter;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
 
-public class JnCounterSpi implements SchemaPartSpi {
+public class RingCounterSpi implements SchemaPartSpi {
     @Override
     public SchemaPart getSchemaPart(String id, String params) {
-        return new JnCounter(id, params);
+        return new RingCounter(id, params);
     }
 
     @Override
     public Class<? extends SchemaPart> getSchemaPartClass() {
-        return JnCounter.class;
+        return RingCounter.class;
     }
 }

@@ -1,8 +1,29 @@
 ## JK-trigger
 
-Implements a JK-trigger functionality with R and S inputs.
+JK-trigger with R and S inputs.
 
-**Input names**: J, K, C, R ,S  
-**Output names**: Q, ~{Q}
+### Pins
 
-**Optional parameter `reverse`:** If provided, the `C` input is reversed (sensitive to negative front, positive otherwise).
+#### Input names:
+
+- `J`- J input
+- `K`- K input
+- `C`- Clock
+  sensitive to raising edge
+- `R`- Reset
+- `S`- Set
+
+#### Output names:
+
+- `Q`- output
+- `~{Q}`- reverse output
+
+### Parameters
+
+#### Mandatory parameters:
+
+- none
+
+#### Optional parameters:
+
+- `reverse`- `C` input sensitive falling edge.

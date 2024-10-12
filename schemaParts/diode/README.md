@@ -2,9 +2,9 @@
 
 Implements diode.
 
-**Pin names**:
+### Pins
 
-- `A` - Anode
-- `K` - Cathode
+- `A`- Anode
+- `K`- Cathode
 
 

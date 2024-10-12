@@ -152,7 +152,7 @@
 			<unit pinMap="8=S;9=D;10=R;11=C;12=~{Q};13=Q"/>
 			<unit pinMap="power;7=NC;14=NC"/>
 		</symbol>
-		<symbol name="4017" symPartClass="JnCounter" symPartParam="size=10">
+		<symbol name="4017" symPartClass="RingCounter" symPartParam="size=10">
 			<unit pinMap="14=C;13=CI;15=R;3=Q0;2=Q1;4=Q2;7=Q3;10=Q4;1=Q5;5=Q6;6=Q7;9=Q8;11=Q9;12=CO"/>
 			<unit pinMap="power;8=NC;16=NC"/>
 		</symbol>
@@ -164,7 +164,7 @@
 			<unit pinMap="10=CP;9=PL;11=DS;7=D0;6=D1;5=D2;4=D3;13=D4;14=D5;15=D6;1=D7;2=Q5;12=Q6;3=Q7"/>
 			<unit pinMap="power;8=NC;16=NC"/>
 		</symbol>
-		<symbol name="4022" symPartClass="JnCounter" symPartParam="size=8">
+		<symbol name="4022" symPartClass="RingCounter" symPartParam="size=8">
 			<unit pinMap="14=C;13=CI;15=R;2=Q0;1=Q1;3=Q2;7=Q3;11=Q4;4=Q5;5=Q6;10=Q7;12=CO"/>
 			<unit pinMap="power;8=NC;16=NC"/>
 		</symbol>

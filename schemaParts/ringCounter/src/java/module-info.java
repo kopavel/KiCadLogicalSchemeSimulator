@@ -30,9 +30,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
-import pko.KiCadLogicalSchemeSimulator.components.jnCounter.JnCounterSpi;
+import pko.KiCadLogicalSchemeSimulator.components.jnCounter.RingCounterSpi;
 
-module KiCadLogicalSchemeSimulator.components.jnCounter {
+module KiCadLogicalSchemeSimulator.components.ringCounter {
     requires KiCadLogicalSchemeSimulator.simulator;
-    provides SchemaPartSpi with JnCounterSpi;
+    provides SchemaPartSpi with RingCounterSpi;
 }

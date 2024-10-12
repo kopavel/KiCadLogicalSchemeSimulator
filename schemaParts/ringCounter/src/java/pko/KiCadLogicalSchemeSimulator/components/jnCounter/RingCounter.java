@@ -35,14 +35,14 @@ import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 
-public class JnCounter extends SchemaPart {
+public class RingCounter extends SchemaPart {
     public final long coMax;
     public long countMax = 1;
     private Bus outBus;
     private Pin carryOutPin;
     private boolean clockEnabled = true;
 
-    protected JnCounter(String id, String sParam) {
+    protected RingCounter(String id, String sParam) {
         super(id, sParam);
         if (!params.containsKey("size")) {
             throw new RuntimeException("Component " + id + " has no parameter \"size\"");
