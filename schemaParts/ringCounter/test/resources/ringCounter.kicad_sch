@@ -221,7 +221,7 @@
     )
     (pin "1" (uuid 79af6972-1da3-46e8-9b16-a5b21ccb2220))
     (instances
-      (project "jnCounter"
+      (project "ringCounter"
         (path "/dca00733-6e59-4b89-b3a6-bb50926963b6"
           (reference "R1") (unit 1)
         )
@@ -259,7 +259,7 @@
     (pin "13" (uuid e4949813-0bcb-4355-9f00-5360ee4d6db0))
     (pin "12" (uuid bb23b2e0-b3a8-4ecc-a800-7436bf2373f3))
     (instances
-      (project "jnCounter"
+      (project "ringCounter"
         (path "/dca00733-6e59-4b89-b3a6-bb50926963b6"
           (reference "U2") (unit 1)
         )
@@ -291,7 +291,7 @@
     (pin "0" (uuid 2bcb6f1a-3727-4a2e-b605-05a746ff700b))
     (pin "1" (uuid 6b40eb59-ea5d-4655-b2c5-3ac90a41a231))
     (instances
-      (project "jnCounter"
+      (project "ringCounter"
         (path "/dca00733-6e59-4b89-b3a6-bb50926963b6"
           (reference "qBus1") (unit 1)
         )
@@ -316,7 +316,7 @@
     )
     (pin "1" (uuid 79af6972-1da3-46e8-9b16-a5b21ccb2221))
     (instances
-      (project "jnCounter"
+      (project "ringCounter"
         (path "/dca00733-6e59-4b89-b3a6-bb50926963b6"
           (reference "Cin1") (unit 1)
         )
@@ -341,7 +341,7 @@
     )
     (pin "1" (uuid 31a809af-f239-4eb9-a34f-a5696bea11b4))
     (instances
-      (project "jnCounter"
+      (project "ringCounter"
         (path "/dca00733-6e59-4b89-b3a6-bb50926963b6"
           (reference "Cout1") (unit 1)
         )
@@ -366,7 +366,7 @@
     )
     (pin "1" (uuid 79af6972-1da3-46e8-9b16-a5b21ccb2222))
     (instances
-      (project "jnCounter"
+      (project "ringCounter"
         (path "/dca00733-6e59-4b89-b3a6-bb50926963b6"
           (reference "C1") (unit 1)
         )

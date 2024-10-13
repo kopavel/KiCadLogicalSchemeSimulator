@@ -29,7 +29,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.components.jnCounter.test;
+package pko.KiCadLogicalSchemeSimulator.components.ringCounter.test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,7 +38,7 @@ import pko.KiCadLogicalSchemeSimulator.test.schemaPartTester.NetTester;
 public class RingCounterTest extends NetTester {
     @Override
     protected String getNetFilePath() {
-        return "test/resources/jnCounter.net";
+        return "test/resources/ringCounter.net";
     }
 
     @Override

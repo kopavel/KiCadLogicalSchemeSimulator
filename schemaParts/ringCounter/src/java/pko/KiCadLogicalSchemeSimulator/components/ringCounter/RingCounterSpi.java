@@ -29,11 +29,18 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+package pko.KiCadLogicalSchemeSimulator.components.ringCounter;
+import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
 
-test {
-    doFirst {
-        jvmArgs += [
-                '--add-exports', 'KiCadLogicalSchemeSimulator.components.jnCounter/pko.KiCadLogicalSchemeSimulator.components.jnCounter=ALL-UNNAMED',
-        ]
+public class RingCounterSpi implements SchemaPartSpi {
+    @Override
+    public SchemaPart getSchemaPart(String id, String params) {
+        return new RingCounter(id, params);
+    }
+
+    @Override
+    public Class<? extends SchemaPart> getSchemaPartClass() {
+        return RingCounter.class;
     }
 }
