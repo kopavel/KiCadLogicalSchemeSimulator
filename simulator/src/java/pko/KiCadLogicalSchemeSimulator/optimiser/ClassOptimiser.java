@@ -220,7 +220,9 @@ public class ClassOptimiser<T> {
                                     line = lines.next();//load constructor definition
                                     int paramNamePos = line.indexOf(' ', line.indexOf('('));
                                     oldItemName = line.substring(paramNamePos, line.indexOf(",", paramNamePos));
-                                    functionSource.append(line.replace(sourceClass.getSimpleName() + "(", sourceClass.getSimpleName() + suffix + "(")).append("\n");
+                                    functionSource =
+                                            new StringBuilder(line.replace(sourceClass.getSimpleName() + "(", sourceClass.getSimpleName() + suffix + "(")).append(
+                                                    "\n");
                                     String superLine = lines.next();//"super" here
                                     lineOffset = countLeadingSpaces(superLine);
                                     functionSource.append(superLine).append("\n");
