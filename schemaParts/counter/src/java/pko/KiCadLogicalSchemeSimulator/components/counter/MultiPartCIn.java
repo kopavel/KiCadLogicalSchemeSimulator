@@ -82,7 +82,7 @@ public class MultiPartCIn extends InPin {
                 /*Optimiser line o*///
                 ^ reverse//
                 /*Optimiser line hasR*///
-                && parent.clockEnabled//
+                && parent.resetState != 0//
         ) {
 
             /*Optimiser line o*/

@@ -47,7 +47,7 @@ public class MultiPartRIn extends InPin {
         this.reverse = reverse;
         cIns = parent.cIns;
         mask = 1L << no;
-        nMask = 1L << no;
+        nMask = ~mask;
         this.no = no;
     }
 

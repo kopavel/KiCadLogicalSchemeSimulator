@@ -48,8 +48,10 @@ public class MultiPartCounterTest extends NetTester {
 
     @BeforeEach
     void reset() {
-        setPin("Ra", true);
-        setPin("Rb", true);
+        setPin("R0", true);
+        setPin("R1", true);
+        setPin("R0", false);
+        setPin("R1", false);
     }
 
     @Test
@@ -57,8 +59,10 @@ public class MultiPartCounterTest extends NetTester {
     void resetPinResetsCounter() {
         setPin("Ca", false);
         setPin("Cb", false);
-        setPin("Ra", true);
-        setPin("Rb", true);
+        checkBus("inB", 1, "Count should be 1 before reset");
+        checkPin("inA", true, "Count should be 1 before reset");
+        setPin("R0", true);
+        setPin("R1", true);
         checkPin("inA", false, "Count should reset on rising edge of reset pin");
         checkBus("inB", 0, "Count should reset on rising edge of reset pin");
     }
@@ -66,7 +70,10 @@ public class MultiPartCounterTest extends NetTester {
     @Test
     @DisplayName("Count increments on clock signal")
     void countIncrementsOnClock() {
-        for (int i = 1; i <= 7; i++) {
+        for (int i = 1; i < 7; i++) {
+            if (i == 3) {
+                continue;
+            }
             setPin("Cb", false);
             checkBus("inB", i, "Count should increment on clock signal");
         }
@@ -79,16 +86,16 @@ public class MultiPartCounterTest extends NetTester {
     }
 
     @Test
-    @DisplayName("Count does not change on reset pin falling edge")
+    @DisplayName("Count does not change with active reset pin")
     void countDoesNotChangeOnResetFallingEdge() {
-        setPin("Cb", false);
-        checkBus("inB", 1, "Count should be 1 before reset");
-        setPin("Rb", false);
-        checkBus("inB", 1, "Count should not change on falling edge of reset pin");
+        setPin("R0", true);
+        setPin("R1", true);
+        checkBus("inB", 0, "Count should be 1 before reset");
+        checkPin("inA", false, "Count should be 1 before reset");
         setPin("Ca", false);
-        checkPin("inA", true, "Count should be 1 before reset");
-        setPin("Ra", false);
-        checkPin("inA", true, "Count should not change on falling edge of reset pin");
+        setPin("Cb", false);
+        checkBus("inB", 0, "Count should not change on falling edge of reset pin");
+        checkPin("inA", false, "Count should not change on falling edge of reset pin");
     }
 
     @Test

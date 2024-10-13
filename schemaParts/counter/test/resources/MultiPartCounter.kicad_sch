@@ -236,7 +236,7 @@
     )
     (pin "1" (uuid 8e8483df-bd1c-4115-a455-87c80eafd17e))
     (instances
-      (project "MultiUnitCounter"
+      (project "MultiPartCounter"
         (path "/dca00733-6e59-4b89-b3a6-bb50926963b6"
           (reference "pulldown1") (unit 1)
         )
@@ -261,7 +261,7 @@
     )
     (pin "1" (uuid aa42988a-a26b-441c-b541-dab6b2487298))
     (instances
-      (project "MultiUnitCounter"
+      (project "MultiPartCounter"
         (path "/dca00733-6e59-4b89-b3a6-bb50926963b6"
           (reference "inA1") (unit 1)
         )
@@ -289,7 +289,7 @@
     (pin "1" (uuid bedfffd0-fbad-422a-a0eb-3cb5fd376df5))
     (pin "0" (uuid 61edb344-257b-4350-96ef-0de3edffe48e))
     (instances
-      (project "MultiUnitCounter"
+      (project "MultiPartCounter"
         (path "/dca00733-6e59-4b89-b3a6-bb50926963b6"
           (reference "inB1") (unit 1)
         )
@@ -323,7 +323,7 @@
     (pin "11" (uuid eb491164-db24-462a-9c9d-42bb3ab5b92a))
     (pin "6" (uuid 34239815-dd3e-407e-8abe-28e442684ef0))
     (instances
-      (project "MultiUnitCounter"
+      (project "MultiPartCounter"
         (path "/dca00733-6e59-4b89-b3a6-bb50926963b6"
           (reference "U1") (unit 1)
         )
@@ -348,7 +348,7 @@
     )
     (pin "1" (uuid 2bb3f2d4-8267-462f-abb0-e16fd203b66f))
     (instances
-      (project "MultiUnitCounter"
+      (project "MultiPartCounter"
         (path "/dca00733-6e59-4b89-b3a6-bb50926963b6"
           (reference "Cb1") (unit 1)
         )
@@ -373,7 +373,7 @@
     )
     (pin "1" (uuid 2bb3f2d4-8267-462f-abb0-e16fd203b670))
     (instances
-      (project "MultiUnitCounter"
+      (project "MultiPartCounter"
         (path "/dca00733-6e59-4b89-b3a6-bb50926963b6"
           (reference "Ca1") (unit 1)
         )
@@ -384,7 +384,7 @@
   (symbol (lib_id "Tests:OutPin") (at 114.3 78.74 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid d77096ae-ba95-4ed8-9edc-178d0158e2d5)
-    (property "Reference" "Rb1" (at 110.236 78.74 0)
+    (property "Reference" "R1" (at 110.236 78.74 0)
       (effects (font (size 0.8 0.8)))
     )
     (property "Value" "OutPin" (at 113.03 72.644 0)
@@ -398,9 +398,9 @@
     )
     (pin "1" (uuid 2bb3f2d4-8267-462f-abb0-e16fd203b671))
     (instances
-      (project "MultiUnitCounter"
+      (project "MultiPartCounter"
         (path "/dca00733-6e59-4b89-b3a6-bb50926963b6"
-          (reference "Rb1") (unit 1)
+          (reference "R1") (unit 1)
         )
       )
     )
@@ -409,7 +409,7 @@
   (symbol (lib_id "Tests:OutPin") (at 114.3 76.2 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid f4e19f4a-27df-4a3e-b258-a73a4b4e947e)
-    (property "Reference" "Ra1" (at 110.236 76.2 0)
+    (property "Reference" "R0" (at 110.236 76.2 0)
       (effects (font (size 0.8 0.8)))
     )
     (property "Value" "OutPin" (at 113.03 70.104 0)
@@ -423,9 +423,9 @@
     )
     (pin "1" (uuid 2bb3f2d4-8267-462f-abb0-e16fd203b672))
     (instances
-      (project "MultiUnitCounter"
+      (project "MultiPartCounter"
         (path "/dca00733-6e59-4b89-b3a6-bb50926963b6"
-          (reference "Ra1") (unit 1)
+          (reference "R0") (unit 1)
         )
       )
     )
