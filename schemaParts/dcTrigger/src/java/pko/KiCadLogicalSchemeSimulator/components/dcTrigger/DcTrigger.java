@@ -68,8 +68,8 @@ public class DcTrigger extends SchemaPart {
     @Override
     public void reset() {
         if (clockEnabled) {
-            qOut.setState(false);
-            iqOut.setState(true);
+            qOut.setLo();
+            iqOut.setHi();
         }
     }
 }

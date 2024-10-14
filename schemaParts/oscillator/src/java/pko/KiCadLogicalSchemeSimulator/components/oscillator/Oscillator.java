@@ -89,26 +89,26 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
                     while (fullSpeedAlive) {
                         ticks += 2000;
                         for (int i = 0; i < 100; i++) {
-                            out.setState(true);
-                            out.setState(false);
-                            out.setState(true);
-                            out.setState(false);
-                            out.setState(true);
-                            out.setState(false);
-                            out.setState(true);
-                            out.setState(false);
-                            out.setState(true);
-                            out.setState(false);
-                            out.setState(true);
-                            out.setState(false);
-                            out.setState(true);
-                            out.setState(false);
-                            out.setState(true);
-                            out.setState(false);
-                            out.setState(true);
-                            out.setState(false);
-                            out.setState(true);
-                            out.setState(false);
+                            out.setHi();
+                            out.setLo();
+                            out.setHi();
+                            out.setLo();
+                            out.setHi();
+                            out.setLo();
+                            out.setHi();
+                            out.setLo();
+                            out.setHi();
+                            out.setLo();
+                            out.setHi();
+                            out.setLo();
+                            out.setHi();
+                            out.setLo();
+                            out.setHi();
+                            out.setLo();
+                            out.setHi();
+                            out.setLo();
+                            out.setHi();
+                            out.setLo();
                         }
                     }
                 } catch (Throwable e) {
@@ -124,26 +124,26 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
                 long target = Math.min(10000, (long) ((System.currentTimeMillis() - timerStart) * clockFreq * 2) - ticks + tickStart) / 20;
                 ticks += target * 20;
                 for (int i = 0; i < target; i++) {
-                    out.setState(true);
-                    out.setState(false);
-                    out.setState(true);
-                    out.setState(false);
-                    out.setState(true);
-                    out.setState(false);
-                    out.setState(true);
-                    out.setState(false);
-                    out.setState(true);
-                    out.setState(false);
-                    out.setState(true);
-                    out.setState(false);
-                    out.setState(true);
-                    out.setState(false);
-                    out.setState(true);
-                    out.setState(false);
-                    out.setState(true);
-                    out.setState(false);
-                    out.setState(true);
-                    out.setState(false);
+                    out.setHi();
+                    out.setLo();
+                    out.setHi();
+                    out.setLo();
+                    out.setHi();
+                    out.setLo();
+                    out.setHi();
+                    out.setLo();
+                    out.setHi();
+                    out.setLo();
+                    out.setHi();
+                    out.setLo();
+                    out.setHi();
+                    out.setLo();
+                    out.setHi();
+                    out.setLo();
+                    out.setHi();
+                    out.setLo();
+                    out.setHi();
+                    out.setLo();
                 }
             }, 0, period, TimeUnit.NANOSECONDS);
         }
@@ -205,7 +205,11 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
     void tick() {
         try {
             ticks++;
-            out.setState(!out.state);
+            if (out.state) {
+                out.setLo();
+            } else {
+                out.setHi();
+            }
         } catch (Throwable e) {
             Log.error(Oscillator.class, "TickError", e);
         }

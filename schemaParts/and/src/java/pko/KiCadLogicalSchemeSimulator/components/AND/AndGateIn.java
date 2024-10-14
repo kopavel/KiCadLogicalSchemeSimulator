@@ -58,23 +58,39 @@ public class AndGateIn extends InPin {
     }
 
     @Override
-    public void setState(boolean newState) {
-        state = newState;
-        if (newState) {
-            /*Optimiser bind mask*/
-            if (parent.inState == mask) {
-                parent.inState = 0;
-                /*Optimiser bind t:true*/
-                out.setState(true);
+    public void setHi() {
+        state = true;
+        /*Optimiser bind mask*/
+        if (parent.inState == mask) {
+            parent.inState = 0;
+            /*Optimiser line o block r*/
+            if (parent.reverse) {
+                out.setLo();
+                /*Optimiser line o blockEnd r block nr*/
             } else {
-                /*Optimiser bind nMask*/
-                parent.inState &= nMask;
+                out.setHi();
+                /*Optimiser line o blockEnd nr*/
             }
-        } else if (parent.inState == 0) {
+        } else {
+            /*Optimiser bind nMask*/
+            parent.inState &= nMask;
+        }
+    }
+
+    @Override
+    public void setLo() {
+        state = false;
+        if (parent.inState == 0) {
             /*Optimiser bind mask*/
             parent.inState = mask;
-            /*Optimiser bind f:false*/
-            out.setState(false);
+            /*Optimiser line o block r*/
+            if (parent.reverse) {
+                out.setHi();
+                /*Optimiser line o blockEnd r block nr*/
+            } else {
+                out.setLo();
+                /*Optimiser line o blockEnd nr*/
+            }
         } else {
             /*Optimiser bind mask*/
             parent.inState |= mask;
@@ -85,7 +101,9 @@ public class AndGateIn extends InPin {
     public InPin getOptimised(boolean keepSetters) {
         ClassOptimiser<AndGateIn> optimiser = new ClassOptimiser<>(this).bind("mask", mask).bind("nMask", nMask);
         if (parent.reverse) {
-            optimiser.bind("t", "false").bind("f", "true");
+            optimiser.cut("nr");
+        } else {
+            optimiser.cut("r");
         }
         AndGateIn build = optimiser.build();
         parent.replaceIn(id, build);

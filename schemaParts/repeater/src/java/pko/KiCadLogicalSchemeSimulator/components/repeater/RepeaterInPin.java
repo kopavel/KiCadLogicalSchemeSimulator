@@ -52,24 +52,42 @@ public class RepeaterInPin extends InPin {
     }
 
     @Override
-    public void setState(boolean newState) {
-        state = newState;
-        out.setState(
-                /*Optimiser line r*///
-                !//
-                        newState);
+    public void setHi() {
+        state = true;
+        /*Optimiser line o block r*/
+        if (parent.reverse) {
+            out.setLo();
+            /*Optimiser line o blockEnd r block nr*/
+        } else {
+            out.setHi();
+            /*Optimiser line o blockEnd nr*/
+        }
+    }
+
+    @Override
+    public void setLo() {
+        state = false;
+        /*Optimiser line o block r*/
+        if (parent.reverse) {
+            out.setHi();
+            /*Optimiser line o blockEnd r block nr*/
+        } else {
+            out.setLo();
+            /*Optimiser line o blockEnd nr*/
+        }
     }
 
     @Override
     public InPin getOptimised(boolean keepSetters) {
+        ClassOptimiser<RepeaterInPin> optimiser = new ClassOptimiser<>(this);
+        RepeaterInPin build = optimiser.build();
         if (parent.reverse) {
-            return this;
+            optimiser.cut("nr");
         } else {
-            ClassOptimiser<RepeaterInPin> optimiser = new ClassOptimiser<>(this).cut("r");
-            RepeaterInPin build = optimiser.build();
-            parent.inPin = build;
-            parent.inPins.put(id, build);
-            return build;
+            optimiser.cut("r");
         }
+        parent.inPin = build;
+        parent.inPins.put(id, build);
+        return build;
     }
 }

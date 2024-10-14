@@ -49,44 +49,62 @@ public class JkTrigger extends SchemaPart {
         kPin = addInPin("K");
         rPin = addInPin(new InPin("R", this) {
             @Override
-            public void setState(boolean newState) {
-                state = newState;
-                clockEnabled = !(newState | sPin.state);
-                if (newState) {
-                    if (!iqOut.state) {
-                        iqOut.setState(true);
+            public void setHi() {
+                state = true;
+                clockEnabled = false;
+                if (!iqOut.state) {
+                    iqOut.setHi();
+                }
+                if (qOut.state != sPin.state) {
+                    if (sPin.state) {
+                        qOut.setHi();
+                    } else {
+                        qOut.setLo();
                     }
-                    if (qOut.state != sPin.state) {
-                        qOut.setState(sPin.state);
-                    }
-                } else if (sPin.state) {
+                }
+            }
+
+            @Override
+            public void setLo() {
+                state = false;
+                clockEnabled = !sPin.state;
+                if (sPin.state) {
                     if (!qOut.state) {
-                        qOut.setState(true);
+                        qOut.setHi();
                     }
                     if (iqOut.state) {
-                        iqOut.setState(false);
+                        iqOut.setLo();
                     }
                 }
             }
         });
         sPin = addInPin(new InPin("S", this) {
             @Override
-            public void setState(boolean newState) {
-                state = newState;
-                clockEnabled = !(newState | rPin.state);
-                if (newState) {
-                    if (!qOut.state) {
-                        qOut.setState(true);
+            public void setHi() {
+                state = true;
+                clockEnabled = false;
+                if (!qOut.state) {
+                    qOut.setHi();
+                }
+                if (iqOut.state != rPin.state) {
+                    if (rPin.state) {
+                        iqOut.setHi();
+                    } else {
+                        iqOut.setLo();
                     }
-                    if (iqOut.state != rPin.state) {
-                        iqOut.setState(rPin.state);
-                    }
-                } else if (rPin.state) {
+                }
+            }
+
+            @Override
+            public void setLo() {
+                state = false;
+                clockEnabled = !rPin.state;
+                if (rPin.state) {
                     if (qOut.state) {
-                        qOut.setState(false);
+                        qOut.setLo();
                     }
                     if (!iqOut.state) {
-                        iqOut.setState(true);
+                        iqOut.setHi();
                     }
                 }
             }
@@ -94,25 +112,35 @@ public class JkTrigger extends SchemaPart {
         if (reverse) {
             addInPin(new InPin("C", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    if (!state && clockEnabled) {
+                public void setHi() {
+                    state = true;
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
+                    if (clockEnabled) {
                         if (jPin.state && kPin.state) {
-                            qOut.setState(!qOut.state);
-                            iqOut.setState(!iqOut.state);
+                            if (qOut.state) {
+                                qOut.setLo();
+                                iqOut.setHi();
+                            } else {
+                                qOut.setHi();
+                                iqOut.setLo();
+                            }
                         } else if (jPin.state) {
                             if (!qOut.state) {
-                                qOut.setState(true);
+                                qOut.setHi();
                             }
                             if (iqOut.state) {
-                                iqOut.setState(false);
+                                iqOut.setLo();
                             }
                         } else if (kPin.state) {
                             if (qOut.state) {
-                                qOut.setState(false);
+                                qOut.setLo();
                             }
                             if (!iqOut.state) {
-                                iqOut.setState(true);
+                                iqOut.setHi();
                             }
                         }
                     }
@@ -121,28 +149,38 @@ public class JkTrigger extends SchemaPart {
         } else {
             addInPin(new InPin("C", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    if (state && clockEnabled) {
+                public void setHi() {
+                    state = true;
+                    if (clockEnabled) {
                         if (jPin.state && kPin.state) {
-                            qOut.setState(!qOut.state);
-                            iqOut.setState(!iqOut.state);
+                            if (qOut.state) {
+                                qOut.setLo();
+                                iqOut.setHi();
+                            } else {
+                                qOut.setHi();
+                                iqOut.setLo();
+                            }
                         } else if (jPin.state) {
                             if (!qOut.state) {
-                                qOut.setState(true);
+                                qOut.setHi();
                             }
                             if (iqOut.state) {
-                                iqOut.setState(false);
+                                iqOut.setLo();
                             }
                         } else if (kPin.state) {
                             if (qOut.state) {
-                                qOut.setState(false);
+                                qOut.setLo();
                             }
                             if (!iqOut.state) {
-                                iqOut.setState(true);
+                                iqOut.setHi();
                             }
                         }
                     }
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
                 }
             });
         }
@@ -154,13 +192,13 @@ public class JkTrigger extends SchemaPart {
     public void initOuts() {
         qOut = getOutPin("Q");
         iqOut = getOutPin("~{Q}");
-        qOut.setState(false);
-        iqOut.setState(true);
+        qOut.setLo();
+        iqOut.setHi();
     }
 
     @Override
     public void reset() {
-        qOut.setState(false);
-        iqOut.setState(true);
+        qOut.setLo();
+        iqOut.setHi();
     }
 }

@@ -38,8 +38,8 @@ import pko.KiCadLogicalSchemeSimulator.test.schemaPartTester.NetTester;
 public class RepeaterTest extends NetTester {
     @BeforeEach
     protected void reset() {
-        setPin("ampOut", false);
-        setPin("notOut", false);
+        setLo("ampOut");
+        setLo("notOut");
     }
 
     @Override
@@ -57,8 +57,8 @@ public class RepeaterTest extends NetTester {
     void repeater() {
         checkPin("notIn", true, "with Lo input NOT out must be Hi");
         checkPin("ampIn", false, "with Lo input repeater out must be Lo");
-        setPin("notOut", true);
-        setPin("ampOut", true);
+        setHi("notOut");
+        setHi("ampOut");
         checkPin("notIn", false, "with Hi input NOT out must be Lo");
         checkPin("ampIn", true, "with Hi input repeater out must be Hi");
     }

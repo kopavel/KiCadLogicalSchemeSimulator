@@ -30,32 +30,36 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.AND.test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import pko.KiCadLogicalSchemeSimulator.test.schemaPartTester.NetTester;
 
 public class NandTest extends NetTester {
+    @BeforeEach
+    public void reset() {
+        setLo(3);
+        setLo(4);
+    }
+
     @Test
     @DisplayName("Both input Lo - out Hi")
     public void bothLo() {
-        setPin(3, false);
-        setPin(4, false);
         checkPin(2, true, "With no input output needs to be Lo");
     }
 
     @Test
     @DisplayName("Only one input Hi - out Hi")
     public void oneHi() {
-        setPin(3, false);
-        setPin(4, true);
+        setHi(4);
         checkPin(2, true, "With Hi on only one input output needs to be Lo");
     }
 
     @Test
     @DisplayName("Both input Hi - out Lo")
     public void bothHi() {
-        setPin(3, true);
-        setPin(4, true);
+        setHi(3);
+        setHi(4);
         checkPin(2, false, "With Hi on both inputs output needs to be Hi");
     }
 

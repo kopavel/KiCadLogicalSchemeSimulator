@@ -48,14 +48,14 @@ public class CounterTest extends NetTester {
 
     @BeforeEach
     void reset() {
-        setPin("rPin", true);
+        setHi("rPin");
     }
 
     @Test
     @DisplayName("Reset pin resets the counter")
     void resetPinResetsCounter() {
-        setPin("cPin", false);
-        setPin("rPin", true);
+        setLo("cPin");
+        setHi("rPin");
         checkBus("qBus", 0, "Count should reset on rising edge of reset pin");
     }
 
@@ -63,26 +63,26 @@ public class CounterTest extends NetTester {
     @DisplayName("Count increments on clock signal")
     void countIncrementsOnClock() {
         for (int i = 1; i <= 15; i++) {
-            setPin("cPin", false);
+            setLo("cPin");
             checkBus("qBus", i, "Count should increment on clock signal");
         }
-        setPin("cPin", false);
+        setLo("cPin");
         checkBus("qBus", 0, "Count should reset after reaching maximum");
     }
 
     @Test
     @DisplayName("Count does not change on reset pin falling edge")
     void countDoesNotChangeOnResetFallingEdge() {
-        setPin("cPin", false);
+        setLo("cPin");
         checkBus("qBus", 1, "Count should be 1 before reset");
-        setPin("rPin", false);
+        setLo("rPin");
         checkBus("qBus", 1, "Count should not change on falling edge of reset pin");
     }
 
     @Test
     @DisplayName("Count does not increment on clock raising edge")
     void countDoesNotIncrementOnClockFallingEdge() {
-        setPin("cPin", true);
+        setHi("cPin");
         checkBus("qBus", 0, "Count should not increment on raising edge of clock signal");
     }
 }

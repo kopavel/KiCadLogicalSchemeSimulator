@@ -59,14 +59,16 @@ public class Counter extends SchemaPart {
         in = addInPin(new CInPin("C", this, reverse, countMask));
         addInPin(new InPin("R", this) {
             @Override
-            public void setState(boolean newState) {
-                state = newState;
-                if (state) {
-                    enabled = false;
-                    outBus.setState(0);
-                } else {
-                    enabled = false;
-                }
+            public void setHi() {
+                state = true;
+                enabled = false;
+                outBus.setState(0);
+            }
+
+            @Override
+            public void setLo() {
+                state = false;
+                enabled = false;
             }
         });
     }

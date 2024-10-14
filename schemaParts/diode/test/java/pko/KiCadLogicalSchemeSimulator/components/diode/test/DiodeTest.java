@@ -69,19 +69,19 @@ public class DiodeTest extends NetTester {
                 }
                 case "w0" -> {
                     outPin("A").strong = false;
-                    setPin("A", false);
+                    setLo("A");
                 }
                 case "w1" -> {
                     outPin("A").strong = false;
-                    setPin("A", true);
+                    setHi("A");
                 }
                 case "s0" -> {
                     outPin("A").strong = true;
-                    setPin("A", false);
+                    setLo("A");
                 }
                 case "s1" -> {
                     outPin("A").strong = true;
-                    setPin("A", true);
+                    setHi("A");
                 }
             }
             if (!outPin("K").hiImpedance) {
@@ -92,19 +92,19 @@ public class DiodeTest extends NetTester {
                 }
                 case "w0" -> {
                     outPin("K").strong = false;
-                    setPin("K", false);
+                    setLo("K");
                 }
                 case "w1" -> {
                     outPin("K").strong = false;
-                    setPin("K", true);
+                    setHi("K");
                 }
                 case "s0" -> {
                     outPin("K").strong = true;
-                    setPin("K", false);
+                    setLo("K");
                 }
                 case "s1" -> {
                     outPin("K").strong = true;
-                    setPin("K", true);
+                    setHi("K");
                 }
             }
             switch (anodeState[i]) {

@@ -65,14 +65,16 @@ public class Keyboard extends SchemaPart implements InteractiveSchemaPart {
         }
         enable = addInPin(new InPin("En", this) {
             @Override
-            public void setState(boolean newState) {
-                state = newState;
-                if (newState) {
-                    out.setHiImpedance();
-                } else {
-                    if (out.state != busMap[(int) in.state] || out.hiImpedance) {
-                        out.setState(busMap[(int) in.state]);
-                    }
+            public void setHi() {
+                state = true;
+                out.setHiImpedance();
+            }
+
+            @Override
+            public void setLo() {
+                state = false;
+                if (out.state != busMap[(int) in.state] || out.hiImpedance) {
+                    out.setState(busMap[(int) in.state]);
                 }
             }
         });
@@ -92,7 +94,7 @@ public class Keyboard extends SchemaPart implements InteractiveSchemaPart {
 
     public void keyEvent(String text, boolean pressed) {
         if (keyDescriptors.containsKey(text)) {
-            event.setState(true);
+            event.setHi();
             KeyDescriptor descriptor = keyDescriptors.get(text);
             for (int i = 0; i < 255; i++) {
                 if ((i & descriptor.rMask) > 0) {

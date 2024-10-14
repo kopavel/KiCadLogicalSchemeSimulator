@@ -69,32 +69,37 @@ public class BusDriver extends SchemaPart {
             if (reverse) {
                 addInPin(new InPin("OE" + (char) ('a' + i), this) {
                     @Override
-                    public void setState(boolean newState) {
-                        state = newState;
-                        if (newState) {
-                            oe[finalI] = false;
-                            if (!outs[finalI].hiImpedance) {
-                                outs[finalI].setHiImpedance();
-                            }
-                        } else {
-                            oe[finalI] = true;
-                            outs[finalI].setState(ins[finalI].state);
+                    public void setHi() {
+                        state = true;
+                        oe[finalI] = false;
+                        if (!outs[finalI].hiImpedance) {
+                            outs[finalI].setHiImpedance();
                         }
+                    }
+
+                    @Override
+                    public void setLo() {
+                        state = false;
+                        oe[finalI] = true;
+                        outs[finalI].setState(ins[finalI].state);
                     }
                 }).state = true;
             } else {
                 addInPin(new InPin("OE" + (char) ('a' + i), this) {
+
                     @Override
-                    public void setState(boolean newState) {
-                        state = newState;
-                        if (newState) {
-                            oe[finalI] = true;
-                            outs[finalI].setState(ins[finalI].state);
-                        } else {
-                            oe[finalI] = false;
-                            if (!outs[finalI].hiImpedance) {
-                                outs[finalI].setHiImpedance();
-                            }
+                    public void setHi() {
+                        state = true;
+                        oe[finalI] = true;
+                        outs[finalI].setState(ins[finalI].state);
+                    }
+
+                    @Override
+                    public void setLo() {
+                        state = false;
+                        oe[finalI] = false;
+                        if (!outs[finalI].hiImpedance) {
+                            outs[finalI].setHiImpedance();
                         }
                     }
                 });

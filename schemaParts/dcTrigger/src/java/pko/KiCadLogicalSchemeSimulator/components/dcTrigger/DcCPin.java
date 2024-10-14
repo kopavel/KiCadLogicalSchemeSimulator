@@ -58,60 +58,89 @@ public class DcCPin extends InPin {
     }
 
     @Override
-    public void setState(boolean newState) {
-        state = newState;
+    public void setHi() {
+        state = true;
+        /*Optimiser block nr*/
         if (
             /*Optimiser line o*/
-                parent.reverse ^//
-                        /*Optimiser bind r:newState*///
-                        newState
+                !parent.reverse && //
                         /*Optimiser line anyRS*///
-                        && parent.clockEnabled//
+                        parent.clockEnabled//
         ) {
             if (dPin.state) {
                 if (iqOut.state) {
-                    iqOut.setState(false);
+                    iqOut.setLo();
                     /*Optimiser block bothRS block anyRS*/
                 }
                 if (!qOut.state) {
                     /*Optimiser blockEnd bothRS  blockEnd anyRS*/
-                    qOut.setState(true);
+                    qOut.setHi();
                 }
             } else {
                 if (qOut.state) {
-                    qOut.setState(false);
+                    qOut.setLo();
                     /*Optimiser block bothRS  block anyRS*/
                 }
                 if (!iqOut.state) {
                     /*Optimiser blockEnd bothRS  blockEnd anyRS*/
-                    iqOut.setState(true);
+                    iqOut.setHi();
                 }
             }
         }
+        /*Optimiser blockEnd nr*/
+    }
+
+    @Override
+    public void setLo() {
+        state = false;
+        /*Optimiser block r*/
+        if (
+            /*Optimiser line o*/
+                parent.reverse &&//
+                        /*Optimiser line anyRS*///
+                        parent.clockEnabled//
+        ) {
+            if (dPin.state) {
+                if (iqOut.state) {
+                    iqOut.setLo();
+                    /*Optimiser block bothRS block anyRS*/
+                }
+                if (!qOut.state) {
+                    /*Optimiser blockEnd bothRS  blockEnd anyRS*/
+                    qOut.setHi();
+                }
+            } else {
+                if (qOut.state) {
+                    qOut.setLo();
+                    /*Optimiser block bothRS  block anyRS*/
+                }
+                if (!iqOut.state) {
+                    /*Optimiser blockEnd bothRS  blockEnd anyRS*/
+                    iqOut.setHi();
+                }
+            }
+        }
+        /*Optimiser blockEnd r*/
     }
 
     @Override
     public InPin getOptimised(boolean keepSetters) {
         boolean anyRs = parent.rPin.used || parent.sPin.used;
         boolean bothRs = parent.rPin.used && parent.sPin.used;
-        if (parent.reverse && bothRs) {
-            return this;
+        ClassOptimiser<DcCPin> optimiser = new ClassOptimiser<>(this).cut("o");
+        if (parent.reverse) {
+            optimiser.cut("nr");
         } else {
-            ClassOptimiser<DcCPin> optimiser = new ClassOptimiser<>(this).cut("o");
-            if (parent.reverse) {
-                optimiser.bind("r", "!newState");
-            } else {
-                optimiser.cut("reverse");
-            }
-            if (!anyRs) {
-                optimiser.cut("anyRS");
-            } else if (!bothRs) {
-                optimiser.cut("bothRS");
-            }
-            DcCPin build = optimiser.build();
-            parent.cPin = build;
-            parent.inPins.put(id, build);
-            return build;
+            optimiser.cut("r");
         }
+        if (!anyRs) {
+            optimiser.cut("anyRS");
+        } else if (!bothRs) {
+            optimiser.cut("bothRS");
+        }
+        DcCPin build = optimiser.build();
+        parent.cPin = build;
+        parent.inPins.put(id, build);
+        return build;
     }
 }

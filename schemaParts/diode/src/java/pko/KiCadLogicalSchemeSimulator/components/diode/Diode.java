@@ -65,12 +65,12 @@ public class Diode extends SchemaPart {
         } else if (cathode.merger.strong && !cathode.strong) {
             if (!anode.strong) {
                 anode.strong = true;
-                anode.setState(false);
+                anode.setLo();
             }
         } else if ((cathode.strong || cathode.hiImpedance) ? cathode.merger.weakState != 0 : Math.abs(cathode.merger.weakState) > 1) {
             if (anode.hiImpedance || anode.strong || cathode.merger.weakState > 0) {
                 anode.strong = false;
-                anode.setState(false);
+                anode.setLo();
             }
         } else if (!anode.hiImpedance) {
             anode.setHiImpedance();
@@ -85,12 +85,12 @@ public class Diode extends SchemaPart {
         } else if (anode.merger.strong && !anode.strong) {
             if (!cathode.strong) {
                 cathode.strong = true;
-                cathode.setState(true);
+                cathode.setHi();
             }
         } else if ((anode.strong || anode.hiImpedance) ? anode.merger.weakState != 0 : Math.abs(anode.merger.weakState) > 1) {
             if (cathode.hiImpedance || cathode.strong || anode.merger.weakState > 0) {
                 cathode.strong = false;
-                cathode.setState(true);
+                cathode.setHi();
             }
         } else if (!cathode.hiImpedance) {
             cathode.setHiImpedance();

@@ -40,7 +40,7 @@ public class DecoderTest extends NetTester {
     @Test
     @DisplayName("default values")
     public void defaultValues() {
-        setPin("cs", true);
+        setHi("cs");
         for (int i = 0; i < 8; i++) {
             assertEquals(-1, checkOut(), "Q out default impedance must be Hi");
         }
@@ -50,7 +50,7 @@ public class DecoderTest extends NetTester {
     @DisplayName("value decode")
     public void valueDecode() {
         setBus("Src", 0);
-        setPin("cs", false);
+        setLo("cs");
         assertEquals(1, checkOut(), "with 0 on A input Q out be 1");
         setBus("Src", 1);
         assertEquals(2, checkOut(), "with 1 on A input Q out be 2");
@@ -58,11 +58,11 @@ public class DecoderTest extends NetTester {
         assertEquals(3, checkOut(), "with 2 on A input Q out be 4");
         setBus("Src", 3);
         assertEquals(4, checkOut(), "with 3 on A input Q out be 8");
-        setPin("cs", true);
+        setHi("cs");
         assertEquals(-1, checkOut(), "with Hi CS Q impedance must be Hi");
         setBus("Src", 2);
         assertEquals(-1, checkOut(), "with Hi CS Q impedance must be Hi");
-        setPin("cs", false);
+        setLo("cs");
         assertEquals(3, checkOut(), "with Lo CS A state must be stored internally");
     }
 

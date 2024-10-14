@@ -48,11 +48,11 @@ public class DcTriggerTest extends NetTester {
 
     @BeforeEach
     void reset() {
-        setPin("S", false);
-        setPin("R", true);
-        setPin("R", false);
-        setPin("D", false);
-        setPin("C", false);
+        setLo("S");
+        setHi("R");
+        setLo("R");
+        setLo("D");
+        setLo("C");
     }
 
     @Test
@@ -65,18 +65,18 @@ public class DcTriggerTest extends NetTester {
     @Test
     @DisplayName("main states")
     void mainStates() {
-        setPin("C", true);
+        setHi("C");
         checkPin("Q", false, "after C pin raise  with Lo 'D' Q state must remain 0");
         checkPin("~{Q}", true, "after C pin raise with Lo 'D' ~{Q} state must remain 1");
-        setPin("D", true);
-        setPin("C", true);
+        setHi("D");
+        setHi("C");
         checkPin("Q", true, "after C pin raise with Hi 'D' Q state must be 1");
         checkPin("~{Q}", false, "after C pin raise with Hi 'D' ~{Q} state must be 0");
-        setPin("D", false);
-        setPin("C", false);
+        setLo("D");
+        setLo("C");
         checkPin("Q", true, "after C pin fall Q state must be preserved");
         checkPin("~{Q}", false, "after C pin fall with Hi 'D' ~{Q} state must be preserved");
-        setPin("C", true);
+        setHi("C");
         checkPin("Q", false, "after C pin raise with Lo 'D' Q state must be 0");
         checkPin("~{Q}", true, "after C pin raise with Lo 'D' ~{Q} state must be 1");
     }
@@ -84,21 +84,21 @@ public class DcTriggerTest extends NetTester {
     @Test
     @DisplayName("RS states")
     void rsStates() {
-        setPin("S", true);
+        setHi("S");
         checkPin("Q", true, "after S pin set to Hi Q state must be 1");
         checkPin("~{Q}", false, "after S pin set to Hi 'D' ~{Q} state must be 0");
-        setPin("D", false);
-        setPin("C", true);
+        setLo("D");
+        setHi("C");
         checkPin("Q", true, "with Hi S pin C pin state change must be ignored");
         checkPin("~{Q}", false, "with Hi S pin C pin state change must be ignored");
-        setPin("R", true);
+        setHi("R");
         checkPin("Q", true, "after R pin set to Hi with S pin Hi too Q state must be 1");
         checkPin("~{Q}", true, "after R pin set to Hi with S pin Hi too ~{Q] state must be 1");
-        setPin("S", false);
+        setLo("S");
         checkPin("Q", false, "after S pin set to Lo with Hi R  Q state must be 0");
         checkPin("~{Q}", true, "after S pin set to Lo with Hi R  ~{Q} state must be 0");
-        setPin("D", false);
-        setPin("C", true);
+        setLo("D");
+        setHi("C");
         checkPin("Q", false, "with Hi R pin C pin state change must be ignored");
         checkPin("~{Q}", true, "with Hi R pin C pin state change must be ignored");
     }

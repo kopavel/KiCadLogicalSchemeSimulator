@@ -58,67 +58,121 @@ public class DCounter extends SchemaPart {
         if (params.containsKey("carryReverse")) {
             addInPin(new InPin("CI", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    ciState = !newState;
+                public void setHi() {
+                    state = true;
+                    ciState = false;
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
+                    ciState = true;
                 }
             });
             carryHi = false;
             carryLo = true;
             udPin = addInPin(new InPin("UD", this, true) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    final boolean newOutState = outBus.state == (newState ? maxCount : 0);
-                    if (cOutPin.state == newOutState) {
-                        cOutPin.setState(!newOutState);
+                public void setHi() {
+                    state = true;
+                    if (outBus.state == maxCount) {
+                        if (cOutPin.state) {
+                            cOutPin.setLo();
+                        }
+                    } else if (!cOutPin.state) {
+                        cOutPin.setHi();
+                    }
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
+                    if (outBus.state == 0) {
+                        if (!cOutPin.state) {
+                            cOutPin.setHi();
+                        }
+                    } else if (cOutPin.state) {
+                        cOutPin.setLo();
                     }
                 }
             });
             addInPin(new InPin("R", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    resetInactive = !newState;
-                    if (!resetInactive && outBus.state != 0) {
+                public void setHi() {
+                    state = true;
+                    resetInactive = false;
+                    if (outBus.state != 0) {
                         outBus.setState(0);
                         if (!cOutPin.state) {
-                            cOutPin.setState(true);
+                            cOutPin.setHi();
                         }
                     }
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
+                    resetInactive = true;
                 }
             });
         } else {
             addInPin(new InPin("CI", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    ciState = newState;
+                public void setHi() {
+                    state = true;
+                    ciState = true;
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
+                    ciState = false;
                 }
             });
             carryHi = true;
             carryLo = false;
             udPin = addInPin(new InPin("UD", this, true) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    final boolean newOutState = newState && outBus.state == maxCount || !newState && outBus.state == 0;
-                    if (cOutPin.state != newOutState) {
-                        cOutPin.setState(newOutState);
+                public void setHi() {
+                    state = true;
+                    if (outBus.state == maxCount) {
+                        if (!cOutPin.state) {
+                            cOutPin.setHi();
+                        }
+                    } else if (cOutPin.state) {
+                        cOutPin.setLo();
+                    }
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
+                    if (outBus.state == 0) {
+                        if (!cOutPin.state) {
+                            cOutPin.setHi();
+                        }
+                    } else if (cOutPin.state) {
+                        cOutPin.setLo();
                     }
                 }
             });
             addInPin(new InPin("R", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    resetInactive = !newState;
-                    if (!resetInactive && outBus.state != 0) {
+                public void setHi() {
+                    state = true;
+                    resetInactive = false;
+                    if (outBus.state != 0) {
                         outBus.setState(0);
                         if (cOutPin.state) {
-                            cOutPin.setState(false);
+                            cOutPin.setLo();
                         }
                     }
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
+                    resetInactive = true;
                 }
             });
         }
@@ -133,29 +187,47 @@ public class DCounter extends SchemaPart {
         });
         addInPin(new InPin("PE", this) {
             @Override
-            public void setState(boolean newState) {
-                state = newState;
-                presetDisabled = !newState;
-                if (!presetDisabled && resetInactive && outBus.state != jBus.state) {
+            public void setHi() {
+                state = true;
+                presetDisabled = false;
+                if (resetInactive && outBus.state != jBus.state) {
                     outBus.setState(jBus.state);
                 }
+            }
+
+            @Override
+            public void setLo() {
+                state = false;
+                presetDisabled = true;
             }
         });
         if (params.containsKey("bdReverse")) {
             addInPin(new InPin("BD", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    maxCount = !newState ? 15 : 9;
+                public void setHi() {
+                    state = true;
+                    maxCount = 9;
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
+                    maxCount = 15;
                 }
             });
             maxCount = 15;
         } else {
             addInPin(new InPin("BD", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    maxCount = newState ? 15 : 9;
+                public void setHi() {
+                    state = true;
+                    maxCount = 15;
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
+                    maxCount = 9;
                 }
             });
             maxCount = 9;
@@ -163,62 +235,70 @@ public class DCounter extends SchemaPart {
         if (reverse) {
             addInPin(new InPin("C", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    if (state) {
-                        cState = false;
-                    } else {
-                        cState = true;
-                        if (eState) {
-                            process();
-                        }
+                public void setHi() {
+                    state = true;
+                    cState = false;
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
+                    cState = true;
+                    if (eState) {
+                        process();
                     }
                 }
             });
         } else {
             addInPin(new InPin("C", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    if (state) {
-                        cState = true;
-                        if (eState) {
-                            process();
-                        }
-                    } else {
-                        cState = false;
+                public void setHi() {
+                    state = true;
+                    cState = true;
+                    if (eState) {
+                        process();
                     }
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
+                    cState = false;
                 }
             });
         }
         if (eReverse) {
             addInPin(new InPin("E", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    if (state) {
-                        eState = false;
-                    } else {
-                        eState = true;
-                        if (cState) {
-                            process();
-                        }
+                public void setHi() {
+                    state = true;
+                    eState = false;
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
+                    eState = true;
+                    if (cState) {
+                        process();
                     }
                 }
             });
         } else {
             addInPin(new InPin("E", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    if (state) {
-                        eState = true;
-                        if (cState) {
-                            process();
-                        }
-                    } else {
-                        eState = false;
+                public void setHi() {
+                    state = true;
+                    eState = true;
+                    if (cState) {
+                        process();
                     }
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
+                    eState = false;
                 }
             });
         }
@@ -231,13 +311,21 @@ public class DCounter extends SchemaPart {
         outBus.useBitPresentation = true;
         cOutPin = getOutPin("CO");
         outBus.setState(0);
-        cOutPin.setState(carryLo);
+        if (carryLo) {
+            cOutPin.setHi();
+        } else {
+            cOutPin.setLo();
+        }
     }
 
     @Override
     public void reset() {
         outBus.setState(0);
-        cOutPin.setState(carryLo);
+        if (carryLo) {
+            cOutPin.setHi();
+        } else {
+            cOutPin.setLo();
+        }
     }
 
     private void process() {
@@ -245,9 +333,17 @@ public class DCounter extends SchemaPart {
             if (udPin.state) {
                 outBus.state++;
                 if (outBus.state == maxCount) {
-                    cOutPin.setState(carryHi);
+                    if (carryHi) {
+                        cOutPin.setHi();
+                    } else {
+                        cOutPin.setLo();
+                    }
                 } else {
-                    cOutPin.setState(carryLo);
+                    if (carryLo) {
+                        cOutPin.setHi();
+                    } else {
+                        cOutPin.setLo();
+                    }
                     if (outBus.state > maxCount) {
                         outBus.setState(0);
                     }
@@ -255,9 +351,17 @@ public class DCounter extends SchemaPart {
             } else {
                 outBus.state--;
                 if (outBus.state == 0) {
-                    cOutPin.setState(carryHi);
+                    if (carryHi) {
+                        cOutPin.setHi();
+                    } else {
+                        cOutPin.setLo();
+                    }
                 } else {
-                    cOutPin.setState(carryLo);
+                    if (carryLo) {
+                        cOutPin.setHi();
+                    } else {
+                        cOutPin.setLo();
+                    }
                     if (outBus.state < 0) {
                         outBus.setState(maxCount);
                     }

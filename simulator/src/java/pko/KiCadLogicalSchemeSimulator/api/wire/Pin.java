@@ -41,7 +41,7 @@ public abstract class Pin extends ModelItem<Pin> {
     public boolean state;
     @Getter
     public boolean strong = true;
-    //for passive pin (don't lost it on optimisation)
+    //for a passive pin (don't lost it on optimisation)
     public OutPin merger;
 
     public Pin(Pin oldPin, String variantId) {
@@ -77,7 +77,8 @@ public abstract class Pin extends ModelItem<Pin> {
         return state ? 1L : 0L;
     }
 
-    abstract public void setState(boolean newState);
+    abstract public void setHi();
+    abstract public void setLo();
 
     @Override
     public Pin getOptimised(boolean keepSetters) {
@@ -96,7 +97,11 @@ public abstract class Pin extends ModelItem<Pin> {
 
     public void resend() {
         if (!hiImpedance) {
-            setState(state);
+            if (state) {
+                setHi();
+            } else {
+                setLo();
+            }
         }
     }
 

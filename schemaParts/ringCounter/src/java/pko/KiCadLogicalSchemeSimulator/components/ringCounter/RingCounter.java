@@ -62,26 +62,41 @@ public class RingCounter extends SchemaPart {
         addOutPin("CO");
         addInPin(new InPin("CI", this) {
             @Override
-            public void setState(boolean newState) {
-                state = newState;
-                clockEnabled = !state;
+            public void setHi() {
+                state = true;
+                clockEnabled = false;
+            }
+
+            @Override
+            public void setLo() {
+                state = false;
+                clockEnabled = true;
             }
         });
         if (reverse) {
             addInPin(new InPin("C", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    if (!state && clockEnabled) {
+                public void setHi() {
+                    state = true;
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
+                    if (clockEnabled) {
                         if (outBus.state >= countMax) {
                             outBus.state = 1;
                             if (carryOutPin.state) {
-                                carryOutPin.setState(false);
+                                carryOutPin.setLo();
                             }
                         } else {
                             outBus.state = outBus.state << 1;
                             if (carryOutPin.state != (outBus.state < coMax)) {
-                                carryOutPin.setState(outBus.state < coMax);
+                                if (outBus.state < coMax) {
+                                    carryOutPin.setHi();
+                                } else {
+                                    carryOutPin.setLo();
+                                }
                             }
                         }
                         outBus.setState(outBus.state);
@@ -90,49 +105,64 @@ public class RingCounter extends SchemaPart {
             });
             addInPin(new InPin("R", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
+                public void setHi() {
+                    state = true;
                     clockEnabled = state;
-                    if (!state) {
-                        if (outBus.state != 1) {
-                            outBus.setState(1);
-                        }
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
+                    clockEnabled = state;
+                    if (outBus.state != 1) {
+                        outBus.setState(1);
                     }
                 }
             });
         } else {
             addInPin(new InPin("C", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    if (state && clockEnabled) {
+                public void setHi() {
+                    state = true;
+                    if (clockEnabled) {
                         if (outBus.state >= countMax) {
                             outBus.state = 1;
                             if (carryOutPin.state) {
-                                carryOutPin.setState(false);
+                                carryOutPin.setLo();
                             }
                         } else {
                             outBus.state = outBus.state << 1;
                             if (carryOutPin.state != outBus.state < coMax) {
-                                carryOutPin.setState(outBus.state < coMax);
+                                if (outBus.state < coMax) {
+                                    carryOutPin.setHi();
+                                } else {
+                                    carryOutPin.setLo();
+                                }
                             }
                         }
                         outBus.setState(outBus.state);
                     }
                 }
+
+                @Override
+                public void setLo() {
+                    state = false;
+                }
             });
             addInPin(new InPin("R", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    if (state) {
-                        clockEnabled = false;
-                        if (outBus.state != 1) {
-                            outBus.setState(1);
-                        }
-                    } else {
-                        clockEnabled = true;
+                public void setHi() {
+                    state = true;
+                    clockEnabled = false;
+                    if (outBus.state != 1) {
+                        outBus.setState(1);
                     }
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
+                    clockEnabled = true;
                 }
             });
         }
@@ -148,6 +178,6 @@ public class RingCounter extends SchemaPart {
     @Override
     public void reset() {
         outBus.setState(1);
-        carryOutPin.setState(true);
+        carryOutPin.setHi();
     }
 }

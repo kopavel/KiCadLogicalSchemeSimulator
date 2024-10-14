@@ -51,9 +51,15 @@ public class Led extends SchemaPart implements InteractiveSchemaPart {
             }
 
             @Override
-            public void setState(boolean newState) {
-                state = newState;
-                ledUiComponent.state = state;
+            public void setHi() {
+                state = true;
+                ledUiComponent.state = true;
+            }
+
+            @Override
+            public void setLo() {
+                state = false;
+                ledUiComponent.state = false;
             }
         });
         int size = Integer.parseInt(params.getOrDefault("size", "20"));

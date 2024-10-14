@@ -54,11 +54,20 @@ public class SingleBitMultiplexer extends SchemaPart {
             int finalInNo = inNo;
             inPins[inNo] = addInPin(new InPin(String.valueOf(finalInNo), this) {
                 @Override
-                public void setState(boolean newState) {
+                public void setHi() {
                     hiImpedance = false;
-                    state = newState;
+                    state = true;
                     if (finalInNo == nState /*&& outBus.state != newState*/) {
-                        outPin.setState(newState);
+                        outPin.setHi();
+                    }
+                }
+
+                @Override
+                public void setLo() {
+                    hiImpedance = false;
+                    state = false;
+                    if (finalInNo == nState /*&& outBus.state != newState*/) {
+                        outPin.setLo();
                     }
                 }
             });
@@ -68,16 +77,30 @@ public class SingleBitMultiplexer extends SchemaPart {
             int nMask = ~mask;
             addInPin(new InPin("N" + i, this) {
                 @Override
-                public void setState(boolean newState) {
+                public void setHi() {
                     hiImpedance = false;
-                    state = newState;
-                    if (newState) {
-                        nState |= mask;
-                    } else {
-                        nState &= nMask;
-                    }
+                    state = true;
+                    nState |= mask;
                     if (!inPins[nState].hiImpedance && outPin.state != inPins[nState].state) {
-                        outPin.setState(inPins[nState].state);
+                        if (inPins[nState].state) {
+                            outPin.setHi();
+                        } else {
+                            outPin.setLo();
+                        }
+                    }
+                }
+
+                @Override
+                public void setLo() {
+                    hiImpedance = false;
+                    state = false;
+                    nState &= nMask;
+                    if (!inPins[nState].hiImpedance && outPin.state != inPins[nState].state) {
+                        if (inPins[nState].state) {
+                            outPin.setHi();
+                        } else {
+                            outPin.setLo();
+                        }
                     }
                 }
             });

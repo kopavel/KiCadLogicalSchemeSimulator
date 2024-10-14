@@ -58,23 +58,39 @@ public class OrGateIn extends InPin {
     }
 
     @Override
-    public void setState(boolean newState) {
-        state = newState;
-        if (newState) {
-            if (parent.inState == 0) {
-                /*Optimiser bind mask*/
-                parent.inState = mask;
-                /*Optimiser bind t:true*/
-                out.setState(true);
-            } else {
-                /*Optimiser bind mask*/
-                parent.inState |= mask;
-            }
+    public void setHi() {
+        state = true;
+        if (parent.inState == 0) {
             /*Optimiser bind mask*/
-        } else if (parent.inState == mask) {
+            parent.inState = mask;
+            /*Optimiser line o block r*/
+            if (parent.reverse) {
+                out.setLo();
+                /*Optimiser line o blockEnd r block nr*/
+            } else {
+                out.setHi();
+                /*Optimiser line o blockEnd nr*/
+            }
+        } else {
+            /*Optimiser bind mask*/
+            parent.inState |= mask;
+        }
+        /*Optimiser bind mask*/
+    }
+
+    @Override
+    public void setLo() {
+        state = false;
+        if (parent.inState == mask) {
             parent.inState = 0;
-            /*Optimiser bind f:false*/
-            out.setState(false);
+            /*Optimiser line o block r*/
+            if (parent.reverse) {
+                out.setHi();
+                /*Optimiser line o blockEnd r block nr*/
+            } else {
+                out.setLo();
+                /*Optimiser line o blockEnd nr*/
+            }
         } else {
             /*Optimiser bind nMask*/
             parent.inState &= nMask;
@@ -85,7 +101,9 @@ public class OrGateIn extends InPin {
     public InPin getOptimised(boolean keepSetters) {
         ClassOptimiser<OrGateIn> optimiser = new ClassOptimiser<>(this).bind("mask", mask).bind("nMask", nMask);
         if (parent.reverse) {
-            optimiser.bind("t", "false").bind("f", "true");
+            optimiser.cut("nr");
+        } else {
+            optimiser.cut("r");
         }
         OrGateIn build = optimiser.build();
         parent.replaceIn(id, build);

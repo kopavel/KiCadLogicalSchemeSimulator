@@ -85,12 +85,20 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
         } else if (otherPin.merger.strong && !otherPin.strong) {
             if (!pin.strong || pin.state != otherPin.merger.state) {
                 pin.strong = true;
-                pin.setState(otherPin.merger.state);
+                if (otherPin.merger.state) {
+                    pin.setHi();
+                } else {
+                    pin.setLo();
+                }
             }
         } else if ((otherPin.strong || otherPin.hiImpedance) ? otherPin.merger.weakState != 0 : Math.abs(otherPin.merger.weakState) > 1) {
             if (pin.hiImpedance || pin.strong || pin.state != otherPin.merger.weakState > 0) {
                 pin.strong = false;
-                pin.setState(otherPin.merger.weakState > 0);
+                if (otherPin.merger.weakState > 0) {
+                    pin.setHi();
+                } else {
+                    pin.setLo();
+                }
             }
         } else if (!pin.hiImpedance) {
             pin.setHiImpedance();

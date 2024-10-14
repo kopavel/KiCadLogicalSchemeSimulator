@@ -37,9 +37,9 @@ import pko.KiCadLogicalSchemeSimulator.test.schemaPartTester.NetTester;
 public class SdRamTest extends NetTester {
     @BeforeEach
     public void reset() {
-        setPin("~{WE}", true);
-        setPin("~{RAS}", true);
-        setPin("~{CAS}", true);
+        setHi("~{WE}");
+        setHi("~{RAS}");
+        setHi("~{CAS}");
         if (!outBus("aBus").hiImpedance) {
             outBus("aBus").setHiImpedance();
         }
@@ -62,23 +62,23 @@ public class SdRamTest extends NetTester {
     void testMultipleWritesAndReads() {
         long[] testValues = {0x00, 0xFF, 0xA5, 0x5A};
         long[] testAddresses = {0x00, 0x01, 0xee, 0x88};
-        setPin("~{WE}", false);
+        setLo("~{WE}");
         checkBusImpedance("SDRAM64K1", "D", "with hi ~{CAS} or lo ~{WR} D bus must be in hiImpedance");
         for (int i = 0; i < testValues.length; i++) {
             setBus("dOut", testValues[i]);
             setBus("aBus", testAddresses[i]);
-            setPin("~{RAS}", false);
+            setLo("~{RAS}");
             setBus("aBus", testAddresses[i] + 1);
-            setPin("~{CAS}", false);
+            setLo("~{CAS}");
         }
         outBus("dOut").setHiImpedance();
         checkBusImpedance("SDRAM64K1", "D", "with hi ~{CAS} or lo ~{WR} D bus must be in hiImpedance");
-        setPin("~{WE}", true);
+        setHi("~{WE}");
         for (int i = 0; i < testValues.length; i++) {
             setBus("aBus", testAddresses[i]);
-            setPin("~{RAS}", false);
+            setLo("~{RAS}");
             setBus("aBus", testAddresses[i] + 1);
-            setPin("~{CAS}", false);
+            setLo("~{CAS}");
             checkBus("dIn", testValues[i], "The value read from RAM does not match the value written.");
         }
     }

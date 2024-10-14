@@ -102,13 +102,24 @@ public class MultiOutDecoder extends SchemaPart {
                 if (csReverse) {
                     addInPin(new InPin("CS" + (char) ('a' + finalI) + j, this) {
                         @Override
-                        public void setState(boolean newState) {
-                            state = newState;
-                            if (newState) {
-                                csStates[finalI] |= mask;
+                        public void setHi() {
+                            state = true;
+                            csStates[finalI] |= mask;
+                            if (csStates[finalI] == 0) {
+                                if (outBuses[finalI].state != outState || outBuses[finalI].hiImpedance) {
+                                    outBuses[finalI].setState(outState);
+                                }
                             } else {
-                                csStates[finalI] &= nMask;
+                                if (!outBuses[finalI].hiImpedance) {
+                                    outBuses[finalI].setHiImpedance();
+                                }
                             }
+                        }
+
+                        @Override
+                        public void setLo() {
+                            state = false;
+                            csStates[finalI] &= nMask;
                             if (csStates[finalI] == 0) {
                                 if (outBuses[finalI].state != outState || outBuses[finalI].hiImpedance) {
                                     outBuses[finalI].setState(outState);
@@ -124,13 +135,24 @@ public class MultiOutDecoder extends SchemaPart {
                     csStates[finalI] |= mask;
                     addInPin(new InPin("CS" + (char) ('a' + finalI) + j, this) {
                         @Override
-                        public void setState(boolean newState) {
-                            state = newState;
-                            if (newState) {
-                                csStates[finalI] &= nMask;
+                        public void setHi() {
+                            state = true;
+                            csStates[finalI] &= nMask;
+                            if (csStates[finalI] == 0) {
+                                if (outBuses[finalI].state != outState || outBuses[finalI].hiImpedance) {
+                                    outBuses[finalI].setState(outState);
+                                }
                             } else {
-                                csStates[finalI] |= mask;
+                                if (!outBuses[finalI].hiImpedance) {
+                                    outBuses[finalI].setHiImpedance();
+                                }
                             }
+                        }
+
+                        @Override
+                        public void setLo() {
+                            state = false;
+                            csStates[finalI] |= mask;
                             if (csStates[finalI] == 0) {
                                 if (outBuses[finalI].state != outState || outBuses[finalI].hiImpedance) {
                                     outBuses[finalI].setState(outState);

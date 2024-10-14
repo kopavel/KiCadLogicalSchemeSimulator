@@ -126,35 +126,40 @@ public class Rom extends SchemaPart {
         if (reverse) {
             addInPin(new InPin("~{CS}", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    if (state) {
-                        csActive = false;
-                        if (!dBus.hiImpedance) {
-                            dBus.setHiImpedance();
-                        }
-                    } else {
-                        csActive = true;
-                        if (dBus.hiImpedance || dBus.state != words[addr]) {
-                            dBus.setState(words[addr]);
-                        }
+                public void setHi() {
+                    state = true;
+                    csActive = false;
+                    if (!dBus.hiImpedance) {
+                        dBus.setHiImpedance();
+                    }
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
+                    csActive = true;
+                    if (dBus.hiImpedance || dBus.state != words[addr]) {
+                        dBus.setState(words[addr]);
                     }
                 }
             });
         } else {
             addInPin(new InPin("CS", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
+                public void setHi() {
+                    state = true;
                     csActive = state;
-                    if (state) {
-                        if (dBus.hiImpedance || dBus.state != words[addr]) {
-                            dBus.setState(words[addr]);
-                        }
-                    } else {
-                        if (!dBus.hiImpedance) {
-                            dBus.setHiImpedance();
-                        }
+                    if (dBus.hiImpedance || dBus.state != words[addr]) {
+                        dBus.setState(words[addr]);
+                    }
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
+                    csActive = state;
+                    if (!dBus.hiImpedance) {
+                        dBus.setHiImpedance();
                     }
                 }
             });

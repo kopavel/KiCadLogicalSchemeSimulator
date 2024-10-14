@@ -48,21 +48,21 @@ public class MultiPartCounterTest extends NetTester {
 
     @BeforeEach
     void reset() {
-        setPin("R0", true);
-        setPin("R1", true);
-        setPin("R0", false);
-        setPin("R1", false);
+        setHi("R0");
+        setHi("R1");
+        setLo("R0");
+        setLo("R1");
     }
 
     @Test
     @DisplayName("Reset pin resets the counter")
     void resetPinResetsCounter() {
-        setPin("Ca", false);
-        setPin("Cb", false);
+        setLo("Ca");
+        setLo("Cb");
         checkBus("inB", 1, "Count should be 1 before reset");
         checkPin("inA", true, "Count should be 1 before reset");
-        setPin("R0", true);
-        setPin("R1", true);
+        setHi("R0");
+        setHi("R1");
         checkPin("inA", false, "Count should reset on rising edge of reset pin");
         checkBus("inB", 0, "Count should reset on rising edge of reset pin");
     }
@@ -74,26 +74,26 @@ public class MultiPartCounterTest extends NetTester {
             if (i == 3) {
                 continue;
             }
-            setPin("Cb", false);
+            setLo("Cb");
             checkBus("inB", i, "Count should increment on clock signal");
         }
-        setPin("Cb", false);
+        setLo("Cb");
         checkBus("inB", 0, "Count should reset after reaching maximum");
-        setPin("Ca", false);
+        setLo("Ca");
         checkPin("inA", true, "Count should increment on clock signal");
-        setPin("Ca", false);
+        setLo("Ca");
         checkPin("inA", false, "Count should reset after reaching maximum");
     }
 
     @Test
     @DisplayName("Count does not change with active reset pin")
     void countDoesNotChangeOnResetFallingEdge() {
-        setPin("R0", true);
-        setPin("R1", true);
+        setHi("R0");
+        setHi("R1");
         checkBus("inB", 0, "Count should be 1 before reset");
         checkPin("inA", false, "Count should be 1 before reset");
-        setPin("Ca", false);
-        setPin("Cb", false);
+        setLo("Ca");
+        setLo("Cb");
         checkBus("inB", 0, "Count should not change on falling edge of reset pin");
         checkPin("inA", false, "Count should not change on falling edge of reset pin");
     }
@@ -101,9 +101,9 @@ public class MultiPartCounterTest extends NetTester {
     @Test
     @DisplayName("Count does not increment on clock raising edge")
     void countDoesNotIncrementOnClockFallingEdge() {
-        setPin("Ca", true);
+        setHi("Ca");
         checkPin("inA", false, "Count should not increment on raising edge of clock signal");
-        setPin("Cb", true);
+        setHi("Cb");
         checkBus("inB", 0, "Count should not increment on raising edge of clock signal");
     }
 }

@@ -48,9 +48,9 @@ public class RomTest extends NetTester {
 
     @Test
     void testMultipleWritesAndReads() {
-        setPin("~{CS}", true);
+        setHi("~{CS}");
         checkBusImpedance("dBus", "with Hi ~{CS} D bus must be in hiImpedance");
-        setPin("~{CS}", false);
+        setLo("~{CS}");
         assertFalse(inBus("dBus").hiImpedance, "with lo ~{CS} D bus must nod be in hiImpedance");
         for (int i = 0; i < 5; i++) {
             setBus("aBus", i);

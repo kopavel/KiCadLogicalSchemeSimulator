@@ -83,23 +83,40 @@ public class SingleBitRam extends SchemaPart {
             });
             csPin = addInPin(new InPin("~{CS}", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
+                public void setHi() {
+                    state = true;
+                    rOut();
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
                     rOut();
                 }
             });
             oePin = addInPin(new InPin("~{OE}", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
+                public void setHi() {
+                    state = true;
+                    rOut();
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
                     rOut();
                 }
             });
             addInPin(new InPin("~{WE}", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    if (!state && !csPin.state) {
+                public void setHi() {
+                    state = true;
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
+                    if (!csPin.state) {
                         data[(int) aBus.state] = dIn.state;
                     }
                 }
@@ -116,25 +133,42 @@ public class SingleBitRam extends SchemaPart {
             });
             csPin = addInPin(new InPin("CS", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
+                public void setHi() {
+                    state = true;
+                    out();
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
                     out();
                 }
             });
             oePin = addInPin(new InPin("OE", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
+                public void setHi() {
+                    state = true;
+                    out();
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
                     out();
                 }
             });
             addInPin(new InPin("WE", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    if (state && csPin.state) {
+                public void setHi() {
+                    state = true;
+                    if (csPin.state) {
                         data[(int) aBus.state] = dIn.state;
                     }
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
                 }
             });
         }
@@ -153,7 +187,11 @@ public class SingleBitRam extends SchemaPart {
     private void out() {
         if (oePin.state && csPin.state) {
             if (dOut.state != data[(int) aBus.state] || dOut.hiImpedance) {
-                dOut.setState(data[(int) aBus.state]);
+                if (data[(int) aBus.state]) {
+                    dOut.setHi();
+                } else {
+                    dOut.setLo();
+                }
             }
         } else {
             if (!dOut.hiImpedance) {
@@ -169,7 +207,11 @@ public class SingleBitRam extends SchemaPart {
             }
         } else {
             if (dOut.state != data[(int) aBus.state] || dOut.hiImpedance) {
-                dOut.setState(data[(int) aBus.state]);
+                if (data[(int) aBus.state]) {
+                    dOut.setHi();
+                } else {
+                    dOut.setLo();
+                }
             }
         }
     }

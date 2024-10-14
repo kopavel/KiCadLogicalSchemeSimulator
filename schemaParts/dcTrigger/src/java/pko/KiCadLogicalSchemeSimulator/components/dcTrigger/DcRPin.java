@@ -63,59 +63,83 @@ public class DcRPin extends InPin {
     }
 
     @Override
-    public void setState(boolean newState) {
-        state = newState;
+    public void setHi() {
+        state = true;
+        //noinspection PointlessBooleanExpression
         parent.clockEnabled =
-                /*Optimiser line noReverse*/
-                !
-                        /*Optimiser line o*/
-                        reverse ^//
-                        (newState
-                                /*Optimiser line noS*///
-                                || sPin.state//
-                        );
-        //
-        if (
-            /*Optimiser line o*/
-                reverse ^//
-                        /*Optimiser bind n:newState */
-                        newState) {
+                /*Optimiser line nr*///
+                false ||
+                        /*Optimiser line o*///
+                        reverse &&
+                                /*Optimiser line r*///
+                                sPin.state//
+        ;
+
+        /*Optimiser line o block nr*/
+        if (!reverse) {
             if (!iqOut.state) {
-                iqOut.setState(true);
+                iqOut.setHi();
                 /*Optimiser block noS*/
             }
-            if (
-                /*Optimiser line noReverse*/
-                    !//
-                            /*Optimiser line o*/
-                            reverse ^//
-                            sPin.state) {
+            if (sPin.state) {
                 /*Optimiser blockEnd noS*/
-                qOut.setState(false);
+                qOut.setLo();
             }
-            /*Optimiser block noS*/
-        } else if (
-            /*Optimiser line o*/
-                reverse ^//
-                        /*Optimiser bind s:parent.sPin.state*/
-                        sPin.state) {
-            if (iqOut.state) {
-                iqOut.setState(false);
+            /*Optimiser block noS block r blockEnd nr line o*/
+        } else//
+            if (!sPin.state) {
+                if (iqOut.state) {
+                    iqOut.setLo();
+                }
+                if (!qOut.state) {
+                    qOut.setHi();
+                }
             }
-            if (!qOut.state) {
-                qOut.setState(true);
+        /*Optimiser blockEnd r blockEnd noS*/
+    }
+
+    @Override
+    public void setLo() {
+        state = false;
+        //noinspection PointlessBooleanExpression
+        parent.clockEnabled =
+                /*Optimiser line nr*///
+                true &&
+                        /*Optimiser line o*///
+                        !reverse &&
+                        /*Optimiser line r*///
+                        !sPin.state//
+        ;
+        /*Optimiser line o block r*/
+        if (reverse) {
+            if (!iqOut.state) {
+                iqOut.setHi();
+                /*Optimiser block noS*/
             }
-            /*Optimiser blockEnd noS*/
-        }
+            if (sPin.state) {
+                /*Optimiser blockEnd noS*/
+                qOut.setLo();
+            }
+            /*Optimiser line o block noS blockEnd r block nr*/
+        } else//
+            if (sPin.state) {
+                if (iqOut.state) {
+                    iqOut.setLo();
+                }
+                if (!qOut.state) {
+                    qOut.setHi();
+                }
+            }
+        /*Optimiser blockEnd noS blockEnd nr*/
     }
 
     @Override
     public InPin getOptimised(boolean keepSetters) {
         ClassOptimiser<DcRPin> optimiser = new ClassOptimiser<>(this).cut("o");
         if (reverse) {
-            optimiser.cut("noReverse").bind("n", "!newState").bind("s", "!sPin.state");
+            optimiser.cut("nr");
         } else {
-            optimiser.cut("reverse");
+            optimiser.cut("r");
         }
         if (!parent.sPin.used) {
             optimiser.cut("noS");

@@ -38,24 +38,24 @@ public class AndTest extends NetTester {
     @Test
     @DisplayName("Both input Lo - out Lo")
     public void bothLo() {
-        setPin(1, false);
-        setPin(2, false);
+        setLo(1);
+        setLo(2);
         checkPin(1, false, "With no input output needs to be Lo");
     }
 
     @Test
     @DisplayName("Only one input Hi - out Lo")
     public void oneHi() {
-        setPin(1, false);
-        setPin(2, true);
+        setLo(1);
+        setHi(2);
         checkPin(1, false, "With Hi on only one input output needs to be Lo");
     }
 
     @Test
     @DisplayName("Both input Hi - out Hi")
     public void bothHi() {
-        setPin(1, true);
-        setPin(2, true);
+        setHi(1);
+        setHi(2);
         checkPin(1, true, "With Hi on both inputs output needs to be Hi");
     }
 

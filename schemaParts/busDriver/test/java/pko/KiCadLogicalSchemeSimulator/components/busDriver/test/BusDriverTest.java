@@ -49,17 +49,17 @@ public class BusDriverTest extends NetTester {
     @Test
     protected void testBusDriver() {
         setBus("oA", 0b1010);
-        setPin("OEa", true);
-        setPin("OEb", true);
+        setHi("OEa");
+        setHi("OEb");
         checkBusImpedance("iA", "Initial state of out bus iA must be hiImpedance");
         checkPinImpedance("iB0", "Initial state of out pin iB0 must be hiImpedance");
         checkPinImpedance("iB1", "Initial state of out pin iB1 must be hiImpedance");
-        setPin("OEa", false);
+        setLo("OEa");
         assertFalse(inBus("iA").hiImpedance, "with OEa in Hi state of out bus iA must not be hiImpedance");
         checkBus("iA", 0b1010, "with OEa in Lo state of out bus iA must 10");
-        setPin("oB0", true);
-        setPin("oB1", false);
-        setPin("OEb", false);
+        setHi("oB0");
+        setLo("oB1");
+        setLo("OEb");
         assertFalse(inPin("iB0").hiImpedance, "with OEb in Hi state of out pin iB0 must not be hiImpedance");
         assertFalse(inPin("iB1").hiImpedance, "with OEb in Hi state of out pin iB1 must not be hiImpedance");
         checkPin("iB0", true, "with OEb in Lo state of out bus iB0 must true");

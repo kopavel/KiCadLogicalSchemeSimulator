@@ -49,7 +49,7 @@ public class RingCounterTest extends NetTester {
     @BeforeEach
     void reset() {
         net.schemaParts.get("U2").reset();
-        setPin("Cin", false);
+        setLo("Cin");
     }
 
     @Test
@@ -69,9 +69,9 @@ public class RingCounterTest extends NetTester {
             } else {
                 checkPin("Cout", false, "Carry out must be 0 when count are " + Math.pow(2, i) + "; i = " + i);
             }
-            setPin("C", true);
+            setHi("C");
         }
-        setPin("C", true);
+        setHi("C");
         checkBus("qBus", 1, "Count should reset after reaching maximum");
     }
 
@@ -79,38 +79,38 @@ public class RingCounterTest extends NetTester {
     @DisplayName("Reset pin resets the counter")
     void resetPinResetsCounter() {
         for (int i = 1; i <= 3; i++) {
-            setPin("C", true);
+            setHi("C");
         }
         checkBus("qBus", 8, "Count should be 8 before reset");
-        setPin("R", true);
+        setHi("R");
         checkBus("qBus", 1, "Count should reset on rising edge of reset pin");
     }
 
     @Test
     @DisplayName("Count does not change on reset pin falling edge")
     void countDoesNotChangeOnResetFallingEdge() {
-        setPin("C", true);
+        setHi("C");
         checkBus("qBus", 2, "Count should be 2 before reset");
-        setPin("R", false);
+        setLo("R");
         checkBus("qBus", 2, "Count should not change on falling edge of reset pin");
     }
 
     @Test
     @DisplayName("Count does not increment on clock falling edge")
     void countDoesNotIncrementOnClockFallingEdge() {
-        setPin("C", true);
+        setHi("C");
         checkBus("qBus", 2, "Count should be 2 before test");
-        setPin("C", false);
+        setLo("C");
         checkBus("qBus", 2, "Count should not increment on falling edge of clock signal");
     }
 
     @Test
     @DisplayName("Count does not increment on Hi CarryIn")
     void countDoesNotIncrementOnHiCi() {
-        setPin("C", true);
+        setHi("C");
         checkBus("qBus", 2, "Count should be 2 before test");
-        setPin("Cin", true);
-        setPin("C", true);
+        setHi("Cin");
+        setHi("C");
         checkBus("qBus", 2, "Count should not increment on falling edge of clock signal");
     }
 }

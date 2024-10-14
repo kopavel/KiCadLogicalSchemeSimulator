@@ -48,14 +48,14 @@ public class LatchTest extends NetTester {
     @Test
     @DisplayName("Q pin should be in high-impedance state with Hi CS")
     void qPinHighImpedanceWithHighCs() {
-        setPin("RegOe", true);
+        setHi("RegOe");
         checkBusImpedance("RegIn", "With Hi CS pin, Q must be in high-impedance state");
     }
 
     @Test
     @DisplayName("Q pin should remain high-impedance with Hi CS and changing D pin")
     void qPinRemainsHighImpedanceWithHighCsAndChangingD() {
-        setPin("RegOe", true);
+        setHi("RegOe");
         setBus("RegOut", 1);
         checkBusImpedance("RegIn", "With Hi CS pin, Q must remain in high-impedance state when D pin changes");
     }
@@ -63,12 +63,12 @@ public class LatchTest extends NetTester {
     @Test
     @DisplayName("Latch should store and read correctly")
     void latchWriteAndRead() {
-        setPin("RegOe", true);
+        setHi("RegOe");
         setBus("RegOut", 1);
-        setPin("RegWr", false);
-        setPin("RegOe", false);
+        setLo("RegWr");
+        setLo("RegOe");
         checkBus("RegIn", 1, "Q pin should reflect the state of D pin after OE falling edge");
-        setPin("RegOe", true);
+        setHi("RegOe");
         checkBusImpedance("RegIn", "Q pin should be in high-impedance state after OE raising edge");
     }
 }

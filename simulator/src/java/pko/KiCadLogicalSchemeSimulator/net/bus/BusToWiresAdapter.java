@@ -77,16 +77,21 @@ public class BusToWiresAdapter extends OutBus {
                 }
                 hasQueue = true;
                 /*Optimiser bind nState:newMaskState*/
-                queueState = newMaskState != 0;
+                queueState = newMaskState == 0;
                 /*Optimiser blockEnd recurse*/
             } else {
                 processing = true;
-                /*Optimiser blockEnd setters  blockEnd allRecurse line dest bind nState:newMaskState*/
-                final boolean dState = newMaskState != 0;
-                for (Pin destination : destinations) {
-                    /*Optimiser bind v:dState*/
-                    destination.setState(dState);
+                /*Optimiser blockEnd setters blockEnd allRecurse bind nState:newMaskState*/
+                if (newMaskState == 0) {
+                    for (Pin destination : destinations) {
+                        destination.setLo();
+                    }
+                } else {
+                    for (Pin destination : destinations) {
+                        destination.setHi();
+                    }
                 }
+
                 /*Optimiser block setters block recurse block allRecurse*/
                 while (hasQueue) {
                     hasQueue = false;
@@ -97,8 +102,14 @@ public class BusToWiresAdapter extends OutBus {
                         }
                     } else {
                         /*Optimiser blockEnd iSetter*/
-                        for (Pin destination : destinations) {
-                            destination.setState(queueState);
+                        if (queueState) {
+                            for (Pin destination : destinations) {
+                                destination.setLo();
+                            }
+                        } else {
+                            for (Pin destination : destinations) {
+                                destination.setHi();
+                            }
                         }
                         /*Optimiser line iSetter*/
                     }
@@ -140,8 +151,14 @@ public class BusToWiresAdapter extends OutBus {
                         destination.setHiImpedance();
                     }
                 } else {
-                    for (Pin destination : destinations) {
-                        destination.setState(queueState);
+                    if (queueState) {
+                        for (Pin destination : destinations) {
+                            destination.setLo();
+                        }
+                    } else {
+                        for (Pin destination : destinations) {
+                            destination.setHi();
+                        }
                     }
                 }
             }
@@ -182,13 +199,6 @@ public class BusToWiresAdapter extends OutBus {
             }
             if (groupByMask == 0) {
                 optimiser.cut("mask").bind("nState", "newState");
-                if (destinations.length == 1) {
-                    optimiser.bind("v", "newState != 0").cut("dest");
-                }
-            } else {
-                if (destinations.length == 1) {
-                    optimiser.bind("v", "newMaskState != 0").cut("dest");
-                }
             }
             return optimiser.build();
         }

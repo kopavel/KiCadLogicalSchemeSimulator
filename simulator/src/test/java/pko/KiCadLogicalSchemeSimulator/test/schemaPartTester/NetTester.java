@@ -103,12 +103,20 @@ public abstract class NetTester {
         outBus(id).setState(state);
     }
 
-    protected void setPin(String id, boolean state) {
-        outPin(id).setState(state);
+    protected void setLo(String id) {
+        outPin(id).setLo();
     }
 
-    protected void setPin(int id, boolean state) {
-        outPin(id).setState(state);
+    protected void setHi(String id) {
+        outPin(id).setHi();
+    }
+
+    protected void setHi(int id) {
+        outPin(id).setHi();
+    }
+
+    protected void setLo(int id) {
+        outPin(id).setLo();
     }
 
     protected void checkPin(int id, boolean state, String message) {

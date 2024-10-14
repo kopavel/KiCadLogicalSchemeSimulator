@@ -48,9 +48,9 @@ public class RamTest extends NetTester {
 
     @BeforeEach
     void reset() {
-        setPin("~{CS}", true);
-        setPin("~{OE}", true);
-        setPin("~{WE}", true);
+        setHi("~{CS}");
+        setHi("~{OE}");
+        setHi("~{WE}");
     }
 
     @Test
@@ -58,31 +58,31 @@ public class RamTest extends NetTester {
         long[] testValues = {0x00, 0xFF, 0xA5, 0x5A};
         long[] testAddresses = {0x00, 0x01, 0xFF, 0x88};
         checkBusImpedance("RAM1", "D", "with hi ~{CS} D bus must be in hiImpedance");
-        setPin("~{CS}", false);
+        setLo("~{CS}");
         checkBusImpedance("RAM1", "D", "with lo ~{CS} and hi ~{OE} D bus must be in hiImpedance");
         for (int i = 0; i < testValues.length; i++) {
             setBus("aBus", testAddresses[i]);
             setBus("dOut", testValues[i]);
-            setPin("~{WE}", false);
+            setLo("~{WE}");
         }
         outBus("dOut").setHiImpedance();
-        setPin("~{OE}", false);
+        setLo("~{OE}");
         assertFalse(inBus("dIn").hiImpedance, "with lo ~{OE} D bus must not be in hiImpedance");
         for (int i = 0; i < testValues.length; i++) {
             setBus("aBus", testAddresses[i]);
             checkBus("dIn", testValues[i], "The value read from RAM does not match the value written.");
         }
-        setPin("~{CS}", true);
+        setHi("~{CS}");
         checkBusImpedance("RAM1", "D", "with hi ~{CS} D bus must be in hiImpedance even with lo ~{OE}");
-        setPin("~{OE}", true);
+        setHi("~{OE}");
         setBus("dOut", 0);
         for (int i = 0; i < testValues.length; i++) {
             setBus("aBus", testAddresses[i]);
-            setPin("~{WE}", false);
+            setLo("~{WE}");
         }
         outBus("dOut").setHiImpedance();
-        setPin("~{CS}", false);
-        setPin("~{OE}", false);
+        setLo("~{CS}");
+        setLo("~{OE}");
         assertFalse(inBus("dIn").hiImpedance, "with lo ~{CS} D bus must not be in hiImpedance");
         for (int i = 0; i < testValues.length; i++) {
             setBus("aBus", testAddresses[i]);

@@ -63,53 +63,67 @@ public class Buffer extends SchemaPart {
             if (reverse) {
                 oePin = addInPin(new InPin("OE", this) {
                     @Override
-                    public void setState(boolean newState) {
-                        state = newState;
-                        if (state) {
-                            if (!qBus.hiImpedance) {
-                                qBus.setHiImpedance();
-                            }
-                        } else if (qBus.state != latch || qBus.hiImpedance) {
+                    public void setHi() {
+                        state = true;
+                        if (!qBus.hiImpedance) {
+                            qBus.setHiImpedance();
+                        }
+                    }
+
+                    @Override
+                    public void setLo() {
+                        state = false;
+                        if (qBus.state != latch || qBus.hiImpedance) {
                             qBus.setState(latch);
                         }
                     }
                 });
                 addInPin(new InPin("WR", this) {
                     @Override
-                    public void setState(boolean newState) {
-                        state = newState;
-                        if (!state) {
-                            latch = dBus.state;
-                            if (!oePin.state && (qBus.state != latch || qBus.hiImpedance)) {
-                                qBus.setState(latch);
-                            }
+                    public void setHi() {
+                        state = true;
+                    }
+
+                    @Override
+                    public void setLo() {
+                        state = false;
+                        latch = dBus.state;
+                        if (!oePin.state && (qBus.state != latch || qBus.hiImpedance)) {
+                            qBus.setState(latch);
                         }
                     }
                 });
             } else {
                 oePin = addInPin(new InPin("OE", this) {
                     @Override
-                    public void setState(boolean newState) {
-                        state = newState;
-                        if (state) {
-                            if (qBus.state != latch || qBus.hiImpedance) {
-                                qBus.setState(latch);
-                            }
-                        } else if (!qBus.hiImpedance) {
+                    public void setHi() {
+                        state = true;
+                        if (qBus.state != latch || qBus.hiImpedance) {
+                            qBus.setState(latch);
+                        }
+                    }
+
+                    @Override
+                    public void setLo() {
+                        state = false;
+                        if (!qBus.hiImpedance) {
                             qBus.setHiImpedance();
                         }
                     }
                 });
                 addInPin(new InPin("WR", this) {
                     @Override
-                    public void setState(boolean newState) {
-                        state = newState;
-                        if (state) {
-                            latch = dBus.state;
-                            if (oePin.state && (qBus.state != latch || qBus.hiImpedance)) {
-                                qBus.setState(latch);
-                            }
+                    public void setHi() {
+                        state = true;
+                        latch = dBus.state;
+                        if (oePin.state && (qBus.state != latch || qBus.hiImpedance)) {
+                            qBus.setState(latch);
                         }
+                    }
+
+                    @Override
+                    public void setLo() {
+                        state = false;
                     }
                 });
             }
@@ -117,13 +131,17 @@ public class Buffer extends SchemaPart {
         } else if (reverse) {
             oePin = addInPin(new InPin("CS", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    if (state) {
-                        if (!qBus.hiImpedance) {
-                            qBus.setHiImpedance();
-                        }
-                    } else if (qBus.state != dBus.state || qBus.hiImpedance) {
+                public void setHi() {
+                    state = true;
+                    if (!qBus.hiImpedance) {
+                        qBus.setHiImpedance();
+                    }
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
+                    if (qBus.state != dBus.state || qBus.hiImpedance) {
                         qBus.setState(dBus.state);
                     }
                 }
@@ -140,13 +158,17 @@ public class Buffer extends SchemaPart {
         } else {
             oePin = addInPin(new InPin("CS", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    if (state) {
-                        if (qBus.state != dBus.state || qBus.hiImpedance) {
-                            qBus.setState(dBus.state);
-                        }
-                    } else if (!qBus.hiImpedance) {
+                public void setHi() {
+                    state = true;
+                    if (qBus.state != dBus.state || qBus.hiImpedance) {
+                        qBus.setState(dBus.state);
+                    }
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
+                    if (!qBus.hiImpedance) {
                         qBus.setHiImpedance();
                     }
                 }

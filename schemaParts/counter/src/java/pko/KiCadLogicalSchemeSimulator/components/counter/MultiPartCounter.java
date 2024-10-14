@@ -104,7 +104,7 @@ public class MultiPartCounter extends SchemaPart {
         for (int i = 0; i < sizes.length; i++) {
             if (sizes[i] == 1) {
                 if (outPins[i].state) {
-                    outPins[i].setState(false);
+                    outPins[i].setLo();
                 }
             } else if (outBuses[i].state > 0) {
                 outBuses[i].setState(0);

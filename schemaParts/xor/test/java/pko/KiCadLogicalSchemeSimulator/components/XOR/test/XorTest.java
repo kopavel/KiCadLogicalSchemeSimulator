@@ -47,11 +47,11 @@ public class XorTest extends NetTester {
     @Test
     protected void xorTest() {
         checkPin(1, false, "Initial out state must be Lo");
-        setPin(1, true);
+        setHi(1);
         checkPin(1, true, "With one input Hi output state must be Hi");
-        setPin(2, true);
+        setHi(2);
         checkPin(1, false, "With both input Hi output state must be Lo");
-        setPin(1, false);
+        setLo(1);
         checkPin(1, true, "With one input Hi output state must be Hi");
     }
 }

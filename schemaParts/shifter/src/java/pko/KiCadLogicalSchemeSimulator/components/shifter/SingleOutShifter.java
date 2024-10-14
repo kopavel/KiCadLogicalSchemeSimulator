@@ -69,19 +69,33 @@ public class SingleOutShifter extends SchemaPart {
         if (plReverse) {
             addInPin(new InPin("PL", this) {
                 @Override
-                public void setState(boolean newState) {
+                public void setHi() {
                     hiImpedance = false;
-                    state = newState;
-                    parallelLoad = !newState;
+                    state = true;
+                    parallelLoad = false;
+                }
+
+                @Override
+                public void setLo() {
+                    hiImpedance = false;
+                    state = false;
+                    parallelLoad = true;
                 }
             });
         } else {
             addInPin(new InPin("PL", this) {
                 @Override
-                public void setState(boolean newState) {
+                public void setHi() {
                     hiImpedance = false;
-                    state = newState;
-                    parallelLoad = newState;
+                    state = true;
+                    parallelLoad = true;
+                }
+
+                @Override
+                public void setLo() {
+                    hiImpedance = false;
+                    state = false;
+                    parallelLoad = false;
                 }
             });
         }
@@ -90,29 +104,35 @@ public class SingleOutShifter extends SchemaPart {
             clockEnabled = false;
             rPin = addInPin(new InPin("R", this) {
                 @Override
-                public void setState(boolean newState) {
+                public void setHi() {
                     hiImpedance = false;
-                    state = newState;
-                    if (newState) {
-                        clockEnabled = ciPin.state ^ inhibitReverse;
-                    } else {
-                        clockEnabled = false;
-                        latch = 0;
-                    }
+                    state = true;
+                    clockEnabled = ciPin.state ^ inhibitReverse;
+                }
+
+                @Override
+                public void setLo() {
+                    hiImpedance = false;
+                    state = false;
+                    clockEnabled = false;
+                    latch = 0;
                 }
             });
         } else {
             rPin = addInPin(new InPin("R", this) {
                 @Override
-                public void setState(boolean newState) {
+                public void setHi() {
                     hiImpedance = false;
-                    state = newState;
-                    if (newState) {
-                        clockEnabled = false;
-                        latch = 0;
-                    } else {
-                        clockEnabled = ciPin.state ^ inhibitReverse;
-                    }
+                    state = true;
+                    clockEnabled = false;
+                    latch = 0;
+                }
+
+                @Override
+                public void setLo() {
+                    hiImpedance = false;
+                    state = false;
+                    clockEnabled = ciPin.state ^ inhibitReverse;
                 }
             });
         }
@@ -121,37 +141,49 @@ public class SingleOutShifter extends SchemaPart {
             clockEnabled = false;
             ciPin = addInPin(new InPin("CI", this) {
                 @Override
-                public void setState(boolean newState) {
+                public void setHi() {
                     hiImpedance = false;
-                    state = newState;
-                    if (newState) {
-                        clockEnabled = false;
-                    } else {
-                        clockEnabled = rPin.state ^ clearReverse;
-                    }
+                    state = true;
+                    clockEnabled = false;
+                }
+
+                @Override
+                public void setLo() {
+                    hiImpedance = false;
+                    state = false;
+                    clockEnabled = rPin.state ^ clearReverse;
                 }
             });
         } else {
             ciPin = addInPin(new InPin("CI", this) {
                 @Override
-                public void setState(boolean newState) {
+                public void setHi() {
                     hiImpedance = false;
-                    state = newState;
-                    if (newState) {
-                        clockEnabled = rPin.state ^ clearReverse;
-                    } else {
-                        clockEnabled = false;
-                    }
+                    state = true;
+                    clockEnabled = rPin.state ^ clearReverse;
+                }
+
+                @Override
+                public void setLo() {
+                    hiImpedance = false;
+                    state = false;
+                    clockEnabled = false;
                 }
             });
         }
         if (reverse) {
             addInPin(new InPin("CP", this) {
                 @Override
-                public void setState(boolean newState) {
+                public void setHi() {
                     hiImpedance = false;
-                    state = newState;
-                    if (!newState && clockEnabled) {
+                    state = true;
+                }
+
+                @Override
+                public void setLo() {
+                    hiImpedance = false;
+                    state = false;
+                    if (clockEnabled) {
                         if (parallelLoad) {
                             latch = dBus.state;
                         } else {
@@ -163,17 +195,27 @@ public class SingleOutShifter extends SchemaPart {
                             }
                         }
                         if (out.state == ((latch & outMask) == 0)) {
-                            out.setState((latch & outMask) != 0);
+                            if ((latch & outMask) != 0) {
+                                out.setHi();
+                            } else {
+                                out.setLo();
+                            }
                         }
                     }
                 }
             });
             addInPin(new InPin("CN", this) {
                 @Override
-                public void setState(boolean newState) {
+                public void setHi() {
                     hiImpedance = false;
-                    state = newState;
-                    if (!newState && clockEnabled) {
+                    state = true;
+                }
+
+                @Override
+                public void setLo() {
+                    hiImpedance = false;
+                    state = false;
+                    if (clockEnabled) {
                         if (parallelLoad) {
                             latch = dBus.state;
                         } else {
@@ -185,7 +227,11 @@ public class SingleOutShifter extends SchemaPart {
                             }
                         }
                         if (out.state == ((latch & outMask) == 0)) {
-                            out.setState((latch & outMask) != 0);
+                            if ((latch & outMask) != 0) {
+                                out.setHi();
+                            } else {
+                                out.setLo();
+                            }
                         }
                     }
                 }
@@ -193,10 +239,10 @@ public class SingleOutShifter extends SchemaPart {
         } else {
             addInPin(new InPin("CP", this) {
                 @Override
-                public void setState(boolean newState) {
+                public void setHi() {
                     hiImpedance = false;
-                    state = newState;
-                    if (newState && clockEnabled) {
+                    state = true;
+                    if (clockEnabled) {
                         if (parallelLoad) {
                             latch = dBus.state;
                         } else {
@@ -208,17 +254,27 @@ public class SingleOutShifter extends SchemaPart {
                             }
                         }
                         if (out.state == ((latch & outMask) == 0)) {
-                            out.setState((latch & outMask) != 0);
+                            if ((latch & outMask) != 0) {
+                                out.setHi();
+                            } else {
+                                out.setLo();
+                            }
                         }
                     }
+                }
+
+                @Override
+                public void setLo() {
+                    hiImpedance = false;
+                    state = false;
                 }
             });
             addInPin(new InPin("CN", this) {
                 @Override
-                public void setState(boolean newState) {
+                public void setHi() {
                     hiImpedance = false;
-                    state = newState;
-                    if (newState && clockEnabled) {
+                    state = true;
+                    if (clockEnabled) {
                         if (parallelLoad) {
                             latch = dBus.state;
                         } else {
@@ -230,9 +286,19 @@ public class SingleOutShifter extends SchemaPart {
                             }
                         }
                         if (out.state == ((latch & outMask) == 0)) {
-                            out.setState((latch & outMask) != 0);
+                            if ((latch & outMask) != 0) {
+                                out.setHi();
+                            } else {
+                                out.setLo();
+                            }
                         }
                     }
+                }
+
+                @Override
+                public void setLo() {
+                    hiImpedance = false;
+                    state = false;
                 }
             });
         }
@@ -252,6 +318,6 @@ public class SingleOutShifter extends SchemaPart {
     @Override
     public void reset() {
         latch = 0;
-        out.setState(false);
+        out.setLo();
     }
 }

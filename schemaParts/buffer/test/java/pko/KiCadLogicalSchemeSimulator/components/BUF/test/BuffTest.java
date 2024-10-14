@@ -51,13 +51,13 @@ public class BuffTest extends NetTester {
     @BeforeEach
     void reset() {
         setBus("BufOut", 0);
-        setPin("BufCs", true);
+        setHi("BufCs");
     }
 
     @Test
     @DisplayName("Hi CS")
     void noCs() {
-        setPin("BufCs", true);
+        setHi("BufCs");
         checkBusImpedance("BufIn", "With Hi CS pin Q must be hiImpedance");
         setBus("BufOut", 1);
         checkBusImpedance("BufIn", "With Hi CS pin Q must be hiImpedance");
@@ -66,7 +66,7 @@ public class BuffTest extends NetTester {
     @Test
     @DisplayName("Lo CS and Hi D")
     void trueInput() {
-        setPin("BufCs", false);
+        setLo("BufCs");
         checkBus("BufIn", 0, "With Lo CS pin Q must not be hiImpedance");
         setBus("BufOut", 1);
         checkBus("BufIn", 1, "With Lo CS and Hi D pin Q must be Hi");
@@ -75,7 +75,7 @@ public class BuffTest extends NetTester {
     @Test
     @DisplayName("Lo CS and Lo D")
     void falseInput() {
-        setPin("BufCs", false);
+        setLo("BufCs");
         setBus("BufOut", 0);
         assertFalse(inBus("BufIn").hiImpedance, "With Lo CS pin Q must not be hiImpedance");
         checkBus("BufIn", 0, "With Lo CS and Hi D pin Q must be Hi");
@@ -85,11 +85,11 @@ public class BuffTest extends NetTester {
     @DisplayName("Toggle CS")
     void toggleCs() {
         setBus("BufOut", 3);
-        setPin("BufCs", false);
+        setLo("BufCs");
         checkBus("BufIn", 3, "With Lo CS and Hi D pin Q must be Hi");
-        setPin("BufCs", true);
+        setHi("BufCs");
         checkBusImpedance("BufIn", "With Hi CS pin Q must be hiImpedance");
-        setPin("BufCs", false);
+        setLo("BufCs");
         checkBus("BufIn", 3, "With Lo CS again pin Q must be Hi");
     }
 }

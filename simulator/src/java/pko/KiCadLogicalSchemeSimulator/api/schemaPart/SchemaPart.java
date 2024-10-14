@@ -72,9 +72,15 @@ public abstract class SchemaPart {
             }
 
             @Override
-            public void setState(boolean newState) {
+            public void setHi() {
                 hiImpedance = false;
-                state = newState;
+                state = true;
+            }
+
+            @Override
+            public void setLo() {
+                hiImpedance = false;
+                state = false;
             }
         });
     }
@@ -82,8 +88,13 @@ public abstract class SchemaPart {
     public InPin addNoFloatingInPin(String pinId) {
         return addInPin(new InPin(pinId, this) {
             @Override
-            public void setState(boolean newState) {
-                state = newState;
+            public void setHi() {
+                state = true;
+            }
+
+            @Override
+            public void setLo() {
+                state = false;
             }
         });
     }

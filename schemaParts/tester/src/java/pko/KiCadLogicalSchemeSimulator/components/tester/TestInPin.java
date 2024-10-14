@@ -45,9 +45,15 @@ public class TestInPin extends SchemaPart {
             }
 
             @Override
-            public void setState(boolean newState) {
+            public void setHi() {
                 hiImpedance = false;
-                state = newState;
+                state = true;
+            }
+
+            @Override
+            public void setLo() {
+                hiImpedance = false;
+                state = false;
             }
         });
     }

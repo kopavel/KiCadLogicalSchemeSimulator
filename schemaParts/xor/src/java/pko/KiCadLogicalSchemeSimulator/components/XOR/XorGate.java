@@ -44,38 +44,102 @@ public class XorGate extends SchemaPart {
         if (reverse) {
             in1 = addInPin(new InPin("IN0", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    if (out.state != (in1.state == in2.state)) {
-                        out.setState(in1.state == in2.state);
+                public void setHi() {
+                    state = true;
+                    if (out.state != (in2.state)) {
+                        if (in2.state) {
+                            out.setHi();
+                        } else {
+                            out.setLo();
+                        }
+                    }
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
+                    if (out.state == in2.state) {
+                        if (in2.state) {
+                            out.setLo();
+                        } else {
+                            out.setHi();
+                        }
                     }
                 }
             });
             in2 = addInPin(new InPin("IN1", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    if (out.state != (in1.state == in2.state)) {
-                        out.setState(in1.state == in2.state);
+                public void setHi() {
+                    state = true;
+                    if (out.state != in1.state) {
+                        if (in1.state) {
+                            out.setHi();
+                        } else {
+                            out.setLo();
+                        }
+                    }
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
+                    if (out.state == in1.state) {
+                        if (!in1.state) {
+                            out.setHi();
+                        } else {
+                            out.setLo();
+                        }
                     }
                 }
             });
         } else {
             in1 = addInPin(new InPin("IN0", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    if (out.state == (in1.state == in2.state)) {
-                        out.setState(in1.state != in2.state);
+                public void setHi() {
+                    state = true;
+                    if (out.state == (in2.state)) {
+                        if (in2.state) {
+                            out.setLo();
+                        } else {
+                            out.setHi();
+                        }
+                    }
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
+                    if (out.state != in2.state) {
+                        if (in2.state) {
+                            out.setHi();
+                        } else {
+                            out.setLo();
+                        }
                     }
                 }
             });
             in2 = addInPin(new InPin("IN1", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    if (out.state == (in1.state == in2.state)) {
-                        out.setState(in1.state != in2.state);
+                public void setHi() {
+                    state = true;
+                    if (out.state == in1.state) {
+                        if (in1.state) {
+                            out.setLo();
+                        } else {
+                            out.setHi();
+                        }
+                    }
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
+                    if (out.state != in1.state) {
+                        if (in1.state) {
+                            out.setHi();
+                        } else {
+                            out.setLo();
+                        }
                     }
                 }
             });
@@ -86,7 +150,11 @@ public class XorGate extends SchemaPart {
     @Override
     public void initOuts() {
         out = getOutPin("OUT");
-        out.setState(in1.state != in2.state);
+        if (in1.state == in2.state) {
+            out.setLo();
+        } else {
+            out.setHi();
+        }
     }
 
     @Override

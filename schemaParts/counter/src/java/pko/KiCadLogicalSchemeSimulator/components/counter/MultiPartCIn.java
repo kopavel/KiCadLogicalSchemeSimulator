@@ -75,20 +75,22 @@ public class MultiPartCIn extends InPin {
     }
 
     @Override
-    public void setState(boolean newState) {
-        state = newState;
-        /*Optimiser bind newState*/
-        if (newState
-                /*Optimiser line o*///
-                ^ reverse//
-                /*Optimiser line hasR*///
-                && parent.resetState != 0//
+    public void setHi() {
+        state = true;
+        /*Optimiser block nr block hasR*///
+        if (
+            /*Optimiser line o*///
+                !reverse &&//
+                        parent.resetState != 0//
         ) {
-
-            /*Optimiser line o*/
+            /*Optimiser line o blockEnd hasR*/
             if (size == 1) {
                 /*Optimiser line pin*/
-                outPin.setState(!outPin.state);
+                if (outPin.state) {
+                    outPin.setLo();
+                } else {
+                    outPin.setHi();
+                }
                 /*Optimiser line o*/
             } else if (skipMask != 0) {
                 /*Optimiser line skip bind skip:skipMask*///
@@ -99,12 +101,46 @@ public class MultiPartCIn extends InPin {
                 outBus.setState((outBus.state + 1) & countMask);
                 /*Optimiser line o*/
             }
+            /*Optimiser line nasR*/
         }
+        /*Optimiser blockEnd nr*/
+    }
+
+    @Override
+    public void setLo() {
+        state = false;
+        /*Optimiser block r block hasR*/
+        if (
+            /*Optimiser line o*///
+                reverse &&//
+                        parent.resetState != 0//
+        ) {
+            /*Optimiser line o blockEnd hasR*/
+            if (size == 1) {
+                /*Optimiser line pin*/
+                if (outPin.state) {
+                    outPin.setLo();
+                } else {
+                    outPin.setHi();
+                }
+                /*Optimiser line o*/
+            } else if (skipMask != 0) {
+                /*Optimiser line skip bind skip:skipMask*///
+                outBus.setState(outBus.state + (((outBus.state & skipMask) == skipMask) ? 2 : 1));
+                /*Optimiser line o*/
+            } else {
+                /*Optimiser line bus bind countMask*///
+                outBus.setState((outBus.state + 1) & countMask);
+                /*Optimiser line o*/
+            }
+            /*Optimiser line hasR*/
+        }
+        /*Optimiser blockEnd r*/
     }
 
     public void reset() {
         if (size == 1) {
-            outPin.setState(false);
+            outPin.setLo();
         } else {
             outBus.setState(0);
         }
@@ -114,7 +150,9 @@ public class MultiPartCIn extends InPin {
     public InPin getOptimised(boolean keepSetters) {
         ClassOptimiser<MultiPartCIn> optimiser = new ClassOptimiser<>(this).cut("o");
         if (reverse) {
-            optimiser.bind("newState", "!newState");
+            optimiser.cut("nr");
+        } else {
+            optimiser.cut("r");
         }
         if (size == 1) {
             optimiser.cut("bus").cut("skip");

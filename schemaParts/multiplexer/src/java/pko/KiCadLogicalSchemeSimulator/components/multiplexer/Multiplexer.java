@@ -79,13 +79,18 @@ public class Multiplexer extends SchemaPart {
             int nMask = ~mask;
             addInPin(new InPin("N" + i, this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    if (newState) {
-                        nState |= mask;
-                    } else {
-                        nState &= nMask;
+                public void setHi() {
+                    state = true;
+                    nState |= mask;
+                    if (outBus.state != inBuses[nState].state) {
+                        outBus.setState(inBuses[nState].state);
                     }
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
+                    nState &= nMask;
                     if (outBus.state != inBuses[nState].state) {
                         outBus.setState(inBuses[nState].state);
                     }

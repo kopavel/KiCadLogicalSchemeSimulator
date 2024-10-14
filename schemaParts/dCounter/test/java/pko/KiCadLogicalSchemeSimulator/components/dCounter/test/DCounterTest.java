@@ -55,20 +55,20 @@ public class DCounterTest extends NetTester {
         DCounter counter = (DCounter) net.schemaParts.get("U1");
         InPin rPin = (InPin) counter.getInItem("R");
         counter.reset();
-        setPin("UD", true);
-        setPin("BD", true);
-        rPin.setState(false);
+        setHi("UD");
+        setHi("BD");
+        rPin.setLo();
     }
 
     @Test
     @DisplayName("Default counter behavior - count up, binary mode")
     void defaultCounterBehavior() {
-        setPin("Cin", false);
+        setLo("Cin");
         checkBus("qBus", 0, "Initial state should be 0");
         checkPin("Cout", true, "Initial carry-out state should be 1");
         for (int i = 0; i < 15; i++) {
             checkBus("qBus", i, "Output state should be equal to the count");
-            setPin("CK", false);
+            setLo("CK");
         }
         checkPin("Cout", false, "Carry-out should be 0 after overflow");
     }
@@ -77,27 +77,27 @@ public class DCounterTest extends NetTester {
     @DisplayName("Reset counter")
     void resetCounter() {
         InPin rPin = (InPin) net.schemaParts.get("U1").getInItem("R");
-        setPin("Cin", false);
-        setPin("UD", true);
+        setLo("Cin");
+        setHi("UD");
         for (int i = 0; i < 15; i++) {
-            setPin("CK", false);
+            setLo("CK");
         }
-        rPin.setState(false);
+        rPin.setLo();
         checkBus("qBus", 15, "State should be preserved after reset pin set to 0");
         checkPin("Cout", false, "Carry-out should remain lo after reset pin set to 0");
-        rPin.setState(true);
+        rPin.setHi();
         checkBus("qBus", 0, "State should be reset to 0 after reset pin set to 1");
         checkPin("Cout", true, "Carry-out should reset to hi after reset pin set to 1");
-        rPin.setState(false);
+        rPin.setLo();
     }
 
     @Test
     @DisplayName("Presetting the counter")
     void presetCounter() {
         setBus("jBus", 5);
-        setPin("PE", true);
+        setHi("PE");
         checkBus("qBus", 5, "State should be set to preset value when preset is enabled");
-        setPin("PE", false);
+        setLo("PE");
         setBus("jBus", 0);
         checkBus("qBus", 5, "State should be preserved when preset is disabled");
     }
@@ -105,14 +105,14 @@ public class DCounterTest extends NetTester {
     @Test
     @DisplayName("Count down behavior")
     void countDownBehavior() {
-        setPin("Cin", false);
-        setPin("UD", false);
+        setLo("Cin");
+        setLo("UD");
         checkBus("qBus", 0, "Initial state should be 0");
-        setPin("CK", false);
+        setLo("CK");
         checkPin("Cout", true, "Initial carry-out state should be 1");
         for (int i = 15; i > 0; i--) {
             checkBus("qBus", i, "Output state should be equal to the count");
-            setPin("CK", false);
+            setLo("CK");
         }
         checkPin("Cout", false, "Carry-out should be 0 after underflow");
     }
@@ -121,48 +121,48 @@ public class DCounterTest extends NetTester {
     @DisplayName("Toggle between binary and decimal modes")
     void toggleMode() {
         DCounter counter = (DCounter) net.schemaParts.get("U1");
-        setPin("Cin", true);
+        setHi("Cin");
         // Initial state assertions
         checkBus("qBus", 0, "Initial state should be 0");
         checkPin("Cout", true, "Initial carry-out state should be 1");
         // Binary mode (default)
         assertEquals(15, counter.maxCount, "Maximum count should be 15 in binary mode");
         // Toggle to decimal mode
-        setPin("BD", false);
+        setLo("BD");
         assertEquals(9, counter.maxCount, "Maximum count should be 9 in decimal mode");
         // Toggle back to binary mode
-        setPin("BD", true);
+        setHi("BD");
         assertEquals(15, counter.maxCount, "Maximum count should be 15 in binary mode after toggling back");
     }
 
     @Test
     @DisplayName("Toggle between counting up and counting down")
     void toggleCountDirection() {
-        setPin("Cin", false);
-        setPin("UD", true);
+        setLo("Cin");
+        setHi("UD");
         // Initial state assertions
         checkBus("qBus", 0, "Initial state should be 0");
         checkPin("Cout", true, "Initial carry-out state should be 1");
         // Counting up (default)
         for (int i = 0; i < 4; i++) {
-            setPin("CK", false);
+            setLo("CK");
         }
         checkBus("qBus", 4, "Count should be equal 4");
         // Toggle to count down mode
-        setPin("UD", false);
+        setLo("UD");
         for (int i = 0; i < 2; i++) {
-            setPin("CK", false);
+            setLo("CK");
         }
         checkBus("qBus", 2, "Count should be equal 2");
         for (int i = 0; i < 3; i++) {
-            setPin("CK", false);
+            setLo("CK");
         }
         checkBus("qBus", 15, "Count should be equal after underflow 15");
-        setPin("UD", true);
-        setPin("CK", false);
+        setHi("UD");
+        setLo("CK");
         checkBus("qBus", 0, "Count should be equal 0 after overflow");
-        setPin("Cin", true);
-        setPin("CK", false);
+        setHi("Cin");
+        setLo("CK");
         checkBus("qBus", 0, "Clock must be ignored with carry in set to Lo");
     }
 }

@@ -49,20 +49,20 @@ public class MaskedMultiplexerTest extends NetTester {
         setBus("bBus", 0b1100);
         checkPin("Qa", true, "with n=0 Qa state must be equal with A 1 pin state");
         checkPin("Qb", false, "with n=0 Qb state must be equal with A 1 pin state");
-        setPin("Ea", true);
+        setHi("Ea");
         checkPin("Qa", false, "with Ea Lo Qa state must be Lo");
         checkPin("Qb", false, "with n=0 Qb state must be equal with A 1 pin state");
-        setPin("Ea", false);
+        setLo("Ea");
         setBus("nBus", 1);
         checkPin("Qa", false, "with n=1 Qa state must be equal with A 2 pin state");
         checkPin("Qb", false, "with n=1 Qb state must be equal with A 2 pin state");
         setBus("nBus", 2);
         checkPin("Qa", true, "with n=2 Qa state must be equal with A 3 pin state");
         checkPin("Qb", true, "with n=2 Qb state must be equal with A 3 pin state");
-        setPin("Eb", true);
+        setHi("Eb");
         checkPin("Qa", true, "with n=2 Qa state must be equal with A 3 pin state");
         checkPin("Qb", false, "with Eb Lo Qb state must be Lo");
-        setPin("Eb", false);
+        setLo("Eb");
         setBus("nBus", 3);
         checkPin("Qa", false, "with n=3 Qa state must be equal with A 4 pin state");
         checkPin("Qb", true, "with n=3 Qb state must be equal with A 4 pin state");
@@ -73,8 +73,8 @@ public class MaskedMultiplexerTest extends NetTester {
         setBus("aBus", 0);
         setBus("bBus", 0);
         setBus("nBus", 0);
-        setPin("Ea", false);
-        setPin("Eb", false);
+        setLo("Ea");
+        setLo("Eb");
     }
 
     @Override

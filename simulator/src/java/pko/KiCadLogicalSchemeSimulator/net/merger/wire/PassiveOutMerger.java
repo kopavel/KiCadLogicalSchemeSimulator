@@ -47,15 +47,28 @@ public class PassiveOutMerger extends OutPin {
     }
 
     @Override
-    public void setState(boolean newState) {
+    public void setHi() {
         if (!source.strong) {
             if (oldStrong) {
-                weakState += newState ? 1 : -1;
+                weakState += 1;
             }
         } else if (!oldStrong) {
-            weakState -= newState ? 1 : -1;
+            weakState -= 1;
         }
         oldStrong = source.strong;
-        super.setState(newState);
+        super.setHi();
+    }
+
+    @Override
+    public void setLo() {
+        if (!source.strong) {
+            if (oldStrong) {
+                weakState += -1;
+            }
+        } else if (!oldStrong) {
+            weakState -= -1;
+        }
+        oldStrong = source.strong;
+        super.setLo();
     }
 }

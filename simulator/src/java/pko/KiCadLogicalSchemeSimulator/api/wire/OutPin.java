@@ -64,10 +64,10 @@ public class OutPin extends Pin {
     }
 
     @Override
-    public void setState(boolean newState) {
+    public void setHi() {
         /*Optimiser line ts*/
         hiImpedance = false;
-        state = newState;
+        state = true;
         /*Optimiser block allRecurse*/
         if (processing) {
             /*Optimiser line recurse*/
@@ -83,7 +83,7 @@ public class OutPin extends Pin {
             processing = true;
             /*Optimiser blockEnd allRecurse*/
             for (Pin destination : destinations) {
-                destination.setState(newState);
+                destination.setHi();
             }
             /*Optimiser block recurse block allRecurse*/
             while (hasQueue) {
@@ -95,8 +95,64 @@ public class OutPin extends Pin {
                     }
                 } else {
                     /*Optimiser blockEnd ts*/
+                    if (state) {
+                        for (Pin destination : destinations) {
+                            destination.setHi();
+                        }
+                    } else {
+                        for (Pin destination : destinations) {
+                            destination.setLo();
+                        }
+                    }
+                    /*Optimiser line ts*/
+                }
+            }
+            /*Optimiser blockEnd recurse*/
+            processing = false;
+        }
+        /*Optimiser blockEnd allRecurse*/
+    }
+
+    @Override
+    public void setLo() {
+        /*Optimiser line ts*/
+        hiImpedance = false;
+        state = false;
+        /*Optimiser block allRecurse*/
+        if (processing) {
+            /*Optimiser line recurse*/
+            if (hasQueue) {
+                if (recurseError()) {
+                    return;
+                }
+                /*Optimiser block recurse*/
+            }
+            hasQueue = true;
+            /*Optimiser blockEnd recurse*/
+        } else {
+            processing = true;
+            /*Optimiser blockEnd allRecurse*/
+            for (Pin destination : destinations) {
+                destination.setLo();
+            }
+            /*Optimiser block recurse block allRecurse*/
+            while (hasQueue) {
+                hasQueue = false;
+                /*Optimiser block ts*/
+                if (hiImpedance) {
                     for (Pin destination : destinations) {
-                        destination.setState(state);
+                        destination.setHiImpedance();
+                    }
+                } else {
+                    /*Optimiser blockEnd ts*/
+                    if (state) {
+                        for (Pin destination : destinations) {
+                            destination.setHi();
+                        }
+                    } else {
+                        for (Pin destination : destinations) {
+                            destination.setLo();
+                        }
                     }
                     /*Optimiser line ts*/
                 }
@@ -142,8 +198,14 @@ public class OutPin extends Pin {
                         destination.setHiImpedance();
                     }
                 } else {
-                    for (Pin destination : destinations) {
-                        destination.setState(state);
+                    if (state) {
+                        for (Pin destination : destinations) {
+                            destination.setHi();
+                        }
+                    } else {
+                        for (Pin destination : destinations) {
+                            destination.setLo();
+                        }
                     }
                 }
             }
@@ -155,7 +217,11 @@ public class OutPin extends Pin {
 
     public void resend() {
         if (!hiImpedance) {
-            setState(state);
+            if (state) {
+                setHi();
+            } else {
+                setLo();
+            }
         }
     }
 

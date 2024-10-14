@@ -63,27 +63,34 @@ public class MultiUnitDcTrigger extends SchemaPart {
         if (params.containsKey("setReverse")) {
             rPin = addInPin(new InPin("R", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    clockEnabled = newState && sPin.state;
-                    if (newState) {
-                        if (!sPin.state) {
-                            for (int i = 0; i < size; i++) {
-                                if (iqOut[i].state) {
-                                    iqOut[i].setState(false);
-                                }
-                                if (!qOut[i].state) {
-                                    qOut[i].setState(true);
-                                }
+                public void setHi() {
+                    state = true;
+                    clockEnabled = sPin.state;
+                    if (!sPin.state) {
+                        for (int i = 0; i < size; i++) {
+                            if (iqOut[i].state) {
+                                iqOut[i].setLo();
+                            }
+                            if (!qOut[i].state) {
+                                qOut[i].setHi();
                             }
                         }
-                    } else {
-                        for (int i = 0; i < size; i++) {
-                            if (!iqOut[i].state) {
-                                iqOut[i].setState(true);
-                            }
-                            if (qOut[i].state == sPin.state) {
-                                qOut[i].setState(!sPin.state);
+                    }
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
+                    clockEnabled = false;
+                    for (int i = 0; i < size; i++) {
+                        if (!iqOut[i].state) {
+                            iqOut[i].setHi();
+                        }
+                        if (qOut[i].state == sPin.state) {
+                            if (sPin.state) {
+                                qOut[i].setLo();
+                            } else {
+                                qOut[i].setHi();
                             }
                         }
                     }
@@ -91,27 +98,34 @@ public class MultiUnitDcTrigger extends SchemaPart {
             });
             sPin = addInPin(new InPin("S", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    clockEnabled = newState && rPin.state;
-                    if (newState) {
-                        if (!rPin.state) {
-                            for (int i = 0; i < size; i++) {
-                                if (qOut[i].state) {
-                                    qOut[i].setState(false);
-                                }
-                                if (!iqOut[i].state) {
-                                    iqOut[i].setState(true);
-                                }
+                public void setHi() {
+                    state = true;
+                    clockEnabled = rPin.state;
+                    if (!rPin.state) {
+                        for (int i = 0; i < size; i++) {
+                            if (qOut[i].state) {
+                                qOut[i].setLo();
+                            }
+                            if (!iqOut[i].state) {
+                                iqOut[i].setHi();
                             }
                         }
-                    } else {
-                        for (int i = 0; i < size; i++) {
-                            if (!qOut[i].state) {
-                                qOut[i].setState(true);
-                            }
-                            if (iqOut[i].state == rPin.state) {
-                                iqOut[i].setState(!rPin.state);
+                    }
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
+                    clockEnabled = false;
+                    for (int i = 0; i < size; i++) {
+                        if (!qOut[i].state) {
+                            qOut[i].setHi();
+                        }
+                        if (iqOut[i].state == rPin.state) {
+                            if (rPin.state) {
+                                iqOut[i].setLo();
+                            } else {
+                                iqOut[i].setHi();
                             }
                         }
                     }
@@ -120,25 +134,34 @@ public class MultiUnitDcTrigger extends SchemaPart {
         } else {
             rPin = addInPin(new InPin("R", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    clockEnabled = !newState && !sPin.state;
-                    if (newState) {
-                        for (int i = 0; i < size; i++) {
-                            if (!iqOut[i].state) {
-                                iqOut[i].setState(true);
-                            }
-                            if (qOut[i].state != sPin.state) {
-                                qOut[i].setState(sPin.state);
+                public void setHi() {
+                    state = true;
+                    clockEnabled = false;
+                    for (int i = 0; i < size; i++) {
+                        if (!iqOut[i].state) {
+                            iqOut[i].setHi();
+                        }
+                        if (qOut[i].state != sPin.state) {
+                            if (sPin.state) {
+                                qOut[i].setHi();
+                            } else {
+                                qOut[i].setLo();
                             }
                         }
-                    } else if (sPin.state) {
+                    }
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
+                    clockEnabled = !sPin.state;
+                    if (sPin.state) {
                         for (int i = 0; i < size; i++) {
                             if (iqOut[i].state) {
-                                iqOut[i].setState(false);
+                                iqOut[i].setLo();
                             }
                             if (!qOut[i].state) {
-                                qOut[i].setState(true);
+                                qOut[i].setHi();
                             }
                         }
                     }
@@ -146,25 +169,34 @@ public class MultiUnitDcTrigger extends SchemaPart {
             });
             sPin = addInPin(new InPin("S", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    clockEnabled = !newState && !rPin.state;
-                    if (newState) {
-                        for (int i = 0; i < size; i++) {
-                            if (!qOut[i].state) {
-                                qOut[i].setState(true);
-                            }
-                            if (iqOut[i].state != rPin.state) {
-                                iqOut[i].setState(rPin.state);
+                public void setHi() {
+                    state = true;
+                    clockEnabled = false;
+                    for (int i = 0; i < size; i++) {
+                        if (!qOut[i].state) {
+                            qOut[i].setHi();
+                        }
+                        if (iqOut[i].state != rPin.state) {
+                            if (rPin.state) {
+                                iqOut[i].setHi();
+                            } else {
+                                iqOut[i].setLo();
                             }
                         }
-                    } else if (rPin.state) {
+                    }
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
+                    clockEnabled = !rPin.state;
+                    if (rPin.state) {
                         for (int i = 0; i < size; i++) {
                             if (qOut[i].state) {
-                                qOut[i].setState(false);
+                                qOut[i].setLo();
                             }
                             if (!iqOut[i].state) {
-                                iqOut[i].setState(true);
+                                iqOut[i].setHi();
                             }
                         }
                     }
@@ -174,23 +206,28 @@ public class MultiUnitDcTrigger extends SchemaPart {
         if (reverse) {
             addInPin(new InPin("C", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    if (!newState && clockEnabled) {
+                public void setHi() {
+                    state = true;
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
+                    if (clockEnabled) {
                         for (int i = 0; i < size; i++) {
                             if (dPin[i].state) {
                                 if (!qOut[i].state) {
-                                    qOut[i].setState(true);
+                                    qOut[i].setHi();
                                 }
                                 if (iqOut[i].state) {
-                                    iqOut[i].setState(false);
+                                    iqOut[i].setLo();
                                 }
                             } else {
                                 if (qOut[i].state) {
-                                    qOut[i].setState(false);
+                                    qOut[i].setLo();
                                 }
                                 if (!iqOut[i].state) {
-                                    iqOut[i].setState(true);
+                                    iqOut[i].setHi();
                                 }
                             }
                         }
@@ -200,27 +237,32 @@ public class MultiUnitDcTrigger extends SchemaPart {
         } else {
             addInPin(new InPin("C", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    if (newState && clockEnabled) {
+                public void setHi() {
+                    state = true;
+                    if (clockEnabled) {
                         for (int i = 0; i < size; i++) {
                             if (dPin[i].state) {
                                 if (!qOut[i].state) {
-                                    qOut[i].setState(true);
+                                    qOut[i].setHi();
                                 }
                                 if (iqOut[i].state) {
-                                    iqOut[i].setState(false);
+                                    iqOut[i].setLo();
                                 }
                             } else {
                                 if (qOut[i].state) {
-                                    qOut[i].setState(false);
+                                    qOut[i].setLo();
                                 }
                                 if (!iqOut[i].state) {
-                                    iqOut[i].setState(true);
+                                    iqOut[i].setHi();
                                 }
                             }
                         }
                     }
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
                 }
             });
         }
@@ -242,8 +284,8 @@ public class MultiUnitDcTrigger extends SchemaPart {
     @Override
     public void reset() {
         for (int i = 0; i < size; i++) {
-            qOut[i].setState(false);
-            iqOut[i].setState(true);
+            qOut[i].setLo();
+            iqOut[i].setHi();
         }
         rPin.state = params.containsKey("setReverse");
         sPin.state = params.containsKey("setReverse");

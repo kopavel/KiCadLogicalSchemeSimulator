@@ -82,9 +82,13 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
         if (reverse) {
             addInPin(new InPin("HSync", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    if (!newState) {
+                public void setHi() {
+                    state = true;
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
                         if (hSize == 0 && !Net.stabilizing) {
                             hSize = hPos + 3;
                             byte[] firstRow = Arrays.copyOf(ram[0], hSize);
@@ -95,88 +99,96 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                         vPos++;
                         row = ram[vPos];
                         rows++;
-                    }
                 }
             });
             addInPin(new InPin("VSync", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    if (!newState) {
-                        if (vSize != 0) {
-                            synchronized (refresh) {
-                                refresh.notifyAll();
-                            }
-                        } else if (!Net.stabilizing) {
-                            vSize = vPos + 2;
-                            while (!display.sized) {
-                                try {
-                                    //noinspection BusyWait
-                                    Thread.sleep(1);
-                                } catch (InterruptedException e) {
-                                    throw new RuntimeException(e);
-                                }
-                            }
-                            Thread.ofVirtual().start(() -> SwingUtilities.invokeLater(() -> {
-                                //noinspection deprecation
-                                display.reshape(display.currentX, display.currentY, hSize * display.scaleFactor, vSize * display.scaleFactor);
-                            }));
-                            ram = Arrays.copyOf(ram, vSize);
+                public void setHi() {
+                    state = true;
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
+                    if (vSize != 0) {
+                        synchronized (refresh) {
+                            refresh.notifyAll();
                         }
-                        hPos = 0;
-                        vPos = 0;
-                        row = ram[vPos];
+                    } else if (!Net.stabilizing) {
+                        vSize = vPos + 2;
+                        while (!display.sized) {
+                            try {
+                                //noinspection BusyWait
+                                Thread.sleep(1);
+                            } catch (InterruptedException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                        Thread.ofVirtual().start(() -> SwingUtilities.invokeLater(() -> {
+                            //noinspection deprecation
+                            display.reshape(display.currentX, display.currentY, hSize * display.scaleFactor, vSize * display.scaleFactor);
+                        }));
+                        ram = Arrays.copyOf(ram, vSize);
                     }
+                    hPos = 0;
+                    vPos = 0;
+                    row = ram[vPos];
                 }
             });
         } else {
             addInPin(new InPin("HSync", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    if (newState) {
-                        if (hSize == 0 && !Net.stabilizing) {
-                            hSize = hPos + 3;
-                            byte[] firstRow = Arrays.copyOf(ram[0], hSize);
-                            ram = new byte[2048][hSize];
-                            ram[0] = firstRow;
-                        }
-                        hPos = 0;
-                        vPos++;
-                        row = ram[vPos];
-                        rows++;
+                public void setHi() {
+                    state = true;
+                    if (hSize == 0 && !Net.stabilizing) {
+                        hSize = hPos + 3;
+                        byte[] firstRow = Arrays.copyOf(ram[0], hSize);
+                        ram = new byte[2048][hSize];
+                        ram[0] = firstRow;
                     }
+                    hPos = 0;
+                    vPos++;
+                    row = ram[vPos];
+                    rows++;
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
                 }
             });
             addInPin(new InPin("VSync", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    if (newState) {
-                        if (vSize != 0) {
-                            synchronized (refresh) {
-                                refresh.notifyAll();
-                            }
-                        } else if (!Net.stabilizing) {
-                            vSize = vPos + 2;
-                            while (!display.sized) {
-                                try {
-                                    //noinspection BusyWait
-                                    Thread.sleep(1);
-                                } catch (InterruptedException e) {
-                                    throw new RuntimeException(e);
-                                }
-                            }
-                            Thread.ofVirtual().start(() -> SwingUtilities.invokeLater(() -> {
-                                //noinspection deprecation
-                                display.reshape(display.currentX, display.currentY, hSize * display.scaleFactor, vSize * display.scaleFactor);
-                            }));
-                            ram = Arrays.copyOf(ram, vSize);
+                public void setHi() {
+                    state = true;
+                    if (vSize != 0) {
+                        synchronized (refresh) {
+                            refresh.notifyAll();
                         }
-                        hPos = 0;
-                        vPos = 0;
-                        row = ram[vPos];
+                    } else if (!Net.stabilizing) {
+                        vSize = vPos + 2;
+                        while (!display.sized) {
+                            try {
+                                //noinspection BusyWait
+                                Thread.sleep(1);
+                            } catch (InterruptedException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                        Thread.ofVirtual().start(() -> SwingUtilities.invokeLater(() -> {
+                            //noinspection deprecation
+                            display.reshape(display.currentX, display.currentY, hSize * display.scaleFactor, vSize * display.scaleFactor);
+                        }));
+                        ram = Arrays.copyOf(ram, vSize);
                     }
+                    hPos = 0;
+                    vPos = 0;
+                    row = ram[vPos];
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
                 }
             });
         }
@@ -185,11 +197,14 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
             final Pin in = vIn;
 
             @Override
-            public void setState(boolean newState) {
-                state = newState;
-                if (!newState) {
-                    row[hPos++] = (byte) (in.state ? 0xff : 0x0);
-                }
+            public void setHi() {
+                state = true;
+            }
+
+            @Override
+            public void setLo() {
+                state = false;
+                row[hPos++] = (byte) (in.state ? 0xff : 0x0);
             }
         });
     }

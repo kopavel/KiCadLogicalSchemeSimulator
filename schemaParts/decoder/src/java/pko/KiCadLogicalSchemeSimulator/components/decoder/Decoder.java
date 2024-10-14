@@ -77,31 +77,41 @@ public class Decoder extends SchemaPart {
         if (reverse) {
             addInPin(new InPin("CS", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    csState = !newState;
-                    if (csState) {
-                        if (!aBus.hiImpedance && (outBus.state != outState || outBus.hiImpedance)) {
-                            outBus.setState(outState);
-                        }
-                    } else if (!outBus.hiImpedance) {
+                public void setHi() {
+                    state = true;
+                    csState = false;
+                    if (!outBus.hiImpedance) {
                         outBus.setHiImpedance();
+                    }
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
+                    csState = true;
+                    if (!aBus.hiImpedance && (outBus.state != outState || outBus.hiImpedance)) {
+                        outBus.setState(outState);
                     }
                 }
             });
         } else {
             addInPin(new InPin("CS", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    csState = newState;
-                    if (csState) {
-                        if (!aBus.hiImpedance) {
-                            if (outBus.state != outState || outBus.hiImpedance) {
-                                outBus.setState(outState);
-                            }
+                public void setHi() {
+                    state = true;
+                    csState = true;
+                    if (!aBus.hiImpedance) {
+                        if (outBus.state != outState || outBus.hiImpedance) {
+                            outBus.setState(outState);
                         }
-                    } else if (!outBus.hiImpedance) {
+                    }
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
+                    csState = false;
+                    if (!outBus.hiImpedance) {
                         outBus.setHiImpedance();
                     }
                 }

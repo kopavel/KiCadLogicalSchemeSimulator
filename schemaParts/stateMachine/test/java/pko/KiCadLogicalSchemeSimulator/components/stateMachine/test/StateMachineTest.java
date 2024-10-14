@@ -57,11 +57,11 @@ public class StateMachineTest extends NetTester {
             if (i > 0) {
                 checkBus("out", states[i - 1], "Out must be preserved until clock pulse");
             }
-            setPin("S", true);
+            setHi("S");
             checkBus("out", states[i], "State must change on strobe front");
-            setPin("F", true);
+            setHi("F");
             checkBus("out", states[i] ^ mask, "State must be in reverse, if R is Hi");
-            setPin("F", false);
+            setLo("F");
         }
     }
 }

@@ -44,8 +44,13 @@ public class NCWire extends OutPin {
     }
 
     @Override
-    public void setState(boolean newState) {
-        state = newState;
+    public void setHi() {
+        state = true;
+    }
+
+    @Override
+    public void setLo() {
+        state = false;
     }
 
     @Override

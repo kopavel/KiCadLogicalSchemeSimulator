@@ -63,17 +63,21 @@ public class MaskedMultiplexer extends SchemaPart {
             outMask = -1;
             addInPin(new InPin("OE", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    if (newState) {
-                        outMask = 0;
-                    } else {
-                        outMask = -1;
-                    }
+                public void setHi() {
+                    state = true;
+                    outMask = 0;
                     InBus inBus = inBuses[nState];
-                    if (newState && outBus.state != inBus.state) {
+                    if (outBus.state != inBus.state) {
                         outBus.setState(inBus.state);
-                    } else if (!newState && outBus.state != 0) {
+                    }
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
+                    outMask = -1;
+                    InBus inBus = inBuses[nState];
+                    if (outBus.state != 0) {
                         outBus.setState(0);
                     }
                 }
@@ -83,13 +87,19 @@ public class MaskedMultiplexer extends SchemaPart {
                 long nMask = ~mask;
                 addInPin(new InPin("OE" + (char) ('a' + i), this) {
                     @Override
-                    public void setState(boolean newState) {
-                        state = newState;
-                        if (newState) {
-                            outMask &= nMask;
-                        } else {
-                            outMask |= mask;
+                    public void setHi() {
+                        state = true;
+                        outMask &= nMask;
+                        InBus inBus = inBuses[nState];
+                        if (outBus.state != (inBus.state & outMask)) {
+                            outBus.setState(inBus.state & outMask);
                         }
+                    }
+
+                    @Override
+                    public void setLo() {
+                        state = false;
+                        outMask |= mask;
                         InBus inBus = inBuses[nState];
                         if (outBus.state != (inBus.state & outMask)) {
                             outBus.setState(inBus.state & outMask);
@@ -100,18 +110,22 @@ public class MaskedMultiplexer extends SchemaPart {
         } else {
             addInPin(new InPin("OE", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    if (newState) {
-                        outMask = -1;
-                    } else {
-                        outMask = 0;
-                    }
+                public void setHi() {
+                    state = true;
+                    outMask = -1;
                     InBus inBus = inBuses[nState];
-                    if (!newState && outBus.state != inBus.state) {
-                        outBus.setState(inBus.state);
-                    } else if (newState && outBus.state != 0) {
+                    if (outBus.state != 0) {
                         outBus.setState(0);
+                    }
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
+                    outMask = 0;
+                    InBus inBus = inBuses[nState];
+                    if (outBus.state != inBus.state) {
+                        outBus.setState(inBus.state);
                     }
                 }
             });
@@ -120,13 +134,19 @@ public class MaskedMultiplexer extends SchemaPart {
                 long nMask = ~mask;
                 addInPin(new InPin("OE" + (char) ('a' + i), this) {
                     @Override
-                    public void setState(boolean newState) {
-                        state = newState;
-                        if (newState) {
-                            outMask |= mask;
-                        } else {
-                            outMask &= nMask;
+                    public void setHi() {
+                        state = true;
+                        outMask |= mask;
+                        InBus inBus = inBuses[nState];
+                        if (outBus.state != (inBus.state & outMask)) {
+                            outBus.setState(inBus.state & outMask);
                         }
+                    }
+
+                    @Override
+                    public void setLo() {
+                        state = false;
+                        outMask &= nMask;
                         InBus inBus = inBuses[nState];
                         if (outBus.state != (inBus.state & outMask)) {
                             outBus.setState(inBus.state & outMask);
@@ -156,13 +176,18 @@ public class MaskedMultiplexer extends SchemaPart {
             int nMask = ~mask;
             addInPin(new InPin("N" + i, this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    if (newState) {
-                        nState |= mask;
-                    } else {
-                        nState &= nMask;
+                public void setHi() {
+                    state = true;
+                    nState |= mask;
+                    if (outBus.state != (inBuses[nState].state & outMask)) {
+                        outBus.setState(inBuses[nState].state & outMask);
                     }
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
+                    nState &= nMask;
                     if (outBus.state != (inBuses[nState].state & outMask)) {
                         outBus.setState(inBuses[nState].state & outMask);
                     }

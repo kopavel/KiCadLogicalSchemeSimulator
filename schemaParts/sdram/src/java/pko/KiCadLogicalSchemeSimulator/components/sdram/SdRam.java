@@ -82,60 +82,70 @@ public class SdRam extends SchemaPart {
         if (reverse) {
             addInPin(new InPin("~{RAS}", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    if (!state) {
-                        hiPart = (int) (addrPin.state * module);
-                    }
+                public void setHi() {
+                    state = true;
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
+                    hiPart = (int) (addrPin.state * module);
                 }
             });
             addInPin(new InPin("~{CAS}", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    if (state) {
-                        if (!dOut.hiImpedance) {
-                            dOut.setHiImpedance();
+                public void setHi() {
+                    state = true;
+                    if (!dOut.hiImpedance) {
+                        dOut.setHiImpedance();
+                    }
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
+                    addr = (int) (hiPart + addrPin.state);
+                    if (we.state) {
+                        if (dOut.state != bytes[addr] || dOut.hiImpedance) {
+                            dOut.setState(bytes[addr]);
                         }
                     } else {
-                        addr = (int) (hiPart + addrPin.state);
-                        if (we.state) {
-                            if (dOut.state != bytes[addr] || dOut.hiImpedance) {
-                                dOut.setState(bytes[addr]);
-                            }
-                        } else {
-                            bytes[addr] = dIn.state;
-                        }
+                        bytes[addr] = dIn.state;
                     }
                 }
             });
         } else {
             addInPin(new InPin("RAS", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    if (state) {
-                        hiPart = (int) (addrPin.state * module);
-                    }
+                public void setHi() {
+                    state = true;
+                    hiPart = (int) (addrPin.state * module);
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
                 }
             });
             addInPin(new InPin("CAS", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    if (state) {
-                        addr = (int) (hiPart + addrPin.state);
-                        if (we.state) {
-                            bytes[addr] = dIn.state;
-                        } else {
-                            if (dOut.state != bytes[addr] || dOut.hiImpedance) {
-                                dOut.setState(bytes[addr]);
-                            }
-                        }
+                public void setHi() {
+                    state = true;
+                    addr = (int) (hiPart + addrPin.state);
+                    if (we.state) {
+                        bytes[addr] = dIn.state;
                     } else {
-                        if (!dOut.hiImpedance) {
-                            dOut.setHiImpedance();
+                        if (dOut.state != bytes[addr] || dOut.hiImpedance) {
+                            dOut.setState(bytes[addr]);
                         }
+                    }
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
+                    if (!dOut.hiImpedance) {
+                        dOut.setHiImpedance();
                     }
                 }
             });

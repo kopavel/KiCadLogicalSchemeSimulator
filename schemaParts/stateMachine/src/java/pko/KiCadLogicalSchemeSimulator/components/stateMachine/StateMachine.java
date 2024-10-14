@@ -86,9 +86,18 @@ public class StateMachine extends SchemaPart {
         }
         dPin = addInPin(new InPin("D", this) {
             @Override
-            public void setState(boolean newState) {
-                state = newState;
-                long newOutState = (newState ? 0 : states[latch]) ^ outMask;
+            public void setHi() {
+                state = true;
+                long newOutState = ((long) 0) ^ outMask;
+                if (out.state != newOutState) {
+                    out.setState(newOutState);
+                }
+            }
+
+            @Override
+            public void setLo() {
+                state = false;
+                long newOutState = (states[latch]) ^ outMask;
                 if (out.state != newOutState) {
                     out.setState(newOutState);
                 }
@@ -96,33 +105,40 @@ public class StateMachine extends SchemaPart {
         });
         sPin = addInPin(new InPin("S", this) {
             @Override
-            public void setState(boolean newState) {
-                state = newState;
-                if (state) {
-                    latch = (int) in.state;
+            public void setHi() {
+                state = true;
+                latch = (int) in.state;
+                long newOutState = (dPin.state ? 0 : states[latch]) ^ outMask;
+                if (out.state != newOutState) {
+                    out.setState(newOutState);
+                }
+            }
+
+            @Override
+            public void setLo() {
+                state = false;
+            }
+        });
+        addInPin(new InPin("R", this) {
+            @Override
+            public void setHi() {
+                state = true;
+                {
+                    outMask = mask;
                     long newOutState = (dPin.state ? 0 : states[latch]) ^ outMask;
                     if (out.state != newOutState) {
                         out.setState(newOutState);
                     }
                 }
             }
-        });
-        addInPin(new InPin("R", this) {
+
             @Override
-            public void setState(boolean newState) {
-                state = newState;
-                if (state) {
-                    outMask = mask;
-                    long newOutState = (dPin.state ? 0 : states[latch]) ^ outMask;
-                    if (out.state != newOutState) {
-                        out.setState(newOutState);
-                    }
-                } else {
-                    outMask = 0;
-                    long newOutState = (dPin.state ? 0 : states[latch]) ^ outMask;
-                    if (out.state != newOutState) {
-                        out.setState(newOutState);
-                    }
+            public void setLo() {
+                state = false;
+                outMask = 0;
+                long newOutState = (dPin.state ? 0 : states[latch]) ^ outMask;
+                if (out.state != newOutState) {
+                    out.setState(newOutState);
                 }
             }
         });

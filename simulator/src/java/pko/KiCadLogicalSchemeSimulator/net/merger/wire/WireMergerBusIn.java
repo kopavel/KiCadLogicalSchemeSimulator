@@ -43,9 +43,9 @@ import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 //Todo if source are MaskGroup and we are only one destination - path throe MaskGroup and use mask here directly
 public class WireMergerBusIn extends InBus implements MergerInput<Bus> {
+    public final WireMerger merger;
     @Getter
     public long mask;
-    public final WireMerger merger;
     public Pin[] destinations;
 
     public WireMergerBusIn(Bus source, long mask, WireMerger merger) {
@@ -94,17 +94,35 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus> {
         /*Optimiser blockEnd iSetter*/
         if (merger.state == (newState == 0)) { // merger state changes
             merger.state = newState != 0;
-            for (Pin destination : destinations) {
-                destination.setState(merger.state);
+            if (merger.state) {
+                for (Pin destination : destinations) {
+                    destination.setHi();
+                }
+            } else {
+                for (Pin destination : destinations) {
+                    destination.setHi();
+                }
             }
         } else if (merger.hiImpedance) {
-            for (Pin destination : destinations) {
-                destination.setState(merger.state);
+            if (merger.state) {
+                for (Pin destination : destinations) {
+                    destination.setHi();
+                }
+            } else {
+                for (Pin destination : destinations) {
+                    destination.setHi();
+                }
             }
             /*Optimiser block passivePins*/
         } else if (!merger.strong) {
-            for (Pin destination : destinations) {
-                destination.setState(merger.state);
+            if (merger.state) {
+                for (Pin destination : destinations) {
+                    destination.setHi();
+                }
+            } else {
+                for (Pin destination : destinations) {
+                    destination.setHi();
+                }
             }
             /*Optimiser blockEnd passivePins*/
         }
@@ -147,8 +165,14 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus> {
         if (merger.weakState != 0) {
             if (merger.state != (merger.weakState > 0)) {
                 merger.state = merger.weakState > 0;
-                for (Pin destination : destinations) {
-                    destination.setState(merger.state);
+                if (merger.state) {
+                    for (Pin destination : destinations) {
+                        destination.setHi();
+                    }
+                } else {
+                    for (Pin destination : destinations) {
+                        destination.setHi();
+                    }
                 }
             }
             /*Optimiser block strongOnly*/

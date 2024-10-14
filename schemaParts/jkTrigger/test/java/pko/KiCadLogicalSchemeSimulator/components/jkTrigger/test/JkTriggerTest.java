@@ -39,10 +39,10 @@ public class JkTriggerTest extends NetTester {
     @BeforeEach
     public void reset() {
         net.schemaParts.get("U1_A").reset();
-        setPin("R", false);
-        setPin("S", false);
-        setPin("J", false);
-        setPin("K", false);
+        setLo("R");
+        setLo("S");
+        setLo("J");
+        setLo("K");
     }
 
     @Test
@@ -51,34 +51,34 @@ public class JkTriggerTest extends NetTester {
         //Lo j and k - store
         checkPin("Q", false, "Default Q state must be 0");
         checkPin("~{Q}", true, "Default ~{Q} state must be 1;");
-        setPin("C", true);
+        setHi("C");
         checkPin("Q", false, "after C pin fall with Lo on 'J' and 'K' Q state must remain 0");
         checkPin("~{Q}", true, "after C pin fall with Lo on 'J' and 'K' ~{Q} state must remain 1");
-        setPin("C", true);
+        setHi("C");
         checkPin("Q", false, "after C pin fall with Lo on 'J' and 'K' Q state must remain 0");
         checkPin("~{Q}", true, "after C pin fall with Lo on 'J' and 'K' ~{Q} state must remain 1");
         //Hi j Lo k - set
-        setPin("J", true);
-        setPin("C", true);
+        setHi("J");
+        setHi("C");
         checkPin("Q", true, "after C pin fall with Hi on 'J' and Lo on 'K' Q state must be 1");
         checkPin("~{Q}", false, "after C pin fall with Hi on 'J' and Lo on 'K' ~{Q} state must be 0");
-        setPin("C", true);
+        setHi("C");
         checkPin("Q", true, "after C pin fall with Hi on 'J' and Lo on 'K' Q state must be 1");
         checkPin("~{Q}", false, "after C pin fall with Hi on 'J' and Lo on 'K' ~{Q} state must be 0");
         //Hi j and k - toggle
-        setPin("K", true);
-        setPin("C", true);
+        setHi("K");
+        setHi("C");
         checkPin("Q", false, "after C pin fall with Hi on 'J' and Lo on 'K' Q state must be toggled");
         checkPin("~{Q}", true, "after C pin fall with Hi on 'J' and Lo on 'K' ~{Q} state must be toggled");
-        setPin("C", true);
+        setHi("C");
         checkPin("Q", true, "after C pin fall with Hi on 'J' and Lo on 'K' Q state must be toggled");
         checkPin("~{Q}", false, "after C pin fall with Hi on 'J' and Lo on 'K' ~{Q} state must be toggled");
         //Lo j Hi k - reset
-        setPin("J", false);
-        setPin("C", true);
+        setLo("J");
+        setHi("C");
         checkPin("Q", false, "after C pin fall with Lo on 'J' and Hi on 'K' Q state must be reset");
         checkPin("~{Q}", true, "after C pin fall with Lo on 'J' and Hi on 'K' ~{Q} state must be toggled");
-        setPin("C", true);
+        setHi("C");
         checkPin("Q", false, "after C pin fall with Lo on 'J' and Hi on 'K' Q state must be reset");
         checkPin("~{Q}", true, "after C pin fall with Lo on 'J' and Hi on 'K' ~{Q} state must be toggled");
     }
@@ -86,21 +86,21 @@ public class JkTriggerTest extends NetTester {
     @Test
     @DisplayName("RS states")
     public void rsStates() {
-        setPin("S", true);
+        setHi("S");
         checkPin("Q", true, "after S pin set to Hi Q state must be 1");
         checkPin("~{Q}", false, "after S pin set to Hi 'D' ~{Q} state must be 0");
-        setPin("J", true);
-        setPin("K", true);
-        setPin("C", true);
+        setHi("J");
+        setHi("K");
+        setHi("C");
         checkPin("Q", true, "with Hi S pin C pin state change must be ignored");
         checkPin("~{Q}", false, "with Hi S pin C pin state change must be ignored");
-        setPin("R", true);
+        setHi("R");
         checkPin("Q", true, "after R pin set to Hi with S pin Hi too Q state must be 1");
         checkPin("~{Q}", true, "after R pin set to Hi with S pin Hi too ~{Q] state must be 1");
-        setPin("S", false);
+        setLo("S");
         checkPin("Q", false, "after S pin set to Lo with Hi R  Q state must be 0");
         checkPin("~{Q}", true, "after S pin set to Lo with Hi R  ~{Q} state must be 0");
-        setPin("C", true);
+        setHi("C");
         checkPin("Q", false, "with Hi R pin C pin state change must be ignored");
         checkPin("~{Q}", true, "with Hi R pin C pin state change must be ignored");
     }

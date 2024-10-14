@@ -55,24 +55,34 @@ public class CInPin extends InPin {
     }
 
     @Override
-    public void setState(boolean newState) {
-        state = newState;
-        /*Optimiser bind newState*/
-        if (newState
-                /*Optimiser block reverse*///
-                ^ reverse
-            /*Optimiser blockEnd reverse*///
-        ) {
-            /*Optimiser bind countMask*///
+    public void setHi() {
+        state = true;
+        /*Optimiser line o*/
+        if (!reverse) {
+            /*Optimiser bind countMask line nr*/
             out.setState((out.state + 1) & countMask);
+            /*Optimiser line o*/
+        }
+    }
+
+    @Override
+    public void setLo() {
+        state = false;
+        /*Optimiser line o*/
+        if (reverse) {
+            /*Optimiser bind countMask line r*/
+            out.setState((out.state + 1) & countMask);
+            /*Optimiser line o*/
         }
     }
 
     @Override
     public InPin getOptimised(boolean keepSetters) {
-        ClassOptimiser<CInPin> optimiser = new ClassOptimiser<>(this).cut("reverse").bind("countMask", countMask);
+        ClassOptimiser<CInPin> optimiser = new ClassOptimiser<>(this).cut("o").bind("countMask", countMask);
         if (reverse) {
-            optimiser.bind("newState", "!newState");
+            optimiser.cut("nr");
+        } else {
+            optimiser.cut("r");
         }
         CInPin build = optimiser.build();
         ((Counter) parent).in = build;

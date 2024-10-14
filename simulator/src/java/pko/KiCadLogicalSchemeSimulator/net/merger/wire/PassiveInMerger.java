@@ -48,12 +48,18 @@ public class PassiveInMerger extends TriStateOutPin {
     }
 
     @Override
-    public void setState(boolean newState) {
+    public void setHi() {
         if (source.strong) {
             throw new ShortcutException(source);
         }
     }
 
+    @Override
+    public void setLo() {
+        if (source.strong) {
+            throw new ShortcutException(source);
+        }
+    }
     @Override
     public void setHiImpedance() {
     }

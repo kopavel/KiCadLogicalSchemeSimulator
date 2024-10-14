@@ -47,25 +47,40 @@ public class SingleBitBuffer extends SchemaPart {
             if (reverse) {
                 oePin = addInPin(new InPin("OE", this) {
                     @Override
-                    public void setState(boolean newState) {
-                        state = newState;
-                        if (state) {
-                            if (!qPin.hiImpedance) {
-                                qPin.setHiImpedance();
+                    public void setHi() {
+                        state = true;
+                        if (!qPin.hiImpedance) {
+                            qPin.setHiImpedance();
+                        }
+                    }
+
+                    @Override
+                    public void setLo() {
+                        state = false;
+                        if (qPin.state != latch || qPin.hiImpedance) {
+                            if (latch) {
+                                qPin.setHi();
+                            } else {
+                                qPin.setLo();
                             }
-                        } else if (qPin.state != latch || qPin.hiImpedance) {
-                            qPin.setState(latch);
                         }
                     }
                 });
                 addInPin(new InPin("WR", this) {
                     @Override
-                    public void setState(boolean newState) {
-                        state = newState;
-                        if (!state) {
-                            latch = dPin.state;
-                            if (!oePin.state && (qPin.state != latch || qPin.hiImpedance)) {
-                                qPin.setState(latch);
+                    public void setHi() {
+                        state = true;
+                    }
+
+                    @Override
+                    public void setLo() {
+                        state = false;
+                        latch = dPin.state;
+                        if (!oePin.state && (qPin.state != latch || qPin.hiImpedance)) {
+                            if (latch) {
+                                qPin.setHi();
+                            } else {
+                                qPin.setLo();
                             }
                         }
                     }
@@ -73,27 +88,42 @@ public class SingleBitBuffer extends SchemaPart {
             } else {
                 oePin = addInPin(new InPin("OE", this) {
                     @Override
-                    public void setState(boolean newState) {
-                        state = newState;
-                        if (state) {
-                            if (qPin.state != latch || qPin.hiImpedance) {
-                                qPin.setState(latch);
+                    public void setHi() {
+                        state = true;
+                        if (qPin.state != latch || qPin.hiImpedance) {
+                            if (latch) {
+                                qPin.setHi();
+                            } else {
+                                qPin.setLo();
                             }
-                        } else if (!qPin.hiImpedance) {
+                        }
+                    }
+
+                    @Override
+                    public void setLo() {
+                        state = false;
+                        if (!qPin.hiImpedance) {
                             qPin.setHiImpedance();
                         }
                     }
                 });
                 addInPin(new InPin("WR", this) {
                     @Override
-                    public void setState(boolean newState) {
-                        state = newState;
-                        if (state) {
-                            latch = dPin.state;
-                            if (oePin.state && (qPin.state != latch || qPin.hiImpedance)) {
-                                qPin.setState(latch);
+                    public void setHi() {
+                        state = true;
+                        latch = dPin.state;
+                        if (oePin.state && (qPin.state != latch || qPin.hiImpedance)) {
+                            if (latch) {
+                                qPin.setHi();
+                            } else {
+                                qPin.setLo();
                             }
                         }
+                    }
+
+                    @Override
+                    public void setLo() {
+                        state = false;
                     }
                 });
             }
@@ -101,46 +131,78 @@ public class SingleBitBuffer extends SchemaPart {
         } else if (reverse) {
             oePin = addInPin(new InPin("CS", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    if (state) {
-                        if (!qPin.hiImpedance) {
-                            qPin.setHiImpedance();
+                public void setHi() {
+                    state = true;
+                    if (!qPin.hiImpedance) {
+                        qPin.setHiImpedance();
+                    }
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
+                    if (qPin.state != dPin.state || qPin.hiImpedance) {
+                        if (dPin.state) {
+                            qPin.setHi();
+                        } else {
+                            qPin.setLo();
                         }
-                    } else if (qPin.state != dPin.state || qPin.hiImpedance) {
-                        qPin.setState(dPin.state);
                     }
                 }
             });
             dPin = addInPin(new InPin("D", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    if (!oePin.state && (qPin.state != dPin.state || qPin.hiImpedance)) {
-                        qPin.setState(newState);
+                public void setHi() {
+                    state = true;
+                    if (!oePin.state && (!qPin.state || qPin.hiImpedance)) {
+                        qPin.setHi();
+                    }
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
+                    if (!oePin.state && (qPin.state || qPin.hiImpedance)) {
+                        qPin.setLo();
                     }
                 }
             });
         } else {
             oePin = addInPin(new InPin("CS", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    if (state) {
-                        if (qPin.state != dPin.state || qPin.hiImpedance) {
-                            qPin.setState(dPin.state);
+                public void setHi() {
+                    state = true;
+                    if (qPin.state != dPin.state || qPin.hiImpedance) {
+                        if (dPin.state) {
+                            qPin.setHi();
+                        } else {
+                            qPin.setLo();
                         }
-                    } else if (!qPin.hiImpedance) {
+                    }
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
+                    if (!qPin.hiImpedance) {
                         qPin.setHiImpedance();
                     }
                 }
             });
             dPin = addInPin(new InPin("D", this) {
                 @Override
-                public void setState(boolean newState) {
-                    state = newState;
-                    if (oePin.state && (qPin.state != dPin.state || qPin.hiImpedance)) {
-                        qPin.setState(newState);
+                public void setHi() {
+                    state = true;
+                    if (oePin.state && (!qPin.state || qPin.hiImpedance)) {
+                        qPin.setHi();
+                    }
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
+                    if (oePin.state && (qPin.state || qPin.hiImpedance)) {
+                        qPin.setLo();
                     }
                 }
             });
