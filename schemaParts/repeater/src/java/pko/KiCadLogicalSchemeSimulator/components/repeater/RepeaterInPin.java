@@ -79,13 +79,13 @@ public class RepeaterInPin extends InPin {
 
     @Override
     public InPin getOptimised(boolean keepSetters) {
-        ClassOptimiser<RepeaterInPin> optimiser = new ClassOptimiser<>(this);
-        RepeaterInPin build = optimiser.build();
+        ClassOptimiser<RepeaterInPin> optimiser = new ClassOptimiser<>(this).cut("o");
         if (parent.reverse) {
             optimiser.cut("nr");
         } else {
             optimiser.cut("r");
         }
+        RepeaterInPin build = optimiser.build();
         parent.inPin = build;
         parent.inPins.put(id, build);
         return build;
