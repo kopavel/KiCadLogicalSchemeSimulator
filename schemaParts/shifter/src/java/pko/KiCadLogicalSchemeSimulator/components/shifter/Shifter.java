@@ -89,7 +89,7 @@ public class Shifter extends SchemaPart {
                 @Override
                 public void setLo() {
                     state = true;
-                    parallelLoad = true;
+                    parallelLoad = false;
                 }
             });
         }
