@@ -100,7 +100,7 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus> {
                 }
             } else {
                 for (Pin destination : destinations) {
-                    destination.setHi();
+                    destination.setLo();
                 }
             }
         } else if (merger.hiImpedance) {
@@ -110,7 +110,7 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus> {
                 }
             } else {
                 for (Pin destination : destinations) {
-                    destination.setHi();
+                    destination.setLo();
                 }
             }
             /*Optimiser block passivePins*/
@@ -121,7 +121,7 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus> {
                 }
             } else {
                 for (Pin destination : destinations) {
-                    destination.setHi();
+                    destination.setLo();
                 }
             }
             /*Optimiser blockEnd passivePins*/
@@ -171,7 +171,7 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus> {
                     }
                 } else {
                     for (Pin destination : destinations) {
-                        destination.setHi();
+                        destination.setLo();
                     }
                 }
             }
