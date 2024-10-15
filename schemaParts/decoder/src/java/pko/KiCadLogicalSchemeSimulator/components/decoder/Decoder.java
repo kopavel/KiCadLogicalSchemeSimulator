@@ -80,16 +80,14 @@ public class Decoder extends SchemaPart {
                 public void setHi() {
                     state = true;
                     csState = false;
-                    if (!outBus.hiImpedance) {
-                        outBus.setHiImpedance();
-                    }
+                    outBus.setHiImpedance();
                 }
 
                 @Override
                 public void setLo() {
                     state = false;
                     csState = true;
-                    if (!aBus.hiImpedance && (outBus.state != outState || outBus.hiImpedance)) {
+                    if (!aBus.hiImpedance) {
                         outBus.setState(outState);
                     }
                 }
@@ -101,9 +99,7 @@ public class Decoder extends SchemaPart {
                     state = true;
                     csState = true;
                     if (!aBus.hiImpedance) {
-                        if (outBus.state != outState || outBus.hiImpedance) {
-                            outBus.setState(outState);
-                        }
+                        outBus.setState(outState);
                     }
                 }
 
@@ -111,9 +107,7 @@ public class Decoder extends SchemaPart {
                 public void setLo() {
                     state = false;
                     csState = false;
-                    if (!outBus.hiImpedance) {
-                        outBus.setHiImpedance();
-                    }
+                    outBus.setHiImpedance();
                 }
             });
         }

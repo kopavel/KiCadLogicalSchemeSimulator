@@ -104,30 +104,22 @@ public class MultiOutDecoder extends SchemaPart {
                         @Override
                         public void setHi() {
                             state = true;
-                            csStates[finalI] |= mask;
-                            if (csStates[finalI] == 0) {
-                                if (outBuses[finalI].state != outState || outBuses[finalI].hiImpedance) {
-                                    outBuses[finalI].setState(outState);
-                                }
+                            if (!outBuses[finalI].hiImpedance) {
+                                outBuses[finalI].setHiImpedance();
+                                csStates[finalI] = mask;
                             } else {
-                                if (!outBuses[finalI].hiImpedance) {
-                                    outBuses[finalI].setHiImpedance();
-                                }
+                                csStates[finalI] |= mask;
                             }
                         }
 
                         @Override
                         public void setLo() {
                             state = false;
-                            csStates[finalI] &= nMask;
-                            if (csStates[finalI] == 0) {
-                                if (outBuses[finalI].state != outState || outBuses[finalI].hiImpedance) {
-                                    outBuses[finalI].setState(outState);
-                                }
+                            if (csStates[finalI] == nMask) {
+                                outBuses[finalI].setState(outState);
+                                csStates[finalI] = 0;
                             } else {
-                                if (!outBuses[finalI].hiImpedance) {
-                                    outBuses[finalI].setHiImpedance();
-                                }
+                                csStates[finalI] &= nMask;
                             }
                         }
                     });
@@ -137,30 +129,22 @@ public class MultiOutDecoder extends SchemaPart {
                         @Override
                         public void setHi() {
                             state = true;
-                            csStates[finalI] &= nMask;
-                            if (csStates[finalI] == 0) {
-                                if (outBuses[finalI].state != outState || outBuses[finalI].hiImpedance) {
-                                    outBuses[finalI].setState(outState);
-                                }
+                            if (csStates[finalI] == nMask) {
+                                outBuses[finalI].setState(outState);
+                                csStates[finalI] = 0;
                             } else {
-                                if (!outBuses[finalI].hiImpedance) {
-                                    outBuses[finalI].setHiImpedance();
-                                }
+                                csStates[finalI] &= nMask;
                             }
                         }
 
                         @Override
                         public void setLo() {
                             state = false;
-                            csStates[finalI] |= mask;
-                            if (csStates[finalI] == 0) {
-                                if (outBuses[finalI].state != outState || outBuses[finalI].hiImpedance) {
-                                    outBuses[finalI].setState(outState);
-                                }
+                            if (!outBuses[finalI].hiImpedance) {
+                                outBuses[finalI].setHiImpedance();
+                                csStates[finalI] = mask;
                             } else {
-                                if (!outBuses[finalI].hiImpedance) {
-                                    outBuses[finalI].setHiImpedance();
-                                }
+                                csStates[finalI] |= mask;
                             }
                         }
                     });

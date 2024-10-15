@@ -51,8 +51,7 @@ public class OutBus extends Bus {
     private final Map<Long, Map<Byte, OffsetBus>> corrected = new HashMap<>();
     public Bus[] destinations = new Bus[0];
     public long mask;
-    public long powerState;
-    public long strongState;
+
 
     public OutBus(String id, SchemaPart parent, int size, String... names) {
         super(id, parent, size, names);
@@ -65,18 +64,6 @@ public class OutBus extends Bus {
         mask = oldBus.mask;
         hiImpedance = oldBus.hiImpedance;
         triState = oldBus.triState;
-    }
-
-    public void addWeakSource(Pin powerPin, long mask) {
-        if ((strongState & mask) > 0) {
-            throw new RuntimeException("Shortcut. Can't add source " + powerPin + " to " + this);
-        }
-        if (powerPin.strong) {
-            strongState |= mask;
-        }
-        if (powerPin.state) {
-            powerState |= mask;
-        }
     }
 
     public void addDestination(Bus bus, long mask, byte offset) {
@@ -130,7 +117,6 @@ public class OutBus extends Bus {
 
     @Override
     public void setState(long newState) {
-        strongState |= mask;
         /*Optimiser line ts*/
         hiImpedance = false;
         state = newState;
@@ -237,7 +223,7 @@ public class OutBus extends Bus {
     public Bus getOptimised(boolean keepSetters) {
         if (destinations.length == 0) {
             return new NCBus(this);
-        } else if (destinations.length == 1 && powerState == 0) {
+        } else if (destinations.length == 1) {
             return destinations[0].getOptimised(true).copyState(this);
         } else {
             for (int i = 0; i < destinations.length; i++) {
