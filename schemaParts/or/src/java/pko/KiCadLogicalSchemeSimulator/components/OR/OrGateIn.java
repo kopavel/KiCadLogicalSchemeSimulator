@@ -99,7 +99,7 @@ public class OrGateIn extends InPin {
 
     @Override
     public InPin getOptimised(boolean keepSetters) {
-        ClassOptimiser<OrGateIn> optimiser = new ClassOptimiser<>(this).bind("mask", mask).bind("nMask", nMask);
+        ClassOptimiser<OrGateIn> optimiser = new ClassOptimiser<>(this).bind("mask", mask).bind("nMask", nMask).cut("o");
         if (parent.reverse) {
             optimiser.cut("nr");
         } else {

@@ -60,13 +60,12 @@ public class DcCPin extends InPin {
     @Override
     public void setHi() {
         state = true;
-        /*Optimiser block nr*/
+        /*Optimiser block nr block anyRS*/
         if (
             /*Optimiser line o*/
                 !parent.reverse && //
-                        /*Optimiser line anyRS*///
-                        parent.clockEnabled//
-        ) {
+                        parent.clockEnabled) {
+            /*Optimiser blockEnd anyRS*/
             if (dPin.state) {
                 if (iqOut.state) {
                     iqOut.setLo();
@@ -86,6 +85,7 @@ public class DcCPin extends InPin {
                     iqOut.setHi();
                 }
             }
+            /*Optimiser line anyRS*/
         }
         /*Optimiser blockEnd nr*/
     }

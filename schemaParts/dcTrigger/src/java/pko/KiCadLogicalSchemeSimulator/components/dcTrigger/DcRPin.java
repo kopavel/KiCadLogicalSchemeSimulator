@@ -68,11 +68,11 @@ public class DcRPin extends InPin {
         //noinspection PointlessBooleanExpression
         parent.clockEnabled =
                 /*Optimiser line nr*///
-                false ||
+                false
                         /*Optimiser line o*///
-                        reverse &&
-                                /*Optimiser line r*///
-                                sPin.state//
+                        || reverse &&
+                        /*Optimiser line r bind false:sPin.state*///
+                        sPin.state//
         ;
 
         /*Optimiser line o block nr*/
@@ -81,7 +81,7 @@ public class DcRPin extends InPin {
                 iqOut.setHi();
                 /*Optimiser block noS*/
             }
-            if (sPin.state) {
+            if (!sPin.state) {
                 /*Optimiser blockEnd noS*/
                 qOut.setLo();
             }
@@ -104,10 +104,10 @@ public class DcRPin extends InPin {
         //noinspection PointlessBooleanExpression
         parent.clockEnabled =
                 /*Optimiser line nr*///
-                true &&
+                true
                         /*Optimiser line o*///
-                        !reverse &&
-                        /*Optimiser line r*///
+                        && !reverse &&
+                        /*Optimiser line r bind true:!sPin.state*///
                         !sPin.state//
         ;
         /*Optimiser line o block r*/
@@ -143,6 +143,13 @@ public class DcRPin extends InPin {
         }
         if (!parent.sPin.used) {
             optimiser.cut("noS");
+            if (reverse) {
+                optimiser.bind("true", "false");
+                optimiser.bind("false", "true");
+            } else {
+                optimiser.bind("true", "false");
+                optimiser.bind("false", "false");
+            }
         }
         DcRPin build = optimiser.build();
         parent.rPin = build;

@@ -117,13 +117,13 @@ public class MultiPartCIn extends InPin {
         ) {
             /*Optimiser line o blockEnd hasR*/
             if (size == 1) {
-                /*Optimiser line pin*/
+                /*Optimiser block pin*/
                 if (outPin.state) {
                     outPin.setLo();
                 } else {
                     outPin.setHi();
                 }
-                /*Optimiser line o*/
+                /*Optimiser line o blockEnd pin*/
             } else if (skipMask != 0) {
                 /*Optimiser line skip bind skip:skipMask*///
                 outBus.setState(outBus.state + (((outBus.state & skipMask) == skipMask) ? 2 : 1));

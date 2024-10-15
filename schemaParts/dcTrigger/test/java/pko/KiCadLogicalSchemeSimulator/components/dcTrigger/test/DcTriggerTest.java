@@ -48,11 +48,11 @@ public class DcTriggerTest extends NetTester {
 
     @BeforeEach
     void reset() {
+        setLo("D");
+        setLo("C");
         setLo("S");
         setHi("R");
         setLo("R");
-        setLo("D");
-        setLo("C");
     }
 
     @Test

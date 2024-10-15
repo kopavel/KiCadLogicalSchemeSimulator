@@ -68,11 +68,11 @@ public class DcSPin extends InPin {
         //noinspection PointlessBooleanExpression
         parent.clockEnabled =
                 /*Optimiser line nr*///
-                false ||
+                false
                         /*Optimiser line o*///
-                        reverse &&
-                                /*Optimiser line r*///
-                                rPin.state//
+                        || reverse &&
+                        /*Optimiser line r bind false:rPin.state*///
+                        rPin.state//
         ;
         //
         /*Optimiser line o block nr*/
@@ -81,7 +81,7 @@ public class DcSPin extends InPin {
                 qOut.setHi();
                 /*Optimiser block noR*/
             }
-            if (rPin.state) {
+            if (!rPin.state) {
                 /*Optimiser blockEnd noR*/
                 iqOut.setLo();
             }
@@ -104,10 +104,10 @@ public class DcSPin extends InPin {
         //noinspection PointlessBooleanExpression
         parent.clockEnabled =
                 /*Optimiser line nr*///
-                true &&
+                true
                         /*Optimiser line o*///
-                        !reverse &&
-                        /*Optimiser line r*///
+                        && !reverse &&
+                        /*Optimiser line r bind true:!rPin.state*///
                         !rPin.state//
         ;
         /*Optimiser line o block r*/
@@ -120,7 +120,7 @@ public class DcSPin extends InPin {
                 /*Optimiser blockEnd noR*/
                 iqOut.setLo();
             }
-            /*Optimiser block noR blockEnd r block nr*/
+            /*Optimiser line o block noR blockEnd r block nr*/
         } else//
             if (rPin.state) {
                 if (qOut.state) {
@@ -143,6 +143,13 @@ public class DcSPin extends InPin {
         }
         if (!parent.rPin.used) {
             optimiser.cut("noR");
+            if (reverse) {
+                optimiser.bind("true", "false");
+                optimiser.bind("false", "true");
+            } else {
+                optimiser.bind("true", "false");
+                optimiser.bind("false", "false");
+            }
         }
         DcSPin build = optimiser.build();
         parent.sPin = build;
