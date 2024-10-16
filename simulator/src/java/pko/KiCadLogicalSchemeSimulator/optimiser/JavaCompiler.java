@@ -83,7 +83,6 @@ public class JavaCompiler {
         }
     }
     public static Class<?> compileJavaSource(String classPath, String className, String sourceCode) {
-        Log.trace(JavaCompiler.class, "Compile source \n{}", sourceCode);
         InMemoryJavaFileManager fileManager = new InMemoryJavaFileManager(compiler.getStandardFileManager(null, null, null));
         JavaFileObject javaFileObject = new InMemoryJavaFileObject(className, sourceCode);
         List<JavaFileObject> javaFileObjects = Collections.singletonList(javaFileObject);
