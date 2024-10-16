@@ -1,21 +1,39 @@
-## Multiplexer
+## Masked Multiplexer
 
-Implements a multiplexer with a defined output amount and ways.
+Multiplexer with a defined amount of outputs and ways. Has a multiple OE pint per part.
 
-**Input names**:
+### Pins
 
-- `[Ax, Bx, …]` where x is a sequential number, starting from 0.
-- `Nx` where x is a sequential number, starting from 0.
-- `OE` output enabled, if Lo — all parts output is in `Hi Impedance` state.
-- `OEx` where x is part `id` in range [a…z]. output enabled, if Lo — exact part output is in `Hi Impedance` state.
+#### Input names:
 
-**Output names**: Qc, where c is a 'way' identifier, like A, B, ... (QA, QB, ...)
+- `Wx`- Data inputs.  
+  x - sequential number in range [0…size-1].  
+  W - way ID in range [A…ASCII(`A`+((2^nSize-1)-1))].
+- `Nx`- way selection inputs.  
+  x - sequential number in range [0…((2^nSize-1)-1)].
+- `OE`- outputs enabled.
+  `Lo` — all outputa in Hi-Impedance.
+- `OEw`- way output enabled.
+  w - way ID in range [a…ASCII(`a`+((2^nSize-1)-1))].
+  `Lo` — way output in Hi-Impedance.
 
-**Mandatory parameters**:
+#### Output names:
 
-- `size`: Specifies the amount of output pins in one 'way'.
-- `nSize`: Specifies the amount of 'way' identification pins. The 'way' size calculated as 2^nSize.
+- `Qw`- outputs
+  w - way ID in range [a…ASCII(`a`+((2^nSize-1)-1))].
 
-**Optional parameter `reverse`**: it true — OE input is reversed.
+### Parameters
 
-For describe 4-way 4-pin multiplexer, provide the following parameters: `size=4;nSize=2`.
+#### Mandatory parameters:
+
+- `size`- amount of output pins in one 'way' in range [2…64].
+- `nSize`- amount of 'way' identification pins in range [1..5].   
+  amount of 'ways' is 2^nSize.
+
+#### Optional parameters:
+
+- `reverse` — OE inputs reversed.
+
+### Example
+
+4-way 4-pin multiplexer: `size=4;nSize=2`.
