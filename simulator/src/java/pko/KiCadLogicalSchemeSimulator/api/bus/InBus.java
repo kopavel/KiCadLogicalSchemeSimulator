@@ -30,6 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.api.bus;
+import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 
 public abstract class InBus extends Bus {
@@ -42,7 +43,7 @@ public abstract class InBus extends Bus {
     }
 
     @Override
-    public InBus getOptimised(boolean keepSetters) {
-        return this;
+    public InBus getOptimised(ModelItem<?> source) {
+        return (InBus) super.getOptimised(source);
     }
 }

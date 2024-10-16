@@ -30,6 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.api.wire;
+import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
 
@@ -46,9 +47,9 @@ public class PullPin extends OutPin implements MergerInput<Pin> {
     }
 
     @Override
-    public Pin getOptimised(boolean keepSetters) {
+    public Pin getOptimised(ModelItem<?> source) {
         for (int i = 0; i < destinations.length; i++) {
-            destinations[i] = destinations[i].getOptimised(false);
+            destinations[i] = destinations[i].getOptimised(this);
         }
         return this;
     }

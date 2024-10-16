@@ -63,7 +63,7 @@ public class OffsetBusBenchmark {
             for (int i = 0; i < 5; i++) {
                 ((OutBus) out).addDestination(testPart.addInBus("in" + i, 7), 0b11111, (byte) 2);
             }
-            out = out.getOptimised(true);
+            out = out.getOptimised(null);
         }
     }
 }

@@ -81,7 +81,7 @@ public class OutBusBenchmark {
             for (int i = 0; i < 5; i++) {
                 ((OutBus) out).addDestination(testPart.addInBus("in" + i, 5), 0b11111, (byte) 0);
             }
-            out = out.getOptimised(true);
+            out = out.getOptimised(null);
         }
     }
 }

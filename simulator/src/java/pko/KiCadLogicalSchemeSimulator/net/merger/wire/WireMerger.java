@@ -30,6 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.net.merger.wire;
+import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.ShortcutException;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
 import pko.KiCadLogicalSchemeSimulator.api.wire.OutPin;
@@ -75,9 +76,9 @@ public class WireMerger extends OutPin {
     }
 
     @Override
-    public Pin getOptimised(boolean keepSetters) {
+    public Pin getOptimised(ModelItem<?> source) {
         for (int i = 0; i < destinations.length; i++) {
-            destinations[i] = destinations[i].getOptimised(false);
+            destinations[i] = destinations[i].getOptimised(this);
         }
         return this;
     }

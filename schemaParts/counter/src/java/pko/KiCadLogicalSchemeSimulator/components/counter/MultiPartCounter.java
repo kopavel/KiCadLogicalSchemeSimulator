@@ -93,7 +93,7 @@ public class MultiPartCounter extends SchemaPart {
             }
         }
         rIns.values().forEach(pin -> {
-            if (pin.isHiImpedance() || pin.getState() == 0) {
+            if (pin.isHiImpedance() || !pin.state) {
                 resetState |= (1L << pin.no);
             }
         });

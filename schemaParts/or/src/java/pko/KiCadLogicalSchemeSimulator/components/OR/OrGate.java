@@ -58,7 +58,7 @@ public class OrGate extends SchemaPart {
     public void initOuts() {
         out = getOutPin("OUT");
         ins.values().forEach(pin -> {
-            if (!pin.isHiImpedance() && pin.getState() != 0) {
+            if (!pin.isHiImpedance() && pin.state) {
                 inState |= (1L << Long.parseLong(pin.getId().substring(2)));
             }
             pin.out = out;

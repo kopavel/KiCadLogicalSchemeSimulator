@@ -30,6 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.net.bus;
+import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 
@@ -82,11 +83,11 @@ public class BusInInterconnect extends InBus {
     /*Optimiser blockEnd iSetter*/
 
     @Override
-    public InBus getOptimised(boolean keepSetters) {
-        destination = destination.getOptimised(false);
+    public InBus getOptimised(ModelItem<?> source) {
+        destination = destination.getOptimised(this);
         ClassOptimiser<BusInInterconnect> optimiser =
                 new ClassOptimiser<>(this).bind("interconnectMask", interconnectMask).bind("inverseInterconnectMask", inverseInterconnectMask);
-        if (!keepSetters) {
+        if (source != null) {
             optimiser.cut("setters");
         }
         if (!triState) {

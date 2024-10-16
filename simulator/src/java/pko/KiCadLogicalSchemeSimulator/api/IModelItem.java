@@ -44,7 +44,12 @@ public interface IModelItem<T> extends Comparable<IModelItem<T>> {
     Set<String> getAliases();
     SchemaPart getParent();
     String getId();
-    IModelItem<T> getOptimised(boolean keepSetters);
+    IModelItem<T> getOptimised(ModelItem<?> source);
     void resend();
     IModelItem<T> copyState(IModelItem<T> oldItem);
+    default T getThis() {
+        //noinspection unchecked
+        return (T) this;
+    }
+    ;
 }

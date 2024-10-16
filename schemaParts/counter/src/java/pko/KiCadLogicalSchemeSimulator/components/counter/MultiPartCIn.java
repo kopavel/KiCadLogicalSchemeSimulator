@@ -30,6 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.counter;
+import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
@@ -76,6 +77,7 @@ public class MultiPartCIn extends InPin {
 
     @Override
     public void setHi() {
+        /*Optimiser line setter*/
         state = true;
         /*Optimiser block nr block hasR*///
         if (
@@ -108,6 +110,7 @@ public class MultiPartCIn extends InPin {
 
     @Override
     public void setLo() {
+        /*Optimiser line setter*/
         state = false;
         /*Optimiser block r block hasR*/
         if (
@@ -147,7 +150,7 @@ public class MultiPartCIn extends InPin {
     }
 
     @Override
-    public InPin getOptimised(boolean keepSetters) {
+    public InPin getOptimised(ModelItem<?> source) {
         ClassOptimiser<MultiPartCIn> optimiser = new ClassOptimiser<>(this).cut("o");
         if (reverse) {
             optimiser.cut("nr");
@@ -165,6 +168,9 @@ public class MultiPartCIn extends InPin {
                 .stream()
                 .noneMatch(p -> p.used)) {
             optimiser.cut("hasR");
+        }
+        if (source != null) {
+            optimiser.cut("setter");
         }
         MultiPartCIn build = optimiser.build();
         parent.cIns[partNo] = build;

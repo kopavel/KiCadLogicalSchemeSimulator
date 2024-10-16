@@ -60,8 +60,9 @@ public abstract class Pin extends ModelItem<Pin> {
     @Override
     public Pin copyState(IModelItem<Pin> oldPin) {
         this.strong = oldPin.isStrong();
-        this.state = oldPin.getState() != 0;
-        if (oldPin instanceof Pin pin && this.merger == null) {
+        Pin pin = oldPin.getThis();
+        this.state = pin.state;
+        if (this.merger == null) {
             this.merger = pin.merger;
         }
         return this;
@@ -74,15 +75,15 @@ public abstract class Pin extends ModelItem<Pin> {
 
     @Override
     public long getState() {
-        return state ? 1L : 0L;
+        return source == this ? (state ? 1L : 0L) : source.getState();
     }
 
     abstract public void setHi();
     abstract public void setLo();
 
     @Override
-    public Pin getOptimised(boolean keepSetters) {
-        return this;
+    public Pin getOptimised(ModelItem<?> source) {
+        return (Pin) super.getOptimised(source);
     }
 
     @Override

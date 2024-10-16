@@ -135,7 +135,7 @@ public class Z80Cpu extends SchemaPart {
                         }
                     } else if (T3) {
                         if (M1) {
-                            ((ReadRequest) ioRequest).callback.accept((int) dIn.getState());
+                            ((ReadRequest) ioRequest).callback.accept((int) dIn.state);
                             rdPin.setHi();
                             mReqPin.setHi();
                             m1Pin.setHi();
@@ -172,7 +172,7 @@ public class Z80Cpu extends SchemaPart {
                             mReqPin.setLo();
                         } else if (ioRequest instanceof MemoryRequest) {
                             if (ioRequest instanceof ReadRequest readRequest) {
-                                readRequest.callback.accept((int) dIn.getState());
+                                readRequest.callback.accept((int) dIn.state);
                                 rdPin.setHi();
                             } else {
                                 wrPin.setHi();
@@ -180,7 +180,7 @@ public class Z80Cpu extends SchemaPart {
                             mReqPin.setHi();
                         } else {
                             if (ioRequest instanceof ReadRequest readRequest) {
-                                readRequest.callback.accept((int) dIn.getState());
+                                readRequest.callback.accept((int) dIn.state);
                                 rdPin.setHi();
                             } else {
                                 wrPin.setHi();
@@ -249,7 +249,7 @@ public class Z80Cpu extends SchemaPart {
     @Override
     public String extraState() {
         return "Adr :" + String.format("%04x", aOut.state) +//
-                "\nData:" + String.format("%02x", dIn.getState()) +//
+                "\nData:" + String.format("%02x", dIn.state) +//
                 "\nPC  :" + String.format("%02x", cpu.getProgramCounter()) + //
                 "\nA   :" + String.format("%02x", cpu.getRegisterValue(CPUConstants.RegisterNames.A)) +//
                 "\nF   :" + String.format("%06d", Integer.parseInt(Integer.toBinaryString(cpu.getRegisterValue(CPUConstants.RegisterNames.F)))) + //

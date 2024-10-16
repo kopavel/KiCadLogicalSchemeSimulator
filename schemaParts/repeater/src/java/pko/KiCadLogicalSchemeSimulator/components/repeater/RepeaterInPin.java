@@ -30,6 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.repeater;
+import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
@@ -53,6 +54,7 @@ public class RepeaterInPin extends InPin {
 
     @Override
     public void setHi() {
+        /*Optimiser line setter*/
         state = true;
         /*Optimiser line o block r*/
         if (parent.reverse) {
@@ -66,6 +68,7 @@ public class RepeaterInPin extends InPin {
 
     @Override
     public void setLo() {
+        /*Optimiser line setter*/
         state = false;
         /*Optimiser line o block r*/
         if (parent.reverse) {
@@ -78,12 +81,15 @@ public class RepeaterInPin extends InPin {
     }
 
     @Override
-    public InPin getOptimised(boolean keepSetters) {
+    public InPin getOptimised(ModelItem<?> source) {
         ClassOptimiser<RepeaterInPin> optimiser = new ClassOptimiser<>(this).cut("o");
         if (parent.reverse) {
             optimiser.cut("nr");
         } else {
             optimiser.cut("r");
+        }
+        if (source != null) {
+            optimiser.cut("setter");
         }
         RepeaterInPin build = optimiser.build();
         parent.inPin = build;

@@ -94,21 +94,21 @@ public abstract class Bus extends ModelItem<Bus> {
 
     @Override
     public long getState() {
-        return state;
+        return source == this ? state : source.getState();
     }
 
     abstract public void setState(long newState);
 
     @Override
     public Bus copyState(IModelItem<Bus> oldBus) {
-        this.state = oldBus.getState();
+        this.state = oldBus.getThis().state;
         this.used = true;
         return this;
     }
 
     @Override
-    public Bus getOptimised(boolean keepSetters) {
-        return this;
+    public Bus getOptimised(ModelItem<?> source) {
+        return (Bus) super.getOptimised(source);
     }
 
     @Override

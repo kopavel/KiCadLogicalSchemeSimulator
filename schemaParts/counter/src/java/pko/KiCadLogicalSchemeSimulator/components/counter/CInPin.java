@@ -30,6 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.counter;
+import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
@@ -56,6 +57,7 @@ public class CInPin extends InPin {
 
     @Override
     public void setHi() {
+        /*Optimiser line setter*/
         state = true;
         /*Optimiser line o*/
         if (!reverse) {
@@ -67,6 +69,7 @@ public class CInPin extends InPin {
 
     @Override
     public void setLo() {
+        /*Optimiser line setter*/
         state = false;
         /*Optimiser line o*/
         if (reverse) {
@@ -77,12 +80,15 @@ public class CInPin extends InPin {
     }
 
     @Override
-    public InPin getOptimised(boolean keepSetters) {
+    public InPin getOptimised(ModelItem<?> source) {
         ClassOptimiser<CInPin> optimiser = new ClassOptimiser<>(this).cut("o").bind("countMask", countMask);
         if (reverse) {
             optimiser.cut("nr");
         } else {
             optimiser.cut("r");
+        }
+        if (source != null) {
+            optimiser.cut("setter");
         }
         CInPin build = optimiser.build();
         ((Counter) parent).in = build;

@@ -64,7 +64,7 @@ public class BusToWireBenchmark {
             out.addDestination(testPart.addInPin("IN"));
 */
 //            }
-            out = out.getOptimised(true);
+            out = out.getOptimised(null);
         }
     }
 }

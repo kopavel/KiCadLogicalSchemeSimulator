@@ -32,6 +32,7 @@
 package pko.KiCadLogicalSchemeSimulator.api.bus;
 import pko.KiCadLogicalSchemeSimulator.Simulator;
 import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
+import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.net.bus.BusToWiresAdapter;
@@ -220,14 +221,14 @@ public class OutBus extends Bus {
     }
 
     @Override
-    public Bus getOptimised(boolean keepSetters) {
+    public Bus getOptimised(ModelItem<?> source) {
         if (destinations.length == 0) {
             return new NCBus(this);
         } else if (destinations.length == 1) {
-            return destinations[0].getOptimised(true).copyState(this);
+            return destinations[0].getOptimised(null).copyState(this);
         } else {
             for (int i = 0; i < destinations.length; i++) {
-                destinations[i] = destinations[i].getOptimised(false);
+                destinations[i] = destinations[i].getOptimised(this);
             }
             ClassOptimiser<OutBus> optimiser = new ClassOptimiser<>(this, OutBus.class).unroll(destinations.length);
             if (!Simulator.recursive && Utils.notContain(Simulator.recursiveOuts, getName())) {

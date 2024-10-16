@@ -30,6 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.net.bus;
+import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
@@ -152,18 +153,18 @@ public class MaskGroupBus extends OutBus {
     /*Optimiser blockEnd iSetter*/
 
     @Override
-    public Bus getOptimised(boolean keepSetters) {
+    public Bus getOptimised(ModelItem<?> source) {
         if (destinations.length == 0) {
             throw new RuntimeException("unconnected MaskGroupBus " + getName());
         } else if (destinations.length == 1 && destinations[0].useFullOptimiser()) {
             destinations[0].groupByMask = mask;
-            return destinations[0].getOptimised(keepSetters).copyState(destinations[0]);
+            return destinations[0].getOptimised(source).copyState(destinations[0]);
         } else {
             for (int i = 0; i < destinations.length; i++) {
-                destinations[i] = destinations[i].getOptimised(false);
+                destinations[i] = destinations[i].getOptimised(this);
             }
             ClassOptimiser<MaskGroupBus> optimiser = new ClassOptimiser<>(this).unroll(destinations.length).bind("m", mask).bind("d", "destination0");
-            if (!keepSetters) {
+            if (source != null) {
                 optimiser.cut("setters");
             }
             if (!triState) {

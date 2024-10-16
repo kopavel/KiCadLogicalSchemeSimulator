@@ -31,6 +31,7 @@
  */
 package pko.KiCadLogicalSchemeSimulator.net.bus;
 import pko.KiCadLogicalSchemeSimulator.Simulator;
+import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
@@ -176,15 +177,15 @@ public class BusToWiresAdapter extends OutBus {
     }
 
     @Override
-    public BusToWiresAdapter getOptimised(boolean keepSetters) {
+    public BusToWiresAdapter getOptimised(ModelItem<?> source) {
         if (destinations.length == 0) {
             throw new RuntimeException("unconnected BusToWiresAdapter " + getName());
         } else {
             for (int i = 0; i < destinations.length; i++) {
-                destinations[i] = destinations[i].getOptimised(false);
+                destinations[i] = destinations[i].getOptimised(this);
             }
             ClassOptimiser<BusToWiresAdapter> optimiser = new ClassOptimiser<>(this).unroll(destinations.length).bind("m", mask);
-            if (!keepSetters) {
+            if (source != null) {
                 optimiser.cut("setters");
             }
             if (!triState) {

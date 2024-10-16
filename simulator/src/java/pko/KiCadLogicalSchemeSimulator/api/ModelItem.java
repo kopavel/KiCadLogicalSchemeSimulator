@@ -49,15 +49,20 @@ public abstract class ModelItem<T> implements IModelItem<T> {
     public long groupByMask;
     public byte groupedByOffset;
     public boolean used;
+    public ModelItem<?> source;
     private boolean reportedRecurse;
 
     protected ModelItem(String id, SchemaPart parent) {
         this.id = id;
         this.parent = parent;
+        source = this;
     }
 
     @Override
-    public ModelItem<T> getOptimised(boolean keepSetters) {
+    public ModelItem<T> getOptimised(ModelItem<?> source) {
+        if (source != null) {
+            this.source = source;
+        }
         return this;
     }
 

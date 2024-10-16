@@ -48,6 +48,7 @@ public class DcTrigger extends SchemaPart {
         dPin = addInPin("D");
         rPin = addInPin(new DcRPin("R", this, params.containsKey("setReverse")));
         sPin = addInPin(new DcSPin("S", this, params.containsKey("setReverse")));
+        rPin.sPin = sPin;
         cPin = addInPin(new DcCPin("C", this));
         addOutPin("Q", false);
         addOutPin("~{Q}", true);

@@ -30,6 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.net.merger.wire;
+import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.ShortcutException;
 import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
@@ -65,7 +66,7 @@ public class PassiveInMerger extends TriStateOutPin {
     }
 
     @Override
-    public Pin getOptimised(boolean keepSetters) {
-        return this;
+    public Pin getOptimised(ModelItem<?> source) {
+        return super.getOptimised(source);
     }
 }

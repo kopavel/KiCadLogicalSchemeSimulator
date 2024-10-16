@@ -31,6 +31,7 @@
  */
 package pko.KiCadLogicalSchemeSimulator.net.merger.bus;
 import lombok.Getter;
+import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.ShortcutException;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
@@ -427,20 +428,20 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
     }
 
     @Override
-    public BusMergerWireIn getOptimised(boolean keepSetters) {
+    public BusMergerWireIn getOptimised(ModelItem<?> source) {
         if (getClass() == BusMergerWireIn.class) {
             return this;
         }
         merger.sources.remove(this);
         destinations = merger.destinations;
         for (int i = 0; i < destinations.length; i++) {
-            destinations[i] = destinations[i].getOptimised(false);
+            destinations[i] = destinations[i].getOptimised(this);
             if (triState) {
                 destinations[i].triState = true;
             }
         }
         ClassOptimiser<BusMergerWireIn> optimiser = new ClassOptimiser<>(this).unroll(merger.destinations.length).bind("m", mask).bind("nm", nMask);
-        if (!keepSetters) {
+        if (source != null) {
             optimiser.cut("setters");
         }
         if (!triState) {

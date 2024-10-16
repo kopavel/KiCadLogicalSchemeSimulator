@@ -30,6 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.net.merger.bus;
+import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.ShortcutException;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
@@ -130,9 +131,9 @@ public class BusMerger extends OutBus {
     }
 
     @Override
-    public Bus getOptimised(boolean keepSetters) {
+    public Bus getOptimised(ModelItem<?> source) {
         for (int i = 0; i < destinations.length; i++) {
-            destinations[i] = destinations[i].getOptimised(false);
+            destinations[i] = destinations[i].getOptimised(this);
         }
         return this;
     }

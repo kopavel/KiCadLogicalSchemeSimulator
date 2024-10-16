@@ -30,6 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.dcTrigger;
+import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
@@ -64,6 +65,7 @@ public class DcRPin extends InPin {
 
     @Override
     public void setHi() {
+        /*Optimiser line setter*/
         state = true;
         //noinspection PointlessBooleanExpression
         parent.clockEnabled =
@@ -100,6 +102,7 @@ public class DcRPin extends InPin {
 
     @Override
     public void setLo() {
+        /*Optimiser line setter*/
         state = false;
         //noinspection PointlessBooleanExpression
         parent.clockEnabled =
@@ -134,7 +137,7 @@ public class DcRPin extends InPin {
     }
 
     @Override
-    public InPin getOptimised(boolean keepSetters) {
+    public InPin getOptimised(ModelItem<?> source) {
         ClassOptimiser<DcRPin> optimiser = new ClassOptimiser<>(this).cut("o");
         if (reverse) {
             optimiser.cut("nr");
@@ -150,6 +153,9 @@ public class DcRPin extends InPin {
                 optimiser.bind("true", "false");
                 optimiser.bind("false", "false");
             }
+        }
+        if (source != null && !sPin.used) {
+            optimiser.cut("setter");
         }
         DcRPin build = optimiser.build();
         parent.rPin = build;

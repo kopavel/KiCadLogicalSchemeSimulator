@@ -30,6 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.net.bus;
+import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
 
@@ -51,7 +52,7 @@ public class NCBus extends OutBus {
     }
 
     @Override
-    public Bus getOptimised(boolean keepSetters) {
-        return this;
+    public Bus getOptimised(ModelItem<?> source) {
+        return super.getOptimised(source);
     }
 }

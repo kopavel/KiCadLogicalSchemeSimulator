@@ -31,6 +31,7 @@
  */
 package pko.KiCadLogicalSchemeSimulator.net.merger.bus;
 import lombok.Getter;
+import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.ShortcutException;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
@@ -349,12 +350,12 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
     }
 
     @Override
-    public BusMergerBusIn getOptimised(boolean keepSetters) {
+    public BusMergerBusIn getOptimised(ModelItem<?> source) {
         //ToDo in case of "no passive pin" weakPins/weakState are known after build phase (incomplete)
         merger.sources.remove(this);
         destinations = merger.destinations;
         for (int i = 0; i < destinations.length; i++) {
-            destinations[i] = destinations[i].getOptimised(false);
+            destinations[i] = destinations[i].getOptimised(this);
             if (triState) {
                 destinations[i].triState = true;
             }
@@ -365,7 +366,7 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
         } else {
             optimiser.cut("sameMask").bind("nm", nMask);
         }
-        if (!keepSetters) {
+        if (source != null) {
             optimiser.cut("setters");
         }
         if (!triState) {

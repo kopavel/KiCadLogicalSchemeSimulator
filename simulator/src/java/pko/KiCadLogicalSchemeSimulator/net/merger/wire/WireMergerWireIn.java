@@ -30,6 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.net.merger.wire;
+import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.ShortcutException;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
@@ -402,11 +403,11 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
     }
 
     @Override
-    public WireMergerWireIn getOptimised(boolean keepSetters) {
+    public WireMergerWireIn getOptimised(ModelItem<?> source) {
         ((WireMerger) merger).sources.remove(this);
         destinations = merger.destinations;
         for (int i = 0; i < destinations.length; i++) {
-            destinations[i] = destinations[i].getOptimised(false);
+            destinations[i] = destinations[i].getOptimised(this);
             if (triState) {
                 destinations[i].triState = true;
             }
@@ -418,7 +419,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                 optimiser.cut("hiAndPassive");
             }
         }
-        if (!keepSetters) {
+        if (source != null) {
             optimiser.cut("setters");
         }
         if (!triState) {

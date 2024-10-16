@@ -31,6 +31,7 @@
  */
 package pko.KiCadLogicalSchemeSimulator.net.bus;
 import pko.KiCadLogicalSchemeSimulator.Simulator;
+import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
@@ -187,9 +188,9 @@ public class OffsetBus extends OutBus {
     }
 
     @Override
-    public Bus getOptimised(boolean keepSetters) {
+    public Bus getOptimised(ModelItem<?> source) {
         for (int i = 0; i < destinations.length; i++) {
-            destinations[i] = destinations[i].getOptimised(false);
+            destinations[i] = destinations[i].getOptimised(this);
         }
         ClassOptimiser<OffsetBus> optimiser = new ClassOptimiser<>(this).unroll(destinations.length);
         if (offset > 0) {
@@ -199,7 +200,7 @@ public class OffsetBus extends OutBus {
             optimiser.bind("o", -offset);
             optimiser.cut("positive");
         }
-        if (!keepSetters) {
+        if (source != null) {
             optimiser.cut("setters");
         }
         if (!triState) {

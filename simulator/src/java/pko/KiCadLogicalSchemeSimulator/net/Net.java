@@ -338,10 +338,10 @@ public class Net {
             }
         });
         for (OutPin wireMerger : wireMergers.values()) {
-            wireMerger.getOptimised(false);
+            wireMerger.getOptimised(null);
         }
         for (OutBus merger : busMergers.values()) {
-            merger.getOptimised(false);
+            merger.getOptimised(null);
         }
         for (SchemaPart p : schemaParts.values()) {
             for (IModelItem<?> outItem : p.outPins.values()

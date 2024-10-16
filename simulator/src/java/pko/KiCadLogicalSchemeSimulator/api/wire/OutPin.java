@@ -32,6 +32,7 @@
 package pko.KiCadLogicalSchemeSimulator.api.wire;
 import pko.KiCadLogicalSchemeSimulator.Simulator;
 import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
+import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.net.wire.NCWire;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
@@ -233,14 +234,14 @@ public class OutPin extends Pin {
     }
 
     @Override
-    public Pin getOptimised(boolean keepSetters) {
+    public Pin getOptimised(ModelItem<?> source) {
         if (destinations.length == 0) {
             return new NCWire(this);
         } else if (destinations.length == 1) {
-            return destinations[0].getOptimised(true).copyState(this);
+            return destinations[0].getOptimised(null).copyState(this);
         } else {
             for (int i = 0; i < destinations.length; i++) {
-                destinations[i] = destinations[i].getOptimised(false);
+                destinations[i] = destinations[i].getOptimised(this);
             }
             ClassOptimiser<OutPin> optimiser = new ClassOptimiser<>(this, OutPin.class).unroll(destinations.length);
             if (!Simulator.recursive && Utils.notContain(Simulator.recursiveOuts, getName())) {

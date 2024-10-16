@@ -30,6 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.OR;
+import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
@@ -59,6 +60,7 @@ public class OrGateIn extends InPin {
 
     @Override
     public void setHi() {
+        /*Optimiser line setter*/
         state = true;
         if (parent.inState == 0) {
             /*Optimiser bind mask*/
@@ -80,6 +82,7 @@ public class OrGateIn extends InPin {
 
     @Override
     public void setLo() {
+        /*Optimiser line setter*/
         state = false;
         if (parent.inState == mask) {
             parent.inState = 0;
@@ -98,12 +101,15 @@ public class OrGateIn extends InPin {
     }
 
     @Override
-    public InPin getOptimised(boolean keepSetters) {
+    public InPin getOptimised(ModelItem<?> source) {
         ClassOptimiser<OrGateIn> optimiser = new ClassOptimiser<>(this).bind("mask", mask).bind("nMask", nMask).cut("o");
         if (parent.reverse) {
             optimiser.cut("nr");
         } else {
             optimiser.cut("r");
+        }
+        if (source != null) {
+            optimiser.cut("setter");
         }
         OrGateIn build = optimiser.build();
         parent.replaceIn(id, build);

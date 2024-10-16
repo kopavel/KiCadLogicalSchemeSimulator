@@ -221,7 +221,7 @@ public abstract class SchemaPart {
     public abstract void initOuts();
 
     public <T> void replaceOut(IModelItem<T> outPin) {
-        IModelItem<T> newOutPin = outPin.getOptimised(true);
+        IModelItem<T> newOutPin = outPin.getOptimised(null);
         if (outPin != newOutPin) {
             newOutPin.copyState(outPin);
             outPins.put(outPin.getId(), newOutPin);

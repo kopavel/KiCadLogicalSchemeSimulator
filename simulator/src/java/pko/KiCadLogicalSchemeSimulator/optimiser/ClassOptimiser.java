@@ -171,7 +171,7 @@ public class ClassOptimiser<T> {
             for (ListIterator<String> lines = source.listIterator(); lines.hasNext(); ) {
                 String line = lines.next();
                 //override getOptimised
-                if (line.contains("getOptimised(boolean keepSetters)")) {
+                if (line.contains("getOptimised(ModelItem<?> source)")) {
                     resultSource.append(line).append("\n").append("return this;\n}");
                 }
                 int lineOffset = countLeadingSpaces(line);
