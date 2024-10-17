@@ -29,48 +29,60 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.components.dcTrigger;
+package pko.KiCadLogicalSchemeSimulator.components.dcTrigger.multiUnit;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 
-public class DcTrigger extends SchemaPart {
-    public InPin dPin;
-    public DcRPin rPin;
-    public DcSPin sPin;
-    public DcCPin cPin;
-    public Pin qOut;
-    public Pin iqOut;
+//FixMe make unittest
+public class MultiUnitDcTrigger extends SchemaPart {
+    private final int size;
+    public MultiUnitDcCPin cPin;
+    public MultiUnitDcRPin rPin;
     public boolean clockEnabled = true;
 
-    protected DcTrigger(String id, String sParam) {
+    protected MultiUnitDcTrigger(String id, String sParam) {
         super(id, sParam);
-        dPin = addInPin("D");
-        rPin = addInPin(new DcRPin("R", this, params.containsKey("setReverse")));
-        sPin = addInPin(new DcSPin("S", this, params.containsKey("setReverse")));
-        rPin.sPin = sPin;
-        cPin = addInPin(new DcCPin("C", this));
-        addOutPin("Q", false);
-        addOutPin("~{Q}", true);
+        if (!params.containsKey("size")) {
+            throw new RuntimeException("MultiUnitDcTrigger component " + id + " has no parameter \"size\"");
+        }
+        try {
+            size = Integer.parseInt(params.get("size"));
+        } catch (NumberFormatException r) {
+            throw new RuntimeException("MultiUnitDcTrigger component " + id + " size must be >1");
+        }
+        if (size < 2) {
+            throw new RuntimeException("MultiUnitDcTrigger component " + id + " size must be >1");
+        }
+        InPin[] dPin = new InPin[size];
+        Pin[] qOut = new Pin[size];
+        Pin[] iqOut = new Pin[size];
+        for (int i = 0; i < size; i++) {
+            dPin[i] = addInPin("D" + (char) ('a' + i));
+            addOutPin("Q" + (char) ('a' + i), false);
+            addOutPin("~{Q" + (char) ('a' + i) + "}", true);
+            qOut[i] = getOutPin("Q" + (char) ('a' + i));
+            iqOut[i] = getOutPin("~{Q" + (char) ('a' + i) + "}");
+        }
+        rPin = addInPin(new MultiUnitDcRPin("R", this, params.containsKey("setReverse"), qOut, iqOut));
+        cPin = addInPin(new MultiUnitDcCPin("C", this, dPin, qOut, iqOut));
     }
 
     @Override
     public void initOuts() {
-        qOut = getOutPin("Q");
-        iqOut = getOutPin("~{Q}");
-        rPin.qOut = qOut;
-        rPin.iqOut = iqOut;
-        sPin.qOut = qOut;
-        sPin.iqOut = iqOut;
-        cPin.qOut = qOut;
-        cPin.iqOut = iqOut;
+        for (int i = 0; i < size; i++) {
+            cPin.qOut[i] = getOutPin("Q" + (char) ('a' + i));
+            cPin.iqOut[i] = getOutPin("~{Q" + (char) ('a' + i) + "}");
+            rPin.qOut[i] = cPin.qOut[i];
+            rPin.iqOut[i] = cPin.iqOut[i];
+        }
     }
 
     @Override
     public void reset() {
-        if (clockEnabled) {
-            qOut.setLo();
-            iqOut.setHi();
+        for (int i = 0; i < size; i++) {
+            cPin.qOut[i].setLo();
+            cPin.iqOut[i].setHi();
         }
     }
 }

@@ -29,36 +29,33 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.components.dcTrigger;
+package pko.KiCadLogicalSchemeSimulator.components.dcTrigger.multiUnit;
 import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 
-public class DcSPin extends InPin {
+public class MultiUnitDcRPin extends InPin {
     public final boolean reverse;
-    public final DcTrigger parent;
-    public InPin rPin;
-    public Pin qOut;
-    public Pin iqOut;
+    public final MultiUnitDcTrigger parent;
+    public Pin[] qOut;
+    public Pin[] iqOut;
 
-    public DcSPin(String id, DcTrigger parent, boolean reverse) {
+    public MultiUnitDcRPin(String id, MultiUnitDcTrigger parent, boolean reverse, Pin[] qOut, Pin[] iqOut) {
         super(id, parent);
         this.parent = parent;
         this.reverse = reverse;
         state = reverse;
-        rPin = parent.rPin;
-        qOut = parent.qOut;
-        iqOut = parent.iqOut;
+        this.qOut = qOut;
+        this.iqOut = iqOut;
     }
 
     /*Optimiser constructor*/
-    public DcSPin(DcSPin oldPin, String variantId) {
+    public MultiUnitDcRPin(MultiUnitDcRPin oldPin, String variantId) {
         super(oldPin, variantId);
         reverse = oldPin.reverse;
         parent = oldPin.parent;
         state = oldPin.state;
-        rPin = oldPin.rPin;
         qOut = oldPin.qOut;
         iqOut = oldPin.iqOut;
     }
@@ -73,31 +70,19 @@ public class DcSPin extends InPin {
                 false
                         /*Optimiser line o*///
                         || reverse &&
-                        /*Optimiser line r bind false:rPin.state*///
-                        rPin.state//
+                        /*Optimiser line r*/
+                        true//
         ;
-
-        /*Optimiser line o block nr*/
+        /*Optimiser block nr line o*/
         if (!reverse) {
-            if (!qOut.state) {
-                qOut.setHi();
-                /*Optimiser block noR*/
-            }
-            if (!rPin.state) {
-                /*Optimiser blockEnd noR*/
-                iqOut.setLo();
-            }
-            /*Optimiser block noR block r blockEnd nr line o*/
-        } else//
-            if (!rPin.state) {
-                if (qOut.state) {
-                    qOut.setLo();
-                }
-                if (!iqOut.state) {
-                    iqOut.setHi();
+            for (int i = 0; i < iqOut.length; i++) {
+                if (qOut[i].state) {
+                    iqOut[i].setHi();
+                    qOut[i].setLo();
                 }
             }
-        /*Optimiser blockEnd noR blockEnd r*/
+            /*Optimiser blockEnd nr line o*/
+        }
     }
 
     @Override
@@ -109,57 +94,37 @@ public class DcSPin extends InPin {
                 /*Optimiser line nr*///
                 true
                         /*Optimiser line o*///
-                        && !reverse &&
-                        /*Optimiser line r bind true:!rPin.state*///
-                        !rPin.state//
+                        && (!reverse ||
+                        /*Optimiser line r*/
+                        false //
+                        /*Optimiser line o*///
+                )//
         ;
-        /*Optimiser line o block r*/
+        /*Optimiser block r line o*/
         if (reverse) {
-            if (!qOut.state) {
-                qOut.setHi();
-                /*Optimiser block noR*/
-            }
-            if (rPin.state) {
-                /*Optimiser blockEnd noR*/
-                iqOut.setLo();
-            }
-            /*Optimiser line o block noR blockEnd r block nr*/
-        } else//
-            if (rPin.state) {
-                if (qOut.state) {
-                    qOut.setLo();
-                }
-                if (!iqOut.state) {
-                    iqOut.setHi();
+            for (int i = 0; i < iqOut.length; i++) {
+                if (qOut[i].state) {
+                    iqOut[i].setHi();
+                    qOut[i].setLo();
                 }
             }
-        /*Optimiser blockEnd noR blockEnd nr*/
+            /*Optimiser blockEnd r line o*/
+        }
     }
 
     @Override
     public InPin getOptimised(ModelItem<?> source) {
-        ClassOptimiser<DcSPin> optimiser = new ClassOptimiser<>(this).cut("o");
+        ClassOptimiser<MultiUnitDcRPin> optimiser = new ClassOptimiser<>(this).cut("o");
         if (reverse) {
             optimiser.cut("nr");
         } else {
             optimiser.cut("r");
         }
-        if (!parent.rPin.used) {
-            optimiser.cut("noR");
-            if (reverse) {
-                optimiser.bind("true", "false");
-                optimiser.bind("false", "true");
-            } else {
-                optimiser.bind("true", "false");
-                optimiser.bind("false", "false");
-            }
-        }
-        if (source != null && !rPin.used) {
+        if (source != null) {
             optimiser.cut("setter");
         }
-        DcSPin build = optimiser.build();
-        parent.sPin = build;
-        parent.rPin.sPin = build;
+        MultiUnitDcRPin build = optimiser.build();
+        parent.rPin = build;
         parent.inPins.put(id, build);
         return build;
     }

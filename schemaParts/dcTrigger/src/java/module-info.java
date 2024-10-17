@@ -31,7 +31,7 @@
  */
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
 import pko.KiCadLogicalSchemeSimulator.components.dcTrigger.DcTriggerSpi;
-import pko.KiCadLogicalSchemeSimulator.components.dcTrigger.MultiUnitDcTriggerSpi;
+import pko.KiCadLogicalSchemeSimulator.components.dcTrigger.multiUnit.MultiUnitDcTriggerSpi;
 
 open module KiCadLogicalSchemeSimulator.components.dcTrigger {
     requires KiCadLogicalSchemeSimulator.simulator;

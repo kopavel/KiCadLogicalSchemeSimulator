@@ -73,7 +73,7 @@ public class DcRPin extends InPin {
                 false
                         /*Optimiser line o*///
                         || reverse &&
-                        /*Optimiser line r bind false:sPin.state*///
+                        /*Optimiser line r bind false:sPin.state*/
                         sPin.state//
         ;
 
@@ -110,7 +110,7 @@ public class DcRPin extends InPin {
                 true
                         /*Optimiser line o*///
                         && !reverse &&
-                        /*Optimiser line r bind true:!sPin.state*///
+                        /*Optimiser line r bind true:!sPin.state*/
                         !sPin.state//
         ;
         /*Optimiser line o block r*/
