@@ -37,25 +37,22 @@ import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 
 public class MultiUnitDcCPin extends InPin {
     public final MultiUnitDcTrigger parent;
-    public final InPin[] dPin;
-    public Pin[] qOut;
-    public Pin[] iqOut;
+    public final Pins[] pins;
 
     public MultiUnitDcCPin(String id, MultiUnitDcTrigger parent, InPin[] dPin, Pin[] qOut, Pin[] iqOut) {
         super(id, parent);
         this.parent = parent;
-        this.dPin = dPin;
-        this.qOut = qOut;
-        this.iqOut = iqOut;
+        pins = new Pins[dPin.length];
+        for (int i = 0; i < dPin.length; i++) {
+            pins[i] = new Pins(dPin[i], qOut[i], iqOut[i]);
+        }
     }
 
-    /*Optimiser constructor*/
+    /*Optimiser constructor unroll pin:pins*/
     public MultiUnitDcCPin(MultiUnitDcCPin oldPin, String variantId) {
         super(oldPin, variantId);
         parent = oldPin.parent;
-        dPin = oldPin.dPin;
-        qOut = oldPin.qOut;
-        iqOut = oldPin.iqOut;
+        pins = oldPin.pins;
     }
 
     @Override
@@ -67,17 +64,15 @@ public class MultiUnitDcCPin extends InPin {
             /*Optimiser line o*/
                 !parent.reverse && //
                         parent.clockEnabled) {
-            for (int i = 0; i < dPin.length; i++) {
-                if (dPin[i].state) {
-                    if (iqOut[i].state) {
-                        iqOut[i].setLo();
-                        qOut[i].setHi();
+            for (Pins pin : pins) {
+                if (pin.dPin.state) {
+                    if (pin.iqOut.state) {
+                        pin.iqOut.setLo();
+                        pin.qOut.setHi();
                     }
-                } else {
-                    if (qOut[i].state) {
-                        qOut[i].setLo();
-                        iqOut[i].setHi();
-                    }
+                } else if (pin.qOut.state) {
+                    pin.qOut.setLo();
+                    pin.iqOut.setHi();
                 }
             }
         }
@@ -93,17 +88,15 @@ public class MultiUnitDcCPin extends InPin {
             /*Optimiser line o*/
                 parent.reverse && //
                         parent.clockEnabled) {
-            for (int i = 0; i < dPin.length; i++) {
-                if (dPin[i].state) {
-                    if (iqOut[i].state) {
-                        iqOut[i].setLo();
-                        qOut[i].setHi();
+            for (Pins pin : pins) {
+                if (pin.dPin.state) {
+                    if (pin.iqOut.state) {
+                        pin.iqOut.setLo();
+                        pin.qOut.setHi();
                     }
-                } else {
-                    if (qOut[i].state) {
-                        qOut[i].setLo();
-                        iqOut[i].setHi();
-                    }
+                } else if (pin.qOut.state) {
+                    pin.qOut.setLo();
+                    pin.iqOut.setHi();
                 }
             }
         }
@@ -121,6 +114,7 @@ public class MultiUnitDcCPin extends InPin {
         if (source != null) {
             optimiser.cut("setter");
         }
+        optimiser.unroll(pins.length);
         MultiUnitDcCPin build = optimiser.build();
         parent.cPin = build;
         parent.inPins.put(id, build);

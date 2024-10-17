@@ -38,26 +38,26 @@ import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 public class MultiUnitDcRPin extends InPin {
     public final boolean reverse;
     public final MultiUnitDcTrigger parent;
-    public Pin[] qOut;
-    public Pin[] iqOut;
+    public Pins[] pins;
 
     public MultiUnitDcRPin(String id, MultiUnitDcTrigger parent, boolean reverse, Pin[] qOut, Pin[] iqOut) {
         super(id, parent);
         this.parent = parent;
         this.reverse = reverse;
         state = reverse;
-        this.qOut = qOut;
-        this.iqOut = iqOut;
+        pins = new Pins[qOut.length];
+        for (int i = 0; i < qOut.length; i++) {
+            pins[i] = new Pins(qOut[i], iqOut[i]);
+        }
     }
 
-    /*Optimiser constructor*/
+    /*Optimiser constructor unroll pin:pins*/
     public MultiUnitDcRPin(MultiUnitDcRPin oldPin, String variantId) {
         super(oldPin, variantId);
         reverse = oldPin.reverse;
         parent = oldPin.parent;
         state = oldPin.state;
-        qOut = oldPin.qOut;
-        iqOut = oldPin.iqOut;
+        pins = oldPin.pins;
     }
 
     @Override
@@ -75,10 +75,10 @@ public class MultiUnitDcRPin extends InPin {
         ;
         /*Optimiser block nr line o*/
         if (!reverse) {
-            for (int i = 0; i < iqOut.length; i++) {
-                if (qOut[i].state) {
-                    iqOut[i].setHi();
-                    qOut[i].setLo();
+            for (Pins pin : pins) {
+                if (pin.qOut.state) {
+                    pin.iqOut.setHi();
+                    pin.qOut.setLo();
                 }
             }
             /*Optimiser blockEnd nr line o*/
@@ -102,10 +102,10 @@ public class MultiUnitDcRPin extends InPin {
         ;
         /*Optimiser block r line o*/
         if (reverse) {
-            for (int i = 0; i < iqOut.length; i++) {
-                if (qOut[i].state) {
-                    iqOut[i].setHi();
-                    qOut[i].setLo();
+            for (Pins pin : pins) {
+                if (pin.qOut.state) {
+                    pin.iqOut.setHi();
+                    pin.qOut.setLo();
                 }
             }
             /*Optimiser blockEnd r line o*/
@@ -123,6 +123,7 @@ public class MultiUnitDcRPin extends InPin {
         if (source != null) {
             optimiser.cut("setter");
         }
+        optimiser.unroll(pins.length);
         MultiUnitDcRPin build = optimiser.build();
         parent.rPin = build;
         parent.inPins.put(id, build);

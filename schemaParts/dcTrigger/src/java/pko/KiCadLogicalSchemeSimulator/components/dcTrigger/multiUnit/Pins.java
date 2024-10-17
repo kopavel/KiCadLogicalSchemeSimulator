@@ -29,12 +29,18 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
-import pko.KiCadLogicalSchemeSimulator.components.dcTrigger.DcTriggerSpi;
-import pko.KiCadLogicalSchemeSimulator.components.dcTrigger.multiUnit.MultiUnitDcTriggerSpi;
+package pko.KiCadLogicalSchemeSimulator.components.dcTrigger.multiUnit;
+import lombok.AllArgsConstructor;
+import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 
-open module KiCadLogicalSchemeSimulator.components.dcTrigger {
-    requires KiCadLogicalSchemeSimulator.simulator;
-    requires static lombok;
-    provides SchemaPartSpi with DcTriggerSpi, MultiUnitDcTriggerSpi;
+@AllArgsConstructor
+public class Pins {
+    public InPin dPin;
+    public Pin qOut;
+    public Pin iqOut;
+    public Pins(Pin qOut, Pin iqOut) {
+        this.qOut = qOut;
+        this.iqOut = iqOut;
+    }
 }

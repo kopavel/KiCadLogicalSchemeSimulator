@@ -71,18 +71,18 @@ public class MultiUnitDcTrigger extends SchemaPart {
     @Override
     public void initOuts() {
         for (int i = 0; i < size; i++) {
-            cPin.qOut[i] = getOutPin("Q" + (char) ('a' + i));
-            cPin.iqOut[i] = getOutPin("~{Q" + (char) ('a' + i) + "}");
-            rPin.qOut[i] = cPin.qOut[i];
-            rPin.iqOut[i] = cPin.iqOut[i];
+            cPin.pins[i].qOut = getOutPin("Q" + (char) ('a' + i));
+            cPin.pins[i].iqOut = getOutPin("~{Q" + (char) ('a' + i) + "}");
+            rPin.pins[i].qOut = cPin.pins[i].qOut;
+            rPin.pins[i].iqOut = cPin.pins[i].iqOut;
         }
     }
 
     @Override
     public void reset() {
         for (int i = 0; i < size; i++) {
-            cPin.qOut[i].setLo();
-            cPin.iqOut[i].setHi();
+            cPin.pins[i].qOut.setLo();
+            cPin.pins[i].iqOut.setHi();
         }
     }
 }
