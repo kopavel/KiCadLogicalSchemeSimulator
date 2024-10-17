@@ -45,12 +45,12 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 
 public class Z80Cpu extends SchemaPart {
+    protected final InPin waitPin;
+    protected final InBus dIn;
     private final Z80Core cpu;
     private final AsyncIoQueue ioQueue = new AsyncIoQueue();
-    protected InBus dIn;
     protected Bus dOut;
     protected Bus aOut;
-    protected InPin waitPin;
     protected Pin rdPin;
     protected Pin wrPin;
     protected Pin mReqPin;
@@ -60,16 +60,9 @@ public class Z80Cpu extends SchemaPart {
     protected Pin haltPin;
     protected int T;
     protected int M;
-    private boolean inWait;
-    private boolean T1;
-    private boolean T2;
-    private boolean T3;
-    private boolean T4;
-    private boolean M1;
+    private boolean notInWait;
     private boolean nmiTriggered;
     private boolean extraWait;
-    private boolean needDataPinReset;
-    private boolean needRefreshPinReset;
 
     public Z80Cpu(String id) {
         super(id, null);
@@ -79,17 +72,13 @@ public class Z80Cpu extends SchemaPart {
             public void setHi() {
                 state = true;
                 if (M > 0) {
-                    if (T4 || (!M1 && T3)) {
+                    if ((M != 1 && T == 3) || T == 4) {
                         T = 1;
-                        if (needRefreshPinReset) {
+                        if (!refreshPin.state) {
                             refreshPin.setHi();
-                            needRefreshPinReset = false;
                         }
-                        if (needDataPinReset) {
-                            if (!dOut.hiImpedance) {
-                                dOut.setHiImpedance();
-                            }
-                            needDataPinReset = false;
+                        if (!dOut.hiImpedance) {
+                            dOut.setHiImpedance();
                         }
                         ioQueue.next();
                         if (ioQueue.request == null) {
@@ -103,44 +92,40 @@ public class Z80Cpu extends SchemaPart {
                         } else {
                             M++;
                         }
+                    } else if (T == 2 && (extraWait || !notInWait)) {
+                        extraWait = false;
                     } else {
-                        if (T2 && (inWait || extraWait)) {
-                            extraWait = false;
-                        } else {
-                            T++;
-                        }
+                        T++;
                     }
-                    T1 = T == 1;
-                    T2 = T == 2;
-                    T3 = T == 3;
-                    T4 = T == 4;
-                    M1 = M == 1;
                     Request ioRequest = ioQueue.request;
-                    if (T1) {
-                        if (M1) {
-                            m1Pin.setLo();
-                            cpu.executeOneInstruction();
-                            ioRequest = ioQueue.request;
+                    switch (T) {
+                        case 1 -> {
+                            if (M == 1) {
+                                m1Pin.setLo();
+                                cpu.executeOneInstruction();
+                                ioRequest = ioQueue.request;
+                            }
+                            aOut.setState(ioRequest.address);
+                            extraWait = ioRequest instanceof DeviceRequest;
                         }
-                        aOut.setState(ioRequest.address);
-                        extraWait = ioRequest instanceof DeviceRequest;
-                    } else if (T2) {
-                        if (!inWait && ioRequest instanceof DeviceRequest) {
-                            ioReqPin.setLo();
-                            if (ioRequest instanceof WriteRequest) {
-                                wrPin.setLo();
-                            } else {
-                                rdPin.setLo();
+                        case 2 -> {
+                            if (ioRequest instanceof DeviceRequest && notInWait) {
+                                ioReqPin.setLo();
+                                if (ioRequest instanceof WriteRequest) {
+                                    wrPin.setLo();
+                                } else {
+                                    rdPin.setLo();
+                                }
                             }
                         }
-                    } else if (T3) {
-                        if (M1) {
-                            ((ReadRequest) ioRequest).callback.accept((int) dIn.state);
-                            rdPin.setHi();
-                            mReqPin.setHi();
-                            m1Pin.setHi();
-                            refreshPin.setLo();
-                            needRefreshPinReset = true;
+                        case 3 -> {
+                            if (M == 1) {
+                                ((ReadRequest) ioRequest).callback.accept((int) dIn.state);
+                                rdPin.setHi();
+                                mReqPin.setHi();
+                                m1Pin.setHi();
+                                refreshPin.setLo();
+                            }
                         }
                     }
                 }
@@ -151,44 +136,46 @@ public class Z80Cpu extends SchemaPart {
                 state = false;
                 if (M > 0) {
                     Request ioRequest = ioQueue.request;
-                    if (T1) {
-                        if (ioRequest instanceof MemoryRequest) {
-                            mReqPin.setLo();
-                            if (ioRequest instanceof ReadRequest) {
-                                rdPin.setLo();
+                    switch (T) {
+                        case 1 -> {
+                            if (ioRequest instanceof MemoryRequest) {
+                                mReqPin.setLo();
+                                if (ioRequest instanceof ReadRequest) {
+                                    rdPin.setLo();
+                                }
+                            }
+                            if (ioRequest instanceof WriteRequest writeRequest) {
+                                dOut.setState(writeRequest.payload);
                             }
                         }
-                        if (ioRequest instanceof WriteRequest writeRequest) {
-                            dOut.setState(writeRequest.payload);
-                            needDataPinReset = true;
+                        case 2 -> {
+                            if (ioRequest instanceof WriteRequest && ioRequest instanceof MemoryRequest && notInWait) {
+                                wrPin.setLo();
+                            }
+                            notInWait = waitPin.state;
                         }
-                    } else if (T2) {
-                        if (!inWait && ioRequest instanceof MemoryRequest && ioRequest instanceof WriteRequest) {
-                            wrPin.setLo();
-                        }
-                        inWait = !waitPin.state;
-                    } else if (T3) {
-                        if (M1) {
-                            mReqPin.setLo();
-                        } else if (ioRequest instanceof MemoryRequest) {
-                            if (ioRequest instanceof ReadRequest readRequest) {
-                                readRequest.callback.accept((int) dIn.state);
-                                rdPin.setHi();
+                        case 3 -> {
+                            if (M == 1) {
+                                mReqPin.setLo();
+                            } else if (ioRequest instanceof MemoryRequest) {
+                                if (ioRequest instanceof ReadRequest readRequest) {
+                                    readRequest.callback.accept((int) dIn.state);
+                                    rdPin.setHi();
+                                } else {
+                                    wrPin.setHi();
+                                }
+                                mReqPin.setHi();
                             } else {
-                                wrPin.setHi();
+                                if (ioRequest instanceof ReadRequest readRequest) {
+                                    readRequest.callback.accept((int) dIn.state);
+                                    rdPin.setHi();
+                                } else {
+                                    wrPin.setHi();
+                                }
+                                ioReqPin.setHi();
                             }
-                            mReqPin.setHi();
-                        } else {
-                            if (ioRequest instanceof ReadRequest readRequest) {
-                                readRequest.callback.accept((int) dIn.state);
-                                rdPin.setHi();
-                            } else {
-                                wrPin.setHi();
-                            }
-                            ioReqPin.setHi();
                         }
-                    } else {
-                        mReqPin.setHi();
+                        default -> mReqPin.setHi();
                     }
                 }
             }
@@ -297,13 +284,6 @@ public class Z80Cpu extends SchemaPart {
             refreshPin.setHi();
         }
         M = 1;
-        T1 = false;
-        T2 = false;
-        T3 = false;
-        T4 = false;
-        M1 = true;
-        needDataPinReset = false;
-        needRefreshPinReset = false;
         nmiTriggered = false;
     }
 }
