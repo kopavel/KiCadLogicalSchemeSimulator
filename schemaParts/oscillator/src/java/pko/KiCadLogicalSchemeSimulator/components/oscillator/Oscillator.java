@@ -85,30 +85,31 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
         if (clockFreq == 0) {
             fullSpeedAlive = true;
             fullSpeedThread = Thread.ofPlatform().priority(MAX_PRIORITY).start(() -> {
+                final Pin local = out;
                 try {
                     while (fullSpeedAlive) {
                         ticks += 2000;
                         for (int i = 0; i < 100; i++) {
-                            out.setHi();
-                            out.setLo();
-                            out.setHi();
-                            out.setLo();
-                            out.setHi();
-                            out.setLo();
-                            out.setHi();
-                            out.setLo();
-                            out.setHi();
-                            out.setLo();
-                            out.setHi();
-                            out.setLo();
-                            out.setHi();
-                            out.setLo();
-                            out.setHi();
-                            out.setLo();
-                            out.setHi();
-                            out.setLo();
-                            out.setHi();
-                            out.setLo();
+                            local.setHi();
+                            local.setLo();
+                            local.setHi();
+                            local.setLo();
+                            local.setHi();
+                            local.setLo();
+                            local.setHi();
+                            local.setLo();
+                            local.setHi();
+                            local.setLo();
+                            local.setHi();
+                            local.setLo();
+                            local.setHi();
+                            local.setLo();
+                            local.setHi();
+                            local.setLo();
+                            local.setHi();
+                            local.setLo();
+                            local.setHi();
+                            local.setLo();
                         }
                     }
                 } catch (Throwable e) {
@@ -121,29 +122,30 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
             tickStart = ticks;
             long period = Math.max(10, (long) (10000000.0 / clockFreq));
             scheduler.scheduleAtFixedRate(() -> {
+                final Pin local = out;
                 long target = Math.min(10000, (long) ((System.currentTimeMillis() - timerStart) * clockFreq * 2) - ticks + tickStart) / 20;
                 ticks += target * 20;
                 for (int i = 0; i < target; i++) {
-                    out.setHi();
-                    out.setLo();
-                    out.setHi();
-                    out.setLo();
-                    out.setHi();
-                    out.setLo();
-                    out.setHi();
-                    out.setLo();
-                    out.setHi();
-                    out.setLo();
-                    out.setHi();
-                    out.setLo();
-                    out.setHi();
-                    out.setLo();
-                    out.setHi();
-                    out.setLo();
-                    out.setHi();
-                    out.setLo();
-                    out.setHi();
-                    out.setLo();
+                    local.setHi();
+                    local.setLo();
+                    local.setHi();
+                    local.setLo();
+                    local.setHi();
+                    local.setLo();
+                    local.setHi();
+                    local.setLo();
+                    local.setHi();
+                    local.setLo();
+                    local.setHi();
+                    local.setLo();
+                    local.setHi();
+                    local.setLo();
+                    local.setHi();
+                    local.setLo();
+                    local.setHi();
+                    local.setLo();
+                    local.setHi();
+                    local.setLo();
                 }
             }, 0, period, TimeUnit.NANOSECONDS);
         }
