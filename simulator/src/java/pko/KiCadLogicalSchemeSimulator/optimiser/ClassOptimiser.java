@@ -105,7 +105,7 @@ public class ClassOptimiser<T> {
                 suffix += "_ae";
             }
             String optimizedClassName = sourceClass.getSimpleName() + suffix;
-            String optimizedFullClassName = sourceClass.getPackageName() + ".optimised." + sourceClass.getSimpleName() + suffix;
+            String optimizedFullClassName = sourceClass.getPackageName() + ".optimised." + sourceClass.getSimpleName() + "." + sourceClass.getSimpleName() + suffix;
             Class<?> dynamicClass = dynamicClasses.get(optimizedFullClassName);
             if (dynamicClass == null) {
                 try {
@@ -180,7 +180,7 @@ public class ClassOptimiser<T> {
                     resultSource.append(line).append("\n");
                     //skip asserts
                 } else if (line.startsWith("package ")) {
-                    line = line.replace(";", ".optimised;");
+                    line = line.replace(";", ".optimised." + sourceClass.getSimpleName() + ";");
                     resultSource.append(line).append("\n");
                     resultSource.append("import ").append(sourceClass.getPackageName()).append(".*;\n");
                     //skip asserts
@@ -281,8 +281,11 @@ public class ClassOptimiser<T> {
                         // class definition
                     } else if (line.contains("public class " + sourceClass.getSimpleName())) {
                         //rename class definition
-                        resultSource.append("public class ").append(sourceClass.getSimpleName())
-                                    .append(suffix).append(" extends ").append(sourceClass.getSimpleName())
+                        resultSource.append("public class ")
+                                    .append(sourceClass.getSimpleName())
+                                    .append(suffix)
+                                    .append(" extends ")
+                                    .append(sourceClass.getSimpleName())
                                     .append(" {\n");
                         functionOffset = -1;
                         functionSource = new StringBuilder();
