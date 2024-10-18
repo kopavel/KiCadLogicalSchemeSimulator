@@ -1,8 +1,27 @@
 ## REPEATER
 
-Implements simple repeater functionality.
+Buffer/inverter.
 
-**Input names**: IN.  
-**Output names**: OUT.
+### Pins
 
-**Optional parameter `reverse`:** If provided, the output is reversed, resulting a NOT element.
+#### Input names:
+
+- `IN`- Input.
+
+#### Output names:
+
+- `OUT`- Output.
+
+### Parameters
+
+#### Mandatory parameters:
+
+- none
+
+#### Optional parameters:
+
+- `reverse`- output reversed.
+
+### Example
+
+NOT element: `reverse`
