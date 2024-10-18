@@ -1,14 +1,28 @@
 ## Oscillator
 
-Implement oscillator.
+### Pins
 
-**Output names**: OUT
+#### Input names:
 
-**Optional parameter `outName`:** If provided, define output pin name;  
-**Optional parameter `freq`:** If provided, define oscillator preset frequency in kilohertz (maybe fractional);  
-**Optional parameter `start`:** If provided, oscilator start automatically after net are stabilised;
+- none
 
-The schema part is interactive and opens an additional control panel on a click.
+#### Output names:
+
+- `OUT`- Output
+
+### Parameters
+
+#### Mandatory parameters:
+
+#### Optional parameters:
+
+- `freq`- oscillator preset frequency in kilohertz  
+  maybe fractional
+- `start`- oscilator start automatically after net stabilised;
+
+### Description
+
+The Schema part is interactive and opens an additional control panel on a click.
 
 ![img_1.png](img/oscillator_ui.png)
 

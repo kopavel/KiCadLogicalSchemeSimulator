@@ -54,26 +54,21 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
     private double clockFreq = 0;
     private Thread fullSpeedThread;
     private volatile boolean fullSpeedAlive;
-    private String outAlias = "OUT";
     private long timerStart;
     private long tickStart;
 
     public Oscillator(String id, String sParams) {
         super(id, sParams);
-        String sAliases = params.get("outName");
-        if (sAliases != null) {
-            outAlias = sAliases;
-        }
         if (params.containsKey("freq")) {
             clockFreq = Double.parseDouble(params.get("freq"));
         }
-        addOutPin(outAlias, false);
+        addOutPin("OUT", false);
         oscillatorUiComponent = new OscillatorUiComponent(120, id, this);
     }
 
     @Override
     public void initOuts() {
-        out = getOutPin(outAlias);
+        out = getOutPin("OUT");
     }
 
     @Override

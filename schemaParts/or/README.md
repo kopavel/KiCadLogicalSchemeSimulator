@@ -1,12 +1,26 @@
-## OR gate
+## Logical OR gate
 
-Implements logical OR gate functionality.
+### Pins
 
-**Input names**: INx, where x a sequential number, starting from 0
-**Output names**: OUT
+#### Input names:
 
-**Mandatory parameter `size`:** specifies the number of input pins.  
-**Optional parameter `reverse`:** if provided, the output is reversed, resulting in a NOR gate.
+- `INx`- Gate input.  
+  x - input number in range[0…size-1].
 
-For example, to create a 2-input NOR gate, you would provide the following parameters: `size=2;reverse`.
+#### Output names:
 
+- `OUT`- Gate output.
+
+### Parameters
+
+#### Mandatory parameters:
+
+- `size`- amount of input pin in range[2…64].
+
+#### Optional parameters:
+
+- `reverse`- reverse output for NOR gate.
+
+### Example
+
+2-input NOR gate: `size=2;reverse`

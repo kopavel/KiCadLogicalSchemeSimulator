@@ -15,7 +15,7 @@
 
 #### Mandatory parameters:
 
-- `size`- amount of input pins.
+- `size`- amount of input pin in range[2…64].
 
 #### Optional parameters:
 

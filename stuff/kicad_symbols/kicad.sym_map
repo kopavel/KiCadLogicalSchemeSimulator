@@ -102,7 +102,10 @@
 		</symbol>
 	</lib>
 	<lib name="Oscillator">
-		<symbol name="MAX7375AXR805" symPartClass="Oscillator" symPartParam="outName=CLOCK"/>
+		<symbol name="MAX7375AXR805" symPartClass="Oscillator">
+			<unit pinMap="2=OUT"/>
+			<unit pinMap="power;1=NC;3=NC"/>
+		</symbol>
 	</lib>
 	<lib name="4xxx">
 		<symbol name="4001" symPartClass="OrGate" symPartParam="size=2;reverse">
