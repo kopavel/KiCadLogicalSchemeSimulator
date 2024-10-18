@@ -1,10 +1,29 @@
 ## Power pin
 
-Implement a schema part with a static state on the output. Used for pull-up, pull-down resistors and power rails.
+Schema part with a static state on the output.  
+Used for a pull-up, pull-down resistors and power rails.
 
-**Output names**: OUT
+### Pins
 
-**Optional parameters**
+#### Input names:
 
-- `hi`: If provided state well be 1, 0 otherwise
-- `strong`: If provided output is power rail, Pull up/down otherwise
+- none
+
+#### Output names:
+
+- `OUT`- output.
+
+### Parameters
+
+#### Mandatory parameters:
+
+- none
+
+#### Optional parameters:
+
+- `hi`- Hi state, Lo otherwise.
+- `strong`- power rail, Pull up/down otherwise.
+
+### Example
+
+Power rail: `hi;strong`

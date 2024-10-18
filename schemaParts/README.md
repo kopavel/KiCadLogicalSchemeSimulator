@@ -17,9 +17,9 @@ Some interactive parts has additional interfaces/functionality if you click on i
 * [JkTrigger](jkTrigger/README.md) — JK trigger.
 * [Led](led/README.md) — LED indicator.
 * [MaskedMultiplexer]( multiplexer/MaskedMultiplexer.md) — Multiplexer with a defined amount outputs and ways with masking inputs.
-* [Multiplexer](multiplexer/README.md) — Multiplexer with a defined amount outputs and ways.
 * [MultiOutDecoder](decoder/MultiOutDecoder.md) — Decoder with multiple output pin groups.
 * [MultiPartConter](counter/MultiPartCounter.md) — Multipart binary counter.
+* [Multiplexer](multiplexer/README.md) — Multiplexer with a defined amount outputs and ways.
 * [OrGate](or/README.md) — Logical OR gate.
 * [Oscillator](oscillator/README.md) — Oscillator with various modes of operation and oscilloscope.
 * [Power](power/README.md) — Static output, useful for a pull-up/pull-down resistors.
@@ -27,12 +27,13 @@ Some interactive parts has additional interfaces/functionality if you click on i
 * [RingCounter](ringCounter/README.md) — Ring counter.
 * [Rom](rom/README.md) — ROM.
 * [SdRam](sdram/README.md) — Dynamic RAM.
-* [SingleBitSdRam](sdram/SingleBitSdRam.md) — Single bit Dynamic RAM.
-* [SingleBitBuffer](buffer/SingleBitBuffer.md) — Single bit Buffer or Latch.
-* [SingleOutShifter](shifter/SingleOutShifter.md) — Bit shifter with single bit output.
 * [Shifter](shifter/README.md) — Bit shifter.
-* [Switch](switch/README.md) — Interactive “normally opened” switch.
+* [SingleBitBuffer](buffer/SingleBitBuffer.md) — Single bit Buffer or Latch.
+* [SingleBitRam](ram/SingleBitRam.md) — Single bit Dynamic RAM.
+* [SingleBitSdRam](sdram/SingleBitSdRam.md) — Single bit Dynamic RAM.
+* [SingleOutShifter](shifter/SingleOutShifter.md) — Bit shifter with single bit output.
 * [StateMachine](stateMachine/README.md) — Logical state machine.
+* [Switch](switch/README.md) — Interactive “normally opened” switch.
 * [XorGate](xor/README.md) — Logical XOR gate.
 * [Z80Cpu](z80/README.md) — Zilog Z80 CPU pin and timing level functionality.
 
