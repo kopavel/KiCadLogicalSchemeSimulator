@@ -1,21 +1,36 @@
 ## ROM
 
-Implements a ROM with a defined number of address inputs and data outputs.
+ROM with a defined amount of address inputs and data outputs.
 
-**Input names**:
+### Pins
 
-- Ax, where x is a sequential number, starting from 0
-- CS (Chip Select)
+#### Input names:
 
-**Output names**: Dx, where x is a sequential number, starting from 0
+- `Ax`
+  x - sequential number in range [0…aSize-1].
+- `CS`- Chip Select.
 
-**Mandatory parameters**:
+#### Output names:
 
-- `size`: Specifies the number of output/data pins.
-- `aSize`: Specifies the number of address pins.
-- `file`: Specifies the path to the file (absolute or relative to the working folder) from which ROM content is populated.
+- `Dx`- data outputs.
+  x - sequential number in range [2…size-1].
 
-**Optional parameter `reverse`**: If provided, the input CS is reversed, allowing for different configuration styles.
+### Parameters
 
-The file content is taken on a byte-by-byte basis if `size` is less than or equal to 8. For `size` greater than 8, the content is read in BigEndian order.
-For example, to describe a 4Kb 8-bit ROM, populated from the file `bios.bin`, you would provide the following parameters: `size=8;aSize=12;file=bios.bin`.
+#### Mandatory parameters:
+
+- `size`- amount of data pins in range [2…64].
+- `aSize`- amount of address pins in range [1…32].
+- `file`- path to the file, from which ROM content populated.
+  Absolute or relative to working folder.
+  The file content taken on a 'byte-by-byte' basis if size less than or equal to 8.  
+  For size, greater than 8, the content is read in BigEndian order.
+
+#### Optional parameters:
+
+- `reverse`- input `CS` reversed.
+
+### Example
+
+4Kb 8-bit ROM, populated from the file `bios.bin`:  
+`size=8;aSize=12;file=bios.bin`
