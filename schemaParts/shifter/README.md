@@ -1,32 +1,45 @@
 ## Shifter
 
-Implements a bit shifter.
+Bit shifter.
 
-**Input names**:
+### Pins
 
-- `Dx`- parallel load input, where x a sequential number, starting from 0.
-- `CP` - clock input. Shift bits to High side on Rising edge, if DS is `Hi`, set first bit to `Hi`.
-- `CN` - clock input. Shift bits to Lo side on Rising edge, if DS is `Hi`, set the highest bit to `Hi`.
-- `CO` - clock inhibit. If active — clock inputs ignored.
-- `PL` - parallel load. If active — on clock input rising edge load `Dx` inputs.
+#### Input names:
+
+- `Dx`- parallel load input  
+  x - sequential number in range of [0…size-1].
+- `CP` - Positive shift clock input.  
+  Shift bits to High side on Rising edge. If `DS` Hi, set first bit to Hi.
+- `CN` - Negative shift clock input.   
+  Shift bits to Lo side on Rising edge. If `DS` Hi, set the highest bit to Hi.
+- `CO` - clock inhibit.  
+  If active (Hi)— clock inputs ignored.
+- `PL` - parallel load.  
+  If active (Hi)— on clock input rising edge load `Dx` inputs.
 - `DS` - serial load input.
-- `R` - shifter reset. If active — clock inputs ignored.
+- `R` - shifter reset.
+  If active (Hi) — clock inputs ignored.
 
-**Output names**:
+#### Output names:
 
-- `Qx` - shifter outputs, where x a sequential number, starting from 0.
+- `Qx`- outputs
+  x - sequential number in range of [0…size-1].
 
-**Mandatory parameters:**
+### Parameters
 
-- `size`: specifies size of shifter in bits.
+#### Mandatory parameters:
 
-**Optional parameters:**
+- `size`- size of shifter in rage of [2…64].
 
-- `reverse`: if provided, the clock inputs reversed.
-- `plReverse`: if provided, the `PL` input reversed.
-- `clearReverse`: if provided, the `R` input reversed.
-- `inhibitReverse`: if provided, the `CI` input reversed.
+#### Optional parameters:
 
-**Example**  
-8-bit shifter with <span style="text-decoration: overline;">CP</span> : `size=8;reverse`.
+- `reverse`- clock inputs sensible to falling edge.
+- `plReverse`- `PL` input reversed.
+- `clearReverse`- `R` input reversed.
+- `inhibitReverse`- `CI` input reversed.
+
+### Example
+
+An 8-bit shifter with `CP`, sensible to falling edge:  
+`size=8;reverse`.
 
