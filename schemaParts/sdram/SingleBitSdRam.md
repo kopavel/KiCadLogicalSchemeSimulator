@@ -1,19 +1,34 @@
-## SDRAM
+## SingleBitSdRam
 
-Dynamic RAM with a defined amount of address inputs and single data output.
+Dynamic RAM with a defined amount of address inputs and single data input/output.
 
-**Input names**:
+### Pins
 
-- `Ax`, where x is a sequential number, starting from 0
-- `RAS` (Row Address Strobe)
-- `CAS` (Column Address Strobe)
-- `WE` (Write Enable)
-- `Din` Data input
+#### Input names:
 
-**Output name**: `Dout` Data output
+- `Ax`- Address inputs.  
+  x - sequential number in range [0…size-1]
+- `Din`- Data input.
+- `RAS`- Row Address Strobe.  
+  raising front sensitive.
+- `CAS`- Column Address Strobe.  
+  raising front sensitive.
+- `WE`- Write Enable.
 
-**Mandatory parameter**: `size`: Specifies the number of address pins.
+#### Output names:
 
-**Optional parameter `reverse`**: If provided, the inputs RAS, CAS, and WE are reversed, allowing for different configuration styles.
+- `Dout`- Data output.
 
-For describe a 4096x1 bit SDRAM, you would provide the following parameters: `size=6`.
+### Parameters
+
+#### Mandatory parameters:
+
+- `size`- amount of address pins.
+
+#### Optional parameters:
+
+- `reverse`- inputs `RAS`, `CAS` and `WE` reversed.
+
+### Example
+
+4Kb single bit SD-RAM: `size=6`.

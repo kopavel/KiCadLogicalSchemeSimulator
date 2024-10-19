@@ -1,22 +1,38 @@
 ## SDRAM
 
-Implements dynamic RAM with a defined number of address inputs and data outputs.
+Dynamic RAM with a defined amount of address inputs and data inputs/outputs.
 
-**Input names**:
+### Pins
 
-- Ax, where x is a sequential number, starting from 0
-- RAS (Row Address Strobe)
-- CAS (Column Address Strobe)
-- WE (Write Enable)
+#### Input names:
 
-**Output names**: Dx, where x is a sequential number, starting from 0
+- `Ax`- Address inputs.  
+  x - sequential number in range [0…aSize-1]
+- `Dx`- Data inputs.  
+  x - sequential number in range [0…size-1]
+- `RAS`- Row Address Strobe.  
+  raising front sensitive.
+- `CAS`- Column Address Strobe.  
+  raising front sensitive.
+- `WE`- Write Enable.
 
-**Mandatory parameters**:
+#### Output names:
 
-- `size`: Specifies the number of output/data pins.
-- `aSize`: Specifies the number of address pins.
-- `separateOut`: If specified — D bus inputs are separated from Outputs and named Din[x], where x is a sequential number, starting from 0.
+- `Dx`- Data outputs.  
+  x - sequential number in range [0…size-1]
 
-**Optional parameter `reverse`**: If provided, the inputs RAS, CAS, and WE are reversed, allowing for different configuration styles.
+### Parameters
 
-For example, to describe a 4Kb 8-bit SDRAM, you would provide the following parameters: `size=8;aSize=12`.
+#### Mandatory parameters:
+
+- `size`- amount of data pins.
+- `aSize`- amount of address pins.
+- `separateOut`- `D` inputs separated from outputs and named `Dinx`, where x - sequential number in range [0…size-1].
+
+#### Optional parameters:
+
+- `reverse`- inputs `RAS`, `CAS` and `WE` reversed.
+
+### Example
+
+4Kb 8-bit SD-RAM: `size=8;aSize=6`.
