@@ -40,10 +40,10 @@ public class StateMachine extends SchemaPart {
     private final long[] states;
     private final InBus in;
     private final InPin dPin;
-    private final InPin sPin;
     private final long mask;
+    private InPin cPin;
     private Bus out;
-    private int latch;
+    private long outState;
     private long outMask;
 
     public StateMachine(String id, String sParam) {
@@ -97,26 +97,10 @@ public class StateMachine extends SchemaPart {
             @Override
             public void setLo() {
                 state = false;
-                long newOutState = (states[latch]) ^ outMask;
+                long newOutState = (outState) ^ outMask;
                 if (out.state != newOutState) {
                     out.setState(newOutState);
                 }
-            }
-        });
-        sPin = addInPin(new InPin("S", this) {
-            @Override
-            public void setHi() {
-                state = true;
-                latch = (int) in.state;
-                long newOutState = (dPin.state ? 0 : states[latch]) ^ outMask;
-                if (out.state != newOutState) {
-                    out.setState(newOutState);
-                }
-            }
-
-            @Override
-            public void setLo() {
-                state = false;
             }
         });
         addInPin(new InPin("R", this) {
@@ -125,7 +109,7 @@ public class StateMachine extends SchemaPart {
                 state = true;
                 {
                     outMask = mask;
-                    long newOutState = (dPin.state ? 0 : states[latch]) ^ outMask;
+                    long newOutState = (dPin.state ? 0 : outState) ^ outMask;
                     if (out.state != newOutState) {
                         out.setState(newOutState);
                     }
@@ -136,7 +120,7 @@ public class StateMachine extends SchemaPart {
             public void setLo() {
                 state = false;
                 outMask = 0;
-                long newOutState = (dPin.state ? 0 : states[latch]) ^ outMask;
+                long newOutState = (dPin.state ? 0 : outState) ^ outMask;
                 if (out.state != newOutState) {
                     out.setState(newOutState);
                 }
@@ -144,14 +128,30 @@ public class StateMachine extends SchemaPart {
         });
         if (params.containsKey("latch")) {
             in = addInBus("IN", inSize);
+            cPin = addInPin(new InPin("C", this) {
+                @Override
+                public void setHi() {
+                    state = true;
+                    outState = states[(int) in.state];
+                    long newOutState = (dPin.state ? 0 : outState) ^ outMask;
+                    if (out.state != newOutState) {
+                        out.setState(newOutState);
+                    }
+                }
+
+                @Override
+                public void setLo() {
+                    state = false;
+                }
+            });
         } else {
             in = addInBus(new InBus("IN", this, inSize) {
                 @Override
                 public void setState(long newState) {
                     state = newState;
-                    if (sPin.state) {
-                        latch = (int) newState;
-                        long newOutState = (dPin.state ? 0 : states[latch]) ^ outMask;
+                    if (cPin.state) {
+                        outState = states[(int) newState];
+                        long newOutState = (dPin.state ? 0 : outState) ^ outMask;
                         if (out.state != newOutState) {
                             out.setState(newOutState);
                         }

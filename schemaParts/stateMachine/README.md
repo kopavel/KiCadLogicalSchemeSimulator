@@ -1,22 +1,35 @@
 ## State machine
 
-Implements logical state machine functionality.
+Logical state machine.
 
-**Input names**:
+### Pins
 
-- `INx` - inputs, where x a sequential number, starting from 0
-- `S` - strobe. When `Hi`, inputs stored to internal latch.
-- `R` - reverse. When `Hi`, output in reversed state.
-- `D` - disabled. When `Hi`, all outputs state is Lo (Hi, if R active).
+#### Input names:
 
-**Output names**: OUT
+- `INx`- Inputs.  
+  x - sequential number in ranfe of [0…size-1].
+- `C`- Clock.   
+  only in `latch` mode.   
+  on raising edge, inputs stored to internal latch.
+- `R`- reverse.   
+  On active output in reversed state.
+- `D`- disabled.  
+  On active all outputs is `Lo` (`Hi`, if R active).
 
-**Mandatory parameters**:
+#### Output names:
 
-- `size` - specifies input pins amount.
-- `outSize` - specifies output pins amount.
-- `latch` - if presented latch IN only with S front, apply IN change immediately otherwise.
-- `states` - coma separated list of output states for each input combination.
+- `OUT`- Outputs.
 
-Following parameters, as example, create XOR gate, : `size=2;outSize=1;states=1,0,0,1`.
+### Parameters
+
+#### Mandatory parameters:
+
+- `size`- amount of input pins.
+- `outSize`- amount of output pins.
+- `latch`- latch mode. `In` state only applied at `C` raising edge.
+- `states`- coma separated list of output states for each input combination.
+
+### Example
+
+XOR gate: `size=2;outSize=1;states=1,0,0,1`.
 
