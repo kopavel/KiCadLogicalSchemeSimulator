@@ -9,7 +9,7 @@ Matrix of key using host keyboard.
 - `In[x]`- Row inputs.  
   x - number in range [0…7].
 - `En`- Output enabled.  
-  `Lo` put outputs to Hi-Impedance
+  `Low` put outputs to Hi-Impedance
 
 #### Output names:
 

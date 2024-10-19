@@ -11,7 +11,7 @@ Bit shifter with single bit output.
 - `CP` - Positive shift clock input.  
   Shift bits to High side on Rising edge. If `DS` Hi, set first bit to Hi.
 - `CN` - Negative shift clock input.   
-  Shift bits to Lo side on Rising edge. If `DS` Hi, set the highest bit to Hi.
+  Shift bits to Low side on Rising edge. If `DS` Hi, set the highest bit to Hi.
 - `CO` - clock inhibit.  
   If active (Hi)— clock inputs ignored.
 - `PL` - parallel load.  

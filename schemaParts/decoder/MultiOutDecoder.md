@@ -26,7 +26,7 @@ Implements a binary decoder with multiple output pin groups.
 - `cs`- CS pins  
   is a comma-separated list like `<part>,<part>`,
     - `<part>`- a colon-separated list like `N:R:R`.
-        - `R`- reverse mode - `Lo` active
+        - `R`- reverse mode - `Low` active
         - `N`- normal mode - `Hi` active
 
 #### Optional parameters:

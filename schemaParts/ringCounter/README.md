@@ -28,7 +28,7 @@ Implements a Ring counter with a defined amount of outputs.
 
 #### Optional parameters:
 
-- `reverse` - `C` input sensitive to the falling edge and `R` active at `Lo`.
+- `reverse` - `C` input sensitive to the falling edge and `R` active at `Low`.
 
 ### Example
 

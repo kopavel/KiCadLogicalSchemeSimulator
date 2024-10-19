@@ -21,7 +21,7 @@ Used for a pull-up, pull-down resistors and power rails.
 
 #### Optional parameters:
 
-- `hi`- Hi state, Lo otherwise.
+- `hi`- Hi state, Low otherwise.
 - `strong`- power rail, Pull up/down otherwise.
 
 ### Example

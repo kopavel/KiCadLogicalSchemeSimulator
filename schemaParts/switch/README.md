@@ -1,9 +1,14 @@
 ## Switch
 
-Implements interactive “normally opened” switch.
+Interactive initially opened toggle switch.
 
-**Pin names**:
+### Pins
 
-- `INx` - inputs, where x a sequential number in range [1-2].
+- `IN1`,`IN2`- switch pins
+
+### Parameters
+
+- none
+
 
 

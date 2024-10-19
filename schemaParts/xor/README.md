@@ -1,11 +1,26 @@
-## XOR gate
+## Logical XOR gate
 
-Implements logical XOR gate functionality.
+### Pins
 
-**Input names**: IN0, IN1  
-**Output names**: OUT
+#### Input names:
 
-**Optional parameter `reverse`:** if provided, the output is reversed, resulting in a NXOR gate.
+- `IN0`, `IN1`- gate inputs.
 
-For example, to create a NXOR gate, you would provide the following parameter: `reverse`.
+#### Output names:
+
+- `OUT`- Output
+
+### Parameters
+
+#### Mandatory parameters:
+
+- none
+
+#### Optional parameters:
+
+-`reverse`- output reversed, resulting in a NXOR gate.
+
+### Example
+
+NXOR gate: `reverse`.
 

@@ -14,7 +14,7 @@ Logical state machine.
 - `R`- reverse.   
   On active output in reversed state.
 - `D`- disabled.  
-  On active all outputs is `Lo` (`Hi`, if R active).
+  On active all outputs is `Low` (`Hi`, if R active).
 
 #### Output names:
 

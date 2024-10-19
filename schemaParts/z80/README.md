@@ -2,34 +2,55 @@
 
 Implement Zilog Z80 CPU pin and timing level functionality.
 
-**Input names**:
+### Pins
 
-- CLK
-- ~{RESET}
-- ~{NMI}
-- ~{INT}
-- ~{WAIT}
-- ~{BUSRQ}
+#### Input names:
 
-**Output names**:
+- `Dx`- Data Bus.  
+  x - sequential number in range of [0…7].
+- `CLK`- Clock.
+- `~{RESET}`- Reset input.  
+  Active at 'Low'
+- `~{NMI}`- Non-maskable interrupt.  
+  Sensible to falling edge.
+- `~{INT}` - Maskable interrupt.  
+  Active at 'Low'.  
+  Not implemented yet.
+- `~{WAIT}` - Wait.  
+  Active at 'Low'
+- `~{BUSRQ}`- Bus Request.  
+  Active at 'Low'.  
+  Not implemented yet.
 
-- Ax, where x is numbered in [0-15] range
-- ~{RD}
-- ~{WR}
-- ~{MREQ}
-- ~{IORQ}
-- ~{BUSACK}
-- ~{M1}
-- ~{RFSH}
-- ~{HALT}
+#### Output names:
 
-**Bidirectional names**:
+- `Dx`- Data Bus.  
+  x - sequential number in range of [0…7].
+- `Ax`- Address Bus.  
+  x - sequential number in range of [0…15].
+- `~{RD}`- Read request.  
+  Active at 'Low'.
+- `~{WR}`- Write request.  
+  Active at 'Low'.
+- `~{MREQ}`- Memory request.  
+  Active at 'Low'.
+- `~{IORQ}`- Input/Output port request.  
+  Active at 'Low'.
+- `~{BUSACK}`- Bus Acknowledge output.  
+  Active at 'Low'.
+  Not implemented yet.
+- `~{M1}`- Machine Cycle One.  
+  Active at 'Low'.
+- `~{RFSH}`- Refresh.  
+  Active at 'Low'.
+- `~{HALT}`- HALT State.  
+  Active at 'Low'.
 
-- Dx, where x is numbered in [0-7] range
+### Parameters
 
-The Schema part doesn't have any additional parameters.
+- none
 
-<hr>
+### Description
 
 This component serves as a pin-level wrapper that emulates the behavior of the Z80 processor at the hardware level.  
 It is based on [fork](https://github.com/kopavel/Z80Processor) from [Z80Processor](https://github.com/codesqueak/Z80Processor) project for the CPU core emulation.
@@ -38,8 +59,10 @@ The emulation accurately represents the timing diagram of the Z80 processor, wit
 
 - M1 always has 4 T states (plus any additional wait states).
 - Later M states have 3 T states each (plus any additional wait states).
-- IO reads have 3 T states and, as per Z80 specification, one extra Mw state, resulting in a total of 4 states (plus any additional wait states).
+- IO reads have 3 T states and, as per Z80 specification, one extra Mw state, resulting in
+  a total of 4 states (plus any additional wait states).
 
-Certain functionalities such as NMI, BUSRQ, BUSACK, and refresh activity are currently absent but are planned for future implementation.
-Z80Processor contains information about the real T state amount per OPCODE, allowing for precise execution in terms of T states, although this feature is yet to be
+Certain functionalities, such as INT, BUSRQ, BUSACK, and refresh activity absent, but planned for future implementation.
+Z80Processor project contains information about the real T state amount per OP-CODE, allowing for precise execution in terms of T states, although this feature is
+yet to be
 implemented.

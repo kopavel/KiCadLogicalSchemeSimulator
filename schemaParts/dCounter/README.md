@@ -10,8 +10,8 @@ Implements a binary/decimal up/down counter with `PE`, `Carry in`, `Carry out` p
   sensible to raising edge.
 - `PE`- Preset enabled.
 - `CI`- Carry in.
-- `BD`- Binary (Hi)/Decimal (Lo).
-- `UD`- Up (Hi) /Down (Lo) direction.
+- `BD`- Binary (Hi)/Decimal (Low).
+- `UD`- Up (Hi) /Down (Low) direction.
 - `J`- Jam inputs.
 - `R`- Reset.
 - `E`- Clock enable.

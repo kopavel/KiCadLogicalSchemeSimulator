@@ -124,6 +124,7 @@ public class Z80Cpu extends SchemaPart {
                                 rdPin.setHi();
                                 mReqPin.setHi();
                                 m1Pin.setHi();
+                                //FixMe create refresh address counter and set address from it.
                                 refreshPin.setLo();
                             }
                         }

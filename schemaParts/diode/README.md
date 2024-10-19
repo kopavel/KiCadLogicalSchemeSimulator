@@ -7,4 +7,7 @@ Implements diode.
 - `A`- Anode
 - `K`- Cathode
 
+### Parameters
+
+- none
 

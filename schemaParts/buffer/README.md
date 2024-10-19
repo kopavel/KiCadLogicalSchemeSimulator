@@ -9,14 +9,14 @@
 - `CS`- Chip select.   
   Only in buffer mode.
   - `Hi`- transfers input bus state to output bus.
-  - `Lo`- output bus go to “High impedance” mode.
+  - `Low`- output bus go to “High impedance” mode.
 - `WR`- Write.  
   Only in latch mode.
   - On falling edge data from input bus stored internally in the latch.
 - `OE`- Output enable.  
   Only in latch mode.
   - `Hi`- transfers latch state to output bus.
-  - `Lo`- output bus go to “High impedance” mode.
+  - `Low`- output bus go to “High impedance” mode.
 
 #### Output names:
 
@@ -36,4 +36,4 @@
 
 ### Example
 
-8 bit width latch with `OE` active on `Lo` and `WR` sensitive to falling edge: `size=8;latch;reverse`.
+8 bit width latch with `OE` active on `Low` and `WR` sensitive to falling edge: `size=8;latch;reverse`.

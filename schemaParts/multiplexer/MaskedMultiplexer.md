@@ -12,10 +12,10 @@ Multiplexer with a defined amount of outputs and ways. Has a multiple OE pint pe
 - `Nx`- way selection inputs.  
   x - sequential number in range [0…((2^nSize-1)-1)].
 - `OE`- outputs enabled.
-  `Lo` — all outputa in Hi-Impedance.
+  `Low` — all outputs in Hi-Impedance.
 - `OEw`- way output enabled.
   w - way ID in range [a…ASCII(`a`+((2^nSize-1)-1))].
-  `Lo` — way output in Hi-Impedance.
+  `Low` — way output in Hi-Impedance.
 
 #### Output names:
 
