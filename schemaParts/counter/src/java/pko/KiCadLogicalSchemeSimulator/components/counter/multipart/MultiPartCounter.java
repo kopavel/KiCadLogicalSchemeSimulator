@@ -29,7 +29,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.components.counter;
+package pko.KiCadLogicalSchemeSimulator.components.counter.multipart;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
@@ -73,7 +73,11 @@ public class MultiPartCounter extends SchemaPart {
                 addOutBus("Q" + (char) ('a' + i), sizes[i]);
             }
             int max = Integer.parseInt((skip.length - 1 < i || skip[i].isBlank()) ? "0" : skip[i]);
-            cIns[i] = addInPin(new MultiPartCIn("C" + (char) ('a' + i), this, reverse, sizes[i], i, max));
+            if (reverse) {
+                cIns[i] = addInPin(new MultiPartCFallingIn("C" + (char) ('a' + i), this, sizes[i], i, max));
+            } else {
+                cIns[i] = addInPin(new MultiPartCRaisingIn("C" + (char) ('a' + i), this, sizes[i], i, max));
+            }
         }
         for (int i = 0; i < resetAmount; i++) {
             rIns.put("R" + i, addInPin(new MultiPartRIn("R" + i, this, params.containsKey("resetReverse"), i)));
@@ -85,11 +89,11 @@ public class MultiPartCounter extends SchemaPart {
         for (int i = 0; i < sizes.length; i++) {
             if (sizes[i] == 1) {
                 outPins[i] = getOutPin("Q" + (char) ('a' + i));
-                cIns[i].outPin = outPins[i];
+                cIns[i].setOut(outPins[i]);
             } else {
                 outBuses[i] = getOutBus("Q" + (char) ('a' + i));
                 outBuses[i].useBitPresentation = true;
-                cIns[i].outBus = outBuses[i];
+                cIns[i].setOut(outBuses[i]);
             }
         }
         rIns.values().forEach(pin -> {

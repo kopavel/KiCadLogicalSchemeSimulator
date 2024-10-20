@@ -29,11 +29,18 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+package pko.KiCadLogicalSchemeSimulator.components.counter.multipart;
+import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
-import pko.KiCadLogicalSchemeSimulator.components.counter.CounterSpi;
-import pko.KiCadLogicalSchemeSimulator.components.counter.multipart.MultiPartCounterSpi;
 
-open module KiCadLogicalSchemeSimulator.components.counter {
-    requires KiCadLogicalSchemeSimulator.simulator;
-    provides SchemaPartSpi with CounterSpi, MultiPartCounterSpi;
+public class MultiPartCounterSpi implements SchemaPartSpi {
+    @Override
+    public SchemaPart getSchemaPart(String id, String params) {
+        return new MultiPartCounter(id, params);
+    }
+
+    @Override
+    public Class<? extends SchemaPart> getSchemaPartClass() {
+        return MultiPartCounter.class;
+    }
 }

@@ -29,16 +29,16 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.components.counter;
+package pko.KiCadLogicalSchemeSimulator.components.counter.multipart;
 import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.RaisingEdgePin;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
-public class MultiPartCIn extends InPin {
-    public final boolean reverse;
+public class MultiPartCRaisingIn extends RaisingEdgePin implements MultiPartCIn {
     public final long countMask;
     public final int partNo;
     public final MultiPartCounter parent;
@@ -47,7 +47,7 @@ public class MultiPartCIn extends InPin {
     public Bus outBus;
     public Pin outPin;
 
-    public MultiPartCIn(String id, MultiPartCounter parent, boolean reverse, int size, int partNo, int skipMask) {
+    public MultiPartCRaisingIn(String id, MultiPartCounter parent, int size, int partNo, int skipMask) {
         super(id, parent);
         this.parent = parent;
         this.size = size;
@@ -57,16 +57,14 @@ public class MultiPartCIn extends InPin {
         } else {
             outBus = parent.getOutBus("Q" + (char) ('a' + partNo));
         }
-        this.reverse = reverse;
         this.countMask = Utils.getMaskForSize(size);
         this.partNo = partNo;
     }
 
     @SuppressWarnings("unused")
     /*Optimiser constructor*///
-    public MultiPartCIn(MultiPartCIn oldPin, String variantId) {
+    public MultiPartCRaisingIn(MultiPartCRaisingIn oldPin, String variantId) {
         super(oldPin, variantId);
-        reverse = oldPin.reverse;
         countMask = oldPin.countMask;
         outBus = oldPin.outBus;
         partNo = oldPin.partNo;
@@ -79,13 +77,9 @@ public class MultiPartCIn extends InPin {
     public void setHi() {
         /*Optimiser line setter*/
         state = true;
-        /*Optimiser block nr block hasR*///
-        if (
-            /*Optimiser line o*///
-                !reverse &&//
-                        parent.resetState != 0//
-        ) {
-            /*Optimiser line o blockEnd hasR*/
+        /*Optimiser line hasR*/
+        if (parent.resetState != 0) {
+            /*Optimiser line o*/
             if (size == 1) {
                 /*Optimiser line pin*/
                 if (outPin.state) {
@@ -95,52 +89,25 @@ public class MultiPartCIn extends InPin {
                 }
                 /*Optimiser line o*/
             } else if (skipMask != 0) {
-                /*Optimiser line skip bind skip:skipMask*///
+                /*Optimiser line skip bind skip:skipMask*/
                 outBus.setState(outBus.state + (((outBus.state & skipMask) == skipMask) ? 2 : 1));
                 /*Optimiser line o*/
             } else {
-                /*Optimiser line bus bind countMask*///
+                /*Optimiser line bus bind countMask*/
                 outBus.setState((outBus.state + 1) & countMask);
                 /*Optimiser line o*/
             }
             /*Optimiser line nasR*/
         }
-        /*Optimiser blockEnd nr*/
     }
 
     @Override
     public void setLo() {
         /*Optimiser line setter*/
         state = false;
-        /*Optimiser block r block hasR*/
-        if (
-            /*Optimiser line o*///
-                reverse &&//
-                        parent.resetState != 0//
-        ) {
-            /*Optimiser line o blockEnd hasR*/
-            if (size == 1) {
-                /*Optimiser block pin*/
-                if (outPin.state) {
-                    outPin.setLo();
-                } else {
-                    outPin.setHi();
-                }
-                /*Optimiser line o blockEnd pin*/
-            } else if (skipMask != 0) {
-                /*Optimiser line skip bind skip:skipMask*///
-                outBus.setState(outBus.state + (((outBus.state & skipMask) == skipMask) ? 2 : 1));
-                /*Optimiser line o*/
-            } else {
-                /*Optimiser line bus bind countMask*///
-                outBus.setState((outBus.state + 1) & countMask);
-                /*Optimiser line o*/
-            }
-            /*Optimiser line hasR*/
-        }
-        /*Optimiser blockEnd r*/
     }
 
+    @Override
     public void reset() {
         if (size == 1) {
             outPin.setLo();
@@ -151,12 +118,7 @@ public class MultiPartCIn extends InPin {
 
     @Override
     public InPin getOptimised(ModelItem<?> source) {
-        ClassOptimiser<MultiPartCIn> optimiser = new ClassOptimiser<>(this).cut("o");
-        if (reverse) {
-            optimiser.cut("nr");
-        } else {
-            optimiser.cut("r");
-        }
+        ClassOptimiser<MultiPartCRaisingIn> optimiser = new ClassOptimiser<>(this).cut("o");
         if (size == 1) {
             optimiser.cut("bus").cut("skip");
         } else if (skipMask != 0) {
@@ -172,12 +134,22 @@ public class MultiPartCIn extends InPin {
         if (source != null) {
             optimiser.cut("setter");
         }
-        MultiPartCIn build = optimiser.build();
+        MultiPartCRaisingIn build = optimiser.build();
         parent.cIns[partNo] = build;
         parent.inPins.put(id, build);
         for (MultiPartRIn rPin : parent.rIns.values()) {
             rPin.cIns[partNo] = build;
         }
         return build;
+    }
+
+    @Override
+    public void setOut(Pin outPin) {
+        this.outPin = outPin;
+    }
+
+    @Override
+    public void setOut(Bus outBus) {
+        this.outBus = outBus;
     }
 }
