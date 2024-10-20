@@ -55,6 +55,7 @@ public class WireMerger extends OutPin {
         variantId = destination.variantId == null ? "" : destination.variantId + ":";
         variantId += "merger";
         destinations = new Pin[]{destination};
+        split();
         strong = false;
         hiImpedance = true;
         if (destination instanceof PassivePin passivePin) {

@@ -50,9 +50,9 @@ public class ClassOptimiser<T> {
     private final Map<String, String> binds = new HashMap<>();
     private final T oldInstance;
     private final Class<?> sourceClass;
+    private final Map<String, UnrollDescriptor> unrolls = new HashMap<>();
     private String suffix = "";
     private List<String> source;
-    private int unrollSize;
     private boolean noAssert = true;
 
     public ClassOptimiser(T oldInstance) {
@@ -67,15 +67,21 @@ public class ClassOptimiser<T> {
     }
 
     public ClassOptimiser<T> unroll(int size) {
-        unrollSize = size;
-        suffix += "_unroll" + size;
+        unrolls.put("d", new UnrollDescriptor(size));
+        suffix += "_ud" + size;
+        return this;
+    }
+
+    public ClassOptimiser<T> unroll(String id, int size) {
+        unrolls.put(id, new UnrollDescriptor(size));
+        suffix += "_u" + id + size;
         return this;
     }
 
     @SuppressWarnings("UnusedReturnValue")
     public ClassOptimiser<T> cut(String cutName) {
         cutList.add(cutName);
-        suffix += "_cut_" + cutName;
+        suffix += "_c_" + cutName;
         return this;
     }
 
@@ -157,8 +163,8 @@ public class ClassOptimiser<T> {
         Set<String> blocks = new HashSet<>();
         Set<String> cutLines = new HashSet<>();
         Map<String, String> bindPatterns = new HashMap<>();
-        String iteratorPattern = null;
-        String[] iteratorParams = null;
+        Map<String, String> iteratorPattern = new HashMap<>();
+        String iteratorId = "d";
         boolean preserveFunction = false;
         boolean inAsserts = false;
         boolean inComment = false;
@@ -232,15 +238,20 @@ public class ClassOptimiser<T> {
                                     line = lines.previous();
                                 }
                                 case "unroll" -> {
-                                    iteratorParams = params[i++].split(":");
+                                    String[] iteratorParams = params[i++].split(":");
                                     if (iteratorParams.length == 0) {
                                         throw new RuntimeException("No iterator params specified in class " + sourceClass);
                                     }
+                                    String id = (iteratorParams.length == 3) ? iteratorParams[2] : "d";
                                     String iteratorItemType = getField(sourceClass, iteratorParams[1]).getType().getComponentType().getSimpleName();
-                                    iteratorPattern = "for (" + iteratorItemType + " " + iteratorParams[0] + " : " + iteratorParams[1] + ") {";
+                                    iteratorPattern.put(id, "for (" + iteratorItemType + " " + iteratorParams[0] + " : " + iteratorParams[1] + ") {");
                                     String lineTab = " ".repeat(lineOffset);
                                     String blockTab = " ".repeat(functionOffset);
-                                    for (int j = 0; j < unrollSize; j++) {
+                                    if (!unrolls.containsKey(id)) {
+                                        throw new RuntimeException("iterator " + id + " unroll size not specified");
+                                    }
+                                    unrolls.get(id).variable = iteratorParams[0];
+                                    for (int j = 0; j < unrolls.get(id).size; j++) {
                                         //add destination variables initialisation
                                         functionSource.append(lineTab)
                                                       .append(iteratorParams[0])
@@ -311,6 +322,7 @@ public class ClassOptimiser<T> {
                         }
                         preserveFunction = false;
                     } else {
+                        String finalLine = line;
                         //cut lines
                         if (cutLines.stream()
                                 .anyMatch(cutList::contains)) {
@@ -319,16 +331,23 @@ public class ClassOptimiser<T> {
                         } else if (blocks.stream()
                                 .anyMatch(cutList::contains)) {
                             preserveFunction = true;
-                        } else if (iteratorPattern != null && line.contains(iteratorPattern)) {
+                        } else if (iteratorPattern.entrySet()
+                                .stream()
+                                .anyMatch(e -> finalLine.contains(e.getValue()))) {
                             //find iterator body — skip iterator definition
+                            iteratorId = iteratorPattern.entrySet()
+                                    .stream()
+                                    .filter(e -> finalLine.contains(e.getValue()))
+                                    .map(Map.Entry::getKey).findFirst().orElseThrow();
                             iteratorOffset = lineOffset;
                             preserveFunction = true;
                             iteratorSource = new StringBuilder();
                         } else if (lineOffset == iteratorOffset && !functionSource.isEmpty()) {
                             //iterator block end — unroll it
-                            for (int j = 0; j < unrollSize; j++) {
-                                //noinspection DataFlowIssue
-                                functionSource.append(iteratorSource.toString().replaceAll("(?<=\\W|^)" + iteratorParams[0] + "(?=\\W|$)", iteratorParams[0] + j));
+                            UnrollDescriptor descriptor = unrolls.get(iteratorId);
+                            for (int j = 0; j < descriptor.size; j++) {
+                                functionSource.append(iteratorSource.toString()
+                                                                    .replaceAll("(?<=\\W|^)" + descriptor.variable + "(?=\\W|$)", descriptor.variable + j));
                             }
                             iteratorOffset = -1;
                         } else {
@@ -347,9 +366,6 @@ public class ClassOptimiser<T> {
                             if (iteratorOffset > -1) {
                                 if (lineOffset > iteratorOffset) {
                                     //inside iterator block — accumulate whole block
-                                    if (unrollSize == 0) {
-                                        throw new RuntimeException("iterator size not provided");
-                                    }
                                     iteratorSource.append(line).append("\n");
                                 }
                             } else {
@@ -391,5 +407,14 @@ public class ClassOptimiser<T> {
             }
         }
         throw new NoSuchFieldException("Field '" + fieldName + "' not found in class hierarchy.");
+    }
+
+    private static class UnrollDescriptor {
+        public int size;
+        public String variable;
+
+        public UnrollDescriptor(int size) {
+            this.size = size;
+        }
     }
 }

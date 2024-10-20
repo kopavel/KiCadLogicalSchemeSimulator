@@ -149,4 +149,10 @@ public class Utils {
         }
         return true;
     }
+
+    public static void getOptimised(ModelItem<?>[] array, ModelItem<?> source) {
+        for (int i = 0; i < array.length; i++) {
+            array[i] = array[i].getOptimised(source);
+        }
+    }
 }

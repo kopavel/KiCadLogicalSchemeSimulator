@@ -40,6 +40,9 @@ import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 public class OutPin extends Pin {
     public Pin[] destinations = new Pin[0];
+    public Pin[] toImp = new Pin[0];
+    public Pin[] toLow = new Pin[0];
+    public Pin[] toHi = new Pin[0];
     public int weakState;
     public boolean processing;
     public boolean hasQueue;
@@ -48,7 +51,7 @@ public class OutPin extends Pin {
         super(id, parent);
     }
 
-    /*Optimiser constructor unroll destination:destinations*/
+    /*Optimiser constructor unroll low:toLow:l unroll hi:toHi:h unroll imp:toImp:i*/
     public OutPin(OutPin oldPin, String variantId) {
         super(oldPin, variantId);
         hiImpedance = oldPin.hiImpedance;
@@ -61,6 +64,7 @@ public class OutPin extends Pin {
         pin.triState = triState;
         if (!(pin instanceof NCWire)) {
             destinations = Utils.addToArray(destinations, pin);
+            split();
         }
     }
 
@@ -83,26 +87,26 @@ public class OutPin extends Pin {
         } else {
             processing = true;
             /*Optimiser blockEnd allRecurse*/
-            for (Pin destination : destinations) {
-                destination.setHi();
+            for (Pin hi : toHi) {
+                hi.setHi();
             }
             /*Optimiser block recurse block allRecurse*/
             while (hasQueue) {
                 hasQueue = false;
                 /*Optimiser block ts*/
                 if (hiImpedance) {
-                    for (Pin destination : destinations) {
-                        destination.setHiImpedance();
+                    for (Pin imp : toImp) {
+                        imp.setHiImpedance();
                     }
                 } else {
                     /*Optimiser blockEnd ts*/
                     if (state) {
-                        for (Pin destination : destinations) {
-                            destination.setHi();
+                        for (Pin hi : toHi) {
+                            hi.setHi();
                         }
                     } else {
-                        for (Pin destination : destinations) {
-                            destination.setLo();
+                        for (Pin low : toLow) {
+                            low.setLo();
                         }
                     }
                     /*Optimiser line ts*/
@@ -133,26 +137,26 @@ public class OutPin extends Pin {
         } else {
             processing = true;
             /*Optimiser blockEnd allRecurse*/
-            for (Pin destination : destinations) {
-                destination.setLo();
+            for (Pin low : toLow) {
+                low.setLo();
             }
             /*Optimiser block recurse block allRecurse*/
             while (hasQueue) {
                 hasQueue = false;
                 /*Optimiser block ts*/
                 if (hiImpedance) {
-                    for (Pin destination : destinations) {
-                        destination.setHiImpedance();
+                    for (Pin imp : toImp) {
+                        imp.setHiImpedance();
                     }
                 } else {
                     /*Optimiser blockEnd ts*/
                     if (state) {
-                        for (Pin destination : destinations) {
-                            destination.setHi();
+                        for (Pin hi : toHi) {
+                            hi.setHi();
                         }
                     } else {
-                        for (Pin destination : destinations) {
-                            destination.setLo();
+                        for (Pin low : toLow) {
+                            low.setLo();
                         }
                     }
                     /*Optimiser line ts*/
@@ -188,24 +192,24 @@ public class OutPin extends Pin {
         } else {
             processing = true;
             /*Optimiser blockEnd allRecurse*/
-            for (Pin destination : destinations) {
-                destination.setHiImpedance();
+            for (Pin imp : toImp) {
+                imp.setHiImpedance();
             }
             /*Optimiser block recurse block allRecurse*/
             while (hasQueue) {
                 hasQueue = false;
                 if (hiImpedance) {
-                    for (Pin destination : destinations) {
-                        destination.setHiImpedance();
+                    for (Pin imp : toImp) {
+                        imp.setHiImpedance();
                     }
                 } else {
                     if (state) {
-                        for (Pin destination : destinations) {
-                            destination.setHi();
+                        for (Pin hi : toHi) {
+                            hi.setHi();
                         }
                     } else {
-                        for (Pin destination : destinations) {
-                            destination.setLo();
+                        for (Pin low : toLow) {
+                            low.setLo();
                         }
                     }
                 }
@@ -243,7 +247,8 @@ public class OutPin extends Pin {
             for (int i = 0; i < destinations.length; i++) {
                 destinations[i] = destinations[i].getOptimised(this);
             }
-            ClassOptimiser<OutPin> optimiser = new ClassOptimiser<>(this, OutPin.class).unroll(destinations.length);
+            split();
+            ClassOptimiser<OutPin> optimiser = new ClassOptimiser<>(this, OutPin.class).unroll("i", toImp.length).unroll("l", toLow.length).unroll("h", toHi.length);
             if (!Simulator.recursive && Utils.notContain(Simulator.recursiveOuts, getName())) {
                 if (Simulator.noRecursive) {
                     optimiser.cut("allRecurse");
@@ -257,6 +262,23 @@ public class OutPin extends Pin {
                 optimiser.cut("ts");
             }
             return optimiser.build();
+        }
+    }
+
+    protected void split() {
+        toHi = new Pin[0];
+        toLow = new Pin[0];
+        toImp = new Pin[0];
+        for (Pin destination : destinations) {
+            if (!(destination instanceof FallingEdgePin)) {
+                toHi = Utils.addToArray(toHi, destination);
+                if (!(destination instanceof RaisingEdgePin)) {
+                    toImp = Utils.addToArray(toImp, destination);
+                }
+            }
+            if (!(destination instanceof RaisingEdgePin)) {
+                toLow = Utils.addToArray(toLow, destination);
+            }
         }
     }
 }
