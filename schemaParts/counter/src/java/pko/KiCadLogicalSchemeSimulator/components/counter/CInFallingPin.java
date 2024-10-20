@@ -32,25 +32,23 @@
 package pko.KiCadLogicalSchemeSimulator.components.counter;
 import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
+import pko.KiCadLogicalSchemeSimulator.api.wire.FallingEdgePin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 
-public class CInPin extends InPin {
-    public final boolean reverse;
+public class CInFallingPin extends FallingEdgePin {
     public final long countMask;
     public Bus out;
 
-    public CInPin(String id, Counter parent, boolean reverse, long countMask) {
+    public CInFallingPin(String id, Counter parent, long countMask) {
         super(id, parent);
         out = parent.getOutBus("Q");
-        this.reverse = reverse;
         this.countMask = countMask;
     }
 
     /*Optimiser constructor*/
-    public CInPin(CInPin oldPin, String variantId) {
+    public CInFallingPin(CInFallingPin oldPin, String variantId) {
         super(oldPin, variantId);
-        this.reverse = oldPin.reverse;
         this.countMask = oldPin.countMask;
         this.out = oldPin.out;
     }
@@ -59,39 +57,24 @@ public class CInPin extends InPin {
     public void setHi() {
         /*Optimiser line setter*/
         state = true;
-        /*Optimiser line o*/
-        if (!reverse) {
-            /*Optimiser bind countMask line nr*/
-            out.setState((out.state + 1) & countMask);
-            /*Optimiser line o*/
-        }
     }
 
     @Override
     public void setLo() {
         /*Optimiser line setter*/
         state = false;
-        /*Optimiser line o*/
-        if (reverse) {
-            /*Optimiser bind countMask line r*/
-            out.setState((out.state + 1) & countMask);
-            /*Optimiser line o*/
-        }
+        /*Optimiser bind countMask*/
+        out.setState((out.state + 1) & countMask);
     }
 
     @Override
     public InPin getOptimised(ModelItem<?> source) {
-        ClassOptimiser<CInPin> optimiser = new ClassOptimiser<>(this).cut("o").bind("countMask", countMask);
-        if (reverse) {
-            optimiser.cut("nr");
-        } else {
-            optimiser.cut("r");
-        }
+        ClassOptimiser<CInFallingPin> optimiser = new ClassOptimiser<>(this).bind("countMask", countMask);
         if (source != null) {
             optimiser.cut("setter");
         }
-        CInPin build = optimiser.build();
-        ((Counter) parent).in = build;
+        CInFallingPin build = optimiser.build();
+        ((Counter) parent).nIn = build;
         parent.inPins.put(id, build);
         return build;
     }

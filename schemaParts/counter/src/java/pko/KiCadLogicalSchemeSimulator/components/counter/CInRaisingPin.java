@@ -29,58 +29,53 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.components.dcTrigger;
-import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+package pko.KiCadLogicalSchemeSimulator.components.counter;
+import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
+import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.RaisingEdgePin;
+import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 
-public class DcTrigger extends SchemaPart {
-    public InPin dPin;
-    public DcRPin rPin;
-    public DcSPin sPin;
-    public DcCRaisingPin cPin;
-    public DcCFallingPin ncPin;
-    public Pin qOut;
-    public Pin iqOut;
-    public boolean clockEnabled = true;
+public class CInRaisingPin extends RaisingEdgePin {
+    public final long countMask;
+    public Bus out;
 
-    protected DcTrigger(String id, String sParam) {
-        super(id, sParam);
-        dPin = addInPin("D");
-        rPin = addInPin(new DcRPin("R", this, params.containsKey("setReverse")));
-        sPin = addInPin(new DcSPin("S", this, params.containsKey("setReverse")));
-        rPin.sPin = sPin;
-        if (reverse) {
-            ncPin = addInPin(new DcCFallingPin("C", this));
-        } else {
-            cPin = addInPin(new DcCRaisingPin("C", this));
-        }
-        addOutPin("Q", false);
-        addOutPin("~{Q}", true);
+    public CInRaisingPin(String id, Counter parent, long countMask) {
+        super(id, parent);
+        out = parent.getOutBus("Q");
+        this.countMask = countMask;
+    }
+
+    /*Optimiser constructor*/
+    public CInRaisingPin(CInRaisingPin oldPin, String variantId) {
+        super(oldPin, variantId);
+        this.countMask = oldPin.countMask;
+        this.out = oldPin.out;
     }
 
     @Override
-    public void initOuts() {
-        qOut = getOutPin("Q");
-        iqOut = getOutPin("~{Q}");
-        rPin.qOut = qOut;
-        rPin.iqOut = iqOut;
-        sPin.qOut = qOut;
-        sPin.iqOut = iqOut;
-        if (reverse) {
-            ncPin.qOut = qOut;
-            ncPin.iqOut = iqOut;
-        } else {
-            cPin.qOut = qOut;
-            cPin.iqOut = iqOut;
-        }
+    public void setHi() {
+        /*Optimiser line setter*/
+        state = true;
+        /*Optimiser bind countMask*/
+        out.setState((out.state + 1) & countMask);
     }
 
     @Override
-    public void reset() {
-        if (clockEnabled) {
-            qOut.setLo();
-            iqOut.setHi();
+    public void setLo() {
+        /*Optimiser line setter*/
+        state = false;
+    }
+
+    @Override
+    public InPin getOptimised(ModelItem<?> source) {
+        ClassOptimiser<CInRaisingPin> optimiser = new ClassOptimiser<>(this).bind("countMask", countMask);
+        if (source != null) {
+            optimiser.cut("setter");
         }
+        CInRaisingPin build = optimiser.build();
+        ((Counter) parent).in = build;
+        parent.inPins.put(id, build);
+        return build;
     }
 }

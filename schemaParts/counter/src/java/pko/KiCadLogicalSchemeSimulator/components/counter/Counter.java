@@ -36,7 +36,8 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 public class Counter extends SchemaPart {
-    public CInPin in;
+    public CInRaisingPin in;
+    public CInFallingPin nIn;
     private Bus outBus;
     private boolean enabled = true;
 
@@ -56,7 +57,11 @@ public class Counter extends SchemaPart {
         }
         long countMask = Utils.getMaskForSize(pinAmount);
         addOutBus("Q", pinAmount);
-        in = addInPin(new CInPin("C", this, reverse, countMask));
+        if (reverse) {
+            nIn = addInPin(new CInFallingPin("C", this, countMask));
+        } else {
+            in = addInPin(new CInRaisingPin("C", this, countMask));
+        }
         addInPin(new InPin("R", this) {
             @Override
             public void setHi() {
@@ -77,7 +82,11 @@ public class Counter extends SchemaPart {
     public void initOuts() {
         outBus = getOutBus("Q");
         outBus.useBitPresentation = true;
-        in.out = outBus;
+        if (reverse) {
+            nIn.out = outBus;
+        } else {
+            in.out = outBus;
+        }
     }
 
     @Override

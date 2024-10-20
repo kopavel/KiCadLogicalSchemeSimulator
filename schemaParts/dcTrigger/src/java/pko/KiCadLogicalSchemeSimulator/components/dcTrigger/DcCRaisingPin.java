@@ -33,15 +33,16 @@ package pko.KiCadLogicalSchemeSimulator.components.dcTrigger;
 import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.RaisingEdgePin;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 
-public class DcCPin extends InPin {
+public class DcCRaisingPin extends RaisingEdgePin {
     public final DcTrigger parent;
     public final InPin dPin;
     public Pin qOut;
     public Pin iqOut;
 
-    public DcCPin(String id, DcTrigger parent) {
+    public DcCRaisingPin(String id, DcTrigger parent) {
         super(id, parent);
         this.parent = parent;
         dPin = parent.dPin;
@@ -50,7 +51,7 @@ public class DcCPin extends InPin {
     }
 
     /*Optimiser constructor*/
-    public DcCPin(DcCPin oldPin, String variantId) {
+    public DcCRaisingPin(DcCRaisingPin oldPin, String variantId) {
         super(oldPin, variantId);
         parent = oldPin.parent;
         dPin = oldPin.dPin;
@@ -62,12 +63,8 @@ public class DcCPin extends InPin {
     public void setHi() {
         /*Optimiser line setter*/
         state = true;
-        /*Optimiser block nr block anyRS*/
-        if (
-            /*Optimiser line o*/
-                !parent.reverse && //
-                        parent.clockEnabled) {
-            /*Optimiser blockEnd anyRS*/
+        /*Optimiser line anyRS*/
+        if (parent.clockEnabled) {
             if (dPin.state) {
                 if (iqOut.state) {
                     iqOut.setLo();
@@ -89,53 +86,19 @@ public class DcCPin extends InPin {
             }
             /*Optimiser line anyRS*/
         }
-        /*Optimiser blockEnd nr*/
     }
 
     @Override
     public void setLo() {
         /*Optimiser line setter*/
         state = false;
-        /*Optimiser block r*/
-        if (
-            /*Optimiser line o*/
-                parent.reverse &&//
-                        /*Optimiser line anyRS*///
-                        parent.clockEnabled//
-        ) {
-            if (dPin.state) {
-                if (iqOut.state) {
-                    iqOut.setLo();
-                    /*Optimiser block bothRS block anyRS*/
-                }
-                if (!qOut.state) {
-                    /*Optimiser blockEnd bothRS  blockEnd anyRS*/
-                    qOut.setHi();
-                }
-            } else {
-                if (qOut.state) {
-                    qOut.setLo();
-                    /*Optimiser block bothRS  block anyRS*/
-                }
-                if (!iqOut.state) {
-                    /*Optimiser blockEnd bothRS  blockEnd anyRS*/
-                    iqOut.setHi();
-                }
-            }
-        }
-        /*Optimiser blockEnd r*/
     }
 
     @Override
     public InPin getOptimised(ModelItem<?> source) {
         boolean anyRs = parent.rPin.used || parent.sPin.used;
         boolean bothRs = parent.rPin.used && parent.sPin.used;
-        ClassOptimiser<DcCPin> optimiser = new ClassOptimiser<>(this).cut("o");
-        if (parent.reverse) {
-            optimiser.cut("nr");
-        } else {
-            optimiser.cut("r");
-        }
+        ClassOptimiser<DcCRaisingPin> optimiser = new ClassOptimiser<>(this).cut("o");
         if (!anyRs) {
             optimiser.cut("anyRS");
         } else if (!bothRs) {
@@ -144,7 +107,7 @@ public class DcCPin extends InPin {
         if (source != null) {
             optimiser.cut("setter");
         }
-        DcCPin build = optimiser.build();
+        DcCRaisingPin build = optimiser.build();
         parent.cPin = build;
         parent.inPins.put(id, build);
         return build;
