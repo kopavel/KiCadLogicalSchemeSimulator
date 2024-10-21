@@ -38,7 +38,9 @@ import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 import javax.swing.*;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 public class MainMenu extends JMenuBar {
@@ -46,11 +48,20 @@ public class MainMenu extends JMenuBar {
 
     public MainMenu() {
         JMenu schemaParts = new JMenu(mainI81n.getString("schemaParts"));
+        Map<Character, JMenu> letterMenus = new HashMap<>();
         add(schemaParts);
         for (SchemaPart schemaPart : Simulator.net.schemaParts.values()) {
+            char firstLetter = Character.toUpperCase(schemaPart.id.charAt(0));
+            letterMenus.putIfAbsent(firstLetter, new JMenu(String.valueOf(firstLetter)));
             JMenuItem schemaPartItem = new JMenuItem(schemaPart.id);
             schemaPartItem.addActionListener(e -> Simulator.addMonitoringPart(schemaPart.id, null));
-            schemaParts.add(schemaPartItem);
+            letterMenus.get(firstLetter).add(schemaPartItem);
+        }
+// Add all letter menus to the main menu bar
+        for (char letter = 'A'; letter <= 'Z'; letter++) {
+            if (letterMenus.containsKey(letter)) {
+                schemaParts.add(letterMenus.get(letter));
+            }
         }
         JMenu settings = new JMenu(mainI81n.getString("settings"));
         add(settings);
