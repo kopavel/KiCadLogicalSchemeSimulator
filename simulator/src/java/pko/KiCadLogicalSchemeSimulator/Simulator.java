@@ -42,9 +42,9 @@ import pko.KiCadLogicalSchemeSimulator.parsers.pojo.Export;
 import pko.KiCadLogicalSchemeSimulator.parsers.xml.XmlParser;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
+import pko.KiCadLogicalSchemeSimulator.ui.SchemaPartMonitor;
 import pko.KiCadLogicalSchemeSimulator.ui.main.MainMenu;
 import pko.KiCadLogicalSchemeSimulator.ui.main.MainUI;
-import pko.KiCadLogicalSchemeSimulator.ui.schemaPartMonitor.SchemaPartMonitor;
 
 import javax.swing.*;
 import java.awt.*;

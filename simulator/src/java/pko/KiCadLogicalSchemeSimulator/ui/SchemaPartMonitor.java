@@ -29,7 +29,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.ui.schemaPartMonitor;
+package pko.KiCadLogicalSchemeSimulator.ui;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import pko.KiCadLogicalSchemeSimulator.Simulator;
@@ -88,7 +88,7 @@ public class SchemaPartMonitor extends JFrame {
                       if (inItem instanceof Bus bus && bus.useBitPresentation) {
                           char[] bits = leftPad(Long.toBinaryString(bus.state), bus.size, '0').toCharArray();
                           for (int j = 0; j < bus.size; j++) {
-                              label = new JLabel(bus.id + j);
+                              label = new JLabel(schemaPart.ids.get(bus) + j);
                               label.setBorder(BorderFactory.createEmptyBorder(3, 2, 4, 0));
                               label.setAlignmentX(Component.LEFT_ALIGNMENT);
                               label.setFont(AbstractUiComponent.monospacedFont);
@@ -102,7 +102,7 @@ public class SchemaPartMonitor extends JFrame {
                               inputsValues.add(label);
                           }
                       } else {
-                          label = new JLabel(inItem.getId());
+                          label = new JLabel(schemaPart.ids.get(inItem));
                           label.setBorder(BorderFactory.createEmptyBorder(3, 2, 4, 0));
                           label.setAlignmentX(Component.LEFT_ALIGNMENT);
                           label.setFont(AbstractUiComponent.monospacedFont);
@@ -122,7 +122,7 @@ public class SchemaPartMonitor extends JFrame {
                       if (outItem instanceof Bus bus && bus.useBitPresentation) {
                           char[] bits = leftPad(Long.toBinaryString(bus.state), bus.size, '0').toCharArray();
                           for (int j = 0; j < bus.size; j++) {
-                              label = new JLabel(bus.id + j);
+                              label = new JLabel(schemaPart.ids.get(bus) + j);
                               label.setBorder(BorderFactory.createEmptyBorder(3, 0, 4, 2));
                               label.setAlignmentX(Component.RIGHT_ALIGNMENT);
                               label.setFont(AbstractUiComponent.monospacedFont);
@@ -136,7 +136,7 @@ public class SchemaPartMonitor extends JFrame {
                               outs = Utils.addToArray(outs, new Item(outItem, label, 1L << j));
                           }
                       } else {
-                          label = new JLabel(outItem.getId());
+                          label = new JLabel(schemaPart.ids.get(outItem));
                           label.setBorder(BorderFactory.createEmptyBorder(3, 0, 4, 2));
                           label.setAlignmentX(Component.RIGHT_ALIGNMENT);
                           label.setFont(AbstractUiComponent.monospacedFont);
