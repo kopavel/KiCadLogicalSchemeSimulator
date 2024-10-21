@@ -44,7 +44,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 public class MainMenu extends JMenuBar {
-    private static final ResourceBundle mainI81n = ResourceBundle.getBundle("i81n/main");
+    public static final ResourceBundle mainI81n = ResourceBundle.getBundle("i81n/main");
 
     public MainMenu() {
         JMenu schemaParts = new JMenu(mainI81n.getString("schemaParts"));
@@ -57,7 +57,6 @@ public class MainMenu extends JMenuBar {
             schemaPartItem.addActionListener(e -> Simulator.addMonitoringPart(schemaPart.id, null));
             letterMenus.get(firstLetter).add(schemaPartItem);
         }
-// Add all letter menus to the main menu bar
         for (char letter = 'A'; letter <= 'Z'; letter++) {
             if (letterMenus.containsKey(letter)) {
                 schemaParts.add(letterMenus.get(letter));

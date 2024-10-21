@@ -31,43 +31,47 @@
  */
 package pko.KiCadLogicalSchemeSimulator.components.oscillator.oscilloscope;
 import pko.KiCadLogicalSchemeSimulator.Simulator;
-import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
+import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 
 import javax.swing.*;
-import java.util.Comparator;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+
+import static pko.KiCadLogicalSchemeSimulator.ui.main.MainMenu.mainI81n;
 
 public class OscilloscopeMenu extends JMenuBar {
     private final Oscilloscope oscilloscope;
 
-    //FixMe add passive pins menu
     public OscilloscopeMenu(Oscilloscope parent) {
         oscilloscope = parent;
-        JMenu outPinMenu = new JMenu(Oscilloscope.localization.getString("outPins"));
-        add(outPinMenu);
-        JMenu inPinMenu = new JMenu(Oscilloscope.localization.getString("inPins"));
-        add(inPinMenu);
-        List<IModelItem<?>> outPins = Simulator.net.schemaParts.values()
-                .stream()
-                .flatMap(p -> p.outPins.values()
-                        .stream().distinct())
-                .sorted(Comparator.comparing(IModelItem::getName))
-                .toList();
-        for (IModelItem<?> pin : outPins) {
-            JMenuItem outPinItem = new JMenuItem(pin.getName());
-            outPinItem.addActionListener(e -> oscilloscope.addPin(pin, pin.getName()));
-            outPinMenu.add(outPinItem);
+        Map<Character, JMenu> letterMenus = new HashMap<>();
+        JMenu schemaParts = new JMenu(mainI81n.getString("schemaParts"));
+        add(schemaParts);
+        for (SchemaPart schemaPart : Simulator.net.schemaParts.values()) {
+            char firstLetter = Character.toUpperCase(schemaPart.id.charAt(0));
+            letterMenus.putIfAbsent(firstLetter, new JMenu(String.valueOf(firstLetter)));
+            JMenu schemaPartItem = new JMenu(schemaPart.id);
+            letterMenus.get(firstLetter).add(schemaPartItem);
+            schemaPartItem.add(Oscilloscope.localization.getString("inPins"));
+            schemaPart.inPins.values()
+                    .stream().distinct().sorted().forEach(inItem -> {
+                          JMenuItem inPinItem = new JMenuItem(schemaPart.ids.get(inItem));
+                          inPinItem.addActionListener(e -> oscilloscope.addPin(inItem, schemaPart.ids.get(inItem)));
+                          schemaPartItem.add(inPinItem);
+                      });
+            schemaPartItem.addSeparator();
+            schemaPartItem.add(Oscilloscope.localization.getString("outPins"));
+            schemaPart.outPins.values()
+                    .stream().distinct().sorted().forEach(inItem -> {
+                          JMenuItem inPinItem = new JMenuItem(schemaPart.ids.get(inItem));
+                          inPinItem.addActionListener(e -> oscilloscope.addPin(inItem, schemaPart.ids.get(inItem)));
+                          schemaPartItem.add(inPinItem);
+                      });
         }
-        List<IModelItem<?>> inPins = Simulator.net.schemaParts.values()
-                .stream()
-                .flatMap(p -> p.inPins.values()
-                        .stream().distinct())
-                .sorted(Comparator.comparing(IModelItem::getName))
-                .toList();
-        for (IModelItem<?> pin : inPins) {
-            JMenuItem inPinItem = new JMenuItem(pin.getName());
-            inPinItem.addActionListener(e -> oscilloscope.addPin(pin, pin.getName()));
-            inPinMenu.add(inPinItem);
+        for (char letter = 'A'; letter <= 'Z'; letter++) {
+            if (letterMenus.containsKey(letter)) {
+                schemaParts.add(letterMenus.get(letter));
+            }
         }
     }
 }
