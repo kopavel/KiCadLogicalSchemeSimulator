@@ -93,7 +93,7 @@ public class RepeaterInPin extends InPin {
         }
         RepeaterInPin build = optimiser.build();
         parent.inPin = build;
-        parent.inPins.put(id, build);
+        parent.replaceIn(this, build);
         return build;
     }
 }

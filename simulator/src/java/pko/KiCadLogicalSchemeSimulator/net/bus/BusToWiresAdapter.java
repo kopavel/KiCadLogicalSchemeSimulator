@@ -54,6 +54,65 @@ public class BusToWiresAdapter extends OutBus {
         this.mask = mask;
     }
 
+    /*Optimiser block iSetter*/
+    @Override
+    public void setHiImpedance() {
+        /*Optimiser block setters*/
+        hiImpedance = true;
+        /*Optimiser block allRecurse*/
+        if (processing) {
+            /*Optimiser line recurse*/
+            if (hasQueue) {
+                if (recurseError()) {
+                    return;
+                }
+                /*Optimiser block recurse*/
+            }
+            hasQueue = true;
+            /*Optimiser blockEnd recurse*/
+        } else {
+            processing = true;
+            /*Optimiser blockEnd setters blockEnd allRecurse*/
+            for (Pin destination : destinations) {
+                destination.setHiImpedance();
+            }
+            /*Optimiser block setters block recurse block allRecurse*/
+            while (hasQueue) {
+                hasQueue = false;
+                if (hiImpedance) {
+                    for (Pin destination : destinations) {
+                        destination.setHiImpedance();
+                    }
+                } else {
+                    if (queueState) {
+                        for (Pin destination : destinations) {
+                            destination.setLo();
+                        }
+                    } else {
+                        for (Pin destination : destinations) {
+                            destination.setHi();
+                        }
+                    }
+                }
+            }
+            /*Optimiser blockEnd recurse*/
+            processing = false;
+            /*Optimiser blockEnd allRecurse*/
+        }
+        /*Optimiser blockEnd setters*/
+    }
+
+    public void addDestination(Pin pin) {
+        pin.used = true;
+        destinations = Utils.addToArray(destinations, pin);
+    }
+    /*Optimiser blockEnd iSetter*/
+
+    @Override
+    public long getState() {
+        return (source.getState() & mask) > 0 ? 1 : 0;
+    }
+
     @Override
     public void setState(long newState) {
         /*Optimiser block setters line iSetter*/
@@ -122,60 +181,6 @@ public class BusToWiresAdapter extends OutBus {
         }
     }
 
-    /*Optimiser block iSetter*/
-    @Override
-    public void setHiImpedance() {
-        /*Optimiser block setters*/
-        hiImpedance = true;
-        /*Optimiser block allRecurse*/
-        if (processing) {
-            /*Optimiser line recurse*/
-            if (hasQueue) {
-                if (recurseError()) {
-                    return;
-                }
-                /*Optimiser block recurse*/
-            }
-            hasQueue = true;
-            /*Optimiser blockEnd recurse*/
-        } else {
-            processing = true;
-            /*Optimiser blockEnd setters blockEnd allRecurse*/
-            for (Pin destination : destinations) {
-                destination.setHiImpedance();
-            }
-            /*Optimiser block setters block recurse block allRecurse*/
-            while (hasQueue) {
-                hasQueue = false;
-                if (hiImpedance) {
-                    for (Pin destination : destinations) {
-                        destination.setHiImpedance();
-                    }
-                } else {
-                    if (queueState) {
-                        for (Pin destination : destinations) {
-                            destination.setLo();
-                        }
-                    } else {
-                        for (Pin destination : destinations) {
-                            destination.setHi();
-                        }
-                    }
-                }
-            }
-            /*Optimiser blockEnd recurse*/
-            processing = false;
-            /*Optimiser blockEnd allRecurse*/
-        }
-        /*Optimiser blockEnd setters*/
-    }
-    /*Optimiser blockEnd iSetter*/
-
-    public void addDestination(Pin pin) {
-        pin.used = true;
-        destinations = Utils.addToArray(destinations, pin);
-    }
-
     @Override
     public BusToWiresAdapter getOptimised(ModelItem<?> source) {
         if (destinations.length == 0) {
@@ -201,7 +206,12 @@ public class BusToWiresAdapter extends OutBus {
             if (groupByMask == 0) {
                 optimiser.cut("mask").bind("nState", "newState");
             }
-            return optimiser.build();
+            BusToWiresAdapter build = optimiser.build();
+            build.source = source;
+            for (Pin destination : destinations) {
+                destination.source = build;
+            }
+            return build;
         }
     }
 

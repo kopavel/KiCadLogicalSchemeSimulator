@@ -81,6 +81,7 @@ public class WireMerger extends OutPin {
         for (int i = 0; i < destinations.length; i++) {
             destinations[i] = destinations[i].getOptimised(this);
         }
+        this.source = source;
         return this;
     }
 

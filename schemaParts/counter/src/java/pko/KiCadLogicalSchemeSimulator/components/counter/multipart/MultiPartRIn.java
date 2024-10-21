@@ -148,7 +148,7 @@ public class MultiPartRIn extends InPin {
         }
         MultiPartRIn build = optimiser.build();
         parent.rIns.put(id, build);
-        parent.inPins.put(id, build);
+        parent.replaceIn(this, build);
         return build;
     }
 }

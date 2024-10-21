@@ -160,7 +160,7 @@ public class DcRPin extends InPin {
         DcRPin build = optimiser.build();
         parent.rPin = build;
         parent.sPin.rPin = build;
-        parent.inPins.put(id, build);
+        parent.replaceIn(this, build);
         return build;
     }
 }

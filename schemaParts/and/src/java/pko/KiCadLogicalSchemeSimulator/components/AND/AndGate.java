@@ -30,6 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.AND;
+import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 
@@ -66,10 +67,10 @@ public class AndGate extends SchemaPart {
         out.state = inState == 0 ? nReverse : reverse;
     }
 
-    public void replaceIn(String id, AndGateIn pin) {
-        ins.put(id, pin);
-        inPins.put(id, pin);
-
+    @Override
+    public <T> void replaceIn(IModelItem<T> oldPin, IModelItem<T> newPin) {
+        super.replaceIn(oldPin, newPin);
+        ins.put(oldPin.getId(), (AndGateIn) newPin);
     }
 
     @Override

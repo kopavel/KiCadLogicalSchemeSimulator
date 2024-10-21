@@ -261,7 +261,12 @@ public class OutPin extends Pin {
             } else {
                 optimiser.cut("ts");
             }
-            return optimiser.build();
+            OutPin build = optimiser.build();
+            build.source = source;
+            for (Pin destination : destinations) {
+                destination.source = build;
+            }
+            return build;
         }
     }
 

@@ -243,7 +243,13 @@ public class OutBus extends Bus {
                     optimiser.cut("ts");
                 }
             }
-            return optimiser.build();
+            OutBus build = optimiser.build();
+            build.source = source;
+            for (Bus destination : destinations) {
+                destination.source = build;
+            }
+            return build;
+
         }
     }
 

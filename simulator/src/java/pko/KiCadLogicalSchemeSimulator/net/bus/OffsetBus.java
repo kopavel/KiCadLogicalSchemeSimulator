@@ -218,7 +218,12 @@ public class OffsetBus extends OutBus {
         } else {
             optimiser.bind("m", groupByMask);
         }
-        return optimiser.build();
+        OffsetBus build = optimiser.build();
+        build.source = source;
+        for (Bus destination : destinations) {
+            destination.source = build;
+        }
+        return build;
     }
 
     @Override

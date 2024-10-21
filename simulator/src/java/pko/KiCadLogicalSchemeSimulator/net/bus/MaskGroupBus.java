@@ -170,7 +170,12 @@ public class MaskGroupBus extends OutBus {
             if (!triState) {
                 optimiser.cut("iSetter");
             }
-            return optimiser.build();
+            MaskGroupBus build = optimiser.build();
+            build.source = source;
+            for (Bus destination : destinations) {
+                destination.source = build;
+            }
+            return build;
         }
     }
 }

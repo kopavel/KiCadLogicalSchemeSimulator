@@ -240,8 +240,12 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus> {
         if (!triState) {
             optimiser.cut("iSetter");
         }
-        WireMergerBusIn pin = optimiser.build();
-        merger.sources.add(pin);
-        return pin;
+        WireMergerBusIn build = optimiser.build();
+        merger.sources.add(build);
+        build.source = source;
+        for (Pin destination : destinations) {
+            destination.source = build;
+        }
+        return build;
     }
 }

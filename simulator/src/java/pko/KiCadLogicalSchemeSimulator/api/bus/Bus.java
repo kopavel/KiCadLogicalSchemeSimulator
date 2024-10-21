@@ -94,7 +94,7 @@ public abstract class Bus extends ModelItem<Bus> {
 
     @Override
     public long getState() {
-        return source == this ? state : source.getState();
+        return (source == null || source == this) ? state : source.getState();
     }
 
     abstract public void setState(long newState);

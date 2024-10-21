@@ -44,9 +44,10 @@ import java.util.Map;
 public abstract class SchemaPart {
     public final String id;
     public final Map<String, IModelItem<?>> inPins = new HashMap<>();
+    public final Map<IModelItem<?>, String> ids = new HashMap<>();
     public final Map<String, IModelItem<?>> outPins = new HashMap<>();
-    protected final Map<String, String> params = new HashMap<>();
     public final boolean reverse;
+    protected final Map<String, String> params = new HashMap<>();
     protected final boolean nReverse;
     public Map<Integer, String> pinNumberMap;
 
@@ -101,19 +102,23 @@ public abstract class SchemaPart {
 
     public <T extends InPin> T addInPin(T pin) {
         inPins.put(pin.id, pin);
+        ids.put(pin, pin.id);
         return pin;
     }
 
     public void addPassivePin(String pinId) {
         outPins.put(pinId, new PassivePin(pinId, this));
+        ids.put(outPins.get(pinId), pinId);
     }
 
     public void addPullPin(String pinId, boolean state) {
         outPins.put(pinId, new PullPin(pinId, this, state));
+        ids.put(outPins.get(pinId), pinId);
     }
 
     public void addOutPin(String pinId) {
         outPins.put(pinId, new OutPin(pinId, this));
+        ids.put(outPins.get(pinId), pinId);
     }
 
     public void addOutPin(String pinId, boolean state) {
@@ -124,6 +129,7 @@ public abstract class SchemaPart {
 
     public void addTriStateOutPin(String pinId) {
         outPins.put(pinId, new TriStateOutPin(pinId, this));
+        ids.put(outPins.get(pinId), pinId);
     }
 
     public void addTriStateOutPin(String pinId, boolean state) {
@@ -143,6 +149,7 @@ public abstract class SchemaPart {
 
     public <T extends InBus> T addInBus(T bus) {
         inPins.put(bus.id, bus);
+        ids.put(bus, bus.id);
         for (String alias : bus.aliasOffsets.keySet()) {
             inPins.put(alias, bus);
         }
@@ -152,6 +159,7 @@ public abstract class SchemaPart {
     public void addOutBus(String pinId, int size, String... names) {
         OutBus pin = new OutBus(pinId, this, size, names);
         outPins.put(pinId, pin);
+        ids.put(outPins.get(pinId), pinId);
         for (String alias : pin.aliasOffsets.keySet()) {
             outPins.put(alias, pin);
         }
@@ -167,6 +175,7 @@ public abstract class SchemaPart {
     public void addTriStateOutBus(String pinId, int size, String... names) {
         TriStateOutBus pin = new TriStateOutBus(pinId, this, size, names);
         outPins.put(pinId, pin);
+        ids.put(outPins.get(pinId), pinId);
         for (String alias : pin.aliasOffsets.keySet()) {
             outPins.put(alias, pin);
         }
@@ -224,7 +233,9 @@ public abstract class SchemaPart {
         IModelItem<T> newOutPin = outPin.getOptimised(null);
         if (outPin != newOutPin) {
             newOutPin.copyState(outPin);
+            String oldId = ids.remove(outPin);
             outPins.put(outPin.getId(), newOutPin);
+            ids.put(newOutPin, oldId);
             if (outPin instanceof Bus) {
                 for (String alias : outPin.getAliases()) {
                     outPins.put(alias, newOutPin);
@@ -233,6 +244,12 @@ public abstract class SchemaPart {
                 throw new RuntimeException("Unsupported item: " + outPin.getClass().getName());
             }
         }
+    }
+
+    public <T> void replaceIn(IModelItem<T> oldPin, IModelItem<T> newPin) {
+        String oldId = ids.remove(oldPin);
+        inPins.put(oldId, newPin);
+        ids.put(newPin, oldId);
     }
 
     public void reset() {

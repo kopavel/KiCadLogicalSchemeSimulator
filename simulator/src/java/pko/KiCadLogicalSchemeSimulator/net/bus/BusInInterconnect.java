@@ -93,6 +93,9 @@ public class BusInInterconnect extends InBus {
         if (!triState) {
             optimiser.cut("iSetter");
         }
-        return optimiser.build();
+        InBus build = optimiser.build();
+        build.source = source;
+        destination.source = build;
+        return build;
     }
 }

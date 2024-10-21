@@ -62,9 +62,8 @@ public class AndGateIn extends InPin {
     public void setHi() {
         /*Optimiser line setter*/
         state = true;
-        /*Optimiser bind mask*/
-        if (parent.inState == mask) {
-            parent.inState = 0;
+        /*Optimiser bind nMask*/
+        if ((parent.inState &= nMask) == 0) {
             /*Optimiser line o block r*/
             if (parent.reverse) {
                 out.setLo();
@@ -73,9 +72,6 @@ public class AndGateIn extends InPin {
                 out.setHi();
                 /*Optimiser line o blockEnd nr*/
             }
-        } else {
-            /*Optimiser bind nMask*/
-            parent.inState &= nMask;
         }
     }
 
@@ -83,9 +79,8 @@ public class AndGateIn extends InPin {
     public void setLo() {
         /*Optimiser line setter*/
         state = false;
-        if (parent.inState == 0) {
-            /*Optimiser bind mask*/
-            parent.inState = mask;
+        /*Optimiser bind mask*/
+        if ((parent.inState |= mask) == mask) {
             /*Optimiser line o block r*/
             if (parent.reverse) {
                 out.setHi();
@@ -94,9 +89,6 @@ public class AndGateIn extends InPin {
                 out.setLo();
                 /*Optimiser line o blockEnd nr*/
             }
-        } else {
-            /*Optimiser bind mask*/
-            parent.inState |= mask;
         }
     }
 
@@ -112,7 +104,7 @@ public class AndGateIn extends InPin {
             optimiser.cut("setter");
         }
         AndGateIn build = optimiser.build();
-        parent.replaceIn(id, build);
+        parent.replaceIn(this, build);
         return build;
     }
 }

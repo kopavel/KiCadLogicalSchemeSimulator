@@ -343,12 +343,12 @@ public class Net {
         for (OutBus merger : busMergers.values()) {
             merger.getOptimised(null);
         }
-        for (SchemaPart p : schemaParts.values()) {
-            for (IModelItem<?> outItem : p.outPins.values()
-                    .stream().distinct().toList()) {
-                replaceOut(outItem);
-            }
-        }
+        schemaParts.values()
+                .stream()
+                .flatMap(p -> p.outPins.values()
+                        .stream().distinct().toList()
+                        .stream())
+                .forEach(this::replaceOut);
     }
 
     private void replaceOut(IModelItem<?> outItem) {

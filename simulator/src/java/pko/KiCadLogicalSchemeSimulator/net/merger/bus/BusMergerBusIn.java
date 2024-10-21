@@ -372,8 +372,12 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
         if (!triState) {
             optimiser.cut("iSetter");
         }
-        BusMergerBusIn optimised = optimiser.build();
-        merger.sources.add(optimised);
-        return optimised;
+        BusMergerBusIn build = optimiser.build();
+        merger.sources.add(build);
+        build.source = source;
+        for (Bus destination : destinations) {
+            destination.source = build;
+        }
+        return build;
     }
 }

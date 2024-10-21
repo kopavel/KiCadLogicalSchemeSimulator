@@ -425,9 +425,13 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
         if (!triState) {
             optimiser.cut("iSetter");
         }
-        WireMergerWireIn pin = optimiser.build();
-        ((WireMerger) merger).sources.add(pin);
-        return pin;
+        WireMergerWireIn build = optimiser.build();
+        ((WireMerger) merger).sources.add(build);
+        build.source = source;
+        for (Pin destination : destinations) {
+            destination.source = build;
+        }
+        return build;
     }
 
     @Override

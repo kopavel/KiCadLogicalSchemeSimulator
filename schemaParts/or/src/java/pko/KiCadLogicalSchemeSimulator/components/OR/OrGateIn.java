@@ -62,9 +62,8 @@ public class OrGateIn extends InPin {
     public void setHi() {
         /*Optimiser line setter*/
         state = true;
-        if (parent.inState == 0) {
-            /*Optimiser bind mask*/
-            parent.inState = mask;
+        /*Optimiser bind mask*/
+        if ((parent.inState |= mask) == mask) {
             /*Optimiser line o block r*/
             if (parent.reverse) {
                 out.setLo();
@@ -73,19 +72,15 @@ public class OrGateIn extends InPin {
                 out.setHi();
                 /*Optimiser line o blockEnd nr*/
             }
-        } else {
-            /*Optimiser bind mask*/
-            parent.inState |= mask;
         }
-        /*Optimiser bind mask*/
     }
 
     @Override
     public void setLo() {
         /*Optimiser line setter*/
         state = false;
-        if (parent.inState == mask) {
-            parent.inState = 0;
+        /*Optimiser bind nMask*/
+        if ((parent.inState &= nMask) == 0) {
             /*Optimiser line o block r*/
             if (parent.reverse) {
                 out.setHi();
@@ -94,9 +89,6 @@ public class OrGateIn extends InPin {
                 out.setLo();
                 /*Optimiser line o blockEnd nr*/
             }
-        } else {
-            /*Optimiser bind nMask*/
-            parent.inState &= nMask;
         }
     }
 
@@ -112,7 +104,7 @@ public class OrGateIn extends InPin {
             optimiser.cut("setter");
         }
         OrGateIn build = optimiser.build();
-        parent.replaceIn(id, build);
+        parent.replaceIn(this, build);
         return build;
     }
 }

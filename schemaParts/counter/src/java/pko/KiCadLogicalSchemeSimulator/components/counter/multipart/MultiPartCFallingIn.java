@@ -140,6 +140,7 @@ public class MultiPartCFallingIn extends FallingEdgePin implements MultiPartCIn 
         for (MultiPartRIn rPin : parent.rIns.values()) {
             rPin.cIns[partNo] = build;
         }
+        parent.replaceIn(this, build);
         return build;
     }
 
