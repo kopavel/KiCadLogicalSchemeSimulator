@@ -52,7 +52,7 @@ public class OscilloscopeMenu extends JMenuBar {
             letterMenus.putIfAbsent(firstLetter, new JMenu(String.valueOf(firstLetter)));
             JMenu schemaPartItem = new JMenu(schemaPart.id);
             letterMenus.get(firstLetter).add(schemaPartItem);
-            schemaPartItem.add(Oscilloscope.localization.getString("inPins"));
+            schemaPartItem.add(new JLabel(Oscilloscope.localization.getString("inPins")));
             schemaPart.inPins.values()
                     .stream().distinct().sorted().forEach(inItem -> {
                           JMenuItem inPinItem = new JMenuItem(schemaPart.ids.get(inItem));
@@ -60,7 +60,7 @@ public class OscilloscopeMenu extends JMenuBar {
                           schemaPartItem.add(inPinItem);
                       });
             schemaPartItem.addSeparator();
-            schemaPartItem.add(Oscilloscope.localization.getString("outPins"));
+            schemaPartItem.add(new JLabel(Oscilloscope.localization.getString("outPins")));
             schemaPart.outPins.values()
                     .stream().distinct().sorted().forEach(inItem -> {
                           JMenuItem inPinItem = new JMenuItem(schemaPart.ids.get(inItem));
