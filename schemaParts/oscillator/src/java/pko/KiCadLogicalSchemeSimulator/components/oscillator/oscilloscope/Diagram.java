@@ -30,15 +30,14 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.oscillator.oscilloscope;
-import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
-import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
+import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.tools.UiTools;
 import pko.KiCadLogicalSchemeSimulator.tools.ringBuffers.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static pko.KiCadLogicalSchemeSimulator.components.oscillator.oscilloscope.DiagramState.*;
 import static pko.KiCadLogicalSchemeSimulator.tools.ringBuffers.RingBuffer.DEFAULT_CAPACITY;
@@ -48,7 +47,7 @@ public class Diagram extends JPanel {
     private static final int BAR_MIDDLE = 4;
     private static final int BAR_BOTTOM = 12;
     private static final int BAR_HEIGHT = BAR_BOTTOM - BAR_TOP;
-    private final Queue<PinItem> pins = new ConcurrentLinkedQueue<>();
+    final List<PinItem> pins = new CopyOnWriteArrayList<>();
     double tickWidth = 10;
     int offset = 0;
     private Color currentColor;
@@ -82,13 +81,13 @@ public class Diagram extends JPanel {
         });
     }
 
-    public void addPin(IModelItem<?> out, String name) {
+    public void addPin(ModelItem<?> out, String name) {
         pins.add(new PinItem(out, name));
         revalidate();
     }
 
     public void tick() {
-        pins.forEach(item -> item.buffer.put(item.pin instanceof Bus bus && bus.hiImpedance ? -1 : item.pin.getState()));
+        pins.forEach(item -> item.buffer.put(item.pin.hiImpedance ? -1 : item.pin.getState()));
     }
 
     @Override
@@ -225,14 +224,12 @@ public class Diagram extends JPanel {
         }
     }
 
-    private static final class PinItem implements Comparable<PinItem> {
-        private final IModelItem<?> pin;
-        private final String name;
+    static final class PinItem {
+        private final ModelItem<?> pin;
         private final RingBuffer buffer;
 
-        private PinItem(IModelItem<?> pin, String name) {
+        private PinItem(ModelItem<?> pin, String name) {
             this.pin = pin;
-            this.name = name;
             if (pin.getSize() < 8) {
                 this.buffer = new ByteRingBuffer();
             } else if (pin.getSize() < 16) {
@@ -242,11 +239,6 @@ public class Diagram extends JPanel {
             } else {
                 this.buffer = new LongRingBuffer();
             }
-        }
-
-        @Override
-        public int compareTo(PinItem o) {
-            return this.name.compareTo(o.name);
         }
     }
 }

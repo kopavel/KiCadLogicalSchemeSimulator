@@ -31,6 +31,7 @@
  */
 package pko.KiCadLogicalSchemeSimulator.api.schemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
+import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
@@ -43,9 +44,9 @@ import java.util.Map;
 @SuppressWarnings("unused")
 public abstract class SchemaPart {
     public final String id;
-    public final Map<String, IModelItem<?>> inPins = new HashMap<>();
+    public final Map<String, ModelItem<?>> inPins = new HashMap<>();
     public final Map<IModelItem<?>, String> ids = new HashMap<>();
-    public final Map<String, IModelItem<?>> outPins = new HashMap<>();
+    public final Map<String, ModelItem<?>> outPins = new HashMap<>();
     public final boolean reverse;
     protected final Map<String, String> params = new HashMap<>();
     protected final boolean nReverse;
@@ -229,8 +230,8 @@ public abstract class SchemaPart {
 
     public abstract void initOuts();
 
-    public <T> void replaceOut(IModelItem<T> outPin) {
-        IModelItem<T> newOutPin = outPin.getOptimised(null);
+    public <T> void replaceOut(ModelItem<T> outPin) {
+        ModelItem<T> newOutPin = outPin.getOptimised(null);
         if (outPin != newOutPin) {
             newOutPin.copyState(outPin);
             String oldId = ids.remove(outPin);
@@ -246,7 +247,7 @@ public abstract class SchemaPart {
         }
     }
 
-    public <T> void replaceIn(IModelItem<T> oldPin, IModelItem<T> newPin) {
+    public <T> void replaceIn(ModelItem<T> oldPin, ModelItem<T> newPin) {
         String oldId = ids.remove(oldPin);
         inPins.put(oldId, newPin);
         ids.put(newPin, oldId);

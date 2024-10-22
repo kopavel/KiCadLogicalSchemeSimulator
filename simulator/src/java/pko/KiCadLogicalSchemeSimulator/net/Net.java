@@ -32,6 +32,7 @@
 package pko.KiCadLogicalSchemeSimulator.net;
 import pko.KiCadLogicalSchemeSimulator.Simulator;
 import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
+import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
@@ -351,7 +352,7 @@ public class Net {
                 .forEach(this::replaceOut);
     }
 
-    private void replaceOut(IModelItem<?> outItem) {
+    private void replaceOut(ModelItem<?> outItem) {
         outItem.getParent().replaceOut(outItem);
     }
 

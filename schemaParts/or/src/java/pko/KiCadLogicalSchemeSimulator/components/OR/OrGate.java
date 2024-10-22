@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.OR;
-import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
+import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 
@@ -68,7 +68,7 @@ public class OrGate extends SchemaPart {
     }
 
     @Override
-    public <T> void replaceIn(IModelItem<T> oldPin, IModelItem<T> newPin) {
+    public <T> void replaceIn(ModelItem<T> oldPin, ModelItem<T> newPin) {
         super.replaceIn(oldPin, newPin);
         ins.put(oldPin.getId(), (OrGateIn) newPin);
     }
