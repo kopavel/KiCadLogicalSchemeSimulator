@@ -31,9 +31,14 @@
  */
 package pko.KiCadLogicalSchemeSimulator.components.oscillator.oscilloscope;
 import pko.KiCadLogicalSchemeSimulator.Simulator;
+import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,9 +49,30 @@ public class OscilloscopeMenu extends JMenuBar {
 
     public OscilloscopeMenu(Oscilloscope parent) {
         oscilloscope = parent;
+        JMenu pins = new JMenu(mainI81n.getString("schemaParts"));
+        add(pins);
+        fillPinsMenu(pins);
+        JMenu presets = new JMenu(Oscilloscope.localization.getString("preset"));
+        add(presets);
+        JMenuItem reset = new JMenuItem(Oscilloscope.localization.getString("reset"));
+        presets.add(reset);
+        reset.addActionListener(e -> {
+            parent.reset(true);
+        });
+        JMenuItem load = new JMenuItem(Oscilloscope.localization.getString("load"));
+        presets.add(load);
+        load.addActionListener(e -> {
+            loadPreset(parent);
+        });
+        JMenuItem save = new JMenuItem(Oscilloscope.localization.getString("saveAs"));
+        presets.add(save);
+        save.addActionListener(e -> {
+            savePreset(parent);
+        });
+    }
+
+    private void fillPinsMenu(JMenu schemaParts) {
         Map<Character, JMenu> letterMenus = new HashMap<>();
-        JMenu schemaParts = new JMenu(mainI81n.getString("schemaParts"));
-        add(schemaParts);
         for (SchemaPart schemaPart : Simulator.net.schemaParts.values()) {
             char firstLetter = Character.toUpperCase(schemaPart.id.charAt(0));
             letterMenus.putIfAbsent(firstLetter, new JMenu(String.valueOf(firstLetter)));
@@ -56,7 +82,7 @@ public class OscilloscopeMenu extends JMenuBar {
             schemaPart.inPins.values()
                     .stream().distinct().sorted().forEach(inItem -> {
                           JMenuItem inPinItem = new JMenuItem(schemaPart.ids.get(inItem));
-                          inPinItem.addActionListener(e -> oscilloscope.addPin(inItem, schemaPart.ids.get(inItem)));
+                          inPinItem.addActionListener(e -> oscilloscope.addPin(inItem, schemaPart.ids.get(inItem), false));
                           schemaPartItem.add(inPinItem);
                       });
             schemaPartItem.addSeparator();
@@ -64,13 +90,80 @@ public class OscilloscopeMenu extends JMenuBar {
             schemaPart.outPins.values()
                     .stream().distinct().sorted().forEach(inItem -> {
                           JMenuItem inPinItem = new JMenuItem(schemaPart.ids.get(inItem));
-                          inPinItem.addActionListener(e -> oscilloscope.addPin(inItem, schemaPart.ids.get(inItem)));
+                          inPinItem.addActionListener(e -> oscilloscope.addPin(inItem, schemaPart.ids.get(inItem), true));
                           schemaPartItem.add(inPinItem);
                       });
         }
         for (char letter = 'A'; letter <= 'Z'; letter++) {
             if (letterMenus.containsKey(letter)) {
                 schemaParts.add(letterMenus.get(letter));
+            }
+        }
+    }
+
+    private void savePreset(Oscilloscope parent) {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
+        fileChooser.setDialogTitle(Oscilloscope.localization.getString("saveAs"));
+        FileNameExtensionFilter filter = new FileNameExtensionFilter(Oscilloscope.localization.getString("presetFile"), "sym_oscill");
+        fileChooser.setFileFilter(filter);
+        int userSelection = fileChooser.showSaveDialog(null);
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            File fileToSave = fileChooser.getSelectedFile();
+            String filePath = fileToSave.getAbsolutePath();
+            FileFilter selectedFilter = fileChooser.getFileFilter();
+            if (selectedFilter instanceof FileNameExtensionFilter extensionFilter) {
+                String extension = "." + extensionFilter.getExtensions()[0];
+                if (!filePath.endsWith(extension)) {
+                    filePath = filePath + extension;
+                }
+            }
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath))) {
+                for (Diagram.PinItem pin : parent.diagram.pins) {
+                    bw.write(pin.pin.parent.id + ':' + ((pin.out) ? 'O' : 'I') + ':' + pin.pin.id + '\n');
+                }
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+    }
+
+    private void loadPreset(Oscilloscope parent) {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fileChooser.setAcceptAllFileFilterUsed(false);
+        fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
+        fileChooser.setDialogTitle(Oscilloscope.localization.getString("load"));
+        FileNameExtensionFilter filter = new FileNameExtensionFilter(Oscilloscope.localization.getString("presetFile"), "sym_oscill");
+        fileChooser.setFileFilter(filter);
+        int userSelection = fileChooser.showSaveDialog(null);
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            File fileToSave = fileChooser.getSelectedFile();
+            String filePath = fileToSave.getAbsolutePath();
+            FileFilter selectedFilter = fileChooser.getFileFilter();
+            if (selectedFilter instanceof FileNameExtensionFilter extensionFilter) {
+                String extension = "." + extensionFilter.getExtensions()[0];
+                if (!filePath.endsWith(extension)) {
+                    filePath = filePath + extension;
+                }
+            }
+            parent.reset(false);
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), StandardCharsets.UTF_8))) {
+                String content;
+                while ((content = reader.readLine()) != null) {
+                    String[] split = content.split(":");
+                    SchemaPart schemaPart = Simulator.net.schemaParts.get(split[0]);
+                    ModelItem<?> inItem;
+                    if ("I".equals(split[1])) {
+                        inItem = schemaPart.inPins.get(split[2]);
+                        oscilloscope.addPin(inItem, schemaPart.ids.get(inItem), false);
+                    } else {
+                        inItem = schemaPart.outPins.get(split[2]);
+                        oscilloscope.addPin(inItem, schemaPart.ids.get(inItem), true);
+                    }
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         }
     }

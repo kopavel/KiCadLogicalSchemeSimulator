@@ -81,13 +81,23 @@ public class Diagram extends JPanel {
         });
     }
 
-    public void addPin(ModelItem<?> out, String name) {
-        pins.add(new PinItem(out, name));
+    public void clear() {
+        pins.clear();
+        revalidate();
+    }
+
+    public void addPin(ModelItem<?> pin, String name, boolean out) {
+        pins.add(new PinItem(pin, name, out));
         revalidate();
     }
 
     public void tick() {
         pins.forEach(item -> item.buffer.put(item.pin.hiImpedance ? -1 : item.pin.getState()));
+    }
+
+    public void removePin(int idx) {
+        pins.remove(idx);
+        revalidate();
     }
 
     @Override
@@ -225,11 +235,13 @@ public class Diagram extends JPanel {
     }
 
     static final class PinItem {
-        private final ModelItem<?> pin;
-        private final RingBuffer buffer;
+        final ModelItem<?> pin;
+        final boolean out;
+        final RingBuffer buffer;
 
-        private PinItem(ModelItem<?> pin, String name) {
+        private PinItem(ModelItem<?> pin, String name, boolean out) {
             this.pin = pin;
+            this.out = out;
             if (pin.getSize() < 8) {
                 this.buffer = new ByteRingBuffer();
             } else if (pin.getSize() < 16) {

@@ -42,7 +42,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-//ToDo store/load oscilloscope presets...
 //ToDo reset history
 //ToDo search by pin changes
 //ToDo navigate to start/end
@@ -52,17 +51,19 @@ public class Oscilloscope extends JFrame {
     final Diagram diagram;
     final JPanel watchedItemNamesPanel;
     private final ScheduledExecutorService scheduler;
+    private final OscillatorUi oscillatorUi;
 
-    public Oscilloscope(OscillatorUi parent) {
+    public Oscilloscope(OscillatorUi oscillatorUi) {
+        this.oscillatorUi = oscillatorUi;
         setJMenuBar(new OscilloscopeMenu(this));
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
                 scheduler.shutdown();
-                parent.oscilloscope = null;
-                parent.parent.parent.out = ((OscilloscopePin) parent.parent.parent.out).wrapped;
-                parent.parent.parent.restartClock();
+                oscillatorUi.oscilloscope = null;
+                oscillatorUi.parent.parent.out = ((OscilloscopePin) oscillatorUi.parent.parent.out).wrapped;
+                oscillatorUi.parent.parent.restartClock();
                 dispose();
             }
         });
@@ -74,25 +75,21 @@ public class Oscilloscope extends JFrame {
         diagram = new Diagram();
         add(diagram, BorderLayout.CENTER);
         add(watchedItemNamesPanel, BorderLayout.WEST);
-        parent.parent.parent.out = new OscilloscopePin(parent.parent.parent.out, this);
-        parent.parent.parent.restartClock();
+        oscillatorUi.parent.parent.out = new OscilloscopePin(oscillatorUi.parent.parent.out, this);
+        oscillatorUi.parent.parent.restartClock();
         setVisible(true);
         scheduler = Executors.newSingleThreadScheduledExecutor();
         scheduler.scheduleAtFixedRate(this::reDraw, 0, 250, TimeUnit.MILLISECONDS);
-        watchedItemNamesPanel.add(new FixedHeightLabel("clock", watchedItemNamesPanel, diagram));
-        watchedItemNamesPanel.revalidate();
-        watchedItemNamesPanel.repaint();
-        diagram.revalidate();
-        diagram.addPin(parent.parent.parent.out, parent.parent.parent.out.getName());
+        reset(true);
     }
 
-    public void addPin(ModelItem<?> pin, String name) {
+    public void addPin(ModelItem<?> pin, String name, boolean out) {
         FixedHeightLabel label = new FixedHeightLabel(name, watchedItemNamesPanel, diagram);
         watchedItemNamesPanel.add(label);
         watchedItemNamesPanel.revalidate();
         watchedItemNamesPanel.repaint();
         //FixMe check if diagram need to be pinBased, not busBased
-        diagram.addPin(pin, name);
+        diagram.addPin(pin, name, out);
     }
 
     public void reDraw() {
@@ -100,6 +97,18 @@ public class Oscilloscope extends JFrame {
             diagram.revalidate();
             diagram.repaint();
         });
+    }
+
+    public void reset(boolean addClock) {
+        diagram.clear();
+        watchedItemNamesPanel.removeAll();
+        if (addClock) {
+            watchedItemNamesPanel.add(new FixedHeightLabel("clock", watchedItemNamesPanel, diagram));
+            diagram.addPin(oscillatorUi.parent.parent.out, oscillatorUi.parent.parent.out.getName(), true);
+        }
+        diagram.revalidate();
+        watchedItemNamesPanel.revalidate();
+        watchedItemNamesPanel.repaint();
     }
 
     private static class FixedHeightLabel extends JPanel {
@@ -122,8 +131,8 @@ public class Oscilloscope extends JFrame {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     if (e.getButton() > 1) {
+                        diagram.removePin(movedFromIndex);
                         parent.remove(movedFromIndex);
-                        diagram.pins.remove(movedFromIndex);
                         parent.revalidate();
                         parent.repaint();
                     }
@@ -141,8 +150,6 @@ public class Oscilloscope extends JFrame {
                         int targetIndex = parent.getComponentZOrder(componentUnderMouse);
                         swapLabels(movedFromIndex, targetIndex);
                         movedFromIndex = targetIndex;
-                        parent.revalidate();
-                        parent.repaint();
                     }
                 }
             });
@@ -163,9 +170,12 @@ public class Oscilloscope extends JFrame {
             Component toComponent = parent.getComponent(toIndex);
             parent.remove(toComponent);
             parent.add(toComponent, fromIndex);
+            parent.revalidate();
+            parent.repaint();
             Diagram.PinItem toPin = diagram.pins.get(toIndex);
             diagram.pins.remove(toPin);
             diagram.pins.add(fromIndex, toPin);
+            diagram.revalidate();
         }
     }
 }
