@@ -44,7 +44,6 @@ import java.util.concurrent.TimeUnit;
 
 import static java.lang.Thread.MAX_PRIORITY;
 
-//FixMe sometimes multiple thread started - need make some methods as synchronized. 
 public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
     private final OscillatorUiComponent oscillatorUiComponent;
     public long ticks;
@@ -52,6 +51,7 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
     ScheduledExecutorService scheduler;
     @Getter
     private double clockFreq = 0;
+    volatile double currentFreq = 0;
     private Thread fullSpeedThread;
     private volatile boolean fullSpeedAlive;
     private long timerStart;
@@ -78,49 +78,53 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
 
     synchronized public void startClock() {
         if (clockFreq == 0) {
-            fullSpeedAlive = true;
-            fullSpeedThread = Thread.ofPlatform().priority(MAX_PRIORITY).start(() -> {
-                final Pin local = out;
-                try {
-                    while (fullSpeedAlive) {
-                        ticks += 2000;
-                        for (int i = 0; i < 100; i++) {
-                            local.setHi();
-                            local.setLo();
-                            local.setHi();
-                            local.setLo();
-                            local.setHi();
-                            local.setLo();
-                            local.setHi();
-                            local.setLo();
-                            local.setHi();
-                            local.setLo();
-                            local.setHi();
-                            local.setLo();
-                            local.setHi();
-                            local.setLo();
-                            local.setHi();
-                            local.setLo();
-                            local.setHi();
-                            local.setLo();
-                            local.setHi();
-                            local.setLo();
+            if (fullSpeedThread == null || !fullSpeedThread.isAlive()) {
+                fullSpeedAlive = true;
+                fullSpeedThread = Thread.ofPlatform().priority(MAX_PRIORITY).start(() -> {
+                    final Pin local = out;
+                    try {
+                        while (fullSpeedAlive) {
+                            final long count = (long) Math.max(1, (currentFreq / 1000));
+                            ticks += count * 20;
+                            for (int i = 0; i < count; i++) {
+                                local.setHi();
+                                local.setLo();
+                                local.setHi();
+                                local.setLo();
+                                local.setHi();
+                                local.setLo();
+                                local.setHi();
+                                local.setLo();
+                                local.setHi();
+                                local.setLo();
+                                local.setHi();
+                                local.setLo();
+                                local.setHi();
+                                local.setLo();
+                                local.setHi();
+                                local.setLo();
+                                local.setHi();
+                                local.setLo();
+                                local.setHi();
+                                local.setLo();
+                            }
                         }
+                    } catch (Throwable e) {
+                        Log.error(Oscillator.class, "TickError", e);
                     }
-                } catch (Throwable e) {
-                    Log.error(Oscillator.class, "TickError", e);
-                }
-            });
-        } else {
+                });
+            }
+        } else if (scheduler == null) {
             scheduler = Executors.newSingleThreadScheduledExecutor();
             timerStart = System.currentTimeMillis();
             tickStart = ticks;
             long period = Math.max(10, (long) (10000000.0 / clockFreq));
             scheduler.scheduleAtFixedRate(() -> {
                 final Pin local = out;
-                long target = Math.min(10000, (long) ((System.currentTimeMillis() - timerStart) * clockFreq * 2) - ticks + tickStart) / 20;
-                ticks += target * 20;
-                for (int i = 0; i < target; i++) {
+                long target = Math.min(10000, (long) ((System.currentTimeMillis() - timerStart) * clockFreq * 2) - ticks + tickStart);
+                ticks += target;
+                long count = target / 20;
+                for (int i = 0; i < count; i++) {
                     local.setHi();
                     local.setLo();
                     local.setHi();
@@ -173,7 +177,7 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
         boolean retVal = false;
         if (scheduler != null) {
             retVal = true;
-            scheduler.shutdown();
+            scheduler.shutdownNow();
             try {
                 scheduler.awaitTermination(10, TimeUnit.SECONDS);
             } catch (InterruptedException e) {

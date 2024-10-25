@@ -44,14 +44,16 @@ import java.awt.event.MouseEvent;
 import java.util.ResourceBundle;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 public class OscillatorUi extends JFrame {
     public final OscillatorUiComponent parent;
-    final ScheduledExecutorService scheduler;
+    final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     public Oscilloscope oscilloscope;
     JTextField freqTextField;
     JTextField achievedTextField;
+    ScheduledFuture<?> scheduled;
     private JButton startButton;
     private JButton stopButton;
     private JPanel panel;
@@ -60,7 +62,6 @@ public class OscillatorUi extends JFrame {
     private JButton doTicks;
     private JTextField totalTicks;
     private JButton oscilloscopeButton;
-
 
     public OscillatorUi(OscillatorUiComponent parent) {
         this.$$$setupUI$$$();
@@ -91,12 +92,17 @@ public class OscillatorUi extends JFrame {
             protected void textChanged() {
                 String text = freqTextField.getText();
                 if (!text.isBlank()) {
-                    try {
-                        parent.parent.setClockFreq(Double.parseDouble(freqTextField.getText()));
-                        freqTextField.setBackground(new Color(255, 255, 255, 0));
-                    } catch (NumberFormatException e) {
-                        freqTextField.setBackground(new Color(255, 0, 0, 91));
+                    if (scheduled != null) {
+                        scheduled.cancel(false);
                     }
+                    scheduled = scheduler.schedule(() -> {
+                        try {
+                            parent.parent.setClockFreq(Double.parseDouble(freqTextField.getText()));
+                            freqTextField.setBackground(new Color(255, 255, 255, 0));
+                        } catch (NumberFormatException e) {
+                            freqTextField.setBackground(new Color(255, 0, 0, 91));
+                        }
+                    }, 300, TimeUnit.MILLISECONDS);
                 }
             }
         });
@@ -128,8 +134,8 @@ public class OscillatorUi extends JFrame {
                 });
             }
         });
-        scheduler = Executors.newSingleThreadScheduledExecutor();
-        scheduler.scheduleAtFixedRate(this::tick, 0, 1, TimeUnit.SECONDS);
+        //noinspection resource
+        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this::tick, 0, 1, TimeUnit.SECONDS);
         pack();
     }
 
@@ -143,7 +149,7 @@ public class OscillatorUi extends JFrame {
 
     private void tick() {
         SwingUtilities.invokeLater(() -> {
-            achievedTextField.setText(parent.formatter.format(parent.freq));
+            achievedTextField.setText(parent.formatter.format(parent.parent.currentFreq));
             totalTicks.setText(String.valueOf(parent.parent.ticks));
         });
     }

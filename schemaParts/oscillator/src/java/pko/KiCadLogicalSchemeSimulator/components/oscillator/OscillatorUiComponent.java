@@ -44,7 +44,6 @@ public class OscillatorUiComponent extends AbstractUiComponent {
     public final Oscillator parent;
     public final DecimalFormat formatter = new DecimalFormat("#,###");
     public volatile OscillatorUi ui;
-    public double freq = 0;
     private long lastTicks;
 
     public OscillatorUiComponent(int size, String title, Oscillator parent) {
@@ -78,15 +77,15 @@ public class OscillatorUiComponent extends AbstractUiComponent {
 
     @Override
     protected void draw() {
-        g2d.drawString(formatter.format((long) freq), 0, titleHeight * 2);
+        g2d.drawString(formatter.format((long) parent.currentFreq), 0, titleHeight * 2);
     }
 
     private void getFreq() {
         double newFreq = (parent.ticks - lastTicks) / 2.0;
-        if (freq < newFreq * 0.9 || freq > newFreq * 1.1) {
-            freq = newFreq;
+        if (parent.currentFreq < newFreq * 0.9 || parent.currentFreq > newFreq * 1.1) {
+            parent.currentFreq = newFreq;
         } else {
-            freq = (freq * 0.8) + ((parent.ticks - lastTicks) * 0.1);
+            parent.currentFreq = (parent.currentFreq * 0.8) + ((parent.ticks - lastTicks) * 0.1);
         }
         lastTicks = parent.ticks;
     }
