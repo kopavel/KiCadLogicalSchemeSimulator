@@ -53,7 +53,6 @@ public class OutBus extends Bus {
     public Bus[] destinations = new Bus[0];
     public long mask;
 
-
     public OutBus(String id, SchemaPart parent, int size, String... names) {
         super(id, parent, size, names);
         mask = Utils.getMaskForSize(size);
@@ -249,7 +248,6 @@ public class OutBus extends Bus {
                 destination.source = build;
             }
             return build;
-
         }
     }
 

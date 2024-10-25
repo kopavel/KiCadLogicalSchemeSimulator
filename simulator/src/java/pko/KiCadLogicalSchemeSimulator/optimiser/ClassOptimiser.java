@@ -166,6 +166,7 @@ public class ClassOptimiser<T> {
         Map<String, String> iteratorPattern = new HashMap<>();
         String iteratorId = "d";
         boolean preserveFunction = false;
+        boolean skipFunction = false;
         boolean inAsserts = false;
         boolean inComment = false;
         int functionOffset = -1;
@@ -176,21 +177,21 @@ public class ClassOptimiser<T> {
         try {
             for (ListIterator<String> lines = source.listIterator(); lines.hasNext(); ) {
                 String line = lines.next();
+                int lineOffset = countLeadingSpaces(line);
                 //override getOptimised
                 if (line.contains("getOptimised(ModelItem<?> source)")) {
+                    skipFunction = true;
                     resultSource.append(line).append("\n").append("return this;\n}");
-                }
-                int lineOffset = countLeadingSpaces(line);
-                //Copy imports
-                if (line.startsWith("import ")) {
+                } else if (line.startsWith("import ")) {
+                    //Copy imports
                     resultSource.append(line).append("\n");
-                    //skip asserts
                 } else if (line.startsWith("package ")) {
+                    //skip asserts
                     line = line.replace(";", ".optimised." + sourceClass.getSimpleName() + ";");
                     resultSource.append(line).append("\n");
                     resultSource.append("import ").append(sourceClass.getPackageName()).append(".*;\n");
-                    //skip asserts
                 } else if (noAssert && line.trim().startsWith("assert")) {
+                    //skip asserts
                     if (!line.contains(";")) {
                         inAsserts = true; //multiline assert
                     }
@@ -310,7 +311,7 @@ public class ClassOptimiser<T> {
                         //function end
                         if (line.trim().equals("}")) {
                             functionSource.append(line).append("\n");
-                            if (preserveFunction) {
+                            if (preserveFunction && !skipFunction) {
                                 resultSource.append("\n").append(functionSource);
                             }
                             functionOffset = -1;
@@ -321,6 +322,7 @@ public class ClassOptimiser<T> {
                             functionSource = new StringBuilder(line).append("\n");
                         }
                         preserveFunction = false;
+                        skipFunction = false;
                     } else {
                         String finalLine = line;
                         //cut lines
