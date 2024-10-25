@@ -32,12 +32,7 @@
 package pko.KiCadLogicalSchemeSimulator.components.Z80;
 import com.codingrodent.microprocessor.Z80.CPUConstants;
 import com.codingrodent.microprocessor.Z80.Z80Core;
-import com.codingrodent.microprocessor.io.device.DeviceRequest;
-import com.codingrodent.microprocessor.io.memory.MemoryRequest;
 import com.codingrodent.microprocessor.io.queue.AsyncIoQueue;
-import com.codingrodent.microprocessor.io.queue.ReadRequest;
-import com.codingrodent.microprocessor.io.queue.Request;
-import com.codingrodent.microprocessor.io.queue.WriteRequest;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
@@ -47,8 +42,8 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 public class Z80Cpu extends SchemaPart {
     protected final InPin waitPin;
     protected final InBus dIn;
-    private final Z80Core cpu;
-    private final AsyncIoQueue ioQueue = new AsyncIoQueue();
+    final Z80Core cpu;
+    final AsyncIoQueue ioQueue = new AsyncIoQueue();
     protected Bus dOut;
     protected Bus aOut;
     protected Pin rdPin;
@@ -58,129 +53,11 @@ public class Z80Cpu extends SchemaPart {
     protected Pin m1Pin;
     protected Pin refreshPin;
     protected Pin haltPin;
-    protected int T;
-    protected int M;
-    private boolean notInWait;
-    private boolean nmiTriggered;
-    private boolean extraWait;
+    Z80CPin cPin;
 
     public Z80Cpu(String id) {
         super(id, null);
         cpu = new Z80Core(ioQueue);
-        addInPin(new InPin("CLK", this) {
-            @Override
-            public void setHi() {
-                state = true;
-                if (M > 0) {
-                    if ((M != 1 && T == 3) || T == 4) {
-                        T = 1;
-                        if (!refreshPin.state) {
-                            refreshPin.setHi();
-                        }
-                        if (!dOut.hiImpedance) {
-                            dOut.setHiImpedance();
-                        }
-                        ioQueue.next();
-                        if (ioQueue.request == null) {
-                            if (nmiTriggered) {
-                                nmiTriggered = false;
-                                cpu.processNMI();
-                                M++;
-                            } else {
-                                M = 1;
-                            }
-                        } else {
-                            M++;
-                        }
-                    } else if (T == 2 && (extraWait || !notInWait)) {
-                        extraWait = false;
-                    } else {
-                        T++;
-                    }
-                    Request ioRequest = ioQueue.request;
-                    switch (T) {
-                        case 1 -> {
-                            if (M == 1) {
-                                m1Pin.setLo();
-                                cpu.executeOneInstruction();
-                                ioRequest = ioQueue.request;
-                            }
-                            aOut.setState(ioRequest.address);
-                            extraWait = ioRequest instanceof DeviceRequest;
-                        }
-                        case 2 -> {
-                            if (ioRequest instanceof DeviceRequest && notInWait) {
-                                ioReqPin.setLo();
-                                if (ioRequest instanceof WriteRequest) {
-                                    wrPin.setLo();
-                                } else {
-                                    rdPin.setLo();
-                                }
-                            }
-                        }
-                        case 3 -> {
-                            if (M == 1) {
-                                ((ReadRequest) ioRequest).callback.accept((int) dIn.state);
-                                rdPin.setHi();
-                                mReqPin.setHi();
-                                m1Pin.setHi();
-                                //FixMe create refresh address counter and set address from it.
-                                refreshPin.setLo();
-                            }
-                        }
-                    }
-                }
-            }
-
-            @Override
-            public void setLo() {
-                state = false;
-                if (M > 0) {
-                    Request ioRequest = ioQueue.request;
-                    switch (T) {
-                        case 1 -> {
-                            if (ioRequest instanceof MemoryRequest) {
-                                mReqPin.setLo();
-                                if (ioRequest instanceof ReadRequest) {
-                                    rdPin.setLo();
-                                }
-                            }
-                            if (ioRequest instanceof WriteRequest writeRequest) {
-                                dOut.setState(writeRequest.payload);
-                            }
-                        }
-                        case 2 -> {
-                            if (ioRequest instanceof WriteRequest && ioRequest instanceof MemoryRequest && notInWait) {
-                                wrPin.setLo();
-                            }
-                            notInWait = waitPin.state;
-                        }
-                        case 3 -> {
-                            if (M == 1) {
-                                mReqPin.setLo();
-                            } else if (ioRequest instanceof MemoryRequest) {
-                                if (ioRequest instanceof ReadRequest readRequest) {
-                                    readRequest.callback.accept((int) dIn.state);
-                                    rdPin.setHi();
-                                } else {
-                                    wrPin.setHi();
-                                }
-                                mReqPin.setHi();
-                            } else {
-                                if (ioRequest instanceof ReadRequest readRequest) {
-                                    readRequest.callback.accept((int) dIn.state);
-                                    rdPin.setHi();
-                                } else {
-                                    wrPin.setHi();
-                                }
-                                ioReqPin.setHi();
-                            }
-                        }
-                        default -> mReqPin.setHi();
-                    }
-                }
-            }
-        });
         addInPin(new InPin("~{RESET}", this) {
             @Override
             public void setHi() {
@@ -202,7 +79,7 @@ public class Z80Cpu extends SchemaPart {
             @Override
             public void setLo() {
                 state = false;
-                nmiTriggered = true;
+                cPin.nmiTriggered = true;
             }
         });
         addInPin("~{INT}");
@@ -219,6 +96,7 @@ public class Z80Cpu extends SchemaPart {
         addTriStateOutBus("D", 8);
         addTriStateOutBus("A", 16);
         dIn = addInBus("D", 8);
+        cPin = addInPin(new Z80CPin("CLK", this));
     }
 
     @Override
@@ -232,6 +110,14 @@ public class Z80Cpu extends SchemaPart {
         haltPin = getOutPin("~{HALT}");
         aOut = getOutBus("A");
         dOut = getOutBus("D");
+        cPin.rdPin = getOutPin("~{RD}");
+        cPin.wrPin = getOutPin("~{WR}");
+        cPin.mReqPin = getOutPin("~{MREQ}");
+        cPin.ioReqPin = getOutPin("~{IORQ}");
+        cPin.m1Pin = getOutPin("~{M1}");
+        cPin.refreshPin = getOutPin("~{RFSH}");
+        cPin.aOut = getOutBus("A");
+        cPin.dOut = getOutBus("D");
     }
 
     @Override
@@ -252,13 +138,13 @@ public class Z80Cpu extends SchemaPart {
                 "\naBC :" + String.format("%04x", cpu.getRegisterValue(CPUConstants.RegisterNames.BC_ALT)) +//
                 "\naDE :" + String.format("%04x", cpu.getRegisterValue(CPUConstants.RegisterNames.DE_ALT)) +//
                 "\nI   :" + String.format("%02x", cpu.getRegisterValue(CPUConstants.RegisterNames.I)) +//
-                "\nNMI triggered:" + nmiTriggered +//
-                "\nM   :" + M +//
-                "\nT   :" + T;
+                "\nNMI triggered:" + cPin.nmiTriggered +//
+                "\nM   :" + cPin.M +//
+                "\nT   :" + cPin.T;
     }
 
     public void reset() {
-        T = 0;
+        cPin.T = 0;
         cpu.reset();
         if (mReqPin.hiImpedance || !mReqPin.state) {
             mReqPin.setHi();
@@ -284,7 +170,7 @@ public class Z80Cpu extends SchemaPart {
         if (refreshPin.hiImpedance || !refreshPin.state) {
             refreshPin.setHi();
         }
-        M = 1;
-        nmiTriggered = false;
+        cPin.M = 1;
+        cPin.nmiTriggered = false;
     }
 }
