@@ -45,8 +45,9 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
     @Getter
     public final long mask;
     public final long nMask;
-    public Bus[] destinations;
     public final BusMerger merger;
+    public Bus[] destinations;
+    public long maskState;
 
     public BusMergerBusIn(Bus source, long mask, BusMerger merger) {
         super(source, "BMergeBIn");
@@ -68,6 +69,29 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
 
     @Override
     public void setState(long newState) {
+        /*Optimiser line setters*/
+        state = newState;
+        /*Optimiser line o*/
+        if (applyMask != 0) {
+            /*Optimiser block byMask bind gm:groupByMask*/
+            newState = newState & applyMask;
+            if (maskState != newState) {
+                maskState = newState;
+            } else {
+                return;
+            }
+            /*Optimiser line o blockEnd byMask*/
+        }
+        /*Optimiser line o*/
+        if (applyOffset > 0) {
+            /*Optimiser line byOffset line positive bind o:groupByOffset*/
+            newState = newState << applyOffset;
+            /*Optimiser line o*/
+        } else if (applyOffset < 0) {
+            /*Optimiser line byOffset line negative bind o:-groupByOffset*/
+            newState = newState >> -applyOffset;
+            /*Optimiser line o*/
+        }
         assert Log.debug(this.getClass(),
                 "Bus merger change. before: newState:{}, Source:{} (state:{},  hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{})",
                 newState,
@@ -79,8 +103,6 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
                 merger.strongPins,
                 merger.weakState,
                 merger.weakPins);
-        /*Optimiser line setters*/
-        state = newState;
         /*Optimiser block sameMask line otherMask*/
         if (mask == merger.mask) {
             /*Optimiser block iSetter*/
@@ -161,9 +183,7 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
             }
             /*Optimiser blockEnd iSetter bind nm:nMask*/
             mergerState &= nMask;
-            //ToDo if we are after maskGroup - don't use mask here
-            /*Optimiser bind m:mask*/
-            mergerState |= newState & mask;
+            mergerState |= newState;
             if (mergerState != merger.state) {
                 merger.state = mergerState;
                 /*Optimiser block setters*/
@@ -360,7 +380,7 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
                 destinations[i].triState = true;
             }
         }
-        ClassOptimiser<BusMergerBusIn> optimiser = new ClassOptimiser<>(this).unroll(merger.destinations.length).bind("m", mask);
+        ClassOptimiser<BusMergerBusIn> optimiser = new ClassOptimiser<>(this).cut("o").unroll(merger.destinations.length).bind("m", mask);
         if (mask == merger.mask) {
             optimiser.cut("otherMask");
         } else {
@@ -372,6 +392,18 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
         if (!triState) {
             optimiser.cut("iSetter");
         }
+        if (applyMask == 0) {
+            optimiser.cut("byMask");
+        } else {
+            optimiser.bind("gm", applyMask);
+        }
+        if (applyOffset == 0) {
+            optimiser.cut("byOffset");
+        } else if (applyOffset > 0) {
+            optimiser.cut("negative").bind("o", applyOffset);
+        } else {
+            optimiser.cut("positive").bind("o", -applyOffset);
+        }
         BusMergerBusIn build = optimiser.build();
         merger.sources.add(build);
         build.source = source;
@@ -379,5 +411,10 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
             destination.source = build;
         }
         return build;
+    }
+
+    @Override
+    public boolean useFullOptimiser() {
+        return true;
     }
 }

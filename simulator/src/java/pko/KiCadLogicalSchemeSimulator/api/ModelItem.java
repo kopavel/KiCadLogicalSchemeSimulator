@@ -46,8 +46,8 @@ public abstract class ModelItem<T> implements IModelItem<T> {
     public boolean triState;
     public boolean processing;
     public boolean hasQueue;
-    public long groupByMask;
-    public byte groupedByOffset;
+    public long applyMask;
+    public byte applyOffset;
     public boolean used;
     public ModelItem<?> source;
     private boolean reportedRecurse;

@@ -203,7 +203,7 @@ public class BusToWiresAdapter extends OutBus {
             } else if (!Simulator.recursive && Utils.notContain(Simulator.recursiveOuts, getName())) {
                 optimiser.cut("recurse");
             }
-            if (groupByMask == 0) {
+            if (applyMask == 0) {
                 optimiser.cut("mask").bind("nState", "newState");
             }
             BusToWiresAdapter build = optimiser.build();

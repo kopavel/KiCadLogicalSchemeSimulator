@@ -189,41 +189,47 @@ public class OffsetBus extends OutBus {
 
     @Override
     public Bus getOptimised(ModelItem<?> source) {
-        for (int i = 0; i < destinations.length; i++) {
-            destinations[i] = destinations[i].getOptimised(this);
-        }
-        ClassOptimiser<OffsetBus> optimiser = new ClassOptimiser<>(this).unroll(destinations.length);
-        if (offset > 0) {
-            optimiser.bind("o", offset);
-            optimiser.cut("negative");
+        if (destinations.length == 1 && destinations[0].useFullOptimiser()) {
+            destinations[0].applyMask = applyMask;
+            destinations[0].applyOffset = offset;
+            return destinations[0].getOptimised(source);
         } else {
-            optimiser.bind("o", -offset);
-            optimiser.cut("positive");
+            for (int i = 0; i < destinations.length; i++) {
+                destinations[i] = destinations[i].getOptimised(this);
+            }
+            ClassOptimiser<OffsetBus> optimiser = new ClassOptimiser<>(this).unroll(destinations.length);
+            if (offset > 0) {
+                optimiser.bind("o", offset);
+                optimiser.cut("negative");
+            } else {
+                optimiser.bind("o", -offset);
+                optimiser.cut("positive");
+            }
+            if (source != null) {
+                optimiser.cut("setters");
+            }
+            if (!triState) {
+                optimiser.cut("iSetter");
+            } else if (applyMask != 0) {
+                optimiser.bind("d", "destination0");
+            }
+            if (destinations.length < 2 || Simulator.noRecursive) {
+                optimiser.cut("allRecurse");
+            } else if (!Simulator.recursive && Utils.notContain(Simulator.recursiveOuts, getName())) {
+                optimiser.cut("recurse");
+            }
+            if (applyMask == 0) {
+                optimiser.cut("mask").bind("v", "newState");
+            } else {
+                optimiser.bind("m", applyMask);
+            }
+            OffsetBus build = optimiser.build();
+            build.source = source;
+            for (Bus destination : destinations) {
+                destination.source = build;
+            }
+            return build;
         }
-        if (source != null) {
-            optimiser.cut("setters");
-        }
-        if (!triState) {
-            optimiser.cut("iSetter");
-        } else if (groupByMask != 0) {
-            optimiser.bind("d", "destination0");
-        }
-        if (destinations.length < 2 || Simulator.noRecursive) {
-            optimiser.cut("allRecurse");
-        } else if (!Simulator.recursive && Utils.notContain(Simulator.recursiveOuts, getName())) {
-            optimiser.cut("recurse");
-        }
-        if (groupByMask == 0) {
-            optimiser.cut("mask").bind("v", "newState");
-        } else {
-            optimiser.bind("m", groupByMask);
-        }
-        OffsetBus build = optimiser.build();
-        build.source = source;
-        for (Bus destination : destinations) {
-            destination.source = build;
-        }
-        return build;
     }
 
     @Override
