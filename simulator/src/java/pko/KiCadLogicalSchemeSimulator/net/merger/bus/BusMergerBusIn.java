@@ -73,7 +73,7 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
         state = newState;
         /*Optimiser line o*/
         if (applyMask != 0) {
-            /*Optimiser block byMask bind gm:groupByMask*/
+            /*Optimiser block byMask bind gm:applyMask*/
             newState = newState & applyMask;
             if (maskState != newState) {
                 maskState = newState;
@@ -84,11 +84,11 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
         }
         /*Optimiser line o*/
         if (applyOffset > 0) {
-            /*Optimiser line byOffset line positive bind o:groupByOffset*/
+            /*Optimiser line byOffset line positive bind o:applyOffset*/
             newState = newState << applyOffset;
             /*Optimiser line o*/
         } else if (applyOffset < 0) {
-            /*Optimiser line byOffset line negative bind o:-groupByOffset*/
+            /*Optimiser line byOffset line negative bind o:-applyOffset*/
             newState = newState >> -applyOffset;
             /*Optimiser line o*/
         }
