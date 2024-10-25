@@ -75,7 +75,10 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
         if (applyMask != 0) {
             /*Optimiser block byMask bind gm:applyMask*/
             newState = newState & applyMask;
-            if (maskState != newState) {
+            if (maskState != newState
+                    /*Optimiser line iSetter*///
+                    || hiImpedance//
+            ) {
                 maskState = newState;
             } else {
                 return;
