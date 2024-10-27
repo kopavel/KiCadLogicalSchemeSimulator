@@ -40,7 +40,7 @@ tasks.register('counters') {
         exec {
             workingDir "$rootDir/stuff/examples/counters"
             executable scriptPath
-            args '-rd', 'counters.net'
+            args 'counters.net'
         }
     }
 }
@@ -51,7 +51,7 @@ tasks.register('z80') {
         exec {
             workingDir "$rootDir/stuff/examples/z80"
             executable scriptPath
-            args '-rd', 'z80.net'
+            args 'z80.net'
 
         }
     }
@@ -63,7 +63,7 @@ tasks.register('trs80') {
         exec {
             workingDir "$rootDir/stuff/examples/trs80"
             executable scriptPath
-            args "-rd", "-ro=VCNT_CHAR2_Q", "-ro=VCNT_CHAR_LINE1_Q", "-ro=VCNT_ROW1_Q", "TRS80I.net"
+            args "TRS80I.net"
 
         }
     }

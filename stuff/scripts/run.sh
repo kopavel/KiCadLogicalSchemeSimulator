@@ -10,7 +10,7 @@ java -Xmx2g \
 --add-opens java.base/java.lang=KiCadLogicalSchemeSimulator.simulator \
 -p "${SCRIPT_DIR}":"${SCRIPT_DIR}/lib":"${SCRIPT_DIR}/schemaParts" \
 --patch-module KiCadLogicalSchemeSimulator.simulator="${SCRIPT_DIR}/optimised" \
--m KiCadLogicalSchemeSimulator.simulator/pko.KiCadLogicalSchemeSimulator.Simulator -od="${SCRIPT_DIR}/optimised" -m="${SCRIPT_DIR}/kicad.sym_map" -m="${SCRIPT_DIR}/retro.sym_map" -m="${SCRIPT_DIR}/chip.sym_map" "$@"
+-m KiCadLogicalSchemeSimulator.simulator/pko.KiCadLogicalSchemeSimulator.Simulator -od="${SCRIPT_DIR}/optimised" -md="${SCRIPT_DIR}" "$@"
 
 # Check the exit code from Java application
 if [ $? -eq 0 ]; then
