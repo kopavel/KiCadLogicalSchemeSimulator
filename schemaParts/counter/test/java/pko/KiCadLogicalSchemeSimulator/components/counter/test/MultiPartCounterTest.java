@@ -59,8 +59,8 @@ public class MultiPartCounterTest extends NetTester {
     void resetPinResetsCounter() {
         setLo("Ca");
         setLo("Cb");
-        checkBus("inB", 1, "Count should be 1 before reset");
         checkPin("inA", true, "Count should be 1 before reset");
+        checkBus("inB", 1, "Count should be 1 before reset");
         setHi("R0");
         setHi("R1");
         checkPin("inA", false, "Count should reset on rising edge of reset pin");

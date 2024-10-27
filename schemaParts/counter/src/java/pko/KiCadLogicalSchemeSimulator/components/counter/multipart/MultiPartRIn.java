@@ -82,8 +82,8 @@ public class MultiPartRIn extends InPin {
                 /*Optimiser bind nMask*/
                 parent.resetState &= nMask;
             }
-        } else
-            /*Optimiser blockEnd nr*/
+            /*Optimiser blockEnd nr line o block r*/
+        } else//
             if (parent.resetState == 0) {
                 /*Optimiser bind mask*/
                 parent.resetState = mask;
@@ -94,7 +94,7 @@ public class MultiPartRIn extends InPin {
                 /*Optimiser bind mask*/
                 parent.resetState |= mask;
             }
-        /*Optimiser blockEnd and*/
+        /*Optimiser blockEnd and blockEnd r*/
     }
 
     @Override
@@ -115,8 +115,8 @@ public class MultiPartRIn extends InPin {
                 /*Optimiser bind nMask*/
                 parent.resetState &= nMask;
             }
-        } else
-            /*Optimiser blockEnd r*/
+            /*Optimiser blockEnd r block nr line o*/
+        } else//
             if (parent.resetState == 0) {
                 /*Optimiser bind mask*/
                 parent.resetState = mask;
@@ -127,7 +127,7 @@ public class MultiPartRIn extends InPin {
                 /*Optimiser bind mask*/
                 parent.resetState |= mask;
             }
-        /*Optimiser blockEnd and*/
+        /*Optimiser blockEnd and blockEnd nr*/
     }
 
     @Override

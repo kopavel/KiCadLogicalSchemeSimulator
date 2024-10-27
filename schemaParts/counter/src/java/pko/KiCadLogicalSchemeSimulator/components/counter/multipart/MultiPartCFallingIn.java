@@ -96,7 +96,7 @@ public class MultiPartCFallingIn extends FallingEdgePin implements MultiPartCIn 
                 /*Optimiser line o blockEnd pin*/
             } else if (skipMask != 0) {
                 /*Optimiser line skip bind skip:skipMask*///
-                outBus.setState(outBus.state + (((outBus.state & skipMask) == skipMask) ? 2 : 1));
+                outBus.setState((outBus.state + (((outBus.state & skipMask) == skipMask) ? 2 : 1)) & countMask);
                 /*Optimiser line o*/
             } else {
                 /*Optimiser line bus bind countMask*///
