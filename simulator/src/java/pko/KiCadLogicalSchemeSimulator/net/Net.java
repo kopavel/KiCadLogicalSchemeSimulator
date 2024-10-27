@@ -79,8 +79,10 @@ public class Net {
         this.optimisedDir = optimisedDir;
         Log.info(Net.class, "Start Net building");
         SchemaPartMap schemaPartMap = new SchemaPartMap();
-        for (String mapPath : mapPaths) {
-            parse(mapPath, schemaPartMap);
+        if (mapPaths != null) {
+            for (String mapPath : mapPaths) {
+                parse(mapPath, schemaPartMap);
+            }
         }
         final Map<String, Part> partParamMap = new HashMap<>();
         if (partParams != null) {
