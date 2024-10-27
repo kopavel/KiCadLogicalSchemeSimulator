@@ -123,7 +123,7 @@ run {
     jvmArgs(jvm_args)
     if (project.hasProperty('appArgs')) {
         def appArgsList = project.getProperties().get('appArgs').toString().split(",")
-        appArgsList += ["-od", "$rootDir/simulator/optimised".toString()]
+        appArgsList += ["-od", "$rootDir/simulator/optimised".toString(), "-md", "$rootDir/stuff/kicad_symbols".toString()]
         args(appArgsList)
     }
     if (project.hasProperty('workDir')) {

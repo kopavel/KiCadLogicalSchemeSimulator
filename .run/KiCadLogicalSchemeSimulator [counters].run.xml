@@ -4,8 +4,7 @@
 			<option name="executionName"/>
 			<option name="externalProjectPath" value="$PROJECT_DIR$"/>
 			<option name="externalSystemIdString" value="GRADLE"/>
-			<option name="scriptParameters"
-			        value="-PappArgs=&quot;-rd,-m=../../kicad_symbols/kicad.sym_map,-m=../../kicad_symbols/chip.sym_map,counters.net&quot; -PworkDir=&quot;stuff/examples/counters&quot;"/>
+			<option name="scriptParameters" value="-PappArgs=&quot;counters.net&quot; -PworkDir=&quot;stuff/examples/counters&quot;"/>
 			<option name="taskDescriptions">
 				<list/>
 			</option>

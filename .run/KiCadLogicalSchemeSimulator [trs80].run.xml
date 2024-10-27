@@ -4,8 +4,7 @@
 			<option name="executionName"/>
 			<option name="externalProjectPath" value="$PROJECT_DIR$"/>
 			<option name="externalSystemIdString" value="GRADLE"/>
-			<option name="scriptParameters"
-                    value="-PappArgs=&quot;-md=../../kicad_symbols,TRS80I.net&quot; -PworkDir=&quot;/stuff/examples/trs80&quot;"/>
+			<option name="scriptParameters" value="-PappArgs=&quot;TRS80I.net&quot; -PworkDir=&quot;/stuff/examples/trs80&quot;"/>
 			<option name="taskDescriptions">
 				<list/>
 			</option>
