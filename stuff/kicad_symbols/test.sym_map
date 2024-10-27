@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<symbolMap>
+<symbolMap xmlns="pko.kicadLogicalSimulator.map">
 	<lib name="Tests">
 		<symbol name="OutBus" symPartClass="TestOutBus"/>
 		<symbol name="OutBus4x" symPartClass="TestOutBus" symPartParam="size=4"/>

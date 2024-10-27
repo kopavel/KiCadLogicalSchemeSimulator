@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<symbolMap>
+<symbolMap xmlns="pko.kicadLogicalSimulator.map">
 	<lib name="retro">
 		<symbol name="MK4116" symPartClass="SingleBitSdRam" symPartParam="size=7;reverse">
 			<unit pinMap="2=Din;3=~{WE};4=~{RAS};5=A0;6=A2;7=A1;10=A5;11=A4;12=A3;13=A6;14=Dout;15=~{CAS}"/>

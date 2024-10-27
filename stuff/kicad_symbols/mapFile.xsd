@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns="pko.kicadLogicalSimulator.map"
+           elementFormDefault="qualified"
+           targetNamespace="pko.kicadLogicalSimulator.map">
+	<xs:simpleType name="ClassName">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[A-Z][a-zA-Z0-9]*"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="pinMapType">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="((power|([0-9]+=[~{}a-zA-Z0-9]+));?)+"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="symPartParamType">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="([A-Za-z]+(=[^;]+)?;?)+"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:element name="symbolMap" type="symbolMapType"/>
+	<xs:complexType name="symbolMapType">
+		<xs:sequence>
+			<xs:element maxOccurs="unbounded" name="lib" type="libType"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="libType">
+		<xs:sequence>
+			<xs:element name="symbol" maxOccurs="unbounded" type="symbolType"/>
+		</xs:sequence>
+		<xs:attribute name="name" use="required" type="xs:NMTOKEN"/>
+	</xs:complexType>
+	<xs:complexType name="symbolType">
+		<xs:sequence>
+			<xs:element minOccurs="0" maxOccurs="unbounded" name="unit" type="unitType"/>
+		</xs:sequence>
+		<xs:attribute name="name" use="required" type="xs:NMTOKEN"/>
+		<xs:attribute name="symPartClass" use="required" type="ClassName"/>
+		<xs:attribute name="symPartParam" type="symPartParamType"/>
+	</xs:complexType>
+	<xs:complexType name="unitType">
+		<xs:attribute name="pinMap" use="required" type="pinMapType"/>
+	</xs:complexType>
+</xs:schema>

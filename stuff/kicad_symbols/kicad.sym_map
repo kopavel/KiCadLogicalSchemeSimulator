@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<symbolMap>
+<symbolMap xmlns="pko.kicadLogicalSimulator.map">
 	<lib name="Diode">
 		<symbol name="BA157" symPartClass="Diode"/>
 		<symbol name="1.5KExxA" symPartClass="Diode">
-			<unit pinMap="A2=A;A1=K"/>
+			<unit pinMap="2=A;1=K"/>
 		</symbol>
 		<symbol name="1N47xxA" symPartClass="Diode"/>
 		<symbol name="1N47xxB" symPartClass="Diode"/>
 		<symbol name="1N62xxA" symPartClass="Diode">
-			<unit pinMap="A2=A;A1=K"/>
+			<unit pinMap="2=A;1=K"/>
 		</symbol>
 		<symbol name="1N630xA" symPartClass="Diode">
-			<unit pinMap="A2=A;A1=K"/>
+			<unit pinMap="2=A;1=K"/>
 		</symbol>
 		<symbol name="1N914" symPartClass="Diode"/>
 		<symbol name="1N914WT" symPartClass="Diode"/>
@@ -61,7 +61,7 @@
 		<symbol name="1N6858UR" symPartClass="Diode"/>
 		<symbol name="1SS355VM" symPartClass="Diode"/>
 		<symbol name="5KPxxA" symPartClass="Diode">
-			<unit pinMap="A2=A;A1=K"/>
+			<unit pinMap="2=A;1=K"/>
 		</symbol>
 		<symbol name="B120-E3" symPartClass="Diode"/>
 		<symbol name="B130-E3" symPartClass="Diode"/>
@@ -183,7 +183,7 @@
 			<unit pinMap="11=IN0;12=IN1;13=IN2;10=OUT"/>
 			<unit pinMap="power;7=NC;14=NC"/>
 		</symbol>
-		<symbol name="4027" symPartClass="JkTrigger" symPartParam="">
+		<symbol name="4027" symPartClass="JkTrigger">
 			<unit pinMap="6=J;3=C;5=K;1=Q;2=~{Q};7=S;4=R"/>
 			<unit pinMap="10=J;13=C;11=K;15=Q;14=~{Q};9=S;12=R"/>
 			<unit pinMap="power;8=NC;16=NC"/>
