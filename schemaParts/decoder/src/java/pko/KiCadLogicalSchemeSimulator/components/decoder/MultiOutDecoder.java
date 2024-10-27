@@ -115,7 +115,7 @@ public class MultiOutDecoder extends SchemaPart {
                         @Override
                         public void setLo() {
                             state = false;
-                            if (csStates[finalI] == nMask) {
+                            if (csStates[finalI] == mask) {
                                 outBuses[finalI].setState(outState);
                                 csStates[finalI] = 0;
                             } else {
@@ -129,7 +129,7 @@ public class MultiOutDecoder extends SchemaPart {
                         @Override
                         public void setHi() {
                             state = true;
-                            if (csStates[finalI] == nMask) {
+                            if (csStates[finalI] == mask) {
                                 outBuses[finalI].setState(outState);
                                 csStates[finalI] = 0;
                             } else {

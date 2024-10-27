@@ -48,7 +48,7 @@ public class MultiOutDecoderTest extends NetTester {
         checkBusImpedance("outA", "with partial CS pins state outA bus state must be hiImpedance ");
         checkBusImpedance("outB", "without outB bus state must be hiImpedance ");
         setBus("Ea", 0b01);
-        assertFalse(inBus("outA").hiImpedance, "with CS pins set  outA bus state must not be hiImpedance ");
+        assertFalse(inBus("outA").hiImpedance, "with CS pins set outA bus state must not be hiImpedance ");
         checkBus("outA", 0b1110, "outA bus state must be 0b1110");
         checkBusImpedance("outB", "without outB bus state must be hiImpedance ");
         setBus("Ea", 0b11);
@@ -57,7 +57,7 @@ public class MultiOutDecoderTest extends NetTester {
         checkBusImpedance("outB", "with partial CS pins state outB bus state must be hiImpedance ");
         setBus("Eb", 0b00);
         checkBusImpedance("outA", "with partial CS pins state outA bus state must be hiImpedance ");
-        assertFalse(inBus("outB").hiImpedance, "with CS pins set  outB bus state must not be hiImpedance ");
+        assertFalse(inBus("outB").hiImpedance, "with CS pins set outB bus state must not be hiImpedance ");
         checkBus("outB", 0b1110, "outB bus state must be 0b1110");
     }
 
