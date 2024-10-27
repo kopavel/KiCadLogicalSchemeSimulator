@@ -38,7 +38,8 @@ module KiCadLogicalSchemeSimulator.simulator {
     exports pko.KiCadLogicalSchemeSimulator.net;
     exports pko.KiCadLogicalSchemeSimulator.optimiser;
     exports pko.KiCadLogicalSchemeSimulator.parsers.pojo.symbolMap;
-    exports pko.KiCadLogicalSchemeSimulator.parsers.pojo;
+    exports pko.KiCadLogicalSchemeSimulator.parsers.pojo.net;
+    exports pko.KiCadLogicalSchemeSimulator.parsers.pojo.param;
     exports pko.KiCadLogicalSchemeSimulator.tools.ringBuffers;
     exports pko.KiCadLogicalSchemeSimulator.tools;
     exports pko.KiCadLogicalSchemeSimulator;
@@ -50,7 +51,8 @@ module KiCadLogicalSchemeSimulator.simulator {
     opens pko.KiCadLogicalSchemeSimulator.net.merger.wire;
     opens pko.KiCadLogicalSchemeSimulator.optimiser;
     opens pko.KiCadLogicalSchemeSimulator.parsers.pojo.symbolMap;
-    opens pko.KiCadLogicalSchemeSimulator.parsers.pojo;
+    opens pko.KiCadLogicalSchemeSimulator.parsers.pojo.net;
+    opens pko.KiCadLogicalSchemeSimulator.parsers.pojo.param;
     opens pko.KiCadLogicalSchemeSimulator;
     requires com.fasterxml.jackson.annotation;
     requires com.fasterxml.jackson.core;

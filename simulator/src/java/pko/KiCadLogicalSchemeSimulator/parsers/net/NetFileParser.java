@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.parsers.net;
-import pko.KiCadLogicalSchemeSimulator.parsers.pojo.*;
+import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.*;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

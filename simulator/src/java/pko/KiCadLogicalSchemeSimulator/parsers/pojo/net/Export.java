@@ -29,7 +29,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.parsers.pojo;
+package pko.KiCadLogicalSchemeSimulator.parsers.pojo.net;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
@@ -37,15 +37,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-
-@XmlAccessorType(XmlAccessType.FIELD)
-@Getter
 @Setter
+@Getter
+@XmlAccessorType(XmlAccessType.FIELD)
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Comp {
-    protected LibSource libsource;
-    protected List<Property> property;
-    protected String ref;
+public class Export {
+    protected Components components;
+    protected Nets nets;
 }

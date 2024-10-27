@@ -232,7 +232,7 @@ public class OutBus extends Bus {
                 destinations[i] = destinations[i].getOptimised(this);
             }
             ClassOptimiser<OutBus> optimiser = new ClassOptimiser<>(this, OutBus.class).unroll(destinations.length);
-            if (!Simulator.recursive && Utils.notContain(Simulator.recursiveOuts, getName())) {
+            if (!Simulator.recursive && Utils.notContain(Simulator.recursiveOuts, getName()) && !parent.recursive.contains(getId())) {
                 if (Simulator.noRecursive) {
                     optimiser.cut("allRecurse");
                 } else {

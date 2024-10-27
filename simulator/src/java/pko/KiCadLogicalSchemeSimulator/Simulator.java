@@ -38,7 +38,9 @@ import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
 import pko.KiCadLogicalSchemeSimulator.net.Net;
 import pko.KiCadLogicalSchemeSimulator.parsers.net.NetFileParser;
-import pko.KiCadLogicalSchemeSimulator.parsers.pojo.Export;
+import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Export;
+import pko.KiCadLogicalSchemeSimulator.parsers.pojo.param.Params;
+import pko.KiCadLogicalSchemeSimulator.parsers.pojo.param.Part;
 import pko.KiCadLogicalSchemeSimulator.parsers.xml.XmlParser;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
@@ -66,6 +68,8 @@ public class Simulator implements Runnable {
     public static Net net;
     @CommandLine.Option(names = {"-od", "--optimisedDir"}, description = "Cache directory path for generated optimised classes")
     public static String optimisedDir = "optimised";
+    @CommandLine.Option(names = {"-md", "--mapFileDir"}, description = "Map file directory path")
+    public static String mapFileDir;
     @CommandLine.Option(names = {"-r", "--recursive"}, description = "Enable recursive event processing, slower simulation")
     public static boolean recursive;
     @CommandLine.Option(names = {"-rd", "--recursive-disabled"}, description = "Disable recursive support completely, some speedup")
@@ -83,6 +87,7 @@ public class Simulator implements Runnable {
             throw new RuntimeException(e);
         }
     }
+    public List<Part> partParams;
     @CommandLine.Parameters(index = "0", arity = "1", description = "Path to KiCad NET file")
     public String netFilePath;
     @CommandLine.Option(names = {"-m", "--mapFile"}, description = "Path to KiCad symbol mapping file")
@@ -212,14 +217,47 @@ public class Simulator implements Runnable {
             if (!new File(netFilePath).exists()) {
                 throw new Exception("Cant fine NET file " + netFilePath);
             }
-            if (mapFiles != null) {
-                for (String mapFile : mapFiles) {
-                    if (!new File(mapFile).exists()) {
-                        throw new Exception("Can't fine Symbol map file " + mapFile);
+            netFilePathNoExtension = netFilePath.substring(0, netFilePath.lastIndexOf("."));
+            if (new File(netFilePathNoExtension + ".sym_param").exists()) {
+                Params params = XmlParser.parse(netFilePathNoExtension + ".sym_param", Params.class);
+                if (params.recursive != null) {
+                    recursive = params.recursive;
+                }
+                if (params.noRecursive != null) {
+                    noRecursive = params.noRecursive;
+                }
+                partParams = params.part;
+                if (params.mapFile != null) {
+                    if (mapFiles == null) {
+                        mapFiles = params.mapFile.toArray(new String[0]);
+                    } else {
+                        for (String mapFile : mapFiles) {
+                            mapFiles = Utils.addToArray(mapFiles, mapFile);
+                        }
                     }
                 }
             }
-            netFilePathNoExtension = netFilePath.substring(0, netFilePath.lastIndexOf("."));
+            if (mapFiles != null) {
+                for (int i = 0; i < mapFiles.length; i++) {
+                    String mapFile = mapFiles[i];
+                    if (!mapFile.endsWith(".sym_map")) {
+                        mapFile += ".sym_map";
+                    }
+                    File file = new File(mapFile);
+                    if (!file.exists() || !file.isFile()) {
+                        if (mapFileDir != null) {
+                            file = new File(mapFileDir + File.separator + mapFile);
+                            if (!file.exists() || !file.isFile()) {
+                                throw new Exception("Can't fine Symbol map file " + mapFile);
+                            } else {
+                                mapFiles[i] = mapFileDir + "/" + mapFile;
+                            }
+                        } else {
+                            throw new Exception("Can't fine Symbol map file " + mapFile);
+                        }
+                    }
+                }
+            }
             loadLocale();
             SwingUtilities.invokeAndWait(() -> {
                 try {
@@ -231,9 +269,9 @@ public class Simulator implements Runnable {
                 ui.setVisible(true);
             });
             if (netFilePath.endsWith("xml")) {
-                net = new Net(XmlParser.parse(netFilePath, Export.class), mapFiles, optimisedDir);
+                net = new Net(XmlParser.parse(netFilePath, Export.class), mapFiles, optimisedDir, partParams);
             } else if (netFilePath.endsWith(".net")) {
-                net = new Net(new NetFileParser().parse(netFilePath), mapFiles, optimisedDir);
+                net = new Net(new NetFileParser().parse(netFilePath), mapFiles, optimisedDir, partParams);
             } else {
                 throw new RuntimeException("Unsupported file extension. " + netFilePath);
             }

@@ -29,20 +29,22 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.parsers.pojo;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+package pko.KiCadLogicalSchemeSimulator.parsers.pojo.param;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @XmlAccessorType(XmlAccessType.FIELD)
 @Getter
 @Setter
 @NoArgsConstructor
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class LibSource {
-    String lib;
-    String part;
+public class Params {
+    public List<Part> part;
+    public List<String> mapFile;
+    public Boolean recursive;
+    public Boolean noRecursive;
 }

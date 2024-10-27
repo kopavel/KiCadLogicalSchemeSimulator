@@ -200,7 +200,7 @@ public class BusToWiresAdapter extends OutBus {
             }
             if (destinations.length < 2 || Simulator.noRecursive) {
                 optimiser.cut("allRecurse");
-            } else if (!Simulator.recursive && Utils.notContain(Simulator.recursiveOuts, getName())) {
+            } else if (!Simulator.recursive && Utils.notContain(Simulator.recursiveOuts, getName()) && !parent.recursive.contains(getId())) {
                 optimiser.cut("recurse");
             }
             if (applyMask == 0) {

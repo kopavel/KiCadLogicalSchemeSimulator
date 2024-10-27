@@ -87,7 +87,7 @@ public abstract class ModelItem<T> implements IModelItem<T> {
         if (Net.stabilizing) {
             hasQueue = false;
             return true;
-        } else if (!Simulator.recursive && Utils.notContain(Simulator.recursiveOuts, getName())) {
+        } else if (!Simulator.recursive && Utils.notContain(Simulator.recursiveOuts, getName()) && !parent.recursive.contains(getId())) {
             if (!reportedRecurse) {
                 Log.error(this.getClass(),
                         "Recursive event loop detected, enable recurse, passing -r parameter to simulator, for specific out only pass -ro={}",

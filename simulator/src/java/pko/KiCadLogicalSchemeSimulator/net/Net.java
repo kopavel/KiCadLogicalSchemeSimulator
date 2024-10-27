@@ -44,9 +44,10 @@ import pko.KiCadLogicalSchemeSimulator.net.merger.bus.BusMerger;
 import pko.KiCadLogicalSchemeSimulator.net.merger.wire.PassiveInMerger;
 import pko.KiCadLogicalSchemeSimulator.net.merger.wire.WireMerger;
 import pko.KiCadLogicalSchemeSimulator.net.wire.NCWire;
-import pko.KiCadLogicalSchemeSimulator.parsers.pojo.Comp;
-import pko.KiCadLogicalSchemeSimulator.parsers.pojo.Export;
-import pko.KiCadLogicalSchemeSimulator.parsers.pojo.Property;
+import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Comp;
+import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Export;
+import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Property;
+import pko.KiCadLogicalSchemeSimulator.parsers.pojo.param.Part;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.symbolMap.SchemaPartMap;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.symbolMap.SymbolDesc;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.symbolMap.SymbolLibMap;
@@ -74,14 +75,19 @@ public class Net {
     private final Map<String, OutPin> wireMergers = new TreeMap<>();
     private final Map<IModelItem<?>, IModelItem<?>> replacement = new HashMap<>();
 
-    public Net(Export export, String[] mapPaths, String optimisedDir) throws IOException {
+    public Net(Export export, String[] mapPaths, String optimisedDir, List<Part> partParams) throws IOException {
         this.optimisedDir = optimisedDir;
         Log.info(Net.class, "Start Net building");
         SchemaPartMap schemaPartMap = new SchemaPartMap();
         for (String mapPath : mapPaths) {
             parse(mapPath, schemaPartMap);
         }
-        export.getComponents().getComp().forEach((Comp component) -> createSchemaPart(component, schemaPartMap));
+        final Map<String, Part> partParamMap = new HashMap<>();
+        if (partParams != null) {
+            partParamMap.putAll(partParams.stream()
+                    .collect(Collectors.toMap(e -> e.id, e -> e)));
+        }
+        export.getComponents().getComp().forEach((Comp component) -> createSchemaPart(component, schemaPartMap, partParamMap));
         export.getNets().getNet().forEach(this::groupSourcesByDestinations);
         buildNet();
         schemaParts.values().forEach(SchemaPart::initOuts);
@@ -141,7 +147,7 @@ public class Net {
         return retVal;
     }
 
-    private void groupSourcesByDestinations(pko.KiCadLogicalSchemeSimulator.parsers.pojo.Net net) {
+    private void groupSourcesByDestinations(pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Net net) {
         if (net.getName().startsWith("unconnected-")) {
             return;
         }
@@ -356,7 +362,7 @@ public class Net {
         outItem.getParent().replaceOut(outItem);
     }
 
-    private void createSchemaPart(Comp component, SchemaPartMap map) {
+    private void createSchemaPart(Comp component, SchemaPartMap map, Map<String, Part> partParams) {
         SymbolDesc symbolDesc = null;
         if (map != null) {
             SymbolLibMap lib = map.libs.get(component.getLibsource().getLib());
@@ -365,9 +371,18 @@ public class Net {
             }
         }
         String id = component.getRef();
-        String className = findSchemaPartProperty(component, "SymPartClass");
-        if ((className == null || className.isBlank()) && symbolDesc != null) {
-            className = symbolDesc.clazz;
+        Part params = partParams.get(id);
+        if (params != null && params.ignore) {
+            return;
+        }
+        String className;
+        if (params != null && params.symPartClass != null) {
+            className = params.symPartClass;
+        } else {
+            className = findSchemaPartProperty(component, "SymPartClass");
+            if ((className == null || className.isBlank()) && symbolDesc != null) {
+                className = symbolDesc.clazz;
+            }
         }
         if (className == null || className.isBlank()) {
             throw new RuntimeException("SchemaPart id:" + id + "(lib:" + component.getLibsource().getLib() + " part:" + component.getLibsource().getPart() +
@@ -378,6 +393,9 @@ public class Net {
             parameters += symbolDesc.params + ";";
         }
         parameters += findSchemaPartProperty(component, "SymPartParam");
+        if (params != null && params.symPartParam != null) {
+            parameters += ";" + params.symPartParam;
+        }
         if (symbolDesc == null || symbolDesc.units == null) {
             SchemaPart schemaPart = getSchemaPart(className, id, parameters);
             schemaParts.put(schemaPart.id, schemaPart);

@@ -250,7 +250,7 @@ public class OutPin extends Pin {
             }
             split();
             ClassOptimiser<OutPin> optimiser = new ClassOptimiser<>(this, OutPin.class).unroll("i", toImp.length).unroll("l", toLow.length).unroll("h", toHi.length);
-            if (!Simulator.recursive && Utils.notContain(Simulator.recursiveOuts, getName())) {
+            if (!Simulator.recursive && Utils.notContain(Simulator.recursiveOuts, getName()) && !parent.recursive.contains(getId())) {
                 if (Simulator.noRecursive) {
                     optimiser.cut("allRecurse");
                 } else {

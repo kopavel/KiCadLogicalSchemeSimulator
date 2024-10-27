@@ -38,8 +38,7 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.TriStateOutBus;
 import pko.KiCadLogicalSchemeSimulator.api.wire.*;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @SuppressWarnings("unused")
 public abstract class SchemaPart {
@@ -48,6 +47,7 @@ public abstract class SchemaPart {
     public final Map<IModelItem<?>, String> ids = new HashMap<>();
     public final Map<String, ModelItem<?>> outPins = new HashMap<>();
     public final boolean reverse;
+    public final List<String> recursive = new ArrayList<>();
     protected final Map<String, String> params = new HashMap<>();
     protected final boolean nReverse;
     public Map<Integer, String> pinNumberMap;
@@ -64,6 +64,9 @@ public abstract class SchemaPart {
         }
         reverse = params.containsKey("reverse");
         nReverse = !reverse;
+        if (params.containsKey("recursive")) {
+            recursive.addAll(Arrays.stream(params.get("recursive").split(",")).toList());
+        }
     }
 
     public InPin addInPin(String pinId) {

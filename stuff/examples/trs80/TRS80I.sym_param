@@ -1,0 +1,8 @@
+<params noRecursive="true" xmlns="pko.kicadLogicalSimulator.param">
+	<part id="VCNT_CHAR2" symPartParam="recursive=Q"/>
+	<part id="VCNT_CHAR_LINE1" symPartParam="recursive=Q"/>
+	<part id="VCNT_ROW1" symPartParam="recursive=Q"/>
+	<mapFile>kicad</mapFile>
+	<mapFile>chip</mapFile>
+	<mapFile>retro</mapFile>
+</params>

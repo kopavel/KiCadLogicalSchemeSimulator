@@ -171,7 +171,7 @@ public abstract class NetTester {
                 rootPath + "/stuff/kicad_symbols/kicad.sym_map",//
                 rootPath + "/stuff/kicad_symbols/chip.sym_map",//
                 rootPath + "/stuff/kicad_symbols/test.sym_map"//
-        }, rootPath + "/simulator/optimised");
+        }, rootPath + "/simulator/optimised", null);
 /*
         for (String part : net.schemaParts.keySet()) {
             System.out.println("load schema part " + part);
