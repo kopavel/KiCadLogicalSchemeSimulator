@@ -60,6 +60,7 @@ public class OutPin extends Pin {
 
     public void addDestination(Pin pin) {
         assert pin != this;
+        used = true;
         pin.used = true;
         pin.triState = triState;
         if (!(pin instanceof NCWire)) {

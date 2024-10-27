@@ -59,6 +59,7 @@ public abstract class Pin extends ModelItem<Pin> {
 
     @Override
     public Pin copyState(IModelItem<Pin> oldPin) {
+        used = true;
         this.strong = oldPin.isStrong();
         Pin pin = oldPin.getThis();
         this.state = pin.state;

@@ -67,6 +67,7 @@ public class OutBus extends Bus {
     }
 
     public void addDestination(Bus bus, long mask, byte offset) {
+        used = true;
         bus.used = true;
         bus.triState = triState;
         if (offset != 0) {
@@ -94,6 +95,7 @@ public class OutBus extends Bus {
     }
 
     public void addDestination(Pin pin, long mask) {
+        used = true;
         pin.used = true;
         pin.triState = triState;
         MaskGroupBus maskGroup = Arrays.stream(destinations)

@@ -79,25 +79,34 @@ public class DcRPin extends InPin {
 
         /*Optimiser line o block nr*/
         if (!reverse) {
-            if (!iqOut.state) {
-                iqOut.setHi();
-                /*Optimiser block noS*/
-            }
-            if (!sPin.state) {
-                /*Optimiser blockEnd noS*/
+            /*Optimiser block q*/
+            if (
+                /*Optimiser line s*/
+                    !sPin.state &&//
+                            qOut.state) {
                 qOut.setLo();
+                /*Optimiser line s block nq*/
             }
-            /*Optimiser block noS block r blockEnd nr line o*/
+            /*Optimiser line sq blockEnd q*/
+            if (!iqOut.state) {
+                /*Optimiser blockEnd s*/
+                iqOut.setHi();
+                /*Optimiser blockEnd nq*/
+            }
+            /*Optimiser block s block r blockEnd nr line o*/
         } else//
             if (!sPin.state) {
-                if (iqOut.state) {
-                    iqOut.setLo();
-                }
+                /*Optimiser block q*/
                 if (!qOut.state) {
                     qOut.setHi();
                 }
+                /*Optimiser blockEnd q block nq*/
+                if (iqOut.state) {
+                    iqOut.setLo();
+                }
+                /*Optimiser blockEnd nq*/
             }
-        /*Optimiser blockEnd r blockEnd noS*/
+        /*Optimiser blockEnd r blockEnd s*/
     }
 
     @Override
@@ -115,15 +124,20 @@ public class DcRPin extends InPin {
         ;
         /*Optimiser line o block r*/
         if (reverse) {
+            /*Optimiser block q*/
+            if (
+                /*Optimiser line s*/
+                    sPin.state &&//
+                            qOut.state) {
+                qOut.setLo();
+                /*Optimiser line s block nq*/
+            }
+            /*Optimiser line sq blockEnd q*/
             if (!iqOut.state) {
                 iqOut.setHi();
-                /*Optimiser block noS*/
+                /*Optimiser blockEnd nq*/
             }
-            if (sPin.state) {
-                /*Optimiser blockEnd noS*/
-                qOut.setLo();
-            }
-            /*Optimiser line o block noS blockEnd r block nr*/
+            /*Optimiser line o block s blockEnd r block nr*/
         } else//
             if (sPin.state) {
                 if (iqOut.state) {
@@ -133,7 +147,7 @@ public class DcRPin extends InPin {
                     qOut.setHi();
                 }
             }
-        /*Optimiser blockEnd noS blockEnd nr*/
+        /*Optimiser blockEnd s blockEnd nr*/
     }
 
     @Override
@@ -144,18 +158,26 @@ public class DcRPin extends InPin {
         } else {
             optimiser.cut("r");
         }
-        if (!parent.sPin.used) {
-            optimiser.cut("noS");
+        if (!sPin.used) {
+            optimiser.cut("s");
+            if (qOut.used) {
+                optimiser.cut("sq");
+            }
             if (reverse) {
                 optimiser.bind("true", "false");
                 optimiser.bind("false", "true");
             } else {
-                optimiser.bind("true", "false");
+                optimiser.bind("true", "true");
                 optimiser.bind("false", "false");
             }
         }
         if (source != null && !sPin.used) {
             optimiser.cut("setter");
+        }
+        if (!qOut.used) {
+            optimiser.cut("q");
+        } else if (!iqOut.used) {
+            optimiser.cut("nq");
         }
         DcRPin build = optimiser.build();
         parent.rPin = build;

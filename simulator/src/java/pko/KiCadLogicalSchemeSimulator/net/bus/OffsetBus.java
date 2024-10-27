@@ -192,7 +192,7 @@ public class OffsetBus extends OutBus {
         if (destinations.length == 1 && destinations[0].useFullOptimiser()) {
             destinations[0].applyMask = applyMask;
             destinations[0].applyOffset = offset;
-            return destinations[0].getOptimised(source);
+            return destinations[0].getOptimised(source).copyState(this);
         } else {
             for (int i = 0; i < destinations.length; i++) {
                 destinations[i] = destinations[i].getOptimised(this);

@@ -72,22 +72,26 @@ public class DcCFallingPin extends FallingEdgePin {
         /*Optimiser line anyRS*/
         if (parent.clockEnabled) {
             if (dPin.state) {
+                /*Optimiser block q*/
+                if (!qOut.state) {
+                    qOut.setHi();
+                    /*Optimiser line bothRS block nq*/
+                }
+                /*Optimiser line bothRSQ blockEnd q*/
                 if (iqOut.state) {
                     iqOut.setLo();
-                    /*Optimiser block bothRS block anyRS*/
-                }
-                if (!qOut.state) {
-                    /*Optimiser blockEnd bothRS  blockEnd anyRS*/
-                    qOut.setHi();
+                    /*Optimiser blockEnd nq*/
                 }
             } else {
+                /*Optimiser block q*/
                 if (qOut.state) {
                     qOut.setLo();
-                    /*Optimiser block bothRS  block anyRS*/
+                    /*Optimiser line bothRS block nq*/
                 }
+                /*Optimiser line bothRSQ blockEnd q*/
                 if (!iqOut.state) {
-                    /*Optimiser blockEnd bothRS  blockEnd anyRS*/
                     iqOut.setHi();
+                    /*Optimiser blockEnd nq*/
                 }
             }
             /*Optimiser line anyRS*/
@@ -103,9 +107,17 @@ public class DcCFallingPin extends FallingEdgePin {
             optimiser.cut("anyRS");
         } else if (!bothRs) {
             optimiser.cut("bothRS");
+            if (qOut.used) {
+                optimiser.cut("bothRSQ");
+            }
         }
         if (source != null) {
             optimiser.cut("setter");
+        }
+        if (!iqOut.used) {
+            optimiser.cut("nq");
+        } else if (!qOut.used) {
+            optimiser.cut("q");
         }
         DcCFallingPin build = optimiser.build();
         parent.ncPin = build;

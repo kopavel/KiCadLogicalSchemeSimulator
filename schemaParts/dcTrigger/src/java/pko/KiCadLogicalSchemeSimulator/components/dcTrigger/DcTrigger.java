@@ -46,6 +46,10 @@ public class DcTrigger extends SchemaPart {
 
     protected DcTrigger(String id, String sParam) {
         super(id, sParam);
+        addOutPin("Q", false);
+        addOutPin("~{Q}", true);
+        qOut = getOutPin("Q");
+        iqOut = getOutPin("~{Q}");
         dPin = addInPin("D");
         rPin = addInPin(new DcRPin("R", this, params.containsKey("setReverse")));
         sPin = addInPin(new DcSPin("S", this, params.containsKey("setReverse")));
@@ -55,8 +59,6 @@ public class DcTrigger extends SchemaPart {
         } else {
             cPin = addInPin(new DcCRaisingPin("C", this));
         }
-        addOutPin("Q", false);
-        addOutPin("~{Q}", true);
     }
 
     @Override
