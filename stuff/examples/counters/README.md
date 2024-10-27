@@ -11,3 +11,9 @@ Additionally, this project provides real-time feedback on achieved frequency,
 while [Digital](https://github.com/hneemann/Digital) doesn't offer this feature.
 This leads to the necessity of using a clock for speed measurement in Digital, which is not very accurate.
 ![Digital](img/digital.png)
+
+for start use counters gradle task
+
+```
+./gradlew conters
+```

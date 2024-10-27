@@ -64,8 +64,26 @@ additional information about internal status is displayed. For example, for the 
 
 Here are some schema Netlist examples:
 
-- [Counters](stuff/examples/counters) - A simple chain of counters and LEDs.
-- [Z80](stuff/examples/z80) - A schema based on the Zilog Z80.
+- [Counters](stuff/examples/counters/README.md) - Simple chain of counters and LEDs.  
+  for start use counters gradle task:
+
+```
+./gradlew counters
+```
+
+- [Z80](stuff/examples/z80/README.md) - Schema based on the Zilog Z80.  
+  for start use z80 gradle task:
+
+```
+./gradlew z80
+```
+
+- [TRS80](stuff/examples/trs80/README.md) - Stripped TRS80-I schema.
+  for start use trs80 gradle task:
+
+```
+./gradlew trs80
+```
 
 ## License
 
