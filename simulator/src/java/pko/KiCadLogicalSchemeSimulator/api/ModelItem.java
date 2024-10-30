@@ -90,8 +90,11 @@ public abstract class ModelItem<T> implements IModelItem<T> {
         } else if (!Simulator.recursive && Utils.notContain(Simulator.recursiveOuts, getName()) && !parent.recursive.contains(getId())) {
             if (!reportedRecurse) {
                 Log.error(this.getClass(),
-                        "Recursive event loop detected, enable recurse, passing -r parameter to simulator, for specific out only pass -ro={}",
-                        getName());
+                        "Recursive event loop detected, enable recurse, passing -r parameter to simulator.\n For specific out only pass -ro={} to smulator" +
+                                ", or modify Schema parameter file adding `recursive={}` to symPartParam in <part> with id=`{}` in ",
+                        getName(),
+                        id,
+                        parent.id);
                 reportedRecurse = true;
             }
             return false;

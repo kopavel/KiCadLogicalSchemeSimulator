@@ -47,16 +47,19 @@ located under the menu Tools->"Generate Legacy Bill of Materials...". That can b
 
 ## Usage
 
-After launching the project, the simulator builds the simulation net and displays all "interactive" schema parts, such as LEDs, displays, or oscillators, on the
-desk. Parts can be arranged freely, and the layout is saved near the Netlist file in a file with the `.sym_layout` extension.
+After launching simulator builds the simulation net and displays all “interactive” schema parts, such as LEDs, Displays or oscillators on the desk.  
+Parts can be arranged freely, and the layout saved near the Netlist file in a file with the `.sym_layout` extension at simulator close.  
+See also simulator [parameter description](stuff/parameters.md) for fine tune simulation process.
 
-For a detailed description of components, see [more information](schemaParts/README.md).
+Check [component list](schemaParts/README.md) for a detailed description of supported schema components.
 
-For schema debugging purposes, an [oscilloscope](schemaParts/oscillator/OSCILLOSCOPE.md) from the [oscillator](schemaParts/oscillator/README.md) component
-can be used. Alternatively, schema part monitoring is available from the main interface menu.
+For schema debugging purposes, an [oscilloscope](schemaParts/oscillator/OSCILLOSCOPE.md) from the [oscillator](schemaParts/oscillator/README.md) component can be
+used.
 
-After selecting a target schema part, its pin representation appears on the screen, showing the current signal on each pin. Optionally, for certain schema parts,
-additional information about internal status is displayed. For example, for the Z80 CPU:
+Alternatively, schema part monitoring is available from the main interface menu.  
+After selecting a target schema part, its pin representation appears on the screen, showing the current signal on each pin.  
+Optionally, for certain schema parts, additional information about internal status is displayed.  
+For example, for the Z80 CPU:
 
 ![Z80 CPU Image](img.png)
 
@@ -65,21 +68,19 @@ additional information about internal status is displayed. For example, for the 
 Here are some schema Netlist examples:
 
 - [Counters](stuff/examples/counters/README.md) - Simple chain of counters and LEDs.  
-  for start use counters gradle task:
+  for start use corresponding gradle task:
 
 ```
 ./gradlew counters
 ```
 
-- [Z80](stuff/examples/z80/README.md) - Schema based on the Zilog Z80.  
-  for start use z80 gradle task:
+- [Z80](stuff/examples/z80/README.md) - Schema based on the Zilog Z80.
 
 ```
 ./gradlew z80
 ```
 
 - [TRS80](stuff/examples/trs80/README.md) - Stripped TRS80-I schema.
-  for start use trs80 gradle task:
 
 ```
 ./gradlew trs80
