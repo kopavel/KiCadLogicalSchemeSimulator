@@ -42,7 +42,6 @@ public class SingleBitSdRam extends SchemaPart {
     private final InBus addrPin;
     private final InPin dIn;
     private final InPin we;
-    private final int module;
     private final int size;
     private Pin dOut;
     private int hiPart;
@@ -60,7 +59,6 @@ public class SingleBitSdRam extends SchemaPart {
         if (size > 15) {
             throw new RuntimeException("Component " + id + " max size is 15");
         }
-        module = (int) Math.pow(2, size);
         int ramSize = (int) Math.pow(2, size * 2);
         mem = new boolean[ramSize];
         for (int i = 0; i < ramSize; i++) {
@@ -79,7 +77,7 @@ public class SingleBitSdRam extends SchemaPart {
                 @Override
                 public void setLo() {
                     state = false;
-                    hiPart = (int) (addrPin.state * module);
+                    hiPart = (int) (addrPin.state << size);
                 }
             });
             addInPin(new InPin("~{CAS}", this) {
@@ -113,7 +111,7 @@ public class SingleBitSdRam extends SchemaPart {
                 @Override
                 public void setHi() {
                     state = true;
-                    hiPart = (int) (addrPin.state * module);
+                    hiPart = (int) (addrPin.state << size);
                 }
 
                 @Override

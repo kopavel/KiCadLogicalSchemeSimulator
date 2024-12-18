@@ -43,7 +43,6 @@ public class SdRam extends SchemaPart {
     private final InBus addrPin;
     private final InBus dIn;
     private final InPin we;
-    private final int module;
     private final int size;
     private final int aSize;
     private Bus dOut;
@@ -69,7 +68,6 @@ public class SdRam extends SchemaPart {
         if (aSize > 15) {
             throw new RuntimeException("SdRam component " + id + " max aSize is 15");
         }
-        module = (int) Math.pow(2, aSize);
         int ramSize = (int) Math.pow(2, aSize * 2);
         bytes = new long[ramSize];
         long maskForSize = Utils.getMaskForSize(size);
@@ -89,7 +87,7 @@ public class SdRam extends SchemaPart {
                 @Override
                 public void setLo() {
                     state = false;
-                    hiPart = (int) (addrPin.state * module);
+                    hiPart = (int) (addrPin.state << aSize);
                 }
             });
             addInPin(new InPin("~{CAS}", this) {
@@ -119,7 +117,7 @@ public class SdRam extends SchemaPart {
                 @Override
                 public void setHi() {
                     state = true;
-                    hiPart = (int) (addrPin.state * module);
+                    hiPart = (int) (addrPin.state << aSize);
                 }
 
                 @Override
