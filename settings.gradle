@@ -41,14 +41,14 @@ dependencyResolutionManagement {
     }
     repositories {
         mavenCentral()
-        maven { url 'https://jitpack.io' }
+        maven { url = 'https://jitpack.io' }
         maven {
-            name "instrumentFormsRepository-third-party"
-            url "https://cache-redirector.jetbrains.com/intellij-dependencies"
+            name = "instrumentFormsRepository-third-party"
+            url = "https://cache-redirector.jetbrains.com/intellij-dependencies"
         }
         maven {
-            name "instrumentFormsRepository-jetbrains"
-            url "https://www.jetbrains.com/intellij-repository/releases"
+            name = "instrumentFormsRepository-jetbrains"
+            url = "https://www.jetbrains.com/intellij-repository/releases"
         }
     }
 }

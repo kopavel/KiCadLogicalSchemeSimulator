@@ -107,6 +107,7 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                     state = true;
                 }
 
+                @SuppressWarnings("deprecation")
                 @Override
                 public void setLo() {
                     state = false;
@@ -125,7 +126,6 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                             }
                         }
                         Thread.ofVirtual().start(() -> SwingUtilities.invokeLater(() -> {
-                            //noinspection deprecation
                             display.reshape(display.currentX, display.currentY, hSize * display.scaleFactor, vSize * display.scaleFactor);
                         }));
                         ram = Arrays.copyOf(ram, vSize);
@@ -158,6 +158,7 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                 }
             });
             addInPin(new InPin("VSync", this) {
+                @SuppressWarnings("deprecation")
                 @Override
                 public void setHi() {
                     state = true;
@@ -176,7 +177,6 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                             }
                         }
                         Thread.ofVirtual().start(() -> SwingUtilities.invokeLater(() -> {
-                            //noinspection deprecation
                             display.reshape(display.currentX, display.currentY, hSize * display.scaleFactor, vSize * display.scaleFactor);
                         }));
                         ram = Arrays.copyOf(ram, vSize);

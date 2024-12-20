@@ -35,8 +35,8 @@ plugins {
 //    alias libs.plugins.guidesigner
 }
 
-group 'pko'
-version '0.1'
+group = 'pko'
+version = '0.1'
 project.ext.deleteEmptyDirsRecursively = { dir ->
     if (dir.exists() && dir.isDirectory()) {
         dir.eachDir { subDir ->
@@ -50,9 +50,10 @@ project.ext.deleteEmptyDirsRecursively = { dir ->
 }
 
 tasks.register("cleanBuild", Delete).configure() {
+    def fnc = project.ext.deleteEmptyDirsRecursively;
     doLast {
         delete fileTree(dir: "$rootDir/distro/")
-        project.ext.deleteEmptyDirsRecursively(file("$rootDir/distro/"))
+        fnc(file("$rootDir/distro/"))
     }
 }
 
@@ -131,7 +132,7 @@ configure(subprojects) {
         }
     }
     tasks.named('assemble') {
-        group '_build'
+        group = '_build'
         dependsOn(rootProject.tasks.named('cleanBuild'))
     }
 

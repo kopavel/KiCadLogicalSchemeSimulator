@@ -47,9 +47,8 @@ public interface IModelItem<T> extends Comparable<IModelItem<T>> {
     IModelItem<T> getOptimised(ModelItem<?> source);
     void resend();
     IModelItem<T> copyState(IModelItem<T> oldItem);
+    @SuppressWarnings("unchecked")
     default T getThis() {
-        //noinspection unchecked
         return (T) this;
     }
-    ;
 }
