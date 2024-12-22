@@ -34,6 +34,7 @@ import org.openjdk.jmh.annotations.*;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.OutPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.TriStateOutPin;
 
 import java.util.concurrent.TimeUnit;
 
@@ -59,11 +60,11 @@ public class OutPinBenchmark {
                 public void initOuts() {
                 }
             };
-            out = new OutPin("test", testPart);
+            out = new TriStateOutPin("test", testPart);
             for (int i = 0; i < 5; i++) {
                 ((OutPin) out).addDestination(testPart.addInPin("in" + i));
             }
-            out = out.getOptimised(null);
+//            out = out.getOptimised(null);
         }
     }
 }

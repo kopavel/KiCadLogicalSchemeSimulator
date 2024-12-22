@@ -77,15 +77,16 @@ public class OscillatorUiComponent extends AbstractUiComponent {
 
     @Override
     protected void draw() {
-        g2d.drawString(formatter.format((long) parent.currentFreq), 0, titleHeight * 2);
+        g2d.drawString(formatter.format((double) parent.currentFreq.getOpaque()), 0, titleHeight * 2);
     }
 
     private void getFreq() {
         double newFreq = (parent.ticks - lastTicks) / 2.0;
-        if (parent.currentFreq < newFreq * 0.9 || parent.currentFreq > newFreq * 1.1) {
-            parent.currentFreq = newFreq;
+        double freq = parent.currentFreq.getOpaque();
+        if (freq < newFreq * 0.9 || freq > newFreq * 1.1) {
+            parent.currentFreq.setRelease(newFreq);
         } else {
-            parent.currentFreq = (parent.currentFreq * 0.8) + ((parent.ticks - lastTicks) * 0.1);
+            parent.currentFreq.setRelease((freq * 0.8) + ((parent.ticks - lastTicks) * 0.1));
         }
         lastTicks = parent.ticks;
     }
