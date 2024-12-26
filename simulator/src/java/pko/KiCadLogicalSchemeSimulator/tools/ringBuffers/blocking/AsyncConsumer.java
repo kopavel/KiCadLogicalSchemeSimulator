@@ -30,66 +30,123 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.tools.ringBuffers.blocking;
-import lombok.Setter;
-import lombok.experimental.Accessors;
-
-import java.io.Closeable;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.lang.invoke.VarHandle;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
-public abstract class AsyncConsumer<T> implements Consumer<T>, Closeable {
-    private final AtomicBoolean run = new AtomicBoolean();
+public abstract class AsyncConsumer<T> implements Consumer<T>, AutoCloseable {
+    private final List<Thread> consumerThreads = new ArrayList<>();
+    private Thread asyncConsumerStop;
+    private boolean run;
     private Slot<T> currentSlot;
 
-    public AsyncConsumer(int size) {
-        currentSlot = new Slot<>();
-        Slot<T> head = currentSlot;
-        for (int i = 1; i < size; i++) {
-            Slot<T> newSlot = new Slot<>();
-            currentSlot.next = newSlot;
-            currentSlot = newSlot;
+    public AsyncConsumer(int size, int threads) {
+        registerShutdown();
+        Collection<Slot<T>> heads = createSlots(size, threads);
+        for (Slot<T> head : heads) {
+            consumerThreads.add(Thread.ofPlatform().daemon().start(() -> {
+                try {
+                    Slot<T> currentSlot = head;
+                    run = true;
+                    AtomicReference<T> current = currentSlot.payload;
+                    T payload;
+                    while (run) {
+                        while ((payload = current.getOpaque()) != null) {
+                            consume(payload);
+                            current.setOpaque(null);
+//                            VarHandle.releaseFence();
+                            currentSlot = currentSlot.nextConsumer;
+                            current = currentSlot.payload;
+                        }
+//                        VarHandle.acquireFence();
+                        Thread.onSpinWait();
+                    }
+                } catch (Exception e) {
+                    if (run) {
+                        throw e;
+                    }
+                }
+            }));
         }
-        currentSlot.next = head;
-        Thread.ofPlatform().start(() -> {
-            Slot<T> currentSlot = AsyncConsumer.this.currentSlot;
-            run.setOpaque(true);
-            while (run.getOpaque()) {
-                AtomicReference<T> currentPayload = currentSlot.payload;
-                T payload;
-                while ((payload = currentPayload.getOpaque()) == null && run.getOpaque()) {
-                    Thread.onSpinWait();
-                }
-                currentPayload.setRelease(null);
-                currentSlot = currentSlot.next;
-                if (payload != null) {
-                    consume(payload);
-                }
-            }
-        });
     }
 
     @Override
     public void accept(T payload) {
-        AtomicReference<T> currentPayload = currentSlot.payload;
-        while (currentPayload.getOpaque() != null) {
+        AtomicReference<T> current = currentSlot.payload;
+        while (current.getOpaque() != null) {
+//            VarHandle.acquireFence();
             Thread.onSpinWait();
         }
-        currentPayload.setRelease(payload);
-        currentSlot = currentSlot.next;
+        current.setOpaque(payload);
+//        VarHandle.releaseFence();
+        currentSlot = currentSlot.nextProducer;
     }
 
     public abstract void consume(T payload);
 
     @Override
-    public void close() {
-        run.setRelease(false);
+    public synchronized void close() {
+        run = false;
+        VarHandle.releaseFence();
+        asyncConsumerStop.interrupt();
+        try {
+            asyncConsumerStop.join();
+            for (Thread consumerThread : consumerThreads) {
+                consumerThread.join();
+            }
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    @Setter
-    @Accessors(chain = true)
+    private Collection<Slot<T>> createSlots(int size, int threads) {
+        Map<Integer, Slot<T>> heads = new HashMap<>();
+        Map<Integer, Slot<T>> tails = new HashMap<>();
+        currentSlot = new Slot<>();
+        Slot<T> producerHead = currentSlot;
+        heads.put(0, producerHead);
+        tails.put(0, producerHead);
+        for (int i = 1; i < threads; i++) {
+            Slot<T> consumerHead = new Slot<>();
+            heads.put(i, consumerHead);
+            tails.put(i, consumerHead);
+            currentSlot.nextProducer = consumerHead;
+            currentSlot = consumerHead;
+        }
+        for (int i = 1; i < size; i++) {
+            for (Map.Entry<Integer, Slot<T>> head : heads.entrySet()) {
+                Slot<T> consumerSlot = new Slot<>();
+                currentSlot.nextProducer = consumerSlot;
+                tails.get(head.getKey()).nextConsumer = consumerSlot;
+                currentSlot = consumerSlot;
+                tails.put(head.getKey(), consumerSlot);
+            }
+        }
+        for (Map.Entry<Integer, Slot<T>> head : heads.entrySet()) {
+            tails.get(head.getKey()).nextConsumer = head.getValue();
+        }
+        currentSlot.nextProducer = producerHead;
+        currentSlot = producerHead;
+        return heads.values();
+    }
+
+    private void registerShutdown() {
+        Runtime.getRuntime().addShutdownHook(new Thread(this::close));
+        Thread producerThread = Thread.currentThread();
+        asyncConsumerStop = Thread.ofPlatform().name("AsyncConsumerStop").start(() -> {
+            try {
+                producerThread.join();
+            } catch (InterruptedException ignore) {
+            } finally {
+                run = false;
+            }
+        });
+    }
+
     private static class Slot<T> {
         private final AtomicReference<T> payload = new AtomicReference<>();
-        private Slot<T> next;
+        private Slot<T> nextProducer;
+        private Slot<T> nextConsumer;
     }
 }

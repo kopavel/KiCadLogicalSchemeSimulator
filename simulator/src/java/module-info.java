@@ -77,5 +77,7 @@ module KiCadLogicalSchemeSimulator.simulator {
     requires org.apache.logging.log4j.slf4j.impl;
     requires org.apache.logging.log4j;
     requires org.tukaani.xz;
+    requires com.lmax.disruptor;
+
     uses pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
 }
