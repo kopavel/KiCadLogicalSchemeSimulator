@@ -33,28 +33,27 @@ package pko.KiCadLogicalSchemeSimulator.test.benchmarks.consumers;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
 import org.openjdk.jmh.runner.Runner;
-import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openjdk.jmh.runner.options.TimeValue;
 import pko.KiCadLogicalSchemeSimulator.tools.ringBuffers.blocking.AsyncConsumer;
 
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 @State(Scope.Benchmark)
 public class AsyncConsumerBenchmark {
     public static final int THREADS = 1;
     public static final int DISRUPTOR_BUF_SIZE = 1 << 10;
-    public static final int ASYNC_BUF_SIZE = 100;
+    public static final int ASYNC_BUF_SIZE = 1000;
     public static final int PAYLOAD = 10000;
     AsyncConsumer<Long> asyncConsumer;
     Long payload = 10L;
     private Blackhole blackhole;
 
-    public static void main(String[] args) throws RunnerException, IOException {
+    public static void main(String[] args) throws Throwable {
         Options options = new OptionsBuilder()//
-                                              .include(AsyncConsumerBenchmark.class.getSimpleName())
+//                                              .include(AsyncConsumerBenchmark.class.getSimpleName())
+                                              .include(ZigConsumerBenchmark.class.getSimpleName())
 //                                              .include(DisruptorConsumerBenchmark.class.getSimpleName())
                                               .warmupIterations(3)
                                               .warmupTime(TimeValue.seconds(1))
@@ -65,9 +64,10 @@ public class AsyncConsumerBenchmark {
                                               .forks(1)
                                               .build();
         new Runner(options).run();
-//        AsyncConsumerBenchmark atomicReferenceBenchmark = new AsyncConsumerBenchmark();
+//        ZigConsumerBenchmark atomicReferenceBenchmark = new ZigConsumerBenchmark();
+//        atomicReferenceBenchmark.setup(null);
 //        for (int i = 0; i < 10000; i++) {
-//        atomicReferenceBenchmark.counter();
+//        atomicReferenceBenchmark.asyncConsumer();
 //        }
     }
 

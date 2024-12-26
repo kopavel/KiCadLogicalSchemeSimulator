@@ -30,6 +30,7 @@ include ':schemaParts:tester'
 include ':schemaParts:xor'
 include ':schemaParts:z80'
 include ':simulator'
+include ':zigQueue'
 include ':unnamedModules:ideaGui'
 
 dependencyResolutionManagement {

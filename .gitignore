@@ -24,3 +24,7 @@
 /**/#auto_saved_files#
 _autosave-*.kicad_sch
 *.sym_oscill
+/zigQueue/src/zig/*.dll
+/zigQueue/src/zig/*.lib
+/zigQueue/src/zig/*.obj
+/zigQueue/src/zig/*.pdb
