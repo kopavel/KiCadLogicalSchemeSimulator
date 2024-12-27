@@ -149,7 +149,7 @@ public class OscillatorUi extends JFrame {
 
     private void tick() {
         SwingUtilities.invokeLater(() -> {
-            achievedTextField.setText(parent.formatter.format(parent.parent.currentFreq));
+            achievedTextField.setText(parent.formatter.format(parent.parent.currentFreq.getOpaque()));
             totalTicks.setText(String.valueOf(parent.parent.ticks));
         });
     }

@@ -38,10 +38,10 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.net.Net;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
+import java.lang.invoke.VarHandle;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static java.lang.Thread.MAX_PRIORITY;
@@ -51,11 +51,11 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
     public long ticks;
     public Pin out;
     ScheduledExecutorService scheduler;
+    AtomicReference<Double> currentFreq = new AtomicReference<>(0d);
     @Getter
     private double clockFreq = 0;
-    private final AtomicBoolean fullSpeedAlive = new AtomicBoolean();
+    private boolean fullSpeedAlive = false;
     private Thread fullSpeedThread;
-    AtomicReference<Double> currentFreq = new AtomicReference<>(0d);
     private long timerStart;
     private long tickStart;
 
@@ -81,36 +81,33 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
     synchronized public void startClock() {
         if (clockFreq == 0) {
             if (fullSpeedThread == null || !fullSpeedThread.isAlive()) {
-                fullSpeedAlive.setRelease(true);
+                fullSpeedAlive = true;
                 fullSpeedThread = Thread.ofPlatform().priority(MAX_PRIORITY).start(() -> {
                     final Pin local = out;
                     try {
-                        while (fullSpeedAlive.getPlain()) {
-//                            final long count = (long) Math.max(1, (currentFreq / 1000));
-                            ticks += /*count **/ 20;
-//                            for (int i = 0; i < count; i++) {
-                                local.setHi();
-                                local.setLo();
-                                local.setHi();
-                                local.setLo();
-                                local.setHi();
-                                local.setLo();
-                                local.setHi();
-                                local.setLo();
-                                local.setHi();
-                                local.setLo();
-                                local.setHi();
-                                local.setLo();
-                                local.setHi();
-                                local.setLo();
-                                local.setHi();
-                                local.setLo();
-                                local.setHi();
-                                local.setLo();
-                                local.setHi();
-                                local.setLo();
-                            }
-//                        }
+                        while (fullSpeedAlive) {
+                            ticks += 20;
+                            local.setHi();
+                            local.setLo();
+                            local.setHi();
+                            local.setLo();
+                            local.setHi();
+                            local.setLo();
+                            local.setHi();
+                            local.setLo();
+                            local.setHi();
+                            local.setLo();
+                            local.setHi();
+                            local.setLo();
+                            local.setHi();
+                            local.setLo();
+                            local.setHi();
+                            local.setLo();
+                            local.setHi();
+                            local.setLo();
+                            local.setHi();
+                            local.setLo();
+                        }
                     } catch (Throwable e) {
                         Log.error(Oscillator.class, "TickError", e);
                     }
@@ -189,7 +186,8 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
         }
         if (fullSpeedThread != null) {
             retVal = true;
-            fullSpeedAlive.setRelease(false);
+            fullSpeedAlive = false;
+            VarHandle.releaseFence();
             try {
                 fullSpeedThread.join();
                 fullSpeedThread = null;

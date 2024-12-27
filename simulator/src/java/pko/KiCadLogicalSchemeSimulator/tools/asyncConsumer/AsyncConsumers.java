@@ -29,22 +29,19 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.tools.ringBuffers.blocking;
+package pko.KiCadLogicalSchemeSimulator.tools.asyncConsumer;
 import java.lang.invoke.VarHandle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
-public abstract class AsyncConsumer<T> implements Consumer<T>, AutoCloseable {
+public abstract class AsyncConsumers<T> implements Consumer<T>, AutoCloseable {
+    final Queue<T> queue;
     private final List<Thread> consumerThreads = new ArrayList<>();
-    private final Queue<T> queue;
-    private final int threads;
-    private Thread asyncConsumerStop;
-    private boolean run;
+    boolean run;
 
-    public AsyncConsumer(int size, int threads) {
-        this.threads = threads;
+    public AsyncConsumers(int size, int threads) {
         registerShutdown();
         Slot<T>[] rings = createSlots(size, threads);
         if (threads == 0) {
@@ -53,21 +50,28 @@ public abstract class AsyncConsumer<T> implements Consumer<T>, AutoCloseable {
             for (Slot<T> head : rings) {
                 consumerThreads.add(Thread.ofPlatform().start(() -> {
                     try {
+                        long seepCounter = 0;
                         Slot<T> currentSlot = head;
                         run = true;
                         T payload;
                         while (run) {
                             while ((payload = currentSlot.payload.getOpaque()) != null) {
+                                seepCounter = 0;
                                 final AtomicReference<T> sharedPayload = currentSlot.payload;
                                 consume(payload);
                                 sharedPayload.setOpaque(null);
                                 currentSlot = currentSlot.nextSlot;
                             }
+                            if (seepCounter > 1000000) {
+                                Thread.sleep(0, 1);
+                            } else {
+                                seepCounter++;
+                            }
                             Thread.onSpinWait();
                         }
-                    } catch (Exception e) {
+                    } catch (Throwable e) {
                         if (run) {
-                            throw e;
+                            throw new RuntimeException(e);
                         }
                     }
                 }));
@@ -86,9 +90,7 @@ public abstract class AsyncConsumer<T> implements Consumer<T>, AutoCloseable {
     public synchronized void close() {
         run = false;
         VarHandle.releaseFence();
-        asyncConsumerStop.interrupt();
         try {
-            asyncConsumerStop.join();
             for (Thread consumerThread : consumerThreads) {
                 consumerThread.join();
             }
@@ -99,15 +101,7 @@ public abstract class AsyncConsumer<T> implements Consumer<T>, AutoCloseable {
 
     @Override
     public void accept(T payload) {
-        if (threads == 1) {
-            final Slot<T> slot = queue.writeSlot;
-            final AtomicReference<T> currentPayload = slot.payload;
-            if (currentPayload.getOpaque() == null) {
-                currentPayload.setOpaque(payload);
-                queue.writeSlot = slot.nextSlot;
-                return;
-            }
-        } else if (threads > 1) {
+        do {
             Queue<T> currentQueue = queue;
             while (currentQueue != null) {
                 final Slot<T> slot = currentQueue.writeSlot;
@@ -119,8 +113,7 @@ public abstract class AsyncConsumer<T> implements Consumer<T>, AutoCloseable {
                 }
                 currentQueue = currentQueue.next;
             }
-        }
-        consume(payload);
+        } while (run);
     }
 
     private Slot<T>[] createSlots(int size, int threads) {
@@ -144,6 +137,7 @@ public abstract class AsyncConsumer<T> implements Consumer<T>, AutoCloseable {
 
     private void registerShutdown() {
         Runtime.getRuntime().addShutdownHook(new Thread(this::close));
+/*
         Thread producerThread = Thread.currentThread();
         asyncConsumerStop = Thread.ofPlatform().name("AsyncConsumerStop").start(() -> {
             try {
@@ -153,11 +147,12 @@ public abstract class AsyncConsumer<T> implements Consumer<T>, AutoCloseable {
                 run = false;
             }
         });
+*/
     }
 
-    private static class Queue<T> {
-        final private Queue<T> next;
-        private Slot<T> writeSlot;
+    static class Queue<T> {
+        final Queue<T> next;
+        Slot<T> writeSlot;
 
         private Queue(Slot<T> writeSlot, Queue<T> next) {
             this.writeSlot = writeSlot;
@@ -165,8 +160,8 @@ public abstract class AsyncConsumer<T> implements Consumer<T>, AutoCloseable {
         }
     }
 
-    private static class Slot<T> {
-        private final AtomicReference<T> payload = new AtomicReference<>(null);
-        private Slot<T> nextSlot;
+    static class Slot<T> {
+        final AtomicReference<T> payload = new AtomicReference<>(null);
+        Slot<T> nextSlot;
     }
 }

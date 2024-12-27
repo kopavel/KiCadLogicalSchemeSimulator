@@ -36,20 +36,22 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openjdk.jmh.runner.options.TimeValue;
-import pko.KiCadLogicalSchemeSimulator.tools.ringBuffers.blocking.AsyncConsumer;
+import pko.KiCadLogicalSchemeSimulator.tools.asyncConsumer.AsyncConsumer;
+import pko.KiCadLogicalSchemeSimulator.tools.asyncConsumer.AsyncConsumers;
 
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 @State(Scope.Benchmark)
 public class AsyncConsumerBenchmark {
-    public static final int THREADS = 0;
+    public static final int THREADS = 4;
     public static final int ASYNC_BUF_SIZE = 64;
     public static final int PAYLOAD = 100;
     public static final boolean TEST = true;
-    AsyncConsumer<Long> asyncConsumer;
-    Long payload = 10L;
-    private Blackhole blackhole;
+    final Long payload = 10L;
     private long cycles = 100000;
+    Consumer<Long> asyncConsumer;
+    private Blackhole blackhole;
 
     public static void main(String[] args) throws Throwable {
         if (TEST) {
@@ -81,21 +83,34 @@ public class AsyncConsumerBenchmark {
     @Setup
     public void setup(Blackhole blackhole) {
         this.blackhole = blackhole;
-        asyncConsumer = new AsyncConsumer<>(ASYNC_BUF_SIZE, THREADS) {
-            @Override
-            public void consume(Long payload) {
-                process(payload);
-            }
-        };
+        if (THREADS == 0) {
+            asyncConsumer = this::process;
+        } else if (THREADS == 1) {
+            asyncConsumer = new AsyncConsumer<>(ASYNC_BUF_SIZE) {
+                @Override
+                public void consume(Long payload) {
+                    process(payload);
+                }
+            };
+        } else {
+            asyncConsumer = new AsyncConsumers<>(ASYNC_BUF_SIZE, THREADS) {
+                @Override
+                public void consume(Long payload) {
+                    process(payload);
+                }
+            };
+        }
     }
 
     @TearDown
     public void tearDown() throws Exception {
-        asyncConsumer.close();
+        if (asyncConsumer instanceof AutoCloseable autoCloseable) {
+            autoCloseable.close();
+        }
     }
 
     @Benchmark()
-    public void asyncConsumer() throws Exception {
+    public void asyncConsumer() {
         for (int i = 0; i < cycles; i++) {
             asyncConsumer.accept(payload);
             asyncConsumer.accept(payload);
@@ -111,12 +126,12 @@ public class AsyncConsumerBenchmark {
     }
 
     private void process(Long payload) {
-        long acumulator = 0;
+        long accumulator = 0;
         for (int i = 0; i < PAYLOAD; i++) {
-            acumulator++;
+            accumulator++;
         }
         if (blackhole != null) {
-            blackhole.consume(acumulator);
+            blackhole.consume(accumulator);
         }
     }
 }
