@@ -31,56 +31,53 @@
  */
 package pko.KiCadLogicalSchemeSimulator.tools.ringBuffers.blocking;
 import java.lang.invoke.VarHandle;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 public abstract class AsyncConsumer<T> implements Consumer<T>, AutoCloseable {
     private final List<Thread> consumerThreads = new ArrayList<>();
+    private final Queue<T> queue;
+    private final int threads;
     private Thread asyncConsumerStop;
     private boolean run;
-    private Slot<T> currentSlot;
 
     public AsyncConsumer(int size, int threads) {
+        this.threads = threads;
         registerShutdown();
-        Collection<Slot<T>> heads = createSlots(size, threads);
-        for (Slot<T> head : heads) {
-            consumerThreads.add(Thread.ofPlatform().daemon().start(() -> {
-                try {
-                    Slot<T> currentSlot = head;
-                    run = true;
-                    AtomicReference<T> current = currentSlot.payload;
-                    T payload;
-                    while (run) {
-                        while ((payload = current.getOpaque()) != null) {
-                            consume(payload);
-                            current.setOpaque(null);
-//                            VarHandle.releaseFence();
-                            currentSlot = currentSlot.nextConsumer;
-                            current = currentSlot.payload;
+        Slot<T>[] rings = createSlots(size, threads);
+        if (threads == 0) {
+            queue = null;
+        } else {
+            for (Slot<T> head : rings) {
+                consumerThreads.add(Thread.ofPlatform().start(() -> {
+                    try {
+                        Slot<T> currentSlot = head;
+                        run = true;
+                        T payload;
+                        while (run) {
+                            while ((payload = currentSlot.payload.getOpaque()) != null) {
+                                final AtomicReference<T> sharedPayload = currentSlot.payload;
+                                consume(payload);
+                                sharedPayload.setOpaque(null);
+                                currentSlot = currentSlot.nextSlot;
+                            }
+                            Thread.onSpinWait();
                         }
-//                        VarHandle.acquireFence();
-                        Thread.onSpinWait();
+                    } catch (Exception e) {
+                        if (run) {
+                            throw e;
+                        }
                     }
-                } catch (Exception e) {
-                    if (run) {
-                        throw e;
-                    }
-                }
-            }));
+                }));
+            }
+            Queue<T> currentQueue = null;
+            for (int i = threads - 1; i >= 0; i--) {
+                currentQueue = new Queue<>(rings[i], currentQueue);
+            }
+            queue = currentQueue;
         }
-    }
-
-    @Override
-    public void accept(T payload) {
-        AtomicReference<T> current = currentSlot.payload;
-        while (current.getOpaque() != null) {
-//            VarHandle.acquireFence();
-            Thread.onSpinWait();
-        }
-        current.setOpaque(payload);
-//        VarHandle.releaseFence();
-        currentSlot = currentSlot.nextProducer;
     }
 
     public abstract void consume(T payload);
@@ -100,35 +97,49 @@ public abstract class AsyncConsumer<T> implements Consumer<T>, AutoCloseable {
         }
     }
 
-    private Collection<Slot<T>> createSlots(int size, int threads) {
-        Map<Integer, Slot<T>> heads = new HashMap<>();
-        Map<Integer, Slot<T>> tails = new HashMap<>();
-        currentSlot = new Slot<>();
-        Slot<T> producerHead = currentSlot;
-        heads.put(0, producerHead);
-        tails.put(0, producerHead);
-        for (int i = 1; i < threads; i++) {
-            Slot<T> consumerHead = new Slot<>();
-            heads.put(i, consumerHead);
-            tails.put(i, consumerHead);
-            currentSlot.nextProducer = consumerHead;
-            currentSlot = consumerHead;
-        }
-        for (int i = 1; i < size; i++) {
-            for (Map.Entry<Integer, Slot<T>> head : heads.entrySet()) {
-                Slot<T> consumerSlot = new Slot<>();
-                currentSlot.nextProducer = consumerSlot;
-                tails.get(head.getKey()).nextConsumer = consumerSlot;
-                currentSlot = consumerSlot;
-                tails.put(head.getKey(), consumerSlot);
+    @Override
+    public void accept(T payload) {
+        if (threads == 1) {
+            final Slot<T> slot = queue.writeSlot;
+            final AtomicReference<T> currentPayload = slot.payload;
+            if (currentPayload.getOpaque() == null) {
+                currentPayload.setOpaque(payload);
+                queue.writeSlot = slot.nextSlot;
+                return;
+            }
+        } else if (threads > 1) {
+            Queue<T> currentQueue = queue;
+            while (currentQueue != null) {
+                final Slot<T> slot = currentQueue.writeSlot;
+                final AtomicReference<T> currentPayload = slot.payload;
+                if (currentPayload.getOpaque() == null) {
+                    currentPayload.setOpaque(payload);
+                    currentQueue.writeSlot = slot.nextSlot;
+                    return;
+                }
+                currentQueue = currentQueue.next;
             }
         }
-        for (Map.Entry<Integer, Slot<T>> head : heads.entrySet()) {
-            tails.get(head.getKey()).nextConsumer = head.getValue();
+        consume(payload);
+    }
+
+    private Slot<T>[] createSlots(int size, int threads) {
+        List<Slot<T>> rings = new ArrayList<>();
+        for (int i = 0; i < threads; i++) {
+            Slot<T> head = new Slot<>();
+            rings.add(head);
         }
-        currentSlot.nextProducer = producerHead;
-        currentSlot = producerHead;
-        return heads.values();
+        for (Slot<T> head : rings) {
+            Slot<T> currentSlot = head;
+            for (int i = 1; i < size; i++) {
+                Slot<T> consumerSlot = new Slot<>();
+                currentSlot.nextSlot = consumerSlot;
+                currentSlot = consumerSlot;
+            }
+            currentSlot.nextSlot = head;
+        }
+        //noinspection unchecked
+        return rings.toArray(new Slot[0]);
     }
 
     private void registerShutdown() {
@@ -144,9 +155,18 @@ public abstract class AsyncConsumer<T> implements Consumer<T>, AutoCloseable {
         });
     }
 
+    private static class Queue<T> {
+        final private Queue<T> next;
+        private Slot<T> writeSlot;
+
+        private Queue(Slot<T> writeSlot, Queue<T> next) {
+            this.writeSlot = writeSlot;
+            this.next = next;
+        }
+    }
+
     private static class Slot<T> {
-        private final AtomicReference<T> payload = new AtomicReference<>();
-        private Slot<T> nextProducer;
-        private Slot<T> nextConsumer;
+        private final AtomicReference<T> payload = new AtomicReference<>(null);
+        private Slot<T> nextSlot;
     }
 }

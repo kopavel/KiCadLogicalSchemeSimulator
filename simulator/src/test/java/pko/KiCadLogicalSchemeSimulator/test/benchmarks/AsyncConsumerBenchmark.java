@@ -29,7 +29,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.test.benchmarks.consumers;
+package pko.KiCadLogicalSchemeSimulator.test.benchmarks;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
 import org.openjdk.jmh.runner.Runner;
@@ -42,33 +42,40 @@ import java.util.concurrent.TimeUnit;
 
 @State(Scope.Benchmark)
 public class AsyncConsumerBenchmark {
-    public static final int THREADS = 1;
-    public static final int DISRUPTOR_BUF_SIZE = 1 << 10;
-    public static final int ASYNC_BUF_SIZE = 1000;
-    public static final int PAYLOAD = 10000;
+    public static final int THREADS = 0;
+    public static final int ASYNC_BUF_SIZE = 64;
+    public static final int PAYLOAD = 100;
+    public static final boolean TEST = true;
     AsyncConsumer<Long> asyncConsumer;
     Long payload = 10L;
     private Blackhole blackhole;
+    private long cycles = 100000;
 
     public static void main(String[] args) throws Throwable {
-        Options options = new OptionsBuilder()//
-//                                              .include(AsyncConsumerBenchmark.class.getSimpleName())
-                                              .include(ZigConsumerBenchmark.class.getSimpleName())
-//                                              .include(DisruptorConsumerBenchmark.class.getSimpleName())
-                                              .warmupIterations(3)
-                                              .warmupTime(TimeValue.seconds(1))
-                                              .measurementIterations(5)
-                                              .measurementTime(TimeValue.seconds(1))
-                                              .mode(Mode.Throughput)
-                                              .timeUnit(TimeUnit.SECONDS)
-                                              .forks(1)
-                                              .build();
-        new Runner(options).run();
-//        ZigConsumerBenchmark atomicReferenceBenchmark = new ZigConsumerBenchmark();
-//        atomicReferenceBenchmark.setup(null);
-//        for (int i = 0; i < 10000; i++) {
-//        atomicReferenceBenchmark.asyncConsumer();
-//        }
+        if (TEST) {
+            Options options = new OptionsBuilder()//
+                                                  .include(AsyncConsumerBenchmark.class.getSimpleName())
+                                                  .warmupIterations(3)
+                                                  .warmupTime(TimeValue.seconds(1))
+                                                  .measurementIterations(5)
+                                                  .measurementTime(TimeValue.seconds(1))
+                                                  .mode(Mode.AverageTime)
+                                                  .timeUnit(TimeUnit.MILLISECONDS)
+                                                  .forks(1)
+                                                  .build();
+            new Runner(options).run();
+        } else {
+            AsyncConsumerBenchmark atomicReferenceBenchmark = new AsyncConsumerBenchmark();
+            atomicReferenceBenchmark.cycles = Long.MAX_VALUE;
+            try {
+                atomicReferenceBenchmark.setup(null);
+                for (int i = 0; i < 10000; i++) {
+                    atomicReferenceBenchmark.asyncConsumer();
+                }
+            } finally {
+                atomicReferenceBenchmark.tearDown();
+            }
+        }
     }
 
     @Setup
@@ -77,7 +84,7 @@ public class AsyncConsumerBenchmark {
         asyncConsumer = new AsyncConsumer<>(ASYNC_BUF_SIZE, THREADS) {
             @Override
             public void consume(Long payload) {
-                //process(payload);
+                process(payload);
             }
         };
     }
@@ -89,7 +96,7 @@ public class AsyncConsumerBenchmark {
 
     @Benchmark()
     public void asyncConsumer() throws Exception {
-        for (int i = 0; i < 100000; i++) {
+        for (int i = 0; i < cycles; i++) {
             asyncConsumer.accept(payload);
             asyncConsumer.accept(payload);
             asyncConsumer.accept(payload);
@@ -108,6 +115,8 @@ public class AsyncConsumerBenchmark {
         for (int i = 0; i < PAYLOAD; i++) {
             acumulator++;
         }
-        blackhole.consume(acumulator);
+        if (blackhole != null) {
+            blackhole.consume(acumulator);
+        }
     }
 }
