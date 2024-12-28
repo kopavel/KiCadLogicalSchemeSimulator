@@ -29,15 +29,10 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
 package pko.KiCadLogicalSchemeSimulator.components.Z80;
 import com.codingrodent.microprocessor.Z80.Z80Core;
-import com.codingrodent.microprocessor.io.device.DeviceRequest;
-import com.codingrodent.microprocessor.io.memory.MemoryRequest;
 import com.codingrodent.microprocessor.io.queue.AsyncIoQueue;
-import com.codingrodent.microprocessor.io.queue.ReadRequest;
 import com.codingrodent.microprocessor.io.queue.Request;
-import com.codingrodent.microprocessor.io.queue.WriteRequest;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
@@ -90,7 +85,7 @@ public class Z80CPin extends InPin {
                 dOut.setHiImpedance();
             }
             ioQueue.next();
-            if (ioQueue.request == null) {
+            if (ioQueue.request.address == -1) {
                 if (nmiTriggered) {
                     nmiTriggered = false;
                     cpu.processNMI();
@@ -115,21 +110,21 @@ public class Z80CPin extends InPin {
                     ioRequest = ioQueue.request;
                 }
                 aOut.setState(ioRequest.address);
-                extraWait = ioRequest instanceof DeviceRequest;
+                extraWait = !ioRequest.memory;
             }
             case 2 -> {
-                if (ioRequest instanceof DeviceRequest && notInWait) {
+                if (!ioRequest.memory && notInWait) {
                     ioReqPin.setLo();
-                    if (ioRequest instanceof WriteRequest) {
-                        wrPin.setLo();
-                    } else {
+                    if (ioRequest.read) {
                         rdPin.setLo();
+                    } else {
+                        wrPin.setLo();
                     }
                 }
             }
             case 3 -> {
                 if (M == 1) {
-                    ((ReadRequest) ioRequest).callback.accept((int) dIn.state);
+                    ioRequest.callback.accept((int) dIn.state);
                     rdPin.setHi();
                     mReqPin.setHi();
                     m1Pin.setHi();
@@ -146,18 +141,18 @@ public class Z80CPin extends InPin {
         Request ioRequest = ioQueue.request;
         switch (T) {
             case 1 -> {
-                if (ioRequest instanceof MemoryRequest) {
+                if (ioRequest.memory) {
                     mReqPin.setLo();
-                    if (ioRequest instanceof ReadRequest) {
+                    if (ioRequest.read) {
                         rdPin.setLo();
                     }
                 }
-                if (ioRequest instanceof WriteRequest writeRequest) {
-                    dOut.setState(writeRequest.payload);
+                if (!ioRequest.read) {
+                    dOut.setState(ioRequest.payload);
                 }
             }
             case 2 -> {
-                if (ioRequest instanceof WriteRequest && ioRequest instanceof MemoryRequest && notInWait) {
+                if (!ioRequest.read && ioRequest.memory && notInWait) {
                     wrPin.setLo();
                 }
                 notInWait = parent.waitPin.state;
@@ -165,17 +160,17 @@ public class Z80CPin extends InPin {
             case 3 -> {
                 if (M == 1) {
                     mReqPin.setLo();
-                } else if (ioRequest instanceof MemoryRequest) {
-                    if (ioRequest instanceof ReadRequest readRequest) {
-                        readRequest.callback.accept((int) dIn.state);
+                } else if (ioRequest.memory) {
+                    if (ioRequest.read) {
+                        ioRequest.callback.accept((int) dIn.state);
                         rdPin.setHi();
                     } else {
                         wrPin.setHi();
                     }
                     mReqPin.setHi();
                 } else {
-                    if (ioRequest instanceof ReadRequest readRequest) {
-                        readRequest.callback.accept((int) dIn.state);
+                    if (ioRequest.read) {
+                        ioRequest.callback.accept((int) dIn.state);
                         rdPin.setHi();
                     } else {
                         wrPin.setHi();

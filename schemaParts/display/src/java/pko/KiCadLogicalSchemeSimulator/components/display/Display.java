@@ -66,11 +66,16 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
         } catch (NumberFormatException r) {
             throw new RuntimeException("Component " + id + " size must be positive number");
         }
+        final Runnable reshapeRunnable = () -> SwingUtilities.invokeLater(() -> {
+            //noinspection deprecation
+            display.reshape(display.currentX, display.currentY, hSize * display.scaleFactor, vSize * display.scaleFactor);
+        });
         Thread.ofVirtual().start(() -> {
             try {
+                final Runnable repaintRunnable = display::repaint;
                 //noinspection InfiniteLoopStatement
                 while (true) {
-                    SwingUtilities.invokeLater(display::repaint);
+                    SwingUtilities.invokeLater(repaintRunnable);
                     synchronized (refresh) {
                         refresh.wait();
                     }
@@ -89,16 +94,16 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                 @Override
                 public void setLo() {
                     state = false;
-                        if (hSize == 0 && !Net.stabilizing) {
-                            hSize = hPos + 3;
-                            byte[] firstRow = Arrays.copyOf(ram[0], hSize);
-                            ram = new byte[2048][hSize];
-                            ram[0] = firstRow;
-                        }
-                        hPos = 0;
-                        vPos++;
-                        row = ram[vPos];
-                        rows++;
+                    if (hSize == 0 && !Net.stabilizing) {
+                        hSize = hPos + 3;
+                        byte[] firstRow = Arrays.copyOf(ram[0], hSize);
+                        ram = new byte[2048][hSize];
+                        ram[0] = firstRow;
+                    }
+                    hPos = 0;
+                    vPos++;
+                    row = ram[vPos];
+                    rows++;
                 }
             });
             addInPin(new InPin("VSync", this) {
@@ -107,7 +112,6 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                     state = true;
                 }
 
-                @SuppressWarnings("deprecation")
                 @Override
                 public void setLo() {
                     state = false;
@@ -125,9 +129,7 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                                 throw new RuntimeException(e);
                             }
                         }
-                        Thread.ofVirtual().start(() -> SwingUtilities.invokeLater(() -> {
-                            display.reshape(display.currentX, display.currentY, hSize * display.scaleFactor, vSize * display.scaleFactor);
-                        }));
+                        Thread.ofVirtual().start(reshapeRunnable);
                         ram = Arrays.copyOf(ram, vSize);
                     }
                     hPos = 0;
@@ -158,7 +160,6 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                 }
             });
             addInPin(new InPin("VSync", this) {
-                @SuppressWarnings("deprecation")
                 @Override
                 public void setHi() {
                     state = true;
@@ -176,9 +177,7 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                                 throw new RuntimeException(e);
                             }
                         }
-                        Thread.ofVirtual().start(() -> SwingUtilities.invokeLater(() -> {
-                            display.reshape(display.currentX, display.currentY, hSize * display.scaleFactor, vSize * display.scaleFactor);
-                        }));
+                        Thread.ofVirtual().start(reshapeRunnable);
                         ram = Arrays.copyOf(ram, vSize);
                     }
                     hPos = 0;
