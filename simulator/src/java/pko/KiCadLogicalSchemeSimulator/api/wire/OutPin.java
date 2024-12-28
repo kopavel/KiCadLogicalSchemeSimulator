@@ -56,6 +56,8 @@ public class OutPin extends Pin {
         super(oldPin, variantId);
         hiImpedance = oldPin.hiImpedance;
         triState = oldPin.triState;
+        destinations = oldPin.destinations;
+        split();
     }
 
     public void addDestination(Pin pin) {

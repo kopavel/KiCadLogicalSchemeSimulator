@@ -33,19 +33,27 @@ package pko.KiCadLogicalSchemeSimulator.net.bus;
 import pko.KiCadLogicalSchemeSimulator.Simulator;
 import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
+import pko.KiCadLogicalSchemeSimulator.api.wire.FallingEdgePin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.RaisingEdgePin;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 public class BusToWiresAdapter extends OutBus {
     public Pin[] destinations = new Pin[0];
+    public Pin[] toImp = new Pin[0];
+    public Pin[] toLow = new Pin[0];
+    public Pin[] toHi = new Pin[0];
     public long maskState;
     public boolean queueState;
 
-    /*Optimiser constructor unroll destination:destinations*/
+    /* constructor unroll destination:destinations*/
+    /*Optimiser constructor unroll low:toLow:l unroll hi:toHi:h unroll imp:toImp:i*/
     public BusToWiresAdapter(BusToWiresAdapter oldBus, String variantId) {
         super(oldBus, variantId);
         triState = oldBus.triState;
+        destinations = oldBus.destinations;
+        split();
     }
 
     public BusToWiresAdapter(OutBus outBus, long mask) {
@@ -73,24 +81,24 @@ public class BusToWiresAdapter extends OutBus {
         } else {
             processing = true;
             /*Optimiser blockEnd setters blockEnd allRecurse*/
-            for (Pin destination : destinations) {
-                destination.setHiImpedance();
+            for (Pin imp : toImp) {
+                imp.setHiImpedance();
             }
             /*Optimiser block setters block recurse block allRecurse*/
             while (hasQueue) {
                 hasQueue = false;
                 if (hiImpedance) {
-                    for (Pin destination : destinations) {
-                        destination.setHiImpedance();
+                    for (Pin imp : toImp) {
+                        imp.setHiImpedance();
                     }
                 } else {
                     if (queueState) {
-                        for (Pin destination : destinations) {
-                            destination.setLo();
+                        for (Pin low : toLow) {
+                            low.setLo();
                         }
                     } else {
-                        for (Pin destination : destinations) {
-                            destination.setHi();
+                        for (Pin hi : toHi) {
+                            hi.setHi();
                         }
                     }
                 }
@@ -105,6 +113,7 @@ public class BusToWiresAdapter extends OutBus {
     public void addDestination(Pin pin) {
         pin.used = true;
         destinations = Utils.addToArray(destinations, pin);
+        split();
     }
     /*Optimiser blockEnd iSetter*/
 
@@ -143,12 +152,12 @@ public class BusToWiresAdapter extends OutBus {
                 processing = true;
                 /*Optimiser blockEnd setters blockEnd allRecurse bind nState:newMaskState*/
                 if (newMaskState == 0) {
-                    for (Pin destination : destinations) {
-                        destination.setLo();
+                    for (Pin low : toLow) {
+                        low.setLo();
                     }
                 } else {
-                    for (Pin destination : destinations) {
-                        destination.setHi();
+                    for (Pin hi : toHi) {
+                        hi.setHi();
                     }
                 }
 
@@ -157,18 +166,18 @@ public class BusToWiresAdapter extends OutBus {
                     hasQueue = false;
                     /*Optimiser block iSetter*/
                     if (hiImpedance) {
-                        for (Pin destination : destinations) {
-                            destination.setHiImpedance();
+                        for (Pin imp : toImp) {
+                            imp.setHiImpedance();
                         }
                     } else {
                         /*Optimiser blockEnd iSetter*/
                         if (queueState) {
-                            for (Pin destination : destinations) {
-                                destination.setLo();
+                            for (Pin low : toLow) {
+                                low.setLo();
                             }
                         } else {
-                            for (Pin destination : destinations) {
-                                destination.setHi();
+                            for (Pin hi : toHi) {
+                                hi.setHi();
                             }
                         }
                         /*Optimiser line iSetter*/
@@ -189,7 +198,9 @@ public class BusToWiresAdapter extends OutBus {
             for (int i = 0; i < destinations.length; i++) {
                 destinations[i] = destinations[i].getOptimised(this);
             }
-            ClassOptimiser<BusToWiresAdapter> optimiser = new ClassOptimiser<>(this).unroll(destinations.length).bind("m", mask);
+            split();
+            ClassOptimiser<BusToWiresAdapter> optimiser =
+                    new ClassOptimiser<>(this).unroll("i", toImp.length).unroll("l", toLow.length).unroll("h", toHi.length).bind("m", mask);
             if (source != null) {
                 optimiser.cut("setters");
             }
@@ -218,5 +229,22 @@ public class BusToWiresAdapter extends OutBus {
     @Override
     public boolean useFullOptimiser() {
         return true;
+    }
+
+    protected void split() {
+        toHi = new Pin[0];
+        toLow = new Pin[0];
+        toImp = new Pin[0];
+        for (Pin destination : destinations) {
+            if (!(destination instanceof FallingEdgePin)) {
+                toHi = Utils.addToArray(toHi, destination);
+                if (!(destination instanceof RaisingEdgePin)) {
+                    toImp = Utils.addToArray(toImp, destination);
+                }
+            }
+            if (!(destination instanceof RaisingEdgePin)) {
+                toLow = Utils.addToArray(toLow, destination);
+            }
+        }
     }
 }
