@@ -62,6 +62,7 @@ dependencies {
     runtimeOnly project(":schemaParts:ringCounter")
     runtimeOnly project(":schemaParts:keyboard")
     runtimeOnly project(":schemaParts:led")
+    runtimeOnly project(":schemaParts:led16SegmentDisplay")
     runtimeOnly project(":schemaParts:multiplexer")
     runtimeOnly project(":schemaParts:or")
     runtimeOnly project(":schemaParts:oscillator")

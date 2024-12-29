@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <symbolMap xmlns="pko.kicadLogicalSimulator.map">
+	<lib name="Display_Character">
+		<symbol name="HDSP-A153" symPartClass="Led16SegmentDisplay"/>
+	</lib>
 	<lib name="Diode">
 		<symbol name="BA157" symPartClass="Diode"/>
 		<symbol name="1.5KExxA" symPartClass="Diode">

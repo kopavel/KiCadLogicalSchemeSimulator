@@ -29,51 +29,18 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.components.LED;
-import pko.KiCadLogicalSchemeSimulator.api.schemaPart.AbstractUiComponent;
-import pko.KiCadLogicalSchemeSimulator.api.schemaPart.InteractiveSchemaPart;
+package pko.KiCadLogicalSchemeSimulator.components.led16Segment;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
-import pko.KiCadLogicalSchemeSimulator.tools.UiTools;
+import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
 
-import java.awt.*;
-
-public class Led extends SchemaPart implements InteractiveSchemaPart {
-    private final LedUiComponent ledUiComponent;
-
-    protected Led(String id, String sParams) {
-        super(id, sParams);
-        addInPin(new InPin("IN", this) {
-            @Override
-            public void setHiImpedance() {
-                state = false;
-                ledUiComponent.state = false;
-            }
-
-            @Override
-            public void setHi() {
-                state = true;
-                ledUiComponent.state = true;
-            }
-
-            @Override
-            public void setLo() {
-                state = false;
-                ledUiComponent.state = false;
-            }
-        });
-        int size = Integer.parseInt(params.getOrDefault("size", "20"));
-        Color on = UiTools.getColor(params.getOrDefault("onColor", "#ff0000"));
-        Color off = UiTools.getColor(params.getOrDefault("offColor", "#808080"));
-        ledUiComponent = new LedUiComponent(size, on, off, id);
+public class Led16SegmentDisplaySpi implements SchemaPartSpi {
+    @Override
+    public SchemaPart getSchemaPart(String id, String params) {
+        return new Led16SegmentDisplay(id, params);
     }
 
     @Override
-    public void initOuts() {
-    }
-
-    @Override
-    public AbstractUiComponent getComponent() {
-        return ledUiComponent;
+    public Class<? extends SchemaPart> getSchemaPartClass() {
+        return Led16SegmentDisplay.class;
     }
 }

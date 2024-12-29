@@ -61,7 +61,7 @@ public class LedUiComponent extends AbstractUiComponent {
     protected void draw() {
         // Set color and draw the circle
         if (circle == null) {
-            circle = new Ellipse2D.Double((double) (getWidth() - size) / 2, getHeight() - size - 2, size, size);
+            circle = new Ellipse2D.Float((float) (getWidth() - size) / 2, getHeight() - size - 2, size, size);
         }
         g2d.setColor(state ? on : off);
         g2d.fill(circle);

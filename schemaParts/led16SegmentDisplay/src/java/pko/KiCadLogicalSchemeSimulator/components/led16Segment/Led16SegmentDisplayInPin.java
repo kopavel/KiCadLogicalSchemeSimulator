@@ -29,51 +29,37 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.components.LED;
-import pko.KiCadLogicalSchemeSimulator.api.schemaPart.AbstractUiComponent;
-import pko.KiCadLogicalSchemeSimulator.api.schemaPart.InteractiveSchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+package pko.KiCadLogicalSchemeSimulator.components.led16Segment;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
-import pko.KiCadLogicalSchemeSimulator.tools.UiTools;
 
-import java.awt.*;
+public class Led16SegmentDisplayInPin extends InPin {
+    private final Led16SegmentDisplay display;
+    private final int mask;
+    private final int nMask;
 
-public class Led extends SchemaPart implements InteractiveSchemaPart {
-    private final LedUiComponent ledUiComponent;
-
-    protected Led(String id, String sParams) {
-        super(id, sParams);
-        addInPin(new InPin("IN", this) {
-            @Override
-            public void setHiImpedance() {
-                state = false;
-                ledUiComponent.state = false;
-            }
-
-            @Override
-            public void setHi() {
-                state = true;
-                ledUiComponent.state = true;
-            }
-
-            @Override
-            public void setLo() {
-                state = false;
-                ledUiComponent.state = false;
-            }
-        });
-        int size = Integer.parseInt(params.getOrDefault("size", "20"));
-        Color on = UiTools.getColor(params.getOrDefault("onColor", "#ff0000"));
-        Color off = UiTools.getColor(params.getOrDefault("offColor", "#808080"));
-        ledUiComponent = new LedUiComponent(size, on, off, id);
+    public Led16SegmentDisplayInPin(String id, Led16SegmentDisplay parent, int bit) {
+        super(id, parent);
+        this.display = parent;
+        if (parent.reverse) {
+            this.mask = ~(1 << bit);
+        } else {
+            this.mask = 1 << bit;
+        }
+        this.nMask = ~this.mask;
     }
 
     @Override
-    public void initOuts() {
+    public void setHiImpedance() {
+        display.segments &= nMask;
     }
 
     @Override
-    public AbstractUiComponent getComponent() {
-        return ledUiComponent;
+    public void setHi() {
+        display.segments |= mask;
+    }
+
+    @Override
+    public void setLo() {
+        display.segments &= nMask;
     }
 }
