@@ -18,6 +18,7 @@ Some interactive parts has additional interfaces/functionality if you click on i
 * [JkTrigger](jkTrigger/README.md) — JK trigger.
 * [Keyboard](keyboard/README.md) — Matrix of key.
 * [Led](led/README.md) — LED indicator.
+* [Led16SegmentDisplay](Led16SegmentDisplay/README.md) — 16 segment LED display.
 * [MaskedMultiplexer]( multiplexer/MaskedMultiplexer.md) — Multiplexer with a defined amount outputs and ways with masking inputs.
 * [MultiOutDecoder](decoder/MultiOutDecoder.md) — Decoder with multiple output pin groups.
 * [MultiPartConter](counter/MultiPartCounter.md) — Multipart binary counter.

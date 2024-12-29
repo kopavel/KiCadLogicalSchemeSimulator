@@ -28,4 +28,4 @@ Interactive 16 segment LED display schema part.
 
 ### Example
 
-`size=20;onColor=#FF0000;offColor=#808080`
+`size=120;onColor=#FF0000;offColor=#808080`
