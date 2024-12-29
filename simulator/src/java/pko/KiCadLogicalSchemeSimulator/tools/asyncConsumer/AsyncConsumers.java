@@ -30,6 +30,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.tools.asyncConsumer;
+import pko.KiCadLogicalSchemeSimulator.tools.Log;
+
 import java.lang.invoke.VarHandle;
 import java.util.ArrayList;
 import java.util.List;
@@ -95,6 +97,7 @@ public abstract class AsyncConsumers<T> implements Consumer<T>, AutoCloseable {
                 consumerThread.join();
             }
         } catch (InterruptedException e) {
+            Log.error(AsyncConsumers.class, "Error waitng consumer for close", e);
             throw new RuntimeException(e);
         }
     }

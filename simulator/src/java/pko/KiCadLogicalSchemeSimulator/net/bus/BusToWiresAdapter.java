@@ -52,8 +52,6 @@ public class BusToWiresAdapter extends OutBus {
     public BusToWiresAdapter(BusToWiresAdapter oldBus, String variantId) {
         super(oldBus, variantId);
         triState = oldBus.triState;
-        destinations = oldBus.destinations;
-        split();
     }
 
     public BusToWiresAdapter(OutBus outBus, long mask) {
@@ -130,8 +128,8 @@ public class BusToWiresAdapter extends OutBus {
         /*Optimiser blockEnd setters block mask bind m:mask*/
         final long newMaskState = newState & mask;
         if (
-            /*Optimiser block iSetter bind d:destinations[0]*/
-                destinations[0].hiImpedance ||
+            /*Optimiser block iSetter bind d:toImp[0] */
+                toImp[0].hiImpedance ||
                         /*Optimiser blockEnd iSetter */
                         maskState != newMaskState) {
             maskState = newMaskState;
@@ -207,7 +205,7 @@ public class BusToWiresAdapter extends OutBus {
             if (!triState) {
                 optimiser.cut("iSetter");
             } else {
-                optimiser.bind("d", "destination0");
+                optimiser.bind("d", "imp0");
             }
             if (destinations.length < 2 || Simulator.noRecursive) {
                 optimiser.cut("allRecurse");
