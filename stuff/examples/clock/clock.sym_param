@@ -1,0 +1,4 @@
+<params recursive="true" xmlns="pko.kicadLogicalSimulator.param">
+	<mapFile>chip</mapFile>
+	<mapFile>kicad</mapFile>
+</params>

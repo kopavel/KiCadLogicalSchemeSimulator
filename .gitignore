@@ -15,6 +15,7 @@
 /stuff/examples/**/*.kicad_pro
 /stuff/examples/**/*.kicad_prl
 /stuff/examples/**/#auto_saved_files#
+/stuff/examples/clock/clock.xml
 /stuff/examples/counters/counters.xml
 /stuff/examples/switch/switch.xml
 /stuff/examples/trs80/TRS80I.xml

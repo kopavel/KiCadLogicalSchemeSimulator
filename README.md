@@ -74,6 +74,13 @@ Here are some schema Netlist examples:
 ./gradlew counters
 ```
 
+- [Clock](stuff/examples/clock/README.md) - Simple 24h clock.  
+  for start use corresponding gradle task:
+
+```
+./gradlew clock
+
+```
 - [Z80](stuff/examples/z80/README.md) - Schema based on the Zilog Z80.
 
 ```

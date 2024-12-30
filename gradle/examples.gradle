@@ -56,6 +56,18 @@ tasks.register('z80') {
         }
     }
 }
+tasks.register('clock') {
+    group = 'examples'
+    dependsOn tasks.named('assemble')
+    doLast {
+        exec {
+            workingDir "$rootDir/stuff/examples/clock"
+            executable scriptPath
+            args 'clock.net'
+
+        }
+    }
+}
 tasks.register('trs80') {
     group = 'examples'
     dependsOn tasks.named('assemble')
