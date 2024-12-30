@@ -69,6 +69,7 @@ public class DCounter extends SchemaPart {
                     ciState = true;
                 }
             });
+            ciState = true;
             carryHi = false;
             carryLo = true;
             udPin = addInPin(new InPin("UD", this, true) {
@@ -310,12 +311,6 @@ public class DCounter extends SchemaPart {
         outBus = getOutBus("Q");
         outBus.useBitPresentation = true;
         cOutPin = getOutPin("CO");
-        outBus.setState(0);
-        if (carryLo) {
-            cOutPin.setHi();
-        } else {
-            cOutPin.setLo();
-        }
     }
 
     @Override
@@ -331,8 +326,7 @@ public class DCounter extends SchemaPart {
     private void process() {
         if (ciState && presetDisabled && resetInactive) {
             if (udPin.state) {
-                outBus.state++;
-                if (outBus.state == maxCount) {
+                if (outBus.state + 1 == maxCount) {
                     if (carryHi) {
                         cOutPin.setHi();
                     } else {
@@ -343,14 +337,15 @@ public class DCounter extends SchemaPart {
                         cOutPin.setHi();
                     } else {
                         cOutPin.setLo();
-                    }
-                    if (outBus.state > maxCount) {
-                        outBus.setState(0);
                     }
                 }
+                if (outBus.state == maxCount) {
+                    outBus.setState(0);
+                } else {
+                    outBus.setState(outBus.state + 1);
+                }
             } else {
-                outBus.state--;
-                if (outBus.state == 0) {
+                if (outBus.state == 1) {
                     if (carryHi) {
                         cOutPin.setHi();
                     } else {
@@ -362,9 +357,11 @@ public class DCounter extends SchemaPart {
                     } else {
                         cOutPin.setLo();
                     }
-                    if (outBus.state < 0) {
-                        outBus.setState(maxCount);
-                    }
+                }
+                if (outBus.state == 0) {
+                    outBus.setState(maxCount);
+                } else {
+                    outBus.setState(outBus.state - 1);
                 }
             }
         }
