@@ -234,30 +234,31 @@ public class Simulator implements Runnable {
                     if (mapFiles == null) {
                         mapFiles = params.mapFile.toArray(new String[0]);
                     } else {
-                        for (String mapFile : mapFiles) {
+                        for (String mapFile : params.mapFile) {
                             mapFiles = Utils.addToArray(mapFiles, mapFile);
                         }
                     }
                 }
             }
-            if (mapFiles != null) {
-                for (int i = 0; i < mapFiles.length; i++) {
-                    String mapFile = mapFiles[i];
-                    if (!mapFile.endsWith(".sym_map")) {
-                        mapFile += ".sym_map";
-                    }
-                    File file = new File(mapFile);
-                    if (!file.exists() || !file.isFile()) {
-                        if (mapFileDir != null) {
-                            file = new File(mapFileDir + File.separator + mapFile);
-                            if (!file.exists() || !file.isFile()) {
-                                throw new Exception("Can't fine Symbol map file " + mapFile);
-                            } else {
-                                mapFiles[i] = mapFileDir + "/" + mapFile;
-                            }
-                        } else {
+            if (mapFiles == null) {
+                mapFiles = new String[]{"kikad"};
+            }
+            for (int i = 0; i < mapFiles.length; i++) {
+                String mapFile = mapFiles[i];
+                if (!mapFile.endsWith(".sym_map")) {
+                    mapFile += ".sym_map";
+                }
+                File file = new File(mapFile);
+                if (!file.exists() || !file.isFile()) {
+                    if (mapFileDir != null) {
+                        file = new File(mapFileDir + File.separator + mapFile);
+                        if (!file.exists() || !file.isFile()) {
                             throw new Exception("Can't fine Symbol map file " + mapFile);
+                        } else {
+                            mapFiles[i] = mapFileDir + "/" + mapFile;
                         }
+                    } else {
+                        throw new Exception("Can't fine Symbol map file " + mapFile);
                     }
                 }
             }
