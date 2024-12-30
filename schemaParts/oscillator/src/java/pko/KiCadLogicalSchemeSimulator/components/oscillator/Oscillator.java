@@ -117,33 +117,17 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
             scheduler = Executors.newSingleThreadScheduledExecutor();
             timerStart = System.currentTimeMillis();
             tickStart = ticks;
-            long period = Math.max(10, (long) (10000000.0 / clockFreq));
+            long period = Math.max(1, (long) (1000000.0 / clockFreq / 2));
             scheduler.scheduleAtFixedRate(() -> {
                 final Pin local = out;
                 long target = Math.min(10000, (long) ((System.currentTimeMillis() - timerStart) * clockFreq * 2) - ticks + tickStart);
                 ticks += target;
-                long count = target / 20;
-                for (int i = 0; i < count; i++) {
-                    local.setHi();
-                    local.setLo();
-                    local.setHi();
-                    local.setLo();
-                    local.setHi();
-                    local.setLo();
-                    local.setHi();
-                    local.setLo();
-                    local.setHi();
-                    local.setLo();
-                    local.setHi();
-                    local.setLo();
-                    local.setHi();
-                    local.setLo();
-                    local.setHi();
-                    local.setLo();
-                    local.setHi();
-                    local.setLo();
-                    local.setHi();
-                    local.setLo();
+                for (int i = 0; i < target; i++) {
+                    if (local.state) {
+                        local.setLo();
+                    } else {
+                        local.setHi();
+                    }
                 }
             }, 0, period, TimeUnit.NANOSECONDS);
         }
