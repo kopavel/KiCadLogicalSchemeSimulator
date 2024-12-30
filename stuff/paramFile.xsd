@@ -11,7 +11,7 @@
 	</xs:simpleType>
 	<xs:simpleType name="IdType">
 		<xs:restriction base="xs:string">
-			<xs:pattern value="[a-zA-Z_]+[a-zA-Z_0-9]+"/>
+			<xs:pattern value="[a-zA-Z]+[0-9]+"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="SymPartParamType">
@@ -28,10 +28,23 @@
 		<xs:attribute name="noRecursive" type="xs:boolean"/>
 	</xs:complexType>
 	<xs:complexType name="partType">
+		<xs:sequence>
+			<xs:element minOccurs="0" maxOccurs="unbounded" name="unit" type="unitType"/>
+		</xs:sequence>
 		<xs:attribute name="id" use="required" type="IdType"/>
 		<xs:attribute name="ignore" type="xs:boolean"/>
 		<xs:attribute name="symPartClass" type="ClassName"/>
 		<xs:attribute name="symPartParam" type="SymPartParamType"/>
 	</xs:complexType>
+	<xs:complexType name="unitType">
+		<xs:attribute name="name" use="required" type="unitNameType"/>
+		<xs:attribute name="ignore" type="xs:boolean"/>
+		<xs:attribute name="symPartParam" type="SymPartParamType"/>
+	</xs:complexType>
+	<xs:simpleType name="unitNameType">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[A-Z]+"/>
+		</xs:restriction>
+	</xs:simpleType>
 </xs:schema>
 	

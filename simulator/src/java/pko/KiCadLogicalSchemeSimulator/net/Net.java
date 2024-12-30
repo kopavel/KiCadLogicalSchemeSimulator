@@ -48,6 +48,7 @@ import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Comp;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Export;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Property;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.param.Part;
+import pko.KiCadLogicalSchemeSimulator.parsers.pojo.param.Unit;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.symbolMap.SchemaPartMap;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.symbolMap.SymbolDesc;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.symbolMap.SymbolLibMap;
@@ -405,13 +406,26 @@ public class Net {
             for (int i = 0; i < symbolDesc.units.size(); i++) {
                 String unit = symbolDesc.units.get(i);
                 String name;
+                Unit unitConfig = null;
                 if (symbolDesc.units.stream()
                         .filter(u -> !u.startsWith("power;")).count() == 1) {
                     name = id;
                 } else {
-                    name = id + "_" + (char) ('A' + i);
+                    String uId = String.valueOf((char) ('A' + i));
+                    name = id + "_" + uId;
+                    if (params != null && params.unit != null) {
+                        unitConfig = params.unit.stream()
+                                .filter(u -> u.name.equals(uId)).findAny().orElse(null);
+                    }
                 }
-                SchemaPart schemaPart = getSchemaPart(className, name, parameters);
+                if (unitConfig != null && unitConfig.ignore) {
+                    continue;
+                }
+                String unitParam = parameters;
+                if (unitConfig != null && unitConfig.symPartParam != null) {
+                    unitParam += unitConfig.symPartParam;
+                }
+                SchemaPart schemaPart = getSchemaPart(className, name, unitParam);
                 for (String pinMapInfo : unit.split(";")) {
                     if (!pinMapInfo.equals("power")) {
                         String[] mapInfo = pinMapInfo.split("=");

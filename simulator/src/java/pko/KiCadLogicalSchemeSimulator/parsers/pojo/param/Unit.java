@@ -36,17 +36,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-
 @XmlAccessorType(XmlAccessType.FIELD)
 @Getter
 @Setter
 @NoArgsConstructor
-public class Part {
-    public String id;
+public class Unit {
+    public String name;
     public boolean ignore;
-    public String symPartClass;
     public String symPartParam;
-    public List<Unit> unit;
-
 }
