@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <symbolMap xmlns="pko.kicadLogicalSimulator.map">
 	<lib name="Display_Character">
-		<symbol name="HDSP-A153" symPartClass="Led16SegmentDisplay"/>
+		<symbol name="HDSP-A153" symPartClass="Led7SegmentDisplay">
+			<unit pinMap="10=A;9=B;8=C;5=D;4=E;2=F;3=G;7=DP"/>
+		</symbol>
 	</lib>
 	<lib name="Diode">
 		<symbol name="BA157" symPartClass="Diode"/>
@@ -222,8 +224,7 @@
 			<unit pinMap="power;8=NC;1=NC"/>
 		</symbol>
 		<symbol name="4056"
-		        symPartClass="StateMachine"
-		        symPartParam="size=4;latch;outSize=7;states=126,48,109,121,51,91,95,112,127,123,14,55,103,119,1,0">
+		        symPartClass="StateMachine" symPartParam="size=4;latch;outSize=7;latch;states=63,6,91,79,102,109,125,7,127,111,55,118,115,119,64,0">
 			<unit pinMap="5=IN0;3=IN1;2=IN2;4=IN3;1=C;6=R;9=OUT0;10=OUT1;11=OUT2;12=OUT3;13=OUT4;15=OUT5;14=OUT6"/>
 			<unit pinMap="power;7=NC;8=NC;16=NC"/>
 		</symbol>
@@ -304,7 +305,7 @@
 			<unit pinMap="9=C;15=R;10=E;11=Q0;12=Q1;13=Q2;14=Q3"/>
 			<unit pinMap="power;8=NC;16=NC"/>
 		</symbol>
-		<symbol name="4543" symPartClass="StateMachine" symPartParam="size=4;outSize=7;states=126,48,109,121,51,91,95,112,127,123,0,0,0,0,0,0">
+		<symbol name="4543" symPartClass="StateMachine" symPartParam="size=4;cReverse;outSize=7;states=63,6,91,79,102,109,125,7,127,111,0,0,0,0,0,0">
 			<unit pinMap="5=IN0;3=IN1;2=IN2;4=IN3;7=D;1=C;6=R;9=OUT0;10=OUT1;11=OUT2;12=OUT3;13=OUT4;15=OUT5;14=OUT6"/>
 			<unit pinMap="power;8=NC;16=NC"/>
 		</symbol>
