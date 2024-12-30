@@ -29,36 +29,36 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.components.led16Segment;
+package pko.KiCadLogicalSchemeSimulator.components.led7Segment;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.AbstractUiComponent;
 
 import java.awt.*;
 import java.awt.geom.Line2D;
+import java.awt.geom.Rectangle2D;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class Led16SegmentDisplayUiComponent extends AbstractUiComponent {
+public class Led7SegmentDisplayUiComponent extends AbstractUiComponent {
     private final Color on;
     private final Color off;
     private final float segmentWidth; // Thickness of segments
     private final float segmentHeight; // Thickness of segments
-    private final float halfWidth;
     private final float halfHeight;
     private final float width;
     private final float height;
-    public long state;
-    private Line2D[] segment;
+    private final Led7SegmentDisplay parent;
+    private Shape[] segment;
 
-    public Led16SegmentDisplayUiComponent(int size, Color on, Color off, String title) {
+    public Led7SegmentDisplayUiComponent(Led7SegmentDisplay parent, int size, Color on, Color off, String title) {
         super(title, size);
+        this.parent = parent;
         this.on = on;
         this.off = off;
         setBackground(new Color(0, 0, 0, 0));
         width = 0.5f * size;
         height = size - 5;
-        segmentWidth = 3.5f;
-        segmentHeight = 3.5f;
-        halfWidth = width / 2;
+        segmentWidth = 6f;
+        segmentHeight = 6f;
         halfHeight = height / 2;
         //noinspection resource
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this::repaint, 0, redrawPeriod, TimeUnit.MILLISECONDS);
@@ -73,39 +73,29 @@ public class Led16SegmentDisplayUiComponent extends AbstractUiComponent {
     protected void draw() {
         // Set color and draw the circle
         if (segment == null) {
-            segment = new Line2D[17];
+            segment = new Shape[8];
             int y = titleHeight + 5;
             // Top segments
-            segment[0] = new Line2D.Float(segmentWidth, y, halfWidth - segmentWidth, y);
-            segment[1] = new Line2D.Float(halfWidth + segmentWidth, y, width - segmentWidth, y);
+            segment[0] = new Line2D.Float(segmentWidth, y, width - segmentWidth, y);
             // Middle segments
-            segment[2] = new Line2D.Float(segmentWidth, y + halfHeight, halfWidth - segmentWidth, y + halfHeight);
-            segment[3] = new Line2D.Float(halfWidth + segmentWidth, y + halfHeight, width - segmentWidth, y + halfHeight);
+            segment[1] = new Line2D.Float(segmentWidth, y + halfHeight, width - segmentWidth, y + halfHeight);
             // Bottom segments
-            segment[4] = new Line2D.Float(segmentWidth, y + height, halfWidth - segmentWidth, y + height);
-            segment[5] = new Line2D.Float(halfWidth + segmentWidth, y + height, width - segmentWidth, y + height);
+            segment[2] = new Line2D.Float(segmentWidth, y + height, width - segmentWidth, y + height);
             // Vertical segments
-            segment[6] = new Line2D.Float(1, y + segmentHeight, 1, y + halfHeight - segmentHeight);
-            segment[7] = new Line2D.Float(halfWidth, y + segmentHeight, halfWidth, y + halfHeight - segmentHeight);
-            segment[8] = new Line2D.Float(width, y + segmentHeight, width, y + halfHeight - segmentHeight);
-            segment[9] = new Line2D.Float(1, y + halfHeight + segmentHeight, 1, y + height - segmentHeight);
-            segment[10] = new Line2D.Float(halfWidth, y + halfHeight + segmentHeight, halfWidth, y + height - segmentHeight);
-            segment[11] = new Line2D.Float(width, y + halfHeight + segmentHeight, width, y + height - segmentHeight);
-            // Diagonal segments
-            segment[12] = new Line2D.Float(segmentWidth + 2, y + segmentHeight + 1, halfWidth - segmentWidth, y + halfHeight - segmentHeight - 1);
-            segment[13] = new Line2D.Float(halfWidth + segmentWidth + 1, y + halfHeight - segmentHeight - 1, width - segmentWidth - 1, y + segmentHeight + 1);
-            segment[14] = new Line2D.Float(segmentWidth + 2, y + height - segmentHeight - 1, halfWidth - segmentWidth, y + halfHeight + segmentHeight + 1);
-            segment[15] =
-                    new Line2D.Float(halfWidth + segmentWidth + 1, y + halfHeight + segmentHeight + 1, width - segmentWidth - 1, y + height - segmentHeight - 1);
+            segment[3] = new Line2D.Float(1, y + segmentHeight, 1, y + halfHeight - segmentHeight);
+            segment[4] = new Line2D.Float(width, y + segmentHeight, width, y + halfHeight - segmentHeight);
+            segment[5] = new Line2D.Float(1, y + halfHeight + segmentHeight, 1, y + height - segmentHeight);
+            segment[6] = new Line2D.Float(width, y + halfHeight + segmentHeight, width, y + height - segmentHeight);
             // Decimal point
-            segment[16] = new Line2D.Float(width + 1.3f * segmentWidth, y + height, width + 1.3f * segmentWidth, y + height);
+            segment[7] = new Rectangle2D.Float(width + 2 * segmentWidth, y + height - segmentHeight, segmentWidth, segmentHeight);
         }
-        g2d.setStroke(new BasicStroke(3)); // Sets line thickness to 5
-        for (int i = 0; i < 17; i++) {
+        g2d.setStroke(new BasicStroke(5)); // Sets line thickness to 5
+        for (int i = 0; i < 8; i++) {
             if (segment[i] != null) {
                 int bit = 1 << i;
-                g2d.setColor((state & bit) > 0 ? on : off);
+                g2d.setColor((parent.segments & bit) > 0 ? on : off);
                 g2d.draw(segment[i]);
+                g2d.fill(segment[i]);
             }
         }
     }

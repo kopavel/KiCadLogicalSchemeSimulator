@@ -29,7 +29,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.components.led16Segment;
+package pko.KiCadLogicalSchemeSimulator.components.led7Segment;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.AbstractUiComponent;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.InteractiveSchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
@@ -37,33 +37,24 @@ import pko.KiCadLogicalSchemeSimulator.tools.UiTools;
 
 import java.awt.*;
 
-public class Led16SegmentDisplay extends SchemaPart implements InteractiveSchemaPart {
-    private final Led16SegmentDisplayUiComponent led16SegmentDisplayUiComponent;
+public class Led7SegmentDisplay extends SchemaPart implements InteractiveSchemaPart {
+    private final Led7SegmentDisplayUiComponent led7SegmentDisplayUiComponent;
     public int segments;
 
-    protected Led16SegmentDisplay(String id, String sParams) {
+    protected Led7SegmentDisplay(String id, String sParams) {
         super(id, sParams);
-        addInPin(new Led16SegmentDisplayInPin("A1", this, 0));
-        addInPin(new Led16SegmentDisplayInPin("A2", this, 1));
-        addInPin(new Led16SegmentDisplayInPin("B", this, 8));
-        addInPin(new Led16SegmentDisplayInPin("C", this, 11));
-        addInPin(new Led16SegmentDisplayInPin("D1", this, 2));
-        addInPin(new Led16SegmentDisplayInPin("D2", this, 3));
-        addInPin(new Led16SegmentDisplayInPin("E", this, 9));
-        addInPin(new Led16SegmentDisplayInPin("F", this, 6));
-        addInPin(new Led16SegmentDisplayInPin("G1", this, 4));
-        addInPin(new Led16SegmentDisplayInPin("G2", this, 5));
-        addInPin(new Led16SegmentDisplayInPin("H", this, 12));
-        addInPin(new Led16SegmentDisplayInPin("I", this, 7));
-        addInPin(new Led16SegmentDisplayInPin("J", this, 13));
-        addInPin(new Led16SegmentDisplayInPin("K", this, 14));
-        addInPin(new Led16SegmentDisplayInPin("L", this, 10));
-        addInPin(new Led16SegmentDisplayInPin("M", this, 15));
-        addInPin(new Led16SegmentDisplayInPin("DP", this, 16));
+        addInPin(new Led7SegmentDisplayInPin("A", this, 0));
+        addInPin(new Led7SegmentDisplayInPin("B", this, 4));
+        addInPin(new Led7SegmentDisplayInPin("C", this, 6));
+        addInPin(new Led7SegmentDisplayInPin("D", this, 2));
+        addInPin(new Led7SegmentDisplayInPin("E", this, 5));
+        addInPin(new Led7SegmentDisplayInPin("F", this, 3));
+        addInPin(new Led7SegmentDisplayInPin("G", this, 1));
+        addInPin(new Led7SegmentDisplayInPin("DP", this, 7));
         int size = Integer.parseInt(params.getOrDefault("size", "60"));
         Color on = UiTools.getColor(params.getOrDefault("onColor", "#ff0000"));
-        Color off = UiTools.getColor(params.getOrDefault("offColor", "#808080"));
-        led16SegmentDisplayUiComponent = new Led16SegmentDisplayUiComponent(size, on, off, id);
+        Color off = UiTools.getColor(params.getOrDefault("offColor", "#bbbbbb"));
+        led7SegmentDisplayUiComponent = new Led7SegmentDisplayUiComponent(this, size, on, off, id);
     }
 
     @Override
@@ -72,6 +63,6 @@ public class Led16SegmentDisplay extends SchemaPart implements InteractiveSchema
 
     @Override
     public AbstractUiComponent getComponent() {
-        return led16SegmentDisplayUiComponent;
+        return led7SegmentDisplayUiComponent;
     }
 }
