@@ -378,7 +378,7 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
         merger.sources.remove(this);
         destinations = merger.destinations;
         for (int i = 0; i < destinations.length; i++) {
-            destinations[i] = destinations[i].getOptimised(this);
+            destinations[i] = destinations[i].getOptimised(merger);
             if (triState) {
                 destinations[i].triState = true;
             }
@@ -410,9 +410,6 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
         BusMergerBusIn build = optimiser.build();
         merger.sources.add(build);
         build.source = source;
-        for (Bus destination : destinations) {
-            destination.source = build;
-        }
         return build;
     }
 

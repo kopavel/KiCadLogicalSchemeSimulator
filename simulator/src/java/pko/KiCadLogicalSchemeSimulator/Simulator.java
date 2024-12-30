@@ -197,6 +197,9 @@ public class Simulator implements Runnable {
     @Override
     public void run() {
         try {
+            if (noRecursive) {
+                Log.warn(Simulator.class, "Recursive event detection are disabled");
+            }
             schemaPartSpiMap = ServiceLoader.load(SchemaPartSpi.class)
                     .stream()
                     .map(ServiceLoader.Provider::get)
