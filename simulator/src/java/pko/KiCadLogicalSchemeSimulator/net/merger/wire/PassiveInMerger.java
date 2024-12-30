@@ -43,6 +43,9 @@ public class PassiveInMerger extends TriStateOutPin {
         super(source, "PassiveInMerger");
         this.source = source;
         state = powerState;
+        source.state = state;
+        source.strong = true;
+        source.hiImpedance = false;
         hiImpedance = false;
         merger = this;
         strong = true;
