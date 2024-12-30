@@ -80,7 +80,9 @@ public class Decoder extends SchemaPart {
                 public void setHi() {
                     state = true;
                     csState = false;
-                    outBus.setHiImpedance();
+                    if (!outBus.hiImpedance) {
+                        outBus.setHiImpedance();
+                    }
                 }
 
                 @Override
