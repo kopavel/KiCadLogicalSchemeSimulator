@@ -197,6 +197,11 @@ public class BusToWiresAdapter extends OutBus {
                 destinations[i] = destinations[i].getOptimised(this);
             }
             split();
+/*
+            if (parent.id.equals("U1_A")) {
+                toLow[0] = new AsyncInPin(toLow[0]);
+            }
+*/
             ClassOptimiser<BusToWiresAdapter> optimiser =
                     new ClassOptimiser<>(this).unroll("i", toImp.length).unroll("l", toLow.length).unroll("h", toHi.length).bind("m", mask);
             if (source != null) {

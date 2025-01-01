@@ -36,21 +36,19 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openjdk.jmh.runner.options.TimeValue;
-import pko.KiCadLogicalSchemeSimulator.tools.asyncConsumer.AsyncConsumer;
-import pko.KiCadLogicalSchemeSimulator.tools.asyncConsumer.AsyncConsumers;
+import pko.KiCadLogicalSchemeSimulator.tools.asyncConsumer.BatchedAsyncConsumer;
 
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 @State(Scope.Benchmark)
 public class AsyncConsumerBenchmark {
-    public static final int THREADS = 4;
-    public static final int ASYNC_BUF_SIZE = 64;
-    public static final int PAYLOAD = 100;
+    public static final int THREADS = 1;
+    public static final int ASYNC_BUF_SIZE = 3;
+    public static final int PAYLOAD = 1000;
     public static final boolean TEST = true;
-    final Long payload = 10L;
+    final long payload = 10L;
     private long cycles = 100000;
-    Consumer<Long> asyncConsumer;
+    BatchedAsyncConsumer asyncConsumer;
     private Blackhole blackhole;
 
     public static void main(String[] args) throws Throwable {
@@ -60,9 +58,7 @@ public class AsyncConsumerBenchmark {
                                                   .warmupIterations(3)
                                                   .warmupTime(TimeValue.seconds(1))
                                                   .measurementIterations(5)
-                                                  .measurementTime(TimeValue.seconds(1))
-                                                  .mode(Mode.AverageTime)
-                                                  .timeUnit(TimeUnit.MILLISECONDS)
+                                                  .measurementTime(TimeValue.seconds(1)).mode(Mode.Throughput).timeUnit(TimeUnit.SECONDS)
                                                   .forks(1)
                                                   .build();
             new Runner(options).run();
@@ -81,17 +77,20 @@ public class AsyncConsumerBenchmark {
     }
 
     @Setup
-    public void setup(Blackhole blackhole) {
+    public void setup(Blackhole blackhole) throws Exception {
         this.blackhole = blackhole;
+/*
         if (THREADS == 0) {
             asyncConsumer = this::process;
         } else if (THREADS == 1) {
-            asyncConsumer = new AsyncConsumer<>(ASYNC_BUF_SIZE) {
-                @Override
-                public void consume(Long payload) {
+*/
+        asyncConsumer = new BatchedAsyncConsumer(ASYNC_BUF_SIZE, 512) {
+            @Override
+            public void consume(boolean payload) {
                     process(payload);
-                }
-            };
+            }
+        };
+/*
         } else {
             asyncConsumer = new AsyncConsumers<>(ASYNC_BUF_SIZE, THREADS) {
                 @Override
@@ -99,7 +98,8 @@ public class AsyncConsumerBenchmark {
                     process(payload);
                 }
             };
-        }
+*/
+//        }
     }
 
     @TearDown
@@ -112,20 +112,30 @@ public class AsyncConsumerBenchmark {
     @Benchmark()
     public void asyncConsumer() {
         for (int i = 0; i < cycles; i++) {
-            asyncConsumer.accept(payload);
-            asyncConsumer.accept(payload);
-            asyncConsumer.accept(payload);
-            asyncConsumer.accept(payload);
-            asyncConsumer.accept(payload);
-            asyncConsumer.accept(payload);
-            asyncConsumer.accept(payload);
-            asyncConsumer.accept(payload);
-            asyncConsumer.accept(payload);
-            asyncConsumer.accept(payload);
+            asyncConsumer.accept(true);
+            asyncConsumer.accept(true);
+            asyncConsumer.accept(true);
+            asyncConsumer.accept(true);
+            asyncConsumer.accept(true);
+            asyncConsumer.accept(true);
+            asyncConsumer.accept(true);
+            asyncConsumer.accept(true);
+            asyncConsumer.accept(true);
+            asyncConsumer.accept(true);
+            process(true);
+            process(true);
+            process(true);
+            process(true);
+            process(true);
+            process(true);
+            process(true);
+            process(true);
+            process(true);
+            process(true);
         }
     }
 
-    private void process(Long payload) {
+    private void process(boolean payload) {
         long accumulator = 0;
         for (int i = 0; i < PAYLOAD; i++) {
             accumulator++;

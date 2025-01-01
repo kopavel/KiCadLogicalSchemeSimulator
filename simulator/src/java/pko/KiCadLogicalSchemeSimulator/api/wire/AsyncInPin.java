@@ -29,16 +29,15 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.api.bus;
-import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.tools.asyncConsumer.AsyncLongConsumer;
+package pko.KiCadLogicalSchemeSimulator.api.wire;
+import pko.KiCadLogicalSchemeSimulator.tools.asyncConsumer.BatchedAsyncConsumer;
 
 public class AsyncInPin extends Pin {
     private final Pin inPin;
-    AsyncLongConsumer consumer = new AsyncLongConsumer(20) {
+    private final BatchedAsyncConsumer consumer = new BatchedAsyncConsumer(5, 512) {
         @Override
-        public void consume(long payload) {
-            if (payload == 1) {
+        public void consume(boolean payload) {
+            if (payload) {
                 inPin.setHi();
             } else {
                 inPin.setLo();
@@ -53,11 +52,11 @@ public class AsyncInPin extends Pin {
 
     @Override
     public void setHi() {
-        consumer.accept(1L);
+        consumer.accept(true);
     }
 
     @Override
     public void setLo() {
-        consumer.accept(0L);
+        consumer.accept(false);
     }
 }
