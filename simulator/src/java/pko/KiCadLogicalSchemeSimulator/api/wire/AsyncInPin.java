@@ -34,10 +34,10 @@ import pko.KiCadLogicalSchemeSimulator.tools.asyncConsumer.BatchedAsyncConsumer;
 
 public class AsyncInPin extends Pin {
     private final Pin inPin;
-    private final BatchedAsyncConsumer consumer = new BatchedAsyncConsumer(5, 512) {
+    private final BatchedAsyncConsumer consumer = new BatchedAsyncConsumer(4, 512) {
         @Override
-        public void consume(boolean payload) {
-            if (payload) {
+        public void consume(long payload) {
+            if (payload > 0) {
                 inPin.setHi();
             } else {
                 inPin.setLo();
@@ -52,11 +52,11 @@ public class AsyncInPin extends Pin {
 
     @Override
     public void setHi() {
-        consumer.accept(true);
+        consumer.accept(1);
     }
 
     @Override
     public void setLo() {
-        consumer.accept(false);
+        consumer.accept(0);
     }
 }

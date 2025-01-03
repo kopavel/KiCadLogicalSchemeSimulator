@@ -43,7 +43,7 @@ import java.util.concurrent.TimeUnit;
 @State(Scope.Benchmark)
 public class AsyncConsumerBenchmark {
     public static final int THREADS = 1;
-    public static final int ASYNC_BUF_SIZE = 3;
+    public static final int ASYNC_BUF_SIZE = 4;
     public static final int PAYLOAD = 1000;
     public static final boolean TEST = true;
     final long payload = 10L;
@@ -84,10 +84,10 @@ public class AsyncConsumerBenchmark {
             asyncConsumer = this::process;
         } else if (THREADS == 1) {
 */
-        asyncConsumer = new BatchedAsyncConsumer(ASYNC_BUF_SIZE, 512) {
+        asyncConsumer = new BatchedAsyncConsumer(4, 512) {
             @Override
-            public void consume(boolean payload) {
-                    process(payload);
+            public void consume(long payload) {
+//                    process(payload);
             }
         };
 /*
@@ -112,16 +112,17 @@ public class AsyncConsumerBenchmark {
     @Benchmark()
     public void asyncConsumer() {
         for (int i = 0; i < cycles; i++) {
-            asyncConsumer.accept(true);
-            asyncConsumer.accept(true);
-            asyncConsumer.accept(true);
-            asyncConsumer.accept(true);
-            asyncConsumer.accept(true);
-            asyncConsumer.accept(true);
-            asyncConsumer.accept(true);
-            asyncConsumer.accept(true);
-            asyncConsumer.accept(true);
-            asyncConsumer.accept(true);
+            asyncConsumer.accept(i);
+            asyncConsumer.accept(i);
+            asyncConsumer.accept(i);
+            asyncConsumer.accept(i);
+            asyncConsumer.accept(i);
+            asyncConsumer.accept(i);
+            asyncConsumer.accept(i);
+            asyncConsumer.accept(i);
+            asyncConsumer.accept(i);
+            asyncConsumer.accept(i);
+/*
             process(true);
             process(true);
             process(true);
@@ -132,11 +133,12 @@ public class AsyncConsumerBenchmark {
             process(true);
             process(true);
             process(true);
+*/
         }
     }
 
-    private void process(boolean payload) {
-        long accumulator = 0;
+    private void process(long payload) {
+        long accumulator = payload;
         for (int i = 0; i < PAYLOAD; i++) {
             accumulator++;
         }
