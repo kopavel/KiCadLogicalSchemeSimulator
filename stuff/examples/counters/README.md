@@ -2,14 +2,14 @@
 
 **Sequential counters with LED, ideal for speed test.**
 
-On an Intel i-3770s, this schema achieved approximately 520 MHz.
+On an Intel i-3770s, this schema achieved approximately 690 MHz.
 
-For comparison, [Digital](https://github.com/hneemann/Digital) on the same hardware achieved approximately 90 times less speed.  
-However, important to note that [Digital](https://github.com/hneemann/Digital) and this project have different schema building principles,
+For comparison, [_Digital_](https://github.com/hneemann/Digital) on the same hardware achieved more than 100 times less speed.  
+However, important to note that _Digital_ and this project have different schema building principles,
 which may affect simulation speed.  
 Additionally, this project provides real-time feedback on achieved frequency,
-while [Digital](https://github.com/hneemann/Digital) doesn't offer this feature.
-This leads to the necessity of using a clock for speed measurement in Digital, which is not very accurate.
+while _Digital_ doesn't offer this feature.
+This leads to the necessity of using a clock for speed measurement in _Digital_, which is not very accurate.
 ![Digital](img/digital.png)
 
 for start use counters gradle task

@@ -3,9 +3,12 @@
 [KiCad](https://www.kicad.org) plugin for interactive logical scheme simulation.
 Supports two usage methods: directly from KiCad or standalone, using a schema file exported from KiCad in the "PCB Netlist"(`.net`) file format.
 
-Focuses on performance and simplicity of the net schema part API, allowing easy implementation of custom schema part behaviors for simulation.
+Focuses on performance and simplicity of the net schema part API, allowing easy implementation of custom schema part behaviors for simulation.  
+Tend to provide out-of-the-box experience. For that has predefined mapping for several KiCad libraries, like 4xxx, some 74xx and others.
 
-[Here is more info](stuff/kicad_symbols/README.md) about the supported schema part list and how to configure KiCad symbols mapping for the simulator.
+More info about [how to configure KiCad symbols mapping](stuff/kicad_symbols/README.md) for the simulator and [supported schema part list](schemaParts/README.md).
+
+Be sure helping this project by implementing new components and/or extend mapping for existing implementation and share result with comunity.
 
 ## Building
 
@@ -19,19 +22,19 @@ If the build is successful, you will find the output in the 'distro' folder.
 
 ## Standalone Start
 
-Once you have prepared and exported the schema from KiCad in the "PCB Netlist" (`.net`) file format, you can start the project. Use the appropriate script based on
-your operating system from the 'distro' directory.
+When the schema are prepared and exported from KiCad in the "PCB Netlist" (`.net`) file format, you can start the project.  
+Use the appropriate script based on your operating system from the 'distro' directory.
 
 For Unix-like systems:
 
 ```bash
-./run.sh mySchema.net
+./run.sh <path>/<to_my_project>/mySchema.net
 ```
 
 For Windows systems:
 
 ```bat
-run.bat mySchema.net
+run.bat <path>/<to_my_project>/mySchema.net
 ```
 
 These scripts initiate the simulator with the specified `.net` file as the first parameter.
@@ -81,6 +84,7 @@ Here are some schema Netlist examples:
 ./gradlew clock
 
 ```
+
 - [Z80](stuff/examples/z80/README.md) - Schema based on the Zilog Z80.
 
 ```

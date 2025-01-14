@@ -132,6 +132,7 @@ public class Utils {
     }
 
     public static String regexEscape(String input) {
+        input = input.replace("\\s", " ");
         String[] specialChars = {"\\", "^", "$", ".", "|", "?", "*", "+", "(", ")", "[", "{", "]", "}", ":", "!"};
         for (String ch : specialChars) {
             input = input.replace(ch, "\\" + ch);

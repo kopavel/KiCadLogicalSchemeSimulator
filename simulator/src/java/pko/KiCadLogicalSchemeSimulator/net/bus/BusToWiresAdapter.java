@@ -125,14 +125,13 @@ public class BusToWiresAdapter extends OutBus {
         /*Optimiser block setters line iSetter*/
         hiImpedance = false;
         state = newState;
-        /*Optimiser blockEnd setters block mask bind m:mask*/
-        final long newMaskState = newState & mask;
-        if (
-            /*Optimiser block iSetter bind d:toImp[0] */
-                toImp[0].hiImpedance ||
-                        /*Optimiser blockEnd iSetter */
-                        maskState != newMaskState) {
-            maskState = newMaskState;
+        /*Optimiser blockEnd setters block mask*/
+        final long newMaskState;
+        /*Optimiser bind m:mask*/
+        if (maskState != (newMaskState = newState & mask)
+                /*Optimiser line iSetter bind d:toImp[0] *///
+                || toImp[0].hiImpedance //
+        ) {
             /*Optimiser blockEnd mask block setters block allRecurse*/
             if (processing) {
                 /*Optimiser line recurse*/
@@ -143,16 +142,17 @@ public class BusToWiresAdapter extends OutBus {
                     /*Optimiser block recurse*/
                 }
                 hasQueue = true;
-                /*Optimiser bind nState:newMaskState*/
-                queueState = newMaskState == 0;
+                /*Optimiser bind nState:maskState\s=\snewMaskState*/
+                queueState = (maskState = newMaskState) == 0;
                 /*Optimiser blockEnd recurse*/
             } else {
                 processing = true;
-                /*Optimiser blockEnd setters blockEnd allRecurse bind nState:newMaskState*/
-                if (newMaskState == 0) {
+                /*Optimiser blockEnd setters blockEnd allRecurse bind nState:maskState\s=\snewMaskState*/
+                if ((maskState = newMaskState) == 0) {
                     for (Pin low : toLow) {
                         low.setLo();
                     }
+                    /*Optimiser line toHi*/
                 } else {
                     for (Pin hi : toHi) {
                         hi.setHi();
@@ -219,6 +219,9 @@ public class BusToWiresAdapter extends OutBus {
             }
             if (applyMask == 0) {
                 optimiser.cut("mask").bind("nState", "newState");
+            }
+            if (toHi.length == 0) {
+                optimiser.cut("toHi");
             }
             BusToWiresAdapter build = optimiser.build();
             build.source = source;

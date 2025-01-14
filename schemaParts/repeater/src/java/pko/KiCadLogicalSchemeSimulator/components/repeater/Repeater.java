@@ -46,8 +46,7 @@ public class Repeater extends SchemaPart {
     public void initOuts() {
         Pin out = getOutPin("OUT");
         inPin.out = out;
-        //FixMe what is faster? == or ^?
-        out.state = reverse ^ inPin.state;
+        out.state = reverse != inPin.state;
     }
 
     @Override

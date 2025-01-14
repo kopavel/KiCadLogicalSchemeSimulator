@@ -63,8 +63,10 @@ public class CInFallingPin extends FallingEdgePin {
     public void setLo() {
         /*Optimiser line setter*/
         state = false;
+        Bus bus;
+        long state;
         /*Optimiser bind countMask*/
-        out.setState((out.state + 1) & countMask);
+        (bus = out).setState((state = bus.state) == countMask ? 0 : state + 1);
     }
 
     @Override
