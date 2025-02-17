@@ -64,15 +64,17 @@ public class MultiUnitDcCPin extends InPin {
             /*Optimiser line o*/
                 !parent.reverse && //
                         parent.clockEnabled) {
+            Pins lPin;
+            Pin dPin;
             for (Pins pin : pins) {
-                if (pin.dPin.state) {
-                    if (pin.iqOut.state) {
-                        pin.iqOut.setLo();
-                        pin.qOut.setHi();
+                if ((lPin = pin).dPin.state) {
+                    if ((dPin = lPin.iqOut).state) {
+                        dPin.setLo();
+                        lPin.qOut.setHi();
                     }
-                } else if (pin.qOut.state) {
-                    pin.qOut.setLo();
-                    pin.iqOut.setHi();
+                } else if ((dPin = lPin.qOut).state) {
+                    dPin.setLo();
+                    lPin.iqOut.setHi();
                 }
             }
         }
@@ -88,15 +90,17 @@ public class MultiUnitDcCPin extends InPin {
             /*Optimiser line o*/
                 parent.reverse && //
                         parent.clockEnabled) {
+            Pins lPin;
+            Pin dPin;
             for (Pins pin : pins) {
-                if (pin.dPin.state) {
-                    if (pin.iqOut.state) {
-                        pin.iqOut.setLo();
-                        pin.qOut.setHi();
+                if ((lPin = pin).dPin.state) {
+                    if ((dPin = lPin.iqOut).state) {
+                        dPin.setLo();
+                        lPin.qOut.setHi();
                     }
-                } else if (pin.qOut.state) {
-                    pin.qOut.setLo();
-                    pin.iqOut.setHi();
+                } else if ((dPin = lPin.qOut).state) {
+                    dPin.setLo();
+                    lPin.iqOut.setHi();
                 }
             }
         }
