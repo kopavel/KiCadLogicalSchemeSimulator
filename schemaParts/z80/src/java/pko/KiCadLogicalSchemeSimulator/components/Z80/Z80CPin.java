@@ -42,7 +42,7 @@ public class Z80CPin extends InPin {
     final public InBus dIn;
     final public AsyncIoQueue ioQueue;
     final public Z80Core cpu;
-    final Z80Cpu parent;
+    private final InPin waitPin;
     public Pin refreshPin;
     public Bus dOut;
     public Bus aOut;
@@ -59,7 +59,7 @@ public class Z80CPin extends InPin {
 
     public Z80CPin(String id, Z80Cpu parent) {
         super(id, parent);
-        this.parent = parent;
+        this.waitPin = parent.waitPin;
         refreshPin = parent.refreshPin;
         aOut = parent.aOut;
         dOut = parent.dOut;
@@ -75,6 +75,7 @@ public class Z80CPin extends InPin {
 
     @Override
     public void setHi() {
+        AsyncIoQueue queue = ioQueue;
         state = true;
         if ((M != 1 && T == 3) || T == 4) {
             T = 1;
@@ -84,8 +85,8 @@ public class Z80CPin extends InPin {
             if (!dOut.hiImpedance) {
                 dOut.setHiImpedance();
             }
-            ioQueue.next();
-            if (ioQueue.request.address == -1) {
+            queue.next();
+            if (queue.request.address == -1) {
                 if (nmiTriggered) {
                     nmiTriggered = false;
                     cpu.processNMI();
@@ -101,13 +102,13 @@ public class Z80CPin extends InPin {
         } else {
             T++;
         }
-        Request ioRequest = ioQueue.request;
+        Request ioRequest = queue.request;
         switch (T) {
             case 1 -> {
                 if (M == 1) {
                     m1Pin.setLo();
                     cpu.executeOneInstruction();
-                    ioRequest = ioQueue.request;
+                    ioRequest = queue.request;
                 }
                 aOut.setState(ioRequest.address);
                 extraWait = !ioRequest.memory;
@@ -155,7 +156,7 @@ public class Z80CPin extends InPin {
                 if (!ioRequest.read && ioRequest.memory && notInWait) {
                     wrPin.setLo();
                 }
-                notInWait = parent.waitPin.state;
+                notInWait = waitPin.state;
             }
             case 3 -> {
                 if (M == 1) {
