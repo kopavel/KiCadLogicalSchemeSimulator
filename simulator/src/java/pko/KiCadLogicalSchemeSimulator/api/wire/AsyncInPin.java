@@ -34,7 +34,7 @@ import pko.KiCadLogicalSchemeSimulator.tools.asyncConsumer.BatchedAsyncConsumer;
 
 public class AsyncInPin extends Pin {
     private final Pin inPin;
-    private final BatchedAsyncConsumer consumer = new BatchedAsyncConsumer(4, 512) {
+    private final BatchedAsyncConsumer consumer = new BatchedAsyncConsumer(4) {
         @Override
         public void consume(long payload) {
             if (payload > 0) {

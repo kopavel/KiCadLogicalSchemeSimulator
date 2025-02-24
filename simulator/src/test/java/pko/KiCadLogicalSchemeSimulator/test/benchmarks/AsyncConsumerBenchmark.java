@@ -84,7 +84,7 @@ public class AsyncConsumerBenchmark {
             asyncConsumer = this::process;
         } else if (THREADS == 1) {
 */
-        asyncConsumer = new BatchedAsyncConsumer(4, 512) {
+        asyncConsumer = new BatchedAsyncConsumer(4) {
             @Override
             public void consume(long payload) {
 //                    process(payload);
