@@ -43,6 +43,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LibSource {
-    String lib;
-    String part;
+    public String lib;
+    public String part;
 }

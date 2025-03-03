@@ -45,7 +45,19 @@ import java.util.List;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Comp {
-    protected LibSource libsource;
-    protected List<Property> property;
-    protected String ref;
+    public LibSource libsource;
+    public List<Property> property;
+    public String ref;
+
+    public String findSchemaPartProperty(String name) {
+        if (property != null) {
+            for (Property property : property) {
+                if (property.getName().equals(name)) {
+                    return property.getValue();
+                }
+            }
+        }
+        return "";
+    }
+
 }

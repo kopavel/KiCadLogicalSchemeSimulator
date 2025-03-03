@@ -29,7 +29,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.parsers.pojo.symbolMap;
+package pko.KiCadLogicalSchemeSimulator.parsers.symbolMap;
 import java.util.HashMap;
 import java.util.Map;
 

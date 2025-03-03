@@ -54,6 +54,8 @@ module KiCadLogicalSchemeSimulator.simulator {
     opens pko.KiCadLogicalSchemeSimulator.parsers.pojo.net;
     opens pko.KiCadLogicalSchemeSimulator.parsers.pojo.param;
     opens pko.KiCadLogicalSchemeSimulator;
+    exports pko.KiCadLogicalSchemeSimulator.parsers.symbolMap;
+    opens pko.KiCadLogicalSchemeSimulator.parsers.symbolMap;
     requires com.fasterxml.jackson.annotation;
     requires com.fasterxml.jackson.core;
     requires com.fasterxml.jackson.databind;
