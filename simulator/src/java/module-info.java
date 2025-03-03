@@ -78,4 +78,5 @@ module KiCadLogicalSchemeSimulator.simulator {
     requires org.apache.logging.log4j;
     requires org.tukaani.xz;
     uses pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
+    uses pko.KiCadLogicalSchemeSimulator.api.NetFilter;
 }
