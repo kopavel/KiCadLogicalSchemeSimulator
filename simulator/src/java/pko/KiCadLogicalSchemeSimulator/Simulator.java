@@ -32,11 +32,13 @@
 package pko.KiCadLogicalSchemeSimulator;
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import picocli.CommandLine;
+import pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.AbstractUiComponent;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.InteractiveSchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
 import pko.KiCadLogicalSchemeSimulator.net.Net;
+import pko.KiCadLogicalSchemeSimulator.net.ParameterResolver;
 import pko.KiCadLogicalSchemeSimulator.parsers.net.NetFileParser;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Export;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.param.Params;
@@ -58,6 +60,9 @@ import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.none;
+import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.warn;
+
 @CommandLine.Command(name = "", description = "Start Kicad scheme interactive simulation")
 public class Simulator implements Runnable {
     private static final Map<String, SchemaPartMonitor> monitoredParts = new HashMap<>();
@@ -70,10 +75,14 @@ public class Simulator implements Runnable {
     public static String optimisedDir = "optimised";
     @CommandLine.Option(names = {"-md", "--mapFileDir"}, description = "Map file directory path")
     public static String mapFileDir;
-    @CommandLine.Option(names = {"-r", "--recursive"}, description = "Enable recursive event processing, slower simulation")
-    public static boolean recursive;
-    @CommandLine.Option(names = {"-rd", "--recursive-disabled"}, description = "Disable recursive support completely, some speedup")
-    public static boolean noRecursive;
+    @CommandLine.Option(names = {"-r", "--recursionMode"}, description = """
+            Recursive event processing mode
+            \tw - warning only (default, little speed overhead, but only detect and report \
+            events, can be used for explicitely define pins with recursion and set "disable" method here
+            \te - enable for all pins(slower simulation)
+            \td - \
+            disable for all except explicitly specified (see recursiveOut param)""")
+    public static RecursionMode recursionMode = warn;
     @CommandLine.Option(names = {"-do", "--disable-optimiser"}, description = "Disable code optimiser")
     public static boolean noOptimiser;
     @CommandLine.Option(names = {"-ro",
@@ -197,7 +206,7 @@ public class Simulator implements Runnable {
     @Override
     public void run() {
         try {
-            if (noRecursive) {
+            if (recursionMode == none) {
                 Log.warn(Simulator.class, "Recursive event detection are disabled");
             }
             schemaPartSpiMap = ServiceLoader.load(SchemaPartSpi.class)
@@ -223,11 +232,9 @@ public class Simulator implements Runnable {
             netFilePathNoExtension = netFilePath.substring(0, netFilePath.lastIndexOf("."));
             if (new File(netFilePathNoExtension + ".sym_param").exists()) {
                 Params params = XmlParser.parse(netFilePathNoExtension + ".sym_param", Params.class);
-                if (params.recursive != null) {
-                    recursive = params.recursive;
-                }
-                if (params.noRecursive != null) {
-                    noRecursive = params.noRecursive;
+                ParameterResolver.addUnitParams(params);
+                if (params.recursionMode != null) {
+                    recursionMode = params.recursionMode;
                 }
                 partParams = params.part;
                 if (params.mapFile != null) {

@@ -37,6 +37,9 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
+import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.none;
+import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.warn;
+
 public class OffsetBus extends OutBus {
     protected final byte offset;
     public long maskState;
@@ -213,9 +216,9 @@ public class OffsetBus extends OutBus {
             } else if (applyMask != 0) {
                 optimiser.bind("d", "destination0");
             }
-            if (destinations.length < 2 || Simulator.noRecursive) {
+            if (destinations.length < 2 || Simulator.recursionMode == none) {
                 optimiser.cut("allRecurse");
-            } else if (!Simulator.recursive && Utils.notContain(Simulator.recursiveOuts, getName()) && !parent.recursive.contains(getId())) {
+            } else if (Simulator.recursionMode == warn && Utils.notContain(Simulator.recursiveOuts, getName()) && !parent.recursive.contains(getId())) {
                 optimiser.cut("recurse");
             }
             if (applyMask == 0) {

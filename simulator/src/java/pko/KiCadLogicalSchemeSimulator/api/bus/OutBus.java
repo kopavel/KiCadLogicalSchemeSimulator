@@ -48,6 +48,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.none;
+import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.warn;
+
 public class OutBus extends Bus {
     private final Map<Long, Map<Byte, OffsetBus>> corrected = new HashMap<>();
     public Bus[] destinations = new Bus[0];
@@ -232,8 +235,8 @@ public class OutBus extends Bus {
                 destinations[i] = destinations[i].getOptimised(this);
             }
             ClassOptimiser<OutBus> optimiser = new ClassOptimiser<>(this, OutBus.class).unroll(destinations.length);
-            if (!Simulator.recursive && Utils.notContain(Simulator.recursiveOuts, getName()) && !parent.recursive.contains(getId())) {
-                if (Simulator.noRecursive) {
+            if (Simulator.recursionMode != warn && Utils.notContain(Simulator.recursiveOuts, getName()) && !parent.recursive.contains(getId())) {
+                if (Simulator.recursionMode == none) {
                     optimiser.cut("allRecurse");
                 } else {
                     optimiser.cut("recurse");

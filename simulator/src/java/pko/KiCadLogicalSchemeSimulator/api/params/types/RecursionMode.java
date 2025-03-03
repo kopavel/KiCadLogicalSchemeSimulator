@@ -29,22 +29,9 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.parsers.pojo.param;
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode;
-
-import java.util.List;
-
-@XmlAccessorType(XmlAccessType.FIELD)
-@Getter
-@Setter
-@NoArgsConstructor
-public class Params {
-    public List<Part> part;
-    public List<String> mapFile;
-    public RecursionMode recursionMode;
+package pko.KiCadLogicalSchemeSimulator.api.params.types;
+public enum RecursionMode {
+    all,
+    none,
+    warn;
 }

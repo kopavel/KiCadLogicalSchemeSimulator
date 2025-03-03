@@ -34,6 +34,7 @@ module KiCadLogicalSchemeSimulator.simulator {
     exports pko.KiCadLogicalSchemeSimulator.api.bus;
     exports pko.KiCadLogicalSchemeSimulator.api.schemaPart;
     exports pko.KiCadLogicalSchemeSimulator.api.wire;
+    exports pko.KiCadLogicalSchemeSimulator.api.params.types;
     exports pko.KiCadLogicalSchemeSimulator.api;
     exports pko.KiCadLogicalSchemeSimulator.net;
     exports pko.KiCadLogicalSchemeSimulator.optimiser;

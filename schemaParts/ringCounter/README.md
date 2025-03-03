@@ -16,7 +16,7 @@ Implements a Ring counter with a defined amount of outputs.
 #### Output names:
 
 - `CO`- Carry-out
-- `Qx`- Output
+- `Qx`- Output  
   x - a sequential number in ange [0…size-1]
 
 ### Parameters

@@ -37,6 +37,8 @@ import pko.KiCadLogicalSchemeSimulator.net.Net;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
+import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.warn;
+
 @Getter
 public abstract class ModelItem<T> implements IModelItem<T> {
     public String id;
@@ -87,11 +89,15 @@ public abstract class ModelItem<T> implements IModelItem<T> {
         if (Net.stabilizing) {
             hasQueue = false;
             return true;
-        } else if (!Simulator.recursive && Utils.notContain(Simulator.recursiveOuts, getName()) && !parent.recursive.contains(getId())) {
+        } else if (Simulator.recursionMode == warn && Utils.notContain(Simulator.recursiveOuts, getName()) && !parent.recursive.contains(getId())) {
             if (!reportedRecurse) {
-                Log.error(this.getClass(),
-                        "Recursive event loop detected, enable recurse, passing -r parameter to simulator.\n For specific out only pass -ro={} to smulator" +
-                                ", or modify Schema parameter file adding `recursive={}` to symPartParam in <part> with id=`{}` in ",
+                Log.error(this.getClass(), """
+                                Recursive event loop detected use one of solutions
+                                1) Pass recursionMode ="all" to simulator for enabling recursive events for all outs (slower).
+                                2) specify out explicitly as "recursive" passing -ro={} to simulator
+                                3) modify Schema parameter file adding `recursive={}` to symPartParam in <part> with id=`{}`
+                                    if part are multi-unit - use <unit> instead,
+                                    read documentation at https://github.com/kopavel/KiCadLogicalSchemeSimulator/blob/main/stuff/parameters.md#schema-parameter-file" for more information""",
                         getName(),
                         id,
                         parent.id);

@@ -11,7 +11,7 @@
 	</xs:simpleType>
 	<xs:simpleType name="IdType">
 		<xs:restriction base="xs:string">
-			<xs:pattern value="[a-zA-Z]+[0-9]+"/>
+			<xs:pattern value="[a-zA-Z_]+[0-9]+"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="SymPartParamType">
@@ -24,8 +24,7 @@
 			<xs:element minOccurs="0" maxOccurs="unbounded" name="part" type="partType"/>
 			<xs:element minOccurs="0" maxOccurs="unbounded" name="mapFile" type="xs:string"/>
 		</xs:sequence>
-		<xs:attribute name="recursive" type="xs:boolean"/>
-		<xs:attribute name="noRecursive" type="xs:boolean"/>
+		<xs:attribute name="recursionMode" type="recursionModeType"/>
 	</xs:complexType>
 	<xs:complexType name="partType">
 		<xs:sequence>
@@ -44,6 +43,13 @@
 	<xs:simpleType name="unitNameType">
 		<xs:restriction base="xs:string">
 			<xs:pattern value="[A-Z]+"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="recursionModeType">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="all"/>
+			<xs:pattern value="none"/>
+			<xs:pattern value="warn"/>
 		</xs:restriction>
 	</xs:simpleType>
 </xs:schema>
