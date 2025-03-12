@@ -46,5 +46,5 @@ import java.util.List;
 public class Params {
     public List<Part> part;
     public List<String> mapFile;
-    public RecursionMode recursionMode;
+    public RecursionMode recursion;
 }

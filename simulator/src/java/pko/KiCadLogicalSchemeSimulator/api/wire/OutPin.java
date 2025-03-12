@@ -38,8 +38,8 @@ import pko.KiCadLogicalSchemeSimulator.net.wire.NCWire;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
+import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.all;
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.none;
-import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.warn;
 
 public class OutPin extends Pin {
     public Pin[] destinations = new Pin[0];
@@ -253,8 +253,8 @@ public class OutPin extends Pin {
             }
             split();
             ClassOptimiser<OutPin> optimiser = new ClassOptimiser<>(this, OutPin.class).unroll("i", toImp.length).unroll("l", toLow.length).unroll("h", toHi.length);
-            if (Simulator.recursionMode != warn && Utils.notContain(Simulator.recursiveOuts, getName()) && !parent.recursive.contains(getId())) {
-                if (Simulator.recursionMode == none) {
+            if (parent.net.parameterResolver.recursionMode != all && Utils.notContain(Simulator.recursiveOuts, getName()) && !parent.recursive.contains(getId())) {
+                if (parent.net.parameterResolver.recursionMode == none) {
                     optimiser.cut("allRecurse");
                 } else {
                     optimiser.cut("recurse");

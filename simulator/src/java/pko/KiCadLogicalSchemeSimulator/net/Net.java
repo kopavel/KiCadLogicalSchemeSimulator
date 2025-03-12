@@ -37,6 +37,9 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.TriStateOutBus;
+import pko.KiCadLogicalSchemeSimulator.api.params.ParameterResolver;
+import pko.KiCadLogicalSchemeSimulator.api.params.types.PinConfig;
+import pko.KiCadLogicalSchemeSimulator.api.params.types.SchemaPartConfig;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.*;
 import pko.KiCadLogicalSchemeSimulator.net.bus.BusInInterconnect;
@@ -46,12 +49,6 @@ import pko.KiCadLogicalSchemeSimulator.net.merger.wire.WireMerger;
 import pko.KiCadLogicalSchemeSimulator.net.wire.NCWire;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Comp;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Export;
-import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Property;
-import pko.KiCadLogicalSchemeSimulator.parsers.pojo.param.Part;
-import pko.KiCadLogicalSchemeSimulator.parsers.pojo.param.Unit;
-import pko.KiCadLogicalSchemeSimulator.parsers.pojo.symbolMap.SchemaPartMap;
-import pko.KiCadLogicalSchemeSimulator.parsers.pojo.symbolMap.SymbolDesc;
-import pko.KiCadLogicalSchemeSimulator.parsers.pojo.symbolMap.SymbolLibMap;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
@@ -61,36 +58,28 @@ import java.util.stream.Collectors;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
-import static pko.KiCadLogicalSchemeSimulator.net.SymbolDescriptions.PinMapDescriptor;
-import static pko.KiCadLogicalSchemeSimulator.net.SymbolDescriptions.parse;
-import static pko.KiCadLogicalSchemeSimulator.net.SymbolDescriptions.schemaPartPinMap;
 
 public class Net {
-    public static final Queue<IModelItem<?>> forResend = new LinkedList<>();
-    public static volatile boolean stabilizing = true;
+    public final Queue<IModelItem<?>> forResend = new LinkedList<>();
     public final Map<String, SchemaPart> schemaParts = new TreeMap<>();
     public final String optimisedDir;
+    public final ParameterResolver parameterResolver;
     private final Map<Pin, DestinationWireDescriptor> destinationWireDescriptors = new HashMap<>();
     private final Map<Bus, DestinationBusDescriptor> destinationBusDescriptors = new HashMap<>();
     private final Map<String, BusMerger> busMergers = new TreeMap<>();
     private final Map<String, OutPin> wireMergers = new TreeMap<>();
     private final Map<IModelItem<?>, IModelItem<?>> replacement = new HashMap<>();
+    private final Map<String, Comp> compMap;
+    public volatile boolean stabilizing = true;
 
-    public Net(Export export, String[] mapPaths, String optimisedDir, List<Part> partParams) throws IOException {
+    public Net(Export export, String optimisedDir, ParameterResolver parameterResolver) throws IOException {
         this.optimisedDir = optimisedDir;
+        this.parameterResolver = parameterResolver;
         Log.info(Net.class, "Start Net building");
-        SchemaPartMap schemaPartMap = new SchemaPartMap();
-        if (mapPaths != null) {
-            for (String mapPath : mapPaths) {
-                parse(mapPath, schemaPartMap);
-            }
-        }
-        final Map<String, Part> partParamMap = new HashMap<>();
-        if (partParams != null) {
-            partParamMap.putAll(partParams.stream()
-                    .collect(Collectors.toMap(e -> e.id, e -> e)));
-        }
-        export.getComponents().getComp().forEach((Comp component) -> createSchemaPart(component, schemaPartMap, partParamMap));
+//        export.getComponents().getComp().forEach(this::createSchemaPart);
+        compMap = export.getComponents().getComp()
+                .stream()
+                .collect(Collectors.toMap(i -> i.ref, i -> i));
         export.getNets().getNet().forEach(this::groupSourcesByDestinations);
         buildNet();
         schemaParts.values().forEach(SchemaPart::initOuts);
@@ -167,27 +156,19 @@ public class Net {
             powerState = null;
         }
         net.getNode().forEach(node -> {
-            Map<String, PinMapDescriptor> pinMap = schemaPartPinMap.get(node.getRef());
-            String pinName = null;
-            SchemaPart schemaPart = null;
-            if (pinMap != null) {
-                PinMapDescriptor pinMapDescriptor = pinMap.get(node.getPin());
-                if (pinMapDescriptor != null) {
-                    pinName = pinMapDescriptor.pinName;
-                    if ("NC".equals(pinName)) {
-                        return;
-                    }
-                    schemaPart = pinMapDescriptor.schemaPart;
-                }
+            Comp comp = compMap.get(node.getRef());
+            PinConfig pinConfig = parameterResolver.getPinConfig(comp, node);
+            String id = parameterResolver.getId(comp, node);
+            SchemaPartConfig schemaPartConfig = parameterResolver.getSchemaPartConfig(comp, node);
+            if (schemaPartConfig.ignore) {
+                return;
             }
-            if (schemaPart == null || pinName == null) {
-                pinName = node.getPinfunction();
-                schemaPart = this.schemaParts.get(node.getRef());
-            }
+            SchemaPart schemaPart = this.schemaParts.computeIfAbsent(id, i -> createSchemaPart(schemaPartConfig.clazz, id, schemaPartConfig.getParamString()));
             String pinType = node.getPintype();
             if (pinType.contains("+")) {
                 pinType = pinType.substring(0, pinType.indexOf('+'));
             }
+            String pinName = pinConfig == null ? node.getPinfunction() : pinConfig.pinName;
             switch (pinType) {
                 case "input" -> {
                     IModelItem<?> destination = schemaPart.getInItem(pinName);
@@ -250,11 +231,11 @@ public class Net {
         destinationPins.forEach((destinationPin) -> {
             DestinationWireDescriptor descriptor = destinationWireDescriptors.computeIfAbsent(destinationPin, i -> new DestinationWireDescriptor(passivePins));
             if (TRUE == powerState) {
-                SchemaPart pwr = getSchemaPart("Power", "pwr_" + destinationPin.getName(), "hi;strong");
+                SchemaPart pwr = createSchemaPart("Power", "pwr_" + destinationPin.getName(), "hi;strong");
                 schemaParts.put(pwr.id, pwr);
                 descriptor.add(pwr.getOutItem("OUT"), (byte) 0);
             } else if (FALSE == powerState) {
-                SchemaPart gnd = getSchemaPart("Power", "gnd_" + destinationPin.getName(), "strong");
+                SchemaPart gnd = createSchemaPart("Power", "gnd_" + destinationPin.getName(), "strong");
                 schemaParts.put(gnd.id, gnd);
                 descriptor.add(gnd.getOutItem("OUT"), (byte) 0);
             } else {
@@ -269,14 +250,14 @@ public class Net {
                     destinationBusDescriptors.computeIfAbsent((Bus) replacement.getOrDefault(destinationBus, destinationBus), p -> new DestinationBusDescriptor());
             if (TRUE == powerState) {
                 for (Byte destinationOffset : destinationOffsets) {
-                    SchemaPart pwr = getSchemaPart("Power", "pwr_" + destinationBus.getName(), "hi;strong");
+                    SchemaPart pwr = createSchemaPart("Power", "pwr_" + destinationBus.getName(), "hi;strong");
                     schemaParts.put(pwr.id, pwr);
                     descriptor.add(pwr.getOutItem("OUT"), (byte) 0, destinationOffset);
                     sourcesOffset.put(pwr.getOutItem("OUT"), (byte) 0);
                 }
             } else if (FALSE == powerState) {
                 for (Byte destinationOffset : destinationOffsets) {
-                    SchemaPart gnd = getSchemaPart("Power", "gnd_" + destinationBus.getName(), "strong");
+                    SchemaPart gnd = createSchemaPart("Power", "gnd_" + destinationBus.getName(), "strong");
                     schemaParts.put(gnd.id, gnd);
                     descriptor.add(gnd.getOutItem("OUT"), (byte) 0, destinationOffset);
                 }
@@ -365,100 +346,16 @@ public class Net {
         outItem.getParent().replaceOut(outItem);
     }
 
-    private void createSchemaPart(Comp component, SchemaPartMap map, Map<String, Part> partParams) {
-        SymbolDesc symbolDesc = null;
-        if (map != null) {
-            SymbolLibMap lib = map.libs.get(component.getLibsource().getLib());
-            if (lib != null) {
-                symbolDesc = lib.symbols.get(component.getLibsource().getPart());
-            }
-        }
-        String id = component.getRef();
-        Part params = partParams.get(id);
-        if (params != null && params.ignore) {
-            return;
-        }
-        String className;
-        if (params != null && params.symPartClass != null) {
-            className = params.symPartClass;
-        } else {
-            className = findSchemaPartProperty(component, "SymPartClass");
-            if ((className == null || className.isBlank()) && symbolDesc != null) {
-                className = symbolDesc.clazz;
-            }
-        }
-        if (className == null || className.isBlank()) {
-            throw new RuntimeException("SchemaPart id:" + id + "(lib:" + component.getLibsource().getLib() + " part:" + component.getLibsource().getPart() +
-                    ") has no parameter SymPartClass and don't described in mapping file(s)");
-        }
-        String parameters = "";
-        if (symbolDesc != null && symbolDesc.params != null && !symbolDesc.params.isBlank()) {
-            parameters += symbolDesc.params + ";";
-        }
-        parameters += findSchemaPartProperty(component, "SymPartParam");
-        if (params != null && params.symPartParam != null) {
-            parameters += ";" + params.symPartParam;
-        }
-        if (symbolDesc == null || symbolDesc.units == null) {
-            SchemaPart schemaPart = getSchemaPart(className, id, parameters);
-            schemaParts.put(schemaPart.id, schemaPart);
-        } else {
-            for (int i = 0; i < symbolDesc.units.size(); i++) {
-                String unit = symbolDesc.units.get(i);
-                String name;
-                Unit unitConfig = null;
-                if (symbolDesc.units.stream()
-                        .filter(u -> !u.startsWith("power;")).count() == 1) {
-                    name = id;
-                } else {
-                    String uId = String.valueOf((char) ('A' + i));
-                    name = id + "_" + uId;
-                    if (params != null && params.unit != null) {
-                        unitConfig = params.unit.stream()
-                                .filter(u -> u.name.equals(uId)).findAny().orElse(null);
-                    }
-                }
-                if (unitConfig != null && unitConfig.ignore) {
-                    continue;
-                }
-                String unitParam = parameters;
-                if (unitConfig != null && unitConfig.symPartParam != null) {
-                    unitParam += unitConfig.symPartParam;
-                }
-                SchemaPart schemaPart = getSchemaPart(className, name, unitParam);
-                for (String pinMapInfo : unit.split(";")) {
-                    if (!pinMapInfo.equals("power")) {
-                        String[] mapInfo = pinMapInfo.split("=");
-                        schemaPartPinMap.computeIfAbsent(id, s -> new HashMap<>()).put(mapInfo[0], new PinMapDescriptor(mapInfo[1], schemaPart));
-                    }
-                }
-                if (!unit.startsWith("power;")) {
-                    schemaParts.put(schemaPart.id, schemaPart);
-                }
-            }
-        }
-    }
-
-    private SchemaPart getSchemaPart(String className, String id, String params) {
+    private SchemaPart createSchemaPart(String className, String id, String params) {
         if (!Simulator.schemaPartSpiMap.containsKey(className)) {
             throw new RuntimeException("Unknown SchemaPart class " + className + " for SchemaPart id " + id);
         }
         SchemaPart schemaPart = Simulator.schemaPartSpiMap.get(className).getSchemaPart(id, params);
         if (schemaPart == null) {
-            throw new RuntimeException("SchemaPart " + id + " parameter SymPartClass doesn't reflect AbstractSchemaPart class");
+            throw new RuntimeException("SchemaPart " + id + " class parameter doesn't reflect AbstractSchemaPart Java class");
         }
+        schemaPart.net = this;
         return schemaPart;
-    }
-
-    private String findSchemaPartProperty(Comp component, String name) {
-        if (component.getProperty() != null) {
-            for (Property property : component.getProperty()) {
-                if (property.getName().equals(name)) {
-                    return property.getValue();
-                }
-            }
-        }
-        return "";
     }
 
     private void stabilise() {

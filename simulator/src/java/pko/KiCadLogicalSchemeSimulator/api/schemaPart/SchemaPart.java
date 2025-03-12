@@ -37,11 +37,13 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.TriStateOutBus;
 import pko.KiCadLogicalSchemeSimulator.api.wire.*;
+import pko.KiCadLogicalSchemeSimulator.net.Net;
 
 import java.util.*;
 
 @SuppressWarnings("unused")
 public abstract class SchemaPart {
+    public Net net;
     public final String id;
     public final Map<String, ModelItem<?>> inPins = new HashMap<>();
     public final Map<IModelItem<?>, String> ids = new HashMap<>();

@@ -35,7 +35,6 @@ import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.ShortcutException;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
-import pko.KiCadLogicalSchemeSimulator.net.Net;
 import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
@@ -112,8 +111,8 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
             if (hiImpedance) {
                 hiImpedance = false;
                 if (merger.strongPins != 0) {
-                    if (Net.stabilizing) {
-                        Net.forResend.add(this);
+                    if (parent.net.stabilizing) {
+                        parent.net.forResend.add(this);
                         assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
                         return;
                     } else {
@@ -173,8 +172,8 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
                 hiImpedance = false;
                 /*Optimiser bind m:mask*/
                 if ((merger.strongPins & mask) != 0) {
-                    if (Net.stabilizing) {
-                        Net.forResend.add(this);
+                    if (parent.net.stabilizing) {
+                        parent.net.forResend.add(this);
                         assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
                         return;
                     } else {

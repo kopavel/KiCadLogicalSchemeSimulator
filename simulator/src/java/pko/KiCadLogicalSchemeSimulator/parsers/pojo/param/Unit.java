@@ -42,6 +42,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Unit {
     public String name;
-    public boolean ignore;
-    public String symPartParam;
+    public Boolean ignore;
+    public String clazz;
+    public String params;
 }

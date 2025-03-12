@@ -33,7 +33,6 @@ package pko.KiCadLogicalSchemeSimulator.api;
 import lombok.Getter;
 import pko.KiCadLogicalSchemeSimulator.Simulator;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.net.Net;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
@@ -86,21 +85,34 @@ public abstract class ModelItem<T> implements IModelItem<T> {
     }
 
     public boolean recurseError() {
-        if (Net.stabilizing) {
+        if (parent.net.stabilizing) {
             hasQueue = false;
             return true;
-        } else if (Simulator.recursionMode == warn && Utils.notContain(Simulator.recursiveOuts, getName()) && !parent.recursive.contains(getId())) {
+        } else if (parent.net.parameterResolver.recursionMode == warn && Utils.notContain(Simulator.recursiveOuts, getName()) &&
+                !parent.recursive.contains(getId())) {
             if (!reportedRecurse) {
-                Log.error(this.getClass(), """
-                                Recursive event loop detected use one of solutions
-                                1) Pass recursionMode ="all" to simulator for enabling recursive events for all outs (slower).
-                                2) specify out explicitly as "recursive" passing -ro={} to simulator
-                                3) modify Schema parameter file adding `recursive={}` to symPartParam in <part> with id=`{}`
-                                    if part are multi-unit - use <unit> instead,
-                                    read documentation at https://github.com/kopavel/KiCadLogicalSchemeSimulator/blob/main/stuff/parameters.md#schema-parameter-file" for more information""",
-                        getName(),
-                        id,
-                        parent.id);
+                String partId = parent.id;
+                String unitId = null;
+                if (partId.contains("#")) {
+                    unitId = partId.substring(partId.indexOf("#") + 1);
+                    partId = partId.substring(0, partId.indexOf("#"));
+                }
+                String message = """
+                        Recursive event loop detected!
+                            Enable recursive events for all outs (slower) using one of:
+                                - Pass -r=all to simulator
+                                - Modify Schema parameter file adding `recursion="all"` attribute to <params> tag (slower)
+                            Specify specific out as "recursive" using one of:
+                                - pass -ro={} to simulator
+                                - Modify Schema parameter file adding `recursive={}` to param in <part id="{}">""";
+                if (unitId != null) {
+                    message += "<unit name=\"{}\">";
+                }
+                message += """
+                        
+                        read documentation at https://github.com/kopavel/KiCadLogicalSchemeSimulator/blob/main/stuff/parameters.md#schema-parameter-file" for more information
+                        """;
+                Log.error(this.getClass(), message, getName(), id, partId, unitId);
                 reportedRecurse = true;
             }
             return false;

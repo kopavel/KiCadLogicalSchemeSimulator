@@ -35,7 +35,6 @@ import pko.KiCadLogicalSchemeSimulator.api.schemaPart.InteractiveSchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.net.Net;
 
 import javax.swing.*;
 import java.util.Arrays;
@@ -94,7 +93,7 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                 @Override
                 public void setLo() {
                     state = false;
-                    if (hSize == 0 && !Net.stabilizing) {
+                    if (hSize == 0 && !parent.net.stabilizing) {
                         hSize = hPos + 3;
                         byte[] firstRow = Arrays.copyOf(ram[0], hSize);
                         ram = new byte[2048][hSize];
@@ -119,7 +118,7 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                         synchronized (refresh) {
                             refresh.notifyAll();
                         }
-                    } else if (!Net.stabilizing) {
+                    } else if (!parent.net.stabilizing) {
                         vSize = vPos + 2;
                         while (!display.sized) {
                             try {
@@ -142,7 +141,7 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                 @Override
                 public void setHi() {
                     state = true;
-                    if (hSize == 0 && !Net.stabilizing) {
+                    if (hSize == 0 && !parent.net.stabilizing) {
                         hSize = hPos + 3;
                         byte[] firstRow = Arrays.copyOf(ram[0], hSize);
                         ram = new byte[2048][hSize];
@@ -167,7 +166,7 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                         synchronized (refresh) {
                             refresh.notifyAll();
                         }
-                    } else if (!Net.stabilizing) {
+                    } else if (!parent.net.stabilizing) {
                         vSize = vPos + 2;
                         while (!display.sized) {
                             try {

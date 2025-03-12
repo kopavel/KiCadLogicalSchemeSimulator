@@ -36,12 +36,15 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 public class NetFileParser {
     private int currentChar;
 
-    public Export parse(String filePath) throws Exception {
+    public static Export parse(String filePath) throws Exception {
+        return new NetFileParser().process(filePath);
+    }
+
+    private Export process(String filePath) throws Exception {
         Export export = new Export();
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             NetFileItem netFile = parse(reader);
@@ -54,7 +57,6 @@ public class NetFileParser {
             export.setNets(nets);
             netFile.items.get("components").getFirst().items.get("comp").forEach(node -> {
                 Comp comp = new Comp();
-                comp.setProperty(new ArrayList<>());
                 export.getComponents().getComp().add(comp);
                 comp.setRef(node.items.get("ref").getFirst().value);
                 LibSource libSource = new LibSource();
@@ -62,8 +64,6 @@ public class NetFileParser {
                 NetFileItem nodeLibSource = node.items.get("libsource").getFirst();
                 libSource.setLib(nodeLibSource.items.get("lib").getFirst().value);
                 libSource.setPart(nodeLibSource.items.get("part").getFirst().value);
-                addSchemaPartProperty(node, "SymPartClass", comp.getProperty());
-                addSchemaPartProperty(node, "SymPartParam", comp.getProperty());
             });
             //create wires
             netFile.items.get("nets").getFirst().items.get("net").forEach(netNode -> {
@@ -160,14 +160,5 @@ public class NetFileParser {
         }
         currentChar = reader.read();//just skip closing "
         return string.toString();
-    }
-
-    private void addSchemaPartProperty(NetFileItem node, String name, List<Property> propertyList) {
-        Property prop = new Property().setName(name);
-        for (NetFileItem property : node.items.get("property")) {
-            if (property.items.get("name").getFirst().value.equals(name)) {
-                propertyList.add(prop.setValue(property.items.get("value").getFirst().value));
-            }
-        }
     }
 }

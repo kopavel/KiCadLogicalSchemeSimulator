@@ -35,6 +35,7 @@ import org.junit.jupiter.api.TestInstance;
 import pko.KiCadLogicalSchemeSimulator.Simulator;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
+import pko.KiCadLogicalSchemeSimulator.api.params.ParameterResolver;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
@@ -167,11 +168,7 @@ public abstract class NetTester {
                 .stream()
                 .map(ServiceLoader.Provider::get)
                 .collect(Collectors.toMap(spi -> spi.getSchemaPartClass().getSimpleName(), spi -> spi));
-        net = new Net(new NetFileParser().parse(getNetFilePath()), new String[]{//
-                rootPath + "/stuff/kicad_symbols/kicad.sym_map",//
-                rootPath + "/stuff/kicad_symbols/chip.sym_map",//
-                rootPath + "/stuff/kicad_symbols/test.sym_map"//
-        }, rootPath + "/simulator/optimised", null);
+        net = new Net(NetFileParser.parse(getNetFilePath()), rootPath + "/simulator/optimised", new ParameterResolver());
 /*
         for (String part : net.schemaParts.keySet()) {
             System.out.println("load schema part " + part);

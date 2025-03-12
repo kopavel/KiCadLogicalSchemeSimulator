@@ -29,10 +29,31 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.parsers.symbolMap;
+package pko.KiCadLogicalSchemeSimulator.api.params.types;
+import pko.KiCadLogicalSchemeSimulator.api.params.ParameterResolver;
+
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-public class SymbolLibMap {
-    public final Map<String, SymbolDesc> symbols = new HashMap<>();
+public class SchemaPartConfig {
+    public final Map<String, String> params;
+    public String clazz;
+    public boolean ignore;
+
+    public SchemaPartConfig(String clazz, Map<String, String> params) {
+        this.clazz = clazz;
+        this.params = new HashMap<>(params);
+    }
+
+    public void setParams(String param) {
+        ParameterResolver.setParams(param, params);
+    }
+
+    public String getParamString() {
+        return params.entrySet()
+                .stream()
+                .map(e -> e.getKey() + "=" + e.getValue())
+                .collect(Collectors.joining(";"));
+    }
 }

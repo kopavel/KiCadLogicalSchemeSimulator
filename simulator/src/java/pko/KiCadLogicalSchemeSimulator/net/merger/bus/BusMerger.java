@@ -157,8 +157,8 @@ public class BusMerger extends OutBus {
                 }
             } else {
                 if ((weakPins & destinationMask) != 0 && ((weakState & destinationMask) == 0) == pin.state) {
-                    if (Net.stabilizing) {
-                        Net.forResend.add(this);
+                    if (parent.net.stabilizing) {
+                        parent.net.forResend.add(this);
                         assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
                         return;
                     } else {

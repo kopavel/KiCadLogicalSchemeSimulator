@@ -37,7 +37,6 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.net.Net;
 import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
@@ -83,8 +82,8 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus> {
         if (hiImpedance) {
             hiImpedance = false;
             if (merger.strong) { // merger not in hiImpedance or weak
-                if (Net.stabilizing) {
-                    Net.forResend.add(this);
+                if (parent.net.stabilizing) {
+                    parent.net.forResend.add(this);
                     assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
                     return;
                 } else {

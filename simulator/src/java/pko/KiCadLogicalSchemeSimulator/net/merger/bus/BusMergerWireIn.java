@@ -36,7 +36,6 @@ import pko.KiCadLogicalSchemeSimulator.api.ShortcutException;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.net.Net;
 import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
@@ -85,8 +84,8 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                             !oldStrong) { //from hiImpedance or weak
                 /*Optimiser bind m:mask*/
                 if ((merger.strongPins & mask) != 0) { //strong pins shortcut
-                    if (Net.stabilizing) {
-                        Net.forResend.add(this);
+                    if (parent.net.stabilizing) {
+                        parent.net.forResend.add(this);
                         assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
                         return;
                     } else {
@@ -113,8 +112,8 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
         } else { //to weak
             /*Optimiser bind m:mask*/
             if ((merger.weakPins & mask) != 0 && ((merger.weakState & mask) == 0)) { //opposite weak state
-                if (Net.stabilizing) {
-                    Net.forResend.add(this);
+                if (parent.net.stabilizing) {
+                    parent.net.forResend.add(this);
                     assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
                     return;
                 } else {
@@ -223,8 +222,8 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                             !oldStrong) { //from hiImpedance or weak
                 /*Optimiser bind m:mask*/
                 if ((merger.strongPins & mask) != 0) { //strong pins shortcut
-                    if (Net.stabilizing) {
-                        Net.forResend.add(this);
+                    if (parent.net.stabilizing) {
+                        parent.net.forResend.add(this);
                         assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
                         return;
                     } else {
@@ -251,8 +250,8 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
         } else { //to weak
             /*Optimiser bind m:mask*/
             if ((merger.weakPins & mask) != 0 && !((merger.weakState & mask) == 0)) { //opposite weak state
-                if (Net.stabilizing) {
-                    Net.forResend.add(this);
+                if (parent.net.stabilizing) {
+                    parent.net.forResend.add(this);
                     assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
                     return;
                 } else {

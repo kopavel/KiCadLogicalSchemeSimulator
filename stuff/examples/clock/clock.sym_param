@@ -1,4 +1,5 @@
-<params recursionMode="all" xmlns="pko.kicadLogicalSimulator.param">
+<params recursion="warn" xmlns="pko.kicadLogicalSimulator.param">
+	<part id="U1" param="freq=16.384;start"/>
 	<mapFile>chip</mapFile>
 	<mapFile>kicad</mapFile>
 </params>

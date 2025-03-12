@@ -1,3 +1,6 @@
-<params recursionMode="all" xmlns="pko.kicadLogicalSimulator.param">
+<params recursion="none" xmlns="pko.kicadLogicalSimulator.param">
 	<mapFile>chip</mapFile>
+	<part id="Display1" param="reverse"/>
+	<part id="OSC1" param="start"/>
+	<part id="ROM1" param="file=rom.bin"/>
 </params>

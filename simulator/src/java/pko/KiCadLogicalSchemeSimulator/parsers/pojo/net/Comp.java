@@ -37,8 +37,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-
 @XmlAccessorType(XmlAccessType.FIELD)
 @Getter
 @Setter
@@ -46,18 +44,5 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Comp {
     public LibSource libsource;
-    public List<Property> property;
     public String ref;
-
-    public String findSchemaPartProperty(String name) {
-        if (property != null) {
-            for (Property property : property) {
-                if (property.getName().equals(name)) {
-                    return property.getValue();
-                }
-            }
-        }
-        return "";
-    }
-
 }

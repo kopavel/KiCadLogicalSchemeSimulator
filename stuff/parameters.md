@@ -12,7 +12,7 @@ For that following CLI keys can be used:
 
 [//]: # (Fixme redefine recurseve parameters, sym_params - include unit subtag description)
 
-* `-r, --recursionMode`: Configure recursive events processing.
+* `-r, --recursion`: Configure recursive events processing.
   * `warn` - only report warning and recursive event detection - less overhead, comparing with `all`.
   * `all` - processing recursive events on all output pins (Has bigger simulation overhead, comparing with warning only logic.)
   * `none` - Disable recursive support completely. If schema doesn't generate recursive events (No warning about that from detection logic),
@@ -49,14 +49,14 @@ Check [XSD](paramFile.xsd) for details.
 
 ```xml
 
-<params recursionMode="all" xmlns="pko.kicadLogicalSimulator.param">
-	<part id="VCNT_CHAR2" symPartParam="recursive=Q"/>
+<params recursion="all" xmlns="pko.kicadLogicalSimulator.param">
+	<part id="VCNT_CHAR2" params="recursive=Q"/>
 	<mapFile>kicad</mapFile>
 	<mapFile>retro</mapFile>
 </params>
 ```
 
-- `recursionMode`: equivalent of `-r` CLI key
+- `recursion`: equivalent of `-r` CLI key
 - `mapFile`: equivalent of `-m` CLI key
 - `part`: override Schema part definition for specific ID
     - `ignore`: completely ignore specific schema part.

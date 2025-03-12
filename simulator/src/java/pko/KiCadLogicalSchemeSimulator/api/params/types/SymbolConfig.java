@@ -29,10 +29,40 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.parsers.symbolMap;
+package pko.KiCadLogicalSchemeSimulator.api.params.types;
+import pko.KiCadLogicalSchemeSimulator.api.params.ParameterResolver;
+
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-public class SymbolMap {
-    public final Map<String, SymbolLibMap> libs = new HashMap<>();
+public class SymbolConfig {
+    public String clazz;
+    public Map<String, String> symbolParams = new HashMap<>();
+    public List<Integer> ignoredUnits = new ArrayList<>();
+    public Map<Integer, PinConfig> pinMap = new HashMap<>();
+    public int unitAmount = 0;
+
+    public SymbolConfig(String clazz, String params) {
+        this.clazz = clazz;
+        if (params != null) {
+            ParameterResolver.setParams(params, symbolParams);
+        }
+    }
+
+    public void addUnit(String unit) {
+        if (unit.startsWith("ignore;")) {
+            ignoredUnits.add(unitAmount);
+        }
+        for (String pin : unit.split(";")) {
+            if (!pin.equals("ignore")) {
+                String[] pinConf = pin.split("=");
+                int pinNo = Integer.parseInt(pinConf[0]);
+                pinMap.put(pinNo, new PinConfig(unitAmount, pinConf[1]));
+            }
+        }
+        unitAmount++;
+    }
 }
+

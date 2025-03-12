@@ -54,10 +54,7 @@
       (value "MAX7375AXR805")
       (footprint "Package_TO_SOT_SMD:SOT-323_SC-70")
       (datasheet "https://datasheets.maximintegrated.com/en/ds/MAX7375.pdf")
-      (fields
-        (field (name "SymPartParam") "start"))
       (libsource (lib "Oscillator") (part "MAX7375AXR805") (description "Silicon Clock Oscillator 8MHz, SC-70-3"))
-      (property (name "SymPartParam") (value "start"))
       (property (name "Sheetname") (value ""))
       (property (name "Sheetfile") (value "counters.kicad_sch"))
       (property (name "ki_description") (value "Silicon Clock Oscillator 8MHz, SC-70-3"))

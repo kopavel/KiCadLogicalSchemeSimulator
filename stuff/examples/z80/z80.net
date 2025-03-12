@@ -223,10 +223,7 @@
       (tstamps "015098fc-c118-4c62-a2ad-61f563b2cfb4"))
     (comp (ref "Display1")
       (value "~")
-      (fields
-        (field (name "SymPartParam") "reverse"))
       (libsource (lib "chip") (part "DISPLAY") (description ""))
-      (property (name "SymPartParam") (value "reverse"))
       (property (name "Sheetname") (value ""))
       (property (name "Sheetfile") (value "z80.kicad_sch"))
       (sheetpath (names "/") (tstamps "/"))
@@ -359,10 +356,7 @@
       (tstamps "24439c96-cd1e-48db-b27a-f6fb23004199"))
     (comp (ref "OSC1")
       (value "OSC")
-      (fields
-        (field (name "SymPartParam") "start"))
       (libsource (lib "chip") (part "OSCILLATOR") (description ""))
-      (property (name "SymPartParam") (value "start"))
       (property (name "Sheetname") (value ""))
       (property (name "Sheetfile") (value "z80.kicad_sch"))
       (sheetpath (names "/") (tstamps "/"))
@@ -579,10 +573,7 @@
       (tstamps "2a72b366-854f-4f5f-8651-c7f200a28aa7"))
     (comp (ref "ROM1")
       (value "ROM")
-      (fields
-        (field (name "SymPartParam") "file=rom.bin"))
       (libsource (lib "chip") (part "ROM4K") (description "4Kb rom"))
-      (property (name "SymPartParam") (value "file=rom.bin"))
       (property (name "Sheetname") (value ""))
       (property (name "Sheetfile") (value "z80.kicad_sch"))
       (property (name "ki_description") (value "4Kb rom"))

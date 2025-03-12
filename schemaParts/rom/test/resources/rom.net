@@ -41,10 +41,7 @@
       (tstamps "2ba868b8-4ecd-43ed-aaf5-e6e3f475bfcb"))
     (comp (ref "ROM1")
       (value "ROM")
-      (fields
-        (field (name "SymPartParam") "file=test/resources/rom.bin"))
       (libsource (lib "chip") (part "ROM4K") (description "4Kb rom"))
-      (property (name "SymPartParam") (value "file=test/resources/rom.bin"))
       (property (name "Sheetname") (value ""))
       (property (name "Sheetfile") (value "rom.kicad_sch"))
       (property (name "ki_description") (value "4Kb rom"))

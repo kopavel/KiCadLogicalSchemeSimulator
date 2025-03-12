@@ -216,9 +216,10 @@ public class OffsetBus extends OutBus {
             } else if (applyMask != 0) {
                 optimiser.bind("d", "destination0");
             }
-            if (destinations.length < 2 || Simulator.recursionMode == none) {
+            if (destinations.length < 2 || parent.net.parameterResolver.recursionMode == none) {
                 optimiser.cut("allRecurse");
-            } else if (Simulator.recursionMode == warn && Utils.notContain(Simulator.recursiveOuts, getName()) && !parent.recursive.contains(getId())) {
+            } else if (parent.net.parameterResolver.recursionMode == warn && Utils.notContain(Simulator.recursiveOuts, getName()) &&
+                    !parent.recursive.contains(getId())) {
                 optimiser.cut("recurse");
             }
             if (applyMask == 0) {

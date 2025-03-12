@@ -57,7 +57,7 @@ public class MainMenu extends JMenuBar {
             schemaPartItem.addActionListener(e -> Simulator.addMonitoringPart(schemaPart.id, null));
             letterMenus.get(firstLetter).add(schemaPartItem);
         }
-        for (char letter = 'A'; letter <= 'Z'; letter++) {
+        for (char letter = '0'; letter <= 'Z'; letter++) {
             if (letterMenus.containsKey(letter)) {
                 schemaParts.add(letterMenus.get(letter));
             }

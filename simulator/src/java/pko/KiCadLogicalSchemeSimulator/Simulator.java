@@ -32,17 +32,16 @@
 package pko.KiCadLogicalSchemeSimulator;
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import picocli.CommandLine;
+import pko.KiCadLogicalSchemeSimulator.api.params.ParameterResolver;
 import pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.AbstractUiComponent;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.InteractiveSchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
 import pko.KiCadLogicalSchemeSimulator.net.Net;
-import pko.KiCadLogicalSchemeSimulator.net.ParameterResolver;
 import pko.KiCadLogicalSchemeSimulator.parsers.net.NetFileParser;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Export;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.param.Params;
-import pko.KiCadLogicalSchemeSimulator.parsers.pojo.param.Part;
 import pko.KiCadLogicalSchemeSimulator.parsers.xml.XmlParser;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
@@ -61,7 +60,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.none;
-import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.warn;
+import static pko.KiCadLogicalSchemeSimulator.parsers.symbolMap.SymbolMapFileParser.parse;
 
 @CommandLine.Command(name = "", description = "Start Kicad scheme interactive simulation")
 public class Simulator implements Runnable {
@@ -70,24 +69,24 @@ public class Simulator implements Runnable {
     public static Map<String, SchemaPartSpi> schemaPartSpiMap;
     public static MainUI ui;
     public static String netFilePathNoExtension;
-    public static Net net;
     @CommandLine.Option(names = {"-od", "--optimisedDir"}, description = "Cache directory path for generated optimised classes")
     public static String optimisedDir = "optimised";
     @CommandLine.Option(names = {"-md", "--mapFileDir"}, description = "Map file directory path")
     public static String mapFileDir;
-    @CommandLine.Option(names = {"-r", "--recursionMode"}, description = """
+    @CommandLine.Option(names = {"-do", "--disable-optimiser"}, description = "Disable code optimiser")
+    public static boolean noOptimiser;
+    @CommandLine.Option(names = {"-ro",
+            "--recursiveOut"}, description = "Enable recursive event processing for specific part output only, can be specified multiple times, slower simulation")
+    public static String[] recursiveOuts;
+    public static Net net;
+    @CommandLine.Option(names = {"-r", "--recursion"}, description = """
             Recursive event processing mode
             \tw - warning only (default, little speed overhead, but only detect and report \
             events, can be used for explicitely define pins with recursion and set "disable" method here
             \te - enable for all pins(slower simulation)
             \td - \
             disable for all except explicitly specified (see recursiveOut param)""")
-    public static RecursionMode recursionMode = warn;
-    @CommandLine.Option(names = {"-do", "--disable-optimiser"}, description = "Disable code optimiser")
-    public static boolean noOptimiser;
-    @CommandLine.Option(names = {"-ro",
-            "--recursiveOut"}, description = "Enable recursive event processing for specific part output only, can be specified multiple times, slower simulation")
-    public static String[] recursiveOuts;
+    public static RecursionMode recursionMode;
     static {
         try {
             addReadsMethod = Module.class.getDeclaredMethod("implAddReads", Module.class);
@@ -96,7 +95,6 @@ public class Simulator implements Runnable {
             throw new RuntimeException(e);
         }
     }
-    public List<Part> partParams;
     @CommandLine.Parameters(index = "0", arity = "1", description = "Path to KiCad NET file")
     public String netFilePath;
     @CommandLine.Option(names = {"-m", "--mapFile"}, description = "Path to KiCad symbol mapping file")
@@ -206,6 +204,7 @@ public class Simulator implements Runnable {
     @Override
     public void run() {
         try {
+            ParameterResolver parameterResolver = new ParameterResolver();
             if (recursionMode == none) {
                 Log.warn(Simulator.class, "Recursive event detection are disabled");
             }
@@ -230,13 +229,9 @@ public class Simulator implements Runnable {
                 throw new Exception("Cant fine NET file " + netFilePath);
             }
             netFilePathNoExtension = netFilePath.substring(0, netFilePath.lastIndexOf("."));
+            Params params = null;
             if (new File(netFilePathNoExtension + ".sym_param").exists()) {
-                Params params = XmlParser.parse(netFilePathNoExtension + ".sym_param", Params.class);
-                ParameterResolver.addUnitParams(params);
-                if (params.recursionMode != null) {
-                    recursionMode = params.recursionMode;
-                }
-                partParams = params.part;
+                params = XmlParser.parse(netFilePathNoExtension + ".sym_param", Params.class);
                 if (params.mapFile != null) {
                     if (mapFiles == null) {
                         mapFiles = params.mapFile.toArray(new String[0]);
@@ -269,6 +264,9 @@ public class Simulator implements Runnable {
                     }
                 }
             }
+            for (String mapPath : mapFiles) {
+                parse(mapPath, parameterResolver);
+            }
             loadLocale();
             SwingUtilities.invokeAndWait(() -> {
                 try {
@@ -279,13 +277,19 @@ public class Simulator implements Runnable {
                 ui = new MainUI();
                 ui.setVisible(true);
             });
+            if (recursionMode != null) {
+                parameterResolver.recursionMode = recursionMode;
+            }
+            Export export;
             if (netFilePath.endsWith("xml")) {
-                net = new Net(XmlParser.parse(netFilePath, Export.class), mapFiles, optimisedDir, partParams);
+                export = XmlParser.parse(netFilePath, Export.class);
             } else if (netFilePath.endsWith(".net")) {
-                net = new Net(new NetFileParser().parse(netFilePath), mapFiles, optimisedDir, partParams);
+                export = NetFileParser.parse(netFilePath);
             } else {
                 throw new RuntimeException("Unsupported file extension. " + netFilePath);
             }
+            parameterResolver.processNetFile(export, params);
+            net = new Net(export, optimisedDir, parameterResolver);
             net.schemaParts.values().forEach(schemaPart -> {
                 if (schemaPart instanceof InteractiveSchemaPart) {
                     try {

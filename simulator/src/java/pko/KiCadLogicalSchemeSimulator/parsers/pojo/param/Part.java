@@ -32,6 +32,7 @@
 package pko.KiCadLogicalSchemeSimulator.parsers.pojo.param;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAttribute;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -44,9 +45,10 @@ import java.util.List;
 @NoArgsConstructor
 public class Part {
     public String id;
-    public boolean ignore;
-    public String symPartClass;
-    public String symPartParam;
+    public Boolean ignore;
+    @XmlAttribute(name = "class")
+    public String clazz;
+    public String param;
     public List<Unit> unit;
 
 }

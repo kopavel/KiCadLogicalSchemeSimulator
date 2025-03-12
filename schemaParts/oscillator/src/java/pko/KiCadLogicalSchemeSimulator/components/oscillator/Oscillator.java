@@ -35,7 +35,6 @@ import pko.KiCadLogicalSchemeSimulator.api.schemaPart.AbstractUiComponent;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.InteractiveSchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.net.Net;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 import java.lang.invoke.VarHandle;
@@ -142,7 +141,7 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
     void startIfDefault() {
         if (fullSpeedThread == null) {
             Thread.ofVirtual().start(() -> {
-                while (Net.stabilizing || out == null) {
+                while (net.stabilizing || out == null) {
                     try {
                         Thread.sleep(1);
                     } catch (InterruptedException e) {

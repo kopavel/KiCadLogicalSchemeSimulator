@@ -14,17 +14,17 @@
 			<xs:pattern value="[a-zA-Z_]+[0-9]+"/>
 		</xs:restriction>
 	</xs:simpleType>
-	<xs:simpleType name="SymPartParamType">
+	<xs:simpleType name="ParamType">
 		<xs:restriction base="xs:string">
 			<xs:pattern value="([A-Za-z]+(=[^;]+)?;?)+"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:complexType name="paramType">
-		<xs:sequence>
+		<xs:choice minOccurs="1" maxOccurs="unbounded">
 			<xs:element minOccurs="0" maxOccurs="unbounded" name="part" type="partType"/>
 			<xs:element minOccurs="0" maxOccurs="unbounded" name="mapFile" type="xs:string"/>
-		</xs:sequence>
-		<xs:attribute name="recursionMode" type="recursionModeType"/>
+		</xs:choice>
+		<xs:attribute name="recursion" type="recursionModeType"/>
 	</xs:complexType>
 	<xs:complexType name="partType">
 		<xs:sequence>
@@ -32,13 +32,14 @@
 		</xs:sequence>
 		<xs:attribute name="id" use="required" type="IdType"/>
 		<xs:attribute name="ignore" type="xs:boolean"/>
-		<xs:attribute name="symPartClass" type="ClassName"/>
-		<xs:attribute name="symPartParam" type="SymPartParamType"/>
+		<xs:attribute name="class" type="ClassName"/>
+		<xs:attribute name="param" type="ParamType"/>
 	</xs:complexType>
 	<xs:complexType name="unitType">
 		<xs:attribute name="name" use="required" type="unitNameType"/>
 		<xs:attribute name="ignore" type="xs:boolean"/>
-		<xs:attribute name="symPartParam" type="SymPartParamType"/>
+		<xs:attribute name="class" type="ParamType"/>
+		<xs:attribute name="params" type="ClassName"/>
 	</xs:complexType>
 	<xs:simpleType name="unitNameType">
 		<xs:restriction base="xs:string">
