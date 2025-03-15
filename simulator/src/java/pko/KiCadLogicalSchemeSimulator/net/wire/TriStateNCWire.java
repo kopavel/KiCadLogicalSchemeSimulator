@@ -29,40 +29,40 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.net.merger.wire;
+package pko.KiCadLogicalSchemeSimulator.net.wire;
 import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
-import pko.KiCadLogicalSchemeSimulator.api.ShortcutException;
-import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.OutPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.TriStateOutPin;
 
-public class PassiveInMerger extends TriStateOutPin {
-    final PassivePin source;
+public class TriStateNCWire extends OutPin {
+    public TriStateNCWire(OutPin outPin) {
+        super(outPin, "NC");
+    }
 
-    public PassiveInMerger(PassivePin source, Boolean powerState) {
-        super(source, "PassiveInMerger");
-        this.source = source;
-        state = powerState;
-        hiImpedance = false;
-        merger = this;
-        strong = true;
+    @Override
+    public void addDestination(Pin pin) {
+        throw new UnsupportedOperationException("Can't add destination to NC Out Pin");
     }
 
     @Override
     public void setHi() {
-        if (source.strong) {
-            throw new ShortcutException(source);
-        }
+        state = true;
+        hiImpedance = false;
     }
 
     @Override
     public void setLo() {
-        if (source.strong) {
-            throw new ShortcutException(source);
-        }
+        state = false;
+        hiImpedance = false;
     }
+
     @Override
     public void setHiImpedance() {
+        hiImpedance = true;
+    }
+
+    @Override
+    public void resend() {
     }
 
     @Override

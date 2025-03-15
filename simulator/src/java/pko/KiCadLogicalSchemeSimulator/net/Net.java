@@ -46,7 +46,7 @@ import pko.KiCadLogicalSchemeSimulator.net.bus.BusInInterconnect;
 import pko.KiCadLogicalSchemeSimulator.net.merger.bus.BusMerger;
 import pko.KiCadLogicalSchemeSimulator.net.merger.wire.PassiveInMerger;
 import pko.KiCadLogicalSchemeSimulator.net.merger.wire.WireMerger;
-import pko.KiCadLogicalSchemeSimulator.net.wire.NCWire;
+import pko.KiCadLogicalSchemeSimulator.net.wire.TriStateNCWire;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Comp;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Export;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
@@ -219,7 +219,7 @@ public class Net {
             if ((destinationPins.isEmpty())) {
                 Optional<PassivePin> passivePin = passivePins.stream().findAny();
                 if (passivePin.isPresent()) {
-                    destinationPins.add(new NCWire(passivePin.get()));
+                    destinationPins.add(new TriStateNCWire(passivePin.get()));
                 } else if (destinationBusesOffsets.isEmpty()) {
                     sourcesOffset.forEach((out, offset) -> Log.warn(Net.class, "Unconnected Out:" + out.getName() + offset));
                 }
