@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <symbolMap xmlns="pko.kicadLogicalSimulator.map">
 	<lib name="Tests">
-		<symbol name="OutBus" symPartClass="TestOutBus"/>
-		<symbol name="OutBus4x" symPartClass="TestOutBus" symPartParam="size=4"/>
-		<symbol name="OutBus2x" symPartClass="TestOutBus" symPartParam="size=2"/>
-		<symbol name="InBus" symPartClass="TestInBus"/>
-		<symbol name="InBus4x" symPartClass="TestInBus" symPartParam="size=4"/>
-		<symbol name="InBus2x" symPartClass="TestInBus" symPartParam="size=2"/>
-		<symbol name="OutPin" symPartClass="TestOutPin"/>
-		<symbol name="InPin" symPartClass="TestInPin"/>
+		<symbol name="OutBus" class="TestOutBus"/>
+		<symbol name="OutBus4x" class="TestOutBus" param="size=4"/>
+		<symbol name="OutBus2x" class="TestOutBus" param="size=2"/>
+		<symbol name="InBus" class="TestInBus"/>
+		<symbol name="InBus4x" class="TestInBus" param="size=4"/>
+		<symbol name="InBus2x" class="TestInBus" param="size=2"/>
+		<symbol name="OutPin" class="TestOutPin"/>
+		<symbol name="InPin" class="TestInPin"/>
 	</lib>
 </symbolMap>

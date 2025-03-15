@@ -46,7 +46,7 @@ public class SymbolMapFileParser {
             SymbolMap xmlSymbolMap = XmlParser.parse(mapPath, SymbolMap.class);
             for (Library library : xmlSymbolMap.getLib()) {
                 for (Symbol symbol : library.getSymbol()) {
-                    SymbolConfig symbolConfig = parameterResolver.addSymbol(library.getName(), symbol.getName(), symbol.getSymPartClass(), symbol.getSymPartParam());
+                    SymbolConfig symbolConfig = parameterResolver.addSymbol(library.getName(), symbol.getName(), symbol.getClazz(), symbol.getParam());
                     if (symbol.getUnit() != null) {
                         symbol.getUnit()
                                 .stream()

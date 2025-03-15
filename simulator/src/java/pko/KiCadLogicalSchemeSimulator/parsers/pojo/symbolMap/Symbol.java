@@ -44,11 +44,9 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class Symbol {
-    @XmlAttribute
     String name;
-    @XmlAttribute
-    String symPartClass;
-    @XmlAttribute
-    String symPartParam;
+    @XmlAttribute(name = "class")
+    String clazz;
+    String param;
     List<Unit> unit;
 }

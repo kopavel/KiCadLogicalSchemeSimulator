@@ -1,61 +1,61 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <symbolMap xmlns="pko.kicadLogicalSimulator.map">
 	<lib name="chip">
-		<symbol name="3OR" symPartClass="OrGate" symPartParam="size=3"/>
-		<symbol name="4OR" symPartClass="OrGate" symPartParam="size=4"/>
-		<symbol name="4REG" symPartClass="Buffer" symPartParam="size=4;latch;reverse">
+		<symbol name="3OR" class="OrGate" param="size=3"/>
+		<symbol name="4OR" class="OrGate" param="size=4"/>
+		<symbol name="4REG" class="Buffer" param="size=4;latch;reverse">
 			<unit pinMap="17=WR;18=OE"/>
 		</symbol>
-		<symbol name="5OR" symPartClass="OrGate" symPartParam="size=5"/>
-		<symbol name="6OR" symPartClass="OrGate" symPartParam="size=6"/>
-		<symbol name="7OR" symPartClass="OrGate" symPartParam="size=7"/>
-		<symbol name="8OR" symPartClass="OrGate" symPartParam="size=8"/>
-		<symbol name="8REG" symPartClass="Buffer" symPartParam="size=8;latch;reverse">
+		<symbol name="5OR" class="OrGate" param="size=5"/>
+		<symbol name="6OR" class="OrGate" param="size=6"/>
+		<symbol name="7OR" class="OrGate" param="size=7"/>
+		<symbol name="8OR" class="OrGate" param="size=8"/>
+		<symbol name="8REG" class="Buffer" param="size=8;latch;reverse">
 			<unit pinMap="17=WR;18=OE"/>
 		</symbol>
-		<symbol name="AND" symPartClass="AndGate" symPartParam="size=2"/>
-		<symbol name="4AND" symPartClass="AndGate" symPartParam="size=4"/>
-		<symbol name="BUF" symPartClass="Buffer" symPartParam="size=8;reverse">
+		<symbol name="AND" class="AndGate" param="size=2"/>
+		<symbol name="4AND" class="AndGate" param="size=4"/>
+		<symbol name="BUF" class="Buffer" param="size=8;reverse">
 			<unit pinMap="17=CS"/>
 		</symbol>
-		<symbol name="BUFx1" symPartClass="SingleBitBuffer"/>
-		<symbol name="COUNTER" symPartClass="Counter" symPartParam="size=4;reverse"/>
-		<symbol name="COUNTERx17" symPartClass="Counter" symPartParam="size=17;reverse"/>
-		<symbol name="DC_TRIGER" symPartClass="DcTrigger"/>
-		<symbol name="DECODE_3BIT" symPartClass="Decoder" symPartParam="size=3;reverse;outReverse">
+		<symbol name="BUFx1" class="SingleBitBuffer"/>
+		<symbol name="COUNTER" class="Counter" param="size=4;reverse"/>
+		<symbol name="COUNTERx17" class="Counter" param="size=17;reverse"/>
+		<symbol name="DC_TRIGER" class="DcTrigger"/>
+		<symbol name="DECODE_3BIT" class="Decoder" param="size=3;reverse;outReverse">
 			<unit pinMap="1=A0;2=A1;3=A2;4=Q0;5=Q1;6=Q2;7=Q3;8=Q4;9=Q5;10=Q6;11=Q7;12=CS"/>
 		</symbol>
-		<symbol name="DISPLAY" symPartClass="Display" symPartParam="reverse"/>
-		<symbol name="LED" symPartClass="Led" symPartParam="size=30;onColor=#FF0000;offColor=#808080"/>
-		<symbol name="MUX2x1" symPartClass="SingleBitMultiplexer" symPartParam="size=1;nSize=1;reverse"/>
-		<symbol name="MUX2x2" symPartClass="Multiplexer" symPartParam="size=2;nSize=1;reverse"/>
-		<symbol name="MUX2x4" symPartClass="Multiplexer" symPartParam="size=4;nSize=1;reverse"/>
-		<symbol name="MUX2x7" symPartClass="Multiplexer" symPartParam="size=7;nSize=1;reverse"/>
-		<symbol name="MUX2x8" symPartClass="Multiplexer" symPartParam="size=8;nSize=1;reverse"/>
-		<symbol name="MUX2x10" symPartClass="Multiplexer" symPartParam="size=10;nSize=1;reverse"/>
-		<symbol name="MUX2x12" symPartClass="Multiplexer" symPartParam="size=12;nSize=1;reverse"/>
-		<symbol name="MUX4x2" symPartClass="Multiplexer" symPartParam="size=2;nSize=2;reverse"/>
-		<symbol name="MUX4x8" symPartClass="Multiplexer" symPartParam="size=8;nSize=2;reverse"/>
-		<symbol name="NAND" symPartClass="AndGate" symPartParam="size=2;reverse"/>
-		<symbol name="NOR" symPartClass="OrGate" symPartParam="size=2;reverse"/>
-		<symbol name="NOT" symPartClass="Repeater" symPartParam="reverse"/>
-		<symbol name="AMP" symPartClass="Repeater"/>
-		<symbol name="NXOR" symPartClass="XorGate" symPartParam="reverse"/>
-		<symbol name="OR" symPartClass="OrGate" symPartParam="size=2"/>
-		<symbol name="OSCILLATOR" symPartClass="Oscillator"/>
-		<symbol name="PULLDOWN" symPartClass="Power"/>
-		<symbol name="PULLUP" symPartClass="Power" symPartParam="hi"/>
-		<symbol name="RAM1MB" symPartClass="Ram" symPartParam="aSize=20;size=8;reverse"/>
-		<symbol name="RAM64K" symPartClass="Ram" symPartParam="aSize=16;size=8;reverse"/>
-		<symbol name="RAM256" symPartClass="Ram" symPartParam="aSize=8;size=8;reverse"/>
-		<symbol name="ROM4K" symPartClass="Rom" symPartParam="aSize=12;size=8;reverse"/>
-		<symbol name="SDRAM64K" symPartClass="SdRam" symPartParam="aSize=8;size=8;reverse"/>
-		<symbol name="SHIFT" symPartClass="SingleOutShifter" symPartParam="size=8;outPin=0;plReverse">
+		<symbol name="DISPLAY" class="Display" param="reverse"/>
+		<symbol name="LED" class="Led" param="size=30;onColor=#FF0000;offColor=#808080"/>
+		<symbol name="MUX2x1" class="SingleBitMultiplexer" param="size=1;nSize=1;reverse"/>
+		<symbol name="MUX2x2" class="Multiplexer" param="size=2;nSize=1;reverse"/>
+		<symbol name="MUX2x4" class="Multiplexer" param="size=4;nSize=1;reverse"/>
+		<symbol name="MUX2x7" class="Multiplexer" param="size=7;nSize=1;reverse"/>
+		<symbol name="MUX2x8" class="Multiplexer" param="size=8;nSize=1;reverse"/>
+		<symbol name="MUX2x10" class="Multiplexer" param="size=10;nSize=1;reverse"/>
+		<symbol name="MUX2x12" class="Multiplexer" param="size=12;nSize=1;reverse"/>
+		<symbol name="MUX4x2" class="Multiplexer" param="size=2;nSize=2;reverse"/>
+		<symbol name="MUX4x8" class="Multiplexer" param="size=8;nSize=2;reverse"/>
+		<symbol name="NAND" class="AndGate" param="size=2;reverse"/>
+		<symbol name="NOR" class="OrGate" param="size=2;reverse"/>
+		<symbol name="NOT" class="Repeater" param="reverse"/>
+		<symbol name="AMP" class="Repeater"/>
+		<symbol name="NXOR" class="XorGate" param="reverse"/>
+		<symbol name="OR" class="OrGate" param="size=2"/>
+		<symbol name="OSCILLATOR" class="Oscillator"/>
+		<symbol name="PULLDOWN" class="Power"/>
+		<symbol name="PULLUP" class="Power" param="hi"/>
+		<symbol name="RAM1MB" class="Ram" param="aSize=20;size=8;reverse"/>
+		<symbol name="RAM64K" class="Ram" param="aSize=16;size=8;reverse"/>
+		<symbol name="RAM256" class="Ram" param="aSize=8;size=8;reverse"/>
+		<symbol name="ROM4K" class="Rom" param="aSize=12;size=8;reverse"/>
+		<symbol name="SDRAM64K" class="SdRam" param="aSize=8;size=8;reverse"/>
+		<symbol name="SHIFT" class="SingleOutShifter" param="size=8;outPin=0;plReverse">
 			<unit pinMap="1=D0;2=D1;3=D2;4=D3;5=D4;6=D5;7=D6;8=D7;9=Q;17=CN;18=PL"/>
 		</symbol>
-		<symbol name="SWITCH" symPartClass="Switch"/>
-		<symbol name="XOR" symPartClass="XorGate"/>
-		<symbol name="Z80CPU" symPartClass="Z80Cpu"/>
-		<symbol name="KBD" symPartClass="Keyboard"/>
+		<symbol name="SWITCH" class="Switch"/>
+		<symbol name="XOR" class="XorGate"/>
+		<symbol name="Z80CPU" class="Z80Cpu"/>
+		<symbol name="KBD" class="Keyboard"/>
 	</lib>
 </symbolMap>
