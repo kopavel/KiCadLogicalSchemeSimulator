@@ -33,7 +33,6 @@ package pko.KiCadLogicalSchemeSimulator.api.params.types;
 public class PinConfig {
     public int unitNo;
     public String pinName;
-//    public final RecursionMode recursionMode;
 
     public PinConfig(int unitNo, String pinName) {
         this.pinName = pinName;

@@ -1,7 +1,5 @@
 (export (version "E")
   (design
-    (source "D:\\soft_a\\verilog\\KiCadLogicalSchemeSimulator\\stuff\\examples\\clock\\clock.kicad_sch")
-    (date "30/12/2024 20:54:12")
     (tool "Eeschema 7.0.9")
     (sheet (number "1") (name "/") (tstamps "/")
       (title_block
@@ -501,17 +499,6 @@
         (pin (num "1") (name "IN0") (type "input"))
         (pin (num "2") (name "IN1") (type "input"))
         (pin (num "3") (name "OUT") (type "output")))))
-  (libraries
-    (library (logical "4xxx")
-      (uri "C:\\Program Files\\KiCad\\7.0\\share\\kicad\\symbols\\/4xxx.kicad_sym"))
-    (library (logical "74xx")
-      (uri "C:\\Program Files\\KiCad\\7.0\\share\\kicad\\symbols\\/74xx.kicad_sym"))
-    (library (logical "Display_Character")
-      (uri "C:\\Program Files\\KiCad\\7.0\\share\\kicad\\symbols\\/Display_Character.kicad_sym"))
-    (library (logical "Oscillator")
-      (uri "C:\\Program Files\\KiCad\\7.0\\share\\kicad\\symbols\\/Oscillator.kicad_sym"))
-    (library (logical "chip")
-      (uri "C:/Users/kopavel/Documents/KiCad/7.0/symbols/chip.kicad_sym")))
   (nets
     (net (code "1") (name "Net-(SW1-IN1)")
       (node (ref "SW1") (pin "1") (pinfunction "IN1") (pintype "passive"))
