@@ -241,7 +241,7 @@ public class Simulator implements Runnable {
                 }
             }
             if (mapFiles == null) {
-                mapFiles = new String[]{"kikad"};
+                mapFiles = new String[]{"kicad"};
             }
             for (int i = 0; i < mapFiles.length; i++) {
                 String mapFile = mapFiles[i];
