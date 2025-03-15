@@ -3,7 +3,13 @@
            xmlns="pko.kicadLogicalSimulator.param"
            elementFormDefault="qualified"
            targetNamespace="pko.kicadLogicalSimulator.param">
-	<xs:element name="params" type="paramType"/>
+	<xs:element name="params" type="paramType">
+		<xs:annotation>
+			<xs:documentation>
+				Additional parameters for schema simulator
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
 	<xs:simpleType name="ClassName">
 		<xs:restriction base="xs:string">
 			<xs:pattern value="[A-Z][a-zA-Z0-9]*"/>
@@ -21,25 +27,112 @@
 	</xs:simpleType>
 	<xs:complexType name="paramType">
 		<xs:choice minOccurs="1" maxOccurs="unbounded">
-			<xs:element minOccurs="0" maxOccurs="unbounded" name="part" type="partType"/>
-			<xs:element minOccurs="0" maxOccurs="unbounded" name="mapFile" type="xs:string"/>
+			<xs:element minOccurs="0" maxOccurs="unbounded" name="part" type="partType">
+				<xs:annotation>
+					<xs:documentation>
+						Specific part (or all units in multi-unit part) customization.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element minOccurs="0" maxOccurs="unbounded" name="mapFile" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>
+						Schema part mapping file for load. Name or full path.
+						Relative path searched in working folder and in a folder, passed through mapFileDir CLI parameter.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 		</xs:choice>
-		<xs:attribute name="recursion" type="recursionModeType"/>
+		<xs:attribute name="recursion" type="recursionModeType">
+			<xs:annotation>
+				<xs:documentation>
+					Recursion mode for whole simulation.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 	</xs:complexType>
 	<xs:complexType name="partType">
 		<xs:sequence>
-			<xs:element minOccurs="0" maxOccurs="unbounded" name="unit" type="unitType"/>
+			<xs:element minOccurs="0" maxOccurs="unbounded" name="unit" type="unitType">
+				<xs:annotation>
+					<xs:documentation>
+						Specific unit customization.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 		</xs:sequence>
-		<xs:attribute name="id" use="required" type="IdType"/>
-		<xs:attribute name="ignore" type="xs:boolean"/>
-		<xs:attribute name="class" type="ClassName"/>
-		<xs:attribute name="param" type="ParamType"/>
+		<xs:attribute name="id" use="required" type="IdType">
+			<xs:annotation>
+				<xs:documentation>
+					Schema part ID.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="ignore" type="xs:boolean">
+			<xs:annotation>
+				<xs:documentation>
+					Ignore current schema part completely.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="class" type="ClassName">
+			<xs:annotation>
+				<xs:documentation>
+					Java class name, used for schema part behavior simulation.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="param" type="ParamType">
+			<xs:annotation>
+				<xs:documentation>
+					Additional parameters, used for class instantiation.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="recursive" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>
+					List of pin names with explicitly enabled recursive event handling
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 	</xs:complexType>
 	<xs:complexType name="unitType">
-		<xs:attribute name="name" use="required" type="unitNameType"/>
-		<xs:attribute name="ignore" type="xs:boolean"/>
-		<xs:attribute name="class" type="ParamType"/>
-		<xs:attribute name="params" type="ClassName"/>
+		<xs:attribute name="name" use="required" type="unitNameType">
+			<xs:annotation>
+				<xs:documentation>
+					Schema part unit name
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="ignore" type="xs:boolean">
+			<xs:annotation>
+				<xs:documentation>
+					Ignore current schema part unit completely.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="class" type="ParamType">
+			<xs:annotation>
+				<xs:documentation>
+					Java class name, used for schema part unit behavior simulation.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="params" type="ClassName">
+			<xs:annotation>
+				<xs:documentation>
+					Additional parameters, used for class instantiation.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="recursive" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>
+					List of pin names with explicitly enabled recursive event handling
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 	</xs:complexType>
 	<xs:simpleType name="unitNameType">
 		<xs:restriction base="xs:string">

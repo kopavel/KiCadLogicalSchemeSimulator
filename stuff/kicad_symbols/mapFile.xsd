@@ -13,32 +13,86 @@
 			<xs:pattern value="((ignore|([0-9]+=[~{}a-zA-Z0-9]+));?)+"/>
 		</xs:restriction>
 	</xs:simpleType>
-	<xs:simpleType name="symPartParamType">
+	<xs:simpleType name="paramType">
 		<xs:restriction base="xs:string">
 			<xs:pattern value="([A-Za-z]+(=[^;]+)?;?)+"/>
 		</xs:restriction>
 	</xs:simpleType>
-	<xs:element name="symbolMap" type="symbolMapType"/>
+	<xs:element name="symbolMap" type="symbolMapType">
+		<xs:annotation>
+			<xs:documentation>
+				Library symbols mapping description.
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
 	<xs:complexType name="symbolMapType">
 		<xs:sequence>
-			<xs:element maxOccurs="unbounded" name="lib" type="libType"/>
+			<xs:element maxOccurs="unbounded" name="lib" type="libType">
+				<xs:annotation>
+					<xs:documentation>
+						Library symbols mapping description.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="libType">
 		<xs:sequence>
-			<xs:element name="symbol" maxOccurs="unbounded" type="symbolType"/>
+			<xs:element name="symbol" maxOccurs="unbounded" type="symbolType">
+				<xs:annotation>
+					<xs:documentation>
+						Symbols mapping description.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 		</xs:sequence>
-		<xs:attribute name="name" use="required" type="xs:NMTOKEN"/>
+		<xs:attribute name="name" use="required" type="xs:NMTOKEN">
+			<xs:annotation>
+				<xs:documentation>
+					Library name.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 	</xs:complexType>
 	<xs:complexType name="symbolType">
 		<xs:sequence>
-			<xs:element minOccurs="0" maxOccurs="unbounded" name="unit" type="unitType"/>
+			<xs:element minOccurs="0" maxOccurs="unbounded" name="unit" type="unitType">
+				<xs:annotation>
+					<xs:documentation>
+						Unit mapping description.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 		</xs:sequence>
-		<xs:attribute name="name" use="required" type="xs:NMTOKEN"/>
-		<xs:attribute name="symPartClass" use="required" type="ClassName"/>
-		<xs:attribute name="symPartParam" type="symPartParamType"/>
+		<xs:attribute name="name" use="required" type="xs:NMTOKEN">
+			<xs:annotation>
+				<xs:documentation>
+					Symbol name.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="class" use="required" type="ClassName">
+			<xs:annotation>
+				<xs:documentation>
+					Java class name, used for schema part unit behavior simulation.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="param" type="paramType">
+			<xs:annotation>
+				<xs:documentation>
+					Additional parameters, used for class instantiation.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 	</xs:complexType>
 	<xs:complexType name="unitType">
-		<xs:attribute name="pinMap" use="required" type="pinMapType"/>
+		<xs:attribute name="pinMap" use="required" type="pinMapType">
+			<xs:annotation>
+				<xs:documentation>
+					Pin mapping. Semicolon separated list of pair 'pinNumber=PinName'. Ff start with 'ignore' - ignored pin list.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 	</xs:complexType>
 </xs:schema>

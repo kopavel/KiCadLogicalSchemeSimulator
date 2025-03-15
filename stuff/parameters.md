@@ -2,7 +2,7 @@
 
 ## CLI
 
-Usage:  [-r] [-do] [-md=<mapFileDir>] [-od=\<optimisedDir>] [-m=\<mapFiles>]... [-ro=\<recursiveOuts>]... \<netFilePath\>
+Usage:  [-r] [-ro=\<recursiveOuts>]... [-od=\<optimisedDir>] [-do] [-md=<mapFileDir>] [-m=\<mapFiles>]... \<netFilePath\>
 
 ### Recursive events
 
@@ -10,34 +10,32 @@ By default, Simulator detect recursive events and show warning about it in LOG/C
 This has little overhead, comparing with full recursive support, and give compatibility to tune simulator for correct work.  
 For that following CLI keys can be used:
 
-[//]: # (Fixme redefine recurseve parameters, sym_params - include unit subtag description)
-
 * `-r, --recursion`: Configure recursive events processing.
   * `warn` - only report warning and recursive event detection - less overhead, comparing with `all`.
   * `all` - processing recursive events on all output pins (Has bigger simulation overhead, comparing with warning only logic.)
   * `none` - Disable recursive support completely. If schema doesn't generate recursive events (No warning about that from detection logic),
-    or after add `-ro` key for all output with recursive events, detection logic can be disabled,
-    giving some performance boots.
+    or after add `-ro` key for all output with recursive events, detection logic can be disabled, giving some performance boots.
 
 * `-ro, --recursiveOut` Enable recursive event processing for specific output only.  
   Can be specified multiple time for each output, on which recursive events detected.
+
+Second option - use Simulation parameter file (see description below).
 
 ### Code optimiser
 
 - `-od, ----optimisedDir`: Cache directory path for generated optimised classes.  
   Simulator generate optimised class versions for specific cases.  
-  For startup time optimisation those classes cached in specified here directory.
-  If not specified - default is "./optimised" in working folder.
+  For startup time optimisation those classes cached in specified here directory.  
+  If not specified - "./optimised" in working folder used.
 
 - `-do, --disable-optimiser`: Disable code optimiser.  
   Used for debug purposes. Not to be specified for regular use.
 
 ### Mapping files
 
-- `-m, --mapFile`: Path to KiCad symbol mapping file
-  Can be
-- `-md, --mapFileDir`: Map file directory path.
-  Directory, in which map files searched. Map fieles
+- `-m, --mapFile`: Name/path of KiCad symbol mapping file.  
+  Can be specified multiple times for multiple files.
+- `-md, --mapFileDir`: Directory for map file search if it can't be found in working directory.
 - `<netFilePath>`: Path to KiCad NET file
 
 ## Schema parameter file
@@ -50,7 +48,7 @@ Check [XSD](paramFile.xsd) for details.
 ```xml
 
 <params recursion="all" xmlns="pko.kicadLogicalSimulator.param">
-	<part id="VCNT_CHAR2" params="recursive=Q"/>
+  <part id="VCNT_CHAR2" recursive="Q" param="reverse"/>
 	<mapFile>kicad</mapFile>
 	<mapFile>retro</mapFile>
 </params>
@@ -59,12 +57,7 @@ Check [XSD](paramFile.xsd) for details.
 - `recursion`: equivalent of `-r` CLI key
 - `mapFile`: equivalent of `-m` CLI key
 - `part`: override Schema part definition for specific ID
-    - `ignore`: completely ignore specific schema part.
-    - `symPartClass`: points to the Java class name used for schema part behavior simulation.
-    - `symPartParam`: additional parameters needed for class instantiation
+  - `param`: additional parameters needed for class instantiation
+  - `recursive`: list of pins with explicitly enabled recursive event handling
 
-Parameters and class override priority (first win):
-
-1) Schema parameter file.
-2) Symbol fields in schema it self.
-3) Mapping file.
+Parameters and class definition in Schema parameter file has priority over definition in Mapping file.
