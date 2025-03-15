@@ -96,15 +96,14 @@ public class ParameterResolver {
                 if (symbolConfig == null) {
                     throw new RuntimeException("Unmapped symbol " + comp.libsource.lib + "." + comp.libsource.part);
                 } else {
-                    //FixMe ignored unit in mapping file??
                     if ((symbolConfig.unitAmount - symbolConfig.ignoredUnits.size()) > 1) {
                         for (int i = 0; i < symbolConfig.unitAmount; i++) {
-                            SchemaPartConfig newConfig = new SchemaPartConfig(symbolConfig.clazz, symbolConfig.symbolParams);
+                            SchemaPartConfig newConfig = new SchemaPartConfig(symbolConfig, i);
                             config.put(i, newConfig);
                             schemaPartsById.put(comp.ref + "#" + ((char) ('A' + i)), newConfig);
                         }
                     } else {
-                        SchemaPartConfig newConfig = new SchemaPartConfig(symbolConfig.clazz, symbolConfig.symbolParams);
+                        SchemaPartConfig newConfig = new SchemaPartConfig(symbolConfig, 0);
                         config.put(0, newConfig);
                         schemaPartsById.put(comp.ref, newConfig);
                     }

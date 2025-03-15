@@ -44,9 +44,10 @@ public class SchemaPartConfig {
     public boolean ignore;
     public Set<String> recursivePins = new HashSet<>();
 
-    public SchemaPartConfig(String clazz, Map<String, String> params) {
-        this.clazz = clazz;
-        this.params = new HashMap<>(params);
+    public SchemaPartConfig(SymbolConfig symbolConfig, int unitNo) {
+        this.clazz = symbolConfig.clazz;
+        this.params = new HashMap<>(symbolConfig.symbolParams);
+        this.ignore = symbolConfig.ignoredUnits.contains(unitNo);
     }
 
     public void setParams(String param) {

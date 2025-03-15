@@ -59,7 +59,7 @@ public class SymbolConfig {
             if (!pin.equals("ignore")) {
                 String[] pinConf = pin.split("=");
                 int pinNo = Integer.parseInt(pinConf[0]);
-                pinMap.put(pinNo, new PinConfig(unitAmount, pinConf[1]));
+                pinMap.put(pinNo, new PinConfig(unitAmount, pinConf.length == 1 ? null : pinConf[1]));
             }
         }
         unitAmount++;
