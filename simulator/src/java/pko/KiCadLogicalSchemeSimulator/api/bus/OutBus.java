@@ -30,7 +30,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.api.bus;
-import pko.KiCadLogicalSchemeSimulator.Simulator;
 import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
@@ -48,8 +47,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.all;
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.none;
+import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.warn;
 
 public class OutBus extends Bus {
     private final Map<Long, Map<Byte, OffsetBus>> corrected = new HashMap<>();
@@ -235,17 +234,15 @@ public class OutBus extends Bus {
                 destinations[i] = destinations[i].getOptimised(this);
             }
             ClassOptimiser<OutBus> optimiser = new ClassOptimiser<>(this, OutBus.class).unroll(destinations.length);
-            if (parent.net.parameterResolver.recursionMode != all && Utils.notContain(Simulator.recursiveOuts, getName()) && !parent.recursive.contains(getId())) {
-                if (parent.net.parameterResolver.recursionMode == none) {
-                    optimiser.cut("allRecurse");
-                } else {
-                    optimiser.cut("recurse");
-                }
-                if (triState) {
-                    optimiser.cut("noTs");
-                } else {
-                    optimiser.cut("ts");
-                }
+            if (getRecursionMode() == none) {
+                optimiser.cut("allRecurse");
+            } else if (getRecursionMode() == warn) {
+                optimiser.cut("recurse");
+            }
+            if (triState) {
+                optimiser.cut("noTs");
+            } else {
+                optimiser.cut("ts");
             }
             OutBus build = optimiser.build();
             build.source = source;

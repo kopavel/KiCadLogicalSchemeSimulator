@@ -30,7 +30,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.net.bus;
-import pko.KiCadLogicalSchemeSimulator.Simulator;
 import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
 import pko.KiCadLogicalSchemeSimulator.api.wire.FallingEdgePin;
@@ -215,10 +214,9 @@ public class BusToWiresAdapter extends OutBus {
             } else {
                 optimiser.bind("d", "imp0");
             }
-            if (destinations.length < 2 || parent.net.parameterResolver.recursionMode == none) {
+            if (destinations.length < 2 || getRecursionMode() == none) {
                 optimiser.cut("allRecurse");
-            } else if (parent.net.parameterResolver.recursionMode == warn && Utils.notContain(Simulator.recursiveOuts, getName()) &&
-                    !parent.recursive.contains(getId())) {
+            } else if (getRecursionMode() == warn) {
                 optimiser.cut("recurse");
             }
             if (applyMask == 0) {

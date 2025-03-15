@@ -81,11 +81,9 @@ public class Simulator implements Runnable {
     public static Net net;
     @CommandLine.Option(names = {"-r", "--recursion"}, description = """
             Recursive event processing mode
-            \tw - warning only (default, little speed overhead, but only detect and report \
-            events, can be used for explicitely define pins with recursion and set "disable" method here
-            \te - enable for all pins(slower simulation)
-            \td - \
-            disable for all except explicitly specified (see recursiveOut param)""")
+            \twarn - warning only (default, little speed overhead, but only detect and report events, can be used for explicitly define pins with recursion and set "disable" method here
+            \tall - enable for all pins(slower simulation)
+            \tnone - disable for all except explicitly specified (see recursiveOut param)""")
     public static RecursionMode recursionMode;
     static {
         try {
@@ -288,7 +286,7 @@ public class Simulator implements Runnable {
             } else {
                 throw new RuntimeException("Unsupported file extension. " + netFilePath);
             }
-            parameterResolver.processNetFile(export, params);
+            parameterResolver.processNetFile(export, params, recursiveOuts);
             net = new Net(export, optimisedDir, parameterResolver);
             net.schemaParts.values().forEach(schemaPart -> {
                 if (schemaPart instanceof InteractiveSchemaPart) {

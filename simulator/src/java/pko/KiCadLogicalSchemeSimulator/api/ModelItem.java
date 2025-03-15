@@ -31,10 +31,9 @@
  */
 package pko.KiCadLogicalSchemeSimulator.api;
 import lombok.Getter;
-import pko.KiCadLogicalSchemeSimulator.Simulator;
+import pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
-import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.warn;
 
@@ -88,8 +87,7 @@ public abstract class ModelItem<T> implements IModelItem<T> {
         if (parent.net.stabilizing) {
             hasQueue = false;
             return true;
-        } else if (parent.net.parameterResolver.recursionMode == warn && Utils.notContain(Simulator.recursiveOuts, getName()) &&
-                !parent.recursive.contains(getId())) {
+        } else if (getRecursionMode() == warn) {
             if (!reportedRecurse) {
                 String partId = parent.id;
                 String unitId = null;
@@ -121,6 +119,9 @@ public abstract class ModelItem<T> implements IModelItem<T> {
         }
     }
 
+    public RecursionMode getRecursionMode() {
+        return parent.net.parameterResolver.getRecursionMode(parent.id, id);
+    }
     public boolean useFullOptimiser() {
         return false;
     }

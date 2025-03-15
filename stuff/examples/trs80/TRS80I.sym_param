@@ -1,7 +1,7 @@
 <params recursion="none" xmlns="pko.kicadLogicalSimulator.param">
-	<part id="VCNT_CHAR2" param="recursive=Q"/>
-	<part id="VCNT_CHAR_LINE1" param="recursive=Q"/>
-	<part id="VCNT_ROW1" param="recursive=Q"/>
+	<part id="VCNT_CHAR2" recursive="Q"/>
+	<part id="VCNT_CHAR_LINE1" recursive="Q"/>
+	<part id="VCNT_ROW1" recursive="Q"/>
 	<part id="BIOS1" param="file=rom_a_L2.bin"/>
 	<part id="BIOS2" param="file=rom_b_L2.bin"/>
 	<part id="CHAR_GEN2" param="file=character_set_10.bin"/>

@@ -45,4 +45,5 @@ public class Unit {
     public Boolean ignore;
     public String clazz;
     public String params;
+    public String recursive;
 }

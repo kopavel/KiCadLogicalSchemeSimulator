@@ -50,5 +50,6 @@ public class Part {
     public String clazz;
     public String param;
     public List<Unit> unit;
+    public String recursive;
 
 }

@@ -1,5 +1,5 @@
 <params recursion="all" xmlns="pko.kicadLogicalSimulator.param">
-	<part id="DEC1" params="recursive=Q"/>
+	<part id="DEC1" recursive="Q"/>
 	<mapFile>kicad</mapFile>
 	<mapFile>chip</mapFile>
 </params>

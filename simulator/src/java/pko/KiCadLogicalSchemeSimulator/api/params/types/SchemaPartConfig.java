@@ -33,13 +33,16 @@ package pko.KiCadLogicalSchemeSimulator.api.params.types;
 import pko.KiCadLogicalSchemeSimulator.api.params.ParameterResolver;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class SchemaPartConfig {
     public final Map<String, String> params;
     public String clazz;
     public boolean ignore;
+    public Set<String> recursivePins = new HashSet<>();
 
     public SchemaPartConfig(String clazz, Map<String, String> params) {
         this.clazz = clazz;

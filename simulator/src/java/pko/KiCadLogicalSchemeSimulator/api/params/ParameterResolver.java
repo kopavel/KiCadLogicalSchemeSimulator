@@ -41,13 +41,14 @@ import pko.KiCadLogicalSchemeSimulator.parsers.pojo.param.Params;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.param.Part;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.param.Unit;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
+import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.all;
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.warn;
 
 public class ParameterResolver {
     public final Map<String, Map<Integer, SchemaPartConfig>> schemaParts = new HashMap<>();
+    public final Map<String, SchemaPartConfig> schemaPartsById = new HashMap<>();
     public final Map<String, Map<String, SymbolConfig>> symbols = new HashMap<>();
     public RecursionMode recursionMode = warn;
 
@@ -73,8 +74,18 @@ public class ParameterResolver {
         return symbolConfig;
     }
 
-    public void processNetFile(Export export, Params params) {
-        recursionMode = params.recursion;
+    public void processNetFile(Export export, Params params, String[] recursiveOut) {
+        Map<String, List<String>> cliRecursivePin = new HashMap<>();
+        if (recursiveOut != null) {
+            for (String pin : recursiveOut) {
+                String pinName = pin.substring(pin.lastIndexOf("_") + 1);
+                String partId = pin.substring(0, pin.lastIndexOf("_") - 1);
+                cliRecursivePin.computeIfAbsent(partId, e -> new ArrayList<>()).add(pinName);
+            }
+        }
+        if (params != null) {
+            recursionMode = params.recursion;
+        }
         for (Comp comp : export.getComponents().getComp()) {
             Map<String, SymbolConfig> libSymbols = symbols.get(comp.libsource.lib);
             Map<Integer, SchemaPartConfig> config = schemaParts.computeIfAbsent(comp.ref, e -> new HashMap<>());
@@ -85,24 +96,35 @@ public class ParameterResolver {
                 if (symbolConfig == null) {
                     throw new RuntimeException("Unmapped symbol " + comp.libsource.lib + "." + comp.libsource.part);
                 } else {
-                    if (symbolConfig.unitAmount > 0) {
+                    //FixMe ignored unit in mapping file??
+                    if ((symbolConfig.unitAmount - symbolConfig.ignoredUnits.size()) > 1) {
                         for (int i = 0; i < symbolConfig.unitAmount; i++) {
-                            config.put(i, new SchemaPartConfig(symbolConfig.clazz, symbolConfig.symbolParams));
+                            SchemaPartConfig newConfig = new SchemaPartConfig(symbolConfig.clazz, symbolConfig.symbolParams);
+                            config.put(i, newConfig);
+                            schemaPartsById.put(comp.ref + "#" + ((char) ('A' + i)), newConfig);
                         }
                     } else {
-                        config.put(0, new SchemaPartConfig(symbolConfig.clazz, symbolConfig.symbolParams));
+                        SchemaPartConfig newConfig = new SchemaPartConfig(symbolConfig.clazz, symbolConfig.symbolParams);
+                        config.put(0, newConfig);
+                        schemaPartsById.put(comp.ref, newConfig);
                     }
                 }
             }
-            if (params.part != null) {
+            if (params != null && params.part != null) {
                 for (Part part : params.part) {
                     if (part.id.equals(comp.ref)) {
-                        if (part.param != null) {
-                            for (SchemaPartConfig conf : config.values()) {
+                        for (SchemaPartConfig conf : config.values()) {
+                            if (part.param != null) {
                                 conf.setParams(part.param);
-                                if (part.ignore != null) {
-                                    conf.ignore = part.ignore;
-                                }
+                            }
+                            if (part.ignore != null) {
+                                conf.ignore = part.ignore;
+                            }
+                            if (part.recursive != null) {
+                                conf.recursivePins.addAll(Arrays.asList(part.recursive.split(";")));
+                            }
+                            if (cliRecursivePin.containsKey(comp.getRef())) {
+                                conf.recursivePins.addAll(cliRecursivePin.get(comp.getRef()));
                             }
                         }
                         if (part.unit != null) {
@@ -116,6 +138,12 @@ public class ParameterResolver {
                                 }
                                 if (unit.ignore != null) {
                                     conf.ignore = part.ignore;
+                                }
+                                if (unit.recursive != null) {
+                                    conf.recursivePins.addAll(Arrays.asList(unit.recursive.split(";")));
+                                }
+                                if (cliRecursivePin.containsKey(comp.getRef() + "#" + unit.name)) {
+                                    conf.recursivePins.addAll(cliRecursivePin.get(comp.getRef() + "#" + unit.name));
                                 }
                             }
                         }
@@ -154,5 +182,9 @@ public class ParameterResolver {
             symbolId = symbolId + '#' + ((char) ('A' + pinConfig.unitNo));
         }
         return symbolId;
+    }
+
+    public RecursionMode getRecursionMode(String partId, String pinName) {
+        return schemaPartsById.get(partId).recursivePins.contains(pinName) ? all : recursionMode;
     }
 }
