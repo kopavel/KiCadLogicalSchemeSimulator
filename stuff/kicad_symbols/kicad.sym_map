@@ -223,7 +223,7 @@
 			<unit pinMap="14=IN;15=OUT"/>
 			<unit pinMap="ignore;8;1"/>
 		</symbol>
-		<symbol name="4056" class="StateMachine" param="size=4;latch;outSize=7;latch;states=63,6,91,79,102,109,125,7,127,111,55,118,115,119,64,0">
+		<symbol name="4056" class="StateMachine" param="size=4;latch;outSize=7;latch;states=126,48,109,121,51,91,95,112,127,123,14,55,103,119,1,0">
 			<unit pinMap="5=IN0;3=IN1;2=IN2;4=IN3;1=C;6=R;9=OUT0;10=OUT1;11=OUT2;12=OUT3;13=OUT4;15=OUT5;14=OUT6"/>
 			<unit pinMap="ignore;7;8;16"/>
 		</symbol>
