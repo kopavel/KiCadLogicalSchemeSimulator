@@ -53,7 +53,7 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
     AtomicReference<Double> currentFreq = new AtomicReference<>(0d);
     @Getter
     private double clockFreq = 0;
-    private boolean fullSpeedAlive = false;
+    private AtomicReference<Boolean> fullSpeedAlive = new AtomicReference<>(false);
     private Thread fullSpeedThread;
     private long timerStart;
     private long tickStart;
@@ -80,11 +80,11 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
     synchronized public void startClock() {
         if (clockFreq == 0) {
             if (fullSpeedThread == null || !fullSpeedThread.isAlive()) {
-                fullSpeedAlive = true;
+                fullSpeedAlive.setOpaque(true);
                 fullSpeedThread = Thread.ofPlatform().priority(MAX_PRIORITY).start(() -> {
                     final Pin local = out;
                     try {
-                        while (fullSpeedAlive) {
+                        while (fullSpeedAlive.getOpaque()) {
                             ticks += 20;
                             local.setHi();
                             local.setLo();
@@ -169,7 +169,7 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
         }
         if (fullSpeedThread != null) {
             retVal = true;
-            fullSpeedAlive = false;
+            fullSpeedAlive.setOpaque(false);
             VarHandle.releaseFence();
             try {
                 fullSpeedThread.join();
