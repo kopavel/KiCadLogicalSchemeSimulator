@@ -37,6 +37,11 @@ import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 
 import java.util.Set;
 
+import static pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin.State.HiImp;
+import static pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin.State.Lo;
+import static pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin.State.WeakHi;
+import static pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin.State.WeakLo;
+
 public abstract class Pin extends ModelItem<Pin> {
     public boolean state;
     @Getter
@@ -104,6 +109,21 @@ public abstract class Pin extends ModelItem<Pin> {
             } else {
                 setLo();
             }
+        }
+    }
+
+    public PassivePin.State getOtherState() {
+        if (merger.hiImpedance) {
+            return HiImp;
+        } else if (hiImpedance) {
+            return merger.state ? PassivePin.State.Hi : Lo;
+        } else if (strong) {
+            return merger.weakState == 0 ? HiImp : (merger.weakState < 0 ? WeakLo : WeakHi);
+        } else if (merger.strong) {
+            return merger.state ? PassivePin.State.Hi : Lo;
+        } else {
+            int otherWeak = merger.weakState - (state ? 1 : -1);
+            return otherWeak == 0 ? HiImp : (otherWeak < 0 ? WeakLo : WeakHi);
         }
     }
 

@@ -49,4 +49,19 @@ public class PassivePin extends TriStateOutPin {
             return super.getOptimised(source);
         }
     }
+
+    public enum State {
+        HiImp(false, false),
+        Hi(true, true),
+        Lo(false, true),
+        WeakHi(true, false),
+        WeakLo(false, false);
+        public final boolean state;
+        public final boolean strong;
+
+        State(boolean state, boolean strong) {
+            this.state = state;
+            this.strong = strong;
+        }
+    }
 }
