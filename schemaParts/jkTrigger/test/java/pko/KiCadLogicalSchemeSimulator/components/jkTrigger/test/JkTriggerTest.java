@@ -38,7 +38,7 @@ import pko.KiCadLogicalSchemeSimulator.test.schemaPartTester.NetTester;
 public class JkTriggerTest extends NetTester {
     @BeforeEach
     public void reset() {
-        net.schemaParts.get("U1_A").reset();
+        net.schemaParts.get("U1#A").reset();
         setLo("R");
         setLo("S");
         setLo("J");
