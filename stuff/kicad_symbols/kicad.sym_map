@@ -444,4 +444,9 @@
 			<unit pinMap="1=IN1;2=IN2"/>
 		</symbol>
 	</lib>
+	<lib name="Device">
+		<symbol name="R" class="Resister">
+			<unit pinMap="1=IN1;2=IN2"/>
+		</symbol>
+	</lib>
 </symbolMap>

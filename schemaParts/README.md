@@ -29,6 +29,7 @@ Some interactive parts has additional interfaces/functionality if you click on i
 * [Power](power/README.md) — Static output, useful for a pull-up/pull-down resistors.
 * [Ram](ram/README.md) — Static RAM.
 * [Repeater](repeater/README.md) — Single bit buffer/inverter.
+* [Resister](resister/README.md) — Resister.
 * [RingCounter](ringCounter/README.md) — Ring counter.
 * [Rom](rom/README.md) — ROM.
 * [SdRam](sdram/README.md) — Dynamic RAM.

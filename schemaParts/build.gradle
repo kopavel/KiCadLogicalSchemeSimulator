@@ -70,6 +70,7 @@ dependencies {
     runtimeOnly project(":schemaParts:power")
     runtimeOnly project(":schemaParts:ram")
     runtimeOnly project(":schemaParts:repeater")
+    runtimeOnly project(":schemaParts:resister")
     runtimeOnly project(":schemaParts:rom")
     runtimeOnly project(":schemaParts:sdram")
     runtimeOnly project(":schemaParts:shifter")
@@ -127,6 +128,7 @@ configure(subprojects) { subproject ->
                     '--module-path', classpath.asPath,
                     '--add-modules', 'KiCadLogicalSchemeSimulator.simulator',
                     '--add-exports', 'KiCadLogicalSchemeSimulator.simulator/pko.KiCadLogicalSchemeSimulator.parsers.net=ALL-UNNAMED',
+                    '--add-exports', 'KiCadLogicalSchemeSimulator.simulator/pko.KiCadLogicalSchemeSimulator.parsers.xml=ALL-UNNAMED',
                     '--add-opens', 'java.base/java.lang=KiCadLogicalSchemeSimulator.simulator'
             ]
         }
