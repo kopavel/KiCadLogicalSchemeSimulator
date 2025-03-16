@@ -46,6 +46,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
     public WireMergerWireIn(Pin source, WireMerger merger) {
         super(source, "PMergePIn");
         this.merger = merger;
+        oldStrong = source.strong;
         hiImpedance = source.hiImpedance;
         destinations = merger.destinations;
     }
