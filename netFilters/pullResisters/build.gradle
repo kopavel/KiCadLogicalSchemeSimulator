@@ -32,5 +32,5 @@
 
 dependencies {
     implementation project(":schemaParts:power")
-    runtimeOnly project(":netFilters:pullResisters")
+    implementation project(":schemaParts:resister")
 }

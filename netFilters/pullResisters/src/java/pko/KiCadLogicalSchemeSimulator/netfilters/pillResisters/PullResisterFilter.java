@@ -31,13 +31,54 @@
  */
 package pko.KiCadLogicalSchemeSimulator.netfilters.pillResisters;
 import pko.KiCadLogicalSchemeSimulator.api.NetFilter;
-import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api.params.ParameterResolver;
+import pko.KiCadLogicalSchemeSimulator.api.params.types.PinConfig;
+import pko.KiCadLogicalSchemeSimulator.api.params.types.SchemaPartConfig;
+import pko.KiCadLogicalSchemeSimulator.components.power.Power;
+import pko.KiCadLogicalSchemeSimulator.components.resister.Resister;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Export;
+import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Net;
+import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Node;
 
+import java.util.Iterator;
 import java.util.Map;
 
 public class PullResisterFilter implements NetFilter {
     @Override
-    public void doFilter(Export netFile, Map<String, SchemaPart> schemaParts) {
+    public void doFilter(Export netFile, ParameterResolver parameterResolver) {
+        for (Net net : netFile.getNets().getNet()) {
+            if ("gnd".equalsIgnoreCase(net.getName()) || "pwr".equalsIgnoreCase(net.getName())) {
+                node:
+                for (Iterator<Node> iterator = net.getNode().iterator(); iterator.hasNext(); ) {
+                    Node node = iterator.next();
+                    SchemaPartConfig schemaPartConfig = parameterResolver.getSchemaPartConfig(node);
+                    if (schemaPartConfig.clazz.equals(Resister.class.getSimpleName())) {
+                        schemaPartConfig.clazz = Power.class.getSimpleName();
+                        if ("pwr".equalsIgnoreCase(net.getName())) {
+                            schemaPartConfig.params.put("hi", "true");
+                        }
+                        Map<Integer, PinConfig> pinMap = parameterResolver.getPinMap(node);
+                        for (Integer pin : pinMap.keySet()) {
+                            if (!pin.equals(Integer.parseInt(node.getPin()))) {
+                                for (Net otherNet : netFile.getNets().getNet()) {
+                                    if (otherNet == net) {
+                                        continue;
+                                    }
+                                    for (Node otherNode : otherNet.getNode()) {
+                                        if (otherNode.getRef().equals(node.getRef())) {
+                                            otherNode.setPin(null);
+                                            otherNode.setPinfunction("OUT");
+                                            otherNode.setPintype("output");
+                                            iterator.remove();
+                                            continue node;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }

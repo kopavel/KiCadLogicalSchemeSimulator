@@ -32,7 +32,9 @@
 import pko.KiCadLogicalSchemeSimulator.api.NetFilter;
 import pko.KiCadLogicalSchemeSimulator.netfilters.pillResisters.PullResisterFilter;
 
-module KiCadLogicalSchemeSimulator.netFilters.pullResisters {
+open module KiCadLogicalSchemeSimulator.netFilters.pullResisters {
+    requires KiCadLogicalSchemeSimulator.components.resister;
+    requires KiCadLogicalSchemeSimulator.components.power;
     requires KiCadLogicalSchemeSimulator.simulator;
     provides NetFilter with PullResisterFilter;
 }

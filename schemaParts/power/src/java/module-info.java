@@ -30,9 +30,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
-import pko.KiCadLogicalSchemeSimulator.components.power.PowerSpi;
 
 module KiCadLogicalSchemeSimulator.components.power {
+    exports pko.KiCadLogicalSchemeSimulator.components.power;
     requires KiCadLogicalSchemeSimulator.simulator;
-    provides SchemaPartSpi with PowerSpi;
+    provides SchemaPartSpi with pko.KiCadLogicalSchemeSimulator.components.power.PowerSpi;
 }

@@ -33,6 +33,7 @@ package pko.KiCadLogicalSchemeSimulator.net;
 import pko.KiCadLogicalSchemeSimulator.Simulator;
 import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
+import pko.KiCadLogicalSchemeSimulator.api.NetFilter;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
@@ -47,7 +48,6 @@ import pko.KiCadLogicalSchemeSimulator.net.merger.bus.BusMerger;
 import pko.KiCadLogicalSchemeSimulator.net.merger.wire.PassiveInMerger;
 import pko.KiCadLogicalSchemeSimulator.net.merger.wire.WireMerger;
 import pko.KiCadLogicalSchemeSimulator.net.wire.TriStateNCWire;
-import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Comp;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Export;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
@@ -69,17 +69,15 @@ public class Net {
     private final Map<String, BusMerger> busMergers = new TreeMap<>();
     private final Map<String, OutPin> wireMergers = new TreeMap<>();
     private final Map<IModelItem<?>, IModelItem<?>> replacement = new HashMap<>();
-    private final Map<String, Comp> compMap;
     public volatile boolean stabilizing = true;
 
     public Net(Export export, String optimisedDir, ParameterResolver parameterResolver) throws IOException {
         this.optimisedDir = optimisedDir;
         this.parameterResolver = parameterResolver;
         Log.info(Net.class, "Start Net building");
-//        export.getComponents().getComp().forEach(this::createSchemaPart);
-        compMap = export.getComponents().getComp()
-                .stream()
-                .collect(Collectors.toMap(i -> i.ref, i -> i));
+        for (NetFilter netFilter : ServiceLoader.load(NetFilter.class)) {
+            netFilter.doFilter(export, parameterResolver);
+        }
         export.getNets().getNet().forEach(this::groupSourcesByDestinations);
         buildNet();
         schemaParts.values().forEach(SchemaPart::initOuts);
@@ -156,10 +154,9 @@ public class Net {
             powerState = null;
         }
         net.getNode().forEach(node -> {
-            Comp comp = compMap.get(node.getRef());
-            PinConfig pinConfig = parameterResolver.getPinConfig(comp, node);
-            String id = parameterResolver.getId(comp, node);
-            SchemaPartConfig schemaPartConfig = parameterResolver.getSchemaPartConfig(comp, node);
+            PinConfig pinConfig = parameterResolver.getPinConfig(node);
+            String id = parameterResolver.getId(node);
+            SchemaPartConfig schemaPartConfig = parameterResolver.getSchemaPartConfig(node);
             if (schemaPartConfig.ignore) {
                 return;
             }

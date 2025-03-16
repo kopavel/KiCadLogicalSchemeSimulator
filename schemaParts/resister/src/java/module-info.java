@@ -30,9 +30,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
-import pko.KiCadLogicalSchemeSimulator.components.resister.ResisterSpi;
 
-module KiCadLogicalSchemeSimulator.components.Resister {
+module KiCadLogicalSchemeSimulator.components.resister {
+    exports pko.KiCadLogicalSchemeSimulator.components.resister;
     requires KiCadLogicalSchemeSimulator.simulator;
-    provides SchemaPartSpi with ResisterSpi;
+    provides SchemaPartSpi with pko.KiCadLogicalSchemeSimulator.components.resister.ResisterSpi;
 }

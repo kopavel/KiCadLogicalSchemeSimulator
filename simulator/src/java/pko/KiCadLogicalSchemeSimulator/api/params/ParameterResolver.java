@@ -42,6 +42,7 @@ import pko.KiCadLogicalSchemeSimulator.parsers.pojo.param.Part;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.param.Unit;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.all;
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.warn;
@@ -50,6 +51,7 @@ public class ParameterResolver {
     public final Map<String, Map<Integer, SchemaPartConfig>> schemaParts = new HashMap<>();
     public final Map<String, SchemaPartConfig> schemaPartsById = new HashMap<>();
     public final Map<String, Map<String, SymbolConfig>> symbols = new HashMap<>();
+    private final Map<String, Comp> compMap = new HashMap<>();
     public RecursionMode recursionMode = warn;
 
     public static void setParams(String params, Map<String, String> paramMap) {
@@ -86,6 +88,9 @@ public class ParameterResolver {
         if (params != null) {
             recursionMode = params.recursion;
         }
+        compMap.putAll(export.getComponents().getComp()
+                .stream()
+                .collect(Collectors.toMap(i -> i.ref, i -> i)));
         for (Comp comp : export.getComponents().getComp()) {
             Map<String, SymbolConfig> libSymbols = symbols.get(comp.libsource.lib);
             Map<Integer, SchemaPartConfig> config = schemaParts.computeIfAbsent(comp.ref, e -> new HashMap<>());
@@ -152,12 +157,13 @@ public class ParameterResolver {
         }
     }
 
-    public SchemaPartConfig getSchemaPartConfig(Comp comp, Node node) {
+    public SchemaPartConfig getSchemaPartConfig(Node node) {
+        Comp comp = compMap.get(node.getRef());
         if (!symbols.containsKey(comp.libsource.lib) || !symbols.get(comp.libsource.lib).containsKey(comp.libsource.part)) {
             throw new RuntimeException(
                     "Unmapped SchemaPart id:" + comp.ref + "(lib:" + comp.getLibsource().getLib() + " part:" + comp.getLibsource().getPart() + ")");
         }
-        PinConfig pinConfig = getPinConfig(comp, node);
+        PinConfig pinConfig = getPinConfig(node);
         if (pinConfig != null) {
             return schemaParts.get(node.getRef()).get(pinConfig.unitNo);
         } else {
@@ -165,18 +171,24 @@ public class ParameterResolver {
         }
     }
 
-    public PinConfig getPinConfig(Comp comp, Node node) {
+    public PinConfig getPinConfig(Node node) {
         if (node.getPin() == null || node.getPin().isEmpty()) {
             return null;
         } else {
-            return symbols.get(comp.libsource.lib).get(comp.libsource.getPart()).pinMap.get(Integer.parseInt(node.getPin()));
+            return getPinMap(node).get(Integer.parseInt(node.getPin()));
         }
     }
 
-    public String getId(Comp comp, Node node) {
+    public Map<Integer, PinConfig> getPinMap(Node node) {
+        Comp comp = compMap.get(node.getRef());
+        return symbols.get(comp.libsource.lib).get(comp.libsource.getPart()).pinMap;
+    }
+
+    public String getId(Node node) {
+        Comp comp = compMap.get(node.getRef());
         String symbolId = node.getRef();
         SymbolConfig symbolConfig = symbols.get(comp.libsource.lib).get(comp.libsource.getPart());
-        PinConfig pinConfig = getPinConfig(comp, node);
+        PinConfig pinConfig = getPinConfig(node);
         if ((symbolConfig.unitAmount - symbolConfig.ignoredUnits.size() > 1) && pinConfig != null) {
             symbolId = symbolId + '#' + ((char) ('A' + pinConfig.unitNo));
         }
