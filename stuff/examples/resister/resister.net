@@ -1,7 +1,5 @@
 (export (version "E")
   (design
-    (source "D:\\soft_a\\verilog\\KiCadLogicalSchemeSimulator\\stuff\\examples\\resister\\resister.kicad_sch")
-    (date "15/03/2025 22:31:38")
     (tool "Eeschema 7.0.9")
     (sheet (number "1") (name "/") (tstamps "/")
       (title_block
@@ -177,11 +175,6 @@
       (pins
         (pin (num "1") (name "IN1") (type "passive"))
         (pin (num "2") (name "IN2") (type "passive")))))
-  (libraries
-    (library (logical "Device")
-      (uri "C:\\Program Files\\KiCad\\7.0\\share\\kicad\\symbols\\/Device.kicad_sym"))
-    (library (logical "chip")
-      (uri "C:/Users/kopavel/Documents/KiCad/7.0/symbols/chip.kicad_sym")))
   (nets
     (net (code "1") (name "Net-(Led1-IN)")
       (node (ref "Led1") (pin "1") (pinfunction "IN") (pintype "input"))
