@@ -56,7 +56,6 @@ dependencies {
     implementation libs.xz
     implementation libs.commons.compress
     runtimeOnly(project(":schemaParts"))
-    runtimeOnly(project(":netFilters"))
     implementation libs.jackson.databind
     implementation libs.jaxb.api
     implementation libs.jakarta.api

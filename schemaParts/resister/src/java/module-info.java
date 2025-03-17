@@ -29,10 +29,13 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+import pko.KiCadLogicalSchemeSimulator.api.NetFilter;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
 
 module KiCadLogicalSchemeSimulator.components.resister {
     exports pko.KiCadLogicalSchemeSimulator.components.resister;
+    requires KiCadLogicalSchemeSimulator.components.power;
     requires KiCadLogicalSchemeSimulator.simulator;
     provides SchemaPartSpi with pko.KiCadLogicalSchemeSimulator.components.resister.ResisterSpi;
+    provides NetFilter with pko.KiCadLogicalSchemeSimulator.components.resister.PullResisterFilter;
 }

@@ -1,8 +1,6 @@
 import org.gradle.api.initialization.resolve.RepositoriesMode
 
 rootProject.name = 'KiCadLogicalSchemeSimulator'
-include ':netFilters'
-include ':netFilters:pullResisters'
 include ':schemaParts'
 include ':schemaParts:and'
 include ':schemaParts:buffer'

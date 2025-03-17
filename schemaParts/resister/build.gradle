@@ -32,5 +32,4 @@
 
 dependencies {
     implementation project(":schemaParts:power")
-    implementation project(":schemaParts:resister")
 }

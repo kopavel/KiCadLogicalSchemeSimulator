@@ -29,13 +29,12 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.netfilters.pillResisters;
+package pko.KiCadLogicalSchemeSimulator.components.resister;
 import pko.KiCadLogicalSchemeSimulator.api.NetFilter;
 import pko.KiCadLogicalSchemeSimulator.api.params.ParameterResolver;
 import pko.KiCadLogicalSchemeSimulator.api.params.types.PinConfig;
 import pko.KiCadLogicalSchemeSimulator.api.params.types.SchemaPartConfig;
 import pko.KiCadLogicalSchemeSimulator.components.power.Power;
-import pko.KiCadLogicalSchemeSimulator.components.resister.Resister;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Export;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Net;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Node;
