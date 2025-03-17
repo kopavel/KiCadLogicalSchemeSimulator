@@ -14,6 +14,7 @@ Some interactive parts has additional interfaces/functionality if you click on i
 * [DcTrigger](dcTrigger/README.md) — DC-trigger with R and S inputs.
 * [Decoder](decoder/README.md) — Binary decoder.
 * [Diode](diode/README.md) — Diode.
+* [DipSwitch](dipSwitch/README.md) — Net file filter for Dip switch behavior.
 * [Display](display/README.md) — Monochrome display.
 * [JkTrigger](jkTrigger/README.md) — JK trigger.
 * [Keyboard](keyboard/README.md) — Matrix of key.

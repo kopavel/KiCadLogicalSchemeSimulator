@@ -30,13 +30,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 import pko.KiCadLogicalSchemeSimulator.api.NetFilter;
-import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
-import pko.KiCadLogicalSchemeSimulator.components.resister.PullResisterFilter;
-import pko.KiCadLogicalSchemeSimulator.components.resister.ResisterSpi;
+import pko.KiCadLogicalSchemeSimulator.components.dipSwitch.DipSwitch;
 
-module KiCadLogicalSchemeSimulator.components.resister {
-    requires KiCadLogicalSchemeSimulator.components.power;
+open module KiCadLogicalSchemeSimulator.components.dipSwiitch {
     requires KiCadLogicalSchemeSimulator.simulator;
-    provides SchemaPartSpi with ResisterSpi;
-    provides NetFilter with PullResisterFilter;
+    provides NetFilter with DipSwitch;
 }

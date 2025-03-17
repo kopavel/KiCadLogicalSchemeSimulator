@@ -58,6 +58,7 @@ dependencies {
     runtimeOnly project(":schemaParts:decoder")
     runtimeOnly project(":schemaParts:display")
     runtimeOnly project(":schemaParts:diode")
+    runtimeOnly project(":schemaParts:dipSwitch")
     runtimeOnly project(":schemaParts:jkTrigger")
     runtimeOnly project(":schemaParts:ringCounter")
     runtimeOnly project(":schemaParts:keyboard")

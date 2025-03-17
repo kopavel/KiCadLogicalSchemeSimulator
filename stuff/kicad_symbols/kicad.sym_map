@@ -449,4 +449,108 @@
 			<unit pinMap="1=IN1;2=IN2"/>
 		</symbol>
 	</lib>
+	<lib name="Switch">
+		<symbol name="SW_DIP_x01" class="DipSwitch">
+			<unit pinMap="ignore;1;2"/>
+		</symbol>
+		<symbol name="SW_DIP_x02" class="DipSwitch">
+			<unit pinMap="ignore;1;4"/>
+			<unit pinMap="ignore;2;3"/>
+		</symbol>
+		<symbol name="SW_DIP_x03" class="DipSwitch">
+			<unit pinMap="ignore;1;6"/>
+			<unit pinMap="ignore;2;5"/>
+			<unit pinMap="ignore;3;4"/>
+		</symbol>
+		<symbol name="SW_DIP_x04" class="DipSwitch">
+			<unit pinMap="ignore;1;8"/>
+			<unit pinMap="ignore;2;7"/>
+			<unit pinMap="ignore;3;6"/>
+			<unit pinMap="ignore;4;5"/>
+		</symbol>
+		<symbol name="SW_DIP_x05" class="DipSwitch">
+			<unit pinMap="ignore;1;10"/>
+			<unit pinMap="ignore;2;9"/>
+			<unit pinMap="ignore;3;8"/>
+			<unit pinMap="ignore;4;7"/>
+			<unit pinMap="ignore;5;6"/>
+		</symbol>
+		<symbol name="SW_DIP_x06" class="DipSwitch">
+			<unit pinMap="ignore;1;12"/>
+			<unit pinMap="ignore;2;11"/>
+			<unit pinMap="ignore;3;10"/>
+			<unit pinMap="ignore;4;9"/>
+			<unit pinMap="ignore;5;8"/>
+			<unit pinMap="ignore;6;7"/>
+		</symbol>
+		<symbol name="SW_DIP_x07" class="DipSwitch">
+			<unit pinMap="ignore;1;14"/>
+			<unit pinMap="ignore;2;13"/>
+			<unit pinMap="ignore;3;12"/>
+			<unit pinMap="ignore;4;11"/>
+			<unit pinMap="ignore;5;10"/>
+			<unit pinMap="ignore;6;9"/>
+			<unit pinMap="ignore;7;8"/>
+		</symbol>
+		<symbol name="SW_DIP_x08" class="DipSwitch">
+			<unit pinMap="ignore;1;16"/>
+			<unit pinMap="ignore;2;15"/>
+			<unit pinMap="ignore;3;14"/>
+			<unit pinMap="ignore;4;13"/>
+			<unit pinMap="ignore;5;12"/>
+			<unit pinMap="ignore;6;11"/>
+			<unit pinMap="ignore;7;10"/>
+			<unit pinMap="ignore;8;9"/>
+		</symbol>
+		<symbol name="SW_DIP_x09" class="DipSwitch">
+			<unit pinMap="ignore;1;18"/>
+			<unit pinMap="ignore;2;17"/>
+			<unit pinMap="ignore;3;16"/>
+			<unit pinMap="ignore;4;15"/>
+			<unit pinMap="ignore;5;14"/>
+			<unit pinMap="ignore;6;13"/>
+			<unit pinMap="ignore;7;12"/>
+			<unit pinMap="ignore;8;11"/>
+			<unit pinMap="ignore;9;10"/>
+		</symbol>
+		<symbol name="SW_DIP_x10" class="DipSwitch">
+			<unit pinMap="ignore;1;20"/>
+			<unit pinMap="ignore;2;19"/>
+			<unit pinMap="ignore;3;18"/>
+			<unit pinMap="ignore;4;17"/>
+			<unit pinMap="ignore;5;16"/>
+			<unit pinMap="ignore;6;15"/>
+			<unit pinMap="ignore;7;14"/>
+			<unit pinMap="ignore;8;13"/>
+			<unit pinMap="ignore;9;12"/>
+			<unit pinMap="ignore;10;11"/>
+		</symbol>
+		<symbol name="SW_DIP_x11" class="DipSwitch">
+			<unit pinMap="ignore;1;22"/>
+			<unit pinMap="ignore;2;21"/>
+			<unit pinMap="ignore;3;20"/>
+			<unit pinMap="ignore;4;19"/>
+			<unit pinMap="ignore;5;18"/>
+			<unit pinMap="ignore;6;17"/>
+			<unit pinMap="ignore;7;16"/>
+			<unit pinMap="ignore;8;15"/>
+			<unit pinMap="ignore;9;14"/>
+			<unit pinMap="ignore;10;13"/>
+			<unit pinMap="ignore;11;12"/>
+		</symbol>
+		<symbol name="SW_DIP_x12" class="DipSwitch">
+			<unit pinMap="ignore;1;24"/>
+			<unit pinMap="ignore;2;23"/>
+			<unit pinMap="ignore;3;22"/>
+			<unit pinMap="ignore;4;21"/>
+			<unit pinMap="ignore;5;20"/>
+			<unit pinMap="ignore;6;19"/>
+			<unit pinMap="ignore;7;18"/>
+			<unit pinMap="ignore;8;17"/>
+			<unit pinMap="ignore;9;16"/>
+			<unit pinMap="ignore;10;15"/>
+			<unit pinMap="ignore;11;14"/>
+			<unit pinMap="ignore;12;13"/>
+		</symbol>
+	</lib>
 </symbolMap>
