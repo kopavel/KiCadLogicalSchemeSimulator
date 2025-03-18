@@ -119,7 +119,7 @@ public class BusToWiresAdapter extends OutBus {
 
     @Override
     public long getState() {
-        return (source.getState() & mask) > 0 ? 1 : 0;
+        return ((source == null ? state : source.getState()) & mask) > 0 ? 1 : 0;
     }
 
     @Override
