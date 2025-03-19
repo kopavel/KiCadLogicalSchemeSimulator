@@ -51,6 +51,7 @@ public class PullPin extends OutPin implements MergerInput<Pin> {
         for (int i = 0; i < destinations.length; i++) {
             destinations[i] = destinations[i].getOptimised(this);
         }
+        split();
         this.source = source;
         return this;
     }
