@@ -52,20 +52,22 @@ public class DipSwitch implements NetFilter {
                 node:
                 for (Node node : net.getNode()) {
                     SchemaPartConfig schemaPartConfig = parameterResolver.getSchemaPartConfig(node);
-                    if (schemaPartConfig.clazz.equals(DipSwitch.class.getSimpleName()) && schemaPartConfig.params.containsKey("on")) {
+                    if (schemaPartConfig != null && schemaPartConfig.clazz.equals(DipSwitch.class.getSimpleName()) && schemaPartConfig.params.containsKey("On")) {
                         Map<Integer, PinConfig> pinMap = parameterResolver.getPinMap(node);
-                        for (Integer pin : pinMap.keySet()) {
-                            if (!pin.equals(Integer.parseInt(node.getPin()))) {
-                                for (Net otherNet : netFile.getNets().getNet()) {
-                                    if (otherNet != net) {
-                                        if (otherNet.getNode()
-                                                .stream()
-                                                .anyMatch(n -> n.getRef().equals(node.getRef()))) {
-                                            forAdd.addAll(otherNet.getNode());
-                                            forDelete.add(otherNet);
-                                            continue node;
-                                        }
-                                    }
+                        int firstPinNo = Integer.parseInt(node.getPin());
+                        int unitNo = pinMap.get(firstPinNo).unitNo;
+                        String secondPinNo = String.valueOf(pinMap.entrySet()
+                                .stream()
+                                .filter(p -> p.getValue().unitNo == unitNo && !p.getKey().equals(firstPinNo))
+                                .map(Map.Entry::getKey).findFirst().orElseThrow());
+                        for (Net otherNet : netFile.getNets().getNet()) {
+                            if (otherNet != net) {
+                                if (otherNet.getNode()
+                                        .stream()
+                                        .anyMatch(n -> n.getRef().equals(node.getRef()) && n.getPin().equals(secondPinNo))) {
+                                    forAdd.addAll(otherNet.getNode());
+                                    forDelete.add(otherNet);
+                                    continue node;
                                 }
                             }
                         }

@@ -46,14 +46,15 @@ public class PullResisterFilter implements NetFilter {
     @Override
     public void doFilter(Export netFile, ParameterResolver parameterResolver) {
         for (Net net : netFile.getNets().getNet()) {
-            if ("gnd".equalsIgnoreCase(net.getName()) || "pwr".equalsIgnoreCase(net.getName())) {
+            Boolean powerState = parameterResolver.getPowerState(net);
+            if (powerState != null) {
                 node:
                 for (Iterator<Node> iterator = net.getNode().iterator(); iterator.hasNext(); ) {
                     Node node = iterator.next();
                     SchemaPartConfig schemaPartConfig = parameterResolver.getSchemaPartConfig(node);
-                    if (schemaPartConfig.clazz.equals(Resister.class.getSimpleName())) {
+                    if (schemaPartConfig != null && schemaPartConfig.clazz.equals(Resister.class.getSimpleName())) {
                         schemaPartConfig.clazz = Power.class.getSimpleName();
-                        if ("pwr".equalsIgnoreCase(net.getName())) {
+                        if (powerState) {
                             schemaPartConfig.params.put("hi", "true");
                         }
                         Map<Integer, PinConfig> pinMap = parameterResolver.getPinMap(node);
