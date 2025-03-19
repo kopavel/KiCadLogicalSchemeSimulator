@@ -84,16 +84,10 @@ public class MultiPartRIn extends InPin {
             }
             /*Optimiser blockEnd nr line o block r*/
         } else//
-            if (parent.resetState == 0) {
-                /*Optimiser bind mask*/
-                parent.resetState = mask;
-                for (MultiPartCIn cIn : cIns) {
-                    cIn.reset();
-                }
-            } else {
-                /*Optimiser bind mask*/
-                parent.resetState |= mask;
-            }
+        {
+            /*Optimiser bind mask*/
+            parent.resetState |= mask;
+        }
         /*Optimiser blockEnd and blockEnd r*/
     }
 
@@ -117,16 +111,11 @@ public class MultiPartRIn extends InPin {
             }
             /*Optimiser blockEnd r block nr line o*/
         } else//
-            if (parent.resetState == 0) {
-                /*Optimiser bind mask*/
-                parent.resetState = mask;
-                for (MultiPartCIn cIn : cIns) {
-                    cIn.reset();
-                }
-            } else {
-                /*Optimiser bind mask*/
-                parent.resetState |= mask;
-            }
+        {
+            /*Optimiser bind mask*/
+            parent.resetState |= mask;
+        }
+
         /*Optimiser blockEnd and blockEnd nr*/
     }
 
