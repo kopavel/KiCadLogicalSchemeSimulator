@@ -161,13 +161,10 @@ public class Net {
                 return;
             }
             SchemaPart schemaPart = this.schemaParts.computeIfAbsent(id, i -> createSchemaPart(schemaPartConfig.clazz, id, schemaPartConfig.getParamString()));
-            String pinType = node.getPintype();
-            if (pinType.contains("+")) {
-                pinType = pinType.substring(0, pinType.indexOf('+'));
-            }
             String pinName = pinConfig == null ? node.getPinfunction() : pinConfig.pinName;
+            SchemaPart.PinType pinType = schemaPart.getPinType(pinName);
             switch (pinType) {
-                case "input" -> {
+                case input -> {
                     IModelItem<?> destination = schemaPart.getInItem(pinName);
                     if (replacement.containsKey(destination)) {
                         destination = replacement.get(destination);
@@ -178,7 +175,7 @@ public class Net {
                         default -> throw new IllegalStateException("Unexpected input type: " + destination.getClass().getName());
                     }
                 }
-                case "tri_state", "output" -> {
+                case output -> {
                     if (powerState != null) {
                         throw new RuntimeException("OUt pin on power rail");
                     }
@@ -187,7 +184,7 @@ public class Net {
                     assert source.getAliasOffset(pinName) != null : "No alias for pin " + pinName;
                     sourcesOffset.put(source, source.getAliasOffset(pinName));
                 }
-                case "bidirectional" -> {
+                case bidirectional -> {
                     if (powerState != null) {
                         throw new RuntimeException("OUt pin on power rail");
                     }
@@ -202,9 +199,7 @@ public class Net {
                     assert source.getAliasOffset(pinName) != null : "No alias for pin " + pinName;
                     sourcesOffset.put(source, source.getAliasOffset(pinName));
                 }
-                case "passive" -> passivePins.add((PassivePin) schemaPart.getOutPin(pinName));
-                case "power_in" -> { /*ignore*/ }
-                default -> throw new RuntimeException("Unsupported pin type " + pinType);
+                case passive -> passivePins.add((PassivePin) schemaPart.getOutPin(pinName));
             }
         });
         if (powerState != null) {

@@ -42,16 +42,22 @@ import pko.KiCadLogicalSchemeSimulator.net.Net;
 import java.util.HashMap;
 import java.util.Map;
 
+import static pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart.PinType.bidirectional;
+import static pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart.PinType.input;
+import static pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart.PinType.output;
+import static pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart.PinType.passive;
+
 @SuppressWarnings("unused")
 public abstract class SchemaPart {
-    public Net net;
     public final String id;
     public final Map<String, ModelItem<?>> inPins = new HashMap<>();
+    public final Map<String, PinType> pinType = new HashMap<>();
     public final Map<IModelItem<?>, String> ids = new HashMap<>();
     public final Map<String, ModelItem<?>> outPins = new HashMap<>();
     public final boolean reverse;
     protected final Map<String, String> params = new HashMap<>();
     protected final boolean nReverse;
+    public Net net;
     public Map<Integer, String> pinNumberMap;
 
     protected SchemaPart(String id, String sParam) {
@@ -104,22 +110,45 @@ public abstract class SchemaPart {
     }
 
     public <T extends InPin> T addInPin(T pin) {
+        if (pinType.containsKey(pin.id)) {
+            throw new RuntimeException("Double pin name in " + id + ":" + pin.id);
+        } else {
+            pinType.put(pin.id, input);
+        }
         inPins.put(pin.id, pin);
         ids.put(pin, pin.id);
         return pin;
     }
 
     public void addPassivePin(String pinId) {
+        if (pinType.containsKey(pinId)) {
+            throw new RuntimeException("Double pin name in " + id + ":" + pinId);
+        } else {
+            pinType.put(pinId, passive);
+        }
         outPins.put(pinId, new PassivePin(pinId, this));
         ids.put(outPins.get(pinId), pinId);
     }
 
     public void addPullPin(String pinId, boolean state) {
+        if (pinType.containsKey(pinId)) {
+            throw new RuntimeException("Double pin name in " + id + ":" + pinId);
+        }
+        pinType.put(pinId, output);
         outPins.put(pinId, new PullPin(pinId, this, state));
         ids.put(outPins.get(pinId), pinId);
     }
 
     public void addOutPin(String pinId) {
+        if (pinType.containsKey(pinId)) {
+            if (pinType.get(pinId) == input) {
+                pinType.put(pinId, bidirectional);
+            } else {
+                throw new RuntimeException("Double pin name in " + id + ":" + pinId);
+            }
+        } else {
+            pinType.put(pinId, output);
+        }
         outPins.put(pinId, new OutPin(pinId, this));
         ids.put(outPins.get(pinId), pinId);
     }
@@ -131,6 +160,11 @@ public abstract class SchemaPart {
     }
 
     public void addTriStateOutPin(String pinId) {
+        if (pinType.containsKey(pinId)) {
+            throw new RuntimeException("Double pin name in " + id + ":" + pinId);
+        } else {
+            pinType.put(pinId, output);
+        }
         outPins.put(pinId, new TriStateOutPin(pinId, this));
         ids.put(outPins.get(pinId), pinId);
     }
@@ -151,19 +185,43 @@ public abstract class SchemaPart {
     }
 
     public <T extends InBus> T addInBus(T bus) {
+        PinType type;
+        if (pinType.containsKey(bus.id)) {
+            if (pinType.get(bus.id) == output) {
+                type = bidirectional;
+            } else {
+                throw new RuntimeException("Double pin name in " + id + ":" + bus.id);
+            }
+        } else {
+            type = input;
+        }
+        pinType.put(bus.id, type);
         inPins.put(bus.id, bus);
         ids.put(bus, bus.id);
         for (String alias : bus.aliasOffsets.keySet()) {
+            pinType.put(alias, type);
             inPins.put(alias, bus);
         }
         return bus;
     }
 
     public void addOutBus(String pinId, int size, String... names) {
+        PinType type;
+        if (pinType.containsKey(pinId)) {
+            if (pinType.get(pinId) == input) {
+                type = bidirectional;
+            } else {
+                throw new RuntimeException("Double pin name in " + id + ":" + pinId);
+            }
+        } else {
+            type = output;
+        }
         OutBus pin = new OutBus(pinId, this, size, names);
+        pinType.put(pinId, type);
         outPins.put(pinId, pin);
         ids.put(outPins.get(pinId), pinId);
         for (String alias : pin.aliasOffsets.keySet()) {
+            pinType.put(alias, type);
             outPins.put(alias, pin);
         }
     }
@@ -176,10 +234,15 @@ public abstract class SchemaPart {
     }
 
     public void addTriStateOutBus(String pinId, int size, String... names) {
+        if (pinType.containsKey(pinId)) {
+            throw new RuntimeException("Double pin name in " + id + ":" + pinId);
+        }
         TriStateOutBus pin = new TriStateOutBus(pinId, this, size, names);
+        pinType.put(pinId, output);
         outPins.put(pinId, pin);
         ids.put(outPins.get(pinId), pinId);
         for (String alias : pin.aliasOffsets.keySet()) {
+            pinType.put(alias, output);
             outPins.put(alias, pin);
         }
     }
@@ -189,6 +252,10 @@ public abstract class SchemaPart {
         OutBus pin = (OutBus) outPins.get(pinId);
         pin.state = state;
         pin.hiImpedance = false;
+    }
+
+    public PinType getPinType(String name) {
+        return pinType.get(name);
     }
 
     public IModelItem<?> getInItem(String name) {
@@ -256,5 +323,12 @@ public abstract class SchemaPart {
     }
 
     public void reset() {
+    }
+
+    public enum PinType {
+        input,
+        output,
+        passive,
+        bidirectional
     }
 }
