@@ -65,6 +65,7 @@ public class MultiOutDecoder extends SchemaPart {
         }
         long outMask = Utils.getMaskForSize(outSize);
         if (reverse) {
+            outState = outMask;
             addInBus(new InBus("A", this, inSize) {
                 @Override
                 public void setState(long newState) {
@@ -152,7 +153,7 @@ public class MultiOutDecoder extends SchemaPart {
             }
         }
         for (int i = 0; i < partAmount; i++) {
-            addTriStateOutBus("Q" + (char) ('a' + i), outSize);
+            addTriStateOutBus("Q" + (char) ('a' + i), outSize, reverse ? outMask : 0L);
         }
     }
 
