@@ -115,7 +115,7 @@ public abstract class ModelItem<T> implements IModelItem<T> {
             }
             return false;
         } else {
-            throw new RuntimeException("Recursive event loop detected, need implement fair queue");
+            throw new RuntimeException("Recursive event loop detected on " + getName() + ", need implement fair queue");
         }
     }
 
