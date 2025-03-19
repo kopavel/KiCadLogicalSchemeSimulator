@@ -60,4 +60,4 @@ Check [XSD](paramFile.xsd) for details.
   - `param`: additional parameters needed for class instantiation
   - `recursive`: list of pins with explicitly enabled recursive event handling
 
-Parameters and class definition in Schema parameter file has priority over definition in Mapping file.
+Parameters definition in Schema parameter file has priority over definition in Mapping file.

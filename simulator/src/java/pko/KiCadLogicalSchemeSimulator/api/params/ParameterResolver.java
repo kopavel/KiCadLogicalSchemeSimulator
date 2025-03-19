@@ -105,10 +105,18 @@ public class ParameterResolver {
                 continue;
             }
             Map<Integer, SchemaPartConfig> config = schemaParts.computeIfAbsent(comp.ref, e -> new HashMap<>());
+            if (part != null && part.alias != null) {
+                String[] split = part.alias.split("\\.");
+                comp.libsource.lib = split[0];
+                comp.libsource.part = split[1];
+            }
+            String lib = comp.libsource.lib;
+            String partId = comp.libsource.part;
+            Map<String, SymbolConfig> libSymbols = symbols.get(lib);
             if (libSymbols == null) {
                 throw new RuntimeException("Unmapped library " + lib + " for " + comp.ref);
             } else {
-                SymbolConfig symbolConfig = libSymbols.get(comp.libsource.part);
+                SymbolConfig symbolConfig = libSymbols.get(partId);
                 if (symbolConfig == null) {
                     throw new RuntimeException("Unmapped symbol " + lib + "." + partId + " for " + comp.ref);
                 } else {

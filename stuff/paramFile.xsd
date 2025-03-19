@@ -75,10 +75,10 @@
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="class" type="ClassName">
+		<xs:attribute name="alias" type="xs:string">
 			<xs:annotation>
 				<xs:documentation>
-					Java class name, used for schema part behavior simulation.
+					Use other library simbol instead
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
