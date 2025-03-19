@@ -42,6 +42,7 @@ import pko.KiCadLogicalSchemeSimulator.parsers.pojo.param.Part;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.param.Unit;
 
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.all;
@@ -53,6 +54,7 @@ public class ParameterResolver {
     public final Map<String, Map<String, SymbolConfig>> symbols = new HashMap<>();
     private final Map<String, Comp> compMap = new HashMap<>();
     public RecursionMode recursionMode = warn;
+    Pattern pwrPattern = Pattern.compile("\\+[0-9]+v", Pattern.CASE_INSENSITIVE);
 
     public static void setParams(String params, Map<String, String> paramMap) {
         for (String param : params.split(";")) {
@@ -197,5 +199,15 @@ public class ParameterResolver {
 
     public RecursionMode getRecursionMode(String partId, String pinName) {
         return schemaPartsById.get(partId).recursivePins.contains(pinName) ? all : recursionMode;
+    }
+
+    public Boolean getPowerState(Net net) {
+        if ("gnd".equalsIgnoreCase(net.getName())) {
+            return false;
+        } else if ("pwr".equalsIgnoreCase(net.getName()) || pwrPattern.matcher(net.getName()).matches()) {
+            return true;
+        } else {
+            return null;
+        }
     }
 }

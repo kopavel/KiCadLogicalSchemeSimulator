@@ -145,14 +145,7 @@ public class Net {
         List<Pin> destinationPins = new ArrayList<>();
         Map<InBus, SortedSet<Byte>> destinationBusesOffsets = new HashMap<>();
         List<PassivePin> passivePins = new ArrayList<>();
-        Boolean powerState;
-        if ("gnd".equalsIgnoreCase(net.getName())) {
-            powerState = false;
-        } else if ("pwr".equalsIgnoreCase(net.getName())) {
-            powerState = true;
-        } else {
-            powerState = null;
-        }
+        Boolean powerState = parameterResolver.getPowerState(net);
         net.getNode().forEach(node -> {
             PinConfig pinConfig = parameterResolver.getPinConfig(node);
             String id = parameterResolver.getId(node);
