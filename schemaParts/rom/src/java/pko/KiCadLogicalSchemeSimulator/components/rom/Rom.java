@@ -53,13 +53,13 @@ public class Rom extends SchemaPart {
     protected Rom(String id, String sParam) {
         super(id, sParam);
         if (!sParam.contains("file")) {
-            throw new RuntimeException("Rom component need \"file\" parameter");
+            throw new RuntimeException("Rom component " + id + " need \"file\" parameter");
         }
         if (!sParam.contains("size")) {
-            throw new RuntimeException("Rom component need \"size\" parameter");
+            throw new RuntimeException("Rom component " + id + " need \"size\" parameter");
         }
         if (!sParam.contains("aSize")) {
-            throw new RuntimeException("Rom component need \"aSize\" parameter");
+            throw new RuntimeException("Rom component " + id + " need \"aSize\" parameter");
         }
         try {
             size = Integer.parseInt(params.get("size"));
