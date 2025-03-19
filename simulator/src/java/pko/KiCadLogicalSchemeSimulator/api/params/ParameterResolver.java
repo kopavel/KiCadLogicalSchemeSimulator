@@ -36,6 +36,7 @@ import pko.KiCadLogicalSchemeSimulator.api.params.types.SchemaPartConfig;
 import pko.KiCadLogicalSchemeSimulator.api.params.types.SymbolConfig;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Comp;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Export;
+import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Net;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Node;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.param.Params;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.param.Part;
@@ -45,6 +46,7 @@ import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static java.lang.Boolean.TRUE;
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.all;
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.warn;
 
@@ -94,7 +96,14 @@ public class ParameterResolver {
                 .stream()
                 .collect(Collectors.toMap(i -> i.ref, i -> i)));
         for (Comp comp : export.getComponents().getComp()) {
-            Map<String, SymbolConfig> libSymbols = symbols.get(comp.libsource.lib);
+            Part part = null;
+            if (params != null && params.part != null) {
+                part = params.part.stream()
+                        .filter(p -> p.id.equals(comp.ref)).findAny().orElse(null);
+            }
+            if (part != null && TRUE == part.ignore) {
+                continue;
+            }
             Map<Integer, SchemaPartConfig> config = schemaParts.computeIfAbsent(comp.ref, e -> new HashMap<>());
             if (libSymbols == null) {
                 throw new RuntimeException("Unmapped library " + lib + " for " + comp.ref);
@@ -103,55 +112,51 @@ public class ParameterResolver {
                 if (symbolConfig == null) {
                     throw new RuntimeException("Unmapped symbol " + lib + "." + partId + " for " + comp.ref);
                 } else {
-                    if ((symbolConfig.unitAmount - symbolConfig.ignoredUnits.size()) > 1) {
+                    if (symbolConfig.unitAmount == 0 || (symbolConfig.unitAmount - symbolConfig.ignoredUnits.size()) == 1) {
+                        SchemaPartConfig newConfig = new SchemaPartConfig(symbolConfig, 0);
+                        config.put(0, newConfig);
+                        schemaPartsById.put(comp.ref, newConfig);
+                    } else {
                         for (int i = 0; i < symbolConfig.unitAmount; i++) {
                             SchemaPartConfig newConfig = new SchemaPartConfig(symbolConfig, i);
                             config.put(i, newConfig);
                             schemaPartsById.put(comp.ref + "#" + ((char) ('A' + i)), newConfig);
                         }
-                    } else {
-                        SchemaPartConfig newConfig = new SchemaPartConfig(symbolConfig, 0);
-                        config.put(0, newConfig);
-                        schemaPartsById.put(comp.ref, newConfig);
                     }
                 }
             }
-            if (params != null && params.part != null) {
-                for (Part part : params.part) {
-                    if (part.id.equals(comp.ref)) {
-                        for (SchemaPartConfig conf : config.values()) {
-                            if (part.param != null) {
-                                conf.setParams(part.param);
-                            }
-                            if (part.ignore != null) {
-                                conf.ignore = part.ignore;
-                            }
-                            if (part.recursive != null) {
-                                conf.recursivePins.addAll(Arrays.asList(part.recursive.split(";")));
-                            }
-                            if (cliRecursivePin.containsKey(comp.getRef())) {
-                                conf.recursivePins.addAll(cliRecursivePin.get(comp.getRef()));
-                            }
+            if (part != null) {
+                for (SchemaPartConfig conf : config.values()) {
+                    if (part.param != null) {
+                        conf.setParams(part.param);
+                    }
+                    if (part.ignore != null) {
+                        conf.ignore = part.ignore;
+                    }
+                    if (part.recursive != null) {
+                        conf.recursivePins.addAll(Arrays.asList(part.recursive.split(";")));
+                    }
+                    if (cliRecursivePin.containsKey(comp.getRef())) {
+                        conf.recursivePins.addAll(cliRecursivePin.get(comp.getRef()));
+                    }
+                }
+                if (part.unit != null) {
+                    for (Unit unit : part.unit) {
+                        SchemaPartConfig conf = config.get(unit.name.getBytes()[0] - 'A');
+                        if (conf == null) {
+                            throw new RuntimeException("Unmapped unit " + (unit.name.getBytes()[0] - 'A') + " in part " + part.id);
                         }
-                        if (part.unit != null) {
-                            for (Unit unit : part.unit) {
-                                SchemaPartConfig conf = config.get(unit.name.getBytes()[0] - 'A');
-                                if (conf == null) {
-                                    throw new RuntimeException("Unmapped unit " + (unit.name.getBytes()[0] - 'A') + " in part " + part.id);
-                                }
-                                if (unit.params != null) {
-                                    setParams(unit.params, conf.params);
-                                }
-                                if (unit.ignore != null) {
-                                    conf.ignore = part.ignore;
-                                }
-                                if (unit.recursive != null) {
-                                    conf.recursivePins.addAll(Arrays.asList(unit.recursive.split(";")));
-                                }
-                                if (cliRecursivePin.containsKey(comp.getRef() + "#" + unit.name)) {
-                                    conf.recursivePins.addAll(cliRecursivePin.get(comp.getRef() + "#" + unit.name));
-                                }
-                            }
+                        if (unit.params != null) {
+                            setParams(unit.params, conf.params);
+                        }
+                        if (unit.ignore != null) {
+                            conf.ignore = part.ignore;
+                        }
+                        if (unit.recursive != null) {
+                            conf.recursivePins.addAll(Arrays.asList(unit.recursive.split(";")));
+                        }
+                        if (cliRecursivePin.containsKey(comp.getRef() + "#" + unit.name)) {
+                            conf.recursivePins.addAll(cliRecursivePin.get(comp.getRef() + "#" + unit.name));
                         }
                     }
                 }
@@ -160,10 +165,8 @@ public class ParameterResolver {
     }
 
     public SchemaPartConfig getSchemaPartConfig(Node node) {
-        Comp comp = compMap.get(node.getRef());
-        if (!symbols.containsKey(comp.libsource.lib) || !symbols.get(comp.libsource.lib).containsKey(comp.libsource.part)) {
-            throw new RuntimeException(
-                    "Unmapped SchemaPart id:" + comp.ref + "(lib:" + comp.getLibsource().getLib() + " part:" + comp.getLibsource().getPart() + ")");
+        if (!schemaParts.containsKey(node.getRef())) {
+            return null;
         }
         PinConfig pinConfig = getPinConfig(node);
         if (pinConfig != null) {
@@ -183,6 +186,10 @@ public class ParameterResolver {
 
     public Map<Integer, PinConfig> getPinMap(Node node) {
         Comp comp = compMap.get(node.getRef());
+        if (!symbols.containsKey(comp.libsource.lib) || !symbols.get(comp.libsource.lib).containsKey(comp.libsource.part)) {
+            throw new RuntimeException(
+                    "Unmapped SchemaPart id:" + comp.ref + "(lib:" + comp.getLibsource().getLib() + " part:" + comp.getLibsource().getPart() + ")");
+        }
         return symbols.get(comp.libsource.lib).get(comp.libsource.getPart()).pinMap;
     }
 

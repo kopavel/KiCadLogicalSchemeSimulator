@@ -147,12 +147,12 @@ public class Net {
         List<PassivePin> passivePins = new ArrayList<>();
         Boolean powerState = parameterResolver.getPowerState(net);
         net.getNode().forEach(node -> {
-            PinConfig pinConfig = parameterResolver.getPinConfig(node);
-            String id = parameterResolver.getId(node);
             SchemaPartConfig schemaPartConfig = parameterResolver.getSchemaPartConfig(node);
-            if (schemaPartConfig.ignore) {
+            if (schemaPartConfig == null || schemaPartConfig.ignore) {
                 return;
             }
+            PinConfig pinConfig = parameterResolver.getPinConfig(node);
+            String id = parameterResolver.getId(node);
             SchemaPart schemaPart = this.schemaParts.computeIfAbsent(id, i -> createSchemaPart(schemaPartConfig.clazz, id, schemaPartConfig.getParamString()));
             String pinName = pinConfig == null ? node.getPinfunction() : pinConfig.pinName;
             SchemaPart.PinType pinType = schemaPart.getPinType(pinName);
