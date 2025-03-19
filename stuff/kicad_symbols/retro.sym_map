@@ -3,14 +3,21 @@
 	<lib name="retro">
 		<symbol name="MK4116" class="SingleBitSdRam" param="size=7;reverse">
 			<unit pinMap="2=Din;3=~{WE};4=~{RAS};5=A0;6=A2;7=A1;10=A5;11=A4;12=A3;13=A6;14=Dout;15=~{CAS}"/>
+			<unit pinMap="ignore;1;8;9;16"/>
 		</symbol>
 		<symbol name="MK4116x8" class="SdRam" param="size=8;aSize=7;reverse;separateOut"/>
 		<symbol name="MCM6670" class="Rom" param="size=5;aSize=10;reverse">
 			<unit pinMap="7=A3;6=A4;5=A5;4=A6;3=A7;2=A8;1=A9;8=A0;10=A1;11=A2;12=D0;13=D1;14=D2;15=D3;16=D4;17=~{CS}"/>
+			<unit pinMap="ignore;9;18"/>
 		</symbol>
 		<symbol name="2102AN" class="SingleBitRam" param="size=10;reverse">
 			<unit pinMap="8=A0;4=A1;5=A2;6=A3;7=A4;2=A5;1=A6;16=A7;15=A8;14=A9;11=Din;12=Dout;13=~{CS};3=~{WE}"/>
+			<unit pinMap="ignore;9;10"/>
 		</symbol>
 		<symbol name="2102ANx8" class="Ram" param="size=8;aSize=10;reverse;separateOut"/>
+		<symbol name="2364" class="Rom" param="aSize=13;size=8;reverse">
+			<unit pinMap="8=A0;7=A1;6=A2;5=A3;4=A4;3=A5;2=A6;1=A7;23=A8;22=A9;19=A10;18=A11;21=A12;20=~{CS};9=D0;10=D1;11=D2;13=D3;14=D4;15=D5;16=D6;17=D7"/>
+			<unit pinMap="ignore;12;24"/>
+		</symbol>
 	</lib>
 </symbolMap>

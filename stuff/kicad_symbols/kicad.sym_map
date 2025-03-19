@@ -349,6 +349,15 @@
 			<unit pinMap="13=IN;12=OUT"/>
 			<unit pinMap="ignore;7;14"/>
 		</symbol>
+		<symbol name="74HC04" class="Repeater" param="reverse">
+			<unit pinMap="1=IN;2=OUT"/>
+			<unit pinMap="3=IN;4=OUT"/>
+			<unit pinMap="5=IN;6=OUT"/>
+			<unit pinMap="9=IN;8=OUT"/>
+			<unit pinMap="11=IN;10=OUT"/>
+			<unit pinMap="13=IN;12=OUT"/>
+			<unit pinMap="ignore;7;14"/>
+		</symbol>
 		<symbol name="74LS11" class="AndGate" param="size=3">
 			<unit pinMap="1=IN0;2=IN1;13=IN2;12=OUT"/>
 			<unit pinMap="3=IN0;4=IN1;5=IN2;6=OUT"/>
@@ -443,13 +452,6 @@
 		<symbol name="SW_Push_Open" class="Switch" param="reverse">
 			<unit pinMap="1=IN1;2=IN2"/>
 		</symbol>
-	</lib>
-	<lib name="Device">
-		<symbol name="R" class="Resister">
-			<unit pinMap="1=IN1;2=IN2"/>
-		</symbol>
-	</lib>
-	<lib name="Switch">
 		<symbol name="SW_DIP_x01" class="DipSwitch">
 			<unit pinMap="ignore;1;2"/>
 		</symbol>
@@ -551,6 +553,21 @@
 			<unit pinMap="ignore;10;15"/>
 			<unit pinMap="ignore;11;14"/>
 			<unit pinMap="ignore;12;13"/>
+		</symbol>
+	</lib>
+	<lib name="Device">
+		<symbol name="R" class="Resister">
+			<unit pinMap="1=IN1;2=IN2"/>
+		</symbol>
+		<symbol name="R_Pack08_Split" class="DipSwitch">
+			<unit pinMap="ignore;1;16"/>
+			<unit pinMap="ignore;2;15"/>
+			<unit pinMap="ignore;3;14"/>
+			<unit pinMap="ignore;4;13"/>
+			<unit pinMap="ignore;5;12"/>
+			<unit pinMap="ignore;6;11"/>
+			<unit pinMap="ignore;7;10"/>
+			<unit pinMap="ignore;8;9"/>
 		</symbol>
 	</lib>
 </symbolMap>
