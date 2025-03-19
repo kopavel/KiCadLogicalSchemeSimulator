@@ -97,11 +97,11 @@ public class ParameterResolver {
             Map<String, SymbolConfig> libSymbols = symbols.get(comp.libsource.lib);
             Map<Integer, SchemaPartConfig> config = schemaParts.computeIfAbsent(comp.ref, e -> new HashMap<>());
             if (libSymbols == null) {
-                throw new RuntimeException("Unmapped library " + comp.libsource.lib);
+                throw new RuntimeException("Unmapped library " + lib + " for " + comp.ref);
             } else {
                 SymbolConfig symbolConfig = libSymbols.get(comp.libsource.part);
                 if (symbolConfig == null) {
-                    throw new RuntimeException("Unmapped symbol " + comp.libsource.lib + "." + comp.libsource.part);
+                    throw new RuntimeException("Unmapped symbol " + lib + "." + partId + " for " + comp.ref);
                 } else {
                     if ((symbolConfig.unitAmount - symbolConfig.ignoredUnits.size()) > 1) {
                         for (int i = 0; i < symbolConfig.unitAmount; i++) {

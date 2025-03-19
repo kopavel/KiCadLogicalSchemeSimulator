@@ -170,7 +170,7 @@ public class Net {
                 }
                 case output -> {
                     if (powerState != null) {
-                        throw new RuntimeException("OUt pin on power rail");
+                        throw new RuntimeException("OUt pin " + id + "_" + pinName + " on power rail");
                     }
                     IModelItem<?> source = schemaPart.getOutItem(pinName);
                     assert source != null : "No pin named " + pinName + " in schema part " + schemaPart.id;
