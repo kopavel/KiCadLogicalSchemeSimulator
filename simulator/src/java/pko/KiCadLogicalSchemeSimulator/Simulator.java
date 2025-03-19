@@ -55,8 +55,8 @@ import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.none;
@@ -260,6 +260,8 @@ public class Simulator implements Runnable {
                     } else {
                         throw new Exception("Can't fine Symbol map file " + mapFile);
                     }
+                } else {
+                    mapFiles[i] = mapFile;
                 }
             }
             for (String mapPath : mapFiles) {
