@@ -30,7 +30,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.net.wire;
-import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.wire.OutPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 
@@ -65,8 +64,4 @@ public class TriStateNCWire extends OutPin {
     public void resend() {
     }
 
-    @Override
-    public Pin getOptimised(ModelItem<?> source) {
-        return super.getOptimised(source);
-    }
 }
