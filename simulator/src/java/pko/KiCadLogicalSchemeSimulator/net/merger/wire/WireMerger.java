@@ -81,6 +81,7 @@ public class WireMerger extends OutPin {
         for (int i = 0; i < destinations.length; i++) {
             destinations[i] = destinations[i].getOptimised(this);
         }
+        split();
         this.source = source;
         return this;
     }
@@ -90,7 +91,7 @@ public class WireMerger extends OutPin {
         bus.addDestination(input, mask, (byte) 0);
         sources.add(input);
         if (!bus.hiImpedance) {
-            if (!hiImpedance) {
+            if (!hiImpedance && strong) {
                 throw new ShortcutException(sources);
             }
             hiImpedance = false;
