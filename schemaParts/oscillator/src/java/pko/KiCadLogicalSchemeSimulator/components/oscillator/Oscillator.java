@@ -53,7 +53,7 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
     AtomicReference<Double> currentFreq = new AtomicReference<>(0d);
     @Getter
     private double clockFreq = 0;
-    private AtomicReference<Boolean> fullSpeedAlive = new AtomicReference<>(false);
+    private final AtomicReference<Boolean> fullSpeedAlive = new AtomicReference<>(false);
     private Thread fullSpeedThread;
     private long timerStart;
     private long tickStart;

@@ -94,21 +94,24 @@ public class SdRam extends SchemaPart {
                 @Override
                 public void setHi() {
                     state = true;
-                    if (!dOut.hiImpedance) {
-                        dOut.setHiImpedance();
+                    Bus out;
+                    if (!(out = dOut).hiImpedance) {
+                        out.setHiImpedance();
                     }
                 }
 
                 @Override
                 public void setLo() {
                     state = false;
-                    addr = (int) (hiPart + addrPin.state);
+                    int a = (addr = (int) (hiPart + addrPin.state));
                     if (we.state) {
-                        if (dOut.state != bytes[addr] || dOut.hiImpedance) {
-                            dOut.setState(bytes[addr]);
+                        Bus out;
+                        long l;
+                        if ((out = dOut).state != (l = bytes[a]) || out.hiImpedance) {
+                            out.setState(l);
                         }
                     } else {
-                        bytes[addr] = dIn.state;
+                        bytes[a] = dIn.state;
                     }
                 }
             });
@@ -133,8 +136,10 @@ public class SdRam extends SchemaPart {
                     if (we.state) {
                         bytes[addr] = dIn.state;
                     } else {
-                        if (dOut.state != bytes[addr] || dOut.hiImpedance) {
-                            dOut.setState(bytes[addr]);
+                        Bus out;
+                        long l;
+                        if ((out = dOut).state != (l = bytes[addr]) || out.hiImpedance) {
+                            out.setState(l);
                         }
                     }
                 }
@@ -142,8 +147,9 @@ public class SdRam extends SchemaPart {
                 @Override
                 public void setLo() {
                     state = false;
-                    if (!dOut.hiImpedance) {
-                        dOut.setHiImpedance();
+                    Bus out;
+                    if (!(out = dOut).hiImpedance) {
+                        out.setHiImpedance();
                     }
                 }
             });

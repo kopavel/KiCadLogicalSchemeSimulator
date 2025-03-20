@@ -81,18 +81,22 @@ public class Multiplexer extends SchemaPart {
                 @Override
                 public void setHi() {
                     state = true;
-                    nState |= mask;
-                    if (outBus.state != inBuses[nState].state) {
-                        outBus.setState(inBuses[nState].state);
+                    int s = (nState |= mask);
+                    long state;
+                    Bus out;
+                    if ((out = outBus).state != (state = inBuses[s].state)) {
+                        out.setState(state);
                     }
                 }
 
                 @Override
                 public void setLo() {
                     state = false;
-                    nState &= nMask;
-                    if (outBus.state != inBuses[nState].state) {
-                        outBus.setState(inBuses[nState].state);
+                    int s = (nState &= nMask);
+                    long state;
+                    Bus out;
+                    if ((out = outBus).state != (state = inBuses[s].state)) {
+                        out.setState(state);
                     }
                 }
             });

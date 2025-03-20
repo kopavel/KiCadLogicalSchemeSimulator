@@ -77,35 +77,39 @@ public class Z80CPin extends InPin {
     public void setHi() {
         AsyncIoQueue queue = ioQueue;
         state = true;
-        if ((M != 1 && T == 3) || T == 4) {
-            T = 1;
-            if (!refreshPin.state) {
-                refreshPin.setHi();
+        int lM = M;
+        int lT;
+        if (((lT = T) == 3 && lM != 1) || lT == 4) {
+            lT = (T = 1);
+            Pin pin;
+            Bus bus;
+            if (!(pin = refreshPin).state) {
+                pin.setHi();
             }
-            if (!dOut.hiImpedance) {
-                dOut.setHiImpedance();
+            if (!(bus = dOut).hiImpedance) {
+                bus.setHiImpedance();
             }
             queue.next();
             if (queue.request.address == -1) {
                 if (nmiTriggered) {
                     nmiTriggered = false;
                     cpu.processNMI();
-                    M++;
+                    lM = ++M;
                 } else {
-                    M = 1;
+                    lM = (M = 1);
                 }
             } else {
-                M++;
+                lM = ++M;
             }
-        } else if (T == 2 && (extraWait || !notInWait)) {
+        } else if (lT == 2 && (extraWait || !notInWait)) {
             extraWait = false;
         } else {
-            T++;
+            lT = ++T;
         }
         Request ioRequest = queue.request;
-        switch (T) {
+        switch (lT) {
             case 1 -> {
-                if (M == 1) {
+                if (lM == 1) {
                     m1Pin.setLo();
                     cpu.executeOneInstruction();
                     ioRequest = queue.request;
@@ -124,7 +128,7 @@ public class Z80CPin extends InPin {
                 }
             }
             case 3 -> {
-                if (M == 1) {
+                if (lM == 1) {
                     ioRequest.callback.accept((int) dIn.state);
                     rdPin.setHi();
                     mReqPin.setHi();
