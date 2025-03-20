@@ -163,6 +163,9 @@ public class MultiOutDecoder extends SchemaPart {
         for (int i = 0; i < partAmount; i++) {
             outBuses[i] = getOutBus("Q" + (char) ('a' + i));
             outBuses[i].useBitPresentation = true;
+            if (csStates[i] > 0) {
+                outBuses[i].hiImpedance = true;
+            }
         }
     }
 }
