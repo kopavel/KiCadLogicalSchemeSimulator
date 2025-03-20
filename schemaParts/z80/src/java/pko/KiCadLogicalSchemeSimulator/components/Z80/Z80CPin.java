@@ -106,18 +106,18 @@ public class Z80CPin extends InPin {
         } else {
             lT = ++T;
         }
-        Request ioRequest = queue.request;
         switch (lT) {
             case 1 -> {
                 if (lM == 1) {
                     m1Pin.setLo();
                     cpu.executeOneInstruction();
-                    ioRequest = queue.request;
                 }
+                Request ioRequest = queue.request;
                 aOut.setState(ioRequest.address);
                 extraWait = !ioRequest.memory;
             }
             case 2 -> {
+                Request ioRequest = queue.request;
                 if (!ioRequest.memory && notInWait) {
                     ioReqPin.setLo();
                     if (ioRequest.read) {
@@ -129,6 +129,7 @@ public class Z80CPin extends InPin {
             }
             case 3 -> {
                 if (lM == 1) {
+                    Request ioRequest = queue.request;
                     ioRequest.callback.accept((int) dIn.state);
                     rdPin.setHi();
                     mReqPin.setHi();

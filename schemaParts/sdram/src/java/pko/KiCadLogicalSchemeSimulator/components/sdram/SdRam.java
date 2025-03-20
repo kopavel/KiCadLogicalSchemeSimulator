@@ -76,6 +76,7 @@ public class SdRam extends SchemaPart {
         }
         addrPin = addInBus("A", aSize);
         addTriStateOutBus("D", size);
+        we = addInPin(reverse ? "~{WE}" : "WE");
         dIn = addInBus(params.containsKey("separateOut") ? "Din" : "D", size);
         if (reverse) {
             addInPin(new InPin("~{RAS}", this) {
@@ -91,6 +92,10 @@ public class SdRam extends SchemaPart {
                 }
             });
             addInPin(new InPin("~{CAS}", this) {
+                final InBus in = dIn;
+                final InBus aIn = addrPin;
+                final long[] bts = bytes;
+                final InPin w = we;
                 @Override
                 public void setHi() {
                     state = true;
@@ -103,15 +108,15 @@ public class SdRam extends SchemaPart {
                 @Override
                 public void setLo() {
                     state = false;
-                    int a = (addr = (int) (hiPart + addrPin.state));
-                    if (we.state) {
+                    int a = (addr = (int) (hiPart + aIn.state));
+                    if (w.state) {
                         Bus out;
                         long l;
-                        if ((out = dOut).state != (l = bytes[a]) || out.hiImpedance) {
+                        if ((out = dOut).state != (l = bts[a]) || out.hiImpedance) {
                             out.setState(l);
                         }
                     } else {
-                        bytes[a] = dIn.state;
+                        bts[a] = in.state;
                     }
                 }
             });
@@ -154,7 +159,6 @@ public class SdRam extends SchemaPart {
                 }
             });
         }
-        we = addInPin(reverse ? "~{WE}" : "WE");
     }
 
     @Override

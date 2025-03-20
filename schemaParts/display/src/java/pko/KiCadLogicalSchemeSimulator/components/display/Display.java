@@ -35,14 +35,16 @@ import pko.KiCadLogicalSchemeSimulator.api.schemaPart.InteractiveSchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
+import pko.KiCadLogicalSchemeSimulator.net.Net;
 
 import javax.swing.*;
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Display extends SchemaPart implements InteractiveSchemaPart {
     private final InPin vIn;
     private final DisplayUiComponent display;
-    private final Object refresh = new Object();
+    private final AtomicBoolean refresh = new AtomicBoolean();
     public byte[][] ram = new byte[10][4096];
     public int hSize;
     public int vSize;
@@ -74,10 +76,13 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                 final Runnable repaintRunnable = display::repaint;
                 //noinspection InfiniteLoopStatement
                 while (true) {
-                    SwingUtilities.invokeLater(repaintRunnable);
-                    synchronized (refresh) {
-                        refresh.wait();
+                    while (!refresh.getOpaque()) {
+                        //noinspection BusyWait
+                        Thread.sleep(10);
+                        Thread.onSpinWait();
                     }
+                    refresh.setOpaque(false);
+                    SwingUtilities.invokeLater(repaintRunnable);
                 }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
@@ -115,9 +120,7 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                 public void setLo() {
                     state = false;
                     if (vSize != 0) {
-                        synchronized (refresh) {
-                            refresh.notifyAll();
-                        }
+                        refresh.setOpaque(true);
                     } else if (!parent.net.stabilizing) {
                         vSize = vPos + 2;
                         while (!display.sized) {
@@ -159,14 +162,14 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                 }
             });
             addInPin(new InPin("VSync", this) {
+                final Net pNet = parent.net;
+
                 @Override
                 public void setHi() {
                     state = true;
                     if (vSize != 0) {
-                        synchronized (refresh) {
-                            refresh.notifyAll();
-                        }
-                    } else if (!parent.net.stabilizing) {
+                        refresh.setOpaque(true);
+                    } else if (!pNet.stabilizing) {
                         vSize = vPos + 2;
                         while (!display.sized) {
                             try {
