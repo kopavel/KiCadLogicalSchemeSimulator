@@ -117,6 +117,7 @@ public class SingleOutShifterCIPin extends InPin {
         SingleOutShifterCIPin build = optimiser.build();
         parent.rPin.ciPin = build;
         parent.replaceIn(this, build);
+        build.source = source;
         return build;
     }
 }

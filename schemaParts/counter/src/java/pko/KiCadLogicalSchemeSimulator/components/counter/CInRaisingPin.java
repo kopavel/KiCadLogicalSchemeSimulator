@@ -76,6 +76,7 @@ public class CInRaisingPin extends RaisingEdgePin {
         CInRaisingPin build = optimiser.build();
         ((Counter) parent).in = build;
         parent.replaceIn(this, build);
+        build.source = source;
         return build;
     }
 }

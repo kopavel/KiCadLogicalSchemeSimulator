@@ -122,6 +122,7 @@ public class DcCFallingPin extends FallingEdgePin {
         DcCFallingPin build = optimiser.build();
         parent.ncPin = build;
         parent.replaceIn(this, build);
+        build.source = source;
         return build;
     }
 }

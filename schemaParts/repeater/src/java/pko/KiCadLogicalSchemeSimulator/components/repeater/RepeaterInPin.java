@@ -94,6 +94,7 @@ public class RepeaterInPin extends InPin {
         RepeaterInPin build = optimiser.build();
         parent.inPin = build;
         parent.replaceIn(this, build);
+        build.source = source;
         return build;
     }
 }

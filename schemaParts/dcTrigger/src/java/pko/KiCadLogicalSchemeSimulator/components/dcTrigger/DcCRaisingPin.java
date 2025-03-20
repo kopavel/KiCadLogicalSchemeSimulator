@@ -125,6 +125,7 @@ public class DcCRaisingPin extends RaisingEdgePin {
         DcCRaisingPin build = optimiser.build();
         parent.cPin = build;
         parent.replaceIn(this, build);
+        build.source = source;
         return build;
     }
 }

@@ -84,6 +84,7 @@ public class SingleOutShifterPlPin extends InPin {
         }
         SingleOutShifterPlPin build = optimiser.build();
         parent.replaceIn(this, build);
+        build.source = source;
         return build;
     }
 }

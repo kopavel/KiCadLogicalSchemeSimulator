@@ -228,7 +228,7 @@ public class OutBus extends Bus {
         if (destinations.length == 0) {
             return new NCBus(this);
         } else if (destinations.length == 1) {
-            return destinations[0].getOptimised(null).copyState(this);
+            return destinations[0].getOptimised(source).copyState(this);
         } else {
             for (int i = 0; i < destinations.length; i++) {
                 destinations[i] = destinations[i].getOptimised(this);

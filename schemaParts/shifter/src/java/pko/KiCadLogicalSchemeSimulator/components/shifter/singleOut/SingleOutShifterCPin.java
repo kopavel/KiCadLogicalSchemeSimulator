@@ -197,6 +197,7 @@ public class SingleOutShifterCPin extends InPin {
             parent.cp = build;
         }
         parent.replaceIn(this, build);
+        build.source = source;
         return build;
     }
 }

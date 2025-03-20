@@ -183,6 +183,9 @@ public class DcRPin extends InPin {
         parent.rPin = build;
         parent.sPin.rPin = build;
         parent.replaceIn(this, build);
+        if (source != null && !sPin.used) {
+            build.source = source;
+        }
         return build;
     }
 }

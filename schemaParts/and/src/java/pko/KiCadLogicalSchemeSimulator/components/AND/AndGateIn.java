@@ -116,6 +116,7 @@ public class AndGateIn extends InPin {
             optimiser.cut("setter");
         }
         AndGateIn build = optimiser.build();
+        build.source = source;
         parent.replaceIn(this, build);
         return build;
     }

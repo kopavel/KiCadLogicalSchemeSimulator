@@ -122,6 +122,7 @@ public class MultiUnitDcCPin extends InPin {
         MultiUnitDcCPin build = optimiser.build();
         parent.cPin = build;
         parent.replaceIn(this, build);
+        build.source = source;
         return build;
     }
 }
