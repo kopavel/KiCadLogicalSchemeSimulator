@@ -111,7 +111,9 @@ public class ClassOptimiser<T> {
                 suffix += "_ae";
             }
             String optimizedClassName = sourceClass.getSimpleName() + suffix;
-            String optimizedFullClassName = sourceClass.getPackageName() + ".optimised." + sourceClass.getSimpleName() + "." + sourceClass.getSimpleName() + suffix;
+            String optimizedFullClassName =
+                    sourceClass.getPackageName().replace(Simulator.class.getPackageName(), Simulator.class.getPackageName() + ".optimised") + "." +
+                            sourceClass.getSimpleName() + suffix;
             Class<?> dynamicClass = dynamicClasses.get(optimizedFullClassName);
             if (dynamicClass == null) {
                 try {
@@ -187,7 +189,7 @@ public class ClassOptimiser<T> {
                     resultSource.append(line).append("\n");
                 } else if (line.startsWith("package ")) {
                     //skip asserts
-                    line = line.replace(";", ".optimised." + sourceClass.getSimpleName() + ";");
+                    line = line.replace(Simulator.class.getPackageName(), Simulator.class.getPackageName() + ".optimised");
                     resultSource.append(line).append("\n");
                     resultSource.append("import ").append(sourceClass.getPackageName()).append(".*;\n");
                 } else if (noAssert && line.trim().startsWith("assert")) {
