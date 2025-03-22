@@ -40,6 +40,9 @@ import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
+import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.none;
+import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.warn;
+
 public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
     public final long nMask;
     public final BusMerger merger;
@@ -64,6 +67,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
         nMask = oldPin.nMask;
         merger = oldPin.merger;
         destinations = merger.destinations;
+        oldStrong = oldPin.oldStrong;
         triState = oldPin.triState;
     }
 
@@ -72,8 +76,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
         assert Log.debug(BusMergerWireIn.class,
                 "Bus merger change. before: newState:{},  Source:{} (state:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, " +
                         "weakState:{}, weakPins:{})", true,
-                getName(),
-                state, strong, hiImpedance, merger.getName(), merger.state, merger.strongPins, merger.weakState, merger.weakPins);
+                getName(), state, strong, hiImpedance, merger.getName(), merger.state, merger.strongPins, merger.weakState, merger.weakPins);
         long mergerState = merger.state;
         /*Optimiser line setters*/
         state = true;
@@ -143,7 +146,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
         }
         if (mergerState != merger.state) {
             merger.state = mergerState;
-            /*Optimiser block setters*/
+            /*Optimiser block allRecurse*/
             if (processing) {
                 /*Optimiser line recurse*/
                 if (hasQueue) {
@@ -156,11 +159,11 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                 /*Optimiser blockEnd recurse*/
             } else {
                 processing = true;
-                /*Optimiser blockEnd setters*/
+                /*Optimiser blockEnd allRecurse*/
                 for (Bus destination : destinations) {
                     destination.setState(mergerState);
                 }
-                /*Optimiser block setters block recurse*/
+                /*Optimiser block allRecurse block recurse*/
                 while (hasQueue) {
                     hasQueue = false;
                     /*Optimiser block iSetter*/
@@ -179,7 +182,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                 /*Optimiser blockEnd recurse*/
                 processing = false;
             }
-            /*Optimiser blockEnd setters*/
+            /*Optimiser blockEnd allRecurse*/
         }
         oldStrong = strong;
         assert Log.debug(BusMergerWireIn.class,
@@ -281,7 +284,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
         }
         if (mergerState != merger.state) {
             merger.state = mergerState;
-            /*Optimiser block setters*/
+            /*Optimiser block allRecurse*/
             if (processing) {
                 /*Optimiser line recurse*/
                 if (hasQueue) {
@@ -294,11 +297,11 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                 /*Optimiser blockEnd recurse*/
             } else {
                 processing = true;
-                /*Optimiser blockEnd setters*/
+                /*Optimiser blockEnd allRecurse*/
                 for (Bus destination : destinations) {
                     destination.setState(mergerState);
                 }
-                /*Optimiser block setters block recurse*/
+                /*Optimiser block allRecurse block recurse*/
                 while (hasQueue) {
                     hasQueue = false;
                     /*Optimiser block iSetter*/
@@ -317,14 +320,13 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                 /*Optimiser blockEnd recurse*/
                 processing = false;
             }
-            /*Optimiser blockEnd setters*/
+            /*Optimiser blockEnd allRecurse*/
         }
         oldStrong = strong;
         assert Log.debug(BusMergerWireIn.class,
                 "Bus merger change. after: newState:{},  Source:{} (state:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, " +
                         "weakState:{}, weakPins:{})", false,
-                getName(),
-                state, strong, hiImpedance, merger.getName(), merger.state, merger.strongPins, merger.weakState, merger.weakPins);
+                getName(), state, strong, hiImpedance, merger.getName(), merger.state, merger.strongPins, merger.weakState, merger.weakPins);
     }
 
     /*Optimiser block iSetter*/
@@ -363,7 +365,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
         }
         if (mergerState != merger.state) {
             merger.state = mergerState;
-            /*Optimiser block setters*/
+            /*Optimiser block allRecurse*/
             if (processing) {
                 /*Optimiser line recurse*/
                 if (hasQueue) {
@@ -376,11 +378,11 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                 /*Optimiser blockEnd recurse*/
             } else {
                 processing = true;
-                /*Optimiser blockEnd setters*/
+                /*Optimiser blockEnd allRecurse*/
                 for (Bus destination : destinations) {
                     destination.setState(mergerState);
                 }
-                /*Optimiser block setters block recurse*/
+                /*Optimiser block allRecurse block recurse*/
                 while (hasQueue) {
                     hasQueue = false;
                     if (hiImpedance) {
@@ -396,7 +398,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                 /*Optimiser blockEnd recurse*/
                 processing = false;
             }
-            /*Optimiser blockEnd setters*/
+            /*Optimiser blockEnd allRecurse*/
         }
         hiImpedance = true;
         assert Log.debug(BusMergerWireIn.class,
@@ -428,9 +430,6 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
 
     @Override
     public BusMergerWireIn getOptimised(ModelItem<?> source) {
-        if (getClass() == BusMergerWireIn.class) {
-            return this;
-        }
         merger.sources.remove(this);
         destinations = merger.destinations;
         for (int i = 0; i < destinations.length; i++) {
@@ -445,6 +444,11 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
         }
         if (!triState) {
             optimiser.cut("iSetter");
+        }
+        if (getRecursionMode() == none) {
+            optimiser.cut("allRecurse");
+        } else if (getRecursionMode() == warn) {
+            optimiser.cut("recurse");
         }
         BusMergerWireIn build = optimiser.build();
         merger.sources.add(build);
