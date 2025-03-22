@@ -34,7 +34,6 @@ import pko.KiCadLogicalSchemeSimulator.api.schemaPart.AbstractUiComponent;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.InteractiveSchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.net.Net;
 
 import javax.swing.*;
@@ -42,13 +41,13 @@ import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Display extends SchemaPart implements InteractiveSchemaPart {
-    private final InPin vIn;
     private final DisplayUiComponent display;
     private final AtomicBoolean refresh = new AtomicBoolean();
     public byte[][] ram = new byte[10][4096];
     public int hSize;
     public int vSize;
     int rows;
+    byte pixel;
     double fps;
     private int hPos;
     private int vPos;
@@ -90,6 +89,8 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
         });
         if (reverse) {
             addInPin(new InPin("HSync", this) {
+                boolean sized = true;
+
                 @Override
                 public void setHi() {
                     state = true;
@@ -98,19 +99,21 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                 @Override
                 public void setLo() {
                     state = false;
-                    if (hSize == 0 && !parent.net.stabilizing) {
+                    if (sized && !net.stabilizing) {
+                        sized = false;
                         hSize = hPos + 3;
                         byte[] firstRow = Arrays.copyOf(ram[0], hSize);
                         ram = new byte[2048][hSize];
                         ram[0] = firstRow;
                     }
                     hPos = 0;
-                    vPos++;
-                    row = ram[vPos];
+                    row = ram[vPos++];
                     rows++;
                 }
             });
             addInPin(new InPin("VSync", this) {
+                boolean sized;
+
                 @Override
                 public void setHi() {
                     state = true;
@@ -119,10 +122,11 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                 @Override
                 public void setLo() {
                     state = false;
-                    if (vSize != 0) {
+                    if (sized) {
                         refresh.setOpaque(true);
-                    } else if (!parent.net.stabilizing) {
+                    } else if (!net.stabilizing) {
                         vSize = vPos + 2;
+                        sized = true;
                         while (!display.sized) {
                             try {
                                 //noinspection BusyWait
@@ -136,7 +140,7 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                     }
                     hPos = 0;
                     vPos = 0;
-                    row = ram[vPos];
+                    row = ram[0];
                 }
             });
         } else {
@@ -193,10 +197,20 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                 }
             });
         }
-        vIn = addInPin("Vin");
-        addInPin(new InPin("Clock", this) {
-            final Pin in = vIn;
+        addInPin(new InPin("Vin", this) {
+            @Override
+            public void setHi() {
+                state = true;
+                pixel = (byte) 0xff;
+            }
 
+            @Override
+            public void setLo() {
+                state = false;
+                pixel = 0;
+            }
+        }).hiImpedance = false;
+        addInPin(new InPin("Clock", this) {
             @Override
             public void setHi() {
                 state = true;
@@ -205,7 +219,7 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
             @Override
             public void setLo() {
                 state = false;
-                row[hPos++] = (byte) (in.state ? 0xff : 0x0);
+                row[hPos++] = pixel;
             }
         });
     }
