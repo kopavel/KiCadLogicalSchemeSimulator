@@ -67,7 +67,7 @@ public class BusDriver extends SchemaPart {
             });
             addTriStateOutBus("O" + (char) ('a' + i), sizes[i]);
             if (reverse) {
-                addInPin(new InPin("OE" + (char) ('a' + i), this) {
+                InPin inPin = addInPin(new InPin("OE" + (char) ('a' + i), this) {
                     @Override
                     public void setHi() {
                         state = true;
@@ -83,7 +83,9 @@ public class BusDriver extends SchemaPart {
                         oe[finalI] = true;
                         outs[finalI].setState(ins[finalI].state);
                     }
-                }).state = true;
+                });
+                inPin.state = true;
+                inPin.priority = 1;
             } else {
                 addInPin(new InPin("OE" + (char) ('a' + i), this) {
 
@@ -102,7 +104,7 @@ public class BusDriver extends SchemaPart {
                             outs[finalI].setHiImpedance();
                         }
                     }
-                });
+                }).priority = 1;
             }
         }
     }

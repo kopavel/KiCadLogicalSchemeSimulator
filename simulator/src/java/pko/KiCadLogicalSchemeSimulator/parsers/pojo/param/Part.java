@@ -48,5 +48,6 @@ public class Part {
     public String param;
     public List<Unit> unit;
     public String recursive;
+    public String priority;
     public String alias;
 }

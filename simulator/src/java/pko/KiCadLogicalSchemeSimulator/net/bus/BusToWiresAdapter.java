@@ -113,6 +113,7 @@ public class BusToWiresAdapter extends OutBus {
     public void addDestination(Pin pin) {
         pin.used = true;
         destinations = Utils.addToArray(destinations, pin);
+        priority += pin.priority;
         split();
     }
     /*Optimiser blockEnd iSetter*/

@@ -56,6 +56,7 @@ public abstract class Pin extends ModelItem<Pin> {
         strong = oldPin.strong;
         hiImpedance = oldPin.hiImpedance;
         used = oldPin.used;
+        priority = oldPin.priority;
     }
 
     public Pin(String id, SchemaPart parent) {
@@ -71,6 +72,7 @@ public abstract class Pin extends ModelItem<Pin> {
         if (this.merger == null) {
             this.merger = pin.merger;
         }
+        priority += oldPin.getPriority();
         return this;
     }
 

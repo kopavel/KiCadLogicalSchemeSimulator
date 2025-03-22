@@ -40,6 +40,7 @@ import java.util.stream.Collectors;
 
 public class SchemaPartConfig {
     public final Map<String, String> params;
+    public Map<String, Boolean> priority;
     public String clazz;
     public boolean ignore;
     public Set<String> recursivePins = new HashSet<>();

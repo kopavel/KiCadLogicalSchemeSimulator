@@ -56,6 +56,7 @@ public abstract class Bus extends ModelItem<Bus> {
         state = oldBus.state;
         hiImpedance = oldBus.hiImpedance;
         used = oldBus.used;
+        priority = oldBus.priority;
     }
 
     public Bus(String id, SchemaPart parent, int size, String... aliases) {

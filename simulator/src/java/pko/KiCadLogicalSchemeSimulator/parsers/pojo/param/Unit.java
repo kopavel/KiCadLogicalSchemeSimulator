@@ -43,7 +43,7 @@ import lombok.Setter;
 public class Unit {
     public String name;
     public Boolean ignore;
-    public String clazz;
+    public String priority;
     public String params;
     public String recursive;
 }

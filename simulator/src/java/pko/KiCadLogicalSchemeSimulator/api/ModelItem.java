@@ -41,6 +41,8 @@ import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.war
 public abstract class ModelItem<T> implements IModelItem<T> {
     public String id;
     public SchemaPart parent;
+    @Getter
+    public int priority;
     public String variantId;
     public boolean hiImpedance;
     public boolean triState;

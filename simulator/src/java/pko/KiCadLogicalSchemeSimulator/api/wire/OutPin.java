@@ -37,6 +37,9 @@ import pko.KiCadLogicalSchemeSimulator.net.wire.NCWire;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
+import java.util.Arrays;
+import java.util.Comparator;
+
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.none;
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.warn;
 
@@ -66,6 +69,7 @@ public class OutPin extends Pin {
         pin.used = true;
         pin.triState = triState;
         if (!(pin instanceof NCWire)) {
+            priority += pin.priority;
             destinations = Utils.addToArray(destinations, pin);
             split();
         }
@@ -286,5 +290,7 @@ public class OutPin extends Pin {
                 toLow = Utils.addToArray(toLow, destination);
             }
         }
+        Arrays.sort(toLow, Comparator.comparingInt(p -> p.priority));
+        Arrays.sort(toHi, Comparator.comparingInt(p -> -p.priority));
     }
 }

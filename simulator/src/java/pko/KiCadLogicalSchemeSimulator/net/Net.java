@@ -167,6 +167,9 @@ public class Net {
                         case InBus bus -> destinationBusesOffsets.computeIfAbsent(bus, p -> new TreeSet<>()).add(bus.getAliasOffset(pinName));
                         default -> throw new IllegalStateException("Unexpected input type: " + destination.getClass().getName());
                     }
+                    if (schemaPartConfig.priority != null && schemaPartConfig.priority.containsKey(destination.getId())) {
+                        ((ModelItem<?>) destination).priority += schemaPartConfig.priority.get(destination.getId()) ? 1 : -1;
+                    }
                 }
                 case output -> {
                     if (powerState != null) {

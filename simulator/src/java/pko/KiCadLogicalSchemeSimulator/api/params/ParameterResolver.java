@@ -144,6 +144,10 @@ public class ParameterResolver {
                     if (part.recursive != null) {
                         conf.recursivePins.addAll(Arrays.asList(part.recursive.split(";")));
                     }
+                    if (part.priority != null) {
+                        conf.priority = Arrays.stream(part.priority.split(";"))
+                                .collect(Collectors.toMap(p -> p.startsWith("-") ? p.substring(1) : p, p -> !p.startsWith("-")));
+                    }
                     if (cliRecursivePin.containsKey(comp.getRef())) {
                         conf.recursivePins.addAll(cliRecursivePin.get(comp.getRef()));
                     }
@@ -158,10 +162,14 @@ public class ParameterResolver {
                             setParams(unit.params, conf.params);
                         }
                         if (unit.ignore != null) {
-                            conf.ignore = part.ignore;
+                            conf.ignore = unit.ignore;
                         }
                         if (unit.recursive != null) {
                             conf.recursivePins.addAll(Arrays.asList(unit.recursive.split(";")));
+                        }
+                        if (unit.priority != null) {
+                            conf.priority = Arrays.stream(unit.priority.split(";"))
+                                    .collect(Collectors.toMap(p -> p.startsWith("-") ? p.substring(1) : p, p -> !p.startsWith("-")));
                         }
                         if (cliRecursivePin.containsKey(comp.getRef() + "#" + unit.name)) {
                             conf.recursivePins.addAll(cliRecursivePin.get(comp.getRef() + "#" + unit.name));

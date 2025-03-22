@@ -75,6 +75,13 @@
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
+		<xs:attribute name="priority" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>
+					Pins, with prioritized event. Positive - earlier go to 'Hi' and later to 'Lo'. Negative - otherwise
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 		<xs:attribute name="alias" type="xs:string">
 			<xs:annotation>
 				<xs:documentation>
@@ -112,14 +119,14 @@
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="class" type="ParamType">
+		<xs:attribute name="priority" type="xs:string">
 			<xs:annotation>
 				<xs:documentation>
-					Java class name, used for schema part unit behavior simulation.
+					Pins, with prioritized event. Positive - earlier go to 'Hi' and later to 'Lo'. Negative - otherwise
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="params" type="ClassName">
+		<xs:attribute name="params" type="ParamType">
 			<xs:annotation>
 				<xs:documentation>
 					Additional parameters, used for class instantiation.

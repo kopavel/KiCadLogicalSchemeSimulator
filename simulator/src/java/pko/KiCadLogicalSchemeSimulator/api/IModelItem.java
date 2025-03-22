@@ -36,6 +36,7 @@ import java.util.Set;
 
 public interface IModelItem<T> extends Comparable<IModelItem<T>> {
     String getName();
+    int getPriority();
     int getSize();
     long getState();
     boolean isHiImpedance();
