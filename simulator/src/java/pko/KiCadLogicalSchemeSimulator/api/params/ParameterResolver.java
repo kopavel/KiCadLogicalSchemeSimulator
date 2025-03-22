@@ -221,7 +221,7 @@ public class ParameterResolver {
     }
 
     public RecursionMode getRecursionMode(String partId, String pinName) {
-        return schemaPartsById.get(partId).recursivePins.contains(pinName) ? all : recursionMode;
+        return schemaPartsById.containsKey(partId) && schemaPartsById.get(partId).recursivePins.contains(pinName) ? all : recursionMode;
     }
 
     public Boolean getPowerState(Net net) {
