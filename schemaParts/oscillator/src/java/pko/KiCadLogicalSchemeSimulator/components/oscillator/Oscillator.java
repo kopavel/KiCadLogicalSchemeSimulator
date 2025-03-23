@@ -47,13 +47,13 @@ import static java.lang.Thread.MAX_PRIORITY;
 
 public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
     private final OscillatorUiComponent oscillatorUiComponent;
+    private final AtomicReference<Boolean> fullSpeedAlive = new AtomicReference<>(false);
     public long ticks;
     public Pin out;
     ScheduledExecutorService scheduler;
     AtomicReference<Double> currentFreq = new AtomicReference<>(0d);
     @Getter
     private double clockFreq = 0;
-    private final AtomicReference<Boolean> fullSpeedAlive = new AtomicReference<>(false);
     private Thread fullSpeedThread;
     private long timerStart;
     private long tickStart;
@@ -108,7 +108,7 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
                             local.setLo();
                         }
                     } catch (Throwable e) {
-                        Log.error(Oscillator.class, "TickError", e);
+                        Log.error(Oscillator.class, "TickError {}", ticks, e);
                     }
                 });
             }
@@ -195,7 +195,7 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
                 out.setHi();
             }
         } catch (Throwable e) {
-            Log.error(Oscillator.class, "TickError", e);
+            Log.error(Oscillator.class, "TickError {}", ticks, e);
         }
     }
 }
