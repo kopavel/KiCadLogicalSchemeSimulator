@@ -124,6 +124,7 @@ public class Simulator implements Runnable {
     @SuppressWarnings("deprecation")
     public static void loadLayout() {
         try {
+            //FixMe check current screen boundaries
             List<InteractiveSchemaPart> layoutParts = net.schemaParts.values()
                     .stream()
                     .filter(i -> i instanceof InteractiveSchemaPart)
