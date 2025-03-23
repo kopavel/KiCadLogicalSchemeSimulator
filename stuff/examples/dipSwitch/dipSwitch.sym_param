@@ -1,5 +1,6 @@
 <params recursion="all" xmlns="pko.kicadLogicalSimulator.param">
 	<mapFile>kicad</mapFile>
 	<mapFile>chip</mapFile>
-	<part id="SW2" param="off"/>
+	<part id="SW2" param="On"/>
+	<part id="SW3" param="On"/>
 </params>

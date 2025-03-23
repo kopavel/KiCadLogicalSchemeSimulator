@@ -49,33 +49,38 @@ public class DipSwitch implements NetFilter {
         for (Net net : netFile.getNets().getNet()) {
             if (!forDelete.contains(net)) {
                 List<Node> forAdd = new ArrayList<>();
-                node:
-                for (Node node : net.getNode()) {
-                    SchemaPartConfig schemaPartConfig = parameterResolver.getSchemaPartConfig(node);
-                    if (schemaPartConfig != null && schemaPartConfig.clazz.equals(DipSwitch.class.getSimpleName()) && schemaPartConfig.params.containsKey("On")) {
-                        Map<Integer, PinConfig> pinMap = parameterResolver.getPinMap(node);
-                        int firstPinNo = Integer.parseInt(node.getPin());
-                        int unitNo = pinMap.get(firstPinNo).unitNo;
-                        String secondPinNo = String.valueOf(pinMap.entrySet()
-                                .stream()
-                                .filter(p -> p.getValue().unitNo == unitNo && !p.getKey().equals(firstPinNo))
-                                .map(Map.Entry::getKey).findFirst().orElseThrow());
-                        for (Net otherNet : netFile.getNets().getNet()) {
-                            if (otherNet != net) {
-                                if (otherNet.getNode()
-                                        .stream()
-                                        .anyMatch(n -> n.getRef().equals(node.getRef()) && n.getPin().equals(secondPinNo))) {
-                                    forAdd.addAll(otherNet.getNode());
-                                    forDelete.add(otherNet);
-                                    continue node;
-                                }
-                            }
-                        }
-                    }
-                }
+                processNode(netFile, parameterResolver, net, net, forAdd, forDelete);
                 net.getNode().addAll(forAdd);
             }
         }
         netFile.getNets().getNet().removeAll(forDelete);
+    }
+
+    private static void processNode(Export netFile, ParameterResolver parameterResolver, Net net, Net target, List<Node> forAdd, List<Net> forDelete) {
+        node:
+        for (Node node : net.getNode()) {
+            SchemaPartConfig schemaPartConfig = parameterResolver.getSchemaPartConfig(node);
+            if (schemaPartConfig != null && schemaPartConfig.clazz.equals(DipSwitch.class.getSimpleName()) && schemaPartConfig.params.containsKey("On")) {
+                Map<Integer, PinConfig> pinMap = parameterResolver.getPinMap(node);
+                int firstPinNo = Integer.parseInt(node.getPin());
+                int unitNo = pinMap.get(firstPinNo).unitNo;
+                String secondPinNo = String.valueOf(pinMap.entrySet()
+                        .stream()
+                        .filter(p -> p.getValue().unitNo == unitNo && !p.getKey().equals(firstPinNo))
+                        .map(Map.Entry::getKey).findFirst().orElseThrow());
+                for (Net otherNet : netFile.getNets().getNet()) {
+                    if (net != otherNet && otherNet != target) {
+                        if (otherNet.getNode()
+                                .stream()
+                                .anyMatch(n -> n.getRef().equals(node.getRef()) && n.getPin().equals(secondPinNo))) {
+                            forAdd.addAll(otherNet.getNode());
+                            processNode(netFile, parameterResolver, otherNet, net, forAdd, forDelete);
+                            forDelete.add(otherNet);
+                            continue node;
+                        }
+                    }
+                }
+            }
+        }
     }
 }
