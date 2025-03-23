@@ -17,7 +17,7 @@
 	</xs:simpleType>
 	<xs:simpleType name="IdType">
 		<xs:restriction base="xs:string">
-			<xs:pattern value="[a-zA-Z_]+[0-9]+"/>
+			<xs:pattern value="[0-9a-zA-Z_]+"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="ParamType">
