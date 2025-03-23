@@ -131,10 +131,11 @@ public class Z80CPin extends InPin {
                 if (lM == 1) {
                     Request ioRequest = queue.request;
                     ioRequest.callback.accept((int) dIn.state);
-                    rdPin.setHi();
                     mReqPin.setHi();
+                    rdPin.setHi();
                     m1Pin.setHi();
                     //FixMe create refresh address counter and set address from it.
+                    aOut.setState(0);
                     refreshPin.setLo();
                 }
             }
@@ -148,10 +149,10 @@ public class Z80CPin extends InPin {
         switch (T) {
             case 1 -> {
                 if (ioRequest.memory) {
-                    mReqPin.setLo();
                     if (ioRequest.read) {
                         rdPin.setLo();
                     }
+                    mReqPin.setLo();
                 }
                 if (!ioRequest.read) {
                     dOut.setState(ioRequest.payload);
@@ -169,11 +170,12 @@ public class Z80CPin extends InPin {
                 } else if (ioRequest.memory) {
                     if (ioRequest.read) {
                         ioRequest.callback.accept((int) dIn.state);
+                        mReqPin.setHi();
                         rdPin.setHi();
                     } else {
+                        mReqPin.setHi();
                         wrPin.setHi();
                     }
-                    mReqPin.setHi();
                 } else {
                     if (ioRequest.read) {
                         ioRequest.callback.accept((int) dIn.state);
