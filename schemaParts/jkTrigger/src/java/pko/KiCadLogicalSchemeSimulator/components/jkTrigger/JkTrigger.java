@@ -34,6 +34,7 @@ import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 
+//FixME in case of DcTrigger chain on single clock - need C priority in reverse chain order.
 public class JkTrigger extends SchemaPart {
     private final InPin jPin;
     private final InPin kPin;
