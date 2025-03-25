@@ -173,16 +173,24 @@ public class Net {
                 }
                 case output -> {
                     if (powerState != null) {
-                        throw new RuntimeException("OUt pin " + id + "_" + pinName + " on power rail");
+                        throw new AssertionError("OUt pin " + id + "_" + pinName + " on power rail");
                     }
                     IModelItem<?> source = schemaPart.getOutItem(pinName);
-                    assert source != null : "No pin named " + pinName + " in schema part " + schemaPart.id;
-                    assert source.getAliasOffset(pinName) != null : "No alias for pin " + pinName;
-                    sourcesOffset.put(source, source.getAliasOffset(pinName));
+                    if (source == null) {
+                        throw new AssertionError("No pin named " + pinName + " in schema part " + schemaPart.id);
+                    }
+                    Byte aliasOffset = source.getAliasOffset(pinName);
+                    if (aliasOffset == null) {
+                        throw new AssertionError("No alias for pin " + pinName);
+                    }
+                    if (sourcesOffset.containsKey(source)) {
+                        throw new AssertionError("Shortcut on outputs.Part " + source.getName() + " Pin " + sourcesOffset.get(source) + " and " + aliasOffset);
+                    }
+                    sourcesOffset.put(source, aliasOffset);
                 }
                 case bidirectional -> {
                     if (powerState != null) {
-                        throw new RuntimeException("OUt pin on power rail");
+                        throw new AssertionError("OUt pin on power rail");
                     }
                     IModelItem<?> destination = schemaPart.getInItem(pinName);
                     switch (destination) {
