@@ -34,13 +34,14 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 public class MultiOutDecoder extends SchemaPart {
     private final long[] csStates;
     int partAmount;
-    private Bus[] outBuses;
-    private long outState;
+    int outSize;
+    private Pin[][] outs;
 
     protected MultiOutDecoder(String id, String sParam) {
         super(id, sParam);
@@ -55,7 +56,7 @@ public class MultiOutDecoder extends SchemaPart {
         partAmount = partCSs.length;
         boolean[][] CSs = new boolean[partAmount][0];
         csStates = new long[partAmount];
-        int outSize = (int) Math.pow(2, inSize);
+        outSize = (int) Math.pow(2, inSize);
         for (int i = 0; i < partCSs.length; i++) {
             String[] csItems = partCSs[i].split(":");
             CSs[i] = new boolean[csItems.length];
@@ -63,30 +64,33 @@ public class MultiOutDecoder extends SchemaPart {
                 CSs[i][j] = csItems[j].equals("R");
             }
         }
-        long outMask = Utils.getMaskForSize(outSize);
+        Bus aBus;
         if (reverse) {
-            outState = outMask ^ 1L;
-            addInBus(new InBus("A", this, inSize) {
+            aBus = addInBus(new InBus("A", this, inSize) {
                 @Override
                 public void setState(long newState) {
                     state = newState;
-                    outState = (1L << newState) ^ outMask;
-                    for (int i = 0; i < outBuses.length; i++) {
-                        if (csStates[i] == 0 && (outBuses[i].state != outState || outBuses[i].hiImpedance)) {
-                            outBuses[i].setState(outState);
+                    for (int i = 0; i < outs.length; i++) {
+                        Pin out;
+                        if (csStates[i] == 0 && (out = outs[i][(int) newState]).hiImpedance) {
+                            out.setLo();
                         }
                     }
                 }
             });
         } else {
-            addInBus(new InBus("A", this, inSize) {
+            aBus = addInBus(new InBus("A", this, inSize) {
                 @Override
                 public void setState(long newState) {
                     state = newState;
-                    outState = 1L << state;
-                    for (int i = 0; i < outBuses.length; i++) {
-                        if (csStates[i] == 0 && (outBuses[i].state != outState || outBuses[i].hiImpedance)) {
-                            outBuses[i].setState(outState);
+                    for (int i = 0; i < outs.length; i++) {
+                        Pin[] out = outs[i];
+                        if (csStates[i] == 0) {
+                            for (int j = 0; j < outSize; j++) {
+                                if (j != newState && out[j].hiImpedance) {
+                                    out[j].setLo();
+                                }
+                            }
                         }
                     }
                 }
@@ -101,15 +105,17 @@ public class MultiOutDecoder extends SchemaPart {
                 int mask = 1 << j;
                 int nMask = ~mask & fullMask;
                 if (csReverse) {
-                    addInPin(new InPin("CS" + (char) ('a' + finalI) + j, this) {
+                    //FixMe where is nonReverse mode
+                    addInPin(new InPin("CS" + ((char) ('a' + finalI)) + j, this) {
                         @Override
                         public void setHi() {
                             state = true;
-                            if (!outBuses[finalI].hiImpedance) {
-                                outBuses[finalI].setHiImpedance();
-                                csStates[finalI] = mask;
-                            } else {
-                                csStates[finalI] |= mask;
+                            csStates[finalI] |= mask;
+                            Pin[] out = outs[finalI];
+                            for (Pin pin : out) {
+                                if (!pin.hiImpedance) {
+                                    pin.setHiImpedance();
+                                }
                             }
                         }
 
@@ -117,7 +123,7 @@ public class MultiOutDecoder extends SchemaPart {
                         public void setLo() {
                             state = false;
                             if (csStates[finalI] == mask) {
-                                outBuses[finalI].setState(outState);
+                                outs[finalI][(int) aBus.state].setLo();
                                 csStates[finalI] = 0;
                             } else {
                                 csStates[finalI] &= nMask;
@@ -126,12 +132,12 @@ public class MultiOutDecoder extends SchemaPart {
                     });
                 } else {
                     csStates[finalI] |= mask;
-                    addInPin(new InPin("CS" + (char) ('a' + finalI) + j, this) {
+                    addInPin(new InPin("CS" + ((char) ('a' + finalI)) + j, this) {
                         @Override
                         public void setHi() {
                             state = true;
                             if (csStates[finalI] == mask) {
-                                outBuses[finalI].setState(outState);
+                                outs[finalI][(int) aBus.state].setLo();
                                 csStates[finalI] = 0;
                             } else {
                                 csStates[finalI] &= nMask;
@@ -141,11 +147,12 @@ public class MultiOutDecoder extends SchemaPart {
                         @Override
                         public void setLo() {
                             state = false;
-                            if (!outBuses[finalI].hiImpedance) {
-                                outBuses[finalI].setHiImpedance();
-                                csStates[finalI] = mask;
-                            } else {
-                                csStates[finalI] |= mask;
+                            csStates[finalI] |= mask;
+                            Pin[] out = outs[finalI];
+                            for (Pin pin : out) {
+                                if (!pin.hiImpedance) {
+                                    pin.setHiImpedance();
+                                }
                             }
                         }
                     });
@@ -153,18 +160,21 @@ public class MultiOutDecoder extends SchemaPart {
             }
         }
         for (int i = 0; i < partAmount; i++) {
-            addTriStateOutBus("Q" + (char) ('a' + i), outSize, reverse ? outMask : 0L);
+            for (int j = 0; j < outSize; j++) {
+                addTriStateOutPin("Q" + ((char) ('a' + i)) + j);
+            }
         }
     }
 
     @Override
     public void initOuts() {
-        outBuses = new Bus[partAmount];
+        outs = new Pin[partAmount][outSize];
         for (int i = 0; i < partAmount; i++) {
-            outBuses[i] = getOutBus("Q" + (char) ('a' + i));
-            outBuses[i].useBitPresentation = true;
-            if (csStates[i] > 0) {
-                outBuses[i].hiImpedance = true;
+            for (int j = 0; j < outSize; j++) {
+                outs[i][j] = getOutPin("Q" + ((char) ('a' + i)) + j);
+                if (csStates[i] > 0) {
+                    outs[i][j].hiImpedance = true;
+                }
             }
         }
     }
