@@ -34,6 +34,7 @@ import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import pko.KiCadLogicalSchemeSimulator.Simulator;
 import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
+import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.AbstractUiComponent;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
@@ -44,6 +45,7 @@ import javax.swing.border.CompoundBorder;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Comparator;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -83,7 +85,7 @@ public class SchemaPartMonitor extends JFrame {
         title.setText(id);
         schemaPartBox.setBorder(BorderFactory.createLineBorder(borderColor));
         schemaPart.inPins.values()
-                .stream().distinct().sorted().forEach(inItem -> {
+                .stream().distinct().sorted(Comparator.comparing(ModelItem::getId)).forEach(inItem -> {
                       JLabel label;
                       if (inItem instanceof Bus bus && bus.useBitPresentation) {
                           char[] bits = leftPad(Long.toBinaryString(bus.state), bus.size, '0').toCharArray();
@@ -117,7 +119,7 @@ public class SchemaPartMonitor extends JFrame {
                       }
                   });
         schemaPart.outPins.values()
-                .stream().distinct().forEach(outItem -> {
+                .stream().distinct().sorted(Comparator.comparing(ModelItem::getId)).forEach(outItem -> {
                       JLabel label;
                       if (outItem instanceof Bus bus && bus.useBitPresentation) {
                           char[] bits = leftPad(Long.toBinaryString(bus.state), bus.size, '0').toCharArray();
