@@ -110,9 +110,13 @@ public class MultiPartCFallingIn extends FallingEdgePin implements MultiPartCIn 
     @Override
     public void reset() {
         if (size == 1) {
-            outPin.setLo();
+            if (outPin.state) {
+                outPin.setLo();
+            }
         } else {
-            outBus.setState(0);
+            if (outBus.state > 0) {
+                outBus.setState(0);
+            }
         }
     }
 
