@@ -150,8 +150,9 @@ public class Buffer extends SchemaPart {
                 @Override
                 public void setState(long newState) {
                     state = newState;
-                    if (!oePin.state && (qBus.state != dBus.state || qBus.hiImpedance)) {
-                        qBus.setState(newState);
+                    Bus bus;
+                    if (!oePin.state && ((bus = qBus).state != dBus.state || bus.hiImpedance)) {
+                        bus.setState(newState);
                     }
                 }
             });
@@ -160,16 +161,19 @@ public class Buffer extends SchemaPart {
                 @Override
                 public void setHi() {
                     state = true;
-                    if (qBus.state != dBus.state || qBus.hiImpedance) {
-                        qBus.setState(dBus.state);
+                    Bus bus;
+                    long state;
+                    if ((bus = qBus).state != (state = dBus.state) || bus.hiImpedance) {
+                        bus.setState(state);
                     }
                 }
 
                 @Override
                 public void setLo() {
                     state = false;
-                    if (!qBus.hiImpedance) {
-                        qBus.setHiImpedance();
+                    Bus bus;
+                    if (!(bus = qBus).hiImpedance) {
+                        bus.setHiImpedance();
                     }
                 }
             });
@@ -177,8 +181,9 @@ public class Buffer extends SchemaPart {
                 @Override
                 public void setState(long newState) {
                     state = newState;
-                    if (oePin.state && (qBus.state != dBus.state || qBus.hiImpedance)) {
-                        qBus.setState(newState);
+                    Bus bus;
+                    if (oePin.state && ((bus = qBus).state != dBus.state || bus.hiImpedance)) {
+                        bus.setState(newState);
                     }
                 }
             });

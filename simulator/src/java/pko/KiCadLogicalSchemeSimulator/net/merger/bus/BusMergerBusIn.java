@@ -105,8 +105,9 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
                 merger.strongPins,
                 merger.weakState,
                 merger.weakPins);
+        BusMerger merger = this.merger;
         /*Optimiser block sameMask line otherMask*/
-        if (mask == merger.mask) {
+        if (merger.mask == mask) {
             /*Optimiser block iSetter*/
             if (hiImpedance) {
                 hiImpedance = false;
@@ -258,6 +259,7 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
         if (hiImpedance) {
             return;
         }
+        BusMerger merger = this.merger;
         /*Optimiser block sameMask line otherMask*/
         if (mask == merger.mask) {
             merger.strongPins = 0;
