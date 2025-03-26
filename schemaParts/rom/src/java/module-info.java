@@ -34,5 +34,6 @@ import pko.KiCadLogicalSchemeSimulator.components.rom.RomSpi;
 
 module KiCadLogicalSchemeSimulator.components.rom {
     requires KiCadLogicalSchemeSimulator.simulator;
+    requires java.desktop;
     provides SchemaPartSpi with RomSpi;
 }

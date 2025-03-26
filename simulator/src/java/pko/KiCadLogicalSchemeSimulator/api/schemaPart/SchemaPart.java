@@ -39,8 +39,10 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.TriStateOutBus;
 import pko.KiCadLogicalSchemeSimulator.api.wire.*;
 import pko.KiCadLogicalSchemeSimulator.net.Net;
 
+import javax.swing.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import static pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart.PinType.bidirectional;
 import static pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart.PinType.input;
@@ -291,6 +293,10 @@ public abstract class SchemaPart {
     }
 
     public String extraState() {
+        return null;
+    }
+
+    public Supplier<JPanel> extraPanel() {
         return null;
     }
 

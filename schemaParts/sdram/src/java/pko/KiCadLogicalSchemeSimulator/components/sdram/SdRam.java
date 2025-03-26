@@ -34,9 +34,12 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
+import pko.KiCadLogicalSchemeSimulator.tools.MemoryDumpPanel;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
+import javax.swing.*;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Supplier;
 
 public class SdRam extends SchemaPart {
     private final long[] bytes;
@@ -96,6 +99,7 @@ public class SdRam extends SchemaPart {
                 final InBus aIn = addrPin;
                 final long[] bts = bytes;
                 final InPin w = we;
+
                 @Override
                 public void setHi() {
                     state = true;
@@ -164,6 +168,11 @@ public class SdRam extends SchemaPart {
     @Override
     public String extraState() {
         return "A:" + String.format("%" + (int) Math.ceil(aSize / 4d) + "X", addr) + "\nD:" + String.format("%" + (int) Math.ceil(size / 4d) + "X", dIn.state);
+    }
+
+    @Override
+    public Supplier<JPanel> extraPanel() {
+        return () -> new MemoryDumpPanel(bytes);
     }
 
     @Override

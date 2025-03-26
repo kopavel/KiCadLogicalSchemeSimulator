@@ -35,5 +35,6 @@ import pko.KiCadLogicalSchemeSimulator.components.ram.SingleBitRamSpi;
 
 module KiCadLogicalSchemeSimulator.components.ram {
     requires KiCadLogicalSchemeSimulator.simulator;
+    requires java.desktop;
     provides SchemaPartSpi with RamSpi, SingleBitRamSpi;
 }

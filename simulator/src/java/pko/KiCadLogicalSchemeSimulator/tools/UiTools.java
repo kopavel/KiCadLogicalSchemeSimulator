@@ -31,11 +31,14 @@
  */
 package pko.KiCadLogicalSchemeSimulator.tools;
 import javax.imageio.ImageIO;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -68,6 +71,21 @@ public class UiTools {
             BufferedImage letter = letters.computeIfAbsent((byte) pos, c -> font.getSubimage(c * 5, 0, 4, 7));
             dest.drawImage(letter, x, y, null);
         }
+    }
+
+    public static ImageIcon loadBase64Image(String base64) {
+        try {
+            byte[] bytes = Base64.getDecoder().decode(base64);
+            return new ImageIcon(ImageIO.read(new ByteArrayInputStream(bytes)));
+        } catch (Exception e) {
+            Log.error(UiTools.class, "Icon load error", e);
+            return null;
+        }
+    }
+
+    public static String refreshIconBase64() {
+        return "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAQAAADZc7J/AAABOElEQVR42qWVMW7CQBBFXw8SWAj5IClp3cV94iNYok5KqriAIwAu3VE6l3DBTZAQShosT6QpkuCJvTj7ppz/n9arlYyDFV6sEN" +
+                "+6+NbFty5syUgIGcQL0pqakgV388AJMdOQMxquiEkpuCA6R8KhCpSADVdU0XeKMVbxQ8RZFTkdRFRMjeImoadouq6zRKiYtBS3rBGEEixztX8yo49Ar7MmxPCk7gMuCs0lGN50scRFqrkMw14XMS5ize0wbO8UPGpujyHTRYqLZdcnJLoocHHQ3DOGkBrhQkAfMz4Qrsy7HpKwgZ6nNKFCeOdPFjRqj/jNqaWYUhHRQY4gnG8CYhRjOhlxRPQUawJQxCh6CVGFXmdBSowMVYzIaRAzAxSwoKQ2ilcGEZKQsfuur/gfvnV867jrnj/4L8gVvwNYaEhhAAAAAElFTkSuQmCC";
     }
 
     public abstract static class TextChangeListener implements DocumentListener {

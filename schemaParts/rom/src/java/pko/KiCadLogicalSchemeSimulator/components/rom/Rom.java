@@ -35,12 +35,15 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
+import pko.KiCadLogicalSchemeSimulator.tools.MemoryDumpPanel;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
+import javax.swing.*;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.function.Supplier;
 
 public class Rom extends SchemaPart {
     private final long[] words;
@@ -175,5 +178,10 @@ public class Rom extends SchemaPart {
     public String extraState() {
         return "A:" + String.format("%0" + (int) Math.ceil(aSize / 4d) + "X", addr) +
                 (csActive ? ("\nD:" + (addr >= words.length ? "OutOfRange" : String.format("%0" + (int) Math.ceil(size / 4d) + "X", words[addr]))) : "");
+    }
+
+    @Override
+    public Supplier<JPanel> extraPanel() {
+        return () -> new MemoryDumpPanel(words);
     }
 }

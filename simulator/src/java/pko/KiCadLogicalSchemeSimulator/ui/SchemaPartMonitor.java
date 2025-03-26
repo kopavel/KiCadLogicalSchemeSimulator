@@ -43,12 +43,15 @@ import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Comparator;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 import static org.apache.commons.lang3.StringUtils.leftPad;
 
@@ -171,6 +174,33 @@ public class SchemaPartMonitor extends JFrame {
         } else {
             extraPanel.setVisible(false);
         }
+        Supplier<JPanel> extraPannelSupplier = schemaPart.extraPanel();
+        if (extraPannelSupplier != null) {
+            JButton extraPanelButton = new JButton();
+            extraPanelButton.setText(">");
+            extraPanelButton.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    SwingUtilities.invokeLater(() -> {
+                        JFrame jFrame = new JFrame();
+                        jFrame.setTitle(schemaPart.id);
+                        JPanel extraPanel = extraPannelSupplier.get();
+                        jFrame.getContentPane().add(extraPanel, BorderLayout.LINE_START);
+                        jFrame.pack();
+                        jFrame.setLocationRelativeTo(null);
+                        jFrame.setVisible(true);
+                        extraPanel.setVisible(true);
+                    });
+                }
+            });
+            if (schemaPart.outPins.size() > schemaPart.inPins.size()) {
+                inputsNames.add(extraPanelButton);
+                extraPanelButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+            } else {
+                outputsNames.add(extraPanelButton);
+                extraPanelButton.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            }
+        }
         //setSize(new Dimension(250, 90 + Math.max(schemaPart.inMap.size(), schemaPart.outMap.size()) * 16));
         pack();
 //        setSize(new Dimension(200, 78));
@@ -200,10 +230,7 @@ public class SchemaPartMonitor extends JFrame {
             }
             String extraState = schemaPart.extraState();
             if (extraState != null) {
-                extraPanel.setVisible(true);
                 extraPanel.setText(extraState);
-            } else {
-                extraPanel.setVisible(false);
             }
         });
     }
