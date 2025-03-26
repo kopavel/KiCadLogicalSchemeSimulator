@@ -7,7 +7,7 @@
 		</symbol>
 		<symbol name="MK4116x8" class="SdRam" param="size=8;aSize=7;reverse;separateOut"/>
 		<symbol name="MCM6670" class="Rom" param="size=5;aSize=10;reverse">
-			<unit pinMap="7=A3;6=A4;5=A5;4=A6;3=A7;2=A8;1=A9;8=A0;10=A1;11=A2;12=D0;13=D1;14=D2;15=D3;16=D4;17=~{CS}"/>
+			<unit pinMap="7=A3;6=A4;5=A5;4=A6;3=A7;2=A8;1=A9;11=A0;10=A1;8=A2;12=D0;13=D1;14=D2;15=D3;16=D4;17=~{CS}"/>
 			<unit pinMap="ignore;9;18"/>
 		</symbol>
 		<symbol name="2102AN" class="SingleBitRam" param="size=10;reverse">
