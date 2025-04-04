@@ -63,9 +63,8 @@ public class AndGateIn extends InPin {
         /*Optimiser line setter*/
         state = true;
         long state;
-        AndGate parent;
         /*Optimiser bind mask*/
-        if ((state = (parent = this.parent).inState) == mask) {
+        if ((state = parent.inState) == mask) {
             parent.inState = 0;
             /*Optimiser line o block r*/
             if (parent.reverse) {
@@ -87,8 +86,7 @@ public class AndGateIn extends InPin {
         /*Optimiser line setter*/
         state = false;
         long state;
-        AndGate parent;
-        if ((state = (parent = this.parent).inState) == 0) {
+        if ((state = parent.inState) == 0) {
             /*Optimiser bind mask*/
             parent.inState = mask;
             /*Optimiser line o block r*/

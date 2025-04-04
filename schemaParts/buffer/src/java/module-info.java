@@ -31,9 +31,9 @@
  */
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
 import pko.KiCadLogicalSchemeSimulator.components.BUF.BufferSpi;
-import pko.KiCadLogicalSchemeSimulator.components.BUF.SingleBitBufferSpi;
+import pko.KiCadLogicalSchemeSimulator.components.BUF.singleBit.SingleBitBufferSpi;
 
-module KiCadLogicalSchemeSimulator.components.BUF {
+open module KiCadLogicalSchemeSimulator.components.BUF {
     requires KiCadLogicalSchemeSimulator.simulator;
     provides SchemaPartSpi with BufferSpi, SingleBitBufferSpi;
 }
