@@ -68,6 +68,7 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
 
     @Override
     public void setState(long newState) {
+        BusMerger merger = this.merger;
         /*Optimiser line setters*/
         state = newState;
         /*Optimiser line o*/
@@ -105,7 +106,6 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
                 merger.strongPins,
                 merger.weakState,
                 merger.weakPins);
-        BusMerger merger = this.merger;
         /*Optimiser block sameMask line otherMask*/
         if (merger.mask == mask) {
             /*Optimiser block iSetter*/
@@ -246,6 +246,7 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
     /*Optimiser block iSetter*/
     @Override
     public void setHiImpedance() {
+        BusMerger merger = this.merger;
         assert Log.debug(this.getClass(),
                 "Bus merger setImpedance. before: Source:{} (state:{},  hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{})",
                 getName(),
@@ -259,7 +260,6 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
         if (hiImpedance) {
             return;
         }
-        BusMerger merger = this.merger;
         /*Optimiser block sameMask line otherMask*/
         if (mask == merger.mask) {
             merger.strongPins = 0;

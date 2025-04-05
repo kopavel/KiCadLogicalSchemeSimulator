@@ -65,29 +65,28 @@ public class DcCRaisingPin extends RaisingEdgePin {
         state = true;
         /*Optimiser line anyRS*/
         if (parent.clockEnabled) {
-            Pin pin;
             if (dPin.state) {
                 /*Optimiser block q*/
-                if (!(pin = qOut).state) {
-                    pin.setHi();
+                if (!qOut.state) {
+                    qOut.setHi();
                     /*Optimiser line bothRS block nq*/
                 }
                 /*Optimiser line bothRSQ blockEnd q*/
-                if ((pin = iqOut).state) {
-                    pin.setLo();
+                if (iqOut.state) {
+                    iqOut.setLo();
                     /*Optimiser blockEnd nq*/
                 }
                 //noinspection UnnecessaryReturnStatement
                 return;
             } else {
                 /*Optimiser block q*/
-                if ((pin = qOut).state) {
-                    pin.setLo();
+                if (qOut.state) {
+                    qOut.setLo();
                     /*Optimiser line bothRS block nq*/
                 }
                 /*Optimiser line bothRSQ blockEnd q*/
-                if (!(pin = iqOut).state) {
-                    pin.setHi();
+                if (!iqOut.state) {
+                    iqOut.setHi();
                     /*Optimiser blockEnd nq*/
                 }
             }

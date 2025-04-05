@@ -66,6 +66,7 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus> {
 
     @Override
     public void setState(long newState) {
+        WireMerger merger = this.merger;
         assert Log.debug(this.getClass(),
                 "Pin merger change. before: newState:{}, Source:{} (state:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{}, hiImpedance:{})",
                 newState,
@@ -148,6 +149,7 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus> {
     /*Optimiser block iSetter*/
     @Override
     public void setHiImpedance() {
+        WireMerger merger = this.merger;
         assert Log.debug(this.getClass(),
                 "Pin merger setImpedance. before: Source:{} (state:{}, oldImpedance:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{}, hiImpedance:{})",
                 getName(),

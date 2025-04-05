@@ -33,6 +33,7 @@ package pko.KiCadLogicalSchemeSimulator.net.merger.wire;
 import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.ShortcutException;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.OutPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
@@ -63,6 +64,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
 
     @Override
     public void setHi() {
+        OutPin merger = this.merger;
         assert Log.debug(WireMergerWireIn.class,
                 "Pin merger change. before: newState:{}, Source:{} (state:{}, oldStrong:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, " +
                         "strong:{}, hiImpedance:{}, weakState:{})", true,
@@ -197,6 +199,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
 
     @Override
     public void setLo() {
+        OutPin merger = this.merger;
         assert Log.debug(WireMergerWireIn.class,
                 "Pin merger change. before: newState:{}, Source:{} (state:{}, oldStrong:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, " +
                         "strong:{}, hiImpedance:{}, weakState:{})",
@@ -251,7 +254,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
             merger.state = false;
             /*Optimiser block passivePins*/
         } else { //to weak
-            if (merger.weakState != 0 && ((merger.weakState > 0))) { //opposite weak state
+            if (merger.weakState > 0) { //opposite weak state
                 if (parent.net.stabilizing) {
                     parent.net.forResend.add(this);
                     assert Log.debug(this.getClass(), "Weak state shortcut on setting pin {}, try resend later", this);
@@ -333,6 +336,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
     /*Optimiser block iSetter*/
     @Override
     public void setHiImpedance() {
+        OutPin merger = this.merger;
         assert Log.debug(WireMergerWireIn.class,
                 "Pin merger setImpedance. before: Source:{} (state:{}, oldStrong:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{} " +
                         "hiImpedance:{}, weakState:{})",

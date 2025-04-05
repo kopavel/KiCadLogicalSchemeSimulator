@@ -81,6 +81,7 @@ public class MultiPartCFallingIn extends FallingEdgePin implements MultiPartCIn 
 
     @Override
     public void setLo() {
+        Bus bus;
         /*Optimiser line setter*/
         state = false;
         /*Optimiser line hasR*/
@@ -95,8 +96,8 @@ public class MultiPartCFallingIn extends FallingEdgePin implements MultiPartCIn 
                 }
                 /*Optimiser line o blockEnd pin*/
             } else if (skipMask != 0) {
-                /*Optimiser line skip bind skip:skipMask*///
-                outBus.setState((outBus.state + (((outBus.state & skipMask) == skipMask) ? 2 : 1)) & countMask);
+                /*Optimiser line skip bind skip:skipMask bind countMask*///
+                (bus = outBus).setState(((bus.state) + (((bus.state & skipMask) == skipMask) ? 2 : 1)) & countMask);
                 /*Optimiser line o*/
             } else {
                 /*Optimiser line bus bind countMask*///
@@ -126,7 +127,7 @@ public class MultiPartCFallingIn extends FallingEdgePin implements MultiPartCIn 
         if (size == 1) {
             optimiser.cut("bus").cut("skip");
         } else if (skipMask != 0) {
-            optimiser.cut("bus").cut("pin").bind("skip", skipMask);
+            optimiser.cut("bus").cut("pin").bind("skip", skipMask).bind("countMask", countMask);
         } else {
             optimiser.bind("countMask", countMask).cut("pin").cut("skip");
         }

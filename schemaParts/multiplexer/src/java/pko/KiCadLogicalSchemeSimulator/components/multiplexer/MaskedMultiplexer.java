@@ -165,8 +165,9 @@ public class MaskedMultiplexer extends SchemaPart {
                 @Override
                 public void setState(long newState) {
                     state = newState;
-                    if (finalInNo == nState /*&& outBus.state != (newState & outMask)*/) {
-                        outBus.setState(newState & outMask);
+                    long state;
+                    if (finalInNo == nState && outBus.state != (state = (newState & outMask))) {
+                        outBus.setState(state);
                     }
                 }
             });

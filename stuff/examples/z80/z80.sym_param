@@ -3,5 +3,6 @@
 	<part id="Display1" param="reverse"/>
 	<part id="OSC1" param="start"/>
 	<part id="OR10" priority="-IN0"/>
+	<part id="NOT3" priority="-IN"/>
 	<part id="ROM1" param="file=rom.bin"/>
 </params>
