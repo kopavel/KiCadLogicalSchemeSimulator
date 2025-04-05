@@ -75,8 +75,16 @@ public class Net {
         this.optimisedDir = optimisedDir;
         this.parameterResolver = parameterResolver;
         Log.info(Net.class, "Start Net building");
-        for (NetFilter netFilter : ServiceLoader.load(NetFilter.class)) {
-            netFilter.doFilter(export, parameterResolver);
+        boolean doFilter = true;
+        while (doFilter) {
+            doFilter = false;
+            for (NetFilter netFilter : ServiceLoader.load(NetFilter.class)) {
+                boolean filterResult = netFilter.doFilter(export, parameterResolver);
+                doFilter |= filterResult;
+                if (filterResult) {
+                    Log.info(Net.class, "Filter " + netFilter.getClass().getSimpleName() + " modify NET");
+                }
+            }
         }
         export.getNets().getNet().forEach(this::groupSourcesByDestinations);
         buildNet();

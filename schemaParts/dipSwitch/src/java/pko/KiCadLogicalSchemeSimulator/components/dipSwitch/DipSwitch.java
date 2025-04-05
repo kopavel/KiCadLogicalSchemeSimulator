@@ -44,7 +44,7 @@ import java.util.Map;
 
 public class DipSwitch implements NetFilter {
     @Override
-    public void doFilter(Export netFile, ParameterResolver parameterResolver) {
+    public boolean doFilter(Export netFile, ParameterResolver parameterResolver) {
         List<Net> forDelete = new ArrayList<>();
         for (Net net : netFile.getNets().getNet()) {
             if (!forDelete.contains(net)) {
@@ -54,6 +54,7 @@ public class DipSwitch implements NetFilter {
             }
         }
         netFile.getNets().getNet().removeAll(forDelete);
+        return !forDelete.isEmpty();
     }
 
     private static void processNode(Export netFile, ParameterResolver parameterResolver, Net net, Net target, List<Node> forAdd, List<Net> forDelete) {

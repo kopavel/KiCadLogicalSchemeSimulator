@@ -44,7 +44,8 @@ import java.util.Map;
 
 public class PullResisterFilter implements NetFilter {
     @Override
-    public void doFilter(Export netFile, ParameterResolver parameterResolver) {
+    public boolean doFilter(Export netFile, ParameterResolver parameterResolver) {
+        boolean result = false;
         for (Net net : netFile.getNets().getNet()) {
             Boolean powerState = parameterResolver.getPowerState(net);
             if (powerState != null) {
@@ -70,6 +71,7 @@ public class PullResisterFilter implements NetFilter {
                                             otherNode.setPinfunction("OUT");
                                             otherNode.setPintype("output");
                                             iterator.remove();
+                                            result = true;
                                             continue node;
                                         }
                                     }
@@ -80,5 +82,6 @@ public class PullResisterFilter implements NetFilter {
                 }
             }
         }
+        return result;
     }
 }
