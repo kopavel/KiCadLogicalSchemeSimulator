@@ -77,17 +77,15 @@ public class Z80CPin extends InPin {
     public void setHi() {
         AsyncIoQueue queue = ioQueue;
         state = true;
-        int lM = M;
+        int lM;
         int lT;
-        if (((lT = T) == 3 && lM != 1) || lT == 4) {
+        if ((lT = T) == 4 || ((lM = M) != 1 && lT == 3)) {
             lT = (T = 1);
-            Pin pin;
-            Bus bus;
-            if (!(pin = refreshPin).state) {
-                pin.setHi();
+            if (!refreshPin.state) {
+                refreshPin.setHi();
             }
-            if (!(bus = dOut).hiImpedance) {
-                bus.setHiImpedance();
+            if (!dOut.hiImpedance) {
+                dOut.setHiImpedance();
             }
             queue.next();
             if (queue.request.address == -1) {
@@ -129,8 +127,7 @@ public class Z80CPin extends InPin {
             }
             case 3 -> {
                 if (lM == 1) {
-                    Request ioRequest = queue.request;
-                    ioRequest.callback.accept((int) dIn.state);
+                    queue.request.callback.accept((int) dIn.state);
                     mReqPin.setHi();
                     rdPin.setHi();
                     m1Pin.setHi();
