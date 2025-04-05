@@ -99,8 +99,12 @@ public class JavaCompiler {
                                    Log.warn(JavaCompiler.class, "Class {} already loaded", entry.getKey());
                                } catch (ClassNotFoundException ignore) {
                                    Log.debug(JavaCompiler.class, "Cache and load dynamically optimised class {}", entry.getKey());
-                                   storeClass(entry.getKey(), entry.getValue().toByteArray());
-                                   retClass[0] = classLoader.defineClassInPackage(classPath, entry.getValue().toByteArray());
+                                   byte[] classBytes = entry.getValue().toByteArray();
+                                   if (className.startsWith("Out")) {
+                                       classBytes = BytecodeTransformer.transformThisAloadToDup(classBytes);
+                                   }
+                                   storeClass(entry.getKey(), classBytes);
+                                   retClass[0] = classLoader.defineClassInPackage(classPath, classBytes);
                                }
                            } catch (Exception e) {
                                throw new RuntimeException(e);

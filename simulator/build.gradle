@@ -64,6 +64,8 @@ dependencies {
     implementation libs.jackson.datatype.jsr310
     implementation libs.jackson.jaxb.annotations
     implementation libs.picocli
+    implementation libs.asm
+    implementation libs.asm.tree
     testImplementation libs.jmh
     testAnnotationProcessor libs.jmh.annotations
     optimisedCompileOnly(project(":simulator"))
