@@ -33,20 +33,21 @@ package pko.KiCadLogicalSchemeSimulator.components.BUF;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 
 public class Buffer extends SchemaPart {
-    private final int busSize;
-    private final InBus dBus;
-    private final InPin oePin;
-    private Bus qBus;
-    private long latch;
+    public long latch;
+    public BufferOePin oePin;
+    public BufferCsPin csPin;
+    public Bus qBus;
+    public BufferDBus dBus;
+    public BufferWrPin wrPin;
 
     public Buffer(String id, String sParam) {
         super(id, sParam);
         if (!params.containsKey("size")) {
             throw new RuntimeException("Component " + id + " has no parameter \"size\"");
         }
+        int busSize;
         try {
             busSize = Integer.parseInt(params.get("size"));
         } catch (NumberFormatException r) {
@@ -60,133 +61,13 @@ public class Buffer extends SchemaPart {
         }
         addTriStateOutBus("Q", busSize);
         if (params.containsKey("latch")) {
-            if (reverse) {
-                oePin = addInPin(new InPin("OE", this) {
-                    @Override
-                    public void setHi() {
-                        state = true;
-                        if (!qBus.hiImpedance) {
-                            qBus.setHiImpedance();
-                        }
-                    }
-
-                    @Override
-                    public void setLo() {
-                        state = false;
-                        if (qBus.state != latch || qBus.hiImpedance) {
-                            qBus.setState(latch);
-                        }
-                    }
-                });
-                addInPin(new InPin("WR", this) {
-                    @Override
-                    public void setHi() {
-                        state = true;
-                    }
-
-                    @Override
-                    public void setLo() {
-                        state = false;
-                        latch = dBus.state;
-                        if (!oePin.state && (qBus.state != latch || qBus.hiImpedance)) {
-                            qBus.setState(latch);
-                        }
-                    }
-                });
-            } else {
-                oePin = addInPin(new InPin("OE", this) {
-                    @Override
-                    public void setHi() {
-                        state = true;
-                        if (qBus.state != latch || qBus.hiImpedance) {
-                            qBus.setState(latch);
-                        }
-                    }
-
-                    @Override
-                    public void setLo() {
-                        state = false;
-                        if (!qBus.hiImpedance) {
-                            qBus.setHiImpedance();
-                        }
-                    }
-                });
-                addInPin(new InPin("WR", this) {
-                    @Override
-                    public void setHi() {
-                        state = true;
-                        latch = dBus.state;
-                        if (oePin.state && (qBus.state != latch || qBus.hiImpedance)) {
-                            qBus.setState(latch);
-                        }
-                    }
-
-                    @Override
-                    public void setLo() {
-                        state = false;
-                    }
-                });
-            }
-            dBus = addInBus("D", busSize);
-        } else if (reverse) {
-            oePin = addInPin(new InPin("CS", this) {
-                @Override
-                public void setHi() {
-                    state = true;
-                    if (!qBus.hiImpedance) {
-                        qBus.setHiImpedance();
-                    }
-                }
-
-                @Override
-                public void setLo() {
-                    state = false;
-                    if (qBus.state != dBus.state || qBus.hiImpedance) {
-                        qBus.setState(dBus.state);
-                    }
-                }
-            });
-            dBus = addInBus(new InBus("D", this, busSize) {
-                @Override
-                public void setState(long newState) {
-                    state = newState;
-                    Bus bus;
-                    if (!oePin.state && ((bus = qBus).state != dBus.state || bus.hiImpedance)) {
-                        bus.setState(newState);
-                    }
-                }
-            });
+            oePin = addInPin(new BufferOePin("OE", this, qBus));
+            InBus dBus = addInBus("D", busSize);
+            wrPin = addInPin(new BufferWrPin("WR", this, dBus, oePin, qBus));
         } else {
-            oePin = addInPin(new InPin("CS", this) {
-                @Override
-                public void setHi() {
-                    state = true;
-                    Bus bus;
-                    long state;
-                    if ((bus = qBus).state != (state = dBus.state) || bus.hiImpedance) {
-                        bus.setState(state);
-                    }
-                }
-
-                @Override
-                public void setLo() {
-                    state = false;
-                    Bus bus;
-                    if (!(bus = qBus).hiImpedance) {
-                        bus.setHiImpedance();
-                    }
-                }
-            });
-            dBus = addInBus(new InBus("D", this, busSize) {
-                @Override
-                public void setState(long newState) {
-                    state = newState;
-                    Bus bus;
-                    if (oePin.state && ((bus = qBus).state != dBus.state || bus.hiImpedance)) {
-                        bus.setState(newState);
-                    }
-                }
-            });
+            dBus = addInBus(new BufferDBus("D", this, busSize, qBus));
+            csPin = addInPin(new BufferCsPin("CS", this, qBus, dBus));
+            dBus.csPin = csPin;
         }
     }
 
@@ -198,6 +79,13 @@ public class Buffer extends SchemaPart {
     @Override
     public void initOuts() {
         qBus = getOutBus("Q");
+        if (params.containsKey("latch")) {
+            oePin.qBus = qBus;
+            wrPin.qBus = qBus;
+        } else {
+            csPin.qBus = qBus;
+            dBus.qBus = qBus;
+        }
     }
 
     @Override
