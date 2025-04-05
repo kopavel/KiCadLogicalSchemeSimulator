@@ -54,10 +54,12 @@ public class ClassOptimiser<T> {
     private String suffix = "";
     private List<String> source;
     private boolean noAssert = true;
+    public Map<String, Integer> replaceMap = new HashMap<>();
 
     public ClassOptimiser(T oldInstance) {
         this(oldInstance, oldInstance.getClass());
     }
+
 
     public ClassOptimiser(T oldInstance, Class<?> sourceClass) {
         this.oldInstance = oldInstance;
@@ -124,7 +126,7 @@ public class ClassOptimiser<T> {
                     String optimisedSource = process();
                     Log.trace(JavaCompiler.class, "Compile");
                     storeSrc(optimizedFullClassName, optimisedSource);
-                    dynamicClass = JavaCompiler.compileJavaSource(optimizedFullClassName, optimizedClassName, optimisedSource);
+                    dynamicClass = JavaCompiler.compileJavaSource(optimizedFullClassName, optimizedClassName, optimisedSource, replaceMap);
                     if (dynamicClass == null) {
                         Log.error(JavaCompiler.class, "Optimised class compile was not successful, fall back to generic class, file name:" + optimizedFullClassName);
                         return oldInstance;

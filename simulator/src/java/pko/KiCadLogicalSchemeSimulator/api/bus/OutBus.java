@@ -241,8 +241,15 @@ public class OutBus extends Bus {
             }
             if (triState) {
                 optimiser.cut("noTs");
+                if (getRecursionMode() == none) {
+                    optimiser.replaceMap.put("setHiImpedance", destinations.length);
+                    optimiser.replaceMap.put("setState", destinations.length + 1);
+                }
             } else {
                 optimiser.cut("ts");
+                if (getRecursionMode() == none) {
+                    optimiser.replaceMap.put("setState", destinations.length);
+                }
             }
             OutBus build = optimiser.build();
             build.source = source;

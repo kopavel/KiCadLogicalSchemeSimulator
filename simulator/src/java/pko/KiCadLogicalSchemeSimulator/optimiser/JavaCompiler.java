@@ -82,7 +82,7 @@ public class JavaCompiler {
             throw new RuntimeException(e);
         }
     }
-    public static Class<?> compileJavaSource(String classPath, String className, String sourceCode) {
+    public static Class<?> compileJavaSource(String classPath, String className, String sourceCode, Map<String, Integer> replaceMap) {
         InMemoryJavaFileManager fileManager = new InMemoryJavaFileManager(compiler.getStandardFileManager(null, null, null));
         JavaFileObject javaFileObject = new InMemoryJavaFileObject(className, sourceCode);
         List<JavaFileObject> javaFileObjects = Collections.singletonList(javaFileObject);
@@ -100,8 +100,8 @@ public class JavaCompiler {
                                } catch (ClassNotFoundException ignore) {
                                    Log.debug(JavaCompiler.class, "Cache and load dynamically optimised class {}", entry.getKey());
                                    byte[] classBytes = entry.getValue().toByteArray();
-                                   if (className.startsWith("Out")) {
-                                       classBytes = BytecodeTransformer.transformThisAloadToDup(classBytes);
+                                   if (!replaceMap.isEmpty()) {
+                                       classBytes = BytecodeTransformer.transformThisAloadToDup(classBytes, replaceMap);
                                    }
                                    storeClass(entry.getKey(), classBytes);
                                    retClass[0] = classLoader.defineClassInPackage(classPath, classBytes);

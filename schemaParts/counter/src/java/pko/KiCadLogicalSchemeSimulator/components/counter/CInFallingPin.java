@@ -73,6 +73,8 @@ public class CInFallingPin extends FallingEdgePin {
         ClassOptimiser<CInFallingPin> optimiser = new ClassOptimiser<>(this).bind("countMask", countMask);
         if (source != null) {
             optimiser.cut("setter");
+        } else {
+            optimiser.replaceMap.put("setLo", 1);
         }
         CInFallingPin build = optimiser.build();
         ((Counter) parent).nIn = build;

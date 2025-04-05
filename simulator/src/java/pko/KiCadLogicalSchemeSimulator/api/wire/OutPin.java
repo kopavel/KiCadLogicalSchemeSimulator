@@ -262,8 +262,18 @@ public class OutPin extends Pin {
                 optimiser.cut("recurse");
             }
             if (triState) {
+                if (getRecursionMode() == none) {
+                    optimiser.replaceMap.put("setHi", toHi.length + 1);
+                    optimiser.replaceMap.put("setLo", toLow.length + 1);
+                    optimiser.replaceMap.put("setHiImpedance", toImp.length);
+                }
                 optimiser.cut("noTs");
             } else {
+                if (getRecursionMode() == none) {
+                    optimiser.replaceMap.put("setHi", toHi.length);
+                    optimiser.replaceMap.put("setLo", toLow.length);
+                    optimiser.replaceMap.put("setHiImpedance", toImp.length);
+                }
                 optimiser.cut("ts");
             }
             OutPin build = optimiser.build();

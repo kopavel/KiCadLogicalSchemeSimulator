@@ -49,7 +49,6 @@ public class BusToWiresAdapter extends OutBus {
     public long maskState;
     public boolean queueState;
 
-    /* constructor unroll destination:destinations*/
     /*Optimiser constructor unroll low:toLow:l unroll hi:toHi:h unroll imp:toImp:i*/
     public BusToWiresAdapter(BusToWiresAdapter oldBus, String variantId) {
         super(oldBus, variantId);
@@ -62,10 +61,9 @@ public class BusToWiresAdapter extends OutBus {
         this.mask = mask;
     }
 
-    /*Optimiser block iSetter*/
     @Override
     public void setHiImpedance() {
-        /*Optimiser block setters*/
+        /*Optimiser block setters block iSetter*/
         hiImpedance = true;
         /*Optimiser block allRecurse*/
         if (processing) {
@@ -107,7 +105,7 @@ public class BusToWiresAdapter extends OutBus {
             processing = false;
             /*Optimiser blockEnd allRecurse*/
         }
-        /*Optimiser blockEnd setters*/
+        /*Optimiser blockEnd setters blockEnd iSetter*/
     }
 
     public void addDestination(Pin pin) {
@@ -116,7 +114,6 @@ public class BusToWiresAdapter extends OutBus {
         priority += pin.priority;
         split();
     }
-    /*Optimiser blockEnd iSetter*/
 
     @Override
     public long getState() {
@@ -212,8 +209,14 @@ public class BusToWiresAdapter extends OutBus {
             }
             if (!triState) {
                 optimiser.cut("iSetter");
+                if (source == null) {
+                    optimiser.replaceMap.put("setState", 1);
+                }
             } else {
                 optimiser.bind("d", "imp0");
+                if (source == null) {
+                    optimiser.replaceMap.put("setState", 2);
+                }
             }
             if (destinations.length < 2 || getRecursionMode() == none) {
                 optimiser.cut("allRecurse");

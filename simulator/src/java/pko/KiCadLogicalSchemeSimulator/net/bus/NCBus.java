@@ -53,6 +53,6 @@ public class NCBus extends OutBus {
 
     @Override
     public Bus getOptimised(ModelItem<?> source) {
-        return super.getOptimised(source);
+        return this;
     }
 }
