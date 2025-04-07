@@ -38,12 +38,14 @@ import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 
 public class CInRaisingPin extends RaisingEdgePin {
     public final long countMask;
+    private final Counter parent;
     public Bus out;
 
     public CInRaisingPin(String id, Counter parent, long countMask) {
         super(id, parent);
         out = parent.getOutBus("Q");
         this.countMask = countMask;
+        this.parent = parent;
     }
 
     /*Optimiser constructor*/
@@ -51,14 +53,19 @@ public class CInRaisingPin extends RaisingEdgePin {
         super(oldPin, variantId);
         this.countMask = oldPin.countMask;
         this.out = oldPin.out;
+        parent = oldPin.parent;
     }
 
     @Override
     public void setHi() {
         /*Optimiser line setter*/
         state = true;
-        /*Optimiser bind countMask*/
-        out.setState((out.state + 1) & countMask);
+        /*Optimiser line r*/
+        if (parent.enabled) {
+            /*Optimiser bind countMask*/
+            out.setState((out.state + 1) & countMask);
+            /*Optimiser line r*/
+        }
     }
 
     @Override
@@ -72,6 +79,11 @@ public class CInRaisingPin extends RaisingEdgePin {
         ClassOptimiser<CInRaisingPin> optimiser = new ClassOptimiser<>(this).bind("countMask", countMask);
         if (source != null) {
             optimiser.cut("setter");
+        } else {
+            optimiser.replaceMap.put("setLo", 1);
+        }
+        if (!parent.rPin.used) {
+            optimiser.cut("r");
         }
         CInRaisingPin build = optimiser.build();
         ((Counter) parent).in = build;

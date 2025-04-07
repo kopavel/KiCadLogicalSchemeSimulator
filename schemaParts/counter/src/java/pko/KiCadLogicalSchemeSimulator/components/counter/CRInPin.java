@@ -30,57 +30,49 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.counter;
+import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.tools.Utils;
+import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
+import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 
-public class Counter extends SchemaPart {
-    public CInRaisingPin in;
-    public CInFallingPin nIn;
-    Bus outBus;
-    boolean enabled = true;
-    CRInPin rPin;
+class CRInPin extends InPin {
+    private final Counter counter;
+    Bus out;
 
-    protected Counter(String id, String sParam) {
-        super(id, sParam);
-        if (!params.containsKey("size")) {
-            throw new RuntimeException("Component " + id + " has no parameter \"size\"");
-        }
-        int pinAmount;
-        try {
-            pinAmount = Integer.parseInt(params.get("size"));
-        } catch (NumberFormatException r) {
-            throw new RuntimeException("Component " + id + " size must be positive number");
-        }
-        if (pinAmount < 1) {
-            throw new RuntimeException("Component " + id + " size must be positive number");
-        }
-        long countMask = Utils.getMaskForSize(pinAmount);
-        addOutBus("Q", pinAmount);
-        if (reverse) {
-            nIn = addInPin(new CInFallingPin("C", this, countMask));
-        } else {
-            in = addInPin(new CInRaisingPin("C", this, countMask));
-        }
-        rPin = addInPin(new CRInPin(this));
+    public CRInPin(Counter counter) {
+        super("R", counter);
+        this.counter = counter;
+        this.out = counter.outBus;
     }
 
     @Override
-    public void initOuts() {
-        outBus = getOutBus("Q");
-        outBus.useBitPresentation = true;
-        rPin.out = outBus;
-        if (reverse) {
-            nIn.out = outBus;
-        } else {
-            in.out = outBus;
-        }
+    public void setHi() {
+        /*Optimiser line setter*/
+        state = true;
+        counter.enabled = false;
+        out.setState(0);
     }
 
     @Override
-    public void reset() {
-        if (outBus.state > 0 || outBus.hiImpedance) {
-            outBus.setState(0);
+    public void setLo() {
+        /*Optimiser line setter*/
+        state = false;
+        counter.enabled = false;
+    }
+
+    @Override
+    public InPin getOptimised(ModelItem<?> source) {
+        ClassOptimiser<CRInPin> optimiser = new ClassOptimiser<>(this);
+        if (source != null) {
+            optimiser.cut("setter");
+        } else {
+            optimiser.replaceMap.put("setLo", 1);
+            optimiser.replaceMap.put("setHi", 1);
         }
+        CRInPin build = optimiser.build();
+        counter.rPin = build;
+        parent.replaceIn(this, build);
+        build.source = source;
+        return build;
     }
 }

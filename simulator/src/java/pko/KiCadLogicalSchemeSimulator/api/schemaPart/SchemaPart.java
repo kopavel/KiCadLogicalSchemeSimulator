@@ -77,27 +77,7 @@ public abstract class SchemaPart {
     }
 
     public InPin addInPin(String pinId) {
-        return addInPin(new InPin(pinId, this) {
-            @Override
-            public void setHiImpedance() {
-                hiImpedance = true;
-            }
-
-            @Override
-            public void setHi() {
-                hiImpedance = false;
-                state = true;
-            }
-
-            @Override
-            public void setLo() {
-                hiImpedance = false;
-                state = false;
-            }
-        });
-    }
-
-    public InPin addNoFloatingInPin(String pinId) {
+        //Fixme - In pin cant be tri-state, it's only for mergers (internal usage)
         return addInPin(new InPin(pinId, this) {
             @Override
             public void setHi() {

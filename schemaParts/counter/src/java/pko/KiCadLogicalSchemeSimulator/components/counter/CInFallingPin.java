@@ -38,10 +38,12 @@ import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 
 public class CInFallingPin extends FallingEdgePin {
     public final long countMask;
+    private final Counter parent;
     public Bus out;
 
     public CInFallingPin(String id, Counter parent, long countMask) {
         super(id, parent);
+        this.parent = parent;
         out = parent.getOutBus("Q");
         this.countMask = countMask;
     }
@@ -51,6 +53,7 @@ public class CInFallingPin extends FallingEdgePin {
         super(oldPin, variantId);
         this.countMask = oldPin.countMask;
         this.out = oldPin.out;
+        parent = oldPin.parent;
     }
 
     @Override
@@ -64,8 +67,12 @@ public class CInFallingPin extends FallingEdgePin {
         /*Optimiser line setter*/
         state = false;
         long state;
-        /*Optimiser bind countMask*/
-        out.setState((state = out.state) == countMask ? 0 : state + 1);
+        /*Optimiser line r*/
+        if (parent.enabled) {
+            /*Optimiser bind countMask*/
+            out.setState((state = out.state) == countMask ? 0 : state + 1);
+            /*Optimiser line r*/
+        }
     }
 
     @Override
@@ -75,6 +82,9 @@ public class CInFallingPin extends FallingEdgePin {
             optimiser.cut("setter");
         } else {
             optimiser.replaceMap.put("setLo", 1);
+        }
+        if (!parent.rPin.used) {
+            optimiser.cut("r");
         }
         CInFallingPin build = optimiser.build();
         ((Counter) parent).nIn = build;

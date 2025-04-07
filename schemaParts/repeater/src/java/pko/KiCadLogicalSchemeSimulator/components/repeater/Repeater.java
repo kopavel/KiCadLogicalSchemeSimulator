@@ -33,6 +33,7 @@ package pko.KiCadLogicalSchemeSimulator.components.repeater;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 
+//ToDo user out directly (in case of inverter - swap toLow/toHi)
 public class Repeater extends SchemaPart {
     public RepeaterInPin inPin;
 
