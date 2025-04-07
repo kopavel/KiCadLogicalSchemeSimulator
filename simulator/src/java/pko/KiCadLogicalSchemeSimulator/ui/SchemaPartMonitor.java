@@ -122,7 +122,7 @@ public class SchemaPartMonitor extends JFrame {
                       }
                   });
         schemaPart.outPins.values()
-                .stream().distinct().sorted(Comparator.comparing(ModelItem::getId)).forEach(outItem -> {
+                .stream().distinct().sorted(Comparator.comparing(schemaPart.ids::get)).forEach(outItem -> {
                       JLabel label;
                       if (outItem instanceof Bus bus && bus.useBitPresentation) {
                           char[] bits = leftPad(Long.toBinaryString(bus.state), bus.size, '0').toCharArray();
