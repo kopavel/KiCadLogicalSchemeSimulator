@@ -44,7 +44,6 @@ public class MultiPartCounter extends SchemaPart {
     private final Pin[] outPins;
     private final int[] sizes;
     public long resetState;
-    public boolean clockEnabled = true;
 
     protected MultiPartCounter(String id, String sParam) {
         super(id, sParam);
