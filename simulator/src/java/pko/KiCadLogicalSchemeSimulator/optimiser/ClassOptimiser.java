@@ -51,15 +51,14 @@ public class ClassOptimiser<T> {
     private final T oldInstance;
     private final Class<?> sourceClass;
     private final Map<String, UnrollDescriptor> unrolls = new HashMap<>();
+    public Map<String, Integer> replaceMap = new HashMap<>();
     private String suffix = "";
     private List<String> source;
     private boolean noAssert = true;
-    public Map<String, Integer> replaceMap = new HashMap<>();
 
     public ClassOptimiser(T oldInstance) {
         this(oldInstance, oldInstance.getClass());
     }
-
 
     public ClassOptimiser(T oldInstance, Class<?> sourceClass) {
         this.oldInstance = oldInstance;
@@ -256,21 +255,31 @@ public class ClassOptimiser<T> {
                                         throw new RuntimeException("iterator " + id + " unroll size not specified");
                                     }
                                     unrolls.get(id).variable = iteratorParams[0];
+                                    functionSource.append(lineTab)
+                                                  .append(iteratorParams[1])
+                                                  .append("=")
+                                                  .append(oldItemName)
+                                                  .append(".")
+                                                  .append(iteratorParams[1])
+                                                  .append(";\n")
+                                                  .append(lineTab)
+                                                  .append("splitDestinations();\n")
+                                                  .append(blockTab)
+                                                  .append("}\n\n")
+                                                  .append(blockTab)
+                                                  .append("public void splitDestinations () {\n");
                                     for (int j = 0; j < unrolls.get(id).size; j++) {
                                         //add destination variables initialisation
                                         functionSource.append(lineTab)
                                                       .append(iteratorParams[0])
                                                       .append(j)
                                                       .append(" = ")
-                                                      .append(oldItemName)
-                                                      .append(".")
                                                       .append(iteratorParams[1])
                                                       .append("[")
                                                       .append(j)
                                                       .append("];\n");
                                         //add destination variable definitions
-                                        resultSource.append(blockTab)
-                                                    .append("private final ")
+                                        resultSource.append(blockTab).append("private ")
                                                     .append(iteratorItemType)
                                                     .append(" ")
                                                     .append(iteratorParams[0])
@@ -353,7 +362,9 @@ public class ClassOptimiser<T> {
                             UnrollDescriptor descriptor = unrolls.get(iteratorId);
                             for (int j = 0; j < descriptor.size; j++) {
                                 functionSource.append(iteratorSource.toString()
-                                                                    .replaceAll("(?<=\\W|^)" + descriptor.variable + "(?=\\W|$)", descriptor.variable + j));
+                                                                    .replaceAll("(?<=\\W|^)" + descriptor.variable + "(?=\\W|$)", descriptor.variable + j)
+                                                                    .replaceAll("unrollIndexPower", String.valueOf((int) Math.pow(2, j)))
+                                                                    .replaceAll("unrollIndex", String.valueOf(j)));
                             }
                             iteratorOffset = -1;
                         } else {

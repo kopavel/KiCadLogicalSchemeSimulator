@@ -54,6 +54,8 @@ public abstract class ModelItem<T> implements IModelItem<T> {
     public ModelItem<?> source;
     private boolean reportedRecurse;
 
+    public void splitDestinations() {
+    }
     protected ModelItem(String id, SchemaPart parent) {
         this.id = id;
         this.parent = parent;
