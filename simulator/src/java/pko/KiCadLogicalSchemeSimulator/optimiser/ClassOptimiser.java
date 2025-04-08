@@ -177,6 +177,7 @@ public class ClassOptimiser<T> {
         StringBuilder resultSource = new StringBuilder();
         StringBuilder iteratorSource = new StringBuilder();
         StringBuilder functionSource = new StringBuilder();
+        StringBuilder addFunctionSource = new StringBuilder();
         try {
             for (ListIterator<String> lines = source.listIterator(); lines.hasNext(); ) {
                 String line = lines.next();
@@ -260,24 +261,25 @@ public class ClassOptimiser<T> {
                                                   .append("=")
                                                   .append(oldItemName)
                                                   .append(".")
-                                                  .append(iteratorParams[1])
-                                                  .append(";\n")
-                                                  .append(lineTab)
-                                                  .append("splitDestinations();\n")
-                                                  .append(blockTab)
-                                                  .append("}\n\n")
-                                                  .append(blockTab)
-                                                  .append("public void splitDestinations () {\n");
+                                                  .append(iteratorParams[1]).append(";\n");
+                                    if (addFunctionSource.isEmpty()) {
+                                        addFunctionSource.append(lineTab)
+                                                         .append("splitDestinations();\n")
+                                                         .append(blockTab)
+                                                         .append("}\n\n")
+                                                         .append(blockTab)
+                                                         .append("public void splitDestinations () {\n");
+                                    }
                                     for (int j = 0; j < unrolls.get(id).size; j++) {
                                         //add destination variables initialisation
-                                        functionSource.append(lineTab)
-                                                      .append(iteratorParams[0])
-                                                      .append(j)
-                                                      .append(" = ")
-                                                      .append(iteratorParams[1])
-                                                      .append("[")
-                                                      .append(j)
-                                                      .append("];\n");
+                                        addFunctionSource.append(lineTab)
+                                                         .append(iteratorParams[0])
+                                                         .append(j)
+                                                         .append(" = ")
+                                                         .append(iteratorParams[1])
+                                                         .append("[")
+                                                         .append(j)
+                                                         .append("];\n");
                                         //add destination variable definitions
                                         resultSource.append(blockTab).append("private ")
                                                     .append(iteratorItemType)
@@ -323,6 +325,10 @@ public class ClassOptimiser<T> {
                     } else if (lineOffset <= functionOffset && !line.isBlank()) {
                         //function end
                         if (line.trim().equals("}")) {
+                            if (!addFunctionSource.isEmpty()) {
+                                functionSource.append(addFunctionSource);
+                                addFunctionSource = new StringBuilder();
+                            }
                             functionSource.append(line).append("\n");
                             if (preserveFunction && !skipFunction) {
                                 resultSource.append("\n").append(functionSource);
