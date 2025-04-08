@@ -103,13 +103,12 @@ public class SingleOutShifterCPin extends InPin {
                     }
                 }
                 boolean state;
-                Pin lOut;
                 /*Optimiser bind om:lParent.outMask*/
-                if ((state = (lOut = out).state) == ((l & lParent.outMask) == 0L)) {
+                if ((state = out.state) == ((l & lParent.outMask) == 0L)) {
                     if (state) {
-                        lOut.setLo();
+                        out.setLo();
                     } else {
-                        lOut.setHi();
+                        out.setHi();
                     }
                 }
                 lParent.latch = l;
@@ -156,13 +155,12 @@ public class SingleOutShifterCPin extends InPin {
                     }
                 }
                 boolean state;
-                Pin lOut;
                 /*Optimiser bind om:lParent.outMask*/
-                if ((state = (lOut = out).state) == ((l & lParent.outMask) == 0L)) {
+                if ((state = out.state) == ((l & lParent.outMask) == 0L)) {
                     if (state) {
-                        lOut.setLo();
+                        out.setLo();
                     } else {
-                        lOut.setHi();
+                        out.setHi();
                     }
                 }
                 lParent.latch = l;
