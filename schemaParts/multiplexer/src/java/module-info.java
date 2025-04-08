@@ -30,11 +30,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
-import pko.KiCadLogicalSchemeSimulator.components.multiplexer.MaskedMultiplexerSpi;
 import pko.KiCadLogicalSchemeSimulator.components.multiplexer.MultiplexerSpi;
 import pko.KiCadLogicalSchemeSimulator.components.multiplexer.SingleBitMultiplexerSpi;
+import pko.KiCadLogicalSchemeSimulator.components.multiplexer.masked.MaskedMultiplexerSpi;
 
-module KiCadLogicalSchemeSimulator.components.multiplexer {
+open module KiCadLogicalSchemeSimulator.components.multiplexer {
     requires KiCadLogicalSchemeSimulator.simulator;
     provides SchemaPartSpi with MultiplexerSpi, MaskedMultiplexerSpi, SingleBitMultiplexerSpi;
 }
