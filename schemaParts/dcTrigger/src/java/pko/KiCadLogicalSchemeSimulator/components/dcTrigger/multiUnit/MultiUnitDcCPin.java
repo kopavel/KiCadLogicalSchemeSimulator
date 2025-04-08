@@ -37,7 +37,7 @@ import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 
 public class MultiUnitDcCPin extends InPin {
     public final MultiUnitDcTrigger parent;
-    public final Pins[] pins;
+    public Pins[] pins;
 
     public MultiUnitDcCPin(String id, MultiUnitDcTrigger parent, InPin[] dPin, Pin[] qOut, Pin[] iqOut) {
         super(id, parent);
