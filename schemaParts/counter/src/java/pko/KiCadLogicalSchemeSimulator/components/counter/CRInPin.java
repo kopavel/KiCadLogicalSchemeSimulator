@@ -57,7 +57,7 @@ class CRInPin extends InPin {
     public void setLo() {
         /*Optimiser line setter*/
         state = false;
-        counter.enabled = false;
+        counter.enabled = true;
     }
 
     @Override

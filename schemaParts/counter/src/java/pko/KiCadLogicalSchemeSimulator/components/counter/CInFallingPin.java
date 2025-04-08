@@ -38,7 +38,7 @@ import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 
 public class CInFallingPin extends FallingEdgePin {
     public final long countMask;
-    private final Counter parent;
+    public final Counter parent;
     public Bus out;
 
     public CInFallingPin(String id, Counter parent, long countMask) {

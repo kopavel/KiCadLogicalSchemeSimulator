@@ -38,7 +38,7 @@ public class Counter extends SchemaPart {
     public CInRaisingPin in;
     public CInFallingPin nIn;
     Bus outBus;
-    boolean enabled = true;
+    public boolean enabled = true;
     CRInPin rPin;
 
     protected Counter(String id, String sParam) {
