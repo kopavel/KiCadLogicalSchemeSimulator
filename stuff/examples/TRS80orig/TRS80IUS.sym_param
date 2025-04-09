@@ -1,0 +1,106 @@
+<!--
+  ~ Copyright (c) 2024 Pavel Korzh
+  ~
+  ~ All rights reserved.
+  ~
+  ~ Redistribution and use in source and binary forms, with or without
+  ~ modification, are permitted provided that the following conditions are met:
+  ~
+  ~ 1. Redistributions of source code must retain the above copyright notice,
+  ~ this list of conditions and the following disclaimer.
+  ~
+  ~ 2. Redistributions in binary form must reproduce the above copyright notice,
+  ~ this list of conditions and the following disclaimer in the documentation
+  ~ and/or other materials provided with the distribution.
+  ~
+  ~ 3. Neither the name of the copyright holder nor the names of its contributors
+  ~ may be used to endorse or promote products derived from this software
+  ~ without specific prior written permission.
+  ~
+  ~ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  ~ AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  ~ IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+  ~ ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+  ~ LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+  ~ CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+  ~ SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+  ~ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+  ~ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+  ~ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+  ~ POSSIBILITY OF SUCH DAMAGE.
+  -->
+<params recursion="none" xmlns="pko.kicadLogicalSimulator.param">
+	<mapFile>kicad</mapFile>
+	<mapFile>retro</mapFile>
+	<mapFile>chip</mapFile>
+	<mapFile>trs80</mapFile>
+	<!-- customizations -->
+	<part id="Z43" recursive="Q"/>
+	<part id="Z50" recursive="Q"/>
+	<part id="Z12" recursive="Q"/>
+	<part id="Z32" recursive="Q"/>
+	<part id="Z70">
+		<unit name="A" priority="C"/>
+	</part>
+	<part id="Z69">
+		<unit name="A" priority="-C"/>
+	</part>
+	<part id="Z53">
+		<unit name="B" priority="-IN1"/>
+		<unit name="C" priority="-IN1;-IN2"/>
+	</part>
+	<part id="Z66">
+		<unit name="A" recursive="OUT"/>
+	</part>
+	<part id="Display1" param="reverse"/>
+	<!-- Ignore probes -->
+	<part id="G1" ignore="true"/>
+	<part id="G2" ignore="true"/>
+	<part id="G63" ignore="true"/>
+	<part id="J61" ignore="true"/>
+	<part id="J62" ignore="true"/>
+	<part id="J63" ignore="true"/>
+	<!--ignore expansion slot-->
+	<part id="E1" ignore="true"/>
+	<!--DIPs-->
+	<part id="J64" alias="Switch.SW_DIP_x01" param="On"/>
+	<part id="Z71">
+		<unit name="A" params="On"/>
+		<unit name="C" params="On"/>
+		<unit name="E" params="On"/>
+	</part>
+	<part id="Z3">
+		<unit name="B" params="On"/>
+		<unit name="C" params="On"/>
+		<unit name="D" params="On"/>
+		<unit name="E" params="On"/>
+		<unit name="G" params="On"/>
+		<unit name="H" params="On"/>
+		<unit name="F" params="On"/>
+	</part>
+	<!--Populate sockets-->
+	<!--system ram-->
+	<part id="Z13" alias="retro.MK4116"/>
+	<part id="Z14" alias="retro.MK4116"/>
+	<part id="Z15" alias="retro.MK4116"/>
+	<part id="Z16" alias="retro.MK4116"/>
+	<part id="Z17" alias="retro.MK4116"/>
+	<part id="Z18" alias="retro.MK4116"/>
+	<part id="Z19" alias="retro.MK4116"/>
+	<part id="Z20" alias="retro.MK4116"/>
+	<!--video ram-->
+	<part id="Z45" alias="retro.2102AN"/>
+	<part id="Z46" alias="retro.2102AN"/>
+	<part id="Z47" alias="retro.2102AN"/>
+	<part id="Z48" alias="retro.2102AN"/>
+	<part id="Z61" alias="retro.2102AN"/>
+	<part id="Z62" alias="retro.2102AN"/>
+	<part id="Z63" alias="retro.2102AN"/>
+	<!--char gen-->
+	<part id="Z29" alias="retro.MCM6670" param="file=character_set_10.bin"/>
+	<!--bios -->
+	<part id="Z33" alias="retro.2364" param="file=rom_a_L2.bin"/>
+	<part id="Z34" alias="retro.2364" param="file=rom_b_L2.bin"/>
+	<!--keyboard-->
+	<part id="CN3" alias="trs80.KBD"/>
+</params>

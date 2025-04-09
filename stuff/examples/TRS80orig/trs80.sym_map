@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?><!--
+  ~ Copyright (c) 2024 Pavel Korzh
+  ~
+  ~ All rights reserved.
+  ~
+  ~ Redistribution and use in source and binary forms, with or without
+  ~ modification, are permitted provided that the following conditions are met:
+  ~
+  ~ 1. Redistributions of source code must retain the above copyright notice,
+  ~ this list of conditions and the following disclaimer.
+  ~
+  ~ 2. Redistributions in binary form must reproduce the above copyright notice,
+  ~ this list of conditions and the following disclaimer in the documentation
+  ~ and/or other materials provided with the distribution.
+  ~
+  ~ 3. Neither the name of the copyright holder nor the names of its contributors
+  ~ may be used to endorse or promote products derived from this software
+  ~ without specific prior written permission.
+  ~
+  ~ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  ~ AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  ~ IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+  ~ ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+  ~ LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+  ~ CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+  ~ SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+  ~ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+  ~ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+  ~ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+  ~ POSSIBILITY OF SUCH DAMAGE.
+  -->
+<symbolMap xmlns="pko.kicadLogicalSimulator.map">
+	<lib name="trs80">
+		<symbol name="KBD"
+		        class="Keyboard"
+		        param="map=Back Quote_00|A_01|B_02|C_03|D_04|E_05|F_06|G_07|H_10|I_11|J_12|K_13|L_14|M_15|N_16|O_17|P_20|Q_21|R_22|S_23|T_24|U_25|V_26|W_27|X_30|Y_31|Z_32|0_40|1_41|2_42|3_43|4_44|5_45|6_46|7_47|8_50|9_51|Semicolon_52|Quote_53|Comma_54|Minus_55|Period_56|Slash_57|Enter_60|Home_61|Escape_62|Up_63|Down_64|Left_65|Right_66|Space_67|Shift_70|Ctrl_74|Backspace_65">
+			<unit pinMap="2=In4;3=In5;4=In1;5=In0;6=In2;7=In6;8=In7;9=In3;10=Out2;11=Out0;12=Out5;13=Out3;14=En;15=Out6;16=Out1;17=Out7;18=Out4"/>
+			<unit pinMap="ignore;1;19;20"/>
+		</symbol>
+	</lib>
+</symbolMap>
