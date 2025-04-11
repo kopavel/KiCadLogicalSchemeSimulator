@@ -31,9 +31,10 @@
  */
 //ToDo
 // add filters:
-//   or and interconnected inpuls -> -1 input
-//   or and with 1 input -> repeater
+//   similar interconnected inputs -> -1 input
+//   or/and with 1 input -> repeater
 //   repeater on power rail -> power
+//   pull on strong only
 // no need in pull down resisters?
 // "not used" pin -> add "on power rail"
 
@@ -72,6 +73,8 @@ dependencies {
     runtimeOnly project(":schemaParts:led")
     runtimeOnly project(":schemaParts:led16SegmentDisplay")
     runtimeOnly project(":schemaParts:led7SegmentDisplay")
+    runtimeOnly project(":schemaParts:mos6502")
+    runtimeOnly project(":schemaParts:mos6532")
     runtimeOnly project(":schemaParts:multiplexer")
     runtimeOnly project(":schemaParts:or")
     runtimeOnly project(":schemaParts:oscillator")
