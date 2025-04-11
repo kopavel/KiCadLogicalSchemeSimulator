@@ -29,6 +29,13 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+//ToDo
+// add filters:
+//   or and interconnected inpuls -> -1 input
+//   or and with 1 input -> repeater
+//   repeater on power rail -> power
+// no need in pull down resisters?
+// "not used" pin -> add "on power rail"
 
 sourceSets {
     main {
