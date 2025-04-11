@@ -10,7 +10,7 @@
 	</xs:simpleType>
 	<xs:simpleType name="pinMapType">
 		<xs:restriction base="xs:string">
-			<xs:pattern value="(ignore(;[0-9]+)+|(([0-9]+=[~{}a-zA-Z0-9]+);?))+"/>
+			<xs:pattern value="(ignore(;[0-9]+)+|(([0-9]+=[/~{}a-zA-Z0-9.]+);?))+"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="paramType">
