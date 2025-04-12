@@ -237,8 +237,9 @@ public class ClassOptimiser<T> {
                                     String superLine = lines.next();//"super" here
                                     lineOffset = countLeadingSpaces(superLine);
                                     functionSource.append(superLine).append("\n");
-                                    while (!line.trim().equals("}")) { //skip all constructor definition, all in `super`
+                                    while (!(lineOffset <= functionOffset && !line.isBlank())) { //skip all constructor definition, all in `super`
                                         line = lines.next();
+                                        lineOffset = countLeadingSpaces(line);
                                     }
                                     line = lines.previous();
                                 }
@@ -260,8 +261,7 @@ public class ClassOptimiser<T> {
                                                   .append(iteratorParams[1])
                                                   .append("=")
                                                   .append(oldItemName)
-                                                  .append(".")
-                                                  .append(iteratorParams[1]).append(";\n");
+                                                  .append(".").append(iteratorParams[1]).append(";\n");
                                     if (addFunctionSource.isEmpty()) {
                                         addFunctionSource.append(lineTab)
                                                          .append("splitDestinations();\n")
