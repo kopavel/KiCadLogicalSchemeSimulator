@@ -19,6 +19,12 @@ public class BufferOePin extends InPin {
         super(oldPin, variantId);
         parent = oldPin.parent;
         qBus = oldPin.qBus;
+        Bus bus;
+        if (parent.reverse) {
+            if ((bus = qBus).state != 0 || bus.hiImpedance) {
+                bus.setState(0);
+            }
+        }
     }
 
     @Override
