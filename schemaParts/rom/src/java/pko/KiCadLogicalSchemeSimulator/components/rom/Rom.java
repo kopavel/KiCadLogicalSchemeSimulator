@@ -31,9 +31,7 @@
  */
 package pko.KiCadLogicalSchemeSimulator.components.rom;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 import pko.KiCadLogicalSchemeSimulator.tools.MemoryDumpPanel;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
@@ -46,10 +44,9 @@ import java.io.InputStream;
 import java.util.function.Supplier;
 
 public class Rom extends SchemaPart {
-    private final long[] words;
-    private Bus dBus;
-    private int addr;
-    private boolean csActive;
+    public final long[] words;
+    public final RomABus aBus;
+    public final RomCsPin csPin;
     private int size;
     private int aSize;
 
@@ -115,69 +112,26 @@ public class Rom extends SchemaPart {
         } catch (IOException e) {
             throw new RuntimeException("Can't load file " + file, e);
         }
-        addInBus(new InBus("A", this, aSize) {
-            @Override
-            public void setState(long newState) {
-                state = newState;
-                addr = (int) newState;
-                if (csActive && dBus.state != words[addr]) {
-                    dBus.setState(words[addr]);
-                }
-            }
-        });
         addTriStateOutBus("D", size);
+        aBus = addInBus(new RomABus("A", this, aSize));
         if (reverse) {
-            addInPin(new InPin("~{CS}", this) {
-                @Override
-                public void setHi() {
-                    state = true;
-                    csActive = false;
-                    if (!dBus.hiImpedance) {
-                        dBus.setHiImpedance();
-                    }
-                }
-
-                @Override
-                public void setLo() {
-                    state = false;
-                    csActive = true;
-                    if (dBus.hiImpedance || dBus.state != words[addr]) {
-                        dBus.setState(words[addr]);
-                    }
-                }
-            });
+            csPin = addInPin(new RomNCsPin("~{CS}", this));
         } else {
-            addInPin(new InPin("CS", this) {
-                @Override
-                public void setHi() {
-                    state = true;
-                    csActive = state;
-                    if (dBus.hiImpedance || dBus.state != words[addr]) {
-                        dBus.setState(words[addr]);
-                    }
-                }
-
-                @Override
-                public void setLo() {
-                    state = false;
-                    csActive = state;
-                    if (!dBus.hiImpedance) {
-                        dBus.setHiImpedance();
-                    }
-                }
-            });
+            csPin = addInPin(new RomCsPin("CS", this));
         }
     }
 
     @Override
     public void initOuts() {
-        dBus = getOutBus("D");
+        Bus dBus = getOutBus("D");
+        aBus.dBus = dBus;
+        csPin.dBus = dBus;
     }
 
     @Override
     public String extraState() {
-        return "A:" + String.format("%0" + (int) Math.ceil(aSize / 4d) + "X", addr) +
-                (csActive ? ("\nD:" + (addr >= words.length ? "OutOfRange" : String.format("%0" + (int) Math.ceil(size / 4d) + "X", words[addr]))) : "");
+        return "A:" + String.format("%0" + (int) Math.ceil(aSize / 4d) + "X", aBus.state) + (aBus.csActive ? ("\nD:" +
+                (aBus.state >= words.length ? "OutOfRange" : String.format("%0" + (int) Math.ceil(size / 4d) + "X", words[(int) aBus.state]))) : "");
     }
 
     @Override
