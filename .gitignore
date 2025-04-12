@@ -21,6 +21,7 @@
 /stuff/examples/switch/switch.xml
 /stuff/examples/trs80/TRS80I.xml
 /stuff/examples/trs80/*.bin
+/stuff/examples/TRS80orig/*.bin
 /.profileconfig.json
 /**/optimised/
 /**/#auto_saved_files#
