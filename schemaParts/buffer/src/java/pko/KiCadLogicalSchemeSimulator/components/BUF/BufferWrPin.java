@@ -10,12 +10,12 @@ public class BufferWrPin extends InPin {
     public BufferOePin oePin;
     public Bus qBus;
 
-    public BufferWrPin(String id, Buffer parent, Bus dBus, BufferOePin oePin, Bus qBus) {
+    public BufferWrPin(String id, Buffer parent, Bus dBus, BufferOePin oePin) {
         super(id, parent);
         this.parent = parent;
         this.dBus = dBus;
         this.oePin = oePin;
-        this.qBus = qBus;
+        this.qBus = parent.getOutBus("Q");
     }
 
     /*Optimiser constructor*/

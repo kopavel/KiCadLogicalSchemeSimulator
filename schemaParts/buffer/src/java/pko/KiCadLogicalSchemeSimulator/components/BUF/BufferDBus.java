@@ -9,9 +9,9 @@ public class BufferDBus extends InBus {
     public BufferCsPin csPin;
     public Bus qBus;
 
-    public BufferDBus(String id, Buffer parent, int size, Bus qBus, String... names) {
+    public BufferDBus(String id, Buffer parent, int size, String... names) {
         super(id, parent, size, names);
-        this.qBus = qBus;
+        this.qBus = parent.getOutBus("Q");
         this.parent = parent;
     }
 

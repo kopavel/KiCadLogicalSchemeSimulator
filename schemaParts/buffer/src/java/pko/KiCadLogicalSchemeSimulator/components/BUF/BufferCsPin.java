@@ -9,10 +9,10 @@ public class BufferCsPin extends InPin {
     public Bus dBus;
     public Buffer parent;
 
-    public BufferCsPin(String id, Buffer parent, Bus qBus, Bus dBus) {
+    public BufferCsPin(String id, Buffer parent, Bus dBus) {
         super(id, parent);
         this.parent = parent;
-        this.qBus = qBus;
+        this.qBus = parent.getOutBus("Q");
         this.dBus = dBus;
     }
 

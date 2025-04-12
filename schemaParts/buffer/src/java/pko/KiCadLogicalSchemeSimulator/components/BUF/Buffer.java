@@ -61,12 +61,12 @@ public class Buffer extends SchemaPart {
         }
         addTriStateOutBus("Q", busSize);
         if (params.containsKey("latch")) {
-            oePin = addInPin(new BufferOePin("OE", this, qBus));
+            oePin = addInPin(new BufferOePin("OE", this));
             InBus dBus = addInBus("D", busSize);
-            wrPin = addInPin(new BufferWrPin("WR", this, dBus, oePin, qBus));
+            wrPin = addInPin(new BufferWrPin("WR", this, dBus, oePin));
         } else {
-            dBus = addInBus(new BufferDBus("D", this, busSize, qBus));
-            csPin = addInPin(new BufferCsPin("CS", this, qBus, dBus));
+            dBus = addInBus(new BufferDBus("D", this, busSize));
+            csPin = addInPin(new BufferCsPin("CS", this, dBus));
             dBus.csPin = csPin;
         }
     }
@@ -85,6 +85,11 @@ public class Buffer extends SchemaPart {
         } else {
             csPin.qBus = qBus;
             dBus.qBus = qBus;
+        }
+        if (reverse) {
+            if (qBus.state != 0 || qBus.hiImpedance) {
+                qBus.setState(0);
+            }
         }
     }
 

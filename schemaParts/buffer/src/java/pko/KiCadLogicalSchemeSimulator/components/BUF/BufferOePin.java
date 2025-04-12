@@ -8,10 +8,10 @@ public class BufferOePin extends InPin {
     public final Buffer parent;
     public Bus qBus;
 
-    public BufferOePin(String id, Buffer parent, Bus qBus) {
+    public BufferOePin(String id, Buffer parent) {
         super(id, parent);
-        this.qBus = qBus;
         this.parent = parent;
+        this.qBus = parent.getOutBus("Q");
     }
 
     /*Optimiser constructor*/
@@ -19,12 +19,6 @@ public class BufferOePin extends InPin {
         super(oldPin, variantId);
         parent = oldPin.parent;
         qBus = oldPin.qBus;
-        Bus bus;
-        if (parent.reverse) {
-            if ((bus = qBus).state != 0 || bus.hiImpedance) {
-                bus.setState(0);
-            }
-        }
     }
 
     @Override
