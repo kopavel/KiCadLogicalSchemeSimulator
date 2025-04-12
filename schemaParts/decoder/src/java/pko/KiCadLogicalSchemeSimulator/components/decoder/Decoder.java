@@ -122,5 +122,9 @@ public class Decoder extends SchemaPart {
     public void initOuts() {
         outBus = getOutBus("Q");
         outBus.useBitPresentation = true;
+        if (reverse) {
+            outBus.state = outState;
+            outBus.hiImpedance = false;
+        }
     }
 }
