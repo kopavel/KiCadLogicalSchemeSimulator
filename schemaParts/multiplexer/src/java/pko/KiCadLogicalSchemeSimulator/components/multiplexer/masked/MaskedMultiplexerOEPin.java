@@ -33,7 +33,6 @@ package pko.KiCadLogicalSchemeSimulator.components.multiplexer.masked;
 import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 
 public class MaskedMultiplexerOEPin extends InPin {
@@ -53,13 +52,13 @@ public class MaskedMultiplexerOEPin extends InPin {
     }
 
     /*Optimiser constructor*/
-    public MaskedMultiplexerOEPin(Pin oldPin, String variantId, MaskedMultiplexer parent, long mask, long nMask, Bus outBus, Bus[] inBuses) {
+    public MaskedMultiplexerOEPin(MaskedMultiplexerOEPin oldPin, String variantId) {
         super(oldPin, variantId);
-        this.parent = parent;
-        this.mask = mask;
-        this.nMask = nMask;
-        this.outBus = outBus;
-        this.inBuses = inBuses;
+        this.parent = oldPin.parent;
+        this.mask = oldPin.mask;
+        this.nMask = oldPin.nMask;
+        this.outBus = oldPin.outBus;
+        this.inBuses = oldPin.inBuses;
     }
 
     @Override
@@ -108,7 +107,7 @@ public class MaskedMultiplexerOEPin extends InPin {
 
     @Override
     public InPin getOptimised(ModelItem<?> source) {
-        ClassOptimiser<MaskedMultiplexerOEPin> optimiser = new ClassOptimiser<>(this).bind("m", mask).bind("nm", nMask);
+        ClassOptimiser<MaskedMultiplexerOEPin> optimiser = new ClassOptimiser<>(this).bind("m", mask).bind("nm", nMask).cut("o");
         if (source != null) {
             optimiser.cut("setter");
         }
