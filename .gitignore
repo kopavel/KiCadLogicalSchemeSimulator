@@ -10,6 +10,7 @@
 /distro/
 /stuff/work/
 /stuff/examples/**/*.sym_layout
+/stuff/examples/**/*.zip
 /stuff/examples/**/fp-info-cache
 /stuff/examples/**/*.kicad_pcb
 /stuff/examples/**/*.kicad_pro

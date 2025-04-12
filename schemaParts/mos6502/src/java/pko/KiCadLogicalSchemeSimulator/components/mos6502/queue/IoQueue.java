@@ -1,104 +1,123 @@
 package pko.KiCadLogicalSchemeSimulator.components.mos6502.queue;
+import pko.KiCadLogicalSchemeSimulator.components.mos6502.F0Pin;
+import pko.KiCadLogicalSchemeSimulator.components.mos6502.core.Cpu;
+
 public class IoQueue {
-    public Request request;
-    public Request write;
-    int hiAddress;
+    private final Cpu core;
+    private final F0Pin f0Pin;
+    private final Callback loReadWordCallback = lowByte -> this.lowByte = lowByte;
+    public Request head;
     int lowByte;
+    public Request tail;
     int[] resultArray;
     int arrayPos;
+    int arrayLength;
     Callback finalCallback;
     private final Callback hiWordReadCallback = hiByte -> finalCallback.accept((hiByte << 8) | lowByte);
-    private final Callback loReadWordCallback = lowByte -> {
-        shiftWrite();
-        this.lowByte = lowByte;
-        write.address = hiAddress;
-        write.read = true;
-        write.callback = hiWordReadCallback;
-    };
     ArrayCallback arrayCallback;
     private final Callback arrayReadCallback = read -> {
         resultArray[arrayPos++] = read;
-        if (arrayPos == resultArray.length) {
-            arrayCallback.accept(resultArray);
+        if (arrayPos == arrayLength) {
+            arrayCallback.accept();
         }
     };
 
-    public IoQueue() {
-        write = new Request();
-        request = write;
-        write.next = write;
+    public IoQueue(Cpu core, F0Pin f0Pin) {
+        this.core = core;
+        this.f0Pin = f0Pin;
+        tail = new Request();
+        head = tail;
+        tail.next = tail;
     }
 
     public void write(int address, int value) {
         shiftWrite();
-        write.address = address;
-        write.read = false;
-        write.payload = value;
-    }
-
-    public int endAddress() {
-        return 0xffff;
+        Request request;
+        (request = tail).address = address;
+        request.read = false;
+        request.payload = value;
     }
 
     public void read(int address, Callback callback) {
         shiftWrite();
-        write.address = address;
-        write.read = true;
-        write.callback = callback;
+        Request request;
+        (request = tail).address = address;
+        request.callback = callback;
+        request.read = true;
     }
 
-    public void read(int[] addresses, ArrayCallback callback) {
-        resultArray = new int[addresses.length];
+    public void readArray(int[] addresses, int[] destination, int length, ArrayCallback callback) {
+        resultArray = destination;
         arrayPos = 0;
+        arrayLength = length;
         arrayCallback = callback;
         for (int address : addresses) {
             shiftWrite();
-            write.address = address;
-            write.read = true;
-            write.callback = arrayReadCallback;
+            Request request;
+            (request = tail).address = address;
+            request.callback = arrayReadCallback;
+            request.read = true;
         }
     }
 
     public void writeWord(int lo, int hi, int value) {
         shiftWrite();
-        write.address = lo;
-        write.read = false;
-        write.payload = value & 0xff;
+        Request request;
+        (request = tail).address = lo;
+        request.read = false;
+        request.payload = value & 0xff;
         shiftWrite();
-        write.address = hi;
-        write.read = false;
-        write.payload = value >> 8;
+        (request = tail).address = hi;
+        request.read = false;
+        request.payload = value >> 8;
     }
 
     public void readWord(int lo, int hi, Callback callback) {
         shiftWrite();
-        hiAddress = hi;
         finalCallback = callback;
-        write.address = lo;
-        write.read = true;
-        write.callback = loReadWordCallback;
+        Request request;
+        (request = tail).address = lo;
+        request.callback = loReadWordCallback;
+        request.read = true;
+        shiftWrite();
+        (request = tail).address = hi;
+        request.callback = hiWordReadCallback;
+        request.read = true;
     }
 
     public void clear() {
-        request = write;
-        write.address = -1;
-        write.next = write;
+        head = tail;
+        tail.address = -1;
+        tail.next = tail;
     }
 
-    public Request next() {
-        request.address = -1;
-        return (request = request.next);
+    public Request pop() {
+        Request currentRequest;
+        if ((currentRequest = head).address < 0) {
+            if (currentRequest == tail) {
+                core.step();
+                f0Pin.opCode = true;
+            } else {
+                currentRequest = (head = currentRequest.next);
+                if (currentRequest.address < 0) {
+                    core.step();
+                    f0Pin.opCode = true;
+                }
+            }
+        }
+        return currentRequest;
     }
 
     private void shiftWrite() {
-        if (write.next.address != -1) {
-            Request next = write.next;
-            Request newRequest = new Request();
-            newRequest.next = next;
-            write.next = newRequest;
-            write = newRequest;
-        } else {
-            write = write.next;
+        if (tail.address >= 0) {
+            Request next = tail.next;
+            if (next.address != -1) {
+                Request newRequest = new Request();
+                newRequest.next = next;
+                tail = (tail.next = newRequest);
+            } else {
+                tail = next;
+            }
         }
     }
 }

@@ -49,6 +49,7 @@
 		<symbol name="RAM64K" class="Ram" param="aSize=16;size=8;reverse"/>
 		<symbol name="RAM256" class="Ram" param="aSize=8;size=8;reverse"/>
 		<symbol name="ROM4K" class="Rom" param="aSize=12;size=8;reverse"/>
+		<symbol name="ROM8K" class="Rom" param="aSize=13;size=8;reverse"/>
 		<symbol name="SDRAM64K" class="SdRam" param="aSize=8;size=8;reverse"/>
 		<symbol name="SHIFT" class="SingleOutShifter" param="size=8;outPin=0;plReverse">
 			<unit pinMap="1=D0;2=D1;3=D2;4=D3;5=D4;6=D5;7=D6;8=D7;9=Q;17=CN;18=PL"/>

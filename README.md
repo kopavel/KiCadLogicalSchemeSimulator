@@ -100,3 +100,8 @@ Here are some schema Netlist examples:
 ## License
 
 This project is licensed under the GNU General Public License v3.0 (GPL-3.0). You can find the full text of the license in the [LICENSE](LICENSE) file.
+
+Project use sources from other projects:
+
+- https://github.com/sethm/symon for Mos6502 CPU core logic;
+- https://github.com/codesqueak/Z80Processor for Z80 CPU core logic;

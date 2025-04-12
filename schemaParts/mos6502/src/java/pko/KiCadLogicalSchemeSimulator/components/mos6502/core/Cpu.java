@@ -20,6 +20,9 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+/* 2025.04 Pavel Korzh.
+    Source tuned for generating IO request in queue instead us read/write to/from BUS directly.
+*/
 package pko.KiCadLogicalSchemeSimulator.components.mos6502.core;
 import lombok.Getter;
 import lombok.Setter;
@@ -39,7 +42,7 @@ public class Cpu implements InstructionTable {
     public static final int P_IRQ_DISABLE = 0x04;
     public static final int P_DECIMAL = 0x08;
     public static final int P_BREAK = 0x10;
-    // Bit 5 is always '1'
+    // Bit 5 always '1'
     public static final int P_OVERFLOW = 0x40;
     public static final int P_NEGATIVE = 0x80;
     // NMI vector
@@ -131,87 +134,6 @@ public class Cpu implements InstructionTable {
     private final Callback step2fCallback = tmp -> stepXf(tmp & 4);
     private final Callback step1fCallback = tmp -> stepXf(tmp & 2);
     private final Callback step0fCallback = tmp -> stepXf(tmp & 1);
-    /* Simulated behavior */
-    @Setter
-    @Getter
-    private CpuBehavior behavior;
-    private final Callback stepFdCallback = data -> {
-        if (state.decimalModeFlag) {
-            state.a = sbcDecimal(state.a, data);
-        } else {
-            state.a = sbc(state.a, data);
-        }
-    };
-    private final Callback step7dCallback = data -> {
-        if (state.decimalModeFlag) {
-            state.a = adcDecimal(state.a, data);
-        } else {
-            state.a = adc(state.a, data);
-        }
-    };
-    /* The Bus */
-    @Setter
-    @Getter
-    private IoQueue ioQueue;
-    private int writeAddress;
-    private final Callback step0cCallback = tmp -> {
-        setZeroFlag((state.a & tmp) == 0);
-        tmp |= state.a;
-        tmp = tmp & 0xff;
-        ioQueue.write(writeAddress, tmp);
-    };
-    private final Callback step1cCallback = tmp -> {
-        setZeroFlag((state.a & tmp) == 0);
-        tmp &= ~(state.a);
-        tmp &= 0xff;
-        ioQueue.write(writeAddress, tmp);
-    };
-    private final Callback stepf7Callback = data -> ioQueue.write(writeAddress, data & 0xff | 0b10000000);
-    private final Callback stepe7Callback = data -> ioQueue.write(writeAddress, data & 0xff | 0b01000000);
-    private final Callback stepd7Callback = data -> ioQueue.write(writeAddress, data & 0xff | 0b00100000);
-    private final Callback stepc7Callback = data -> ioQueue.write(writeAddress, data & 0xff | 0b00010000);
-    private final Callback stepb7Callback = data -> ioQueue.write(writeAddress, data & 0xff | 0b00001000);
-    private final Callback stepa7Callback = data -> ioQueue.write(writeAddress, data & 0xff | 0b00000100);
-    private final Callback step97Callback = data -> ioQueue.write(writeAddress, data & 0xff | 0b00000010);
-    private final Callback step87Callback = data -> ioQueue.write(writeAddress, data & 0xff | 0b00000001);
-    private final Callback step77Callback = data -> ioQueue.write(writeAddress, data & 0b01111111);
-    private final Callback step67Callback = data -> ioQueue.write(writeAddress, data & 0b10111111);
-    private final Callback step57Callback = data -> ioQueue.write(writeAddress, data & 0b11011111);
-    private final Callback step47Callback = data -> ioQueue.write(writeAddress, data & 0b11101111);
-    private final Callback step37Callback = data -> ioQueue.write(writeAddress, data & 0b11110111);
-    private final Callback step27Callback = data -> ioQueue.write(writeAddress, data & 0b11111011);
-    private final Callback step17Callback = data -> ioQueue.write(writeAddress, data & 0b11111101);
-    private final Callback step07Callback = data -> ioQueue.write(writeAddress, data & 0b11111110);
-    private final Callback stap1aCallback = data -> {
-        int tmp = asl(data);
-        ioQueue.write(writeAddress, tmp);
-        setArithmeticFlags(tmp);
-    };
-    private final Callback stepFeCallback = data -> {
-        int tmp = (data + 1) & 0xff;
-        ioQueue.write(writeAddress, tmp);
-        setArithmeticFlags(tmp);
-    };
-    private final Callback step3eCallback = data -> {
-        int tmp = rol(data);
-        ioQueue.write(writeAddress, tmp);
-        setArithmeticFlags(tmp);
-    };
-    private final Callback step5eCallback = data -> {
-        int tmp = lsr(data);
-        ioQueue.write(writeAddress, tmp);
-        setArithmeticFlags(tmp);
-    };
-    private final Callback stepDeCallback = data -> {
-        int tmp = (data - 1) & 0xff;
-        ioQueue.write(writeAddress, tmp);
-        setArithmeticFlags(tmp);
-    };
-    private final Callback step7eCallback = data -> {
-        int tmp = ror(data);
-        ioQueue.write(writeAddress, tmp);
-        setArithmeticFlags(tmp);
-    };
     private final Callback step3Callback = effectiveAddress -> {
         int hi, lo; // Address calculation
         // Execute
@@ -221,7 +143,7 @@ public class Cpu implements InstructionTable {
                 handleBrk(state.pc + 1);
                 break;
             case 0x08: // PHP - Push Processor Status - Implied
-                // Break flag is always set in the stack value.
+                // Break flag always set in the stack value.
                 stackPush(state.getStatusFlag() | 0x10);
                 break;
             case 0x10: // BPL - Branch if Positive - Relative
@@ -941,11 +863,90 @@ public class Cpu implements InstructionTable {
                 break;
         }
     };
-    private final Callback step2_1Callback = read -> step3Callback.accept((read + state.y) & 0xffff);
-    private final ArrayCallback step2Callback = readArray -> {
+    /* Simulated behavior */
+    @Setter
+    @Getter
+    private CpuBehavior behavior;
+    private final Callback stepFdCallback = data -> {
+        if (state.decimalModeFlag) {
+            state.a = sbcDecimal(state.a, data);
+        } else {
+            state.a = sbc(state.a, data);
+        }
+    };
+    private final Callback step7dCallback = data -> {
+        if (state.decimalModeFlag) {
+            state.a = adcDecimal(state.a, data);
+        } else {
+            state.a = adc(state.a, data);
+        }
+    };
+    /* The Bus */
+    @Setter
+    @Getter
+    private IoQueue ioQueue;
+    private int writeAddress;
+    private final Callback step0cCallback = tmp -> {
+        setZeroFlag((state.a & tmp) == 0);
+        tmp |= state.a;
+        tmp = tmp & 0xff;
+        ioQueue.write(writeAddress, tmp);
+    };
+    private final Callback step1cCallback = tmp -> {
+        setZeroFlag((state.a & tmp) == 0);
+        tmp &= ~(state.a);
+        tmp &= 0xff;
+        ioQueue.write(writeAddress, tmp);
+    };
+    private final Callback stepf7Callback = data -> ioQueue.write(writeAddress, data & 0xff | 0b10000000);
+    private final Callback stepe7Callback = data -> ioQueue.write(writeAddress, data & 0xff | 0b01000000);
+    private final Callback stepd7Callback = data -> ioQueue.write(writeAddress, data & 0xff | 0b00100000);
+    private final Callback stepc7Callback = data -> ioQueue.write(writeAddress, data & 0xff | 0b00010000);
+    private final Callback stepb7Callback = data -> ioQueue.write(writeAddress, data & 0xff | 0b00001000);
+    private final Callback stepa7Callback = data -> ioQueue.write(writeAddress, data & 0xff | 0b00000100);
+    private final Callback step97Callback = data -> ioQueue.write(writeAddress, data & 0xff | 0b00000010);
+    private final Callback step87Callback = data -> ioQueue.write(writeAddress, data & 0xff | 0b00000001);
+    private final Callback step77Callback = data -> ioQueue.write(writeAddress, data & 0b01111111);
+    private final Callback step67Callback = data -> ioQueue.write(writeAddress, data & 0b10111111);
+    private final Callback step57Callback = data -> ioQueue.write(writeAddress, data & 0b11011111);
+    private final Callback step47Callback = data -> ioQueue.write(writeAddress, data & 0b11101111);
+    private final Callback step37Callback = data -> ioQueue.write(writeAddress, data & 0b11110111);
+    private final Callback step27Callback = data -> ioQueue.write(writeAddress, data & 0b11111011);
+    private final Callback step17Callback = data -> ioQueue.write(writeAddress, data & 0b11111101);
+    private final Callback step07Callback = data -> ioQueue.write(writeAddress, data & 0b11111110);
+    private final Callback stap1aCallback = data -> {
+        int tmp = asl(data);
+        ioQueue.write(writeAddress, tmp);
+        setArithmeticFlags(tmp);
+    };
+    private final Callback stepFeCallback = data -> {
+        int tmp = (data + 1) & 0xff;
+        ioQueue.write(writeAddress, tmp);
+        setArithmeticFlags(tmp);
+    };
+    private final Callback step3eCallback = data -> {
+        int tmp = rol(data);
+        ioQueue.write(writeAddress, tmp);
+        setArithmeticFlags(tmp);
+    };
+    private final Callback step5eCallback = data -> {
+        int tmp = lsr(data);
+        ioQueue.write(writeAddress, tmp);
+        setArithmeticFlags(tmp);
+    };
+    private final Callback stepDeCallback = data -> {
+        int tmp = (data - 1) & 0xff;
+        ioQueue.write(writeAddress, tmp);
+        setArithmeticFlags(tmp);
+    };
+    private final Callback step7eCallback = data -> {
+        int tmp = ror(data);
+        ioQueue.write(writeAddress, tmp);
+        setArithmeticFlags(tmp);
+    };
+    private final ArrayCallback step2Callback = () -> {
         int irAddressMode = (state.ir >> 2) & 0x07;  // Bits 3-5 of IR:  [ | | |X|X|X| | ]
         int irOpMode = state.ir & 0x03;              // Bits 6-7 of IR:  [ | | | | | |X|X]
-        state.args = readArray;
         state.stepCounter++;
         // Get the data from the effective address (if any)
         int tmp; // Temporary storage
@@ -1029,23 +1030,25 @@ public class Cpu implements InstructionTable {
                 break;
         }
     };
+    private final Callback step2_1Callback = read -> step3Callback.accept((read + state.y) & 0xffff);
+    int[] addressArray = new int[2];
     private final Callback step1Callback = read -> {
         state.ir = read;
         incrementPC();
         state.opTrap = false;
         // Decode the instruction and operands
         state.instSize = Cpu.instructionSizes[state.ir];
-        int[] statesArray = new int[state.instSize];
-        for (int i = 0; i < state.instSize - 1; i++) {
-            statesArray[i] = state.pc;
+        int length = state.instSize - 1;
+        for (int i = 0; i < length; i++) {
+            addressArray[i] = state.pc;
             // Increment PC after reading
             incrementPC();
         }
-        ioQueue.read(statesArray, step2Callback);
+        ioQueue.readArray(addressArray, state.args, length, step2Callback);
     };
 
     /**
-     * Construct a new CPU.
+     * Build a new CPU.
      */
     public Cpu() {
         this(CpuBehavior.NMOS_6502);
@@ -1218,6 +1221,7 @@ public class Cpu implements InstructionTable {
 
     /**
      * Handle the common behavior of BRK, /IRQ, and /NMI
+     * <p>
      *
      * @ on memory access failure
      */
@@ -1277,7 +1281,7 @@ public class Cpu implements InstructionTable {
         setZeroFlag(result == 0);
         state.overflowFlag = false; // BCD never sets overflow flag
         if (behavior == CpuBehavior.NMOS_6502 || behavior == CpuBehavior.NMOS_WITH_ROR_BUG) {
-            state.negativeFlag = false; // BCD is never negative on NMOS 6502
+            state.negativeFlag = false; // BCD never negative on NMOS 6502
         } else {
             state.negativeFlag = (result & 0x80) != 0; // N Flag is valid on CMOS 6502/65816
         }
@@ -1314,7 +1318,7 @@ public class Cpu implements InstructionTable {
         setZeroFlag(result == 0);
         state.overflowFlag = false; // BCD never sets overflow flag
         if (behavior == CpuBehavior.NMOS_6502 || behavior == CpuBehavior.NMOS_WITH_ROR_BUG) {
-            state.negativeFlag = false; // BCD is never negative on NMOS 6502
+            state.negativeFlag = false; // BCD never negative on NMOS 6502
         } else {
             state.negativeFlag = (result & 0x80) != 0; // N Flag is valid on CMOS 6502/65816
         }

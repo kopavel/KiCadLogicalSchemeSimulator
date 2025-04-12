@@ -99,26 +99,4 @@ public class CpuState {
         }
         return status;
     }
-
-    public String getInstructionByteStatus() {
-        switch (Cpu.instructionSizes[ir]) {
-            case 0:
-            case 1:
-                return Utils.wordToHex(lastPc) + "  " + Utils.byteToHex(ir) + "      ";
-            case 2:
-                return Utils.wordToHex(lastPc) + "  " + Utils.byteToHex(ir) + " " + Utils.byteToHex(args[0]) + "   ";
-            case 3:
-                return Utils.wordToHex(lastPc) + "  " + Utils.byteToHex(ir) + " " + Utils.byteToHex(args[0]) + " " + Utils.byteToHex(args[1]);
-            default:
-                return null;
-        }
-    }
-
-    /**
-     * @return A string representing the current status register state.
-     */
-    public String getProcessorStatusString() {
-        return "[" + (negativeFlag ? 'N' : '.') + (overflowFlag ? 'V' : '.') + "-" + (breakFlag ? 'B' : '.') + (decimalModeFlag ? 'D' : '.') +
-                (irqDisableFlag ? 'I' : '.') + (zeroFlag ? 'Z' : '.') + (carryFlag ? 'C' : '.') + "]";
-    }
 }

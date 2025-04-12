@@ -33,21 +33,14 @@ package pko.KiCadLogicalSchemeSimulator.components.mos6502;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api.wire.FallingEdgePin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.components.mos6502.core.Cpu;
-import pko.KiCadLogicalSchemeSimulator.components.mos6502.queue.IoQueue;
-import pko.KiCadLogicalSchemeSimulator.components.mos6502.queue.Request;
 
 public class Mos6502 extends SchemaPart {
-    private final Cpu core;
-    private final IoQueue queue;
-    public InPin f0Pin;
-    public FallingEdgePin nRdyPin;
-    public InPin nNmiPin;
-    public InPin nIrqPin;
-    public InPin nSoPin;
+    public final InPin rdyPin;
+    public final Cpu core;
+    public final F0Pin f0Pin;
     public InBus dIn;
     public Pin f1Pin;
     public Pin f2Pin;
@@ -55,15 +48,12 @@ public class Mos6502 extends SchemaPart {
     public Pin rwPin;
     public Bus dOut;
     public Bus aOut;
-    public boolean isReady;
-    private Request curentRequest;
+    public boolean opCode;
 
     protected Mos6502(String id, String sParam) {
         super(id, sParam);
         core = new Cpu();
-        queue = new IoQueue();
-        core.setIoQueue(queue);
-        addInPin(new InPin("~{RESET}", this) {
+        addInPin(new InPin("~{RES}", this) {
             @Override
             public void setHi() {
                 state = true;
@@ -113,50 +103,9 @@ public class Mos6502 extends SchemaPart {
                 core.state.overflowFlag = true;
             }
         });
-        InPin rdyPin = addInPin("~{RDY}");
-        addInPin(new InPin("F0", this) {
-            @Override
-            public void setHi() {
-                if (isReady) {
-                    if (curentRequest != null && curentRequest.read) {
-                        curentRequest.callback.accept((int) dIn.state);
-                    }
-                    curentRequest = queue.next();
-                    f2Pin.setLo();
-                    if (curentRequest == null) {
-                        core.step();
-                        curentRequest = queue.request;
-                    }
-                    f1Pin.setHi();
-                    aOut.setState(curentRequest.address);
-                    if (curentRequest.read) {
-                        if (!rwPin.state) {
-                            rwPin.setHi();
-                        }
-                        if (!dOut.hiImpedance) {
-                            dOut.setHiImpedance();
-                        }
-                    } else {
-                        if (rwPin.state) {
-                            rwPin.setLo();
-                        }
-                    }
-                    f1Pin.setLo();
-                }
-                isReady = rdyPin.state;
-            }
-
-            @Override
-            public void setLo() {
-                if (isReady) {
-                    f2Pin.setHi();
-                    if (!curentRequest.read) {
-                        dOut.setState(curentRequest.payload);
-                    }
-                }
-            }
-        });
+        rdyPin = addInPin("~{RDY}");
         dIn = addInBus("D", 8);
+        f0Pin = addInPin(new F0Pin("F0", this));
         addTriStateOutBus("D", 8);
         addOutBus("A", 16);
         addOutPin("F1");
@@ -167,21 +116,27 @@ public class Mos6502 extends SchemaPart {
 
     @Override
     public void reset() {
-        isReady = false;
+        f0Pin.isReady = false;
         if (!dOut.hiImpedance) {
             dOut.setHiImpedance();
         }
-        queue.clear();
+        f0Pin.queue.clear();
         core.reset();
     }
 
     @Override
     public void initOuts() {
         f1Pin = getOutPin("F1");
+        f0Pin.f1Pin = f1Pin;
         f2Pin = getOutPin("F2");
+        f0Pin.f2Pin = f2Pin;
         syncPin = getOutPin("SYNC");
+        f0Pin.syncPin = syncPin;
         rwPin = getOutPin("R/~{W}");
+        f0Pin.rwPin = rwPin;
         dOut = getOutBus("D");
+        f0Pin.dOut = dOut;
         aOut = getOutBus("A");
+        f0Pin.aOut = aOut;
     }
 }
