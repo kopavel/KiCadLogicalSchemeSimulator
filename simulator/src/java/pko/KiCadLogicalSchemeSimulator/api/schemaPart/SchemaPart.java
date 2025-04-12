@@ -216,15 +216,22 @@ public abstract class SchemaPart {
     }
 
     public void addTriStateOutBus(String pinId, int size, String... names) {
+        PinType type;
         if (pinType.containsKey(pinId)) {
-            throw new RuntimeException("Double pin name in " + id + ":" + pinId);
+            if (pinType.get(pinId) == input) {
+                type = bidirectional;
+            } else {
+                throw new RuntimeException("Double pin name in " + id + ":" + pinId);
+            }
+        } else {
+            type = output;
         }
+        pinType.put(pinId, type);
         TriStateOutBus pin = new TriStateOutBus(pinId, this, size, names);
-        pinType.put(pinId, output);
         outPins.put(pinId, pin);
         ids.put(outPins.get(pinId), pinId);
         for (String alias : pin.aliasOffsets.keySet()) {
-            pinType.put(alias, output);
+            pinType.put(alias, type);
             outPins.put(alias, pin);
         }
     }
