@@ -164,6 +164,9 @@ public class Net {
             SchemaPart schemaPart = this.schemaParts.computeIfAbsent(id, i -> createSchemaPart(schemaPartConfig.clazz, id, schemaPartConfig.getParamString()));
             String pinName = pinConfig == null ? node.getPinfunction() : pinConfig.pinName;
             SchemaPart.PinType pinType = schemaPart.getPinType(pinName);
+            if (pinType == null) {
+                throw new RuntimeException("Can't determinate pin type for " + id + ":" + pinName);
+            }
             switch (pinType) {
                 case input -> {
                     IModelItem<?> destination = schemaPart.getInItem(pinName);
