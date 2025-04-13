@@ -110,7 +110,7 @@ public class IoQueue {
     }
 
     public String toString() {
-        Request request = head;
+        Request request = head.next;
         StringBuilder sb = new StringBuilder();
         while (request.address >= 0) {
             sb.append(request).append(";");

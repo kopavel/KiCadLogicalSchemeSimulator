@@ -36,6 +36,7 @@ import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.components.mos6502.core.Cpu;
+import pko.KiCadLogicalSchemeSimulator.components.mos6502.queue.Request;
 
 public class Mos6502 extends SchemaPart {
     public final InPin rdyPin;
@@ -140,6 +141,7 @@ public class Mos6502 extends SchemaPart {
 
     @Override
     public String extraState() {
-        return "Queue:" + f0Pin.queue.toString() + "\n" + core.state.toTraceEvent();
+        Request request = f0Pin.curentRequest;
+        return "Queue:" + (request.address < 0 ? "" : (request + ";")) + f0Pin.queue.toString() + "\n" + core.state.toTraceEvent();
     }
 }
