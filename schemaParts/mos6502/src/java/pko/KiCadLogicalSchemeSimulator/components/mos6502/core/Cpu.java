@@ -20,8 +20,9 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+
 /* 2025.04 Pavel Korzh.
-    Source tuned for generating IO request in queue instead us read/write to/from BUS directly.
+    Source gotten from https://github.com/sethm/symon and  tuned for generating IO request in queue instead us read/write to/from BUS directly.
 */
 package pko.KiCadLogicalSchemeSimulator.components.mos6502.core;
 import lombok.Getter;

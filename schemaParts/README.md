@@ -22,6 +22,7 @@ Some interactive parts has additional interfaces/functionality if you click on i
 * [Led16SegmentDisplay](led16SegmentDisplay/README.md) — 16 segment LED display.
 * [Led7SegmentDisplay](led7SegmentDisplay/README.md) — 7 segment LED display.
 * [MaskedMultiplexer]( multiplexer/MaskedMultiplexer.md) — Multiplexer with a defined amount outputs and ways with masking inputs.
+* [Mos6502](mos6502/README.md) - Mos 6502 CPU.
 * [MultiOutDecoder](decoder/MultiOutDecoder.md) — Decoder with multiple output pin groups.
 * [MultiPartConter](counter/MultiPartCounter.md) — Multipart binary counter.
 * [Multiplexer](multiplexer/README.md) — Multiplexer with a defined amount outputs and ways.
@@ -42,6 +43,6 @@ Some interactive parts has additional interfaces/functionality if you click on i
 * [StateMachine](stateMachine/README.md) — Logical state machine.
 * [Switch](switch/README.md) — Interactive “normally opened” switch.
 * [XorGate](xor/README.md) — Logical XOR gate.
-* [Z80Cpu](z80/README.md) — Zilog Z80 CPU pin and timing level functionality.
+* [Z80Cpu](z80/README.md) — Zilog Z80 CPU.
 
 * more follows … 
