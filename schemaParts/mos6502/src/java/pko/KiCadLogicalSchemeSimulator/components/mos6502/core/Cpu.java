@@ -947,6 +947,10 @@ public class Cpu implements InstructionTable {
     };
     private final Callback step2_1Callback = read -> step3Callback.accept((read + state.y) & 0xffff);
     private final ArrayCallback step2Callback = () -> {
+        state.lastIr = state.ir;
+        state.lastPc = state.irPc;
+        state.lastArgs[0] = state.args[0];
+        state.lastArgs[1] = state.args[1];
         int irAddressMode = (state.ir >> 2) & 0x07;  // Bits 3-5 of IR:  [ | | |X|X|X| | ]
         int irOpMode = state.ir & 0x03;              // Bits 6-7 of IR:  [ | | | | | |X|X]
         state.stepCounter++;
@@ -1066,6 +1070,64 @@ public class Cpu implements InstructionTable {
     }
 
     /**
+     * Return a formatted string representing the last instruction and
+     * operands that were executed.
+     *
+     * @return A string representing the mnemonic and operands of the instruction
+     */
+    public static String disassembleOp(int opCode, int[] args) {
+        if (opCode < 0) {
+            return "Reading";
+        }
+        String mnemonic = opcodeNames[opCode];
+        if (mnemonic == null) {
+            return "???";
+        }
+        StringBuilder sb = new StringBuilder(mnemonic);
+        switch (instructionModes[opCode]) {
+            case ABS:
+                sb.append(" $").append(Utils.wordToHex(Utils.address(args[0], args[1])));
+                break;
+            case AIX:
+                sb.append(" ($").append(Utils.wordToHex(Utils.address(args[0], args[1]))).append(",X)");
+                break;
+            case ABX:
+                sb.append(" $").append(Utils.wordToHex(Utils.address(args[0], args[1]))).append(",X");
+                break;
+            case ABY:
+                sb.append(" $").append(Utils.wordToHex(Utils.address(args[0], args[1]))).append(",Y");
+                break;
+            case IMM:
+                sb.append(" #$").append(Utils.byteToHex(args[0]));
+                break;
+            case IND:
+                sb.append(" ($").append(Utils.wordToHex(Utils.address(args[0], args[1]))).append(")");
+                break;
+            case ZPI:
+                sb.append(" ($").append(Utils.byteToHex(args[0])).append(")");
+                break;
+            case XIN:
+                sb.append(" ($").append(Utils.byteToHex(args[0])).append(",X)");
+                break;
+            case INY:
+                sb.append(" ($").append(Utils.byteToHex(args[0])).append("),Y");
+                break;
+            case REL:
+            case ZPR:
+            case ZPG:
+                sb.append(" $").append(Utils.byteToHex(args[0]));
+                break;
+            case ZPX:
+                sb.append(" $").append(Utils.byteToHex(args[0])).append(",X");
+                break;
+            case ZPY:
+                sb.append(" $").append(Utils.byteToHex(args[0])).append(",Y");
+                break;
+        }
+        return sb.toString();
+    }
+
+    /**
      * Reset the CPU to known initial values.
      */
     public void reset() {
@@ -1101,7 +1163,7 @@ public class Cpu implements InstructionTable {
      */
     public void step() {
         // Store the address from which the IR was read, for debugging.
-        state.lastPc = state.pc;
+        state.irPc = state.pc;
         // Check for Interrupts before doing anything else.
         // This will set the PC and jump to the interrupt vector.
         if (state.nmiAsserted) {

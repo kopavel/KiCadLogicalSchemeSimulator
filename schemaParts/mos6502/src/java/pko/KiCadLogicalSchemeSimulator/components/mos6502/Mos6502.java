@@ -69,7 +69,6 @@ public class Mos6502 extends SchemaPart {
             @Override
             public void setHi() {
                 state = true;
-                core.state.nmiAsserted = false;
             }
 
             @Override
@@ -82,7 +81,6 @@ public class Mos6502 extends SchemaPart {
             @Override
             public void setHi() {
                 state = true;
-                core.state.irqAsserted = false;
             }
 
             @Override
@@ -138,5 +136,10 @@ public class Mos6502 extends SchemaPart {
         f0Pin.dOut = dOut;
         aOut = getOutBus("A");
         f0Pin.aOut = aOut;
+    }
+
+    @Override
+    public String extraState() {
+        return "Queue:" + f0Pin.queue.toString() + "\n" + core.state.toTraceEvent();
     }
 }

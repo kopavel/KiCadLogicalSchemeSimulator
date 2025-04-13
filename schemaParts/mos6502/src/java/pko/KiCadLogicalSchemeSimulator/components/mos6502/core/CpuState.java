@@ -52,11 +52,14 @@ public class CpuState {
     /**
      * Peek-Ahead to next IR
      */
+    public int lastIr = -1;
     public int[] args = new int[2];
+    public int[] lastArgs = new int[2];
     public int instSize;
     public boolean opTrap;
     public boolean irqAsserted;
     public boolean nmiAsserted;
+    public int irPc;
     public int lastPc;
     /* Status Flag Register bits */
     public boolean carryFlag;
@@ -69,6 +72,17 @@ public class CpuState {
     public long stepCounter = 0L;
 
     public CpuState() {
+    }
+
+    /**
+     * Returns a string formatted for the trace log.
+     *
+     * @return a string formatted for the trace log.
+     */
+    public String toTraceEvent() {
+        String opcode = Cpu.disassembleOp(lastIr, lastArgs);
+        return getInstructionByteStatus() + "\n" + String.format("%-14s", opcode) + "\nA:" + Utils.byteToHex(a) + "\nX:" + Utils.byteToHex(x) + "\nY:" +
+                Utils.byteToHex(y) + "\nF:" + Utils.byteToHex(getStatusFlag()) + "\nS:1" + Utils.byteToHex(sp) + "\n" + getProcessorStatusString() + "\n";
     }
 
     /**
@@ -98,5 +112,26 @@ public class CpuState {
             status |= Cpu.P_NEGATIVE;
         }
         return status;
+    }
+
+    public String getInstructionByteStatus() {
+        String retVal = Utils.wordToHex(lastPc) + "  ";
+        if (lastIr < 0) {
+            return retVal + "Reading";
+        }
+        return retVal + switch (Cpu.instructionSizes[lastIr]) {
+            case 0, 1 -> Utils.byteToHex(lastIr) + "      ";
+            case 2 -> Utils.byteToHex(lastIr) + " " + Utils.byteToHex(lastArgs[0]) + "   ";
+            case 3 -> Utils.byteToHex(lastIr) + " " + Utils.byteToHex(lastArgs[0]) + " " + Utils.byteToHex(lastArgs[1]);
+            default -> null;
+        };
+    }
+
+    /**
+     * @return A string representing the current status register state.
+     */
+    public String getProcessorStatusString() {
+        return "[" + (negativeFlag ? 'N' : '.') + (overflowFlag ? 'V' : '.') + "-" + (breakFlag ? 'B' : '.') + (decimalModeFlag ? 'D' : '.') +
+                (irqDisableFlag ? 'I' : '.') + (zeroFlag ? 'Z' : '.') + (carryFlag ? 'C' : '.') + "]";
     }
 }

@@ -109,6 +109,20 @@ public class IoQueue {
         return currentRequest;
     }
 
+    public String toString() {
+        Request request = head;
+        StringBuilder sb = new StringBuilder();
+        while (request.address >= 0) {
+            sb.append(request).append(";");
+            if (request == tail) {
+                break;
+            } else {
+                request = request.next;
+            }
+        }
+        return sb.toString();
+    }
+
     private void shiftWrite() {
         if (tail.address >= 0) {
             Request next = tail.next;
