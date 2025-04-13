@@ -44,6 +44,7 @@ public class RomCsPin extends InPin {
         this.parent = parent;
         aBus = parent.aBus;
         words = parent.words;
+        priority = 1;
     }
 
     @Override

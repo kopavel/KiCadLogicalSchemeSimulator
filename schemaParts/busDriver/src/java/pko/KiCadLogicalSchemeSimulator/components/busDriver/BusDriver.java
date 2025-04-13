@@ -88,7 +88,6 @@ public class BusDriver extends SchemaPart {
                 inPin.priority = 1;
             } else {
                 addInPin(new InPin("OE" + (char) ('a' + i), this) {
-
                     @Override
                     public void setHi() {
                         state = true;
@@ -104,7 +103,7 @@ public class BusDriver extends SchemaPart {
                             outs[finalI].setHiImpedance();
                         }
                     }
-                }).priority = 1;
+                }).priority = -1;
             }
         }
     }
