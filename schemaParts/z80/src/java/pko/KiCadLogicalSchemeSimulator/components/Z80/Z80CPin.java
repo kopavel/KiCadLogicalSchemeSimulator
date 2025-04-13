@@ -30,17 +30,17 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.Z80;
-import com.codingrodent.microprocessor.Z80.Z80Core;
-import com.codingrodent.microprocessor.io.queue.AsyncIoQueue;
-import com.codingrodent.microprocessor.io.queue.Request;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
+import pko.KiCadLogicalSchemeSimulator.components.Z80.core.Z80Core;
+import pko.KiCadLogicalSchemeSimulator.components.Z80.core.queue.IoQueue;
+import pko.KiCadLogicalSchemeSimulator.components.Z80.core.queue.Request;
 
 public class Z80CPin extends InPin {
     final public InBus dIn;
-    final public AsyncIoQueue ioQueue;
+    final public IoQueue ioQueue;
     final public Z80Core cpu;
     private final InPin waitPin;
     public Pin refreshPin;
@@ -75,7 +75,7 @@ public class Z80CPin extends InPin {
 
     @Override
     public void setHi() {
-        AsyncIoQueue queue = ioQueue;
+        IoQueue queue = ioQueue;
         state = true;
         int lM;
         int lT;

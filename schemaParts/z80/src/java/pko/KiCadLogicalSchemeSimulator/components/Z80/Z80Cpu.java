@@ -30,20 +30,20 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.Z80;
-import com.codingrodent.microprocessor.Z80.CPUConstants;
-import com.codingrodent.microprocessor.Z80.Z80Core;
-import com.codingrodent.microprocessor.io.queue.AsyncIoQueue;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
+import pko.KiCadLogicalSchemeSimulator.components.Z80.core.CPUConstants;
+import pko.KiCadLogicalSchemeSimulator.components.Z80.core.Z80Core;
+import pko.KiCadLogicalSchemeSimulator.components.Z80.core.queue.IoQueue;
 
 public class Z80Cpu extends SchemaPart {
     protected final InPin waitPin;
     protected final InBus dIn;
     final Z80Core cpu;
-    final AsyncIoQueue ioQueue = new AsyncIoQueue();
+    final IoQueue ioQueue = new IoQueue();
     protected Bus dOut;
     protected Bus aOut;
     protected Pin rdPin;

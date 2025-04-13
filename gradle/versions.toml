@@ -12,7 +12,6 @@ junit-launcher = { module = 'org.junit.platform:junit-platform-launcher' }
 idea-gui = 'com.jetbrains.intellij.java:java-gui-forms-rt:243.4888'
 swing-flatlaf = 'com.formdev:flatlaf:3.5.1'
 lombok = { module = 'org.projectlombok:lombok', version.ref = 'lombok' }
-z80 = 'com.github.kopavel:Z80Processor:async_IO_v1.7'
 jackson-databind = { module = 'com.fasterxml.jackson.core:jackson-databind', version.ref = 'jackson' }
 jackson-jakarta-annotations = { module = 'com.fasterxml.jackson.module:jackson-module-jakarta-xmlbind-annotations', version.ref = 'jackson' }
 jackson-dataformat-xml = { module = 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml', version.ref = 'jackson' }

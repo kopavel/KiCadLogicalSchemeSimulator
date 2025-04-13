@@ -22,7 +22,7 @@
  */
 
 /* 2025.04 Pavel Korzh.
-    Source gotten from https://github.com/sethm/symon and  tuned for generating IO request in queue instead us read/write to/from BUS directly.
+    Source gotten from https://github.com/sethm/symon and tuned for generating IO request in queue instead us read/write to/from BUS directly.
 */
 package pko.KiCadLogicalSchemeSimulator.components.mos6502.core;
 import lombok.Getter;

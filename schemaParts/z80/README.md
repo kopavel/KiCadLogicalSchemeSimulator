@@ -53,8 +53,8 @@ Implement Zilog Z80 CPU pin and timing level functionality.
 ### Description
 
 This component serves as a pin-level wrapper that emulates the behavior of the Z80 processor at the hardware level.  
-It is based on [fork](https://github.com/kopavel/Z80Processor) from [Z80Processor](https://github.com/codesqueak/Z80Processor) project for the CPU core emulation.
-The core reimplemented in IoQueue/callback manner for possibility postpone IO request in time for processing hardware layer.  
+It is based on sources from [Z80Processor](https://github.com/codesqueak/Z80Processor) project for the CPU core emulation.
+The core reimplemented for generating IORequest instead of direct reading from 'BUS' for possibility postpone IO request in time for processing hardware layer.  
 The emulation accurately represents the timing diagram of the Z80 processor, with the following exceptions:
 
 - M1 always has 4 T states (plus any additional wait states).
