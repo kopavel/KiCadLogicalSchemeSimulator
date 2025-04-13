@@ -32,6 +32,6 @@
 <params recursion="none" xmlns="pko.kicadLogicalSimulator.param">
 	<mapFile>chip</mapFile>
 	<mapFile>retro</mapFile>
-	<part id="ROM1" param="file=led.bin"/>
-	<part id="OSC1" param="start"/>
+	<part id="ROM1" param="file=MOS6532.bin"/>
+	<!--	<part id="OSC1" param="start"/>-->
 </params>

@@ -5,10 +5,10 @@ import pko.KiCadLogicalSchemeSimulator.components.mos6502.core.Cpu;
 public class IoQueue {
     private final Cpu core;
     private final F0Pin f0Pin;
-    private final Callback loReadWordCallback = lowByte -> this.lowByte = lowByte;
     public Request head;
-    int lowByte;
     public Request tail;
+    int lowByte;
+    private final Callback loReadWordCallback = lowByte -> this.lowByte = lowByte;
     int[] resultArray;
     int arrayPos;
     int arrayLength;
@@ -51,7 +51,8 @@ public class IoQueue {
         arrayPos = 0;
         arrayLength = length;
         arrayCallback = callback;
-        for (int address : addresses) {
+        for (int i = 0; i < length; i++) {
+            int address = addresses[i];
             shiftWrite();
             Request request;
             (request = tail).address = address;

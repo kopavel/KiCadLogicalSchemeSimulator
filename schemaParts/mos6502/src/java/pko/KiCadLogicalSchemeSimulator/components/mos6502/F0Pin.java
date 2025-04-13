@@ -81,8 +81,7 @@ public class F0Pin extends InPin {
             dOut.setHiImpedance();
         }
         f1Pin.setHi();
-        //noinspection AssignmentUsedAsCondition
-        if (isReady = rdyPin.state || !request.read) {
+        if (isReady) {
             aOut.setState(request.address);
             if (request.read) {
                 if (!rwPin.state) {
@@ -95,6 +94,7 @@ public class F0Pin extends InPin {
                 syncPin.setHi();
             }
         }
+        isReady = rdyPin.state || !request.read;
         f1Pin.setLo();
     }
 
