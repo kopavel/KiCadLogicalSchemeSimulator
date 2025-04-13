@@ -1170,9 +1170,10 @@ public class Cpu implements InstructionTable {
             handleNmi();
         } else if (state.irqAsserted && !getIrqDisableFlag()) {
             handleIrq(state.pc);
+        } else {
+            // Fetch memory location for this instruction.
+            ioQueue.read(state.pc, step1Callback);
         }
-        // Fetch memory location for this instruction.
-        ioQueue.read(state.pc, step1Callback);
     }
 
     public void setNegativeFlag() {

@@ -35,6 +35,10 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
+import pko.KiCadLogicalSchemeSimulator.tools.MemoryDumpPanel;
+
+import javax.swing.*;
+import java.util.function.Supplier;
 
 public class Mos6532 extends SchemaPart {
     Bus dOut;
@@ -211,7 +215,7 @@ public class Mos6532 extends SchemaPart {
                                     return;
                                 }
                             }
-                            if ((addr & 0b10000) == 0) {
+                            if ((addr & 0b10000) > 0) {
                                 timerInterrupt = (aBus.state & 0b1000) > 0;
                                 timerCount = (timerDivider = switch ((int) (aBus.state & 3)) {
                                     case 0 -> 1;
@@ -221,6 +225,11 @@ public class Mos6532 extends SchemaPart {
                                     default -> throw new IllegalStateException("unreachable");
                                 }) * dIn.state;
                                 timerFlag = false;
+                                if (!pa7Interrupt || !pa7Flag) {
+                                    if (!IRQPin.hiImpedance) {
+                                        IRQPin.setHiImpedance();
+                                    }
+                                }
                                 return;
                             } else {
                                 pa7Interrupt = (aBus.state & 2) > 0;
@@ -246,6 +255,23 @@ public class Mos6532 extends SchemaPart {
         IRQPin = getOutPin("~{IRQ}");
         aPart.initOuts();
         bPart.initOuts();
+    }
+
+    @Override
+    public String extraState() {
+        return "DDRA:" + Long.toBinaryString(aPart.direction) + "\n" +//
+                "DDRB:" + Long.toBinaryString(bPart.direction) + "\n" +//
+                "pa7 Flag:" + pa7Flag + "\n" +//
+                "pa7 PositiveEdge:" + pa7PositiveEdge + "\n" +//
+                "pa7 Interrupt:" + pa7Interrupt + "\n" +//
+                "Timer count:" + timerCount + "\n" +//
+                "Timer divider:" + timerDivider + "\n" +//
+                "timer Flag:" + timerFlag + "\n" +//
+                "timer Interrupt:" + timerInterrupt;
+    }
+
+    public Supplier<JPanel> extraPanel() {
+        return () -> new MemoryDumpPanel(ram);
     }
 
     private class Pins {
