@@ -36,8 +36,6 @@ import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 
-import static pko.KiCadLogicalSchemeSimulator.components.mos6532.Mos6532.Target.*;
-
 public class Mos6532 extends SchemaPart {
     Bus dOut;
     InBus dIn;
@@ -57,7 +55,6 @@ public class Mos6532 extends SchemaPart {
     boolean pa7PositiveEdge;
     long timerDivider = 1;
     long timerCount;
-    Target target;
     long[] ram = new long[128];
     boolean selected;
 
@@ -70,11 +67,13 @@ public class Mos6532 extends SchemaPart {
         RESPin = addInPin(new InPin("~{RES}", this) {
             @Override
             public void setHi() {
+                state = true;
                 selected = cs1Pin.state & !cs2Pin.state;
             }
 
             @Override
             public void setLo() {
+                state = false;
                 selected = false;
                 aPart.reset();
                 bPart.reset();
@@ -83,7 +82,6 @@ public class Mos6532 extends SchemaPart {
                 timerInterrupt = false;
                 timerFlag = false;
                 pa7Flag = false;
-                target = null;
                 if (!IRQPin.hiImpedance) {
                     IRQPin.setHiImpedance();
                 }
@@ -96,29 +94,48 @@ public class Mos6532 extends SchemaPart {
         cs1Pin = addInPin(new InPin("CS1", this) {
             @Override
             public void setHi() {
+                state = true;
                 selected = (!cs2Pin.state) & RESPin.state;
+                if (!selected && !dOut.hiImpedance) {
+                    dOut.setHiImpedance();
+                }
             }
 
             @Override
             public void setLo() {
+                state = false;
                 selected = false;
+                if (!dOut.hiImpedance) {
+                    dOut.setHiImpedance();
+                }
             }
         });
         cs2Pin = addInPin(new InPin("~{CS2}", this) {
             @Override
             public void setHi() {
+                state = true;
                 selected = false;
+                if (!dOut.hiImpedance) {
+                    dOut.setHiImpedance();
+                }
             }
 
             @Override
             public void setLo() {
+                state = false;
                 selected = cs1Pin.state & RESPin.state;
+                if (!selected && !dOut.hiImpedance) {
+                    dOut.setHiImpedance();
+                }
             }
         });
-        addOutBus("D", 8);
+        cs1Pin.priority = -1;
+        cs2Pin.priority = 1;
+        addTriStateOutBus("D", 8);
         addInPin(new InPin("F2", this) {
             @Override
             public void setHi() {
+                state = true;
                 if (timerCount == 0) {
                     timerCount = 255;
                     timerDivider = 1;
@@ -134,28 +151,48 @@ public class Mos6532 extends SchemaPart {
                             if ((addr & 0b100) == 0) {
                                 int mask;
                                 if ((mask = (addr & 3)) == 0) {
-                                    target = DRA;
+                                    dOut.setState(aPart.getState());
                                 } else if (mask == 1) {
-                                    target = DDRA;
+                                    dOut.setState(aPart.direction);
                                 } else if (mask == 2) {
-                                    target = DRB;
+                                    dOut.setState(bPart.getState());
                                 } else {
-                                    target = DDRB;
+                                    dOut.setState(bPart.direction);
                                 }
                                 return;
                             }
                             if ((addr & 1) == 0) {
                                 timerInterrupt = (aBus.state & 0b1000) > 0;
-                                target = timer;
+                                dOut.setState(timerCount / timerDivider);
+                                timerFlag = false;
+                                if (!pa7Interrupt || !pa7Flag) {
+                                    if (!IRQPin.hiImpedance) {
+                                        IRQPin.setHiImpedance();
+                                    }
+                                }
                                 return;
                             }
-                            target = flags;
+                            dOut.setState((timerFlag ? 128 : 0) | (pa7Flag ? 65 : 0));
+                            pa7Flag = false;
+                            if (!timerInterrupt || !timerFlag) {
+                                if (!IRQPin.hiImpedance) {
+                                    IRQPin.setHiImpedance();
+                                }
+                            }
                             return;
                         } else {
-                            target = RAM;
+                            dOut.setState(ram[(int) aBus.state]);
                         }
-                    } else {
-                        target = null;
+                    }
+                }
+            }
+
+            @Override
+            public void setLo() {
+                state = false;
+                timerCount--;
+                if (selected) {
+                    if (!RWPin.state) {
                         if (RSPin.state) {
                             int addr = (int) aBus.state;
                             if ((addr & 0b100) == 0) {
@@ -195,47 +232,7 @@ public class Mos6532 extends SchemaPart {
                         }
                     }
                 }
-            }
-
-            @Override
-            public void setLo() {
-                timerCount--;
-                if (selected & target != null) {
-                    switch (target) {
-                        case RAM:
-                            dOut.setState(ram[(int) aBus.state]);
-                            return;
-                        case DRA:
-                            dOut.setState(aPart.getState());
-                            return;
-                        case DDRA:
-                            dOut.setState(aPart.direction);
-                            return;
-                        case DRB:
-                            dOut.setState(bPart.getState());
-                            return;
-                        case DDRB:
-                            dOut.setState(bPart.direction);
-                            return;
-                        case flags:
-                            dOut.setState((timerFlag ? 128 : 0) | (pa7Flag ? 65 : 0));
-                            pa7Flag = false;
-                            if (!timerInterrupt || !timerFlag) {
-                                if (!IRQPin.hiImpedance) {
-                                    IRQPin.setHiImpedance();
-                                }
-                            }
-                            return;
-                        case timer:
-                            dOut.setState(timerCount / timerDivider);
-                            timerFlag = false;
-                            if (!pa7Interrupt || !pa7Flag) {
-                                if (!IRQPin.hiImpedance) {
-                                    IRQPin.setHiImpedance();
-                                }
-                            }
-                    }
-                } else if (!dOut.hiImpedance) {
+                if (!dOut.hiImpedance) {
                     dOut.setHiImpedance();
                 }
             }
@@ -245,20 +242,10 @@ public class Mos6532 extends SchemaPart {
     @Override
     public void initOuts() {
         dOut = getOutBus("D");
+        dOut.setHiImpedance();
         IRQPin = getOutPin("~{IRQ}");
         aPart.initOuts();
         bPart.initOuts();
-    }
-
-    enum Target {
-        unknown,
-        RAM,
-        DRA,
-        DDRA,
-        DRB,
-        DDRB,
-        timer,
-        flags
     }
 
     private class Pins {
