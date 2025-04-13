@@ -23,6 +23,7 @@ Some interactive parts has additional interfaces/functionality if you click on i
 * [Led7SegmentDisplay](led7SegmentDisplay/README.md) — 7 segment LED display.
 * [MaskedMultiplexer]( multiplexer/MaskedMultiplexer.md) — Multiplexer with a defined amount outputs and ways with masking inputs.
 * [Mos6502](mos6502/README.md) - Mos 6502 CPU.
+* [Mos6532](mos6532/README.md) - Mos 6532 RIOT.
 * [MultiOutDecoder](decoder/MultiOutDecoder.md) — Decoder with multiple output pin groups.
 * [MultiPartConter](counter/MultiPartCounter.md) — Multipart binary counter.
 * [Multiplexer](multiplexer/README.md) — Multiplexer with a defined amount outputs and ways.
