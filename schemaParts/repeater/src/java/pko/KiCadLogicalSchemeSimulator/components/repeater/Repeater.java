@@ -39,7 +39,11 @@ public class Repeater extends SchemaPart {
 
     public Repeater(String id, String sParam) {
         super(id, sParam);
-        addOutPin("OUT", false);
+        if (params.containsKey("openCollector")){
+            addTriStateOutPin("OUT", false);
+        } else {
+            addOutPin("OUT", false);
+        }
         inPin = addInPin(new RepeaterInPin("IN", this));
     }
 

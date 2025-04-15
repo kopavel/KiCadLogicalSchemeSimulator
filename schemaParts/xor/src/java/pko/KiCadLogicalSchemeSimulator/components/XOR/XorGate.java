@@ -48,7 +48,13 @@ public class XorGate extends SchemaPart {
                     state = true;
                     if (out.state != (in2.state)) {
                         if (in2.state) {
-                            out.setHi();
+                            if (parent.params.containsKey("openCollector")){
+                                out.setHiImpedance();
+                                /*Optimiser line o blockEnd oc block rc*/
+                            } else {
+                                out.setHi();
+                                /*Optimiser line o blockEnd rc*/
+                            }
                         } else {
                             out.setLo();
                         }
@@ -62,7 +68,13 @@ public class XorGate extends SchemaPart {
                         if (in2.state) {
                             out.setLo();
                         } else {
-                            out.setHi();
+                            if (parent.params.containsKey("openCollector")){
+                                out.setHiImpedance();
+                                /*Optimiser line o blockEnd oc block rc*/
+                            } else {
+                                out.setHi();
+                                /*Optimiser line o blockEnd rc*/
+                            }
                         }
                     }
                 }
@@ -73,7 +85,13 @@ public class XorGate extends SchemaPart {
                     state = true;
                     if (out.state != in1.state) {
                         if (in1.state) {
-                            out.setHi();
+                            if (parent.params.containsKey("openCollector")){
+                                out.setHiImpedance();
+                                /*Optimiser line o blockEnd oc block rc*/
+                            } else {
+                                out.setHi();
+                                /*Optimiser line o blockEnd rc*/
+                            }
                         } else {
                             out.setLo();
                         }
@@ -85,7 +103,13 @@ public class XorGate extends SchemaPart {
                     state = false;
                     if (out.state == in1.state) {
                         if (!in1.state) {
-                            out.setHi();
+                            if (parent.params.containsKey("openCollector")){
+                                out.setHiImpedance();
+                                /*Optimiser line o blockEnd oc block rc*/
+                            } else {
+                                out.setHi();
+                                /*Optimiser line o blockEnd rc*/
+                            }
                         } else {
                             out.setLo();
                         }
@@ -101,7 +125,13 @@ public class XorGate extends SchemaPart {
                         if (in2.state) {
                             out.setLo();
                         } else {
-                            out.setHi();
+                            if (parent.params.containsKey("openCollector")){
+                                out.setHiImpedance();
+                                /*Optimiser line o blockEnd oc block rc*/
+                            } else {
+                                out.setHi();
+                                /*Optimiser line o blockEnd rc*/
+                            }
                         }
                     }
                 }
@@ -111,7 +141,13 @@ public class XorGate extends SchemaPart {
                     state = false;
                     if (out.state != in2.state) {
                         if (in2.state) {
-                            out.setHi();
+                            if (parent.params.containsKey("openCollector")){
+                                out.setHiImpedance();
+                                /*Optimiser line o blockEnd oc block rc*/
+                            } else {
+                                out.setHi();
+                                /*Optimiser line o blockEnd rc*/
+                            }
                         } else {
                             out.setLo();
                         }
@@ -126,7 +162,13 @@ public class XorGate extends SchemaPart {
                         if (in1.state) {
                             out.setLo();
                         } else {
-                            out.setHi();
+                            if (parent.params.containsKey("openCollector")){
+                                out.setHiImpedance();
+                                /*Optimiser line o blockEnd oc block rc*/
+                            } else {
+                                out.setHi();
+                                /*Optimiser line o blockEnd rc*/
+                            }
                         }
                     }
                 }
@@ -136,7 +178,13 @@ public class XorGate extends SchemaPart {
                     state = false;
                     if (out.state != in1.state) {
                         if (in1.state) {
-                            out.setHi();
+                            if (parent.params.containsKey("openCollector")){
+                                out.setHiImpedance();
+                                /*Optimiser line o blockEnd oc block rc*/
+                            } else {
+                                out.setHi();
+                                /*Optimiser line o blockEnd rc*/
+                            }
                         } else {
                             out.setLo();
                         }
@@ -144,7 +192,11 @@ public class XorGate extends SchemaPart {
                 }
             });
         }
-        addOutPin("OUT");
+        if (params.containsKey("openCollector")){
+            addTriStateOutPin("OUT", false);
+        } else {
+            addOutPin("OUT", false);
+        }
     }
 
     @Override
@@ -153,7 +205,13 @@ public class XorGate extends SchemaPart {
         if (in1.state == in2.state) {
             out.setLo();
         } else {
-            out.setHi();
+            if (params.containsKey("openCollector")){
+                out.setHiImpedance();
+                /*Optimiser line o blockEnd oc block rc*/
+            } else {
+                out.setHi();
+                /*Optimiser line o blockEnd rc*/
+            }
         }
     }
 

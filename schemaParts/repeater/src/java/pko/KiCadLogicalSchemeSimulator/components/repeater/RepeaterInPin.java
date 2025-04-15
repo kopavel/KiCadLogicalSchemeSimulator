@@ -61,7 +61,14 @@ public class RepeaterInPin extends InPin {
             out.setLo();
             /*Optimiser line o blockEnd r block nr*/
         } else {
-            out.setHi();
+            /*Optimiser line o block oc*/
+            if (parent.params.containsKey("openCollector")){
+                out.setHiImpedance();
+                /*Optimiser line o blockEnd oc block rc*/
+            } else {
+                out.setHi();
+                /*Optimiser line o blockEnd rc*/
+            }
             /*Optimiser line o blockEnd nr*/
         }
     }
@@ -72,7 +79,14 @@ public class RepeaterInPin extends InPin {
         state = false;
         /*Optimiser line o block r*/
         if (parent.reverse) {
-            out.setHi();
+            /*Optimiser line o block oc*/
+            if (parent.params.containsKey("openCollector")){
+                out.setHiImpedance();
+                /*Optimiser line o blockEnd oc block rc*/
+            } else {
+                out.setHi();
+                /*Optimiser line o blockEnd rc*/
+            }
             /*Optimiser line o blockEnd r block nr*/
         } else {
             out.setLo();
@@ -87,6 +101,11 @@ public class RepeaterInPin extends InPin {
             optimiser.cut("nr");
         } else {
             optimiser.cut("r");
+        }
+        if (parent.params.containsKey("openCollector")) {
+            optimiser.cut("rc");
+        } else {
+            optimiser.cut("oc");
         }
         if (source != null) {
             optimiser.cut("setter");
