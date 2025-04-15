@@ -333,11 +333,25 @@
 			<unit pinMap="12=IN0;13=IN1;11=OUT"/>
 			<unit pinMap="ignore;7;14"/>
 		</symbol>
+		<symbol name="74LS01" class="AndGate" param="size=2;reverse;openCollector">
+			<unit pinMap="2=IN0;3=IN1;1=OUT"/>
+			<unit pinMap="5=IN0;6=IN1;4=OUT"/>
+			<unit pinMap="8=IN0;9=IN1;10=OUT"/>
+			<unit pinMap="11=IN0;12=IN1;13=OUT"/>
+			<unit pinMap="ignore;7;14"/>
+		</symbol>
 		<symbol name="74LS02" class="OrGate" param="reverse;size=2">
 			<unit pinMap="2=IN0;3=IN1;1=OUT"/>
 			<unit pinMap="5=IN0;6=IN1;4=OUT"/>
 			<unit pinMap="8=IN0;9=IN1;10=OUT"/>
 			<unit pinMap="11=IN0;12=IN1;13=OUT"/>
+			<unit pinMap="ignore;7;14"/>
+		</symbol>
+		<symbol name="74LS03" class="AndGate" param="size=2;reverse;openCollector">
+			<unit pinMap="1=IN0;2=IN1;3=OUT"/>
+			<unit pinMap="4=IN0;5=IN1;6=OUT"/>
+			<unit pinMap="9=IN0;10=IN1;8=OUT"/>
+			<unit pinMap="12=IN0;13=IN1;11=OUT"/>
 			<unit pinMap="ignore;7;14"/>
 		</symbol>
 		<symbol name="74LS04" class="Repeater" param="reverse">
@@ -358,7 +372,56 @@
 			<unit pinMap="13=IN;12=OUT"/>
 			<unit pinMap="ignore;7;14"/>
 		</symbol>
+		<symbol name="74HC05" class="Repeater" param="reverse;openCollector">
+			<unit pinMap="1=IN;2=OUT"/>
+			<unit pinMap="3=IN;4=OUT"/>
+			<unit pinMap="5=IN;6=OUT"/>
+			<unit pinMap="9=IN;8=OUT"/>
+			<unit pinMap="11=IN;10=OUT"/>
+			<unit pinMap="13=IN;12=OUT"/>
+			<unit pinMap="ignore;7;14"/>
+		</symbol>
+		<symbol name="74HC06" class="Repeater" param="reverse;openCollector">
+			<unit pinMap="1=IN;2=OUT"/>
+			<unit pinMap="3=IN;4=OUT"/>
+			<unit pinMap="5=IN;6=OUT"/>
+			<unit pinMap="9=IN;8=OUT"/>
+			<unit pinMap="11=IN;10=OUT"/>
+			<unit pinMap="13=IN;12=OUT"/>
+			<unit pinMap="ignore;7;14"/>
+		</symbol>
+		<symbol name="74LS06N" class="Repeater" param="reverse;openCollector">
+			<unit pinMap="1=IN;2=OUT"/>
+			<unit pinMap="3=IN;4=OUT"/>
+			<unit pinMap="5=IN;6=OUT"/>
+			<unit pinMap="9=IN;8=OUT"/>
+			<unit pinMap="11=IN;10=OUT"/>
+			<unit pinMap="13=IN;12=OUT"/>
+			<unit pinMap="ignore;7;14"/>
+		</symbol>
+		<symbol name="74LS07" class="Repeater" param="reverse;openCollector">
+			<unit pinMap="1=IN;2=OUT"/>
+			<unit pinMap="3=IN;4=OUT"/>
+			<unit pinMap="5=IN;6=OUT"/>
+			<unit pinMap="9=IN;8=OUT"/>
+			<unit pinMap="11=IN;10=OUT"/>
+			<unit pinMap="13=IN;12=OUT"/>
+			<unit pinMap="ignore;7;14"/>
+		</symbol>
+		<symbol name="74LS09" class="AndGate" param="size=2;openCollector">
+			<unit pinMap="1=IN0;2=IN1;3=OUT"/>
+			<unit pinMap="4=IN0;5=IN1;6=OUT"/>
+			<unit pinMap="9=IN0;10=IN1;8=OUT"/>
+			<unit pinMap="12=IN0;13=IN1;11=OUT"/>
+			<unit pinMap="ignore;7;14"/>
+		</symbol>
 		<symbol name="74LS11" class="AndGate" param="size=3">
+			<unit pinMap="1=IN0;2=IN1;13=IN2;12=OUT"/>
+			<unit pinMap="3=IN0;4=IN1;5=IN2;6=OUT"/>
+			<unit pinMap="9=IN0;10=IN1;11=IN2;8=OUT"/>
+			<unit pinMap="ignore;7;14"/>
+		</symbol>
+		<symbol name="74LS12" class="AndGate" param="size=3;reverse;openCollector">
 			<unit pinMap="1=IN0;2=IN1;13=IN2;12=OUT"/>
 			<unit pinMap="3=IN0;4=IN1;5=IN2;6=OUT"/>
 			<unit pinMap="9=IN0;10=IN1;11=IN2;8=OUT"/>
@@ -374,11 +437,37 @@
 			<unit pinMap="9=IN0;10=IN1;12=IN2;13=IN3;8=OUT"/>
 			<unit pinMap="ignore;7;14"/>
 		</symbol>
+		<symbol name="74LS22" class="AndGate" param="size=4;reverse;openCollector">
+			<unit pinMap="1=IN0;2=IN1;4=IN2;5=IN3;6=OUT"/>
+			<unit pinMap="9=IN0;10=IN1;12=IN2;13=IN3;8=OUT"/>
+			<unit pinMap="ignore;7;14"/>
+		</symbol>
+		<symbol name="74LS26" class="AndGate" param="size=2;reverse;openCollector">
+			<unit pinMap="1=IN0;2=IN1;3=OUT"/>
+			<unit pinMap="4=IN0;5=IN1;6=OUT"/>
+			<unit pinMap="9=IN0;10=IN1;8=OUT"/>
+			<unit pinMap="12=IN0;13=IN1;11=OUT"/>
+			<unit pinMap="ignore;7;14"/>
+		</symbol>
 		<symbol name="74LS30" class="AndGate" param="size=8;reverse">
 			<unit pinMap="1=IN0;2=IN1;3=IN2;4=IN3;5=IN4;6=IN5;11=IN6;12=IN7;8=OUT"/>
 			<unit pinMap="ignore;7;14"/>
 		</symbol>
 		<symbol name="74LS32" class="OrGate" param="size=2">
+			<unit pinMap="1=IN0;2=IN1;3=OUT"/>
+			<unit pinMap="4=IN0;5=IN1;6=OUT"/>
+			<unit pinMap="9=IN0;10=IN1;8=OUT"/>
+			<unit pinMap="12=IN0;13=IN1;11=OUT"/>
+			<unit pinMap="ignore;7;14"/>
+		</symbol>
+		<symbol name="74LS33" class="OrGate" param="reverse;size=2;openCollector">
+			<unit pinMap="2=IN0;3=IN1;1=OUT"/>
+			<unit pinMap="5=IN0;6=IN1;4=OUT"/>
+			<unit pinMap="8=IN0;9=IN1;10=OUT"/>
+			<unit pinMap="11=IN0;12=IN1;13=OUT"/>
+			<unit pinMap="ignore;7;14"/>
+		</symbol>
+		<symbol name="74LS38" class="AndGate" param="size=2;reverse;openCollector">
 			<unit pinMap="1=IN0;2=IN1;3=OUT"/>
 			<unit pinMap="4=IN0;5=IN1;6=OUT"/>
 			<unit pinMap="9=IN0;10=IN1;8=OUT"/>
@@ -402,6 +491,13 @@
 			<unit pinMap="1=IN0;2=IN1;3=OUT"/>
 			<unit pinMap="4=IN0;5=IN1;6=OUT"/>
 			<unit pinMap="9=IN0;10=IN1;8=OUT"/>
+			<unit pinMap="12=IN0;13=IN1;11=OUT"/>
+			<unit pinMap="ignore;7;14"/>
+		</symbol>
+		<symbol name="74LS136" class="XorGate" param="openCollector">
+			<unit pinMap="1=IN0;2=IN1;3=OUT"/>
+			<unit pinMap="4=IN0;5=IN1;6=OUT"/>
+			<unit pinMap="9=IN0;10=IN1;11=OUT"/>
 			<unit pinMap="12=IN0;13=IN1;11=OUT"/>
 			<unit pinMap="ignore;7;14"/>
 		</symbol>
@@ -436,6 +532,24 @@
 		<symbol name="74LS393" class="Counter" param="size=4;reverse">
 			<unit pinMap="1=C;2=R;3=Q0;4=Q1;5=Q2;6=Q3"/>
 			<unit pinMap="13=C;12=R;11=Q0;10=Q1;9=Q2;8=Q3"/>
+			<unit pinMap="ignore;7;14"/>
+		</symbol>
+		<symbol name="SN74LS07" class="Repeater" param="openCollector">
+			<unit pinMap="1=IN;2=OUT"/>
+			<unit pinMap="3=IN;4=OUT"/>
+			<unit pinMap="5=IN;6=OUT"/>
+			<unit pinMap="9=IN;8=OUT"/>
+			<unit pinMap="11=IN;10=OUT"/>
+			<unit pinMap="13=IN;12=OUT"/>
+			<unit pinMap="ignore;7;14"/>
+		</symbol>
+		<symbol name="SN74LS07N" class="Repeater" param="openCollector">
+			<unit pinMap="1=IN;2=OUT"/>
+			<unit pinMap="3=IN;4=OUT"/>
+			<unit pinMap="5=IN;6=OUT"/>
+			<unit pinMap="9=IN;8=OUT"/>
+			<unit pinMap="11=IN;10=OUT"/>
+			<unit pinMap="13=IN;12=OUT"/>
 			<unit pinMap="ignore;7;14"/>
 		</symbol>
 	</lib>
