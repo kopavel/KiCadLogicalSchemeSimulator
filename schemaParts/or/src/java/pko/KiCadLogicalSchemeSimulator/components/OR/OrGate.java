@@ -44,7 +44,11 @@ public class OrGate extends SchemaPart {
 
     public OrGate(String id, String sParam) {
         super(id, sParam);
-        addOutPin("OUT", false);
+        if (params.containsKey("openCollector")){
+            addTriStateOutPin("OUT", false);
+        } else {
+            addOutPin("OUT", false);
+        }
         if (!params.containsKey("size")) {
             throw new RuntimeException("Component " + id + " has no parameter \"size\"");
         }

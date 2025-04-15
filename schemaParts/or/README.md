@@ -20,6 +20,7 @@
 #### Optional parameters:
 
 - `reverse`- reverse output for NOR gate.
+- `openColector`- openCollector output
 
 ### Example
 
