@@ -25,6 +25,7 @@ Implements binary decoder.
 
 - `reverse`- `CS` input reversed.
 - `outReverse`- outputs reversed.
+- `decimal`- decimal mode.
 
 ### Example
 

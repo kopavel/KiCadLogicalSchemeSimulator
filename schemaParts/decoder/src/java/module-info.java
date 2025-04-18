@@ -31,9 +31,9 @@
  */
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
 import pko.KiCadLogicalSchemeSimulator.components.decoder.DecoderSpi;
-import pko.KiCadLogicalSchemeSimulator.components.decoder.MultiOutDecoderSpi;
+import pko.KiCadLogicalSchemeSimulator.components.decoder.multiOut.MultiOutDecoderSpi;
 
-module KiCadLogicalSchemeSimulator.components.decoder {
+open module KiCadLogicalSchemeSimulator.components.decoder {
     requires KiCadLogicalSchemeSimulator.simulator;
     provides SchemaPartSpi with DecoderSpi, MultiOutDecoderSpi;
 }

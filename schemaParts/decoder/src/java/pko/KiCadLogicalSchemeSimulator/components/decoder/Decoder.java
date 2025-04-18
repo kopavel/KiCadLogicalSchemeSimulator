@@ -31,14 +31,12 @@
  */
 package pko.KiCadLogicalSchemeSimulator.components.decoder;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 
 public class Decoder extends SchemaPart {
-    private Bus outBus;
-    private boolean csState;
-    private long outState;
+    public Bus outBus;
+    public DecoderABus aBus;
+    public DecoderCsPin csPin;
 
     protected Decoder(String id, String sParam) {
         super(id, sParam);
@@ -46,84 +44,26 @@ public class Decoder extends SchemaPart {
             throw new RuntimeException("Component " + id + " has no parameter \"size\"");
         }
         int inSize = Integer.parseInt(params.get("size"));
-        InBus aBus;
+        aBus = addInBus(new DecoderABus("A", this, inSize));
         if (params.containsKey("outReverse")) {
-            outState = ~1;
-            aBus = addInBus(new InBus("A", this, inSize) {
-                @Override
-                public void setState(long newState) {
-                    state = newState;
-                    outState = ~(1L << newState);
-                    if (csState && (outBus.state != outState || outBus.hiImpedance)) {
-                        outBus.setState(outState);
-                    }
-                }
-            });
+            aBus.outState = ~1;
         } else {
-            outState = 1;
-            aBus = addInBus(new InBus("A", this, inSize) {
-                @Override
-                public void setState(long newState) {
-                    state = newState;
-                    outState = 1L << state;
-                    if (csState) {
-                        if (outBus.state != outState || outBus.hiImpedance) {
-                            outBus.setState(outState);
-                        }
-                    }
-                }
-            });
+            aBus.outState = 1;
         }
-        if (reverse) {
-            addInPin(new InPin("CS", this) {
-                @Override
-                public void setHi() {
-                    state = true;
-                    csState = false;
-                    if (!outBus.hiImpedance) {
-                        outBus.setHiImpedance();
-                    }
-                }
-
-                @Override
-                public void setLo() {
-                    state = false;
-                    csState = true;
-                    if (!aBus.hiImpedance) {
-                        outBus.setState(outState);
-                    }
-                }
-            });
-        } else {
-            addInPin(new InPin("CS", this) {
-                @Override
-                public void setHi() {
-                    state = true;
-                    csState = true;
-                    if (!aBus.hiImpedance) {
-                        outBus.setState(outState);
-                    }
-                }
-
-                @Override
-                public void setLo() {
-                    state = false;
-                    csState = false;
-                    outBus.setHiImpedance();
-                }
-            });
-        }
+        csPin = addInPin(new DecoderCsPin("CS", this));
         int outSize = (int) Math.pow(2, inSize);
         addTriStateOutBus("Q", outSize);
-        csState = reverse;
+        aBus.csState = reverse;
     }
 
     @Override
     public void initOuts() {
         outBus = getOutBus("Q");
+        aBus.outBus = outBus;
+        csPin.outBus = outBus;
         outBus.useBitPresentation = true;
         if (reverse) {
-            outBus.state = outState;
+            outBus.state = aBus.outState;
             outBus.hiImpedance = false;
         }
     }
