@@ -124,6 +124,8 @@ public class Rom extends SchemaPart {
     @Override
     public void initOuts() {
         Bus dBus = getOutBus("D");
+        dBus.hiImpedance=nReverse;
+        aBus.csActive=reverse;
         aBus.dBus = dBus;
         csPin.dBus = dBus;
     }
