@@ -39,6 +39,7 @@ public abstract class InPin extends Pin {
 
     public InPin(Pin oldPin, String variantId) {
         super(oldPin, variantId);
+        triStateIn = oldPin.triStateIn;
     }
 
     public InPin(String id, SchemaPart parent, boolean state) {

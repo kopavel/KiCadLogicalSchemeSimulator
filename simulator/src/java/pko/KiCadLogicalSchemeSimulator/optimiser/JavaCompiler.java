@@ -101,6 +101,7 @@ public class JavaCompiler {
                                    Log.debug(JavaCompiler.class, "Cache and load dynamically optimised class {}", entry.getKey());
                                    byte[] classBytes = entry.getValue().toByteArray();
                                    if (!replaceMap.isEmpty()) {
+                                       //FixMe bench - does it worse it? or JIT do it any way?
                                        classBytes = BytecodeTransformer.transformThisAloadToDup(classBytes, replaceMap);
                                    }
                                    storeClass(entry.getKey(), classBytes);

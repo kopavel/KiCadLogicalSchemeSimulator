@@ -55,8 +55,6 @@ public abstract class Pin extends ModelItem<Pin> {
         state = oldPin.state;
         strong = oldPin.strong;
         hiImpedance = oldPin.hiImpedance;
-        triStateIn = oldPin.triStateIn;
-        triStateOut = oldPin.triStateOut;
         used = oldPin.used;
         priority = oldPin.priority;
         source=oldPin;

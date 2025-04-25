@@ -62,6 +62,7 @@ public class OutBus extends Bus {
     /*Optimiser constructor unroll destination:destinations*/
     public OutBus(OutBus oldBus, String variantId) {
         super(oldBus, variantId);
+        triStateOut = oldBus.triStateOut;
         mask = oldBus.mask;
     }
 
