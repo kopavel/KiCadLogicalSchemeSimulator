@@ -219,7 +219,7 @@ public class OutPin extends Pin {
                 destinations[i] = destinations[i].getOptimised(this);
             }
             split();
-            ClassOptimiser<OutPin> optimiser = new ClassOptimiser<>(this, OutPin.class).unroll("i", toImp.length).unroll("l", toLow.length).unroll("h", toHi.length);
+            ClassOptimiser<OutPin> optimiser = new ClassOptimiser<>(this, OutPin.class).unroll("l", toLow.length).unroll("h", toHi.length);
             if (getRecursionMode() == none) {
                 optimiser.cut("ar");
             } else if (getRecursionMode() == warn) {
@@ -233,6 +233,7 @@ public class OutPin extends Pin {
                     optimiser.replaceMap.put("setLo", toLow.length + 1);
                     optimiser.replaceMap.put("setHiImpedance", toImp.length);
                 }
+                optimiser.unroll("i", toImp.length);
             } else {
                 optimiser.cut("ts");
                 if (getRecursionMode() == none) {

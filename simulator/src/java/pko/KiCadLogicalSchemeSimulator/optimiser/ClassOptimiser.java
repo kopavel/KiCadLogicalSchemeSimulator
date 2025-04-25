@@ -74,8 +74,10 @@ public class ClassOptimiser<T> {
     }
 
     public ClassOptimiser<T> unroll(String id, int size) {
-        unrolls.put(id, new UnrollDescriptor(size));
-        suffix += "_u" + id + size;
+        if (size > 0) {
+            unrolls.put(id, new UnrollDescriptor(size));
+            suffix += "_u" + id + size;
+        }
         return this;
     }
 
@@ -253,40 +255,42 @@ public class ClassOptimiser<T> {
                                     iteratorPattern.put(id, "for (" + iteratorItemType + " " + iteratorParams[0] + " : " + iteratorParams[1] + ") {");
                                     String lineTab = " ".repeat(lineOffset);
                                     String blockTab = " ".repeat(functionOffset);
-                                    if (!unrolls.containsKey(id)) {
-                                        throw new RuntimeException("iterator " + id + " unroll size not specified");
-                                    }
-                                    unrolls.get(id).variable = iteratorParams[0];
-                                    functionSource.append(lineTab)
-                                                  .append(iteratorParams[1])
-                                                  .append("=")
-                                                  .append(oldItemName)
-                                                  .append(".").append(iteratorParams[1]).append(";\n");
-                                    if (addFunctionSource.isEmpty()) {
-                                        addFunctionSource.append(lineTab)
-                                                         .append("splitDestinations();\n")
-                                                         .append(blockTab)
-                                                         .append("}\n\n")
-                                                         .append(blockTab)
-                                                         .append("public void splitDestinations () {\n");
-                                    }
-                                    for (int j = 0; j < unrolls.get(id).size; j++) {
-                                        //add destination variables initialisation
-                                        addFunctionSource.append(lineTab)
-                                                         .append(iteratorParams[0])
-                                                         .append(j)
-                                                         .append(" = ")
-                                                         .append(iteratorParams[1])
-                                                         .append("[")
-                                                         .append(j)
-                                                         .append("];\n");
-                                        //add destination variable definitions
-                                        resultSource.append(blockTab).append("private ")
-                                                    .append(iteratorItemType)
-                                                    .append(" ")
-                                                    .append(iteratorParams[0])
-                                                    .append(j)
-                                                    .append(";\n");
+                                    if (unrolls.containsKey(id)) {
+                                        unrolls.get(id).variable = iteratorParams[0];
+                                        functionSource.append(lineTab)
+                                                      .append(iteratorParams[1])
+                                                      .append("=")
+                                                      .append(oldItemName)
+                                                      .append(".")
+                                                      .append(iteratorParams[1])
+                                                      .append(";\n");
+                                        if (addFunctionSource.isEmpty()) {
+                                            addFunctionSource.append(lineTab)
+                                                             .append("splitDestinations();\n")
+                                                             .append(blockTab)
+                                                             .append("}\n\n")
+                                                             .append(blockTab)
+                                                             .append("public void splitDestinations () {\n");
+                                        }
+                                        for (int j = 0; j < unrolls.get(id).size; j++) {
+                                            //add destination variables initialisation
+                                            addFunctionSource.append(lineTab)
+                                                             .append(iteratorParams[0])
+                                                             .append(j)
+                                                             .append(" = ")
+                                                             .append(iteratorParams[1])
+                                                             .append("[")
+                                                             .append(j)
+                                                             .append("];\n");
+                                            //add destination variable definitions
+                                            resultSource.append(blockTab)
+                                                        .append("private ")
+                                                        .append(iteratorItemType)
+                                                        .append(" ")
+                                                        .append(iteratorParams[0])
+                                                        .append(j)
+                                                        .append(";\n");
+                                        }
                                     }
                                 }
                                 case "bind" -> {

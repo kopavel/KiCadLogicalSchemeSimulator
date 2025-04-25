@@ -357,9 +357,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                 merger.strong,
                 merger.hiImpedance,
                 merger.weakState);
-        if (hiImpedance) {
-            return;
-        }
+        assert !hiImpedance : "Already in hiImpedance:" + this;
         boolean oldState = merger.state;
         if (oldStrong) {
             if (merger.weakState == 0) {

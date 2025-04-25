@@ -199,19 +199,20 @@ public class BusToWiresAdapter extends OutBus {
             }
 */
             ClassOptimiser<BusToWiresAdapter> optimiser =
-                    new ClassOptimiser<>(this).unroll("i", toImp.length).unroll("l", toLow.length).unroll("h", toHi.length).bind("m", mask);
+                    new ClassOptimiser<>(this).unroll("l", toLow.length).unroll("h", toHi.length).bind("m", mask);
             if (source != null) {
                 optimiser.cut("setter");
             }
-            if (!isTriState(source)) {
-                optimiser.cut("ts");
-                if (source == null) {
-                    optimiser.replaceMap.put("setState", 1);
-                }
-            } else {
+            if (isTriState(source)) {
                 optimiser.bind("d", "imp0");
                 if (source == null) {
                     optimiser.replaceMap.put("setState", 2);
+                }
+                optimiser.unroll("i", toImp.length);
+            } else {
+                optimiser.cut("ts");
+                if (source == null) {
+                    optimiser.replaceMap.put("setState", 1);
                 }
             }
             if (destinations.length < 2 || getRecursionMode() == none) {
