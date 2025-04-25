@@ -72,9 +72,9 @@ public class AndGate extends SchemaPart {
     }
 
     @Override
-    public <T> void replaceIn(ModelItem<T> oldPin, ModelItem<T> newPin) {
-        super.replaceIn(oldPin, newPin);
-        ins.put(oldPin.getId(), (AndGateIn) newPin);
+    public <T> void replaceIn(ModelItem<T> oldIn, ModelItem<T> newIn) {
+        super.replaceIn(oldIn, newIn);
+        ins.put(oldIn.getId(), (AndGateIn) newIn);
     }
 
     @Override

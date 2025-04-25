@@ -94,6 +94,7 @@ public class AndGateIn extends InPin {
         /*Optimiser line setter*/
         state = false;
         long state;
+        //FixMe bench it - do this worse?
         AndGate parent;
         if ((state = (parent = this.parent).inState) == 0) {
             /*Optimiser bind mask*/

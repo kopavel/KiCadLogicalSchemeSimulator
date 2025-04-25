@@ -309,10 +309,10 @@ public abstract class SchemaPart {
         }
     }
 
-    public <T> void replaceIn(ModelItem<T> oldPin, ModelItem<T> newPin) {
-        String oldId = ids.remove(oldPin);
-        inPins.put(oldId, newPin);
-        ids.put(newPin, oldId);
+    public <T> void replaceIn(ModelItem<T> oldIn, ModelItem<T> newIn) {
+        String oldId = ids.remove(oldIn);
+        inPins.replaceAll((key, value) -> oldIn == value ? newIn : value);
+        ids.put(newIn, oldId);
     }
 
     public void reset() {
