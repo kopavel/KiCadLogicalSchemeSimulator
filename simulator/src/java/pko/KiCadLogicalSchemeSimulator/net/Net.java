@@ -37,12 +37,14 @@ import pko.KiCadLogicalSchemeSimulator.api.NetFilter;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.TriStateOutBus;
 import pko.KiCadLogicalSchemeSimulator.api.params.ParameterResolver;
 import pko.KiCadLogicalSchemeSimulator.api.params.types.PinConfig;
 import pko.KiCadLogicalSchemeSimulator.api.params.types.SchemaPartConfig;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api.wire.*;
+import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.OutPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.net.bus.BusInInterconnect;
 import pko.KiCadLogicalSchemeSimulator.net.merger.bus.BusMerger;
 import pko.KiCadLogicalSchemeSimulator.net.merger.wire.PassiveInMerger;
@@ -123,9 +125,6 @@ public class Net {
                 //Pin-to-pin connection. Has only one regular or passive pin.
                 for (OutPin pin : pins) {
                     pin.addDestination(destination);
-                    if (pin instanceof TriStateOutPin) {
-                        destination.triState = true;
-                    }
                     retVal = pin;
                 }
                 for (OutPin pin : passivePins) {
@@ -136,9 +135,6 @@ public class Net {
                 //bus-to-pin connection
                 for (Map.Entry<OutBus, Long> bus : buses.entrySet()) {
                     bus.getKey().addDestination(destination, bus.getValue());
-                    if (bus.getKey() instanceof TriStateOutBus) {
-                        destination.triState = true;
-                    }
                 }
             }
         }
@@ -327,26 +323,23 @@ public class Net {
                 } else {
                     //bus-to-bus connection
                     descriptor.buses.forEach((source, offsetMap) -> offsetMap.forEach((offset, mask) -> {
-                        if (source instanceof TriStateOutBus) {
-                            destination.triState = true;
-                        }
                         source.addDestination(destination, mask, offset);
                     }));
                 }
             }
         });
-        for (OutPin wireMerger : wireMergers.values()) {
-            wireMerger.getOptimised(null);
-        }
-        for (OutBus merger : busMergers.values()) {
-            merger.getOptimised(null);
-        }
         schemaParts.values()
                 .stream()
                 .flatMap(p -> p.outPins.values()
                         .stream().distinct().toList()
                         .stream())
                 .forEach(this::replaceOut);
+        for (OutPin wireMerger : wireMergers.values()) {
+            wireMerger.getOptimised(null);
+        }
+        for (OutBus busMerger : busMergers.values()) {
+            busMerger.getOptimised(null);
+        }
     }
 
     private void replaceOut(ModelItem<?> outItem) {

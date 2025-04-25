@@ -42,10 +42,10 @@ import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.war
 public class OffsetBus extends OutBus {
     protected final byte offset;
     public long maskState;
+    public boolean queueImpedance;
 
     public OffsetBus(OutBus outBus, Bus destination, byte offset) {
         super(outBus, "offset" + offset);
-        triState = outBus.triState;
         if (offset == 0) {
             throw new RuntimeException("Offset must not be 0");
         }
@@ -57,59 +57,112 @@ public class OffsetBus extends OutBus {
     public OffsetBus(OffsetBus oldBus, String variantId) {
         super(oldBus, variantId);
         offset = oldBus.offset;
-        triState = oldBus.triState;
         destinations = oldBus.destinations;
+    }
+
+    public void addDestination(Bus item) {
+        item.used = true;
+        item.state = state & maskState;
+        if (offset > 0) {
+            item.state = item.state << offset;
+        } else if (offset < 0) {
+            item.state = item.state >> -offset;
+        }
+        destinations = Utils.addToArray(destinations, item);
     }
 
     @Override
     public void setState(long newState) {
-        /*Optimiser block setters line iSetter*/
+        /*Optimiser line ts  block setter*/
         hiImpedance = false;
         state = newState;
-        /*Optimiser blockEnd setters block mask bind m:mask*/
-        final long newMaskState = newState & mask;
-        if (
-            /*Optimiser line iSetter bind d:destinations[0]*/
-                destinations[0].hiImpedance ||//
-                        maskState != newMaskState) {
+        /*Optimiser blockEnd setter*/
+        final long newMaskState;
+        /*Optimiser block mask bind m:mask*/
+        if (maskState != (newMaskState = newState & mask)
+                /*Optimiser line ts bind d:destinations[0]*///
+                || destinations[0].hiImpedance //
+        ) {
             maskState = newMaskState;
-            /*Optimiser blockEnd mask block setters block allRecurse*/
-            if (processing) {
-                /*Optimiser line recurse*/
-                if (hasQueue) {
-                    if (recurseError()) {
-                        return;
+            /*Optimiser blockEnd mask block ar */
+            switch (processing++) {
+                case 0: {
+                    /*Optimiser blockEnd ar*/
+                    for (Bus destination : destinations) {
+                        /*Optimiser block positive line negative*/
+                        if (offset > 0) {
+                            /*Optimiser bind o:offset bind v:newMaskState*/
+                            destination.setState(newMaskState << offset);
+                            /*Optimiser block negative*/
+                        } else {
+                            /*Optimiser blockEnd positive bind o:-offset bind v:newMaskState*/
+                            destination.setState(newMaskState >> -offset);
+                            /*Optimiser line positive*/
+                        }
+                        /*Optimiser blockEnd negative*/
                     }
-                    /*Optimiser block recurse*/
+                    /*Optimiser block r block ar*/
+                    while (--processing > 0) {
+                        /*Optimiser block ts*/
+                        if (queueImpedance) {
+                            for (Bus destination : destinations) {
+                                destination.setHiImpedance();
+                            }
+                        } else {
+                            /*Optimiser blockEnd ts*/
+                            for (Bus destination : destinations) {
+                                /*Optimiser block positive line negative*/
+                                if (offset > 0) {
+                                    /*Optimiser bind o:offset*/
+                                    destination.setState(maskState << offset);
+                                    /*Optimiser block negative*/
+                                } else {
+                                    /*Optimiser blockEnd positive bind o:-offset*/
+                                    destination.setState(maskState >> -offset);
+                                    /*Optimiser line positive*/
+                                }
+                                /*Optimiser blockEnd negative*/
+                            }
+                            /*Optimiser line ts*/
+                        }
+                    }
+                    /*Optimiser line nr blockEnd r*/
+                    processing = 0;
+                    return;
                 }
-                hasQueue = true;
-                /*Optimiser blockEnd recurse*/
-            } else {
-                processing = true;
-                /*Optimiser blockEnd setters blockEnd allRecurse*/
+                /*Optimiser block ts*/
+                case 1: {
+                    queueImpedance = false;
+                    return;
+                }
+                /*Optimiser blockEnd ts*/
+                case 2: {
+                    recurseError();
+                    return;
+                }
+            }
+            /*Optimiser blockEnd ar line mask*/
+        }
+    }
+
+    @Override
+    public void setHiImpedance() {
+        /*Optimiser block ts line setter*/
+        hiImpedance = true;
+        /*Optimiser block ar */
+        switch (processing++) {
+            case 0: {
+                /*Optimiser blockEnd ar*/
                 for (Bus destination : destinations) {
-                    /*Optimiser block positive line negative*/
-                    if (offset > 0) {
-                        /*Optimiser bind o:offset bind v:newMaskState*/
-                        destination.setState(newMaskState << offset);
-                        /*Optimiser block negative*/
-                    } else {
-                        /*Optimiser blockEnd positive bind o:-offset bind v:newMaskState*/
-                        destination.setState(newMaskState >> -offset);
-                        /*Optimiser line positive*/
-                    }
-                    /*Optimiser blockEnd negative*/
+                    destination.setHiImpedance();
                 }
-                /*Optimiser block setters block recurse block allRecurse*/
-                while (hasQueue) {
-                    hasQueue = false;
-                    /*Optimiser block iSetter*/
-                    if (hiImpedance) {
+                /*Optimiser block r block ar*/
+                while (--processing > 0) {
+                    if (queueImpedance) {
                         for (Bus destination : destinations) {
                             destination.setHiImpedance();
                         }
                     } else {
-                        /*Optimiser blockEnd iSetter*/
                         for (Bus destination : destinations) {
                             /*Optimiser block positive line negative*/
                             if (offset > 0) {
@@ -123,70 +176,22 @@ public class OffsetBus extends OutBus {
                             }
                             /*Optimiser blockEnd negative*/
                         }
-                        /*Optimiser line iSetter*/
                     }
                 }
-                /*Optimiser blockEnd recurse*/
-                processing = false;
+                /*Optimiser line nr blockEnd r*/
+                processing = 0;
+                return;
             }
-            /*Optimiser line mask blockEnd setters blockEnd allRecurse*/
+            case 1: {
+                queueImpedance = true;
+                return;
+            }
+            case 2: {
+                recurseError();
+                return;
+            }
         }
-    }
-
-    /*Optimiser block iSetter*/
-    @Override
-    public void setHiImpedance() {
-        /*Optimiser block setters*/
-        hiImpedance = true;
-        if (processing) {
-            /*Optimiser line recurse*/
-            if (hasQueue) {
-                if (recurseError()) {
-                    return;
-                }
-                /*Optimiser block recurse*/
-            }
-            hasQueue = true;
-            /*Optimiser blockEnd recurse*/
-        } else {
-            processing = true;
-            /*Optimiser blockEnd setters*/
-            for (Bus destination : destinations) {
-                destination.setHiImpedance();
-            }
-            /*Optimiser block setters block recurse*/
-            while (hasQueue) {
-                hasQueue = false;
-                if (hiImpedance) {
-                    for (Bus destination : destinations) {
-                        destination.setHiImpedance();
-                    }
-                } else {
-                    for (Bus destination : destinations) {
-                        /*Optimiser block positive line negative*/
-                        if (offset > 0) {
-                            /*Optimiser bind o:offset*/
-                            destination.setState(state << offset);
-                            /*Optimiser block negative*/
-                        } else {
-                            /*Optimiser blockEnd positive bind o:-offset*/
-                            destination.setState(state >> -offset);
-                            /*Optimiser line positive*/
-                        }
-                        /*Optimiser blockEnd negative*/
-                    }
-                }
-            }
-            /*Optimiser blockEnd recurse*/
-            processing = false;
-        }
-        /*Optimiser blockEnd setters*/
-    }
-    /*Optimiser blockEnd iSetter*/
-
-    public void addDestination(Bus item) {
-        item.used = true;
-        destinations = Utils.addToArray(destinations, item);
+        /*Optimiser blockEnd ar blockEnd ts*/
     }
 
     @Override
@@ -208,17 +213,19 @@ public class OffsetBus extends OutBus {
                 optimiser.cut("positive");
             }
             if (source != null) {
-                optimiser.cut("setters");
+                optimiser.cut("setter");
             }
-            if (!triState) {
-                optimiser.cut("iSetter");
+            if (!isTriState(source)) {
+                optimiser.cut("ts");
             } else if (applyMask != 0) {
                 optimiser.bind("d", "destination0");
             }
             if (destinations.length < 2 || getRecursionMode() == none) {
-                optimiser.cut("allRecurse");
+                optimiser.cut("ar");
             } else if (getRecursionMode() == warn) {
-                optimiser.cut("recurse");
+                optimiser.cut("r");
+            } else {
+                optimiser.cut("nr");
             }
             if (applyMask == 0) {
                 optimiser.cut("mask").bind("v", "newState");

@@ -30,7 +30,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.api.wire;
-import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 
 public abstract class InPin extends Pin {
@@ -45,10 +44,5 @@ public abstract class InPin extends Pin {
     public InPin(String id, SchemaPart parent, boolean state) {
         super(id, parent);
         this.state = state;
-    }
-
-    @Override
-    public InPin getOptimised(ModelItem<?> source) {
-        return (InPin) super.getOptimised(source);
     }
 }

@@ -38,7 +38,7 @@ public class TestInPin extends SchemaPart {
 
     protected TestInPin(String id, String sParam) {
         super(id, sParam);
-        pin = addInPin(new InPin("In", this) {
+        InPin inPin = new InPin("In", this) {
             @Override
             public void setHiImpedance() {
                 hiImpedance = true;
@@ -55,12 +55,14 @@ public class TestInPin extends SchemaPart {
                 hiImpedance = false;
                 state = false;
             }
-        });
+        };
+        inPin.triStateIn = true;
+        pin = addInPin(inPin);
     }
 
     @Override
     public void initOuts() {
-        if (pin.triState) {
+        if (pin.isTriState(pin.source)) {
             pin.hiImpedance = true;
         }
     }

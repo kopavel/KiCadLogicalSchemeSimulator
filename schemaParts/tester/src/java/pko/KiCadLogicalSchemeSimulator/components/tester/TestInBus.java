@@ -44,7 +44,7 @@ public class TestInBus extends SchemaPart {
         } else {
             size = 8;
         }
-        bus = addInBus(new InBus("In", this, size) {
+        InBus inBus = new InBus("In", this, size) {
             @Override
             public void setHiImpedance() {
                 hiImpedance = true;
@@ -55,12 +55,14 @@ public class TestInBus extends SchemaPart {
                 hiImpedance = false;
                 state = newState;
             }
-        });
+        };
+        inBus.triStateIn = true;
+        bus = addInBus(inBus);
     }
 
     @Override
     public void initOuts() {
-        if (bus.triState) {
+        if (bus.isTriState(bus.source)) {
             bus.hiImpedance = true;
         }
     }

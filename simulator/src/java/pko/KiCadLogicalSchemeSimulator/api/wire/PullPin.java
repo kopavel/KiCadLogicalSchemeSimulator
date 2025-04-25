@@ -42,10 +42,6 @@ public class PullPin extends OutPin implements MergerInput<Pin> {
         this.state = state;
     }
 
-    public PullPin(OutPin oldPin, String variantId) {
-        super(oldPin, variantId);
-    }
-
     @Override
     public Pin getOptimised(ModelItem<?> source) {
         for (int i = 0; i < destinations.length; i++) {

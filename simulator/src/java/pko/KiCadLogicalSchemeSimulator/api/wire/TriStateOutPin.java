@@ -36,12 +36,10 @@ public class TriStateOutPin extends OutPin {
     public TriStateOutPin(String id, SchemaPart parent) {
         super(id, parent);
         hiImpedance = true;
-        triState = true;
+        triStateOut = true;
     }
 
     public TriStateOutPin(TriStateOutPin oldPin, String variantId) {
         super(oldPin, variantId);
-        hiImpedance = oldPin.hiImpedance;
-        triState = oldPin.triState;
     }
 }

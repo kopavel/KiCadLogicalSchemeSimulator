@@ -30,7 +30,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.api.bus;
-import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
@@ -64,14 +63,15 @@ public class OutBus extends Bus {
     public OutBus(OutBus oldBus, String variantId) {
         super(oldBus, variantId);
         mask = oldBus.mask;
-        hiImpedance = oldBus.hiImpedance;
-        triState = oldBus.triState;
     }
 
     public void addDestination(Bus bus, long mask, byte offset) {
         used = true;
         bus.used = true;
-        bus.triState = triState;
+        bus.source = this;
+        bus.state = state;
+        bus.hiImpedance = hiImpedance;
+        triStateIn |= bus.triStateIn;
         if (offset != 0) {
             if (corrected.containsKey(mask) && corrected.get(mask).containsKey(offset)) {
                 corrected.get(mask).get(offset).addDestination(bus);
@@ -99,7 +99,9 @@ public class OutBus extends Bus {
     public void addDestination(Pin pin, long mask) {
         used = true;
         pin.used = true;
-        pin.triState = triState;
+        pin.state = (state & mask) >0;
+        pin.hiImpedance = hiImpedance;
+        triStateIn |= pin.triStateIn;
         MaskGroupBus maskGroup = Arrays.stream(destinations)
                 .filter(d -> d instanceof MaskGroupBus)
                 .map(d -> ((MaskGroupBus) d))
@@ -108,14 +110,13 @@ public class OutBus extends Bus {
                     destinations = Utils.addToArray(destinations, groupBus);
                     return groupBus;
                 });
-        BusToWiresAdapter bus = Arrays.stream(maskGroup.destinations)
+        Arrays.stream(maskGroup.destinations)
                 .filter(d -> d instanceof BusToWiresAdapter)
                 .map(d -> (BusToWiresAdapter) d).findFirst().orElseGet(() -> {
-                    BusToWiresAdapter busToWiresAdapter = new BusToWiresAdapter(this, mask);
-                    maskGroup.destinations = Utils.addToArray(maskGroup.destinations, busToWiresAdapter);
-                    return busToWiresAdapter;
-                });
-        bus.addDestination(pin);
+                  BusToWiresAdapter busToWiresAdapter = new BusToWiresAdapter(this, mask);
+                  maskGroup.destinations = Utils.addToArray(maskGroup.destinations, busToWiresAdapter);
+                  return busToWiresAdapter;
+              }).addDestination(pin);
         sort();
     }
 
@@ -124,96 +125,74 @@ public class OutBus extends Bus {
         /*Optimiser line ts*/
         hiImpedance = false;
         state = newState;
-        /*Optimiser block allRecurse*/
-        if (processing) {
-            /*Optimiser line recurse*/
-            if (hasQueue) {
-                if (recurseError()) {
-                    return;
+        /*Optimiser block ar*/
+        switch (processing++) {
+            case 0: {
+                /*Optimiser blockEnd ar*/
+                for (Bus destination : destinations) {
+                    destination.setState(newState);
                 }
-                /*Optimiser block recurse*/
-            }
-            hasQueue = true;
-            /*Optimiser blockEnd recurse*/
-        } else {
-            processing = true;
-            /*Optimiser blockEnd allRecurse*/
-            for (Bus destination : destinations) {
-                destination.setState(newState);
-            }
-            /*Optimiser block recurse block allRecurse*/
-            while (hasQueue) {
-                hasQueue = false;
-                /*Optimiser block ts*/
-                if (hiImpedance) {
-                    for (Bus destination : destinations) {
-                        destination.setHiImpedance();
+                /*Optimiser block r block ar*/
+                while (--processing > 0) {
+                    /*Optimiser block ts*/
+                    if (hiImpedance) {
+                        for (Bus destination : destinations) {
+                            destination.setHiImpedance();
+                        }
+                    } else {
+                        /*Optimiser blockEnd ts*/
+                        for (Bus destination : destinations) {
+                            destination.setState(state);
+                        }
+                        /*Optimiser line ts*/
                     }
-                } else {
-                    /*Optimiser blockEnd ts*/
-                    for (Bus destination : destinations) {
-                        destination.setState(state);
-                    }
-                    /*Optimiser line ts*/
                 }
+                /*Optimiser line nr blockEnd r*/
+                processing = 0;
+                return;
             }
-            /*Optimiser blockEnd recurse*/
-            processing = false;
+            case 2: {
+                recurseError();
+                return;
+            }
         }
-        /*Optimiser blockEnd allRecurse*/
+        /*Optimiser blockEnd ar*/
     }
 
     @Override
     public void setHiImpedance() {
-        /*Optimiser line ts block noTs*/
-        if (!triState) {
-            throw new RuntimeException("setImpedance on non tri-state OutBus");
-            /*Optimiser block ts*/
-        }
-        /*Optimiser blockEnd noTs*/
+        /*Optimiser block ts*/
         assert !hiImpedance : "Already in hiImpedance:" + this;
         hiImpedance = true;
-        /*Optimiser block allRecurse*/
-        if (processing) {
-            /*Optimiser line recurse*/
-            if (hasQueue) {
-                if (recurseError()) {
-                    return;
+        /*Optimiser block ar*/
+        switch (processing++) {
+            case 0: {
+                /*Optimiser blockEnd ar*/
+                for (Bus destination : destinations) {
+                    destination.setHiImpedance();
                 }
-                /*Optimiser block recurse*/
-            }
-            hasQueue = true;
-            /*Optimiser blockEnd recurse*/
-        } else {
-            processing = true;
-            /*Optimiser blockEnd allRecurse*/
-            for (Bus destination : destinations) {
-                destination.setHiImpedance();
-            }
-            /*Optimiser block recurse block allRecurse*/
-            while (hasQueue) {
-                hasQueue = false;
-                if (hiImpedance) {
-                    for (Bus destination : destinations) {
-                        destination.setHiImpedance();
-                    }
-                } else {
-                    for (Bus destination : destinations) {
-                        destination.setState(state);
+                /*Optimiser block r block ar*/
+                while (--processing > 0) {
+                    if (hiImpedance) {
+                        for (Bus destination : destinations) {
+                            destination.setHiImpedance();
+                        }
+                    } else {
+                        for (Bus destination : destinations) {
+                            destination.setState(state);
+                        }
                     }
                 }
+                /*Optimiser line nr blockEnd r*/
+                processing = 0;
+                return;
             }
-            /*Optimiser blockEnd recurse*/
-            processing = false;
+            case 2: {
+                recurseError();
+                return;
+            }
         }
-        /*Optimiser blockEnd allRecurse blockEnd ts*/
-    }
-
-    @Override
-    public Bus copyState(IModelItem<Bus> oldBus) {
-        super.copyState(oldBus);
-        hiImpedance = oldBus.isHiImpedance();
-        return this;
+        /*Optimiser blockEnd ar blockEnd ts*/
     }
 
     @Override
@@ -235,12 +214,13 @@ public class OutBus extends Bus {
             }
             ClassOptimiser<OutBus> optimiser = new ClassOptimiser<>(this, OutBus.class).unroll(destinations.length);
             if (getRecursionMode() == none) {
-                optimiser.cut("allRecurse");
+                optimiser.cut("ar");
             } else if (getRecursionMode() == warn) {
-                optimiser.cut("recurse");
+                optimiser.cut("r");
+            } else {
+                optimiser.cut("nr");
             }
-            if (triState) {
-                optimiser.cut("noTs");
+            if (isTriState(source)) {
                 if (getRecursionMode() == none) {
                     optimiser.replaceMap.put("setHiImpedance", destinations.length);
                     optimiser.replaceMap.put("setState", destinations.length + 1);

@@ -36,121 +36,125 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
+import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.none;
+import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.warn;
+
 public class MaskGroupBus extends OutBus {
     public long queueState;
+    public boolean queueImpedance;
     protected long maskState;
 
     public MaskGroupBus(OutBus source, long mask, String variantId) {
         super(source, variantId + ":mask" + mask);
         this.mask = mask;
-        triState = source.triState;
     }
 
     /*Optimiser constructor unroll destination:destinations*/
     public MaskGroupBus(OutBus source, String variantId) {
         super(source, variantId);
-        triState = source.triState;
     }
 
     public void addDestination(Bus bus) {
         bus.used = true;
-        bus.triState = triState;
+        bus.state = state & mask;
+        bus.hiImpedance = hiImpedance;
+        used = true;
+        triStateIn |= bus.triStateIn;
         destinations = Utils.addToArray(destinations, bus);
     }
 
     @Override
     public void setState(long newState) {
-        /*Optimiser block setters line iSetter*/
+        /*Optimiser line ts block setter*/
         hiImpedance = false;
         state = newState;
-        /*Optimiser blockEnd setters bind m:mask*/
-        final long newMaskState = newState & mask;
-        if (
-            /*Optimiser line iSetter bind d:destinations[0]*/
-                destinations[0].hiImpedance ||//
-                        maskState != newMaskState) {
-            /*Optimiser block setters*/
-            if (processing) {
-                /*Optimiser line recurse*/
-                if (hasQueue) {
-                    if (recurseError()) {
-                        return;
+        /*Optimiser blockEnd setter*/
+        final long newMaskState;
+        /*Optimiser bind m:mask*/
+        if (maskState != (newMaskState = newState & mask)
+                /*Optimiser line ts bind d:destinations[0]*///
+                || destinations[0].hiImpedance //
+        ) {
+            /*Optimiser blockEnd mask block ar*/
+            switch (processing++) {
+                case 0: {
+                    /*Optimiser blockEnd ar */
+                    maskState = newMaskState;
+                    for (Bus destination : destinations) {
+                        destination.setState(newMaskState);
                     }
-                    /*Optimiser block recurse*/
+                    /*Optimiser block r block ar*/
+                    while (--processing > 0) {
+                        /*Optimiser block ts*/
+                        if (queueImpedance) {
+                            for (Bus destination : destinations) {
+                                destination.setHiImpedance();
+                            }
+                        } else {
+                            /*Optimiser blockEnd ts*/
+                            for (Bus destination : destinations) {
+                                destination.setState(queueState);
+                            }
+                            /*Optimiser line ts*/
+                        }
+                    }
+                    /*Optimiser line nr blockEnd r*/
+                    processing = 0;
+                    return;
                 }
-                hasQueue = true;
-                queueState = newMaskState;
-                /*Optimiser blockEnd recurse*/
-            } else {
-                processing = true;
-                /*Optimiser blockEnd setters*/
-                maskState = newMaskState;
+                case 1: {
+                    queueState = newMaskState;
+                    /*Optimiser line ts*/
+                    queueImpedance = false;
+                    return;
+                }
+                case 2: {
+                    recurseError();
+                    return;
+                }
+            }
+            /*Optimiser blockEnd ar*/
+        }
+    }
+
+    @Override
+    public void setHiImpedance() {
+        /*Optimiser block ts line setter*/
+        hiImpedance = true;
+        /*Optimiser block ar*/
+        switch (processing++) {
+            case 0: {
+                /*Optimiser blockEnd ar */
                 for (Bus destination : destinations) {
-                    destination.setState(newMaskState);
+                    destination.setHiImpedance();
                 }
-                /*Optimiser block setters block recurse*/
-                while (hasQueue) {
-                    hasQueue = false;
-                    /*Optimiser block iSetter*/
+                /*Optimiser block r block ar*/
+                while (--processing > 0) {
                     if (hiImpedance) {
                         for (Bus destination : destinations) {
                             destination.setHiImpedance();
                         }
                     } else {
-                        /*Optimiser blockEnd iSetter*/
                         for (Bus destination : destinations) {
                             destination.setState(queueState);
                         }
-                        /*Optimiser line iSetter*/
                     }
                 }
-                /*Optimiser blockEnd recurse*/
-                processing = false;
+                /*Optimiser line nr blockEnd r*/
+                processing = 0;
+                return;
             }
-            /*Optimiser blockEnd setters*/
+            case 1: {
+                queueImpedance = false;
+                return;
+            }
+            case 2: {
+                recurseError();
+                return;
+            }
         }
+        /*Optimiser blockEnd ar blockEnd ts*/
     }
-
-    /*Optimiser block iSetter*/
-    @Override
-    public void setHiImpedance() {
-        /*Optimiser block setters*/
-        hiImpedance = true;
-        if (processing) {
-            /*Optimiser line recurse*/
-            if (hasQueue) {
-                if (recurseError()) {
-                    return;
-                }
-                /*Optimiser block recurse*/
-            }
-            hasQueue = true;
-            /*Optimiser blockEnd recurse*/
-        } else {
-            processing = true;
-            /*Optimiser blockEnd setters*/
-            for (Bus destination : destinations) {
-                destination.setHiImpedance();
-            }
-            /*Optimiser block setters block recurse*/
-            while (hasQueue) {
-                hasQueue = false;
-                if (hiImpedance) {
-                    for (Bus destination : destinations) {
-                        destination.setHiImpedance();
-                    }
-                } else {
-                    for (Bus destination : destinations) {
-                        destination.setState(queueState);
-                    }
-                }
-            }
-            /*Optimiser blockEnd recurse*/
-            processing = false;
-        }
-        /*Optimiser blockEnd setters*/
-    }
-    /*Optimiser blockEnd iSetter*/
 
     @Override
     public Bus getOptimised(ModelItem<?> source) {
@@ -165,10 +169,17 @@ public class MaskGroupBus extends OutBus {
             }
             ClassOptimiser<MaskGroupBus> optimiser = new ClassOptimiser<>(this).unroll(destinations.length).bind("m", mask).bind("d", "destination0");
             if (source != null) {
-                optimiser.cut("setters");
+                optimiser.cut("setter");
             }
-            if (!triState) {
-                optimiser.cut("iSetter");
+            if (destinations.length < 2 || getRecursionMode() == none) {
+                optimiser.cut("ar");
+            } else if (getRecursionMode() == warn) {
+                optimiser.cut("r");
+            } else {
+                optimiser.cut("nr");
+            }
+            if (!isTriState(source)) {
+                optimiser.cut("ts");
             }
             MaskGroupBus build = optimiser.build();
             build.source = source;

@@ -43,7 +43,6 @@ import pko.KiCadLogicalSchemeSimulator.net.wire.NCWire;
 
 import java.util.*;
 
-//Todo if there is no BusMerger in destinations - cut out hiImpedance processing
 //Todo with one source only and only weak others - use simpler "Weak pin" implementation
 public class WireMerger extends OutPin {
     public final Set<PassivePin> passivePins = new TreeSet<>();
@@ -54,10 +53,15 @@ public class WireMerger extends OutPin {
         super(destination.id, destination.parent);
         variantId = destination.variantId == null ? "" : destination.variantId + ":";
         variantId += "merger";
+        destination.used = true;
+        destination.source = this;
+        triStateIn = destination.triStateIn;
         destinations = new Pin[]{destination};
         split();
         strong = false;
-        hiImpedance = true;
+        if (triStateIn) {
+            hiImpedance = true;
+        }
         if (destination instanceof PassivePin passivePin) {
             passivePin.merger = this;
         }
@@ -71,6 +75,9 @@ public class WireMerger extends OutPin {
     @Override
     public void addDestination(Pin pin) {
         super.addDestination(pin);
+        if (triStateIn) {
+            hiImpedance = true;
+        }
         if (!(pin instanceof NCWire)) {
             id += "/" + pin.getName();
         }
@@ -82,7 +89,6 @@ public class WireMerger extends OutPin {
             destinations[i] = destinations[i].getOptimised(this);
         }
         split();
-        this.source = source;
         return this;
     }
 
@@ -106,9 +112,8 @@ public class WireMerger extends OutPin {
                 throw new ShortcutException(sources);
             }
             weakState += pin.state ? 1 : -1;
-            if (hiImpedance) {
+            if (!strong) {
                 state = weakState > 0;
-                strong = false;
                 hiImpedance = false;
             }
         } else if (pin instanceof PassivePin passivePin) {

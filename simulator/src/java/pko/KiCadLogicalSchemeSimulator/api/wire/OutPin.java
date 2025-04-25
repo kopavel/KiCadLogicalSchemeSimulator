@@ -30,7 +30,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.api.wire;
-import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.net.wire.NCWire;
@@ -49,8 +48,6 @@ public class OutPin extends Pin {
     public Pin[] toLow = new Pin[0];
     public Pin[] toHi = new Pin[0];
     public int weakState;
-    public boolean processing;
-    public boolean hasQueue;
 
     public OutPin(String id, SchemaPart parent) {
         super(id, parent);
@@ -59,19 +56,22 @@ public class OutPin extends Pin {
     /*Optimiser constructor unroll low:toLow:l unroll hi:toHi:h unroll imp:toImp:i*/
     public OutPin(OutPin oldPin, String variantId) {
         super(oldPin, variantId);
-        hiImpedance = oldPin.hiImpedance;
-        triState = oldPin.triState;
     }
 
     public void addDestination(Pin pin) {
         assert pin != this;
         used = true;
         pin.used = true;
-        pin.triState = triState;
+        pin.source = this;
+        pin.state = state;
+        pin.hiImpedance = hiImpedance;
+        triStateIn |= pin.triStateIn;
         if (!(pin instanceof NCWire)) {
             priority += pin.priority;
             destinations = Utils.addToArray(destinations, pin);
             split();
+        } else {
+            throw new RuntimeException("what??");
         }
     }
 
@@ -80,49 +80,44 @@ public class OutPin extends Pin {
         /*Optimiser line ts*/
         hiImpedance = false;
         state = true;
-        /*Optimiser block allRecurse*/
-        if (processing) {
-            /*Optimiser line recurse*/
-            if (hasQueue) {
-                if (recurseError()) {
-                    return;
+        /*Optimiser block ar*/
+        switch (processing++) {
+            case 0: {
+                /*Optimiser blockEnd ar*/
+                for (Pin hi : toHi) {
+                    hi.setHi();
                 }
-                /*Optimiser block recurse*/
-            }
-            hasQueue = true;
-            /*Optimiser blockEnd recurse*/
-        } else {
-            processing = true;
-            /*Optimiser blockEnd allRecurse*/
-            for (Pin hi : toHi) {
-                hi.setHi();
-            }
-            /*Optimiser block recurse block allRecurse*/
-            while (hasQueue) {
-                hasQueue = false;
-                /*Optimiser block ts*/
-                if (hiImpedance) {
-                    for (Pin imp : toImp) {
-                        imp.setHiImpedance();
-                    }
-                } else {
-                    /*Optimiser blockEnd ts*/
-                    if (state) {
-                        for (Pin hi : toHi) {
-                            hi.setHi();
+                /*Optimiser block r block ar*/
+                while (--processing > 0) {
+                    /*Optimiser block ts*/
+                    if (hiImpedance) {
+                        for (Pin imp : toImp) {
+                            imp.setHiImpedance();
                         }
                     } else {
-                        for (Pin low : toLow) {
-                            low.setLo();
+                        /*Optimiser blockEnd ts*/
+                        if (state) {
+                            for (Pin hi : toHi) {
+                                hi.setHi();
+                            }
+                        } else {
+                            for (Pin low : toLow) {
+                                low.setLo();
+                            }
                         }
+                        /*Optimiser line ts*/
                     }
-                    /*Optimiser line ts*/
                 }
+                /*Optimiser line nr blockEnd r*/
+                processing = 0;
+                return;
             }
-            /*Optimiser blockEnd recurse*/
-            processing = false;
+            case 2: {
+                recurseError();
+                return;
+            }
         }
-        /*Optimiser blockEnd allRecurse*/
+        /*Optimiser blockEnd ar*/
     }
 
     @Override
@@ -130,118 +125,86 @@ public class OutPin extends Pin {
         /*Optimiser line ts*/
         hiImpedance = false;
         state = false;
-        /*Optimiser block allRecurse*/
-        if (processing) {
-            /*Optimiser line recurse*/
-            if (hasQueue) {
-                if (recurseError()) {
-                    return;
+        /*Optimiser block ar*/
+        switch (processing++) {
+            case 0: {
+                /*Optimiser blockEnd ar*/
+                for (Pin low : toLow) {
+                    low.setLo();
                 }
-                /*Optimiser block recurse*/
-            }
-            hasQueue = true;
-            /*Optimiser blockEnd recurse*/
-        } else {
-            processing = true;
-            /*Optimiser blockEnd allRecurse*/
-            for (Pin low : toLow) {
-                low.setLo();
-            }
-            /*Optimiser block recurse block allRecurse*/
-            while (hasQueue) {
-                hasQueue = false;
-                /*Optimiser block ts*/
-                if (hiImpedance) {
-                    for (Pin imp : toImp) {
-                        imp.setHiImpedance();
-                    }
-                } else {
-                    /*Optimiser blockEnd ts*/
-                    if (state) {
-                        for (Pin hi : toHi) {
-                            hi.setHi();
+                /*Optimiser block r block ar*/
+                while (--processing > 0) {
+                    /*Optimiser block ts*/
+                    if (hiImpedance) {
+                        for (Pin imp : toImp) {
+                            imp.setHiImpedance();
                         }
                     } else {
-                        for (Pin low : toLow) {
-                            low.setLo();
+                        /*Optimiser blockEnd ts*/
+                        if (state) {
+                            for (Pin hi : toHi) {
+                                hi.setHi();
+                            }
+                        } else {
+                            for (Pin low : toLow) {
+                                low.setLo();
+                            }
                         }
+                        /*Optimiser line ts*/
                     }
-                    /*Optimiser line ts*/
                 }
+                /*Optimiser line nr blockEnd r*/
+                processing = 0;
+                return;
             }
-            /*Optimiser blockEnd recurse*/
-            processing = false;
+            case 2: {
+                recurseError();
+                return;
+            }
         }
-        /*Optimiser blockEnd allRecurse*/
+        /*Optimiser blockEnd ar*/
     }
 
     @Override
     public void setHiImpedance() {
-        /*Optimiser line ts block noTs*/
-        if (!triState) {
-            throw new RuntimeException("setImpedance on non tri-state OutPin");
-            /*Optimiser block ts*/
-        }
-        /*Optimiser blockEnd noTs*/
+        /*Optimiser block ts*/
         assert !hiImpedance : "Already in hiImpedance:" + this;
         hiImpedance = true;
-        /*Optimiser block allRecurse*/
-        if (processing) {
-            /*Optimiser line recurse*/
-            if (hasQueue) {
-                if (recurseError()) {
-                    return;
+        /*Optimiser block ar*/
+        switch (processing++) {
+            case 0: {
+                /*Optimiser blockEnd ar*/
+                for (Pin imp : toImp) {
+                    imp.setHiImpedance();
                 }
-                /*Optimiser block recurse*/
-            }
-            hasQueue = true;
-            /*Optimiser blockEnd recurse*/
-        } else {
-            processing = true;
-            /*Optimiser blockEnd allRecurse*/
-            for (Pin imp : toImp) {
-                imp.setHiImpedance();
-            }
-            /*Optimiser block recurse block allRecurse*/
-            while (hasQueue) {
-                hasQueue = false;
-                if (hiImpedance) {
-                    for (Pin imp : toImp) {
-                        imp.setHiImpedance();
-                    }
-                } else {
-                    if (state) {
-                        for (Pin hi : toHi) {
-                            hi.setHi();
+                /*Optimiser block r block ar*/
+                while (--processing > 0) {
+                    if (hiImpedance) {
+                        for (Pin imp : toImp) {
+                            imp.setHiImpedance();
                         }
                     } else {
-                        for (Pin low : toLow) {
-                            low.setLo();
+                        if (state) {
+                            for (Pin hi : toHi) {
+                                hi.setHi();
+                            }
+                        } else {
+                            for (Pin low : toLow) {
+                                low.setLo();
+                            }
                         }
                     }
                 }
+                /*Optimiser line nr blockEnd r*/
+                processing = 0;
+                return;
             }
-            /*Optimiser blockEnd recurse*/
-            processing = false;
-        }
-        /*Optimiser blockEnd allRecurse blockEnd ts*/
-    }
-
-    public void resend() {
-        if (!hiImpedance) {
-            if (state) {
-                setHi();
-            } else {
-                setLo();
+            case 2: {
+                recurseError();
+                return;
             }
         }
-    }
-
-    @Override
-    public Pin copyState(IModelItem<Pin> oldPin) {
-        super.copyState(oldPin);
-        hiImpedance = oldPin.isHiImpedance();
-        return this;
+        /*Optimiser blockEnd ar blockEnd ts*/
     }
 
     @Override
@@ -257,24 +220,24 @@ public class OutPin extends Pin {
             split();
             ClassOptimiser<OutPin> optimiser = new ClassOptimiser<>(this, OutPin.class).unroll("i", toImp.length).unroll("l", toLow.length).unroll("h", toHi.length);
             if (getRecursionMode() == none) {
-                optimiser.cut("allRecurse");
+                optimiser.cut("ar");
             } else if (getRecursionMode() == warn) {
-                optimiser.cut("recurse");
+                optimiser.cut("r");
+            } else {
+                optimiser.cut("nr");
             }
-            if (triState) {
+            if (isTriState(source)) {
                 if (getRecursionMode() == none) {
                     optimiser.replaceMap.put("setHi", toHi.length + 1);
                     optimiser.replaceMap.put("setLo", toLow.length + 1);
                     optimiser.replaceMap.put("setHiImpedance", toImp.length);
                 }
-                optimiser.cut("noTs");
             } else {
+                optimiser.cut("ts");
                 if (getRecursionMode() == none) {
                     optimiser.replaceMap.put("setHi", toHi.length);
                     optimiser.replaceMap.put("setLo", toLow.length);
-                    optimiser.replaceMap.put("setHiImpedance", toImp.length);
                 }
-                optimiser.cut("ts");
             }
             OutPin build = optimiser.build();
             build.source = source;

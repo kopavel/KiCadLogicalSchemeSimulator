@@ -47,18 +47,6 @@ public abstract class Bus extends ModelItem<Bus> {
     public long state;
     public boolean useBitPresentation;
 
-    public Bus(Bus oldBus, String variantId) {
-        this(oldBus.id, oldBus.parent, oldBus.size);
-        this.variantId = variantId + (oldBus.variantId == null ? "" : ":" + oldBus.variantId);
-        aliasOffsets.clear();
-        aliasOffsets.putAll(oldBus.aliasOffsets);
-        useBitPresentation = oldBus.useBitPresentation;
-        state = oldBus.state;
-        hiImpedance = oldBus.hiImpedance;
-        used = oldBus.used;
-        priority = oldBus.priority;
-    }
-
     public Bus(String id, SchemaPart parent, int size, String... aliases) {
         super(id, parent);
         this.size = size;
@@ -83,6 +71,21 @@ public abstract class Bus extends ModelItem<Bus> {
         }
     }
 
+    public Bus(Bus oldBus, String variantId) {
+        this(oldBus.id, oldBus.parent, oldBus.size);
+        this.variantId = variantId + (oldBus.variantId == null ? "" : ":" + oldBus.variantId);
+        aliasOffsets.clear();
+        aliasOffsets.putAll(oldBus.aliasOffsets);
+        useBitPresentation = oldBus.useBitPresentation;
+        state = oldBus.state;
+        hiImpedance = oldBus.hiImpedance;
+        used = oldBus.used;
+        priority = oldBus.priority;
+        triStateIn = oldBus.triStateIn;
+        triStateOut = oldBus.triStateOut;
+        source=oldBus;
+    }
+
     @Override
     public Byte getAliasOffset(String pinName) {
         return aliasOffsets.get(pinName);
@@ -103,7 +106,7 @@ public abstract class Bus extends ModelItem<Bus> {
     @Override
     public Bus copyState(IModelItem<Bus> oldBus) {
         this.state = oldBus.getThis().state;
-        this.used = true;
+        this.hiImpedance = oldBus.isHiImpedance();
         return this;
     }
 

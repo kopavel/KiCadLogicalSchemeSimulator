@@ -37,14 +37,13 @@ import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 public class BusInInterconnect extends InBus {
     public final long interconnectMask;
     public final long senseMask;
-    public final long inverseInterconnectMask;
     public InBus destination;
 
     public BusInInterconnect(InBus destination, long interconnectMask, Byte offset) {
         super(destination, "interconnect" + interconnectMask);
         this.destination = destination;
+        used = true;
         this.interconnectMask = interconnectMask;
-        this.inverseInterconnectMask = ~interconnectMask;
         this.senseMask = 1L << offset;
     }
 
@@ -53,45 +52,40 @@ public class BusInInterconnect extends InBus {
         super(oldBus, variantId);
         interconnectMask = oldBus.interconnectMask;
         senseMask = oldBus.senseMask;
-        inverseInterconnectMask = oldBus.inverseInterconnectMask;
         destination = oldBus.destination;
-        triState = oldBus.triState;
     }
 
     @Override
     public void setState(long newState) {
-        /*Optimiser block setters line iSetter*/
+        /*Optimiser block setters line ts*/
         hiImpedance = false;
         state = newState;
-        /*Optimiser blockEnd setters bind interconnectMask*/
+        /*Optimiser blockEnd setters bind m:interconnectMask*/
         if ((newState & interconnectMask) != 0) {
-            /*Optimiser bind interconnectMask*/
+            /*Optimiser bind m:interconnectMask*/
             destination.setState(newState | interconnectMask);
         } else {
-            /*Optimiser bind inverseInterconnectMask*/
-            destination.setState(newState & inverseInterconnectMask);
+            destination.setState(newState);
         }
     }
 
-    /*Optimiser block iSetter*/
     @Override
     public void setHiImpedance() {
-        /*Optimiser line setters*/
+        /*Optimiser block ts line setters*/
         hiImpedance = true;
         destination.setHiImpedance();
+        /*Optimiser blockEnd ts*/
     }
-    /*Optimiser blockEnd iSetter*/
 
     @Override
     public InBus getOptimised(ModelItem<?> source) {
         destination = destination.getOptimised(this);
-        ClassOptimiser<BusInInterconnect> optimiser =
-                new ClassOptimiser<>(this).bind("interconnectMask", interconnectMask).bind("inverseInterconnectMask", inverseInterconnectMask);
+        ClassOptimiser<BusInInterconnect> optimiser = new ClassOptimiser<>(this).bind("m", interconnectMask);
         if (source != null) {
             optimiser.cut("setters");
         }
-        if (!triState) {
-            optimiser.cut("iSetter");
+        if (!isTriState(source)) {
+            optimiser.cut("ts");
         }
         InBus build = optimiser.build();
         build.source = source;

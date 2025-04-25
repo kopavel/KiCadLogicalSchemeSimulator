@@ -44,6 +44,7 @@ public class PassiveInMerger extends TriStateOutPin {
         hiImpedance = false;
         merger = this;
         strong = true;
+        triStateIn=true;
     }
 
     @Override

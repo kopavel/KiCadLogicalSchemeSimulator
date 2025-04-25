@@ -36,6 +36,6 @@ public class TriStateOutBus extends OutBus {
     public TriStateOutBus(String id, SchemaPart parent, int size, String... names) {
         super(id, parent, size, names);
         hiImpedance = true;
-        triState = true;
+        triStateOut = true;
     }
 }

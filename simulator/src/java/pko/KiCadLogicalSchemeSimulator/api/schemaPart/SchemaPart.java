@@ -155,6 +155,7 @@ public abstract class SchemaPart {
         addTriStateOutPin(pinId);
         OutPin pin = (OutPin) outPins.get(pinId);
         pin.state = state;
+        pin.hiImpedance=false;
     }
 
     public InBus addInBus(String pinId, int size, String... names) {

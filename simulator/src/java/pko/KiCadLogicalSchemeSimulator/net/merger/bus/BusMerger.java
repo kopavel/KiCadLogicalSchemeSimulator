@@ -55,34 +55,41 @@ public class BusMerger extends OutBus {
     public long weakState;
     public boolean hasPassivePin;
 
+    //FixMe initial hiImpedance?
     public BusMerger(Bus destination) {
         super(destination.id, destination.parent, destination.size);
         variantId = destination.variantId == null ? "" : destination.variantId + ":";
         variantId += "merger";
+        destination.used = true;
+        destination.source=this;
         Bus d = destination;
         while (d instanceof BusInInterconnect interconnect) {
-            this.mask &= interconnect.inverseInterconnectMask;
+            this.mask &= ~interconnect.interconnectMask;
             this.mask |= interconnect.senseMask;
             d = interconnect.destination;
         }
         destinations = new Bus[]{destination};
+        triStateIn = destination.triStateIn;
     }
 
-    public void addDestination(Bus item) {
-        item.used = true;
-        switch (item) {
+    public void addDestination(Bus destination) {
+        destination.used = true;
+        destination.source=this;
+        triStateIn |= destination.triStateIn;
+        switch (destination) {
             case BusInInterconnect interconnect -> {
-                this.mask &= interconnect.inverseInterconnectMask;
+                this.mask &= ~interconnect.interconnectMask;
                 this.mask |= interconnect.senseMask;
                 destinations = Utils.addToArray(destinations, interconnect);
             }
             case InBus bus -> destinations = Utils.addToArray(destinations, bus);
-            default -> throw new RuntimeException("Unsupported destination " + item.getClass().getName());
+            default -> throw new RuntimeException("Unsupported destination " + destination.getClass().getName());
         }
-        id += "/" + item.getName();
+        id += "/" + destination.getName();
     }
 
     public void addSource(OutBus bus, long srcMask, byte offset) {
+        bus.used = true;
         long destinationMask = offset == 0 ? srcMask : (offset > 0 ? srcMask << offset : srcMask >> -offset);
         BusMergerBusIn input = new BusMergerBusIn(bus, destinationMask, this);
         bus.addDestination(input, srcMask, offset);
@@ -98,6 +105,7 @@ public class BusMerger extends OutBus {
 
     public void addSource(OutPin pin, byte offset) {
         long destinationMask = 1L << offset;
+        pin.used = true;
         if (pin instanceof PullPin pullPin) {
             weakPins |= destinationMask;
             if (pin.state) {
@@ -135,11 +143,12 @@ public class BusMerger extends OutBus {
         for (int i = 0; i < destinations.length; i++) {
             destinations[i] = destinations[i].getOptimised(this);
         }
-        this.source = source;
         return this;
     }
 
     private void processPin(Pin pin, BusMergerWireIn input, long destinationMask) {
+        input.source=pin;
+        input.triStateOut=pin.triStateOut;
         input.oldStrong = pin.strong;
         input.hiImpedance = pin.hiImpedance;
         input.id = pin.id;

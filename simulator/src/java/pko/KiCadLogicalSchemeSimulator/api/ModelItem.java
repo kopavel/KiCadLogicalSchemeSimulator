@@ -45,17 +45,15 @@ public abstract class ModelItem<T> implements IModelItem<T> {
     public int priority;
     public String variantId;
     public boolean hiImpedance;
-    public boolean triState;
-    public boolean processing;
-    public boolean hasQueue;
+    public boolean triStateIn;
+    public boolean triStateOut;
+    public int processing;
     public long applyMask;
     public byte applyOffset;
     public boolean used;
     public ModelItem<?> source;
     private boolean reportedRecurse;
 
-    public void splitDestinations() {
-    }
     protected ModelItem(String id, SchemaPart parent) {
         this.id = id;
         this.parent = parent;
@@ -83,14 +81,23 @@ public abstract class ModelItem<T> implements IModelItem<T> {
     }
 
     @Override
+    public boolean isHiImpedance() {
+        return (source == null || source == this) ? hiImpedance : source.isHiImpedance();
+    }
+
+    public boolean isTriState(ModelItem<?> source) {
+        return triStateIn & ((source == null || source == this) ? triStateOut : source.isTriState(source.source));
+    }
+
+    @Override
     public int compareTo(IModelItem<T> other) {
         return getName().compareTo(other.getName());
     }
 
-    public boolean recurseError() {
+    public void recurseError() {
         if (parent.net.stabilizing) {
-            hasQueue = false;
-            return true;
+            processing--;
+            return;
         } else if (getRecursionMode() == warn) {
             if (!reportedRecurse) {
                 String partId = parent.id;
@@ -117,7 +124,7 @@ public abstract class ModelItem<T> implements IModelItem<T> {
                 Log.error(this.getClass(), message, getName(), id, partId, unitId);
                 reportedRecurse = true;
             }
-            return false;
+            return;
         } else {
             throw new RuntimeException("Recursive event loop detected on " + getName() + ", need implement fair queue");
         }
@@ -126,6 +133,7 @@ public abstract class ModelItem<T> implements IModelItem<T> {
     public RecursionMode getRecursionMode() {
         return parent.net.parameterResolver.getRecursionMode(parent.id, id);
     }
+
     public boolean useFullOptimiser() {
         return false;
     }

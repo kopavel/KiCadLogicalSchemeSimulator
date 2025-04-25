@@ -44,6 +44,7 @@ public class PassiveOutMerger extends OutPin {
         if (!oldStrong) {
             weakState += source.state ? 1 : -1;
         }
+        triStateIn=true;
     }
 
     @Override
