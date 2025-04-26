@@ -46,10 +46,10 @@ import pko.KiCadLogicalSchemeSimulator.tools.Log;
 public class WireMergerBusIn extends InBus implements MergerInput<Bus> {
     public final WireMerger merger;
     @Getter
-    public long mask;
+    public int mask;
     public Pin[] destinations;
 
-    public WireMergerBusIn(Bus source, long mask, WireMerger merger) {
+    public WireMergerBusIn(Bus source, int mask, WireMerger merger) {
         super(source, "PMergeBIn");
         this.mask = mask;
         this.merger = merger;
@@ -67,7 +67,7 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus> {
     }
 
     @Override
-    public void setState(long newState) {
+    public void setState(int newState) {
         WireMerger merger = this.merger;
         assert Log.debug(this.getClass(),
                 "Pin merger change. before: newState:{}, Source:{} (state:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{}, hiImpedance:{})",

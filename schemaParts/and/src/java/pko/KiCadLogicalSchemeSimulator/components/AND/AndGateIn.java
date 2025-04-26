@@ -37,11 +37,11 @@ import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 
 public class AndGateIn extends InPin {
     public final AndGate parent;
-    public final long mask;
-    public final long nMask;
+    public final int mask;
+    public final int nMask;
     public Pin out;
 
-    public AndGateIn(String id, AndGate parent, long mask) {
+    public AndGateIn(String id, AndGate parent, int mask) {
         super(id, parent);
         this.parent = parent;
         this.mask = mask;
@@ -62,7 +62,7 @@ public class AndGateIn extends InPin {
     public void setHi() {
         /*Optimiser line setter*/
         state = true;
-        long state;
+        int state;
         AndGate parent;
         /*Optimiser bind mask*/
         if ((state = (parent = this.parent).inState) == mask) {
@@ -93,7 +93,7 @@ public class AndGateIn extends InPin {
     public void setLo() {
         /*Optimiser line setter*/
         state = false;
-        long state;
+        int state;
         //FixMe bench it - do this worse?
         AndGate parent;
         if ((state = (parent = this.parent).inState) == 0) {

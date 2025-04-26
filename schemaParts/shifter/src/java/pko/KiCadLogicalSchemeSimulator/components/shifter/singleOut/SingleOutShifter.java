@@ -39,12 +39,12 @@ import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 public class SingleOutShifter extends SchemaPart {
     public final InBus dBus;
     public final InPin dsPins;
-    public final long hiDsMask;
-    public final long latchMask;
-    public final long outMask;
+    public final int hiDsMask;
+    public final int latchMask;
+    public final int outMask;
     final SingleOutShifterRPin rPin;
     final SingleOutShifterCIPin ciPin;
-    public long latch = 0;
+    public int latch = 0;
     public Pin out;
     public boolean parallelLoad;
     public boolean clockEnabled;
@@ -60,11 +60,11 @@ public class SingleOutShifter extends SchemaPart {
         if (!params.containsKey("outPin")) {
             throw new RuntimeException("Component " + id + " has no parameter \"outPin\"");
         }
-        outMask = 1L << Long.parseLong(params.get("outPin"));
+        outMask = 1 << Integer.parseInt(params.get("outPin"));
         dBus = addInBus("D", dSize);
         boolean plReverse = params.containsKey("plReverse");
         latchMask = Utils.getMaskForSize(dSize);
-        hiDsMask = 1L << (dSize - 1);
+        hiDsMask = 1 << (dSize - 1);
         dsPins = addInPin("DS");
         addInPin(new SingleOutShifterPlPin("PL", this, plReverse));
         boolean clearReverse = params.containsKey("clearReverse");
@@ -88,7 +88,7 @@ public class SingleOutShifter extends SchemaPart {
 
     @Override
     public String extraState() {
-        return "latch" + "\n" + Long.toBinaryString(latch);
+        return "latch" + "\n" + Integer.toBinaryString(latch);
     }
 
     @Override

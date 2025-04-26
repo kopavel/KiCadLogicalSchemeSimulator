@@ -40,7 +40,7 @@ public class NCBus extends OutBus {
     }
 
     @Override
-    public void setState(long newState) {
+    public void setState(int newState) {
     }
 
     @Override

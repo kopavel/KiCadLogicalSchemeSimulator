@@ -43,9 +43,9 @@ public class IntRingBuffer extends RingBuffer {
     }
 
     @Override
-    public void put(long element) {
+    public void put(int element) {
         super.put(element);
-        data[writePos] = (int) element;
+        data[writePos] = element;
     }
 
     @Override

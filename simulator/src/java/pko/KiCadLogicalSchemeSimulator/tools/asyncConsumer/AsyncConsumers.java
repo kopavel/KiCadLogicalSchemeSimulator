@@ -52,22 +52,23 @@ public abstract class AsyncConsumers<T> implements Consumer<T>, AutoCloseable {
             for (Slot<T> head : rings) {
                 consumerThreads.add(Thread.ofPlatform().start(() -> {
                     try {
-                        long seepCounter = 0;
+                        long sleepCounter = 0;
                         Slot<T> currentSlot = head;
                         run = true;
                         T payload;
                         while (run) {
                             while ((payload = currentSlot.payload.getOpaque()) != null) {
-                                seepCounter = 0;
+                                sleepCounter = 0;
                                 final AtomicReference<T> sharedPayload = currentSlot.payload;
                                 consume(payload);
                                 sharedPayload.setOpaque(null);
                                 currentSlot = currentSlot.nextSlot;
                             }
-                            if (seepCounter > 1000000) {
+                            if (sleepCounter > 1000000) {
+                                //noinspection BusyWait
                                 Thread.sleep(0, 1);
                             } else {
-                                seepCounter++;
+                                sleepCounter++;
                             }
                             Thread.onSpinWait();
                         }

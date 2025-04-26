@@ -35,7 +35,7 @@ public class BufferCsPin extends InPin {
             /*Optimiser line o blockEnd r block nr*/
         } else {
             Bus bus;
-            long state;
+            int state;
             if ((bus = qBus).state != (state = dBus.state) || bus.hiImpedance) {
                 bus.setState(state);
             }

@@ -61,12 +61,12 @@ public class UiTools {
         return new Color(red, green, blue);
     }
 
-    public static void print(long value, int x, int y, int size, Graphics2D dest) {
+    public static void print(int value, int x, int y, int size, Graphics2D dest) {
         size = Math.max(String.format("%x", value).length(), size);
         x += size * 5;
         while (size-- > 0) {
             x -= 5;
-            long pos = value & 0xf;
+            int pos = value & 0xf;
             value = value >> 4;
             BufferedImage letter = letters.computeIfAbsent((byte) pos, c -> font.getSubimage(c * 5, 0, 4, 7));
             dest.drawImage(letter, x, y, null);

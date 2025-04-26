@@ -40,11 +40,11 @@ import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.non
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.warn;
 
 public class MaskGroupBus extends OutBus {
-    public long queueState;
+    public int queueState;
     public boolean queueImpedance;
-    protected long maskState;
+    protected int maskState;
 
-    public MaskGroupBus(OutBus source, long mask, String variantId) {
+    public MaskGroupBus(OutBus source, int mask, String variantId) {
         super(source, variantId + ":mask" + mask);
         this.mask = mask;
     }
@@ -64,12 +64,12 @@ public class MaskGroupBus extends OutBus {
     }
 
     @Override
-    public void setState(long newState) {
+    public void setState(int newState) {
         /*Optimiser line ts block setter*/
         hiImpedance = false;
         state = newState;
         /*Optimiser blockEnd setter*/
-        final long newMaskState;
+        final int newMaskState;
         /*Optimiser bind m:mask*/
         if (maskState != (newMaskState = newState & mask)
                 /*Optimiser line ts bind d:destinations[0]*///

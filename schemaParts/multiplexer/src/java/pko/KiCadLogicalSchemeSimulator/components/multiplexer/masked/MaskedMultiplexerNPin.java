@@ -67,7 +67,7 @@ public class MaskedMultiplexerNPin extends InPin {
         state = true;
         /*Optimiser bind m:mask*/
         int nState = (parent.nState |= mask);
-        long state;
+        int state;
         if (outBus.state != (state = (inBuses[nState].state
                 /*Optimiser line oe*///
                 & parent.outMask//
@@ -82,7 +82,7 @@ public class MaskedMultiplexerNPin extends InPin {
         state = false;
         /*Optimiser bind nm:nMask*/
         int nState = (parent.nState &= nMask);
-        long state;
+        int state;
         if (outBus.state != (state = (inBuses[nState].state
                 /*Optimiser line oe*///
                 & parent.outMask//

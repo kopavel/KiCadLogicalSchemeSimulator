@@ -36,7 +36,7 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 public class RomABus extends InBus {
     public Bus dBus;
     public boolean csActive;
-    long[] words;
+    int[] words;
 
     public RomABus(String id, Rom parent, int size, String... names) {
         super(id, parent, size, names);
@@ -44,9 +44,9 @@ public class RomABus extends InBus {
     }
 
     @Override
-    public void setState(long newState) {
+    public void setState(int newState) {
         state = newState;
-        long word;
+        int word;
         if (csActive && dBus.state != (word = words[(int) newState])) {
             dBus.setState(word);
         }

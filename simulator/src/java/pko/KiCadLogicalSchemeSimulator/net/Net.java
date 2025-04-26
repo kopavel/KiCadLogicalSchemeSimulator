@@ -96,7 +96,7 @@ public class Net {
         Log.info(Net.class, "Net build complete");
     }
 
-    public Pin processWire(Pin destination, List<OutPin> pins, List<PassivePin> passivePins, Map<OutBus, Long> buses) {
+    public Pin processWire(Pin destination, List<OutPin> pins, List<PassivePin> passivePins, Map<OutBus, Integer> buses) {
         Pin retVal = null;
         if (buses.size() + pins.size() + passivePins.size() > 1) {
             //connect a destination to multiple sources throe Merger
@@ -133,7 +133,7 @@ public class Net {
                 }
             } else {
                 //bus-to-pin connection
-                for (Map.Entry<OutBus, Long> bus : buses.entrySet()) {
+                for (Map.Entry<OutBus, Integer> bus : buses.entrySet()) {
                     bus.getKey().addDestination(destination, bus.getValue());
                 }
             }
@@ -268,9 +268,9 @@ public class Net {
                 if (destinationOffsets.size() > 1) {
                     // interconnected Bus pins
                     destinationBusDescriptors.remove(destinationBus);
-                    long interconnectMask = 0;
+                    int interconnectMask = 0;
                     for (Byte offset : destinationOffsets) {
-                        interconnectMask |= (1L << offset);
+                        interconnectMask |= (1 << offset);
                     }
                     Byte offset = destinationOffsets.getFirst();
                     destinationOffsets.clear();
@@ -322,9 +322,7 @@ public class Net {
                     throw new RuntimeException("Impossible single wire-to-bus connection for destination " + destination.getName());
                 } else {
                     //bus-to-bus connection
-                    descriptor.buses.forEach((source, offsetMap) -> offsetMap.forEach((offset, mask) -> {
-                        source.addDestination(destination, mask, offset);
-                    }));
+                    descriptor.buses.forEach((source, offsetMap) -> offsetMap.forEach((offset, mask) -> source.addDestination(destination, mask, offset)));
                 }
             }
         });
@@ -421,7 +419,7 @@ public class Net {
 
     public static class DestinationWireDescriptor {
         //Bus, offset
-        public final HashMap<OutBus, Long> buses = new HashMap<>();
+        public final HashMap<OutBus, Integer> buses = new HashMap<>();
         //Pin, offset
         public final List<OutPin> pins = new ArrayList<>();
         public final List<PassivePin> passivePins;
@@ -433,7 +431,7 @@ public class Net {
         public void add(IModelItem<?> item, byte offset) {
             switch (item) {
                 case OutPin pin -> pins.add(pin);
-                case OutBus bus -> buses.put(bus, 1L << offset);
+                case OutBus bus -> buses.put(bus, 1 << offset);
                 default -> throw new IllegalStateException("Unsupported item: " + item.getClass().getName());
             }
         }
@@ -441,7 +439,7 @@ public class Net {
 
     private static class DestinationBusDescriptor {
         //Bus, offset, mask
-        public final HashMap<OutBus, Map<Byte, Long>> buses = new HashMap<>();
+        public final HashMap<OutBus, Map<Byte, Integer>> buses = new HashMap<>();
         //Pin, offset
         public final HashMap<Byte, BusPinsOffset> offsets = new HashMap<>();
 
@@ -456,7 +454,7 @@ public class Net {
                 case OutPin pin -> offsets.computeIfAbsent(destinationOffset, e -> new BusPinsOffset()).pins.add(pin);
                 case OutBus bus -> {
                     byte offset = (byte) (destinationOffset - sourceOffset);
-                    long newMask = buses.computeIfAbsent(bus, p -> new HashMap<>()).computeIfAbsent(offset, p -> 0L) | (1L << sourceOffset);
+                    int newMask = buses.computeIfAbsent(bus, p -> new HashMap<>()).computeIfAbsent(offset, p -> 0) | (1 << sourceOffset);
                     buses.get(bus).put(offset, newMask);
                 }
                 default -> throw new IllegalStateException("Unsupported item: " + item.getClass().getName());
@@ -476,7 +474,7 @@ public class Net {
                                         .stream())
                                 .filter(o -> o.getKey() <= pinsOffset)
                                 .forEach(pair -> {
-                                    long correctedMask = ~(1L << (pinsOffset - pair.getKey()));
+                                    int correctedMask = ~(1 << (pinsOffset - pair.getKey()));
                                     pair.setValue(pair.getValue() & correctedMask);
                                 });
                         //remove empty offsets

@@ -40,7 +40,7 @@ import java.util.Map;
 public class OrGate extends SchemaPart {
     private final Map<String, OrGateIn> ins = new HashMap<>();
     public Pin out;
-    public long inState;
+    public int inState;
 
     public OrGate(String id, String sParam) {
         super(id, sParam);
@@ -64,7 +64,7 @@ public class OrGate extends SchemaPart {
         out = getOutPin("OUT");
         ins.values().forEach(pin -> {
             if (!pin.isHiImpedance() && pin.state) {
-                inState |= (1L << Long.parseLong(pin.getId().substring(2)));
+                inState |= (1 << Integer.parseInt(pin.getId().substring(2)));
             }
             pin.out = out;
         });

@@ -49,7 +49,7 @@ public class WireMerger extends OutPin {
     public final Set<BusMergerWireIn> mergers = new TreeSet<>();
     public final Set<MergerInput<?>> sources = new TreeSet<>(Comparator.comparing(mergerInput -> mergerInput.getMask() + ":" + mergerInput.getName()));
 
-    public WireMerger(Pin destination, List<OutPin> pins, List<PassivePin> passivePins, Map<OutBus, Long> buses) {
+    public WireMerger(Pin destination, List<OutPin> pins, List<PassivePin> passivePins, Map<OutBus, Integer> buses) {
         super(destination.id, destination.parent);
         variantId = destination.variantId == null ? "" : destination.variantId + ":";
         variantId += "merger";
@@ -92,7 +92,7 @@ public class WireMerger extends OutPin {
         return this;
     }
 
-    private void addSource(OutBus bus, long mask) {
+    private void addSource(OutBus bus, int mask) {
         WireMergerBusIn input = new WireMergerBusIn(bus, mask, this);
         bus.addDestination(input, mask, (byte) 0);
         sources.add(input);

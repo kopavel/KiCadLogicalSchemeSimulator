@@ -32,7 +32,7 @@
 package pko.KiCadLogicalSchemeSimulator.tools.ringBuffers;
 public interface IRingBufferSlice {
     int size();
-    long next();
+    int next();
     void skip();
-    long peek();
+    int peek();
 }

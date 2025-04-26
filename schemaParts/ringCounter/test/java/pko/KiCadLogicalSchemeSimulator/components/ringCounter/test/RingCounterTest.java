@@ -63,7 +63,7 @@ public class RingCounterTest extends NetTester {
     void countIncrementsOnClock() {
         checkPin("Cout", true, "Carry out initial state must be 1");
         for (int i = 0; i < 8; i++) {
-            checkBus("qBus", (long) Math.pow(2, i), "Count should increment on clock signal");
+            checkBus("qBus", (int) Math.pow(2, i), "Count should increment on clock signal");
             if (i < 4) {
                 checkPin("Cout", true, "Carry out must be 1 when count are " + Math.pow(2, i) + "; i = " + i);
             } else {

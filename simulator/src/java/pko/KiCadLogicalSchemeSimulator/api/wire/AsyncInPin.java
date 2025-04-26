@@ -36,7 +36,7 @@ public class AsyncInPin extends Pin {
     private final Pin inPin;
     private final BatchedAsyncConsumer consumer = new BatchedAsyncConsumer(4) {
         @Override
-        public void consume(long payload) {
+        public void consume(int payload) {
             if (payload > 0) {
                 inPin.setHi();
             } else {

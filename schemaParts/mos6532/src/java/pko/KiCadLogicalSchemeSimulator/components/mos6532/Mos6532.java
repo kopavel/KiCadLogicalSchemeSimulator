@@ -57,9 +57,9 @@ public class Mos6532 extends SchemaPart {
     boolean pa7Interrupt;
     boolean timerInterrupt;
     boolean pa7PositiveEdge;
-    long timerDivider = 1;
-    long timerCount;
-    long[] ram = new long[128];
+    int timerDivider = 1;
+    int timerCount;
+    int[] ram = new int[128];
     boolean selected;
 
     protected Mos6532(String id, String sParam) {
@@ -259,8 +259,8 @@ public class Mos6532 extends SchemaPart {
 
     @Override
     public String extraState() {
-        return "DDRA:" + Long.toBinaryString(aPart.direction) + "\n" +//
-                "DDRB:" + Long.toBinaryString(bPart.direction) + "\n" +//
+        return "DDRA:" + Integer.toBinaryString(aPart.direction) + "\n" +//
+                "DDRB:" + Integer.toBinaryString(bPart.direction) + "\n" +//
                 "pa7 Flag:" + pa7Flag + "\n" +//
                 "pa7 PositiveEdge:" + pa7PositiveEdge + "\n" +//
                 "pa7 Interrupt:" + pa7Interrupt + "\n" +//
@@ -278,8 +278,8 @@ public class Mos6532 extends SchemaPart {
         final InPin[] ins = new InPin[8];
         final String suffix;
         final Pin[] outs = new Pin[8];
-        long data;
-        long direction;
+        int data;
+        int direction;
 
         private Pins(String suffix, Mos6532 parent) {
             this.suffix = suffix;
@@ -316,8 +316,8 @@ public class Mos6532 extends SchemaPart {
         }
 
         public void setState() {
-            long data = (this.data = dIn.state);
-            long direction = this.direction;
+            int data = (this.data = dIn.state);
+            int direction = this.direction;
             int mask = 1;
             for (Pin out : outs) {
                 if ((direction & mask) > 0) {
@@ -339,10 +339,10 @@ public class Mos6532 extends SchemaPart {
             direction = 0;
         }
 
-        private long getState() {
-            long data = this.data;
-            long direction = this.direction;
-            long result = 0;
+        private int getState() {
+            int data = this.data;
+            int direction = this.direction;
+            int result = 0;
             int mask = 1;
             for (InPin in : ins) {
                 if ((direction & mask) > 0) {

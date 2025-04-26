@@ -41,7 +41,7 @@ public class DCounter extends SchemaPart {
     private final boolean carryHi;
     private final boolean carryLo;
     private final InPin udPin;
-    public long maxCount;
+    public int maxCount;
     private Bus outBus;
     private Pin cOutPin;
     private boolean ciState;
@@ -179,7 +179,7 @@ public class DCounter extends SchemaPart {
         }
         jBus = addInBus(new InBus("J", this, 4) {
             @Override
-            public void setState(long newState) {
+            public void setState(int newState) {
                 state = newState;
                 if (!presetDisabled && resetInactive && outBus.state != newState) {
                     outBus.setState(newState);

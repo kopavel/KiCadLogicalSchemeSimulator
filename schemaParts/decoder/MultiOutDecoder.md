@@ -16,7 +16,7 @@ Implements a binary decoder with multiple output pin groups.
 
 - `Qxn` part output
   x - a part identifier in the range [a…z]
-  n - a sequential number in range [0…63].
+  n - a sequential number in range [0…32].
 
 ### Parameters
 

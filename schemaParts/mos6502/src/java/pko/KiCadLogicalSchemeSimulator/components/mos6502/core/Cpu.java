@@ -1152,7 +1152,7 @@ public class Cpu implements InstructionTable {
         // Clear illegal opcode trap.
         state.opTrap = false;
         // Reset step counter
-        state.stepCounter = 0L;
+        state.stepCounter = 0;
         // Reset registers.
         state.a = 0;
         state.x = 0;

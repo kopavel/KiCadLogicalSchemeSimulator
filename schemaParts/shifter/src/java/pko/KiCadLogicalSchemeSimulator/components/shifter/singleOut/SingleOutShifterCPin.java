@@ -73,7 +73,7 @@ public class SingleOutShifterCPin extends InPin {
         if (!reverse) {
             SingleOutShifter lParent;
             if ((lParent = parent).clockEnabled) {
-                long l;
+                int l;
                 if (lParent.parallelLoad) {
                     l = dBus.state;
                 } else {
@@ -98,7 +98,7 @@ public class SingleOutShifterCPin extends InPin {
                                         /*Optimiser line o*///
                                    ://
                                            /*Optimiser line cp*///
-                                1L//
+                                1//
                         ;
                     }
                 }
@@ -125,7 +125,7 @@ public class SingleOutShifterCPin extends InPin {
         if (reverse) {
             SingleOutShifter lParent;
             if ((lParent = parent).clockEnabled) {
-                long l;
+                int l;
                 if (lParent.parallelLoad) {
                     l = dBus.state;
                 } else {
@@ -150,7 +150,7 @@ public class SingleOutShifterCPin extends InPin {
                                         /*Optimiser line o*///
                                    ://
                                            /*Optimiser line cp*///
-                                1L//
+                                1//
                         ;
                     }
                 }

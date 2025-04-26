@@ -47,7 +47,7 @@ public class BusToWiresAdapter extends OutBus {
     public Pin[] toImp = new Pin[0];
     public Pin[] toLow = new Pin[0];
     public Pin[] toHi = new Pin[0];
-    public long maskState;
+    public int maskState;
     public boolean queueState;
 
     /*Optimiser constructor unroll low:toLow:l unroll hi:toHi:h unroll imp:toImp:i*/
@@ -56,14 +56,14 @@ public class BusToWiresAdapter extends OutBus {
         triStateIn = oldBus.triStateIn;
     }
 
-    public BusToWiresAdapter(OutBus outBus, long mask) {
+    public BusToWiresAdapter(OutBus outBus, int mask) {
         super(outBus, "BusToWire");
         this.mask = mask;
     }
 
     public void addDestination(Pin pin) {
         pin.used = true;
-        pin.state=(state&mask)>0;
+        pin.state = (state & mask) > 0;
         used = true;
         triStateIn |= pin.triStateIn;
         destinations = Utils.addToArray(destinations, pin);
@@ -72,18 +72,18 @@ public class BusToWiresAdapter extends OutBus {
     }
 
     @Override
-    public long getState() {
+    public int getState() {
         return ((source == null ? state : source.getState()) & mask) > 0 ? 1 : 0;
     }
 
     @Override
-    public void setState(long newState) {
+    public void setState(int newState) {
         /*Optimiser line ts*/
         hiImpedance = false;
         /*Optimiser line setter*/
         state = newState;
         /*Optimiser block mask*/
-        final long newMaskState;
+        final int newMaskState;
         /*Optimiser bind m:mask*/
         if (maskState != (newMaskState = newState & mask)
                 /*Optimiser line ts bind d:toImp[0] *///
@@ -199,8 +199,7 @@ public class BusToWiresAdapter extends OutBus {
                 toLow[0] = new AsyncInPin(toLow[0]);
             }
 */
-            ClassOptimiser<BusToWiresAdapter> optimiser =
-                    new ClassOptimiser<>(this).unroll("l", toLow.length).unroll("h", toHi.length).bind("m", mask);
+            ClassOptimiser<BusToWiresAdapter> optimiser = new ClassOptimiser<>(this).unroll("l", toLow.length).unroll("h", toHi.length).bind("m", mask);
             if (source != null) {
                 optimiser.cut("setter");
             }

@@ -43,7 +43,7 @@ public abstract class BatchedAsyncConsumer implements AutoCloseable {
     private int pos;
     private Slot writeSlot;
     private static boolean run;
-    private long[] writePayload;
+    private int[] writePayload;
 
     public BatchedAsyncConsumer(int size) {
         pos = maxIndex;
@@ -55,7 +55,7 @@ public abstract class BatchedAsyncConsumer implements AutoCloseable {
                 run = true;
                 while (run) {
                     while (currentSlot.full.getAcquire()) {
-                        for (long payload : currentSlot.payload) {
+                        for (int payload : currentSlot.payload) {
                             consume(payload);
                         }
                         currentSlot.full.setOpaque(false);
@@ -74,7 +74,7 @@ public abstract class BatchedAsyncConsumer implements AutoCloseable {
         VarHandle.releaseFence();
     }
 
-    public abstract void consume(long payload);
+    public abstract void consume(int payload);
 
     @Override
     public synchronized void close() {
@@ -90,7 +90,7 @@ public abstract class BatchedAsyncConsumer implements AutoCloseable {
         }
     }
 
-    public void accept(final long payload) {
+    public void accept(final int payload) {
         int lPos;
         if ((lPos = pos) == 0) {
             writePayload[0] = payload;
@@ -128,12 +128,12 @@ public abstract class BatchedAsyncConsumer implements AutoCloseable {
     }
 
     static class Slot {
-        private final long[] payload;
+        private final int[] payload;
         private final AtomicBoolean full = new AtomicBoolean();
         private Slot nextSlot;
 
         Slot(int size) {
-            this.payload = new long[size];
+            this.payload = new int[size];
         }
     }
 }

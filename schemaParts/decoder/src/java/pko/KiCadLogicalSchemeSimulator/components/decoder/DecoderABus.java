@@ -39,7 +39,7 @@ public class DecoderABus extends InBus {
     public final Decoder parent;
     public Bus outBus;
     public boolean csState;
-    public long outState;
+    public int outState;
 
     public DecoderABus(String id, Decoder parent, int size, String... aliases) {
         super(id, parent, size, aliases);
@@ -55,7 +55,7 @@ public class DecoderABus extends InBus {
     }
 
     @Override
-    public void setState(long newState) {
+    public void setState(int newState) {
         state = newState;
         if (
             /*Optimiser line cs */
@@ -63,13 +63,13 @@ public class DecoderABus extends InBus {
                         outBus.state != (
                                 /*Optimiser line o block r*/
                                 parent.params.containsKey("outReverse") ?//
-                                (outState = ~((1L << newState)
+                                (outState = ~((1 << newState)
                                         /*Optimiser line d*///
                                         % 10//
                                 ))
                                         /*Optimiser line o blockEnd r block nr*///
                                                                         ://
-                                (outState = (1L << newState)
+                                (outState = (1 << newState)
                                         /*Optimiser line d*///
                                         % 10//
                                 )

@@ -42,7 +42,7 @@ public class MaskedMultiplexer extends SchemaPart {
     public final List<MaskedMultiplexerOEPin> oePins = new ArrayList<>();
     public final List<MaskedMultiplexerNPin> nPins = new ArrayList<>();
     public MaskedMultiplexerOEPin oePin;
-    public long outMask = -1;
+    public int outMask;
     public int nState;
     public Bus outBus;
 
@@ -74,9 +74,9 @@ public class MaskedMultiplexer extends SchemaPart {
             int finalInNo = inNo;
             inBuses[inNo] = addInBus(new InBus(String.valueOf(finalInNo), this, partsAmount, aliases) {
                 @Override
-                public void setState(long newState) {
+                public void setState(int newState) {
                     state = newState;
-                    long state;
+                    int state;
                     if (finalInNo == nState && outBus.state != (state = (newState & outMask))) {
                         outBus.setState(state);
                     }
@@ -85,7 +85,7 @@ public class MaskedMultiplexer extends SchemaPart {
         }
         oePin = addInPin(new MaskedMultiplexerOEPin("OE", this, -1));
         for (int i = 0; i < partSize; i++) {
-            oePins.add(addInPin(new MaskedMultiplexerOEPin("OE" + (char) ('a' + i), this, 1L << i)));
+            oePins.add(addInPin(new MaskedMultiplexerOEPin("OE" + (char) ('a' + i), this, 1 << i)));
         }
         for (int i = 0; i < nSize; i++) {
             nPins.add(addInPin(new MaskedMultiplexerNPin("N" + i, this, 1 << i)));

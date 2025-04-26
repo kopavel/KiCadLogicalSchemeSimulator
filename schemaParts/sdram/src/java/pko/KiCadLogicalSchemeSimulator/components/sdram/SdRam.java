@@ -42,7 +42,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Supplier;
 
 public class SdRam extends SchemaPart {
-    private final long[] bytes;
+    private final int[] bytes;
     private final InBus addrPin;
     private final InBus dIn;
     private final InPin we;
@@ -61,8 +61,8 @@ public class SdRam extends SchemaPart {
         if (size < 2) {
             throw new RuntimeException("SdRam component " + id + " size must be larger, than 1");
         }
-        if (size > 64) {
-            throw new RuntimeException("SdRam component " + id + " max size is 64");
+        if (size > 32) {
+            throw new RuntimeException("SdRam component " + id + " max size is 32");
         }
         if (!sParam.contains("aSize")) {
             throw new RuntimeException("SdRam component " + id + " need \"aSize\" parameter");
@@ -72,10 +72,10 @@ public class SdRam extends SchemaPart {
             throw new RuntimeException("SdRam component " + id + " max aSize is 15");
         }
         int ramSize = (int) Math.pow(2, aSize * 2);
-        bytes = new long[ramSize];
-        long maskForSize = Utils.getMaskForSize(size);
+        bytes = new int[ramSize];
+        int maskForSize = Utils.getMaskForSize(size);
         for (int i = 0; i < ramSize; i++) {
-            bytes[i] = ThreadLocalRandom.current().nextLong() & maskForSize;
+            bytes[i] = ThreadLocalRandom.current().nextInt() & maskForSize;
         }
         addrPin = addInBus("A", aSize);
         addTriStateOutBus("D", size);
@@ -97,7 +97,7 @@ public class SdRam extends SchemaPart {
             addInPin(new InPin("~{CAS}", this) {
                 final InBus in = dIn;
                 final InBus aIn = addrPin;
-                final long[] bts = bytes;
+                final int[] bts = bytes;
                 final InPin w = we;
 
                 @Override
@@ -115,7 +115,7 @@ public class SdRam extends SchemaPart {
                     int a = (addr = (int) (hiPart + aIn.state));
                     if (w.state) {
                         Bus out;
-                        long l;
+                        int l;
                         if ((out = dOut).state != (l = bts[a]) || out.hiImpedance) {
                             out.setState(l);
                         }
@@ -146,7 +146,7 @@ public class SdRam extends SchemaPart {
                         bytes[addr] = dIn.state;
                     } else {
                         Bus out;
-                        long l;
+                        int l;
                         if ((out = dOut).state != (l = bytes[addr]) || out.hiImpedance) {
                             out.setState(l);
                         }

@@ -37,12 +37,12 @@ import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 
 public class MaskedMultiplexerOEPin extends InPin {
     public final MaskedMultiplexer parent;
-    public final long mask;
-    public final long nMask;
+    public final int mask;
+    public final int nMask;
     public Bus outBus;
     public Bus[] inBuses;
 
-    public MaskedMultiplexerOEPin(String id, MaskedMultiplexer parent, long mask) {
+    public MaskedMultiplexerOEPin(String id, MaskedMultiplexer parent, int mask) {
         super(id, parent);
         this.parent = parent;
         this.mask = mask;
@@ -65,8 +65,8 @@ public class MaskedMultiplexerOEPin extends InPin {
     public void setHi() {
         /*Optimiser line setter*/
         state = true;
-        long state;
-        long lMask;
+        int state;
+        int lMask;
         MaskedMultiplexer parent;
         /*Optimiser block r line o*/
         if (this.parent.reverse) {
@@ -87,8 +87,8 @@ public class MaskedMultiplexerOEPin extends InPin {
     public void setLo() {
         /*Optimiser line setter*/
         state = true;
-        long state;
-        long lMask;
+        int state;
+        int lMask;
         MaskedMultiplexer parent;
         /*Optimiser block r line o*/
         if (this.parent.reverse) {

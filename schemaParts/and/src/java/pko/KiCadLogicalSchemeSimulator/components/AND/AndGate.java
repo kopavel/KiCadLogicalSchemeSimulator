@@ -39,7 +39,7 @@ import java.util.Map;
 
 public class AndGate extends SchemaPart {
     private final Map<String, AndGateIn> ins = new HashMap<>();
-    public long inState;
+    public int inState;
     private Pin out;
 
     public AndGate(String id, String sParam) {
@@ -64,7 +64,7 @@ public class AndGate extends SchemaPart {
         out = getOutPin("OUT");
         ins.values().forEach(pin -> {
             if (pin.isHiImpedance() || !pin.state) {
-                inState |= (1L << Long.parseLong(pin.getId().substring(2)));
+                inState |= (1 << Integer.parseInt(pin.getId().substring(2)));
             }
             pin.out = out;
         });

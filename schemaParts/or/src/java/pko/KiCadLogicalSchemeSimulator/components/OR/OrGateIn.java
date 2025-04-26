@@ -37,11 +37,11 @@ import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 
 public class OrGateIn extends InPin {
     public final OrGate parent;
-    public final long mask;
-    public final long nMask;
+    public final int mask;
+    public final int nMask;
     public Pin out;
 
-    public OrGateIn(String id, OrGate parent, long mask) {
+    public OrGateIn(String id, OrGate parent, int mask) {
         super(id, parent);
         this.parent = parent;
         this.mask = mask;

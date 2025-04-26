@@ -37,15 +37,15 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 public class StateMachine extends SchemaPart {
-    private final long[] states;
+    private final int[] states;
     private final InBus in;
     private final InPin dPin;
-    private final long mask;
+    private final int mask;
     private InPin cPin;
     private Bus out;
     private boolean cActive;
-    private long outState;
-    private long outMask;
+    private int outState;
+    private int outMask;
 
     public StateMachine(String id, String sParam) {
         super(id, sParam);
@@ -80,9 +80,9 @@ public class StateMachine extends SchemaPart {
             if (stateAmount != split.length) {
                 throw new RuntimeException("State amount not equal with inputs possible combinations amount");
             }
-            states = new long[stateAmount];
+            states = new int[stateAmount];
             for (int i = 0; i < split.length; i++) {
-                states[i] = Long.parseLong(split[i]);
+                states[i] = Integer.parseInt(split[i]);
             }
         } catch (NumberFormatException r) {
             throw new RuntimeException("Component " + id + " state must be positive number");
@@ -92,7 +92,7 @@ public class StateMachine extends SchemaPart {
             @Override
             public void setHi() {
                 state = true;
-                long newOutState = ((long) 0) ^ outMask;
+                int newOutState = 0 ^ outMask;
                 if (out.state != newOutState) {
                     out.setState(newOutState);
                 }
@@ -101,7 +101,7 @@ public class StateMachine extends SchemaPart {
             @Override
             public void setLo() {
                 state = false;
-                long newOutState = (outState) ^ outMask;
+                int newOutState = (outState) ^ outMask;
                 if (out.state != newOutState) {
                     out.setState(newOutState);
                 }
@@ -113,7 +113,7 @@ public class StateMachine extends SchemaPart {
                 state = true;
                 {
                     outMask = mask;
-                    long newOutState = (dPin.state ? 0 : outState) ^ outMask;
+                    int newOutState = (dPin.state ? 0 : outState) ^ outMask;
                     if (out.state != newOutState) {
                         out.setState(newOutState);
                     }
@@ -124,7 +124,7 @@ public class StateMachine extends SchemaPart {
             public void setLo() {
                 state = false;
                 outMask = 0;
-                long newOutState = (dPin.state ? 0 : outState) ^ outMask;
+                int newOutState = (dPin.state ? 0 : outState) ^ outMask;
                 if (out.state != newOutState) {
                     out.setState(newOutState);
                 }
@@ -143,7 +143,7 @@ public class StateMachine extends SchemaPart {
                     state = false;
                     cActive = true;
                     outState = states[(int) in.state];
-                    long newOutState = (dPin.state ? 0 : outState) ^ outMask;
+                    int newOutState = (dPin.state ? 0 : outState) ^ outMask;
                     if (out.state != newOutState) {
                         out.setState(newOutState);
                     }
@@ -157,7 +157,7 @@ public class StateMachine extends SchemaPart {
                     state = true;
                     cActive = true;
                     outState = states[(int) in.state];
-                    long newOutState = (dPin.state ? 0 : outState) ^ outMask;
+                    int newOutState = (dPin.state ? 0 : outState) ^ outMask;
                     if (out.state != newOutState) {
                         out.setState(newOutState);
                     }
@@ -175,11 +175,11 @@ public class StateMachine extends SchemaPart {
         } else {
             in = addInBus(new InBus("IN", this, inSize) {
                 @Override
-                public void setState(long newState) {
+                public void setState(int newState) {
                     state = newState;
                     if (cActive) {
                         outState = states[(int) newState];
-                        long newOutState = (dPin.state ? 0 : outState) ^ outMask;
+                        int newOutState = (dPin.state ? 0 : outState) ^ outMask;
                         if (out.state != newOutState) {
                             out.setState(newOutState);
                         }

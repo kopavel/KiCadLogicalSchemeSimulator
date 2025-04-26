@@ -42,7 +42,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Supplier;
 
 public class Ram extends SchemaPart {
-    private final long[] words;
+    private final int[] words;
     private final InBus dIn;
     private final int size;
     private final int aSize;
@@ -72,8 +72,8 @@ public class Ram extends SchemaPart {
         if (size < 1) {
             throw new RuntimeException("Component " + id + " size must be positive number");
         }
-        if (size > 64) {
-            throw new RuntimeException("Component " + id + " max size is 64");
+        if (size > 32) {
+            throw new RuntimeException("Component " + id + " max size is 32");
         }
         if (aSize < 1) {
             throw new RuntimeException("Component " + id + " size must be positive number");
@@ -82,17 +82,17 @@ public class Ram extends SchemaPart {
             throw new RuntimeException("Component " + id + " max size is 31");
         }
         int ramSize = (int) Math.pow(2, aSize);
-        words = new long[ramSize];
-        long maskForSize = Utils.getMaskForSize(size);
+        words = new int[ramSize];
+        int maskForSize = Utils.getMaskForSize(size);
         for (int i = 0; i < ramSize; i++) {
-            words[i] = ThreadLocalRandom.current().nextLong() & maskForSize;
+            words[i] = ThreadLocalRandom.current().nextInt() & maskForSize;
         }
         addTriStateOutBus("D", size);
         dIn = addInBus(params.containsKey("separateOut") ? "Din" : "D", size);
         if (reverse) {
             aBus = addInBus(new InBus("A", this, aSize) {
                 @Override
-                public void setState(long newState) {
+                public void setState(int newState) {
                     state = newState;
                     if (!csPin.state) {
                         rOut();
@@ -142,7 +142,7 @@ public class Ram extends SchemaPart {
         } else {
             aBus = addInBus(new InBus("A", this, aSize) {
                 @Override
-                public void setState(long newState) {
+                public void setState(int newState) {
                     state = newState;
                     if (!csPin.state) {
                         out();

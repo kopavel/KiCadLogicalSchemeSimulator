@@ -50,9 +50,9 @@ import java.util.*;
 
 public class BusMerger extends OutBus {
     public final Set<MergerInput<?>> sources = new TreeSet<>(Comparator.comparing(mergerInput -> mergerInput.getMask() + ":" + mergerInput.getName()));
-    public long strongPins;
-    public long weakPins;
-    public long weakState;
+    public int strongPins;
+    public int weakPins;
+    public int weakState;
     public boolean hasPassivePin;
 
     //FixMe initial hiImpedance?
@@ -88,9 +88,9 @@ public class BusMerger extends OutBus {
         id += "/" + destination.getName();
     }
 
-    public void addSource(OutBus bus, long srcMask, byte offset) {
+    public void addSource(OutBus bus, int srcMask, byte offset) {
         bus.used = true;
-        long destinationMask = offset == 0 ? srcMask : (offset > 0 ? srcMask << offset : srcMask >> -offset);
+        int destinationMask = offset == 0 ? srcMask : (offset > 0 ? srcMask << offset : srcMask >> -offset);
         BusMergerBusIn input = new BusMergerBusIn(bus, destinationMask, this);
         bus.addDestination(input, srcMask, offset);
         sources.add(input);
@@ -104,7 +104,7 @@ public class BusMerger extends OutBus {
     }
 
     public void addSource(OutPin pin, byte offset) {
-        long destinationMask = 1L << offset;
+        int destinationMask = 1 << offset;
         pin.used = true;
         if (pin instanceof PullPin pullPin) {
             weakPins |= destinationMask;
@@ -125,7 +125,7 @@ public class BusMerger extends OutBus {
     }
 
     public void addSource(Net net, List<OutPin> pins, List<PassivePin> passivePins, Byte offset) {
-        long destinationMask = 1L << offset;
+        int destinationMask = 1 << offset;
         BusMergerWireIn input = new BusMergerWireIn(destinationMask, this);
         Pin pin = net.processWire(input, pins, passivePins, Collections.emptyMap());
         processPin(pin, input, destinationMask);
@@ -146,7 +146,7 @@ public class BusMerger extends OutBus {
         return this;
     }
 
-    private void processPin(Pin pin, BusMergerWireIn input, long destinationMask) {
+    private void processPin(Pin pin, BusMergerWireIn input, int destinationMask) {
         input.source=pin;
         input.triStateOut=pin.triStateOut;
         input.oldStrong = pin.strong;

@@ -115,13 +115,13 @@ public class Diagram extends JPanel {
             IRingBufferSlice values = pinItem.buffer.take(offset + ticksInDiagramm + 1, ticksInDiagramm + 2);
             maxOffset = Math.max(maxOffset, pinItem.buffer.available());
             int start = 0;
-            long prevState = -1;
+            int prevState = -1;
             int end = Math.min(start + ticksInDiagramm, values.size());
             double xPos = 10 + tickWidth * (ticksInDiagramm - end + start);
             double previousX = xPos;
             boolean hasChanges = false;
             for (int i = start; i < end; i++) {
-                long curState = 0;
+                int curState = 0;
                 if (currDiagramState == MultiChange) {
                     values.skip();
                 } else {
@@ -246,10 +246,8 @@ public class Diagram extends JPanel {
                 this.buffer = new ByteRingBuffer();
             } else if (pin.getSize() < 16) {
                 this.buffer = new ShortRingBuffer();
-            } else if (pin.getSize() < 32) {
-                this.buffer = new IntRingBuffer();
             } else {
-                this.buffer = new LongRingBuffer();
+                this.buffer = new IntRingBuffer();
             }
         }
     }

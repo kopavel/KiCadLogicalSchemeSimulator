@@ -51,9 +51,9 @@ import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.war
 import static pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser.ReplaceKind.aload0;
 
 public class OutBus extends Bus {
-    private final Map<Long, Map<Byte, OffsetBus>> corrected = new HashMap<>();
+    private final Map<Integer, Map<Byte, OffsetBus>> corrected = new HashMap<>();
     public Bus[] destinations = new Bus[0];
-    public long mask;
+    public int mask;
 
     public OutBus(String id, SchemaPart parent, int size, String... names) {
         super(id, parent, size, names);
@@ -67,7 +67,7 @@ public class OutBus extends Bus {
         mask = oldBus.mask;
     }
 
-    public void addDestination(Bus bus, long mask, byte offset) {
+    public void addDestination(Bus bus, int mask, byte offset) {
         used = true;
         bus.used = true;
         bus.source = this;
@@ -98,7 +98,7 @@ public class OutBus extends Bus {
         sort();
     }
 
-    public void addDestination(Pin pin, long mask) {
+    public void addDestination(Pin pin, int mask) {
         used = true;
         pin.used = true;
         pin.state = (state & mask) >0;
@@ -123,7 +123,7 @@ public class OutBus extends Bus {
     }
 
     @Override
-    public void setState(long newState) {
+    public void setState(int newState) {
         /*Optimiser line ts*/
         hiImpedance = false;
         state = newState;

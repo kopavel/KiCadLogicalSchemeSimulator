@@ -159,7 +159,7 @@ public class BenchmarkRunner {
 
     // <editor-fold desc="bus state iterator">
     public static void doWork(Bus out) {
-        for (long i = 0; i < 10000; i++) {
+        for (int i = 0; i < 10000; i++) {
             out.setState(1);
             out.setState(2);
             out.setHiImpedance();

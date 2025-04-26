@@ -27,7 +27,7 @@
 
 #### Mandatory parameters:
 
-- `size`- Data bus width in range [2…64].
+- `size`- Data bus width in range [2…32].
 
 #### Optional parameters:
 

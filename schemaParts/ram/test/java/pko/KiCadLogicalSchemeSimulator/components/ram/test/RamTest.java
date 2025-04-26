@@ -55,8 +55,8 @@ public class RamTest extends NetTester {
 
     @Test
     void testMultipleWritesAndReads() {
-        long[] testValues = {0x00, 0xFF, 0xA5, 0x5A};
-        long[] testAddresses = {0x00, 0x01, 0xFF, 0x88};
+        int[] testValues = {0x00, 0xFF, 0xA5, 0x5A};
+        int[] testAddresses = {0x00, 0x01, 0xFF, 0x88};
         checkBusImpedance("RAM1", "D", "with hi ~{CS} D bus must be in hiImpedance");
         setLo("~{CS}");
         checkBusImpedance("RAM1", "D", "with lo ~{CS} and hi ~{OE} D bus must be in hiImpedance");

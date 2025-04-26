@@ -35,16 +35,16 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 
 public class BusInInterconnect extends InBus {
-    public final long interconnectMask;
-    public final long senseMask;
+    public final int interconnectMask;
+    public final int senseMask;
     public InBus destination;
 
-    public BusInInterconnect(InBus destination, long interconnectMask, Byte offset) {
+    public BusInInterconnect(InBus destination, int interconnectMask, Byte offset) {
         super(destination, "interconnect" + interconnectMask);
         this.destination = destination;
         used = true;
         this.interconnectMask = interconnectMask;
-        this.senseMask = 1L << offset;
+        this.senseMask = 1 << offset;
     }
 
     /*Optimiser constructor*/
@@ -56,7 +56,7 @@ public class BusInInterconnect extends InBus {
     }
 
     @Override
-    public void setState(long newState) {
+    public void setState(int newState) {
         /*Optimiser block setters line ts*/
         hiImpedance = false;
         state = newState;

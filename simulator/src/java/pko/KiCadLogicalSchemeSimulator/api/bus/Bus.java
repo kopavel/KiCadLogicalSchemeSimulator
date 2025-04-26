@@ -44,7 +44,7 @@ public abstract class Bus extends ModelItem<Bus> {
     @Getter
     public final int size;
     public final Map<String, Byte> aliasOffsets;
-    public long state;
+    public int state;
     public boolean useBitPresentation;
 
     public Bus(String id, SchemaPart parent, int size, String... aliases) {
@@ -95,11 +95,11 @@ public abstract class Bus extends ModelItem<Bus> {
     }
 
     @Override
-    public long getState() {
+    public int getState() {
         return (source == null || source == this) ? state : source.getState();
     }
 
-    abstract public void setState(long newState);
+    abstract public void setState(int newState);
 
     @Override
     public Bus copyState(IModelItem<Bus> oldBus) {

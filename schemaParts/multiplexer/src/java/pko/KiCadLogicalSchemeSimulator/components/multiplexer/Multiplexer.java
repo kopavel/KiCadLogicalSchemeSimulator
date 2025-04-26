@@ -66,7 +66,7 @@ public class Multiplexer extends SchemaPart {
             int finalInNo = inNo;
             inBuses[inNo] = addInBus(new InBus(String.valueOf(finalInNo), this, partsAmount, aliases.toArray(new String[0])) {
                 @Override
-                public void setState(long newState) {
+                public void setState(int newState) {
                     state = newState;
                     if (finalInNo == nState /*&& outBus.state != newState*/) {
                         outBus.setState(newState);
@@ -82,7 +82,7 @@ public class Multiplexer extends SchemaPart {
                 public void setHi() {
                     state = true;
                     int s = (nState |= mask);
-                    long state;
+                    int state;
                     Bus out;
                     if ((out = outBus).state != (state = inBuses[s].state)) {
                         out.setState(state);
@@ -93,7 +93,7 @@ public class Multiplexer extends SchemaPart {
                 public void setLo() {
                     state = false;
                     int s = (nState &= nMask);
-                    long state;
+                    int state;
                     Bus out;
                     if ((out = outBus).state != (state = inBuses[s].state)) {
                         out.setState(state);

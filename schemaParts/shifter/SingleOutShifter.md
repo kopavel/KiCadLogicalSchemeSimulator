@@ -28,7 +28,7 @@ Bit shifter with single bit output.
 
 #### Mandatory parameters:
 
-- `size`- size of shifter in rage of [2…64].
+- `size`- size of shifter in rage of [2…32].
 - `outPin`- number for Q output in range of [0…size-1].
 
 #### Optional parameters:

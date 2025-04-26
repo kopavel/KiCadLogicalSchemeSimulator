@@ -39,11 +39,11 @@ import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import static pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser.ReplaceKind.aload0;
 
 public class CInFallingPin extends FallingEdgePin {
-    public final long countMask;
+    public final int countMask;
     public final Counter parent;
     public Bus out;
 
-    public CInFallingPin(String id, Counter parent, long countMask) {
+    public CInFallingPin(String id, Counter parent, int countMask) {
         super(id, parent);
         this.parent = parent;
         out = parent.getOutBus("Q");
@@ -68,11 +68,10 @@ public class CInFallingPin extends FallingEdgePin {
     public void setLo() {
         /*Optimiser line setter*/
         state = false;
-        long state;
         /*Optimiser line r*/
         if (parent.enabled) {
             /*Optimiser bind countMask*/
-            out.setState((state = out.state) == countMask ? 0 : state + 1);
+            out.setState(out.state == countMask ? 0 : out.state + 1);
             /*Optimiser line r*/
         }
     }

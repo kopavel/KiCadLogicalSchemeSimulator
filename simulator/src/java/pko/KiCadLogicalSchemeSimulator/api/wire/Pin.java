@@ -84,8 +84,8 @@ public abstract class Pin extends ModelItem<Pin> {
     }
 
     @Override
-    public long getState() {
-        return (source == null || source == this) ? (state ? 1L : 0L) : source.getState();
+    public int getState() {
+        return (source == null || source == this) ? (state ? 1 : 0) : source.getState();
     }
 
     abstract public void setHi();

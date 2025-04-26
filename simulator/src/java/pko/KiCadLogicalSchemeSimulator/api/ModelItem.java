@@ -47,7 +47,7 @@ public abstract class ModelItem<T> implements IModelItem<T> {
     public boolean triStateIn;
     public boolean triStateOut;
     public int processing;
-    public long applyMask;
+    public int applyMask;
     public byte applyOffset;
     public boolean used;
     public ModelItem<?> source;

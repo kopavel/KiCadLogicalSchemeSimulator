@@ -91,7 +91,7 @@ public class SchemaPartMonitor extends JFrame {
                 .stream().distinct().sorted(Comparator.comparing(ModelItem::getId)).forEach(inItem -> {
                       JLabel label;
                       if (inItem instanceof Bus bus && bus.useBitPresentation) {
-                          char[] bits = leftPad(Long.toBinaryString(bus.state), bus.size, '0').toCharArray();
+                          char[] bits = leftPad(Integer.toBinaryString(bus.state), bus.size, '0').toCharArray();
                           for (int j = 0; j < bus.size; j++) {
                               label = new JLabel(schemaPart.ids.get(bus) + j);
                               label.setBorder(BorderFactory.createEmptyBorder(3, 2, 4, 0));
@@ -103,7 +103,7 @@ public class SchemaPartMonitor extends JFrame {
                               label.setAlignmentX(RIGHT_ALIGNMENT);
                               label.setBorder(new CompoundBorder(BorderFactory.createEmptyBorder(2, 2, 1, 0),
                                       new CompoundBorder(BorderFactory.createLineBorder(borderColor), BorderFactory.createEmptyBorder(1, 5, 1, 5))));
-                              ins = Utils.addToArray(ins, new Item(inItem, label, 1L << j));
+                              ins = Utils.addToArray(ins, new Item(inItem, label, 1 << j));
                               inputsValues.add(label);
                           }
                       } else {
@@ -117,7 +117,7 @@ public class SchemaPartMonitor extends JFrame {
                           label.setAlignmentX(RIGHT_ALIGNMENT);
                           label.setBorder(new CompoundBorder(BorderFactory.createEmptyBorder(2, 2, 1, 0),
                                   new CompoundBorder(BorderFactory.createLineBorder(borderColor), BorderFactory.createEmptyBorder(1, 5, 1, 5))));
-                          ins = Utils.addToArray(ins, new Item(inItem, label, 1L));
+                          ins = Utils.addToArray(ins, new Item(inItem, label, 1));
                           inputsValues.add(label);
                       }
                   });
@@ -125,7 +125,7 @@ public class SchemaPartMonitor extends JFrame {
                 .stream().distinct().sorted(Comparator.comparing(schemaPart.ids::get)).forEach(outItem -> {
                       JLabel label;
                       if (outItem instanceof Bus bus && bus.useBitPresentation) {
-                          char[] bits = leftPad(Long.toBinaryString(bus.state), bus.size, '0').toCharArray();
+                          char[] bits = leftPad(Integer.toBinaryString(bus.state), bus.size, '0').toCharArray();
                           for (int j = 0; j < bus.size; j++) {
                               label = new JLabel(schemaPart.ids.get(bus) + j);
                               label.setBorder(BorderFactory.createEmptyBorder(3, 0, 4, 2));
@@ -138,7 +138,7 @@ public class SchemaPartMonitor extends JFrame {
                               label.setBorder(new CompoundBorder(BorderFactory.createEmptyBorder(2, 0, 1, 2),
                                       new CompoundBorder(BorderFactory.createLineBorder(borderColor), BorderFactory.createEmptyBorder(1, 5, 1, 5))));
                               outputsValues.add(label);
-                              outs = Utils.addToArray(outs, new Item(outItem, label, 1L << j));
+                              outs = Utils.addToArray(outs, new Item(outItem, label, 1 << j));
                           }
                       } else {
                           label = new JLabel(schemaPart.ids.get(outItem));
@@ -152,7 +152,7 @@ public class SchemaPartMonitor extends JFrame {
                           label.setBorder(new CompoundBorder(BorderFactory.createEmptyBorder(2, 0, 1, 2),
                                   new CompoundBorder(BorderFactory.createLineBorder(borderColor), BorderFactory.createEmptyBorder(1, 5, 1, 5))));
                           outputsValues.add(label);
-                          outs = Utils.addToArray(outs, new Item(outItem, label, 1L));
+                          outs = Utils.addToArray(outs, new Item(outItem, label, 1));
                       }
                   });
         extraPanel = new JTextArea();
@@ -269,6 +269,6 @@ public class SchemaPartMonitor extends JFrame {
         var1.add(var7, new GridConstraints(1, 2, 1, 1, 8, 2, 3, 3, null, null, null));
     }
 
-    private record Item(IModelItem<?> item, JLabel label, Long mask) {
+    private record Item(IModelItem<?> item, JLabel label, Integer mask) {
     }
 }

@@ -41,7 +41,7 @@ import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.war
 
 public class OffsetBus extends OutBus {
     protected final byte offset;
-    public long maskState;
+    public int maskState;
     public boolean queueImpedance;
 
     public OffsetBus(OutBus outBus, Bus destination, byte offset) {
@@ -72,12 +72,12 @@ public class OffsetBus extends OutBus {
     }
 
     @Override
-    public void setState(long newState) {
+    public void setState(int newState) {
         /*Optimiser line ts  block setter*/
         hiImpedance = false;
         state = newState;
         /*Optimiser blockEnd setter*/
-        final long newMaskState;
+        final int newMaskState;
         /*Optimiser block mask bind m:mask*/
         if (maskState != (newMaskState = newState & mask)
                 /*Optimiser line ts bind d:destinations[0]*///

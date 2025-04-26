@@ -45,7 +45,7 @@ public abstract class RingBuffer {
         return isFull ? capacity : writePos + 1;
     }
 
-    public void put(long element) {
+    public void put(int element) {
         if (++writePos == capacity) {
             writePos = 0;
             isFull = true;

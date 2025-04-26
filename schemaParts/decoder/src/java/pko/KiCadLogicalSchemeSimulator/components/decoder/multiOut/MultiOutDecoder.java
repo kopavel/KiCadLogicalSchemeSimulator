@@ -38,7 +38,7 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 public class MultiOutDecoder extends SchemaPart {
-    private final long[] csStates;
+    private final int[] csStates;
     int partAmount;
     int outSize;
     private Pin[][] outs;
@@ -55,7 +55,7 @@ public class MultiOutDecoder extends SchemaPart {
         String[] partCSs = params.get("cs").split(",");
         partAmount = partCSs.length;
         boolean[][] CSs = new boolean[partAmount][0];
-        csStates = new long[partAmount];
+        csStates = new int[partAmount];
         outSize = (int) Math.pow(2, inSize);
         for (int i = 0; i < partCSs.length; i++) {
             String[] csItems = partCSs[i].split(":");
@@ -68,11 +68,11 @@ public class MultiOutDecoder extends SchemaPart {
         if (reverse) {
             aBus = addInBus(new InBus("A", this, inSize) {
                 @Override
-                public void setState(long newState) {
+                public void setState(int newState) {
                     state = newState;
                     for (int i = 0; i < outs.length; i++) {
                         Pin out;
-                        if (csStates[i] == 0 && (out = outs[i][(int) newState]).hiImpedance) {
+                        if (csStates[i] == 0 && (out = outs[i][newState]).hiImpedance) {
                             out.setLo();
                         }
                     }
@@ -81,7 +81,7 @@ public class MultiOutDecoder extends SchemaPart {
         } else {
             aBus = addInBus(new InBus("A", this, inSize) {
                 @Override
-                public void setState(long newState) {
+                public void setState(int newState) {
                     state = newState;
                     for (int i = 0; i < outs.length; i++) {
                         Pin[] out = outs[i];

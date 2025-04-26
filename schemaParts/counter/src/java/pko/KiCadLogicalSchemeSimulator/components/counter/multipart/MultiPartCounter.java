@@ -43,7 +43,7 @@ public class MultiPartCounter extends SchemaPart {
     private final Bus[] outBuses;
     private final Pin[] outPins;
     private final int[] sizes;
-    public long resetState;
+    public int resetState;
 
     protected MultiPartCounter(String id, String sParam) {
         super(id, sParam);

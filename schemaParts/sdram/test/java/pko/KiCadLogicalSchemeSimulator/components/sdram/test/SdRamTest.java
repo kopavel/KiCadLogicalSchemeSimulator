@@ -60,8 +60,8 @@ public class SdRamTest extends NetTester {
 
     @Test
     void testMultipleWritesAndReads() {
-        long[] testValues = {0x00, 0xFF, 0xA5, 0x5A};
-        long[] testAddresses = {0x00, 0x01, 0xee, 0x88};
+        int[] testValues = {0x00, 0xFF, 0xA5, 0x5A};
+        int[] testAddresses = {0x00, 0x01, 0xee, 0x88};
         setLo("~{WE}");
         checkBusImpedance("SDRAM64K1", "D", "with hi ~{CAS} or lo ~{WR} D bus must be in hiImpedance");
         for (int i = 0; i < testValues.length; i++) {

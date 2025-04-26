@@ -26,7 +26,7 @@ Multiplexer with a defined amount of outputs and ways. Has a multiple OE pint pe
 
 #### Mandatory parameters:
 
-- `size`- amount of output pins in one 'way' in range [2…64].
+- `size`- amount of output pins in one 'way' in range [2…32].
 - `nSize`- amount of 'way' identification pins in range [1..5].   
   amount of 'ways' is 2^nSize.
 

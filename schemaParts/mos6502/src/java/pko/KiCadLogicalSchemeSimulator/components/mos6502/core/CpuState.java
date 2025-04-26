@@ -69,7 +69,7 @@ public class CpuState {
     public boolean decimalModeFlag;
     public boolean breakFlag;
     public boolean overflowFlag;
-    public long stepCounter = 0L;
+    public int stepCounter = 0;
 
     public CpuState() {
     }

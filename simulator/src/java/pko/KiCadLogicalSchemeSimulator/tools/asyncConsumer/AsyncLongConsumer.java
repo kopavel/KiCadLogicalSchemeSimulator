@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.tools.asyncConsumer;
-public abstract class AsyncLongConsumer extends AsyncLongConsumers {
+public abstract class AsyncLongConsumer extends AsyncIntConsumers {
     public AsyncLongConsumer(int size) {
         super(size, 1);
     }

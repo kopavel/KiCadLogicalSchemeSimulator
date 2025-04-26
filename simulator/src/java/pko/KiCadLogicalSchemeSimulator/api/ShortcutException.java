@@ -47,7 +47,7 @@ public class ShortcutException extends RuntimeException {
         StringBuilder message = new StringBuilder("Shortcut on ");
         for (IModelItem<?> pin : pins) {
             if (pin instanceof MergerInput<?> mergerInput) {
-                message.append(Long.toBinaryString(mergerInput.getMask())).append(":");
+                message.append(Integer.toBinaryString(mergerInput.getMask())).append(":");
             }
             message.append(pin.getName()).append(":");
             if (pin.isHiImpedance()) {

@@ -80,7 +80,7 @@ public class Keyboard extends SchemaPart implements InteractiveSchemaPart {
         });
         in = addInBus(new InBus("In", this, 8) {
             @Override
-            public void setState(long newState) {
+            public void setState(int newState) {
                 state = newState;
                 if (!enable.state && (out.state != busMap[(int) newState] || out.hiImpedance)) {
                     out.setState(busMap[(int) newState]);

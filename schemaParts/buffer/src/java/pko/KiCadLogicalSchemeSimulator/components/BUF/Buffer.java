@@ -35,7 +35,7 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 
 public class Buffer extends SchemaPart {
-    public long latch;
+    public int latch;
     public BufferOePin oePin;
     public BufferCsPin csPin;
     public Bus qBus;
@@ -56,8 +56,8 @@ public class Buffer extends SchemaPart {
         if (busSize < 1) {
             throw new RuntimeException("Component " + id + " size  must be positive number");
         }
-        if (busSize > 64) {
-            throw new RuntimeException("Component " + id + " size  must be less then 64");
+        if (busSize > 32) {
+            throw new RuntimeException("Component " + id + " size  must be less then 32");
         }
         addTriStateOutBus("Q", busSize);
         if (params.containsKey("latch")) {

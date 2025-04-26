@@ -33,7 +33,7 @@ public class BufferWrPin extends InPin {
         state = true;
         /*Optimiser line o block nr*/
         if (!parent.reverse) {
-            long state;
+            int state;
             Bus bus;
             parent.latch = (state = dBus.state);
             if (oePin.state && ((bus = qBus).state != state || bus.hiImpedance)) {
@@ -49,7 +49,7 @@ public class BufferWrPin extends InPin {
         state = false;
         /*Optimiser line o block r*/
         if (parent.reverse) {
-            long state;
+            int state;
             Bus bus;
             parent.latch = (state = dBus.state);
             if (!oePin.state && ((bus = qBus).state != state || bus.hiImpedance)) {

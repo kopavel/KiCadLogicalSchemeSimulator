@@ -39,13 +39,13 @@ import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 public class Shifter extends SchemaPart {
     private final InBus dBus;
     private final InPin dsPins;
-    private final long hiDsMask;
-    private final long outMask;
+    private final int hiDsMask;
+    private final int outMask;
     private final InPin rPin;
     private final InPin ciPin;
     private final boolean clearReverse;
     private final boolean inhibitReverse;
-    private long latch = 0;
+    private int latch = 0;
     private Bus out;
     private boolean parallelLoad;
     private boolean clockEnabled = true;
@@ -62,7 +62,7 @@ public class Shifter extends SchemaPart {
         }
         dBus = addInBus("D", dSize);
         outMask = Utils.getMaskForSize(dSize);
-        hiDsMask = 1L << (dSize - 1);
+        hiDsMask = 1 << (dSize - 1);
         dsPins = addInPin("DS");
         if (params.containsKey("plReverse")) {
             addInPin(new InPin("PL", this) {
@@ -274,7 +274,7 @@ public class Shifter extends SchemaPart {
 
     @Override
     public String extraState() {
-        return "latch" + "\n" + Long.toBinaryString(latch);
+        return "latch" + "\n" + Integer.toBinaryString(latch);
     }
 
     @Override

@@ -72,11 +72,11 @@ public class DecoderCsPin extends InPin {
                     /*Optimiser line o*/
                     parent.params.containsKey("outReverse") ? (
                             /*Optimiser line or*/
-                            aBus.outState = ~(1L << aBus.state)
+                            aBus.outState = ~(1 << aBus.state)
                             /*Optimiser line o*///
                     ) : (
                             /*Optimiser line onr*/
-                            aBus.outState = 1L << aBus.state
+                            aBus.outState = 1 << aBus.state
                             /*Optimiser line o*///
                     )//
                            );
@@ -95,12 +95,12 @@ public class DecoderCsPin extends InPin {
                     /*Optimiser line o*/
                     parent.params.containsKey("outReverse") ?
                             /*Optimiser block or*/
-                    aBus.outState = ~((1L << aBus.state)
+                    aBus.outState = ~((1 << aBus.state)
                             /*Optimiser line d*///
                             % 10
                             /*Optimiser line o block onr blockEnd or*///
                     ) : (//
-                            aBus.outState = ((1L << aBus.state)
+                            aBus.outState = ((1 << aBus.state)
                                     /*Optimiser line d*///
                                     % 10
                                     /*Optimiser line o blockEnd onr*///

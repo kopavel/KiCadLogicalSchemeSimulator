@@ -46,7 +46,7 @@ public class Led16SegmentDisplayUiComponent extends AbstractUiComponent {
     private final float halfHeight;
     private final float width;
     private final float height;
-    public long state;
+    public int state;
     private Line2D[] segment;
 
     public Led16SegmentDisplayUiComponent(int size, Color on, Color off, String title) {

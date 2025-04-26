@@ -11,9 +11,9 @@ public class MemoryDumpPanel extends JPanel {
     private static final int CELL_WIDTH = 20;
     private static final int CELL_HEIGHT = 15;
     private static final int ADDR_WIDTH = 35;
-    private final long[] words;
+    private final int[] words;
 
-    public MemoryDumpPanel(long[] words) {
+    public MemoryDumpPanel(int[] words) {
         super(new BorderLayout());
         this.words = words;
         // Get screen height and calculate max panel height (allowing space for taskbar)

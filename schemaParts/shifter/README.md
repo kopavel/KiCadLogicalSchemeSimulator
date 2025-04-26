@@ -29,7 +29,7 @@ Bit shifter.
 
 #### Mandatory parameters:
 
-- `size`- size of shifter in rage of [2…64].
+- `size`- size of shifter in rage of [2…32].
 
 #### Optional parameters:
 

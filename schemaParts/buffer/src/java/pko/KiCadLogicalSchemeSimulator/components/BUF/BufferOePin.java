@@ -32,7 +32,7 @@ public class BufferOePin extends InPin {
             /*Optimiser line o blockEnd r block nr*/
         } else {
             Bus bus;
-            long latch;
+            int latch;
             if ((bus = qBus).state != (latch = parent.latch) || bus.hiImpedance) {
                 bus.setState(latch);
             }
@@ -45,7 +45,7 @@ public class BufferOePin extends InPin {
         state = false;
         /*Optimiser line o block r*/
         if (parent.reverse) {
-            long latch;
+            int latch;
             Bus bus;
             if ((bus = qBus).state != (latch = parent.latch) || bus.hiImpedance) {
                 bus.setState(latch);

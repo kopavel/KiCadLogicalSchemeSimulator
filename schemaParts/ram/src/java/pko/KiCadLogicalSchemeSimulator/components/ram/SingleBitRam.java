@@ -74,7 +74,7 @@ public class SingleBitRam extends SchemaPart {
         if (reverse) {
             aBus = addInBus(new InBus("A", this, size) {
                 @Override
-                public void setState(long newState) {
+                public void setState(int newState) {
                     state = newState;
                     if (!csPin.state) {
                         rOut();
@@ -124,7 +124,7 @@ public class SingleBitRam extends SchemaPart {
         } else {
             aBus = addInBus(new InBus("A", this, size) {
                 @Override
-                public void setState(long newState) {
+                public void setState(int newState) {
                     state = newState;
                     if (!csPin.state) {
                         out();

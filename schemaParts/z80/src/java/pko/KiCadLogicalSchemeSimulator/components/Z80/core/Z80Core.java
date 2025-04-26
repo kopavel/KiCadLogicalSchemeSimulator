@@ -144,7 +144,7 @@ public class Z80Core {
         ioQueue.readByte(idxCBAddress, testIndexBitAddresscallback);
     };
     private boolean halt;
-    private long tStates;
+    private int tStates;
     /* registers */
     private int reg_B, reg_C, reg_D, reg_E, reg_H, reg_L;
     private final Callback setBc2PCCallback = word -> {
@@ -1166,7 +1166,7 @@ public class Z80Core {
      *
      * @return Processor T states
      */
-    public long getTStates() {
+    public int getTStates() {
         return tStates;
     }
 

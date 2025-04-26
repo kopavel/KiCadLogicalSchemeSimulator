@@ -37,7 +37,7 @@ public class RomCsPin extends InPin {
     public final RomABus aBus;
     public Bus dBus;
     Rom parent;
-    long[] words;
+    int[] words;
 
     public RomCsPin(String id, Rom parent) {
         super(id, parent);
@@ -51,7 +51,7 @@ public class RomCsPin extends InPin {
     public void setHi() {
         state = true;
         aBus.csActive = state;
-        long word;
+        int word;
         Bus bus;
         if ((bus = dBus).state != (word = words[(int) aBus.state]) || bus.hiImpedance) {
             bus.setState(word);

@@ -102,11 +102,11 @@ public abstract class NetTester {
         }
     }
 
-    protected void setBus(String id, long state) {
+    protected void setBus(String id, int state) {
         outBus(id).setState(state);
     }
 
-    protected void setBus(int id, long state) {
+    protected void setBus(int id, int state) {
         outBus(id).setState(state);
     }
 
@@ -136,12 +136,12 @@ public abstract class NetTester {
         assertEquals(state, inPin(id).state, message);
     }
 
-    protected void checkBus(int id, long state, String message) {
+    protected void checkBus(int id, int state, String message) {
         assertFalse(inBus(id).hiImpedance, "Bus " + id + " hiImpedance should be false");
         assertEquals(state, inBus(id).state, message);
     }
 
-    protected void checkBus(String id, long state, String message) {
+    protected void checkBus(String id, int state, String message) {
         assertFalse(inBus(id).hiImpedance, "Bus " + id + " hiImpedance should be false");
         assertEquals(state, inBus(id).state, message);
     }

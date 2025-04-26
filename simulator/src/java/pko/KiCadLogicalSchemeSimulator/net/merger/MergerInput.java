@@ -34,5 +34,5 @@ import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
 
 public interface MergerInput<T> extends IModelItem<T> {
     String getName();
-    long getMask();
+    int getMask();
 }

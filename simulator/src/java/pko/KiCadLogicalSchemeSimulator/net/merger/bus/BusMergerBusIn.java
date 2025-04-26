@@ -45,13 +45,13 @@ import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.war
 //Todo with one Bus input and only weak others - use simpler "Weak bus" implementation
 public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
     @Getter
-    public final long mask;
-    public final long nMask;
+    public final int mask;
+    public final int nMask;
     public final BusMerger merger;
     public Bus[] destinations;
-    public long maskState;
+    public int maskState;
 
-    public BusMergerBusIn(Bus source, long mask, BusMerger merger) {
+    public BusMergerBusIn(Bus source, int mask, BusMerger merger) {
         super(source, "BMergeBIn");
         this.mask = mask;
         this.merger = merger;
@@ -73,7 +73,7 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
     }
 
     @Override
-    public void setState(long newState) {
+    public void setState(int newState) {
         BusMerger merger = this.merger;
         /*Optimiser line setter*/
         state = newState;
@@ -165,7 +165,7 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
             }
             /*Optimiser blockEnd sameMask block otherMask line o*/
         } else {
-            long mergerState;
+            int mergerState;
             /*Optimiser block ts*/
             if (hiImpedance) {
                 hiImpedance = false;
@@ -239,7 +239,7 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
         assert !hiImpedance : "Already in hiImpedance:" + this;
         hiImpedance = true;
         BusMerger merger = this.merger;
-        long newState;
+        int newState;
         assert Log.debug(this.getClass(),
                 "Bus merger setImpedance. before: Source:{} (state:{},  hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{})",
                 getName(),
@@ -289,7 +289,7 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
         } else {
             /*Optimiser bind nm:nMask*/
             merger.strongPins &= nMask;
-            long mergerState;
+            int mergerState;
             /*Optimiser bind m:mask bind nm:nMask*/
             if ((mergerState = merger.state & nMask | (merger.weakState & mask)) != merger.state) {
                 merger.state = mergerState;

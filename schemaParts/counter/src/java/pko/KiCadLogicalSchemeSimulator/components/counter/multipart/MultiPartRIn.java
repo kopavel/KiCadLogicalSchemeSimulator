@@ -38,8 +38,8 @@ public class MultiPartRIn extends InPin {
     public final boolean reverse;
     public final MultiPartCIn[] cIns;
     public final MultiPartCounter parent;
-    public final long mask;
-    public final long nMask;
+    public final int mask;
+    public final int nMask;
     public final int no;
 
     public MultiPartRIn(String id, MultiPartCounter parent, boolean reverse, int no) {
@@ -47,7 +47,7 @@ public class MultiPartRIn extends InPin {
         this.parent = parent;
         this.reverse = reverse;
         cIns = parent.cIns;
-        mask = 1L << no;
+        mask = 1 << no;
         nMask = ~mask;
         this.no = no;
     }

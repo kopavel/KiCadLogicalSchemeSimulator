@@ -50,7 +50,7 @@ public class RomNCsPin extends RomCsPin {
     public void setLo() {
         state = false;
         aBus.csActive = true;
-        long word;
+        int word;
         Bus bus;
         if ((bus = dBus).state != (word = words[(int) aBus.state]) || bus.hiImpedance) {
             bus.setState(word);

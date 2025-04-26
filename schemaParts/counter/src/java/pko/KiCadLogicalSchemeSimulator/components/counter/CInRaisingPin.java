@@ -39,11 +39,11 @@ import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import static pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser.ReplaceKind.aload0;
 
 public class CInRaisingPin extends RaisingEdgePin {
-    public final long countMask;
+    public final int countMask;
     private final Counter parent;
     public Bus out;
 
-    public CInRaisingPin(String id, Counter parent, long countMask) {
+    public CInRaisingPin(String id, Counter parent, int countMask) {
         super(id, parent);
         out = parent.getOutBus("Q");
         this.countMask = countMask;

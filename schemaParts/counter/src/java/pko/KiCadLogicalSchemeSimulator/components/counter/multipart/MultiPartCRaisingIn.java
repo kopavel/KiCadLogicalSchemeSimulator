@@ -39,11 +39,11 @@ import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 public class MultiPartCRaisingIn extends RaisingEdgePin implements MultiPartCIn {
-    public final long countMask;
+    public final int countMask;
     public final int partNo;
     public final MultiPartCounter parent;
     public final int size;
-    public final long skipMask;
+    public final int skipMask;
     public Bus outBus;
     public Pin outPin;
 

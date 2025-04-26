@@ -453,7 +453,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
     }
 
     @Override
-    public long getMask() {
+    public int getMask() {
         return 0;
     }
 }

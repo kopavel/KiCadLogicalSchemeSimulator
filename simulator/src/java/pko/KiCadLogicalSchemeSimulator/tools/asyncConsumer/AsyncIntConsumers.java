@@ -34,12 +34,12 @@ import java.lang.invoke.VarHandle;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AsyncLongConsumers implements AutoCloseable {
+public abstract class AsyncIntConsumers implements AutoCloseable {
     final Queue queue;
     private final List<Thread> consumerThreads = new ArrayList<>();
     boolean run;
 
-    public AsyncLongConsumers(int size, int threads) {
+    public AsyncIntConsumers(int size, int threads) {
         registerShutdown();
         Slot[] rings = createSlots(size, threads);
         if (threads == 0) {
@@ -51,7 +51,7 @@ public abstract class AsyncLongConsumers implements AutoCloseable {
 //                        long seepCounter = 0;
                         Slot currentSlot = head;
                         run = true;
-                        long payload;
+                        int payload;
                         while (run) {
                             while ((payload = currentSlot.payload) != -1L) {
 //                                seepCounter = 0;
@@ -84,7 +84,7 @@ public abstract class AsyncLongConsumers implements AutoCloseable {
         }
     }
 
-    public abstract void consume(long payload);
+    public abstract void consume(int payload);
 
     @Override
     public synchronized void close() {
@@ -99,7 +99,7 @@ public abstract class AsyncLongConsumers implements AutoCloseable {
         }
     }
 
-    public void accept(long payload) {
+    public void accept(int payload) {
         do {
             Queue currentQueue = queue;
             while (currentQueue != null) {
@@ -158,7 +158,7 @@ public abstract class AsyncLongConsumers implements AutoCloseable {
     }
 
     static class Slot {
-        long payload = -1;
+        int payload = -1;
         Slot nextSlot;
     }
 }

@@ -19,7 +19,7 @@ ROM with a defined amount of address inputs and data outputs.
 
 #### Mandatory parameters:
 
-- `size`- amount of data pins in range [2…64].
+- `size`- amount of data pins in range [2…32].
 - `aSize`- amount of address pins in range [1…32].
 - `file`- path to the file, from which ROM content populated.
   Absolute or relative to working folder.

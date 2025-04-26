@@ -44,7 +44,7 @@ public class ShortBufferSlice implements IRingBufferSlice {
     }
 
     @Override
-    public long next() {
+    public int next() {
         return slice[++pos];
     }
 
@@ -54,7 +54,7 @@ public class ShortBufferSlice implements IRingBufferSlice {
     }
 
     @Override
-    public long peek() {
+    public int peek() {
         return slice[pos];
     }
 }

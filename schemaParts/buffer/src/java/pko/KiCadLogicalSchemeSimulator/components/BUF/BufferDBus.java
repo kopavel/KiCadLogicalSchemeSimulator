@@ -24,7 +24,7 @@ public class BufferDBus extends InBus {
     }
 
     @Override
-    public void setState(long newState) {
+    public void setState(int newState) {
         state = newState;
         Bus bus;
         /*Optimiser line o block r*/

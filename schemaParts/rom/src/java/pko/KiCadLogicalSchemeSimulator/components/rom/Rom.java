@@ -44,7 +44,7 @@ import java.io.InputStream;
 import java.util.function.Supplier;
 
 public class Rom extends SchemaPart {
-    public final long[] words;
+    public final int[] words;
     public final RomABus aBus;
     public final RomCsPin csPin;
     private int size;
@@ -65,12 +65,12 @@ public class Rom extends SchemaPart {
             size = Integer.parseInt(params.get("size"));
         } catch (NumberFormatException ignore) {
         }
-        long mask = Utils.getMaskForSize(size);
+        int mask = Utils.getMaskForSize(size);
         if (size < 1) {
             throw new RuntimeException("Component " + id + " size must be positive number");
         }
-        if (size > 64) {
-            throw new RuntimeException("Component " + id + " max size is 64");
+        if (size > 32) {
+            throw new RuntimeException("Component " + id + " max size is 32");
         }
         try {
             aSize = Integer.parseInt(params.get("aSize"));
@@ -84,7 +84,7 @@ public class Rom extends SchemaPart {
         }
         String file = params.get("file");
         int romSize = (int) Math.pow(2, aSize);
-        words = new long[romSize];
+        words = new int[romSize];
         for (int i = 0; i < romSize; i++) {
             words[i] = 0;
         }
@@ -102,7 +102,7 @@ public class Rom extends SchemaPart {
             } else {
                 int wordSize = size / 8;
                 for (int pos = 0; pos < romSize; pos++) {
-                    long word = 0;
+                    int word = 0;
                     for (int j = 0; j < wordSize; j++) {
                         word = word << 8 | fileBytes[pos * wordSize + j];
                     }

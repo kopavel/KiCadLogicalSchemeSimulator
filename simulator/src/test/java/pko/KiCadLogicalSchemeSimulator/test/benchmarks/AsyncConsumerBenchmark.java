@@ -46,8 +46,8 @@ public class AsyncConsumerBenchmark {
     public static final int ASYNC_BUF_SIZE = 4;
     public static final int PAYLOAD = 1000;
     public static final boolean TEST = true;
-    final long payload = 10L;
-    private long cycles = 100000;
+    final int payload = 10;
+    private int cycles = 100000;
     BatchedAsyncConsumer asyncConsumer;
     private Blackhole blackhole;
 
@@ -64,7 +64,7 @@ public class AsyncConsumerBenchmark {
             new Runner(options).run();
         } else {
             AsyncConsumerBenchmark atomicReferenceBenchmark = new AsyncConsumerBenchmark();
-            atomicReferenceBenchmark.cycles = Long.MAX_VALUE;
+            atomicReferenceBenchmark.cycles = Integer.MAX_VALUE;
             try {
                 atomicReferenceBenchmark.setup(null);
                 for (int i = 0; i < 10000; i++) {
@@ -86,7 +86,7 @@ public class AsyncConsumerBenchmark {
 */
         asyncConsumer = new BatchedAsyncConsumer(4) {
             @Override
-            public void consume(long payload) {
+            public void consume(int payload) {
 //                    process(payload);
             }
         };
@@ -137,8 +137,8 @@ public class AsyncConsumerBenchmark {
         }
     }
 
-    private void process(long payload) {
-        long accumulator = payload;
+    private void process(int payload) {
+        int accumulator = payload;
         for (int i = 0; i < PAYLOAD; i++) {
             accumulator++;
         }

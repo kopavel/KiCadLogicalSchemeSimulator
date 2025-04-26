@@ -161,7 +161,7 @@ public abstract class SchemaPart {
     public InBus addInBus(String pinId, int size, String... names) {
         return addInBus(new InBus(pinId, this, size, names) {
             @Override
-            public void setState(long newState) {
+            public void setState(int newState) {
                 state = newState;
             }
         });
@@ -209,7 +209,7 @@ public abstract class SchemaPart {
         }
     }
 
-    public void addTriStateOutBus(String pinId, int size, long state, String... names) {
+    public void addTriStateOutBus(String pinId, int size, int state, String... names) {
         addTriStateOutBus(pinId, size, names);
         OutBus pin = (OutBus) outPins.get(pinId);
         pin.state = state;
@@ -237,7 +237,7 @@ public abstract class SchemaPart {
         }
     }
 
-    public void addOutBus(String pinId, int size, long state, String... names) {
+    public void addOutBus(String pinId, int size, int state, String... names) {
         addOutBus(pinId, size, names);
         OutBus pin = (OutBus) outPins.get(pinId);
         pin.state = state;

@@ -43,7 +43,7 @@ public class ShortRingBuffer extends RingBuffer {
     }
 
     @Override
-    public void put(long element) {
+    public void put(int element) {
         super.put(element);
         data[writePos] = (short) element;
     }

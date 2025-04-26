@@ -45,14 +45,14 @@ import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.war
 
 //Fixme cleanup "strong/weak" logic in case on strong only pins
 public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
-    public final long nMask;
+    public final int nMask;
     public final BusMerger merger;
     @Getter
-    public long mask;
+    public int mask;
     public boolean oldStrong;
     public Bus[] destinations;
 
-    public BusMergerWireIn(long mask, BusMerger merger) {
+    public BusMergerWireIn(int mask, BusMerger merger) {
         super(merger.id + ":in", merger.parent);
         variantId = "BMergePIn";
         this.mask = mask;
@@ -88,7 +88,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                 merger.strongPins,
                 merger.weakState,
                 merger.weakPins);
-        long mergerState = merger.state;
+        int mergerState = merger.state;
         /*Optimiser line setter*/
         state = true;
         if (strong) { //to strong
@@ -222,7 +222,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                 merger.strongPins,
                 merger.weakState,
                 merger.weakPins);
-        long mergerState = merger.state;
+        int mergerState = merger.state;
         /*Optimiser line setter*/
         state = false;
         if (strong) { //to strong
@@ -357,7 +357,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                 merger.strongPins,
                 merger.weakState,
                 merger.weakPins);
-        long mergerState = merger.state;
+        int mergerState = merger.state;
         if (oldStrong) {
             /*Optimiser bind nm:nMask*/
             merger.strongPins &= nMask;

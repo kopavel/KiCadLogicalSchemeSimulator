@@ -58,7 +58,7 @@ public class BusDriver extends SchemaPart {
             int finalI = i;
             ins[i] = addInBus(new InBus("I" + (char) ('a' + finalI), this, sizes[finalI]) {
                 @Override
-                public void setState(long newState) {
+                public void setState(int newState) {
                     state = newState;
                     if (oe[finalI]) {
                         outs[finalI].setState(newState);
