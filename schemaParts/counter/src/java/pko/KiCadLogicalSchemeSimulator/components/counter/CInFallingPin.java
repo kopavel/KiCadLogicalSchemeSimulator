@@ -36,6 +36,8 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.FallingEdgePin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 
+import static pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser.ReplaceKind.aload0;
+
 public class CInFallingPin extends FallingEdgePin {
     public final long countMask;
     public final Counter parent;
@@ -80,8 +82,9 @@ public class CInFallingPin extends FallingEdgePin {
         ClassOptimiser<CInFallingPin> optimiser = new ClassOptimiser<>(this).bind("countMask", countMask);
         if (source != null) {
             optimiser.cut("setter");
+            optimiser.replaceBytecode(aload0, "setLo").size(1).swap(2);
         } else {
-            optimiser.replaceMap.put("setLo", 1);
+            optimiser.replaceBytecode(aload0, "setLo").size(2).swap(3);
         }
         if (!parent.rPin.used) {
             optimiser.cut("r");

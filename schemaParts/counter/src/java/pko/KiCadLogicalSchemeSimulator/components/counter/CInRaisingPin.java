@@ -36,6 +36,8 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.RaisingEdgePin;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 
+import static pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser.ReplaceKind.aload0;
+
 public class CInRaisingPin extends RaisingEdgePin {
     public final long countMask;
     private final Counter parent;
@@ -80,7 +82,7 @@ public class CInRaisingPin extends RaisingEdgePin {
         if (source != null) {
             optimiser.cut("setter");
         } else {
-            optimiser.replaceMap.put("setLo", 1);
+            optimiser.replaceBytecode(aload0, "setLo").size(1);
         }
         if (!parent.rPin.used) {
             optimiser.cut("r");

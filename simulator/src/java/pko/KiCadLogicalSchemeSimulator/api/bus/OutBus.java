@@ -48,6 +48,7 @@ import java.util.stream.Stream;
 
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.none;
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.warn;
+import static pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser.ReplaceKind.aload0;
 
 public class OutBus extends Bus {
     private final Map<Long, Map<Byte, OffsetBus>> corrected = new HashMap<>();
@@ -223,13 +224,13 @@ public class OutBus extends Bus {
             }
             if (isTriState(source)) {
                 if (getRecursionMode() == none) {
-                    optimiser.replaceMap.put("setHiImpedance", destinations.length);
-                    optimiser.replaceMap.put("setState", destinations.length + 1);
+                    optimiser.replaceBytecode(aload0, "setHiImpedance").size(destinations.length);
+                    optimiser.replaceBytecode(aload0, "setState").size(destinations.length + 1);
                 }
             } else {
                 optimiser.cut("ts");
                 if (getRecursionMode() == none) {
-                    optimiser.replaceMap.put("setState", destinations.length);
+                    optimiser.replaceBytecode(aload0, "setState").size(destinations.length);
                 }
             }
             OutBus build = optimiser.build();
