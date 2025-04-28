@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Configuration status="info">
+<Configuration status="WARN">
 	<Properties>
 		<Property name="logdir">./logs</Property>
 		<Property name="layout">%d [%t] %-5p %c- %m%n</Property>

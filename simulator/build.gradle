@@ -115,6 +115,7 @@ run {
                  "-XX:ParallelGCThreads=1",
 //                 "-XX:+UnlockDiagnosticVMOptions", "-XX:+DebugNonSafepoints", //"-XX:+UseCountedLoopSafepoints", "-XX:LoopStripMiningIter=1",
                  "--add-opens", "java.base/java.lang=KiCadLogicalSchemeSimulator.simulator",
+                 "--enable-native-access=com.formdev.flatlaf",
                  "-Xmx256m"//, "-XX:+UseLargePages"
 
     ]

@@ -1,8 +1,8 @@
 [versions]
-lombok = '1.18.34'
-log4j2 = '2.23.1'
-jackson = '2.17.2'
-jUnit = '5.10.3'
+lombok = '1.18.38'
+log4j2 = '2.24.3'
+jackson = '2.19.0'
+jUnit = '5.12.2'
 
 [libraries]
 
@@ -19,7 +19,7 @@ jackson-datatype-jsr310 = { module = 'com.fasterxml.jackson.datatype:jackson-dat
 jackson-jaxb-annotations = { module = 'com.fasterxml.jackson.module:jackson-module-jaxb-annotations', version.ref = 'jackson' }
 jakarta-api = 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.2'
 jaxb-api = 'javax.xml.bind:jaxb-api:2.3.1'
-picocli = 'info.picocli:picocli:4.7.6'
+picocli = 'info.picocli:picocli:4.7.7'
 #log4j2
 log4j-slf4j = { version.ref = 'log4j2', module = 'org.apache.logging.log4j:log4j-slf4j-impl' }
 log4j-old = { version.ref = 'log4j2', module = 'org.apache.logging.log4j:log4j-1.2-api' }
@@ -29,7 +29,7 @@ log4j-jul = { version.ref = 'log4j2', module = 'org.apache.logging.log4j:log4j-j
 log4j-jpl = { version.ref = 'log4j2', module = 'org.apache.logging.log4j:log4j-jpl' }
 api-log4j = { version.ref = 'log4j2', module = 'org.apache.logging.log4j:log4j-api' }
 xz = 'org.tukaani:xz:1.10'
-commons-compress = 'org.apache.commons:commons-compress:1.27.0'
+commons-compress = 'org.apache.commons:commons-compress:1.27.1'
 jmh = 'org.openjdk.jmh:jmh-core:1.37'
 jmh-annotations = 'org.openjdk.jmh:jmh-generator-annprocess:1.37'
 asm = "org.ow2.asm:asm:9.8"
