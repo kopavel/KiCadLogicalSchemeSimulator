@@ -49,6 +49,7 @@ public class CounterTest extends NetTester {
     @BeforeEach
     void reset() {
         setHi("rPin");
+        setLo("rPin");
     }
 
     @Test
