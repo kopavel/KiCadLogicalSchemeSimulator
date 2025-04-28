@@ -34,8 +34,7 @@ import lombok.Getter;
 import lombok.Lombok;
 import org.apache.logging.log4j.Logger;
 import pko.KiCadLogicalSchemeSimulator.Simulator;
-import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser.ReplaceKind;
-import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser.ReplaceParams;
+import pko.KiCadLogicalSchemeSimulator.optimiser.BytecodeTransformer.ReplaceParams;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 import javax.tools.*;
@@ -44,8 +43,6 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
-
-import static pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser.ReplaceKind.aload0;
 
 public class JavaCompiler {
     private static final javax.tools.JavaCompiler compiler;
@@ -86,7 +83,7 @@ public class JavaCompiler {
             throw new RuntimeException(e);
         }
     }
-    public static Class<?> compileJavaSource(String classPath, String className, String sourceCode, Map<ReplaceKind, Map<String, ReplaceParams>> replaceMap) {
+    public static Class<?> compileJavaSource(String classPath, String className, String sourceCode, Map<String, List<ReplaceParams>> replaceMap) {
         InMemoryJavaFileManager fileManager = new InMemoryJavaFileManager(compiler.getStandardFileManager(null, null, null));
         JavaFileObject javaFileObject = new InMemoryJavaFileObject(className, sourceCode);
         List<JavaFileObject> javaFileObjects = Collections.singletonList(javaFileObject);
@@ -104,12 +101,16 @@ public class JavaCompiler {
                                } catch (ClassNotFoundException ignore) {
                                    Log.debug(JavaCompiler.class, "Cache and load dynamically optimised class {}", entry.getKey());
                                    byte[] classBytes = entry.getValue().toByteArray();
+/*
                                    if (!replaceMap.isEmpty()) {
                                        //FixMe bench - does it worse it? or JIT do it any way?
-                                       if (replaceMap.containsKey(aload0)) {
-                                           classBytes = BytecodeTransformer.transformThisAloadToDup(classBytes, replaceMap.get(aload0));
+                                       try {
+                                           classBytes = BytecodeTransformer.transformThisAloadToDup(classBytes, replaceMap);
+                                       } catch (Exception e) {
+                                           Log.error(JavaCompiler.class, "Error manipulating bytecode for {} with {}", className, replaceMap, e);
                                        }
                                    }
+*/
                                    storeClass(entry.getKey(), classBytes);
                                    retClass[0] = classLoader.defineClassInPackage(classPath, classBytes);
                                }

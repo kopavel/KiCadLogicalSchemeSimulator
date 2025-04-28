@@ -48,7 +48,7 @@ import java.util.stream.Stream;
 
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.none;
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.warn;
-import static pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser.ReplaceKind.aload0;
+import static pko.KiCadLogicalSchemeSimulator.optimiser.Opcodes.*;
 
 public class OutBus extends Bus {
     private final Map<Integer, Map<Byte, OffsetBus>> corrected = new HashMap<>();
@@ -101,7 +101,7 @@ public class OutBus extends Bus {
     public void addDestination(Pin pin, int mask) {
         used = true;
         pin.used = true;
-        pin.state = (state & mask) >0;
+        pin.state = (state & mask) > 0;
         pin.hiImpedance = hiImpedance;
         triStateIn |= pin.triStateIn;
         MaskGroupBus maskGroup = Arrays.stream(destinations)
@@ -224,13 +224,23 @@ public class OutBus extends Bus {
             }
             if (isTriState(source)) {
                 if (getRecursionMode() == none) {
-                    optimiser.replaceBytecode(aload0, "setHiImpedance").size(destinations.length);
-                    optimiser.replaceBytecode(aload0, "setState").size(destinations.length + 1);
+                    optimiser.byteCodeManipulator("setHiImpedance").dup(destinations.length);
+                    optimiser.byteCodeManipulator("setState").dup(destinations.length + 1);
                 }
             } else {
                 optimiser.cut("ts");
                 if (getRecursionMode() == none) {
-                    optimiser.replaceBytecode(aload0, "setState").size(destinations.length);
+                    optimiser.byteCodeManipulator("setState").dup(destinations.length);
+                    int[] arr1 = new int[destinations.length];
+                    int[] arr2 = new int[destinations.length - 1];
+                    for (int i = 0; i < destinations.length; i++) {
+                        arr1[i] = i + 2;
+                        if (i < destinations.length - 1) {
+                            arr2[i] = i + 1;
+                        }
+                    }
+                    optimiser.byteCodeManipulator("setState", ILOAD, 1).add(DUP_X2, 1).replace(SWAP, arr1);
+                    optimiser.byteCodeManipulator("setState", SWAP).add(DUP_X2, arr2);
                 }
             }
             OutBus build = optimiser.build();

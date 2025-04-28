@@ -30,9 +30,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.optimiser;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import pko.KiCadLogicalSchemeSimulator.Simulator;
+import pko.KiCadLogicalSchemeSimulator.optimiser.BytecodeTransformer.ReplaceParams;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 import java.io.*;
@@ -53,7 +52,7 @@ public class ClassOptimiser<T> {
     private final T oldInstance;
     private final Class<?> sourceClass;
     private final Map<String, UnrollDescriptor> unrolls = new HashMap<>();
-    public Map<ReplaceKind, Map<String, ReplaceParams>> replaceMap = new HashMap<>();
+    public Map<String, List<ReplaceParams>> replaceMap = new HashMap<>();
     private String suffix = "";
     private List<String> source;
     private boolean noAssert = true;
@@ -69,8 +68,18 @@ public class ClassOptimiser<T> {
         assert !(noAssert = false);
     }
 
-    public ReplaceParams replaceBytecode(ReplaceKind kind, String name) {
-        return replaceMap.computeIfAbsent(kind, k -> new HashMap<>()).computeIfAbsent(name, k -> new ReplaceParams());
+    public ReplaceParams byteCodeManipulator(String name, int target, Integer varNo) {
+        ReplaceParams replaceParams = new ReplaceParams(target, varNo);
+        replaceMap.computeIfAbsent(name, k -> new ArrayList<>()).add(replaceParams);
+        return replaceParams;
+    }
+
+    public ReplaceParams byteCodeManipulator(String name, int target) {
+        return byteCodeManipulator(name, target, null);
+    }
+
+    public ReplaceParams byteCodeManipulator(String name) {
+        return byteCodeManipulator(name, Opcodes.ALOAD, 0);
     }
 
     public ClassOptimiser<T> unroll(int size) {
@@ -440,28 +449,6 @@ public class ClassOptimiser<T> {
             }
         }
         throw new NoSuchFieldException("Field '" + fieldName + "' not found in class hierarchy.");
-    }
-
-    public enum ReplaceKind {
-        aload0,
-    }
-
-    @Setter
-    @Accessors(chain = true, fluent = true)
-    public static class ReplaceParams {
-        public Integer size;
-        public List<Integer> swap = new ArrayList<>();
-        public List<Integer> dup = new ArrayList<>();
-
-        public ReplaceParams swap(int s) {
-            swap.add(s - 1);
-            return this;
-        }
-
-        public ReplaceParams dup(int s) {
-            dup.add(s - 1);
-            return this;
-        }
     }
 
     private static class UnrollDescriptor {

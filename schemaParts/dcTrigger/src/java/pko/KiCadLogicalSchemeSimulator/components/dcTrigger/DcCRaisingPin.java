@@ -66,7 +66,7 @@ public class DcCRaisingPin extends RaisingEdgePin {
         /*Optimiser line anyRS*/
         if (parent.clockEnabled) {
             if (dPin.state) {
-                /*Optimiser block q*/
+                /*Optimiser block q bind nq:!qOut*/
                 if (!qOut.state) {
                     qOut.setHi();
                     /*Optimiser line bothRS block nq*/
@@ -107,14 +107,21 @@ public class DcCRaisingPin extends RaisingEdgePin {
         ClassOptimiser<DcCRaisingPin> optimiser = new ClassOptimiser<>(this).cut("o");
         if (!anyRs) {
             optimiser.cut("anyRS");
-        } else if (!bothRs) {
+        }
+        if (!bothRs) {
             optimiser.cut("bothRS");
             if (qOut.used) {
                 optimiser.cut("bothRSQ");
+                if (iqOut.used) {
+                    optimiser.bind("nq", "iqOut");
+                }
             }
         }
         if (source != null) {
             optimiser.cut("setter");
+            if (!anyRs) {
+                optimiser.byteCodeManipulator("setHi").dup(1).skip(2, !(iqOut.used && qOut.used) ? 4 : 5);
+            }
         }
         if (!iqOut.used) {
             optimiser.cut("nq");

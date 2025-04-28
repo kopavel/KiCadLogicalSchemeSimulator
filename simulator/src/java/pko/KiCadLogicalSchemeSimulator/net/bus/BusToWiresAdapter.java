@@ -40,7 +40,6 @@ import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.none;
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.warn;
-import static pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser.ReplaceKind.aload0;
 
 public class BusToWiresAdapter extends OutBus {
     public Pin[] destinations = new Pin[0];
@@ -206,13 +205,13 @@ public class BusToWiresAdapter extends OutBus {
             if (isTriState(source)) {
                 optimiser.bind("d", "imp0");
                 if (source == null) {
-                    optimiser.replaceBytecode(aload0, "setState").size(2);
+                    optimiser.byteCodeManipulator("setState").dup(2);
                 }
                 optimiser.unroll("i", toImp.length);
             } else {
                 optimiser.cut("ts");
                 if (source == null) {
-                    optimiser.replaceBytecode(aload0, "setState").size(1);
+                    optimiser.byteCodeManipulator("setState").dup(1);
                 }
             }
             if (destinations.length < 2 || getRecursionMode() == none) {

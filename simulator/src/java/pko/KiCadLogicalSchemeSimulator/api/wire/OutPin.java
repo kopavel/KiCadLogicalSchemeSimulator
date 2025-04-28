@@ -41,7 +41,6 @@ import java.util.Comparator;
 
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.none;
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.warn;
-import static pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser.ReplaceKind.aload0;
 
 public class OutPin extends Pin {
     public Pin[] destinations = new Pin[0];
@@ -230,16 +229,16 @@ public class OutPin extends Pin {
             }
             if (isTriState(source)) {
                 if (getRecursionMode() == none) {
-                    optimiser.replaceBytecode(aload0, "setHi").size(toHi.length + 1);
-                    optimiser.replaceBytecode(aload0, "setLo").size(toLow.length + 1);
-                    optimiser.replaceBytecode(aload0, "setHiImpedance").size(toImp.length);
+                    optimiser.byteCodeManipulator("setHi").dup(toHi.length + 1);
+                    optimiser.byteCodeManipulator("setLo").dup(toLow.length + 1);
+                    optimiser.byteCodeManipulator("setHiImpedance").dup(toImp.length);
                 }
                 optimiser.unroll("i", toImp.length);
             } else {
                 optimiser.cut("ts");
                 if (getRecursionMode() == none) {
-                    optimiser.replaceBytecode(aload0, "setHi").size(toHi.length);
-                    optimiser.replaceBytecode(aload0, "setLo").size(toLow.length);
+                    optimiser.byteCodeManipulator("setHi").dup(toHi.length);
+                    optimiser.byteCodeManipulator("setLo").dup(toLow.length);
                 }
             }
             OutPin build = optimiser.build();

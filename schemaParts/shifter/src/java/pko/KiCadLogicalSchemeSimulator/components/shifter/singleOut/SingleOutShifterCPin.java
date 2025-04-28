@@ -175,9 +175,9 @@ public class SingleOutShifterCPin extends InPin {
         if (source != null) {
             optimiser.cut("setter");
         }
-        optimiser.bind("om", parent.outMask + "L");
-        optimiser.bind("lm", parent.latchMask + "L");
-        optimiser.bind("hm", parent.hiDsMask + "L");
+        optimiser.bind("om", parent.outMask);
+        optimiser.bind("lm", parent.latchMask);
+        optimiser.bind("hm", parent.hiDsMask);
         if (reverse) {
             optimiser.cut("nr");
         } else {

@@ -62,8 +62,8 @@ public class OrGateIn extends InPin {
     public void setHi() {
         /*Optimiser line setter*/
         state = true;
-        OrGate parent;
-        if ((parent = this.parent).inState == 0) {
+        int state;
+        if ((state = parent.inState) == 0) {
             /*Optimiser bind mask*/
             parent.inState = mask;
             /*Optimiser line o block r*/
@@ -72,7 +72,7 @@ public class OrGateIn extends InPin {
                 /*Optimiser line o blockEnd r block nr*/
             } else {
                 /*Optimiser line o block oc*/
-                if (parent.params.containsKey("openCollector")){
+                if (parent.params.containsKey("openCollector")) {
                     out.setHiImpedance();
                     /*Optimiser line o blockEnd oc block rc*/
                 } else {
@@ -84,7 +84,7 @@ public class OrGateIn extends InPin {
             return;
         } else {
             /*Optimiser bind mask*/
-            parent.inState |= mask;
+            parent.inState = state | mask;
         }
     }
 
@@ -92,14 +92,14 @@ public class OrGateIn extends InPin {
     public void setLo() {
         /*Optimiser line setter*/
         state = false;
-        OrGate parent;
+        int state;
         /*Optimiser bind mask*/
-        if ((parent = this.parent).inState == mask) {
+        if ((state = parent.inState) == mask) {
             parent.inState = 0;
             /*Optimiser line o block r*/
             if (parent.reverse) {
                 /*Optimiser line o block oc*/
-                if (parent.params.containsKey("openCollector")){
+                if (parent.params.containsKey("openCollector")) {
                     out.setHiImpedance();
                     /*Optimiser line o blockEnd oc block rc*/
                 } else {
@@ -114,7 +114,7 @@ public class OrGateIn extends InPin {
             return;
         } else {
             /*Optimiser bind nMask*/
-            parent.inState &= nMask;
+            parent.inState = state & nMask;
         }
     }
 

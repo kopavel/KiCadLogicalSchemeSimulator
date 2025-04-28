@@ -35,8 +35,6 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 
-import static pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser.ReplaceKind.aload0;
-
 class CRInPin extends InPin {
     private final Counter counter;
     Bus out;
@@ -68,8 +66,8 @@ class CRInPin extends InPin {
         if (source != null) {
             optimiser.cut("setter");
         } else {
-            optimiser.replaceBytecode(aload0, "setLo").size(1);
-            optimiser.replaceBytecode(aload0, "setHi").size(1);
+            optimiser.byteCodeManipulator("setLo").dup(1);
+            optimiser.byteCodeManipulator("setHi").dup(1);
         }
         CRInPin build = optimiser.build();
         counter.rPin = build;

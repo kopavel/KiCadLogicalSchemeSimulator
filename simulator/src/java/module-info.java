@@ -84,6 +84,7 @@ module KiCadLogicalSchemeSimulator.simulator {
     requires org.tukaani.xz;
     requires org.objectweb.asm;
     requires org.objectweb.asm.tree;
+    requires org.objectweb.asm.util;
     uses pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
     uses pko.KiCadLogicalSchemeSimulator.api.NetFilter;
 }

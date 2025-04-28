@@ -65,6 +65,7 @@ dependencies {
     implementation libs.jackson.jaxb.annotations
     implementation libs.picocli
     implementation libs.asm
+    implementation libs.asm.util
     implementation libs.asm.tree
     testImplementation libs.jmh
     testAnnotationProcessor libs.jmh.annotations
@@ -109,9 +110,10 @@ run {
                  "-XX:+UseParallelGC",
                  "-XX:CompileThreshold=10",
                  "-XX:MaxInlineSize=64",
-                 "-XX:MaxInlineLevel=5",
+                 "-XX:MaxInlineLevel=20",
+                 "-XX:FreqInlineSize=360",
                  "-XX:ParallelGCThreads=1",
-                 "-XX:+UnlockDiagnosticVMOptions", "-XX:+DebugNonSafepoints", //"-XX:+UseCountedLoopSafepoints", "-XX:LoopStripMiningIter=1",
+//                 "-XX:+UnlockDiagnosticVMOptions", "-XX:+DebugNonSafepoints", //"-XX:+UseCountedLoopSafepoints", "-XX:LoopStripMiningIter=1",
                  "--add-opens", "java.base/java.lang=KiCadLogicalSchemeSimulator.simulator",
                  "-Xmx256m"//, "-XX:+UseLargePages"
 

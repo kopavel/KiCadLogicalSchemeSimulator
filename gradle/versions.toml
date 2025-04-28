@@ -34,6 +34,7 @@ jmh = 'org.openjdk.jmh:jmh-core:1.37'
 jmh-annotations = 'org.openjdk.jmh:jmh-generator-annprocess:1.37'
 asm = "org.ow2.asm:asm:9.8"
 asm-tree = "org.ow2.asm:asm-tree:9.8"
+asm-util = "org.ow2.asm:asm-util:9.8"
 [bundles]
 
 [plugins]
