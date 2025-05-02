@@ -33,6 +33,7 @@ package pko.KiCadLogicalSchemeSimulator.net.merger.wire;
 import lombok.Getter;
 import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.ShortcutException;
+import pko.KiCadLogicalSchemeSimulator.api.SupportMask;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
@@ -41,13 +42,13 @@ import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
-//Todo if source are MaskGroup and we are only one destination - path throe MaskGroup and use mask here directly
 //FixMe where recursion support?
-public class WireMergerBusIn extends InBus implements MergerInput<Bus> {
+public class WireMergerBusIn extends InBus implements MergerInput<Bus>, SupportMask {
     public final WireMerger merger;
     @Getter
     public int mask;
     public Pin[] destinations;
+    public int maskState;
 
     public WireMergerBusIn(Bus source, int mask, WireMerger merger) {
         super(source, "PMergeBIn");
@@ -80,6 +81,19 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus> {
                 merger.hiImpedance);
         /*Optimiser line setters*/
         state = newState;
+        /*Optimiser line o*/
+        if (applyMask != 0) {
+            /*Optimiser block byMask bind gm:applyMask*/
+            if (maskState != (newState = newState & applyMask)) {
+                maskState = newState;
+            } else//
+                /*Optimiser line ts*///
+                if (!hiImpedance)//
+                {
+                    return;
+                }
+            /*Optimiser line o blockEnd byMask*/
+        }
         /*Optimiser block ts*/
         if (hiImpedance) {
             hiImpedance = false;
@@ -217,7 +231,7 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus> {
             destinations[i] = destinations[i].getOptimised(merger);
             triStateIn |= destinations[i].triStateIn;
         }
-        ClassOptimiser<WireMergerBusIn> optimiser = new ClassOptimiser<>(this).unroll(destinations.length);
+        ClassOptimiser<WireMergerBusIn> optimiser = new ClassOptimiser<>(this).unroll(destinations.length).cut("o");
         if (merger.passivePins.isEmpty()) {
             optimiser.cut("passivePins");
             if (merger.weakState != 0) {
@@ -231,6 +245,11 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus> {
         }
         if (!triStateIn) {
             optimiser.cut("ts");
+        }
+        if (applyMask == 0) {
+            optimiser.cut("byMask");
+        } else {
+            optimiser.bind("gm", applyMask);
         }
         WireMergerBusIn build = optimiser.build();
         merger.sources.add(build);
