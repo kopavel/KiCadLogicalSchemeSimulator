@@ -55,7 +55,6 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus> {
         this.merger = merger;
         destinations = merger.destinations;
         triStateIn = true;
-        triStateOut = source.triStateOut;
     }
 
     /*Optimiser constructor unroll destination:destinations*/

@@ -59,6 +59,7 @@ public class BusToWiresAdapter extends OutBus implements SupportMask, SupportOff
 
     public BusToWiresAdapter(OutBus outBus, int mask) {
         super(outBus, "BusToWire");
+        triStateIn=false;
         this.mask = mask;
     }
 

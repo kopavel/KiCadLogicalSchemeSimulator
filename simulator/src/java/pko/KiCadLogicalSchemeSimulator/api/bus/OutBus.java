@@ -93,7 +93,7 @@ public class OutBus extends Bus {
                     .filter(d -> d instanceof MaskGroupBus)
                     .map(d -> ((MaskGroupBus) d))
                     .filter(d -> d.mask == mask || d.mask == loweredMask).findFirst().orElseGet(() -> {
-                      MaskGroupBus groupBus = new MaskGroupBus(this, loweredMask, "Mask" + mask);
+                      MaskGroupBus groupBus = new MaskGroupBus(this, loweredMask, "Mask" + loweredMask);
                       destinations = Utils.addToArray(destinations, groupBus);
                       return groupBus;
                   }).addDestination(bus);

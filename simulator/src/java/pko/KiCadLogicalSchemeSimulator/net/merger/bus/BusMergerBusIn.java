@@ -60,7 +60,6 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus>, SupportMa
         nMask = ~mask;
         destinations = merger.destinations;
         triStateIn = true;
-        triStateOut = source.triStateOut;
         source.used = true;
         used = true;
     }

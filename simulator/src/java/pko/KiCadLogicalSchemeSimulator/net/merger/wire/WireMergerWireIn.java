@@ -52,7 +52,6 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
         hiImpedance = source.hiImpedance;
         destinations = merger.destinations;
         triStateIn=true;
-        triStateOut = source.triStateOut;
     }
 
     /*Optimiser constructor unroll destination:destinations*/

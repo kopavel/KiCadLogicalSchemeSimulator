@@ -47,6 +47,7 @@ public class MaskGroupBus extends OutBus {
 
     public MaskGroupBus(OutBus source, int mask, String variantId) {
         super(source, variantId + ":mask" + mask);
+        triStateIn=false;
         this.mask = mask;
     }
 

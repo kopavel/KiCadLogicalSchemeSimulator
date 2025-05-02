@@ -59,9 +59,6 @@ public class WireMerger extends OutPin {
         destinations = new Pin[]{destination};
         split();
         strong = false;
-        if (triStateIn) {
-            hiImpedance = true;
-        }
         if (destination instanceof PassivePin passivePin) {
             passivePin.merger = this;
         }
@@ -75,32 +72,20 @@ public class WireMerger extends OutPin {
     @Override
     public void addDestination(Pin pin) {
         super.addDestination(pin);
-        if (triStateIn) {
-            hiImpedance = true;
-        }
         if (!(pin instanceof NCWire)) {
             id += "/" + pin.getName();
         }
     }
 
-    @Override
-    public Pin getOptimised(ModelItem<?> source) {
-        for (int i = 0; i < destinations.length; i++) {
-            destinations[i] = destinations[i].getOptimised(this);
-        }
-        split();
-        return this;
-    }
-
     private void addSource(OutBus bus, int mask) {
+        triStateOut |= bus.triStateOut;
         WireMergerBusIn input = new WireMergerBusIn(bus, mask, this);
         bus.addDestination(input, mask, (byte) 0);
         sources.add(input);
         if (!bus.hiImpedance) {
-            if (!hiImpedance && strong) {
+            if (strong) {
                 throw new ShortcutException(sources);
             }
-            hiImpedance = false;
             state = (bus.state & mask) != 0;
         }
     }
@@ -114,7 +99,6 @@ public class WireMerger extends OutPin {
             weakState += pin.state ? 1 : -1;
             if (!strong) {
                 state = weakState > 0;
-                hiImpedance = false;
             }
         } else if (pin instanceof PassivePin passivePin) {
             if (!passivePins.contains(passivePin)) {
@@ -132,13 +116,22 @@ public class WireMerger extends OutPin {
             pin.addDestination(input);
             sources.add(input);
             if (!pin.hiImpedance) {
-                if (!hiImpedance && strong) {
+                if (strong) {
                     throw new ShortcutException(sources);
                 }
                 strong = true;
                 state = pin.state;
-                hiImpedance = false;
             }
         }
+    }
+
+    @Override
+    public Pin getOptimised(ModelItem<?> source) {
+        hiImpedance = isTriState(null);
+        for (int i = 0; i < destinations.length; i++) {
+            destinations[i] = destinations[i].getOptimised(this);
+        }
+        split();
+        return this;
     }
 }
