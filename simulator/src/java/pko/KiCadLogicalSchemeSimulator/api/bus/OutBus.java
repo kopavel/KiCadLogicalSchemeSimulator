@@ -75,7 +75,6 @@ public class OutBus extends Bus {
         bus.state = state;
         bus.hiImpedance = hiImpedance;
         triStateIn |= bus.triStateIn;
-        int loweredMask;
         if (offset != 0) {
             if (corrected.containsKey(mask) && corrected.get(mask).containsKey(offset)) {
                 corrected.get(mask).get(offset).addDestination(bus);
@@ -84,16 +83,19 @@ public class OutBus extends Bus {
                 bus = new OffsetBus(this, bus, offset);
                 corrected.computeIfAbsent(mask, m -> new HashMap<>()).put(offset, (OffsetBus) bus);
             }
+            int loweredMask;
             loweredMask = mask | (offset > 0 ? 0 : Utils.getMaskForSize(-offset));
-        } else {
-            loweredMask = mask;
+            if (!Integer.toBinaryString(loweredMask).contains("0")) {
+                mask = loweredMask;
+            }
         }
-        if (mask != this.mask && loweredMask != this.mask) {
+        if (mask != this.mask) {
+            int finalMask = mask;
             Arrays.stream(destinations)
                     .filter(d -> d instanceof MaskGroupBus)
                     .map(d -> ((MaskGroupBus) d))
-                    .filter(d -> d.mask == mask || d.mask == loweredMask).findFirst().orElseGet(() -> {
-                      MaskGroupBus groupBus = new MaskGroupBus(this, loweredMask, "Mask" + loweredMask);
+                    .filter(d -> d.mask == finalMask).findFirst().orElseGet(() -> {
+                      MaskGroupBus groupBus = new MaskGroupBus(this, finalMask, "Mask" + finalMask);
                       destinations = Utils.addToArray(destinations, groupBus);
                       return groupBus;
                   }).addDestination(bus);
