@@ -72,7 +72,7 @@ public class SingleOutShifterCIPin extends InPin {
                     !//
                             rPin.state
                             /*Optimiser line o*///
-                            ^ !clearReverse//
+                            ^ clearReverse//
             ;
             /*Optimiser line o blockEnd n*/
         }
@@ -90,7 +90,7 @@ public class SingleOutShifterCIPin extends InPin {
                     !//
                             rPin.state
                             /*Optimiser line o*///
-                            ^ !clearReverse//
+                            ^ clearReverse//
             ;
             /*Optimiser line o blockEnd r*/
         } else {
@@ -103,7 +103,7 @@ public class SingleOutShifterCIPin extends InPin {
     @Override
     public InPin getOptimised(ModelItem<?> source) {
         ClassOptimiser<SingleOutShifterCIPin> optimiser = new ClassOptimiser<>(this).cut("o");
-        if (!clearReverse) {
+        if (clearReverse) {
             optimiser.cut("cr");
         }
         if (inhibitReverse) {
