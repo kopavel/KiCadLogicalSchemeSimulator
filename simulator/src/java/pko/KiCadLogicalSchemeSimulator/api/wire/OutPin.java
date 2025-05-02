@@ -56,7 +56,6 @@ public class OutPin extends Pin {
     /*Optimiser constructor unroll low:toLow:l unroll hi:toHi:h unroll imp:toImp:i*/
     public OutPin(OutPin oldPin, String variantId) {
         super(oldPin, variantId);
-        triStateOut = oldPin.triStateOut;
     }
 
     public void addDestination(Pin pin) {

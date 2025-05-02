@@ -80,14 +80,14 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
         /*Optimiser line o*/
         if (applyMask != 0) {
             /*Optimiser block byMask bind gm:applyMask*/
-            if (maskState != (newState = newState & applyMask)
-                    /*Optimiser line ts*///
-                    || hiImpedance//
-            ) {
+            if (maskState != (newState = newState & applyMask)) {
                 maskState = newState;
-            } else {
-                return;
-            }
+            } else//
+                /*Optimiser line ts*///
+                if (!hiImpedance)//
+                {
+                    return;
+                }
             /*Optimiser line o blockEnd byMask*/
         }
         /*Optimiser line o*/
@@ -139,17 +139,8 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
                         }
                         /*Optimiser block r block ar*/
                         while (--processing > 0) {
-                            /*Optimiser block ts*/
-                            if (hiImpedance) {
-                                for (Bus destination : destinations) {
-                                    destination.setHiImpedance();
-                                }
-                            } else {
-                                /*Optimiser blockEnd ts*/
-                                for (Bus destination : destinations) {
-                                    destination.setState(merger.state);
-                                }
-                                /*Optimiser line ts*/
+                            for (Bus destination : destinations) {
+                                destination.setState(merger.state);
                             }
                         }
                         /*Optimiser line nr blockEnd r*/
@@ -194,17 +185,8 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
                         }
                         /*Optimiser block r block ar*/
                         while (--processing > 0) {
-                            /*Optimiser block ts*/
-                            if (hiImpedance) {
-                                for (Bus destination : destinations) {
-                                    destination.setHiImpedance();
-                                }
-                            } else {
-                                /*Optimiser blockEnd ts*/
-                                for (Bus destination : destinations) {
-                                    destination.setState(merger.state);
-                                }
-                                /*Optimiser line ts*/
+                            for (Bus destination : destinations) {
+                                destination.setState(merger.state);
                             }
                         }
                         /*Optimiser line nr blockEnd r*/
@@ -264,14 +246,8 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
                         }
                         /*Optimiser block r block ar*/
                         while (--processing > 0) {
-                            if (hiImpedance) {
-                                for (Bus destination : destinations) {
-                                    destination.setHiImpedance();
-                                }
-                            } else {
-                                for (Bus destination : destinations) {
-                                    destination.setState(merger.state);
-                                }
+                            for (Bus destination : destinations) {
+                                destination.setState(merger.state);
                             }
                         }
                         /*Optimiser line nr blockEnd r*/
@@ -302,14 +278,8 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
                         }
                         /*Optimiser block r block ar*/
                         while (--processing > 0) {
-                            if (hiImpedance) {
-                                for (Bus destination : destinations) {
-                                    destination.setHiImpedance();
-                                }
-                            } else {
-                                for (Bus destination : destinations) {
-                                    destination.setState(merger.state);
-                                }
+                            for (Bus destination : destinations) {
+                                destination.setState(merger.state);
                             }
                         }
                         /*Optimiser line nr blockEnd r*/

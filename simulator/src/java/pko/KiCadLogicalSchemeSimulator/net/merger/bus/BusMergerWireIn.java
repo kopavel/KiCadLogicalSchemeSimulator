@@ -166,17 +166,8 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                     }
                     /*Optimiser block r block ar*/
                     while (--processing > 0) {
-                        /*Optimiser block ts*/
-                        if (hiImpedance) {
-                            for (Bus destination : destinations) {
-                                destination.setHiImpedance();
-                            }
-                        } else {
-                            /*Optimiser blockEnd ts*/
-                            for (Bus destination : destinations) {
-                                destination.setState(merger.state);
-                            }
-                            /*Optimiser line ts*/
+                        for (Bus destination : destinations) {
+                            destination.setState(merger.state);
                         }
                     }
                     /*Optimiser line nr blockEnd r*/
@@ -300,17 +291,8 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                     }
                     /*Optimiser block r block ar*/
                     while (--processing > 0) {
-                        /*Optimiser block ts*/
-                        if (hiImpedance) {
-                            for (Bus destination : destinations) {
-                                destination.setHiImpedance();
-                            }
-                        } else {
-                            /*Optimiser blockEnd ts*/
-                            for (Bus destination : destinations) {
-                                destination.setState(merger.state);
-                            }
-                            /*Optimiser line ts*/
+                        for (Bus destination : destinations) {
+                            destination.setState(merger.state);
                         }
                     }
                     /*Optimiser line nr blockEnd r*/
@@ -385,14 +367,8 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                     }
                     /*Optimiser block r block ar*/
                     while (--processing > 0) {
-                        if (hiImpedance) {
-                            for (Bus destination : destinations) {
-                                destination.setHiImpedance();
-                            }
-                        } else {
-                            for (Bus destination : destinations) {
-                                destination.setState(merger.state);
-                            }
+                        for (Bus destination : destinations) {
+                            destination.setState(merger.state);
                         }
                     }
                     /*Optimiser line nr blockEnd r*/

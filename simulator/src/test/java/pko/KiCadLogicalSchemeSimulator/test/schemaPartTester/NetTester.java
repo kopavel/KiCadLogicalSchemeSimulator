@@ -127,31 +127,31 @@ public abstract class NetTester {
     }
 
     protected void checkPin(int id, boolean state, String message) {
-        assertFalse(inPin(id).hiImpedance, "Pin " + id + " hiImpedance should be false");
+        assertFalse(inPin(id).isHiImpedance(), "Pin " + id + " hiImpedance should be false");
         assertEquals(state, inPin(id).state, message);
     }
 
     protected void checkPin(String id, boolean state, String message) {
-        assertFalse(inPin(id).hiImpedance, "Pin " + id + " hiImpedance should be false");
+        assertFalse(inPin(id).isHiImpedance(), "Pin " + id + " hiImpedance should be false");
         assertEquals(state, inPin(id).state, message);
     }
 
     protected void checkBus(int id, int state, String message) {
-        assertFalse(inBus(id).hiImpedance, "Bus " + id + " hiImpedance should be false");
+        assertFalse(inBus(id).isHiImpedance(), "Bus " + id + " hiImpedance should be false");
         assertEquals(state, inBus(id).state, message);
     }
 
     protected void checkBus(String id, int state, String message) {
-        assertFalse(inBus(id).hiImpedance, "Bus " + id + " hiImpedance should be false");
+        assertFalse(inBus(id).isHiImpedance(), "Bus " + id + " hiImpedance should be false");
         assertEquals(state, inBus(id).state, message);
     }
 
     protected void checkBusImpedance(int id, String message) {
-        assertTrue(inBus(id).hiImpedance, message);
+        assertTrue(inBus(id).isHiImpedance(), message);
     }
 
     protected void checkBusImpedance(String id, String message) {
-        assertTrue(inBus(id).hiImpedance, message);
+        assertTrue(inBus(id).isHiImpedance(), message);
     }
 
     protected void checkBusImpedance(String partId, String id, String message) {
@@ -159,11 +159,11 @@ public abstract class NetTester {
     }
 
     protected void checkPinImpedance(int id, String message) {
-        assertTrue(inPin(id).hiImpedance, message);
+        assertTrue(inPin(id).isHiImpedance(), message);
     }
 
     protected void checkPinImpedance(String id, String message) {
-        assertTrue(inPin(id).hiImpedance, message);
+        assertTrue(inPin(id).isHiImpedance(), message);
     }
 
     @BeforeAll

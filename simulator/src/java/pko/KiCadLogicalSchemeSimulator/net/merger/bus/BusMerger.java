@@ -42,7 +42,6 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.PullPin;
 import pko.KiCadLogicalSchemeSimulator.net.Net;
 import pko.KiCadLogicalSchemeSimulator.net.bus.BusInInterconnect;
 import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
-import pko.KiCadLogicalSchemeSimulator.net.merger.wire.WireMerger;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
@@ -53,15 +52,13 @@ public class BusMerger extends OutBus {
     public int strongPins;
     public int weakPins;
     public int weakState;
-    public boolean hasPassivePin;
 
-    //FixMe initial hiImpedance?
     public BusMerger(Bus destination) {
         super(destination.id, destination.parent, destination.size);
         variantId = destination.variantId == null ? "" : destination.variantId + ":";
         variantId += "merger";
         destination.used = true;
-        destination.source=this;
+        destination.source = this;
         Bus d = destination;
         while (d instanceof BusInInterconnect interconnect) {
             this.mask &= ~interconnect.interconnectMask;
@@ -69,13 +66,11 @@ public class BusMerger extends OutBus {
             d = interconnect.destination;
         }
         destinations = new Bus[]{destination};
-        triStateIn = destination.triStateIn;
     }
 
     public void addDestination(Bus destination) {
         destination.used = true;
-        destination.source=this;
-        triStateIn |= destination.triStateIn;
+        destination.source = this;
         switch (destination) {
             case BusInInterconnect interconnect -> {
                 this.mask &= ~interconnect.interconnectMask;
@@ -90,6 +85,7 @@ public class BusMerger extends OutBus {
 
     public void addSource(OutBus bus, int srcMask, byte offset) {
         bus.used = true;
+        triStateOut |= bus.triStateOut;
         int destinationMask = offset == 0 ? srcMask : (offset > 0 ? srcMask << offset : srcMask >> -offset);
         BusMergerBusIn input = new BusMergerBusIn(bus, destinationMask, this);
         bus.addDestination(input, srcMask, offset);
@@ -118,9 +114,6 @@ public class BusMerger extends OutBus {
             input.parent = pin.parent;
             pin.addDestination(input);
             processPin(pin, input, destinationMask);
-            if (pin instanceof WireMerger wireMerger && !wireMerger.passivePins.isEmpty()) {
-                hasPassivePin = true;
-            }
         }
     }
 
@@ -143,12 +136,14 @@ public class BusMerger extends OutBus {
         for (int i = 0; i < destinations.length; i++) {
             destinations[i] = destinations[i].getOptimised(this);
         }
+        hiImpedance = isTriState(null);
         return this;
     }
 
     private void processPin(Pin pin, BusMergerWireIn input, int destinationMask) {
-        input.source=pin;
-        input.triStateOut=pin.triStateOut;
+        triStateOut |= pin.triStateOut;
+        input.source = pin;
+        input.triStateOut = pin.triStateOut;
         input.oldStrong = pin.strong;
         input.hiImpedance = pin.hiImpedance;
         input.id = pin.id;

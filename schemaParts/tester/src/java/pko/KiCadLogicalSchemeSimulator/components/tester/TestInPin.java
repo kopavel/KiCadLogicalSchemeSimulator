@@ -57,6 +57,7 @@ public class TestInPin extends SchemaPart {
             }
         };
         inPin.triStateIn = true;
+        inPin.hiImpedance=true;
         pin = addInPin(inPin);
     }
 

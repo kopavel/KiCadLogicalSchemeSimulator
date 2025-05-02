@@ -81,6 +81,8 @@ public abstract class Bus extends ModelItem<Bus> {
         hiImpedance = oldBus.hiImpedance;
         used = oldBus.used;
         priority = oldBus.priority;
+        triStateIn=oldBus.triStateIn;
+        triStateOut=oldBus.triStateOut;
         source=oldBus;
     }
 

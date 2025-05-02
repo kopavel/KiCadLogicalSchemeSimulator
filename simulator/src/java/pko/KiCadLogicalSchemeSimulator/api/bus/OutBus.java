@@ -48,7 +48,9 @@ import java.util.stream.Stream;
 
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.none;
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.warn;
-import static pko.KiCadLogicalSchemeSimulator.optimiser.Opcodes.*;
+import static pko.KiCadLogicalSchemeSimulator.optimiser.Opcodes.DUP_X2;
+import static pko.KiCadLogicalSchemeSimulator.optimiser.Opcodes.ILOAD;
+import static pko.KiCadLogicalSchemeSimulator.optimiser.Opcodes.SWAP;
 
 public class OutBus extends Bus {
     private final Map<Integer, Map<Byte, OffsetBus>> corrected = new HashMap<>();
@@ -63,7 +65,6 @@ public class OutBus extends Bus {
     /*Optimiser constructor unroll destination:destinations*/
     public OutBus(OutBus oldBus, String variantId) {
         super(oldBus, variantId);
-        triStateOut = oldBus.triStateOut;
         mask = oldBus.mask;
     }
 

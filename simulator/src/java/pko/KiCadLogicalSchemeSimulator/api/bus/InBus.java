@@ -40,8 +40,6 @@ public abstract class InBus extends Bus {
 
     public InBus(Bus source, String variantId) {
         super(source, variantId);
-        triStateIn = source.triStateIn;
-
     }
 
     @Override
