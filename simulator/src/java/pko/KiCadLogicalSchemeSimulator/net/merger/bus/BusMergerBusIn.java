@@ -33,6 +33,8 @@ package pko.KiCadLogicalSchemeSimulator.net.merger.bus;
 import lombok.Getter;
 import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.ShortcutException;
+import pko.KiCadLogicalSchemeSimulator.api.SupportMask;
+import pko.KiCadLogicalSchemeSimulator.api.SupportOffset;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
@@ -43,7 +45,7 @@ import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.non
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.warn;
 
 //Todo with one Bus input and only weak others - use simpler "Weak bus" implementation
-public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
+public class BusMergerBusIn extends InBus implements MergerInput<Bus>, SupportMask, SupportOffset {
     @Getter
     public final int mask;
     public final int nMask;
@@ -353,10 +355,5 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus> {
         merger.sources.add(build);
         build.source = source;
         return build;
-    }
-
-    @Override
-    public boolean useFullOptimiser() {
-        return true;
     }
 }

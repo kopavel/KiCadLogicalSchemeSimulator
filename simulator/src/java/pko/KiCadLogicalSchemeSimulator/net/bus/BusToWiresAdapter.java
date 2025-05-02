@@ -31,6 +31,8 @@
  */
 package pko.KiCadLogicalSchemeSimulator.net.bus;
 import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
+import pko.KiCadLogicalSchemeSimulator.api.SupportMask;
+import pko.KiCadLogicalSchemeSimulator.api.SupportOffset;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
 import pko.KiCadLogicalSchemeSimulator.api.wire.FallingEdgePin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
@@ -41,7 +43,7 @@ import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.none;
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.warn;
 
-public class BusToWiresAdapter extends OutBus {
+public class BusToWiresAdapter extends OutBus implements SupportMask, SupportOffset {
     public Pin[] destinations = new Pin[0];
     public Pin[] toImp = new Pin[0];
     public Pin[] toLow = new Pin[0];
@@ -236,11 +238,6 @@ public class BusToWiresAdapter extends OutBus {
             }
             return build;
         }
-    }
-
-    @Override
-    public boolean useFullOptimiser() {
-        return true;
     }
 
     protected void split() {

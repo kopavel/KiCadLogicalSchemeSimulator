@@ -31,6 +31,8 @@
  */
 package pko.KiCadLogicalSchemeSimulator.net.bus;
 import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
+import pko.KiCadLogicalSchemeSimulator.api.SupportMask;
+import pko.KiCadLogicalSchemeSimulator.api.SupportOffset;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
@@ -39,7 +41,8 @@ import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.none;
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.warn;
 
-public class OffsetBus extends OutBus {
+//Fixme if we offset "Down" - we can use no mask for "lower bit"
+public class OffsetBus extends OutBus implements SupportOffset, SupportMask {
     protected final byte offset;
     public int maskState;
     public boolean queueImpedance;
@@ -196,7 +199,7 @@ public class OffsetBus extends OutBus {
 
     @Override
     public Bus getOptimised(ModelItem<?> source) {
-        if (destinations.length == 1 && destinations[0].useFullOptimiser()) {
+        if (destinations.length == 1 && destinations[0] instanceof SupportOffset && (applyMask == 0 || destinations[0] instanceof SupportMask)) {
             destinations[0].applyMask = applyMask;
             destinations[0].applyOffset = offset;
             return destinations[0].getOptimised(source).copyState(this);
@@ -239,10 +242,5 @@ public class OffsetBus extends OutBus {
             }
             return build;
         }
-    }
-
-    @Override
-    public boolean useFullOptimiser() {
-        return true;
     }
 }

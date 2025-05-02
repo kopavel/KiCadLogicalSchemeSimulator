@@ -31,6 +31,7 @@
  */
 package pko.KiCadLogicalSchemeSimulator.net.bus;
 import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
+import pko.KiCadLogicalSchemeSimulator.api.SupportMask;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
@@ -160,7 +161,7 @@ public class MaskGroupBus extends OutBus {
     public Bus getOptimised(ModelItem<?> source) {
         if (destinations.length == 0) {
             throw new RuntimeException("unconnected MaskGroupBus " + getName());
-        } else if (destinations.length == 1 && destinations[0].useFullOptimiser()) {
+        } else if (destinations.length == 1 && destinations[0] instanceof SupportMask) {
             destinations[0].applyMask = mask;
             return destinations[0].getOptimised(source).copyState(this);
         } else {

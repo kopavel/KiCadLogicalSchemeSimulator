@@ -132,8 +132,4 @@ public abstract class ModelItem<T> implements IModelItem<T> {
     public RecursionMode getRecursionMode() {
         return parent.net.parameterResolver.getRecursionMode(parent.id, id);
     }
-
-    public boolean useFullOptimiser() {
-        return false;
-    }
 }
