@@ -54,7 +54,6 @@ public class BusToWiresAdapter extends OutBus implements SupportMask, SupportOff
     /*Optimiser constructor unroll low:toLow:l unroll hi:toHi:h unroll imp:toImp:i*/
     public BusToWiresAdapter(BusToWiresAdapter oldBus, String variantId) {
         super(oldBus, variantId);
-        triStateIn = oldBus.triStateIn;
     }
 
     public BusToWiresAdapter(OutBus outBus, int mask) {

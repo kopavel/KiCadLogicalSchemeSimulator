@@ -78,11 +78,11 @@ public abstract class Bus extends ModelItem<Bus> {
         aliasOffsets.putAll(oldBus.aliasOffsets);
         useBitPresentation = oldBus.useBitPresentation;
         state = oldBus.state;
-        hiImpedance = oldBus.hiImpedance;
         used = oldBus.used;
         priority = oldBus.priority;
         triStateIn=oldBus.triStateIn;
         triStateOut=oldBus.triStateOut;
+        hiImpedance = oldBus.hiImpedance & isTriState(source);
         source=oldBus;
     }
 

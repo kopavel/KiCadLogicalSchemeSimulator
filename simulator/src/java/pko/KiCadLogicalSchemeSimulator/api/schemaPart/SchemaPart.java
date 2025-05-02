@@ -296,7 +296,6 @@ public abstract class SchemaPart {
     public <T> void replaceOut(ModelItem<T> outPin) {
         ModelItem<T> newOutPin = outPin.getOptimised(null);
         if (outPin != newOutPin) {
-            newOutPin.copyState(outPin);
             String oldId = ids.remove(outPin);
             outPins.put(outPin.getId(), newOutPin);
             ids.put(newOutPin, oldId);

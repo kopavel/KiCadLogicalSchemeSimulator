@@ -61,9 +61,7 @@ public abstract class ModelItem<T> implements IModelItem<T> {
 
     @Override
     public ModelItem<T> getOptimised(ModelItem<?> source) {
-        if (source != null) {
-            this.source = source;
-        }
+        this.source = source;
         return this;
     }
 

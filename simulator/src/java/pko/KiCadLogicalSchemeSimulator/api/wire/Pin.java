@@ -54,12 +54,12 @@ public abstract class Pin extends ModelItem<Pin> {
         this.variantId = variantId + (oldPin.variantId == null ? "" : ":" + oldPin.variantId);
         state = oldPin.state;
         strong = oldPin.strong;
-        hiImpedance = oldPin.hiImpedance;
         used = oldPin.used;
         priority = oldPin.priority;
-        triStateIn=oldPin.triStateIn;
-        triStateOut=oldPin.triStateOut;
-        source=oldPin;
+        triStateIn = oldPin.triStateIn;
+        triStateOut = oldPin.triStateOut;
+        hiImpedance = oldPin.hiImpedance & isTriState(source);
+        source = oldPin;
     }
 
     public Pin(String id, SchemaPart parent) {
