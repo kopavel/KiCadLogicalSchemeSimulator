@@ -49,7 +49,7 @@ public class OffsetBus extends OutBus implements SupportOffset, SupportMask {
 
     public OffsetBus(OutBus outBus, Bus destination, byte offset) {
         super(outBus, "offset" + offset);
-        triStateIn=false;
+        triStateIn=destination.triStateIn;
         if (offset == 0) {
             throw new RuntimeException("Offset must not be 0");
         }
