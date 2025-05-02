@@ -51,7 +51,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
         oldStrong = source.strong;
         hiImpedance = source.hiImpedance;
         destinations = merger.destinations;
-        triStateIn=true;
+        triStateIn = true;
     }
 
     /*Optimiser constructor unroll destination:destinations*/
@@ -103,7 +103,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                         throw new ShortcutException(((WireMerger) merger).sources);
                     }
                 } else {
-                    merger.strong=true;
+                    merger.strong = true;
                 }
                 /*Optimiser block passivePins line ts*/
                 if (!hiImpedance) { // from weak
@@ -168,6 +168,9 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                 /*Optimiser blockEnd passivePins*/
             }
             /*Optimiser block passivePins*/
+            for (PassivePin passivePin : ((WireMerger) merger).passivePins) {
+                passivePin.parent.onPassivePinChange(merger);
+            }
         } else if (strengthChange) {
             for (Pin destination : ((WireMerger) merger).mergers) {
                 destination.strong = strong;
@@ -177,13 +180,13 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                     destination.setLo();
                 }
             }
+            for (PassivePin passivePin : ((WireMerger) merger).passivePins) {
+                passivePin.parent.onPassivePinChange(merger);
+            }
             /*Optimiser blockEnd passivePins*/
         }
         /*Optimiser block passivePins*/
         oldStrong = strong;
-        for (PassivePin passivePin : ((WireMerger) merger).passivePins) {
-            passivePin.parent.onPassivePinChange(merger);
-        }
         /*Optimiser blockEnd passivePins*/
         assert Log.debug(getClass(),
                 "Pin merger change. after: newState:{}, Source:{} (state:{}, oldStrong:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, " +
@@ -241,7 +244,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                         throw new ShortcutException(((WireMerger) merger).sources);
                     }
                 } else {
-                    merger.strong=true;
+                    merger.strong = true;
                 }
                 /*Optimiser block passivePins line ts*/
                 if (!hiImpedance) { // from weak
@@ -306,6 +309,9 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                 }
             }
             /*Optimiser block passivePins*/
+            for (PassivePin passivePin : ((WireMerger) merger).passivePins) {
+                passivePin.parent.onPassivePinChange(merger);
+            }
         } else if (strengthChange) {
             for (Pin destination : ((WireMerger) merger).mergers) {
                 destination.strong = strong;
@@ -315,13 +321,13 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                     destination.setLo();
                 }
             }
+            for (PassivePin passivePin : ((WireMerger) merger).passivePins) {
+                passivePin.parent.onPassivePinChange(merger);
+            }
             /*Optimiser blockEnd passivePins*/
         }
         /*Optimiser block passivePins*/
         oldStrong = strong;
-        for (PassivePin passivePin : ((WireMerger) merger).passivePins) {
-            passivePin.parent.onPassivePinChange(merger);
-        }
         /*Optimiser blockEnd passivePins*/
         assert Log.debug(getClass(),
                 "Pin merger change. after: newState:{}, Source:{} (state:{}, oldStrong:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, " +
@@ -365,6 +371,11 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                 for (Pin destination : destinations) {
                     destination.setHiImpedance();
                 }
+                /*Optimiser block passivePins*/
+                for (PassivePin passivePin : ((WireMerger) merger).passivePins) {
+                    passivePin.parent.onPassivePinChange(merger);
+                }
+                /*Optimiser blockEnd passivePins*/
             } else {
                 merger.state = merger.weakState > 0;
                 merger.strong = false;
@@ -376,6 +387,11 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                             destination.setLo();
                         }
                     }
+                    /*Optimiser block passivePins*/
+                    for (PassivePin passivePin : ((WireMerger) merger).passivePins) {
+                        passivePin.parent.onPassivePinChange(merger);
+                    }
+                    /*Optimiser blockEnd passivePins*/
                 }
             }
         } else {
@@ -385,16 +401,17 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                     destination.setHiImpedance();
                 }
                 merger.hiImpedance = true;
+                /*Optimiser block passivePins*/
+                for (PassivePin passivePin : ((WireMerger) merger).passivePins) {
+                    passivePin.parent.onPassivePinChange(merger);
+                }
+                /*Optimiser blockEnd passivePins*/
             }
         }
         hiImpedance = true;
         strong = false;
-        /*Optimiser block passivePins*/
+        /*Optimiser line passivePins*/
         oldStrong = false;
-        for (PassivePin passivePin : ((WireMerger) merger).passivePins) {
-            passivePin.parent.onPassivePinChange(merger);
-        }
-        /*Optimiser blockEnd passivePins*/
         assert Log.debug(getClass(),
                 "Pin merger setImpedance. after: Source:{} (state:{}, oldStrong:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{} " +
                         "hiImpedance:{}, weakState:{})",
