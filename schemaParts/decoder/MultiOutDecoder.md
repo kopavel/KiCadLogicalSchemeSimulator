@@ -32,6 +32,7 @@ Implements a binary decoder with multiple output pin groups.
 #### Optional parameters:
 
 - `reverse`- outputs reversed.
+- `openCollector`- outputs in openCollector mode.
 
 ### Example
 

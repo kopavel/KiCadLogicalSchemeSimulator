@@ -45,11 +45,6 @@ public class Decoder extends SchemaPart {
         }
         int inSize = Integer.parseInt(params.get("size"));
         aBus = addInBus(new DecoderABus("A", this, inSize));
-        if (params.containsKey("outReverse")) {
-            aBus.outState = ~1;
-        } else {
-            aBus.outState = 1;
-        }
         csPin = addInPin(new DecoderCsPin("CS", this));
         int outSize = (int) Math.pow(2, inSize);
         addTriStateOutBus("Q", outSize);
@@ -63,7 +58,7 @@ public class Decoder extends SchemaPart {
         csPin.outBus = outBus;
         outBus.useBitPresentation = true;
         if (reverse) {
-            outBus.state = aBus.outState;
+            outBus.state = params.containsKey("outReverse")?~1:1;
             outBus.hiImpedance = false;
         }
     }

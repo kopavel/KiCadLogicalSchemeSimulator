@@ -39,7 +39,6 @@ public class DecoderABus extends InBus {
     public final Decoder parent;
     public Bus outBus;
     public boolean csState;
-    public int outState;
 
     public DecoderABus(String id, Decoder parent, int size, String... aliases) {
         super(id, parent, size, aliases);
@@ -57,6 +56,7 @@ public class DecoderABus extends InBus {
     @Override
     public void setState(int newState) {
         state = newState;
+        int outState;
         if (
             /*Optimiser line cs */
                 csState && //

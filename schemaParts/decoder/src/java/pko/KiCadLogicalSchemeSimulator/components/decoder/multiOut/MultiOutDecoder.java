@@ -30,18 +30,14 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.decoder.multiOut;
-import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 public class MultiOutDecoder extends SchemaPart {
-    private final int[] csStates;
+    public final Part[] parts;
+    public MultiOutDecoderABus aBus;
     int partAmount;
     int outSize;
-    private Pin[][] outs;
 
     protected MultiOutDecoder(String id, String sParam) {
         super(id, sParam);
@@ -54,128 +50,49 @@ public class MultiOutDecoder extends SchemaPart {
         }
         String[] partCSs = params.get("cs").split(",");
         partAmount = partCSs.length;
-        boolean[][] CSs = new boolean[partAmount][0];
-        csStates = new int[partAmount];
+        parts = new Part[partAmount];
         outSize = (int) Math.pow(2, inSize);
-        for (int i = 0; i < partCSs.length; i++) {
-            String[] csItems = partCSs[i].split(":");
-            CSs[i] = new boolean[csItems.length];
-            for (int j = 0; j < csItems.length; j++) {
-                CSs[i][j] = csItems[j].equals("R");
+        aBus = addInBus(new MultiOutDecoderABus("A", this, inSize));
+        for (int partNo = 0; partNo < partAmount; partNo++) {
+            Part part = (parts[partNo] = new Part());
+            part.outs = new Pin[outSize];
+            String[] csItems = partCSs[partNo].split(":");
+            part.CSs = new boolean[csItems.length];
+            part.csPins = new MultiOutDecoderCsPin[csItems.length];
+            for (int csNo = 0; csNo < csItems.length; csNo++) {
+                part.CSs[csNo] = csItems[csNo].equals("R");
+                part.csPins[csNo] = addInPin(new MultiOutDecoderCsPin("CS" + ((char) ('a' + partNo)) + csNo, part, csNo, this));
+                if (!part.CSs[csNo]) {
+                    part.csState |= 1 << csNo;
+                }
             }
-        }
-        Bus aBus;
-        if (reverse) {
-            aBus = addInBus(new InBus("A", this, inSize) {
-                @Override
-                public void setState(int newState) {
-                    state = newState;
-                    for (int i = 0; i < outs.length; i++) {
-                        Pin out;
-                        if (csStates[i] == 0 && (out = outs[i][newState]).hiImpedance) {
-                            out.setLo();
-                        }
-                    }
-                }
-            });
-        } else {
-            aBus = addInBus(new InBus("A", this, inSize) {
-                @Override
-                public void setState(int newState) {
-                    state = newState;
-                    for (int i = 0; i < outs.length; i++) {
-                        Pin[] out = outs[i];
-                        if (csStates[i] == 0) {
-                            for (int j = 0; j < outSize; j++) {
-                                if (j != newState && out[j].hiImpedance) {
-                                    out[j].setLo();
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-        for (int i = 0; i < CSs.length; i++) {
-            boolean[] partCS = CSs[i];
-            int finalI = i;
-            int fullMask = (int) Utils.getMaskForSize(partCS.length);
-            for (int j = 0; j < partCS.length; j++) {
-                boolean csReverse = partCS[j];
-                int mask = 1 << j;
-                int nMask = ~mask & fullMask;
-                if (csReverse) {
-                    //FixMe where is nonReverse mode
-                    addInPin(new InPin("CS" + ((char) ('a' + finalI)) + j, this) {
-                        @Override
-                        public void setHi() {
-                            state = true;
-                            csStates[finalI] |= mask;
-                            Pin[] out = outs[finalI];
-                            for (Pin pin : out) {
-                                if (!pin.hiImpedance) {
-                                    pin.setHiImpedance();
-                                }
-                            }
-                        }
-
-                        @Override
-                        public void setLo() {
-                            state = false;
-                            if (csStates[finalI] == mask) {
-                                outs[finalI][(int) aBus.state].setLo();
-                                csStates[finalI] = 0;
-                            } else {
-                                csStates[finalI] &= nMask;
-                            }
-                        }
-                    });
+            for (int outNo = 0; outNo < outSize; outNo++) {
+                if (params.containsKey("openCollector")) {
+                    addTriStateOutPin("Q" + ((char) ('a' + partNo)) + outNo);
                 } else {
-                    csStates[finalI] |= mask;
-                    addInPin(new InPin("CS" + ((char) ('a' + finalI)) + j, this) {
-                        @Override
-                        public void setHi() {
-                            state = true;
-                            if (csStates[finalI] == mask) {
-                                outs[finalI][(int) aBus.state].setLo();
-                                csStates[finalI] = 0;
-                            } else {
-                                csStates[finalI] &= nMask;
-                            }
-                        }
-
-                        @Override
-                        public void setLo() {
-                            state = false;
-                            csStates[finalI] |= mask;
-                            Pin[] out = outs[finalI];
-                            for (Pin pin : out) {
-                                if (!pin.hiImpedance) {
-                                    pin.setHiImpedance();
-                                }
-                            }
-                        }
-                    });
+                    addOutPin("Q" + ((char) ('a' + partNo)) + outNo);
                 }
-            }
-        }
-        for (int i = 0; i < partAmount; i++) {
-            for (int j = 0; j < outSize; j++) {
-                addTriStateOutPin("Q" + ((char) ('a' + i)) + j);
             }
         }
     }
 
     @Override
     public void initOuts() {
-        outs = new Pin[partAmount][outSize];
-        for (int i = 0; i < partAmount; i++) {
-            for (int j = 0; j < outSize; j++) {
-                outs[i][j] = getOutPin("Q" + ((char) ('a' + i)) + j);
-                if (csStates[i] > 0) {
-                    outs[i][j].hiImpedance = true;
+        for (int partNo = 0; partNo < partAmount; partNo++) {
+            Part part = parts[partNo];
+            for (int outNo = 0; outNo < outSize; outNo++) {
+                part.outs[outNo] = getOutPin("Q" + ((char) ('a' + partNo)) + outNo);
+                if (params.containsKey("openCollector") && part.csState > 0) {
+                    part.outs[outNo].hiImpedance = true;
                 }
             }
         }
+    }
+
+    public static class Part {
+        public Pin[] outs;
+        public MultiOutDecoderCsPin[] csPins;
+        public boolean[] CSs;
+        public int csState;
     }
 }

@@ -515,7 +515,7 @@
 			<unit pinMap="6=A0;5=A1;4=A2;3=A3;1=OEa;10=B0;11=B1;12=B2;13=B3;15=OEb;14=N0;2=N1;7=QA;9=QB"/>
 			<unit pinMap="ignore;8;16"/>
 		</symbol>
-		<symbol name="74LS156" class="MultiOutDecoder" param="size=2;reverse;cs=N:R,R:R">
+		<symbol name="74LS156" class="MultiOutDecoder" param="size=2;reverse;cs=N:R,R:R;openCollector">
 			<unit pinMap="1=CSa0;2=CSa1;3=A1;4=Qa3;5=Qa2;6=Qa1;7=Qa0;9=Qb0;10=Qb1;11=Qb2;12=Qb3;13=A0;14=CSb0;15=CSb1"/>
 			<unit pinMap="ignore;8;16"/>
 		</symbol>
