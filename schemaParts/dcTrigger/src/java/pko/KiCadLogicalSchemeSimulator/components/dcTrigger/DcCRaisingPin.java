@@ -119,9 +119,6 @@ public class DcCRaisingPin extends RaisingEdgePin {
         }
         if (source != null) {
             optimiser.cut("setter");
-            if (!anyRs) {
-                optimiser.byteCodeManipulator("setHi").dup(1).skip(2, !(iqOut.used && qOut.used) ? 4 : 5);
-            }
         }
         if (!iqOut.used) {
             optimiser.cut("nq");

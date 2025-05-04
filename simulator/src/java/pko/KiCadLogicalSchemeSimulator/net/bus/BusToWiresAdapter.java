@@ -58,7 +58,7 @@ public class BusToWiresAdapter extends OutBus implements SupportMask, SupportOff
 
     public BusToWiresAdapter(OutBus outBus, int mask) {
         super(outBus, "BusToWire");
-        triStateIn=false;
+        triStateIn = false;
         this.mask = mask;
     }
 
@@ -206,15 +206,9 @@ public class BusToWiresAdapter extends OutBus implements SupportMask, SupportOff
             }
             if (isTriState(source)) {
                 optimiser.bind("d", "imp0");
-                if (source == null) {
-                    optimiser.byteCodeManipulator("setState").dup(2);
-                }
                 optimiser.unroll("i", toImp.length);
             } else {
                 optimiser.cut("ts");
-                if (source == null) {
-                    optimiser.byteCodeManipulator("setState").dup(1);
-                }
             }
             if (destinations.length < 2 || getRecursionMode() == none) {
                 optimiser.cut("ar");

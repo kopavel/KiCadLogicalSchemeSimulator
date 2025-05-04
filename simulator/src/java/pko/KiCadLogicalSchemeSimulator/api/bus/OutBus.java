@@ -48,9 +48,6 @@ import java.util.stream.Stream;
 
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.none;
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.warn;
-import static pko.KiCadLogicalSchemeSimulator.optimiser.Opcodes.DUP_X2;
-import static pko.KiCadLogicalSchemeSimulator.optimiser.Opcodes.ILOAD;
-import static pko.KiCadLogicalSchemeSimulator.optimiser.Opcodes.SWAP;
 
 public class OutBus extends Bus {
     private final Map<Integer, Map<Byte, OffsetBus>> corrected = new HashMap<>();
@@ -229,26 +226,8 @@ public class OutBus extends Bus {
             } else {
                 optimiser.cut("nr");
             }
-            if (isTriState(source)) {
-                if (getRecursionMode() == none) {
-                    optimiser.byteCodeManipulator("setHiImpedance").dup(destinations.length);
-                    optimiser.byteCodeManipulator("setState").dup(destinations.length + 1);
-                }
-            } else {
+            if (!isTriState(source)) {
                 optimiser.cut("ts");
-                if (getRecursionMode() == none) {
-                    optimiser.byteCodeManipulator("setState").dup(destinations.length);
-                    int[] arr1 = new int[destinations.length];
-                    int[] arr2 = new int[destinations.length - 1];
-                    for (int i = 0; i < destinations.length; i++) {
-                        arr1[i] = i + 2;
-                        if (i < destinations.length - 1) {
-                            arr2[i] = i + 1;
-                        }
-                    }
-                    optimiser.byteCodeManipulator("setState", ILOAD, 1).add(DUP_X2, 1).replace(SWAP, arr1);
-                    optimiser.byteCodeManipulator("setState", SWAP).add(DUP_X2, arr2);
-                }
             }
             OutBus build = optimiser.build();
             build.source = source;

@@ -227,18 +227,9 @@ public class OutPin extends Pin {
                 optimiser.cut("nr");
             }
             if (isTriState(source)) {
-                if (getRecursionMode() == none) {
-                    optimiser.byteCodeManipulator("setHi").dup(toHi.length + 1);
-                    optimiser.byteCodeManipulator("setLo").dup(toLow.length + 1);
-                    optimiser.byteCodeManipulator("setHiImpedance").dup(toImp.length);
-                }
                 optimiser.unroll("i", toImp.length);
             } else {
                 optimiser.cut("ts");
-                if (getRecursionMode() == none) {
-                    optimiser.byteCodeManipulator("setHi").dup(toHi.length);
-                    optimiser.byteCodeManipulator("setLo").dup(toLow.length);
-                }
             }
             OutPin build = optimiser.build();
             build.source = source;

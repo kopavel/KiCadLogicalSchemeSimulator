@@ -65,9 +65,6 @@ class CRInPin extends InPin {
         ClassOptimiser<CRInPin> optimiser = new ClassOptimiser<>(this);
         if (source != null) {
             optimiser.cut("setter");
-        } else {
-            optimiser.byteCodeManipulator("setLo").dup(1);
-            optimiser.byteCodeManipulator("setHi").dup(1);
         }
         CRInPin build = optimiser.build();
         counter.rPin = build;

@@ -31,7 +31,6 @@
  */
 package pko.KiCadLogicalSchemeSimulator.optimiser;
 import pko.KiCadLogicalSchemeSimulator.Simulator;
-import pko.KiCadLogicalSchemeSimulator.optimiser.BytecodeTransformer.ReplaceParams;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 import java.io.*;
@@ -52,7 +51,6 @@ public class ClassOptimiser<T> {
     private final T oldInstance;
     private final Class<?> sourceClass;
     private final Map<String, UnrollDescriptor> unrolls = new HashMap<>();
-    public Map<String, List<ReplaceParams>> replaceMap = new HashMap<>();
     private String suffix = "";
     private List<String> source;
     private boolean noAssert = true;
@@ -66,20 +64,6 @@ public class ClassOptimiser<T> {
         this.sourceClass = sourceClass;
         //noinspection AssertWithSideEffects,ConstantValue
         assert !(noAssert = false);
-    }
-
-    public ReplaceParams byteCodeManipulator(String name, int target, Integer varNo) {
-        ReplaceParams replaceParams = new ReplaceParams(target, varNo);
-        replaceMap.computeIfAbsent(name, k -> new ArrayList<>()).add(replaceParams);
-        return replaceParams;
-    }
-
-    public ReplaceParams byteCodeManipulator(String name, int target) {
-        return byteCodeManipulator(name, target, null);
-    }
-
-    public ReplaceParams byteCodeManipulator(String name) {
-        return byteCodeManipulator(name, Opcodes.ALOAD, 0);
     }
 
     public ClassOptimiser<T> unroll(int size) {
@@ -142,7 +126,7 @@ public class ClassOptimiser<T> {
                     String optimisedSource = process();
                     Log.trace(JavaCompiler.class, "Compile");
                     storeSrc(optimizedFullClassName, optimisedSource);
-                    dynamicClass = JavaCompiler.compileJavaSource(optimizedFullClassName, optimizedClassName, optimisedSource, replaceMap);
+                    dynamicClass = JavaCompiler.compileJavaSource(optimizedFullClassName, optimizedClassName, optimisedSource);
                     if (dynamicClass == null) {
                         Log.error(JavaCompiler.class, "Optimised class compile was not successful, fall back to generic class, file name:" + optimizedFullClassName);
                         return oldInstance;

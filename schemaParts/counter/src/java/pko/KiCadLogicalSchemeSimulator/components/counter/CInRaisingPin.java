@@ -79,8 +79,6 @@ public class CInRaisingPin extends RaisingEdgePin {
         ClassOptimiser<CInRaisingPin> optimiser = new ClassOptimiser<>(this).bind("countMask", countMask);
         if (source != null) {
             optimiser.cut("setter");
-        } else {
-            optimiser.byteCodeManipulator("setLo").dup(1);
         }
         if (!parent.rPin.used) {
             optimiser.cut("r");

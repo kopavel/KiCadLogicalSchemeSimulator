@@ -167,7 +167,7 @@ public abstract class NetTester {
     }
 
     @BeforeAll
-    void loadNet() throws Exception {
+    protected void loadNet() throws Exception {
         String rootPath = getRootPath();
         Simulator.optimisedDir = rootPath + "/simulator/optimised";
         Simulator.schemaPartSpiMap = ServiceLoader.load(SchemaPartSpi.class)
