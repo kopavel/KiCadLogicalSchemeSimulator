@@ -29,7 +29,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.test.benchmarks;
+package pko.KiCadLogicalSchemeSimulator.components.OR.test;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.options.Options;
@@ -41,15 +41,16 @@ import pko.KiCadLogicalSchemeSimulator.test.schemaPartTester.NetTester;
 import java.util.concurrent.TimeUnit;
 
 @State(Scope.Benchmark)
-public class ByteCodeManipulatorBenchmark extends NetTester {
+public class Benchmark extends NetTester {
     private final static boolean TEST = true;
     private final static int cycles = 100000000;
-    private Pin out;
+    private Pin out1;
+    private Pin out2;
 
     public static void main(String[] args) throws Throwable {
         if (TEST) {
             Options options = new OptionsBuilder()//
-                                                  .include(ByteCodeManipulatorBenchmark.class.getSimpleName())
+                                                  .include(Benchmark.class.getSimpleName())
                                                   .warmupIterations(10)
                                                   .warmupTime(TimeValue.seconds(3))
                                                   .measurementIterations(10)
@@ -60,10 +61,10 @@ public class ByteCodeManipulatorBenchmark extends NetTester {
                                                   .build();
             new Runner(options).run();
         } else {
-            ByteCodeManipulatorBenchmark benchmark = new ByteCodeManipulatorBenchmark();
+            Benchmark benchmark = new Benchmark();
             benchmark.setup();
             for (int i = 0; i < 1000; i++) {
-                benchmark.byteCodeManipulation();
+                benchmark.bench();
             }
         }
     }
@@ -71,31 +72,37 @@ public class ByteCodeManipulatorBenchmark extends NetTester {
     @Setup
     public void setup() throws Exception {
         loadNet();
-        out=outPin("OutPin1");
+        out1 = outPin("OutPin1");
+        out2 = outPin("OutPin2");
     }
 
-    @Benchmark()
-    public void byteCodeManipulation() {
+    @org.openjdk.jmh.annotations.Benchmark
+    @Fork(1)
+    @Warmup(iterations = 3, time = 10)
+    @Measurement(iterations = 3, time = 10)
+    @OutputTimeUnit(TimeUnit.SECONDS)
+    public void bench() {
         for (int i = 0; i < cycles; i++) {
-            out.setHi();
-            out.setLo();
-            out.setHi();
-            out.setLo();
-            out.setHi();
-            out.setLo();
-            out.setHi();
-            out.setLo();
-            out.setHi();
-            out.setLo();
+            out1.setHi();
+            out2.setHi();
+            out1.setLo();
+            out2.setLo();
+            out1.setHi();
+            out2.setHi();
+            out1.setLo();
+            out2.setLo();
+            out1.setHi();
+            out1.setLo();
         }
     }
 
+    @Override
     protected String getNetFilePath() {
-        return "simulator/src/test/resources/byteCode.net";
+        return "test/resources/Or.net";
     }
 
     @Override
     protected String getRootPath() {
-        return ".";
+        return "../..";
     }
 }

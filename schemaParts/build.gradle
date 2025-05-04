@@ -107,11 +107,37 @@ configure(subprojects) { subproject ->
             }
         }
     }
+    tasks.register("bench", JavaExec) {
+        group = 'Benchmark'
+        description = 'Run JMH benchmarks'
+        classpath = sourceSets.test.runtimeClasspath
+        mainClass = 'org.openjdk.jmh.Main'
+        // Optional: Set JVM arguments
+        jvmArgs = [
+                '--module-path', "$rootDir/distro/;$rootDir/distro/lib/;$rootDir/distro/schemaParts/",
+                '--add-modules', "KiCadLogicalSchemeSimulator.simulator",
+                '--add-exports', 'KiCadLogicalSchemeSimulator.simulator/pko.KiCadLogicalSchemeSimulator.net.bus=ALL-UNNAMED',
+                '--add-exports', 'KiCadLogicalSchemeSimulator.simulator/pko.KiCadLogicalSchemeSimulator.net.wire=ALL-UNNAMED',
+                '--add-exports', 'KiCadLogicalSchemeSimulator.simulator/pko.KiCadLogicalSchemeSimulator.parsers.net=ALL-UNNAMED',
+                '--add-exports', 'KiCadLogicalSchemeSimulator.simulator/pko.KiCadLogicalSchemeSimulator.parsers.xml=ALL-UNNAMED',
+                '--add-opens', 'java.base/java.lang=KiCadLogicalSchemeSimulator.simulator',
+        ]
+        args = [
+                '-wi', '10', // Number of warm-up iterations
+                '-w', '3', // time of warm-up iterations
+                '-i', '10', // Number of iterations
+                '-r', '3', // time of iterations
+                '-f1', // Number of forks
+                '-t1', // Number of threads
+                "pko.KiCadLogicalSchemeSimulator.components.${project.name.toUpperCase()}.test.Benchmark.bench"//
+        ]
+    }
     dependencies {
         implementation project(":simulator")
         testImplementation project(":simulator").sourceSets.test.output
         testRuntimeOnly project(":simulator")
-
+        testImplementation libs.jmh
+        testAnnotationProcessor libs.jmh.annotations
     }
     tasks.named("jar") {
         doFirst {

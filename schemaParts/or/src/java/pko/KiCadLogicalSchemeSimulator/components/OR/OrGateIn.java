@@ -36,23 +36,24 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 
 public class OrGateIn extends InPin {
-    public final OrGate parent;
+    public final OrGate orGate;
     public final int mask;
     public final int nMask;
     public Pin out;
 
     public OrGateIn(String id, OrGate parent, int mask) {
         super(id, parent);
-        this.parent = parent;
+        orGate = parent;
         this.mask = mask;
-        this.nMask = ~mask;
+        nMask = ~mask;
         out = parent.getOutPin("OUT");
     }
 
+    @SuppressWarnings("unused")
     /*Optimiser constructor*/
     public OrGateIn(OrGateIn oldPin, String variantId) {
         super(oldPin, variantId);
-        parent = oldPin.parent;
+        orGate = oldPin.orGate;
         mask = oldPin.mask;
         nMask = oldPin.nMask;
         out = oldPin.out;
@@ -62,17 +63,17 @@ public class OrGateIn extends InPin {
     public void setHi() {
         /*Optimiser line setter*/
         state = true;
-        int state;
-        if ((state = parent.inState) == 0) {
+        int inState = orGate.inState;
+        if (inState == 0) {
             /*Optimiser bind mask*/
-            parent.inState = mask;
+            inState = mask;
             /*Optimiser line o block r*/
-            if (parent.reverse) {
+            if (orGate.reverse) {
                 out.setLo();
                 /*Optimiser line o blockEnd r block nr*/
             } else {
                 /*Optimiser line o block oc*/
-                if (parent.params.containsKey("openCollector")) {
+                if (orGate.params.containsKey("openCollector")) {
                     out.setHiImpedance();
                     /*Optimiser line o blockEnd oc block rc*/
                 } else {
@@ -81,25 +82,25 @@ public class OrGateIn extends InPin {
                 }
                 /*Optimiser line o blockEnd nr*/
             }
-            return;
         } else {
             /*Optimiser bind mask*/
-            parent.inState = state | mask;
+            inState |= mask;
         }
+        orGate.inState = inState;
     }
 
     @Override
     public void setLo() {
         /*Optimiser line setter*/
         state = false;
-        int state;
+        int inState = orGate.inState;
         /*Optimiser bind mask*/
-        if ((state = parent.inState) == mask) {
-            parent.inState = 0;
+        if (inState == mask) {
+            inState = 0;
             /*Optimiser line o block r*/
-            if (parent.reverse) {
+            if (orGate.reverse) {
                 /*Optimiser line o block oc*/
-                if (parent.params.containsKey("openCollector")) {
+                if (orGate.params.containsKey("openCollector")) {
                     out.setHiImpedance();
                     /*Optimiser line o blockEnd oc block rc*/
                 } else {
@@ -111,32 +112,32 @@ public class OrGateIn extends InPin {
                 out.setLo();
                 /*Optimiser line o blockEnd nr*/
             }
-            return;
         } else {
             /*Optimiser bind nMask*/
-            parent.inState = state & nMask;
+            inState &= nMask;
         }
+        orGate.inState = inState;
     }
 
     @Override
-    public InPin getOptimised(ModelItem<?> source) {
+    public InPin getOptimised(ModelItem<?> inSource) {
         ClassOptimiser<OrGateIn> optimiser = new ClassOptimiser<>(this).bind("mask", mask).bind("nMask", nMask).cut("o");
-        if (parent.reverse) {
+        if (orGate.reverse) {
             optimiser.cut("nr");
         } else {
             optimiser.cut("r");
         }
-        if (parent.params.containsKey("openCollector")) {
+        if (orGate.params.containsKey("openCollector")) {
             optimiser.cut("rc");
         } else {
             optimiser.cut("oc");
         }
-        if (source != null) {
+        if (inSource != null) {
             optimiser.cut("setter");
         }
         OrGateIn build = optimiser.build();
-        parent.replaceIn(this, build);
-        build.source = source;
+        orGate.replaceIn(this, build);
+        build.source = inSource;
         return build;
     }
 }
