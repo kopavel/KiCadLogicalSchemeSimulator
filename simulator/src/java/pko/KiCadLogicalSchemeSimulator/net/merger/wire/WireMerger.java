@@ -91,6 +91,7 @@ public class WireMerger extends OutPin {
     }
 
     private void addSource(OutPin pin) {
+        triStateOut |= pin.triStateOut;
         if (pin instanceof PullPin pullPin) {
             sources.add(pullPin);
             if (weakState != 0 && pin.state != (weakState > 0)) {
@@ -127,7 +128,7 @@ public class WireMerger extends OutPin {
 
     @Override
     public Pin getOptimised(ModelItem<?> source) {
-        hiImpedance = isTriState(null);
+     hiImpedance = isTriState(null) & weakState==0;
         for (int i = 0; i < destinations.length; i++) {
             destinations[i] = destinations[i].getOptimised(this);
         }
