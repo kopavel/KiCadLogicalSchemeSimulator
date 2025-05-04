@@ -135,7 +135,10 @@ configure(subprojects) {
         group = '_build'
         dependsOn(rootProject.tasks.named('cleanBuild'))
     }
-
+    tasks.withType(Test).configureEach {
+        outputs.upToDateWhen { false }
+        outputs.cacheIf { false }
+    }
 }
 
 idea {
