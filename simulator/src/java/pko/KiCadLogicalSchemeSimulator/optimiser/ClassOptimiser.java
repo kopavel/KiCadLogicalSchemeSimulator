@@ -40,13 +40,17 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.regex.Pattern;
 
 import static pko.KiCadLogicalSchemeSimulator.tools.Utils.countLeadingSpaces;
 import static pko.KiCadLogicalSchemeSimulator.tools.Utils.regexEscape;
 
 public class ClassOptimiser<T> {
     private static final Map<String, Class<?>> dynamicClasses = new HashMap<>();
-    final List<String> cutList = new ArrayList<>();
+    private static final Pattern UNROLL_INDEX_POWER = Pattern.compile("unrollIndexPower");
+    private static final Pattern PATTERN = Pattern.compile("[^a-zA-Z0-9_$]");
+    private static final Pattern UNROLL_INDEX = Pattern.compile("unrollIndex");
+    private final List<String> cutList = new ArrayList<>();
     private final Map<String, String> binds = new HashMap<>();
     private final T oldInstance;
     private final Class<?> sourceClass;
@@ -99,7 +103,7 @@ public class ClassOptimiser<T> {
 
     public ClassOptimiser<T> bind(String bindName, String replacement) {
         binds.put(bindName, replacement);
-        suffix += "_" + bindName + "_" + replacement.replaceAll("[^a-zA-Z0-9_$]", "_");
+        suffix += "_" + bindName + "_" + PATTERN.matcher(replacement).replaceAll("_");
         return this;
     }
 
@@ -164,13 +168,13 @@ public class ClassOptimiser<T> {
 
     //ToDo `if` support
     private String process() {
-        Set<String> blocks = new HashSet<>();
-        Set<String> cutLines = new HashSet<>();
+        Collection<String> blocks = new HashSet<>();
+        Collection<String> cutLines = new HashSet<>();
         Map<String, String> bindPatterns = new HashMap<>();
         Map<String, String> iteratorPattern = new HashMap<>();
         String iteratorId = "d";
         boolean preserveFunction = false;
-        boolean skipFunction = false;
+        boolean keepFunction = true;
         boolean inAsserts = false;
         boolean inComment = false;
         int functionOffset = -1;
@@ -180,12 +184,13 @@ public class ClassOptimiser<T> {
         StringBuilder functionSource = new StringBuilder();
         StringBuilder addFunctionSource = new StringBuilder();
         try {
-            for (ListIterator<String> lines = source.listIterator(); lines.hasNext(); ) {
+            ListIterator<String> lines = source.listIterator();
+            while (lines.hasNext()) {
                 String line = lines.next();
                 int lineOffset = countLeadingSpaces(line);
                 //override getOptimised
-                if (line.contains("getOptimised(ModelItem<?> source)")) {
-                    skipFunction = true;
+                if (line.contains("getOptimised(ModelItem<?> ")) {
+                    keepFunction = false;
                     resultSource.append(line).append("\n").append("return this;\n}");
                 } else if (line.startsWith("import ")) {
                     //Copy imports
@@ -231,7 +236,7 @@ public class ClassOptimiser<T> {
                                     functionOffset = countLeadingSpaces(line);
                                     line = lines.next();//load constructor definition
                                     int paramNamePos = line.indexOf(' ', line.indexOf('('));
-                                    oldItemName = line.substring(paramNamePos, line.indexOf(",", paramNamePos));
+                                    oldItemName = line.substring(paramNamePos, line.indexOf(',', paramNamePos));
                                     functionSource =
                                             new StringBuilder(line.replace(sourceClass.getSimpleName() + "(", sourceClass.getSimpleName() + suffix + "(")).append(
                                                     "\n");
@@ -269,9 +274,10 @@ public class ClassOptimiser<T> {
                                                              .append(blockTab)
                                                              .append("}\n\n")
                                                              .append(blockTab)
-                                                             .append("public void splitDestinations () {\n");
+                                                             .append("private void splitDestinations () {\n");
                                         }
-                                        for (int j = 0; j < unrolls.get(id).size; j++) {
+                                        int amount = unrolls.get(id).size;
+                                        for (int j = 0; j < amount; j++) {
                                             //add destination variables initialisation
                                             addFunctionSource.append(lineTab)
                                                              .append(iteratorParams[0])
@@ -327,13 +333,13 @@ public class ClassOptimiser<T> {
                         preserveFunction = false;
                     } else if (lineOffset <= functionOffset && !line.isBlank()) {
                         //function end
-                        if (line.trim().equals("}")) {
+                        if ("}".equals(line.trim())) {
                             if (!addFunctionSource.isEmpty()) {
                                 functionSource.append(addFunctionSource);
                                 addFunctionSource = new StringBuilder();
                             }
                             functionSource.append(line).append("\n");
-                            if (preserveFunction && !skipFunction) {
+                            if (preserveFunction && keepFunction) {
                                 resultSource.append("\n").append(functionSource);
                             }
                             functionOffset = -1;
@@ -344,7 +350,7 @@ public class ClassOptimiser<T> {
                             functionSource = new StringBuilder(line).append("\n");
                         }
                         preserveFunction = false;
-                        skipFunction = false;
+                        keepFunction = true;
                     } else {
                         String finalLine = line;
                         //cut lines
@@ -370,10 +376,11 @@ public class ClassOptimiser<T> {
                             //iterator block end — unroll it
                             UnrollDescriptor descriptor = unrolls.get(iteratorId);
                             for (int j = 0; j < descriptor.size; j++) {
-                                functionSource.append(iteratorSource.toString()
-                                                                    .replaceAll("(?<=\\W|^)" + descriptor.variable + "(?=\\W|$)", descriptor.variable + j)
-                                                                    .replaceAll("unrollIndexPower", String.valueOf((int) Math.pow(2, j)))
-                                                                    .replaceAll("unrollIndex", String.valueOf(j)));
+                                functionSource.append(UNROLL_INDEX.matcher(UNROLL_INDEX_POWER.matcher(iteratorSource.toString()
+                                                                                                                    .replaceAll("(?<=\\W|^)" + descriptor.variable +
+                                                                                                                            "(?=\\W|$)", descriptor.variable + j))
+                                                                                             .replaceAll(String.valueOf((int) Math.pow(2, j))))
+                                                                  .replaceAll(String.valueOf(j)));
                             }
                             iteratorOffset = -1;
                         } else {
@@ -435,11 +442,11 @@ public class ClassOptimiser<T> {
         throw new NoSuchFieldException("Field '" + fieldName + "' not found in class hierarchy.");
     }
 
-    private static class UnrollDescriptor {
+    private static final class UnrollDescriptor {
         public int size;
         public String variable;
 
-        public UnrollDescriptor(int size) {
+        private UnrollDescriptor(int size) {
             this.size = size;
         }
     }
