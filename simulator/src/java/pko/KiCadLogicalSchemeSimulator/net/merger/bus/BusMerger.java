@@ -132,7 +132,7 @@ public class BusMerger extends OutBus {
     }
 
     @Override
-    public Bus getOptimised(ModelItem<?> source) {
+    public Bus getOptimised(ModelItem<?> inSource) {
         for (int i = 0; i < destinations.length; i++) {
             destinations[i] = destinations[i].getOptimised(this);
         }

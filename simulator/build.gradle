@@ -113,7 +113,7 @@ run {
                  "-XX:MaxInlineLevel=20",
                  "-XX:FreqInlineSize=360",
                  "-XX:ParallelGCThreads=1",
-//                 "-XX:+UnlockDiagnosticVMOptions", "-XX:+DebugNonSafepoints", //"-XX:+UseCountedLoopSafepoints", "-XX:LoopStripMiningIter=1",
+                 "-XX:+UnlockDiagnosticVMOptions", "-XX:+DebugNonSafepoints", //"-XX:+UseCountedLoopSafepoints", "-XX:LoopStripMiningIter=1",
                  "--add-opens", "java.base/java.lang=KiCadLogicalSchemeSimulator.simulator",
                  "--enable-native-access=com.formdev.flatlaf",
                  "-Xmx256m"//, "-XX:+UseLargePages"
@@ -141,7 +141,7 @@ run {
         workingDir = "$rootDir/stuff/work"
     }
 }
-tasks.register("runJmh", JavaExec) {
+tasks.register("bench", JavaExec) {
     group = 'Benchmark'
     description = 'Run JMH benchmarks'
     classpath = sourceSets.test.runtimeClasspath
@@ -170,7 +170,6 @@ tasks.register("runJmh", JavaExec) {
 //            "pko.KiCadLogicalSchemeSimulator.test.benchmarks.OffsetBusBenchmark.optimiser",//
 //            "pko.KiCadLogicalSchemeSimulator.test.benchmarks.WireToBusBenchmark.optimiser",//
             //"pko.KiCadLogicalSchemeSimulator.test.benchmarks.BusToWireBenchmark.optimiser",//
-            "pko.KiCadLogicalSchemeSimulator.test.benchmarks.CounterBenchmark.counter"//
     ]
 }
 apply from: "$rootDir/gradle/examples.gradle"

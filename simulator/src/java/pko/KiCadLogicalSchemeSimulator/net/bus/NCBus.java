@@ -53,7 +53,7 @@ public class NCBus extends OutBus {
     }
 
     @Override
-    public Bus getOptimised(ModelItem<?> source) {
+    public Bus getOptimised(ModelItem<?> inSource) {
         return this;
     }
 }

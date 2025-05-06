@@ -42,12 +42,11 @@ import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.war
 
 public class MaskGroupBus extends OutBus {
     public int queueState;
-    public boolean queueImpedance;
     protected int maskState;
 
     public MaskGroupBus(OutBus source, int mask, String variantId) {
         super(source, variantId + ":mask" + mask);
-        triStateIn=false;
+        triStateIn = false;
         this.mask = mask;
     }
 
@@ -67,35 +66,36 @@ public class MaskGroupBus extends OutBus {
 
     @Override
     public void setState(int newState) {
-        /*Optimiser line ts block setter*/
-        hiImpedance = false;
+        /*Optimiser line setter*/
         state = newState;
-        /*Optimiser blockEnd setter*/
-        final int newMaskState;
         /*Optimiser bind m:mask*/
-        if (maskState != (newMaskState = newState & mask)
-                /*Optimiser line ts bind d:destinations[0]*///
-                || destinations[0].hiImpedance //
+        int newMaskState = newState & mask;
+        if (maskState != newMaskState
+                /*Optimiser line ts*///
+                || hiImpedance //
         ) {
+            /*Optimiser line ts*/
+            hiImpedance = false;
+            maskState = newMaskState;
             /*Optimiser blockEnd mask block ar*/
             switch (processing++) {
                 case 0: {
                     /*Optimiser blockEnd ar */
-                    maskState = newMaskState;
                     for (Bus destination : destinations) {
                         destination.setState(newMaskState);
                     }
                     /*Optimiser block r block ar*/
                     while (--processing > 0) {
                         /*Optimiser block ts*/
-                        if (queueImpedance) {
+                        if (hiImpedance) {
                             for (Bus destination : destinations) {
                                 destination.setHiImpedance();
                             }
                         } else {
                             /*Optimiser blockEnd ts*/
+                            newMaskState=queueState;
                             for (Bus destination : destinations) {
-                                destination.setState(queueState);
+                                destination.setState(newMaskState);
                             }
                             /*Optimiser line ts*/
                         }
@@ -106,8 +106,6 @@ public class MaskGroupBus extends OutBus {
                 }
                 case 1: {
                     queueState = newMaskState;
-                    /*Optimiser line ts*/
-                    queueImpedance = false;
                     return;
                 }
                 case 2: {
@@ -121,7 +119,7 @@ public class MaskGroupBus extends OutBus {
 
     @Override
     public void setHiImpedance() {
-        /*Optimiser block ts line setter*/
+        /*Optimiser block ts*/
         hiImpedance = true;
         /*Optimiser block ar*/
         switch (processing++) {
@@ -146,10 +144,6 @@ public class MaskGroupBus extends OutBus {
                 processing = 0;
                 return;
             }
-            case 1: {
-                queueImpedance = false;
-                return;
-            }
             case 2: {
                 recurseError();
                 return;
@@ -159,18 +153,18 @@ public class MaskGroupBus extends OutBus {
     }
 
     @Override
-    public Bus getOptimised(ModelItem<?> source) {
+    public Bus getOptimised(ModelItem<?> inSource) {
         if (destinations.length == 0) {
             throw new RuntimeException("unconnected MaskGroupBus " + getName());
         } else if (destinations.length == 1 && destinations[0] instanceof SupportMask) {
             destinations[0].applyMask = mask;
-            return destinations[0].getOptimised(source).copyState(this);
+            return destinations[0].getOptimised(inSource).copyState(this);
         } else {
             for (int i = 0; i < destinations.length; i++) {
                 destinations[i] = destinations[i].getOptimised(this);
             }
-            ClassOptimiser<MaskGroupBus> optimiser = new ClassOptimiser<>(this).unroll(destinations.length).bind("m", mask).bind("d", "destination0");
-            if (source != null) {
+            ClassOptimiser<MaskGroupBus> optimiser = new ClassOptimiser<>(this).unroll(destinations.length).bind("m", mask);
+            if (inSource != null) {
                 optimiser.cut("setter");
             }
             if (destinations.length < 2 || getRecursionMode() == none) {
@@ -180,11 +174,11 @@ public class MaskGroupBus extends OutBus {
             } else {
                 optimiser.cut("nr");
             }
-            if (!isTriState(source)) {
+            if (!isTriState(inSource)) {
                 optimiser.cut("ts");
             }
             MaskGroupBus build = optimiser.build();
-            build.source = source;
+            build.source = inSource;
             for (Bus destination : destinations) {
                 destination.source = build;
             }

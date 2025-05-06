@@ -65,61 +65,62 @@ public class OutBus extends Bus {
         mask = oldBus.mask;
     }
 
-    public void addDestination(Bus bus, int mask, byte offset) {
+    @SuppressWarnings("AssignmentToMethodParameter")
+    public void addDestination(Bus bus, int destMask, byte offset) {
         used = true;
         bus.used = true;
         bus.source = this;
         bus.state = state;
         bus.hiImpedance = hiImpedance;
-        triStateIn |= bus.triStateIn;
+        triStateIn = triStateIn || bus.triStateIn;
         if (offset != 0) {
-            if (corrected.containsKey(mask) && corrected.get(mask).containsKey(offset)) {
-                corrected.get(mask).get(offset).addDestination(bus);
+            if (corrected.containsKey(destMask) && corrected.get(destMask).containsKey(offset)) {
+                corrected.get(destMask).get(offset).addDestination(bus);
                 return;
             } else {
                 bus = new OffsetBus(this, bus, offset);
-                corrected.computeIfAbsent(mask, m -> new HashMap<>()).put(offset, (OffsetBus) bus);
+                corrected.computeIfAbsent(destMask, m -> new HashMap<>()).put(offset, (OffsetBus) bus);
             }
             int loweredMask;
-            loweredMask = mask | (offset > 0 ? 0 : Utils.getMaskForSize(-offset));
+            loweredMask = destMask | (offset > 0 ? 0 : Utils.getMaskForSize(-offset));
             if (!Integer.toBinaryString(loweredMask).contains("0")) {
-                mask = loweredMask;
+                destMask = loweredMask;
             }
         }
-        if (mask != this.mask) {
-            int finalMask = mask;
+        if (destMask == mask) {
+            destinations = Utils.addToArray(destinations, bus);
+        } else {
+            int finalMask = destMask;
             Arrays.stream(destinations)
-                    .filter(d -> d instanceof MaskGroupBus)
-                    .map(d -> ((MaskGroupBus) d))
-                    .filter(d -> d.mask == finalMask).findFirst().orElseGet(() -> {
+                    .filter(dest -> dest instanceof MaskGroupBus)
+                    .map(dest -> ((MaskGroupBus) dest))
+                    .filter(dest -> dest.mask == finalMask).findFirst().orElseGet(() -> {
                       MaskGroupBus groupBus = new MaskGroupBus(this, finalMask, "Mask" + finalMask);
                       destinations = Utils.addToArray(destinations, groupBus);
                       return groupBus;
                   }).addDestination(bus);
-        } else {
-            destinations = Utils.addToArray(destinations, bus);
         }
         sort();
     }
 
-    public void addDestination(Pin pin, int mask) {
+    public void addDestination(Pin pin, int destMask) {
         used = true;
         pin.used = true;
-        pin.state = (state & mask) > 0;
+        pin.state = (state & destMask) > 0;
         pin.hiImpedance = hiImpedance;
-        triStateIn |= pin.triStateIn;
+        triStateIn = triStateIn || pin.triStateIn;
         MaskGroupBus maskGroup = Arrays.stream(destinations)
-                .filter(d -> d instanceof MaskGroupBus)
-                .map(d -> ((MaskGroupBus) d))
-                .filter(d -> d.mask == mask).findFirst().orElseGet(() -> {
-                    MaskGroupBus groupBus = new MaskGroupBus(this, mask, "Mask" + mask);
+                .filter(dest -> dest instanceof MaskGroupBus)
+                .map(dest -> ((MaskGroupBus) dest))
+                .filter(dest -> dest.mask == destMask).findFirst().orElseGet(() -> {
+                    MaskGroupBus groupBus = new MaskGroupBus(this, destMask, "Mask" + destMask);
                     destinations = Utils.addToArray(destinations, groupBus);
                     return groupBus;
                 });
         Arrays.stream(maskGroup.destinations)
-                .filter(d -> d instanceof BusToWiresAdapter)
-                .map(d -> (BusToWiresAdapter) d).findFirst().orElseGet(() -> {
-                  BusToWiresAdapter busToWiresAdapter = new BusToWiresAdapter(this, mask);
+                .filter(dest -> dest instanceof BusToWiresAdapter)
+                .map(dest -> (BusToWiresAdapter) dest).findFirst().orElseGet(() -> {
+                  BusToWiresAdapter busToWiresAdapter = new BusToWiresAdapter(this, destMask);
                   maskGroup.destinations = Utils.addToArray(maskGroup.destinations, busToWiresAdapter);
                   return busToWiresAdapter;
               }).addDestination(pin);
@@ -159,7 +160,6 @@ public class OutBus extends Bus {
             }
             case 2: {
                 recurseError();
-                return;
             }
         }
         /*Optimiser blockEnd ar*/
@@ -195,7 +195,6 @@ public class OutBus extends Bus {
             }
             case 2: {
                 recurseError();
-                return;
             }
         }
         /*Optimiser blockEnd ar blockEnd ts*/
@@ -209,11 +208,11 @@ public class OutBus extends Bus {
     }
 
     @Override
-    public Bus getOptimised(ModelItem<?> source) {
+    public Bus getOptimised(ModelItem<?> inSource) {
         if (destinations.length == 0) {
             return new NCBus(this);
         } else if (destinations.length == 1) {
-            return destinations[0].getOptimised(source).copyState(this);
+            return destinations[0].getOptimised(inSource).copyState(this);
         } else {
             for (int i = 0; i < destinations.length; i++) {
                 destinations[i] = destinations[i].getOptimised(this);
@@ -226,11 +225,11 @@ public class OutBus extends Bus {
             } else {
                 optimiser.cut("nr");
             }
-            if (!isTriState(source)) {
+            if (!isTriState(inSource)) {
                 optimiser.cut("ts");
             }
             OutBus build = optimiser.build();
-            build.source = source;
+            build.source = inSource;
             for (Bus destination : destinations) {
                 destination.source = build;
             }
@@ -240,9 +239,9 @@ public class OutBus extends Bus {
 
     private void sort() {
         destinations = Stream.concat(Arrays.stream(destinations)
-                        .filter(d -> !(d instanceof MaskGroupBus)),
+                        .filter(dest -> !(dest instanceof MaskGroupBus)),
                 Arrays.stream(destinations)
-                        .filter(d -> d instanceof MaskGroupBus)
-                        .map(d -> (MaskGroupBus) d).sorted(Comparator.comparingLong(d -> d.mask))).toArray(Bus[]::new);
+                        .filter(dest -> dest instanceof MaskGroupBus)
+                        .map(dest -> (MaskGroupBus) dest).sorted(Comparator.comparingLong(dest -> dest.mask))).toArray(Bus[]::new);
     }
 }

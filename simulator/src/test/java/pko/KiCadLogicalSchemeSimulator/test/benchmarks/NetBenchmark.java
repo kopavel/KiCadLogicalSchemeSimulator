@@ -29,30 +29,29 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.components.OR.test;
+package pko.KiCadLogicalSchemeSimulator.test.benchmarks;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openjdk.jmh.runner.options.TimeValue;
-import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
+import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.test.schemaPartTester.NetTester;
 
 import java.util.concurrent.TimeUnit;
 
 @State(Scope.Benchmark)
-public class Benchmark extends NetTester {
+public class NetBenchmark extends NetTester {
     private final static boolean TEST = true;
-    private Pin out1;
-    private Pin out2;
+    private Bus out;
 
     public static void main(String[] args) throws Throwable {
         if (TEST) {
             Options options = new OptionsBuilder()//
-                                                  .include(Benchmark.class.getSimpleName())
-                                                  .warmupIterations(10)
+                                                  .include(NetBenchmark.class.getSimpleName())
+                                                  .warmupIterations(5)
                                                   .warmupTime(TimeValue.seconds(3))
-                                                  .measurementIterations(10)
+                                                  .measurementIterations(5)
                                                   .measurementTime(TimeValue.seconds(3))
                                                   .mode(Mode.Throughput)
                                                   .timeUnit(TimeUnit.SECONDS)
@@ -60,10 +59,10 @@ public class Benchmark extends NetTester {
                                                   .build();
             new Runner(options).run();
         } else {
-            Benchmark benchmark = new Benchmark();
+            NetBenchmark benchmark = new NetBenchmark();
             benchmark.setup();
             for (int i = 0; i < 1000; i++) {
-                benchmark.bench();
+                benchmark.netBench();
             }
         }
     }
@@ -71,37 +70,31 @@ public class Benchmark extends NetTester {
     @Setup
     public void setup() throws Exception {
         loadNet();
-        out1 = outPin("OutPin1");
-        out2 = outPin("OutPin2");
+        out = outBus("OutBus");
     }
 
-    @org.openjdk.jmh.annotations.Benchmark
-    @Fork(1)
-    @Warmup(iterations = 3, time = 10)
-    @Measurement(iterations = 3, time = 10)
-    @OutputTimeUnit(TimeUnit.SECONDS)
-    public void bench() {
+    @Benchmark()
+    public void netBench() {
         for (int i = 0; i < 10000000; i++) {
-            out1.setHi();
-            out2.setHi();
-            out1.setLo();
-            out2.setLo();
-            out1.setHi();
-            out2.setHi();
-            out1.setLo();
-            out2.setLo();
-            out1.setHi();
-            out1.setLo();
+            out.setState(0);
+            out.setState(0xff);
+            out.setHiImpedance();
+            out.setState(0xff);
+            out.setState(0);
+            out.setState(0);
+            out.setState(0xff);
+            out.setHiImpedance();
+            out.setState(0xff);
+            out.setState(0);
         }
     }
 
-    @Override
     protected String getNetFilePath() {
-        return "test/resources/Or.net";
+        return "simulator/src/test/resources/netBench.net";
     }
 
     @Override
     protected String getRootPath() {
-        return "../..";
+        return ".";
     }
 }

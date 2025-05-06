@@ -91,7 +91,7 @@ public abstract class SchemaPart {
         });
     }
 
-    public <T extends InPin> T addInPin(T pin) {
+    public final <T extends InPin> T addInPin(T pin) {
         if (pinType.containsKey(pin.id)) {
             throw new RuntimeException("Double pin name in " + id + ":" + pin.id);
         } else {
@@ -135,7 +135,7 @@ public abstract class SchemaPart {
         ids.put(outPins.get(pinId), pinId);
     }
 
-    public void addOutPin(String pinId, boolean state) {
+    public final void addOutPin(String pinId, boolean state) {
         addOutPin(pinId);
         OutPin pin = (OutPin) outPins.get(pinId);
         pin.state = state;
@@ -151,11 +151,11 @@ public abstract class SchemaPart {
         ids.put(outPins.get(pinId), pinId);
     }
 
-    public void addTriStateOutPin(String pinId, boolean state) {
+    public final void addTriStateOutPin(String pinId, boolean state) {
         addTriStateOutPin(pinId);
         OutPin pin = (OutPin) outPins.get(pinId);
         pin.state = state;
-        pin.hiImpedance=false;
+        pin.hiImpedance = false;
     }
 
     public InBus addInBus(String pinId, int size, String... names) {
@@ -303,8 +303,6 @@ public abstract class SchemaPart {
                 for (String alias : outPin.getAliases()) {
                     outPins.put(alias, newOutPin);
                 }
-            } else if (!(outPin instanceof Pin)) {
-                throw new RuntimeException("Unsupported item: " + outPin.getClass().getName());
             }
         }
     }

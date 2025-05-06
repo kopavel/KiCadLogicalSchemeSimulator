@@ -49,7 +49,7 @@ public class OffsetBus extends OutBus implements SupportOffset, SupportMask {
 
     public OffsetBus(OutBus outBus, Bus destination, byte offset) {
         super(outBus, "offset" + offset);
-        triStateIn=destination.triStateIn;
+        triStateIn = destination.triStateIn;
         if (offset == 0) {
             throw new RuntimeException("Offset must not be 0");
         }
@@ -72,22 +72,22 @@ public class OffsetBus extends OutBus implements SupportOffset, SupportMask {
         } else if (offset < 0) {
             item.state = item.state >> -offset;
         }
-        triStateIn|=item.triStateIn;
+        triStateIn |= item.triStateIn;
         destinations = Utils.addToArray(destinations, item);
     }
 
     @Override
     public void setState(int newState) {
-        /*Optimiser line ts  block setter*/
-        hiImpedance = false;
+        /*Optimiser line setter*/
         state = newState;
-        /*Optimiser blockEnd setter*/
-        final int newMaskState;
+        int newMaskState = newState & mask;
         /*Optimiser block mask bind m:mask*/
-        if (maskState != (newMaskState = newState & mask)
-                /*Optimiser line ts bind d:destinations[0]*///
-                || destinations[0].hiImpedance //
+        if (maskState != newMaskState
+                /*Optimiser line ts*///
+                || hiImpedance //
         ) {
+            /*Optimiser line ts*/
+            hiImpedance = false;
             maskState = newMaskState;
             /*Optimiser blockEnd mask block ar */
             switch (processing++) {
@@ -115,15 +115,16 @@ public class OffsetBus extends OutBus implements SupportOffset, SupportMask {
                             }
                         } else {
                             /*Optimiser blockEnd ts*/
+                            newMaskState=maskState;
                             for (Bus destination : destinations) {
                                 /*Optimiser block positive line negative*/
                                 if (offset > 0) {
                                     /*Optimiser bind o:offset*/
-                                    destination.setState(maskState << offset);
+                                    destination.setState(newMaskState << offset);
                                     /*Optimiser block negative*/
                                 } else {
                                     /*Optimiser blockEnd positive bind o:-offset*/
-                                    destination.setState(maskState >> -offset);
+                                    destination.setState(newMaskState >> -offset);
                                     /*Optimiser line positive*/
                                 }
                                 /*Optimiser blockEnd negative*/
@@ -200,11 +201,11 @@ public class OffsetBus extends OutBus implements SupportOffset, SupportMask {
     }
 
     @Override
-    public Bus getOptimised(ModelItem<?> source) {
+    public Bus getOptimised(ModelItem<?> inSource) {
         if (destinations.length == 1 && destinations[0] instanceof SupportOffset && (applyMask == 0 || destinations[0] instanceof SupportMask)) {
             destinations[0].applyMask = applyMask;
             destinations[0].applyOffset = offset;
-            return destinations[0].getOptimised(source).copyState(this);
+            return destinations[0].getOptimised(inSource).copyState(this);
         } else {
             for (int i = 0; i < destinations.length; i++) {
                 destinations[i] = destinations[i].getOptimised(this);
@@ -217,10 +218,10 @@ public class OffsetBus extends OutBus implements SupportOffset, SupportMask {
                 optimiser.bind("o", -offset);
                 optimiser.cut("positive");
             }
-            if (source != null) {
+            if (inSource != null) {
                 optimiser.cut("setter");
             }
-            if (!isTriState(source)) {
+            if (!isTriState(inSource)) {
                 optimiser.cut("ts");
             } else if (applyMask != 0) {
                 optimiser.bind("d", "destination0");
@@ -238,7 +239,7 @@ public class OffsetBus extends OutBus implements SupportOffset, SupportMask {
                 optimiser.bind("m", applyMask);
             }
             OffsetBus build = optimiser.build();
-            build.source = source;
+            build.source = inSource;
             for (Bus destination : destinations) {
                 destination.source = build;
             }

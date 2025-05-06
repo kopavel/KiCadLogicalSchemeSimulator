@@ -50,7 +50,7 @@ public class OrGateIn extends InPin {
     }
 
     @SuppressWarnings("unused")
-    /*Optimiser constructor*/
+    /*Optimiser constructor*///
     public OrGateIn(OrGateIn oldPin, String variantId) {
         super(oldPin, variantId);
         orGate = oldPin.orGate;
