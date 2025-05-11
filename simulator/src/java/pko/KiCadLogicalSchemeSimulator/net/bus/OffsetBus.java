@@ -72,7 +72,7 @@ public class OffsetBus extends OutBus implements SupportOffset, SupportMask {
         } else if (offset < 0) {
             item.state = item.state >> -offset;
         }
-        triStateIn |= item.triStateIn;
+        triStateIn = triStateIn || item.triStateIn;
         destinations = Utils.addToArray(destinations, item);
     }
 
@@ -144,7 +144,6 @@ public class OffsetBus extends OutBus implements SupportOffset, SupportMask {
                 /*Optimiser blockEnd ts*/
                 case 2: {
                     recurseError();
-                    return;
                 }
             }
             /*Optimiser blockEnd ar line mask*/
@@ -194,7 +193,6 @@ public class OffsetBus extends OutBus implements SupportOffset, SupportMask {
             }
             case 2: {
                 recurseError();
-                return;
             }
         }
         /*Optimiser blockEnd ar blockEnd ts*/

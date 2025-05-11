@@ -33,11 +33,11 @@ package pko.KiCadLogicalSchemeSimulator.api.wire;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 
 public abstract class FallingEdgePin extends InPin {
-    public FallingEdgePin(String id, SchemaPart parent) {
+    protected FallingEdgePin(String id, SchemaPart parent) {
         super(id, parent);
     }
 
-    public FallingEdgePin(Pin oldPin, String variantId) {
+    protected FallingEdgePin(Pin oldPin, String variantId) {
         super(oldPin, variantId);
     }
 

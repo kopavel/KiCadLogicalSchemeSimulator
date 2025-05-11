@@ -39,7 +39,7 @@ public class ByteRingBuffer extends RingBuffer {
 
     public ByteRingBuffer(int capacity) {
         super((capacity < 1) ? DEFAULT_CAPACITY : capacity);
-        this.data = new byte[this.capacity];
+        data = new byte[capacity];
     }
 
     @Override

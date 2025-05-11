@@ -47,14 +47,13 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.net.bus.BusInInterconnect;
 import pko.KiCadLogicalSchemeSimulator.net.merger.bus.BusMerger;
-import pko.KiCadLogicalSchemeSimulator.net.merger.wire.PassiveInMerger;
 import pko.KiCadLogicalSchemeSimulator.net.merger.wire.WireMerger;
-import pko.KiCadLogicalSchemeSimulator.net.wire.TriStateNCWire;
+import pko.KiCadLogicalSchemeSimulator.net.wire.NCWire;
+import pko.KiCadLogicalSchemeSimulator.net.wire.PassiveIn;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Export;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -73,7 +72,7 @@ public class Net {
     private final Map<IModelItem<?>, IModelItem<?>> replacement = new HashMap<>();
     public volatile boolean stabilizing = true;
 
-    public Net(Export export, String optimisedDir, ParameterResolver parameterResolver) throws IOException {
+    public Net(Export export, String optimisedDir, ParameterResolver parameterResolver) {
         this.optimisedDir = optimisedDir;
         this.parameterResolver = parameterResolver;
         Log.info(Net.class, "Start Net building");
@@ -82,7 +81,7 @@ public class Net {
             doFilter = false;
             for (NetFilter netFilter : ServiceLoader.load(NetFilter.class)) {
                 boolean filterResult = netFilter.doFilter(export, parameterResolver);
-                doFilter |= filterResult;
+                doFilter = doFilter || filterResult;
                 if (filterResult) {
                     Log.info(Net.class, "Filter " + netFilter.getClass().getSimpleName() + " modify NET");
                 }
@@ -96,7 +95,7 @@ public class Net {
         Log.info(Net.class, "Net build complete");
     }
 
-    public Pin processWire(Pin destination, List<OutPin> pins, List<PassivePin> passivePins, Map<OutBus, Integer> buses) {
+    public Pin processWire(Pin destination, List<? extends OutPin> pins, List<? extends PassivePin> passivePins, Map<OutBus, Integer> buses) {
         Pin retVal = null;
         if (buses.size() + pins.size() + passivePins.size() > 1) {
             //connect a destination to multiple sources throe Merger
@@ -146,7 +145,7 @@ public class Net {
             return;
         }
         Map<IModelItem<?>, Byte> sourcesOffset = new HashMap<>();
-        List<Pin> destinationPins = new ArrayList<>();
+        Collection<Pin> destinationPins = new ArrayList<>();
         Map<InBus, SortedSet<Byte>> destinationBusesOffsets = new HashMap<>();
         List<PassivePin> passivePins = new ArrayList<>();
         Boolean powerState = parameterResolver.getPowerState(net);
@@ -157,7 +156,7 @@ public class Net {
             }
             PinConfig pinConfig = parameterResolver.getPinConfig(node);
             String id = parameterResolver.getId(node);
-            SchemaPart schemaPart = this.schemaParts.computeIfAbsent(id, i -> createSchemaPart(schemaPartConfig.clazz, id, schemaPartConfig.getParamString()));
+            SchemaPart schemaPart = schemaParts.computeIfAbsent(id, s -> createSchemaPart(schemaPartConfig.clazz, id, schemaPartConfig.getParamString()));
             String pinName = pinConfig == null ? node.getPinfunction() : pinConfig.pinName;
             SchemaPart.PinType pinType = schemaPart.getPinType(pinName);
             if (pinType == null) {
@@ -232,7 +231,7 @@ public class Net {
         //Process Pin destinations
         //
         destinationPins.forEach((destinationPin) -> {
-            DestinationWireDescriptor descriptor = destinationWireDescriptors.computeIfAbsent(destinationPin, i -> new DestinationWireDescriptor(passivePins));
+            DestinationWireDescriptor descriptor = destinationWireDescriptors.computeIfAbsent(destinationPin, pin -> new DestinationWireDescriptor(passivePins));
             if (TRUE == powerState) {
                 SchemaPart pwr = createSchemaPart("Power", "pwr_" + destinationPin.getName(), "hi;strong");
                 schemaParts.put(pwr.id, pwr);
@@ -309,7 +308,7 @@ public class Net {
                             busMerger.addSource(wireMergers.get(passiveHash), offset);
                         } else {
                             //process unprocessed wire
-                            busMerger.addSource(Net.this, lists.pins, lists.passivePins, offset);
+                            busMerger.addSource(this, lists.pins, lists.passivePins, offset);
                         }
                     });
                     //add all buses
@@ -330,8 +329,7 @@ public class Net {
                 .stream()
                 .flatMap(p -> p.outPins.values()
                         .stream().distinct().toList()
-                        .stream())
-                .forEach(this::replaceOut);
+                        .stream()).forEach(Net::replaceOut);
         for (OutPin wireMerger : wireMergers.values()) {
             wireMerger.getOptimised(null);
         }
@@ -340,7 +338,7 @@ public class Net {
         }
     }
 
-    private void replaceOut(ModelItem<?> outItem) {
+    private static void replaceOut(ModelItem<?> outItem) {
         outItem.getParent().replaceOut(outItem);
     }
 
@@ -361,7 +359,7 @@ public class Net {
                 .stream()
                 .flatMap(p -> p.outPins.values()
                         .stream())
-                .filter(i -> !i.isHiImpedance())
+                .filter(modelItem -> !modelItem.isHiImpedance())
                 .distinct()
                 .forEach(item -> {
                     assert Log.debug(Net.class, "Resend pin {}", item);
@@ -370,14 +368,14 @@ public class Net {
                 });
         wireMergers.values()
                 .stream()
-                .filter(i -> !i.isHiImpedance()).distinct().forEach(item -> {
+                .filter(outPin -> !outPin.isHiImpedance()).distinct().forEach(item -> {
                        assert Log.debug(Net.class, "Resend pin {}", item);
                        item.resend();
                        resend();
                    });
         busMergers.values()
                 .stream()
-                .filter(i -> !i.isHiImpedance()).distinct().forEach(item -> {
+                .filter(merger -> !merger.isHiImpedance()).distinct().forEach(item -> {
                       assert Log.debug(Net.class, "Resend pin {}", item);
                       item.resend();
                       resend();
@@ -404,7 +402,7 @@ public class Net {
     }
 
     private void resend() {
-        ArrayList<IModelItem<?>> items = new ArrayList<>(forResend);
+        Iterable<IModelItem<?>> items = new ArrayList<>(forResend);
         forResend.clear();
         items.forEach(item -> {
             assert Log.debug(Net.class, "Resend postponed pin {}", item);
@@ -419,7 +417,7 @@ public class Net {
 
     public static class DestinationWireDescriptor {
         //Bus, offset
-        public final HashMap<OutBus, Integer> buses = new HashMap<>();
+        public final Map<OutBus, Integer> buses = new HashMap<>();
         //Pin, offset
         public final List<OutPin> pins = new ArrayList<>();
         public final List<PassivePin> passivePins;
@@ -439,9 +437,9 @@ public class Net {
 
     private static class DestinationBusDescriptor {
         //Bus, offset, mask
-        public final HashMap<OutBus, Map<Byte, Integer>> buses = new HashMap<>();
+        public final Map<OutBus, Map<Byte, Integer>> buses = new HashMap<>();
         //Pin, offset
-        public final HashMap<Byte, BusPinsOffset> offsets = new HashMap<>();
+        public final Map<Byte, BusPinsOffset> offsets = new HashMap<>();
 
         public boolean useBusMerger() {
             return buses.values()
@@ -469,8 +467,7 @@ public class Net {
                     if (!lists.passivePins.isEmpty()/*stream().anyMatch(p -> p.source != null)*/) {
                         //clean up all buses mask
                         buses.values()
-                                .stream()
-                                .flatMap(m -> m.entrySet()
+                                .stream().flatMap(map -> map.entrySet()
                                         .stream())
                                 .filter(o -> o.getKey() <= pinsOffset)
                                 .forEach(pair -> {

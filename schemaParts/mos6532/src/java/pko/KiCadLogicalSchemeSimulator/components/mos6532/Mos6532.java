@@ -59,7 +59,7 @@ public class Mos6532 extends SchemaPart {
     boolean pa7PositiveEdge;
     int timerDivider = 1;
     int timerCount;
-    int[] ram = new int[128];
+    final int[] ram = new int[128];
     boolean selected;
 
     protected Mos6532(String id, String sParam) {
@@ -72,7 +72,7 @@ public class Mos6532 extends SchemaPart {
             @Override
             public void setHi() {
                 state = true;
-                selected = cs1Pin.state & !cs2Pin.state;
+                selected = cs1Pin.state && !cs2Pin.state;
             }
 
             @Override
@@ -99,7 +99,7 @@ public class Mos6532 extends SchemaPart {
             @Override
             public void setHi() {
                 state = true;
-                selected = (!cs2Pin.state) & RESPin.state;
+                selected = (!cs2Pin.state) && RESPin.state;
                 if (!selected && !dOut.hiImpedance) {
                     dOut.setHiImpedance();
                 }
@@ -127,7 +127,7 @@ public class Mos6532 extends SchemaPart {
             @Override
             public void setLo() {
                 state = false;
-                selected = cs1Pin.state & RESPin.state;
+                selected = cs1Pin.state && RESPin.state;
                 if (!selected && !dOut.hiImpedance) {
                     dOut.setHiImpedance();
                 }
@@ -151,7 +151,7 @@ public class Mos6532 extends SchemaPart {
                 if (selected) {
                     if (RWPin.state) {
                         if (RSPin.state) {
-                            int addr = (int) aBus.state;
+                            int addr = aBus.state;
                             if ((addr & 0b100) == 0) {
                                 int mask;
                                 if ((mask = (addr & 3)) == 0) {
@@ -183,9 +183,8 @@ public class Mos6532 extends SchemaPart {
                                     IRQPin.setHiImpedance();
                                 }
                             }
-                            return;
                         } else {
-                            dOut.setState(ram[(int) aBus.state]);
+                            dOut.setState(ram[aBus.state]);
                         }
                     }
                 }
@@ -198,7 +197,7 @@ public class Mos6532 extends SchemaPart {
                 if (selected) {
                     if (!RWPin.state) {
                         if (RSPin.state) {
-                            int addr = (int) aBus.state;
+                            int addr = aBus.state;
                             if ((addr & 0b100) == 0) {
                                 int mask;
                                 if ((mask = (addr & 3)) == 0) {
@@ -217,7 +216,7 @@ public class Mos6532 extends SchemaPart {
                             }
                             if ((addr & 0b10000) > 0) {
                                 timerInterrupt = (aBus.state & 0b1000) > 0;
-                                timerCount = (timerDivider = switch ((int) (aBus.state & 3)) {
+                                timerCount = (timerDivider = switch ((aBus.state & 3)) {
                                     case 0 -> 1;
                                     case 1 -> 8;
                                     case 2 -> 64;
@@ -230,14 +229,13 @@ public class Mos6532 extends SchemaPart {
                                         IRQPin.setHiImpedance();
                                     }
                                 }
-                                return;
                             } else {
                                 pa7Interrupt = (aBus.state & 2) > 0;
                                 pa7PositiveEdge = (aBus.state & 1) > 0;
-                                return;
                             }
+                            return;
                         } else {
-                            ram[(int) aBus.state] = dIn.state;
+                            ram[aBus.state] = dIn.state;
                         }
                     }
                 }
@@ -274,7 +272,7 @@ public class Mos6532 extends SchemaPart {
         return () -> new MemoryDumpPanel(ram);
     }
 
-    private class Pins {
+    private final class Pins {
         final InPin[] ins = new InPin[8];
         final String suffix;
         final Pin[] outs = new Pin[8];
@@ -284,8 +282,8 @@ public class Mos6532 extends SchemaPart {
         private Pins(String suffix, Mos6532 parent) {
             this.suffix = suffix;
             for (int i = 0; i < 8; i++) {
-                if (suffix.equals("A") && i == 7) {
-                    ins[i] = addInPin(new InPin("PA7", parent) {
+                if ("A".equals(suffix) && i == 7) {
+                    ins[7] = addInPin(new InPin("PA7", parent) {
                         @Override
                         public void setHi() {
                             state = true;

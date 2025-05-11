@@ -34,11 +34,11 @@ import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 
 public abstract class InBus extends Bus {
-    public InBus(String id, SchemaPart parent, int size, String... names) {
+    protected InBus(String id, SchemaPart parent, int size, String... names) {
         super(id, parent, size, names);
     }
 
-    public InBus(Bus source, String variantId) {
+    protected InBus(Bus source, String variantId) {
         super(source, variantId);
     }
 

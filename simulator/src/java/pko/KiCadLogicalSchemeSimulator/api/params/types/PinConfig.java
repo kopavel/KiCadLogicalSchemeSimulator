@@ -31,8 +31,8 @@
  */
 package pko.KiCadLogicalSchemeSimulator.api.params.types;
 public class PinConfig {
-    public int unitNo;
-    public String pinName;
+    public final int unitNo;
+    public final String pinName;
 
     public PinConfig(int unitNo, String pinName) {
         this.pinName = pinName;

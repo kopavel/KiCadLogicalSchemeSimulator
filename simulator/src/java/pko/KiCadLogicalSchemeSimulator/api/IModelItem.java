@@ -47,7 +47,7 @@ public interface IModelItem<T> extends Comparable<IModelItem<T>> {
     String getId();
     IModelItem<T> getOptimised(ModelItem<?> source);
     void resend();
-    IModelItem<T> copyState(IModelItem<T> oldItem);
+    IModelItem<T> copyState(IModelItem<? extends T> oldItem);
     @SuppressWarnings("unchecked")
     default T getThis() {
         return (T) this;

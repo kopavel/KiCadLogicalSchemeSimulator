@@ -57,7 +57,7 @@ public class MultiPartCFallingIn extends FallingEdgePin implements MultiPartCIn 
         } else {
             outBus = parent.getOutBus("Q" + (char) ('a' + partNo));
         }
-        this.countMask = Utils.getMaskForSize(size);
+        countMask = Utils.getMaskForSize(size);
         this.partNo = partNo;
     }
 

@@ -65,7 +65,7 @@ public class OutPin extends Pin {
         pin.source = this;
         pin.state = state;
         pin.hiImpedance = hiImpedance;
-        triStateIn |= pin.triStateIn;
+        triStateIn = triStateIn || pin.triStateIn;
         if (!(pin instanceof NCWire)) {
             priority += pin.priority;
             destinations = Utils.addToArray(destinations, pin);
@@ -114,7 +114,6 @@ public class OutPin extends Pin {
             }
             case 2: {
                 recurseError();
-                return;
             }
         }
         /*Optimiser blockEnd ar*/
@@ -159,7 +158,6 @@ public class OutPin extends Pin {
             }
             case 2: {
                 recurseError();
-                return;
             }
         }
         /*Optimiser blockEnd ar*/
@@ -201,7 +199,6 @@ public class OutPin extends Pin {
             }
             case 2: {
                 recurseError();
-                return;
             }
         }
         /*Optimiser blockEnd ar blockEnd ts*/

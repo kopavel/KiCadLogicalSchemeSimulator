@@ -35,9 +35,7 @@ public class IoQueue {
     public Request request;
     public Request write;
     int lowByte;
-    private final Callback loReadWordCallback = lowByte -> {
-        this.lowByte = lowByte;
-    };
+    private final Callback loReadWordCallback = lowByte -> this.lowByte = lowByte;
     Callback wordCallback;
     private final Callback hiWordReadCallback = (hiByte) -> wordCallback.accept((hiByte << 8) | lowByte);
 

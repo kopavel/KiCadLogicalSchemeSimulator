@@ -49,7 +49,7 @@ public class BusyWaitMutex {
 
     public BusyWaitMutex(boolean initAcquiredState, boolean useThreadPark) {
         acquired = initAcquiredState;
-        this.initState = initAcquiredState;
+        initState = initAcquiredState;
     }
 
     public synchronized void acquire() {

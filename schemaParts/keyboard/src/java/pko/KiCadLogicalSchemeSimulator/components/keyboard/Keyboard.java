@@ -73,8 +73,8 @@ public class Keyboard extends SchemaPart implements InteractiveSchemaPart {
             @Override
             public void setLo() {
                 state = false;
-                if (out.state != busMap[(int) in.state] || out.hiImpedance) {
-                    out.setState(busMap[(int) in.state]);
+                if (out.state != busMap[in.state] || out.hiImpedance) {
+                    out.setState(busMap[in.state]);
                 }
             }
         });
@@ -82,8 +82,8 @@ public class Keyboard extends SchemaPart implements InteractiveSchemaPart {
             @Override
             public void setState(int newState) {
                 state = newState;
-                if (!enable.state && (out.state != busMap[(int) newState] || out.hiImpedance)) {
-                    out.setState(busMap[(int) newState]);
+                if (!enable.state && (out.state != busMap[newState] || out.hiImpedance)) {
+                    out.setState(busMap[newState]);
                 }
             }
         });

@@ -45,7 +45,6 @@ public class Ram extends SchemaPart {
     private final int[] words;
     private final InBus dIn;
     private final int size;
-    private final int aSize;
     private final InPin csPin;
     private final InPin oePin;
     private final Bus aBus;
@@ -64,6 +63,7 @@ public class Ram extends SchemaPart {
         } catch (NumberFormatException ignore) {
             throw new RuntimeException("Component " + id + " size must be positive number");
         }
+        int aSize;
         try {
             aSize = Integer.parseInt(params.get("aSize"));
         } catch (NumberFormatException ignore) {
@@ -135,7 +135,7 @@ public class Ram extends SchemaPart {
                 public void setLo() {
                     state = false;
                     if (!csPin.state) {
-                        words[(int) aBus.state] = dIn.state;
+                        words[aBus.state] = dIn.state;
                     }
                 }
             });
@@ -180,7 +180,7 @@ public class Ram extends SchemaPart {
                 public void setHi() {
                     state = true;
                     if (csPin.state) {
-                        words[(int) aBus.state] = dIn.state;
+                        words[aBus.state] = dIn.state;
                     }
                 }
 
@@ -199,8 +199,8 @@ public class Ram extends SchemaPart {
 
     @Override
     public String extraState() {
-        return "A:" + String.format("%0" + (int) Math.ceil(size / 4d) + "X", (int) aBus.state) + "\nD:" +
-                String.format("%0" + (int) Math.ceil(size / 4d) + "X", words[(int) aBus.state]);
+        return "A:" + String.format("%0" + (int) Math.ceil(size / 4.0d) + "X", aBus.state) + "\nD:" +
+                String.format("%0" + (int) Math.ceil(size / 4.0d) + "X", words[aBus.state]);
     }
 
     @Override
@@ -210,8 +210,8 @@ public class Ram extends SchemaPart {
 
     private void out() {
         if (oePin.state && csPin.state) {
-            if (dOut.hiImpedance || dOut.state != words[(int) aBus.state]) {
-                dOut.setState(words[(int) aBus.state]);
+            if (dOut.hiImpedance || dOut.state != words[aBus.state]) {
+                dOut.setState(words[aBus.state]);
             }
         } else if (!dOut.hiImpedance) {
             dOut.setHiImpedance();
@@ -219,12 +219,12 @@ public class Ram extends SchemaPart {
     }
 
     private void rOut() {
-        if (oePin.state | csPin.state) {
+        if (oePin.state || csPin.state) {
             if (!dOut.hiImpedance) {
                 dOut.setHiImpedance();
             }
-        } else if (dOut.hiImpedance || dOut.state != words[(int) aBus.state]) {
-            dOut.setState(words[(int) aBus.state]);
+        } else if (dOut.hiImpedance || dOut.state != words[aBus.state]) {
+            dOut.setState(words[aBus.state]);
         }
     }
 }

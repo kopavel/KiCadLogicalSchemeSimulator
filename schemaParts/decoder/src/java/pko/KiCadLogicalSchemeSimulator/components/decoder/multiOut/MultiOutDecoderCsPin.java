@@ -53,8 +53,8 @@ public class MultiOutDecoderCsPin extends InPin {
         this.csNo = csNo;
         this.parent = parent;
         this.part = part;
-        this.csRevert = part.CSs[csNo];
-        this.mask = 1 << csNo;
+        csRevert = part.CSs[csNo];
+        mask = 1 << csNo;
         int fullMask = Utils.getMaskForSize(part.CSs.length);
         nMask = ~mask & fullMask;
         aBus = parent.aBus;

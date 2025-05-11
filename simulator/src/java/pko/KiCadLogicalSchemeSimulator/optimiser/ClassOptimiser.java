@@ -443,7 +443,7 @@ public class ClassOptimiser<T> {
     }
 
     private static final class UnrollDescriptor {
-        public int size;
+        public final int size;
         public String variable;
 
         private UnrollDescriptor(int size) {

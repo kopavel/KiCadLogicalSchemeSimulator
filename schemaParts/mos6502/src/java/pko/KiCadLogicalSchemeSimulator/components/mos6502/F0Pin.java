@@ -68,7 +68,7 @@ public class F0Pin extends InPin {
         if (isReady) {
             if (request.read) {
                 request.address = -1;
-                request.callback.accept((int) dIn.state);
+                request.callback.accept(dIn.state);
             }
             if (opCode) {
                 syncPin.setLo();

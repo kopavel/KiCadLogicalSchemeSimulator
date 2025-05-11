@@ -36,16 +36,8 @@ import pko.KiCadLogicalSchemeSimulator.components.mos6502.queue.IoQueue;
  * A simple interface allows this 6502 to read and write to a simulated bus,
  * and exposes some internal state for inspection and debugging.
  */
-public class Cpu implements InstructionTable {
+public class Cpu extends InstructionTable {
     /* Process status register mnemonics */
-    public static final int P_CARRY = 0x01;
-    public static final int P_ZERO = 0x02;
-    public static final int P_IRQ_DISABLE = 0x04;
-    public static final int P_DECIMAL = 0x08;
-    public static final int P_BREAK = 0x10;
-    // Bit 5 always '1'
-    public static final int P_OVERFLOW = 0x40;
-    public static final int P_NEGATIVE = 0x80;
     // NMI vector
     public static final int NMI_VECTOR_L = 0xfffa;
     public static final int NMI_VECTOR_H = 0xfffb;
@@ -135,7 +127,7 @@ public class Cpu implements InstructionTable {
     private final Callback step2fCallback = tmp -> stepXf(tmp & 4);
     private final Callback step1fCallback = tmp -> stepXf(tmp & 2);
     private final Callback step0fCallback = tmp -> stepXf(tmp & 1);
-    int[] addressArray = new int[2];
+    final int[] addressArray = new int[2];
     /* Simulated behavior */
     @Setter
     @Getter
@@ -161,15 +153,11 @@ public class Cpu implements InstructionTable {
     private int writeAddress;
     private final Callback step0cCallback = tmp -> {
         setZeroFlag((state.a & tmp) == 0);
-        tmp |= state.a;
-        tmp = tmp & 0xff;
-        ioQueue.write(writeAddress, tmp);
+        ioQueue.write(writeAddress, tmp | state.a & 0xff);
     };
     private final Callback step1cCallback = tmp -> {
         setZeroFlag((state.a & tmp) == 0);
-        tmp &= ~(state.a);
-        tmp &= 0xff;
-        ioQueue.write(writeAddress, tmp);
+        ioQueue.write(writeAddress, tmp & ~(state.a) & 0xff);
     };
     private final Callback stepf7Callback = data -> ioQueue.write(writeAddress, data & 0xff | 0b10000000);
     private final Callback stepe7Callback = data -> ioQueue.write(writeAddress, data & 0xff | 0b01000000);
@@ -423,13 +411,13 @@ public class Cpu implements InstructionTable {
                 if (behavior == CpuBehavior.NMOS_6502 || behavior == CpuBehavior.NMOS_WITH_ROR_BUG) {
                     return;
                 }
-            case 0x01: // (Zero Page,X)
-            case 0x05: // Zero Page
-            case 0x0d: // Absolute
-            case 0x11: // (Zero Page),Y
-            case 0x15: // Zero Page,X
-            case 0x19: // Absolute,Y
-            case 0x1d: // Absolute,X
+            case 0x01, // (Zero Page,X)
+                 0x05, // Zero Page
+                 0x0d, // Absolute
+                 0x11,// (Zero Page),Y
+                 0x15, // Zero Page,X
+                 0x19, // Absolute,Y
+                 0x1d: // Absolute,X
                 ioQueue.read(effectiveAddress, setArithmeticFlagsOrStateA);
                 return;
             // ASL - Arithmetic Shift Left
@@ -437,10 +425,10 @@ public class Cpu implements InstructionTable {
                 state.a = asl(state.a);
                 setArithmeticFlags(state.a);
                 return;
-            case 0x06: // Zero Page
-            case 0x0e: // Absolute
-            case 0x16: // Zero Page,X
-            case 0x1e: // Absolute,X
+            case 0x06, // Zero Page
+                 0x0e, // Absolute
+                 0x16, // Zero Page,X
+                 0x1e: // Absolute,X
                 writeAddress = effectiveAddress;
                 ioQueue.read(effectiveAddress, stap1aCallback);
                 return;
@@ -452,9 +440,9 @@ public class Cpu implements InstructionTable {
                 if (behavior == CpuBehavior.NMOS_6502 || behavior == CpuBehavior.NMOS_WITH_ROR_BUG) {
                     return;
                 }
-            case 0x24: // Zero Page
-            case 0x2c: // Absolute
-            case 0x3c: // Absolute,X
+            case 0x24, // Zero Page
+                 0x2c, // Absolute
+                 0x3c: // Absolute,X
                 ioQueue.read(effectiveAddress, step3cCallback);
                 return;
             // AND - Logical AND
@@ -466,13 +454,13 @@ public class Cpu implements InstructionTable {
                 if (behavior == CpuBehavior.NMOS_6502 || behavior == CpuBehavior.NMOS_WITH_ROR_BUG) {
                     return;
                 }
-            case 0x21: // (Zero Page,X)
-            case 0x25: // Zero Page
-            case 0x2d: // Absolute
-            case 0x31: // (Zero Page),Y
-            case 0x35: // Zero Page,X
-            case 0x39: // Absolute,Y
-            case 0x3d: // Absolute,X
+            case 0x21, // (Zero Page,X)
+                 0x25, // Zero Page
+                 0x2d, // Absolute
+                 0x31, // (Zero Page),Y
+                 0x35, // Zero Page,X
+                 0x39, // Absolute,Y
+                 0x3d: // Absolute,X
                 ioQueue.read(effectiveAddress, setArithmeticFlagsAndStateA);
                 return;
             // ROL - Rotate Left
@@ -496,13 +484,13 @@ public class Cpu implements InstructionTable {
                 if (behavior == CpuBehavior.NMOS_6502 || behavior == CpuBehavior.NMOS_WITH_ROR_BUG) {
                     return;
                 }
-            case 0x41: // (Zero Page,X)
-            case 0x45: // Zero Page
-            case 0x4d: // Absolute
-            case 0x51: // (Zero Page,Y)
-            case 0x55: // Zero Page,X
-            case 0x59: // Absolute,Y
-            case 0x5d: // Absolute,X
+            case 0x41, // (Zero Page,X)
+                 0x45, // Zero Page
+                 0x4d, // Absolute
+                 0x51, // (Zero Page,Y)
+                 0x55, // Zero Page,X
+                 0x59, // Absolute,Y
+                 0x5d: // Absolute,X
                 ioQueue.read(effectiveAddress, setArithmeticFlagsXorStateA);
                 return;
             // LSR - Logical Shift Right
@@ -529,13 +517,13 @@ public class Cpu implements InstructionTable {
                 if (behavior == CpuBehavior.NMOS_6502 || behavior == CpuBehavior.NMOS_WITH_ROR_BUG) {
                     return;
                 }
-            case 0x61: // (Zero Page,X)
-            case 0x65: // Zero Page
-            case 0x6d: // Absolute
-            case 0x71: // (Zero Page),Y
-            case 0x75: // Zero Page,X
-            case 0x79: // Absolute,Y
-            case 0x7d: // Absolute,X
+            case 0x61, // (Zero Page,X)
+                 0x65, // Zero Page
+                 0x6d, // Absolute
+                 0x71, // (Zero Page),Y
+                 0x75, // Zero Page,X
+                 0x79, // Absolute,Y
+                 0x7d: // Absolute,X
                 ioQueue.read(effectiveAddress, step7dCallback);
                 return;
             // ROR - Rotate Right
@@ -555,13 +543,13 @@ public class Cpu implements InstructionTable {
                 if (behavior == CpuBehavior.NMOS_6502 || behavior == CpuBehavior.NMOS_WITH_ROR_BUG) {
                     return;
                 }
-            case 0x81: // (Zero Page,X)
-            case 0x85: // Zero Page
-            case 0x8d: // Absolute
-            case 0x91: // (Zero Page),Y
-            case 0x95: // Zero Page,X
-            case 0x99: // Absolute,Y
-            case 0x9d: // Absolute,X
+            case 0x81, // (Zero Page,X)
+                 0x85, // Zero Page
+                 0x8d, // Absolute
+                 0x91, // (Zero Page),Y
+                 0x95, // Zero Page,X
+                 0x99, // Absolute,Y
+                 0x9d: // Absolute,X
                 ioQueue.write(effectiveAddress, state.a);
                 return;
             // STY - Store Y Register
@@ -617,13 +605,13 @@ public class Cpu implements InstructionTable {
                 if (behavior == CpuBehavior.NMOS_6502 || behavior == CpuBehavior.NMOS_WITH_ROR_BUG) {
                     return;
                 }
-            case 0xa1: // (Zero Page,X)
-            case 0xa5: // Zero Page
-            case 0xad: // Absolute
-            case 0xb1: // (Zero Page),Y
-            case 0xb5: // Zero Page,X
-            case 0xb9: // Absolute,Y
-            case 0xbd: // Absolute,X
+            case 0xa1, // (Zero Page,X)
+                 0xa5, // Zero Page
+                 0xad, // Absolute
+                 0xb1, // (Zero Page),Y
+                 0xb5, // Zero Page,X
+                 0xb9, // Absolute,Y
+                 0xbd: // Absolute,X
                 ioQueue.read(effectiveAddress, setArithmeticFlagsStateA);
                 return;
             // CPY - Compare Y Register
@@ -642,13 +630,13 @@ public class Cpu implements InstructionTable {
                 if (behavior == CpuBehavior.NMOS_6502 || behavior == CpuBehavior.NMOS_WITH_ROR_BUG) {
                     return;
                 }
-            case 0xc1: // (Zero Page,X)
-            case 0xc5: // Zero Page
-            case 0xcd: // Absolute
-            case 0xd1: // (Zero Page),Y
-            case 0xd5: // Zero Page,X
-            case 0xd9: // Absolute,Y
-            case 0xdd: // Absolute,X
+            case 0xc1, // (Zero Page,X)
+                 0xc5, // Zero Page
+                 0xcd, // Absolute
+                 0xd1, // (Zero Page),Y
+                 0xd5, // Zero Page,X
+                 0xd9, // Absolute,Y
+                 0xdd: // Absolute,X
                 ioQueue.read(effectiveAddress, cmpStateA);
                 return;
             // DEC - Decrement Memory
@@ -686,13 +674,13 @@ public class Cpu implements InstructionTable {
                 if (behavior == CpuBehavior.NMOS_6502 || behavior == CpuBehavior.NMOS_WITH_ROR_BUG) {
                     return;
                 }
-            case 0xe1: // (Zero Page,X)
-            case 0xe5: // Zero Page
-            case 0xed: // Absolute
-            case 0xf1: // (Zero Page),Y
-            case 0xf5: // Zero Page,X
-            case 0xf9: // Absolute,Y
-            case 0xfd: // Absolute,X
+            case 0xe1, // (Zero Page,X)
+                 0xe5, // Zero Page
+                 0xed, // Absolute
+                 0xf1, // (Zero Page),Y
+                 0xf5, // Zero Page,X
+                 0xf9, // Absolute,Y
+                 0xfd: // Absolute,X
                 ioQueue.read(effectiveAddress, stepFdCallback);
                 return;
             // INC - Increment Memory
@@ -943,7 +931,6 @@ public class Cpu implements InstructionTable {
             // TODO: Create a flag to enable highly-accurate emulation of unimplemented instructions.
             default:
                 state.opTrap = true;
-                return;
         }
     };
     private final Callback step2_1Callback = read -> step3Callback.accept((read + state.y) & 0xffff);
@@ -1035,9 +1022,7 @@ public class Cpu implements InstructionTable {
                         return;
                     case 7: // Absolute, X
                         step3Callback.accept(xAddress(state.args[0], state.args[1]));
-                        return;
                 }
-                return;
         }
     };
     private final Callback step1Callback = read -> {
@@ -1045,7 +1030,7 @@ public class Cpu implements InstructionTable {
         incrementPC();
         state.opTrap = false;
         // Decode the instruction and operands
-        state.instSize = Cpu.instructionSizes[state.ir];
+        state.instSize = instructionSizes[state.ir];
         int length = state.instSize - 1;
         if (length > 0) {
             for (int i = 0; i < length; i++) {
@@ -1068,64 +1053,6 @@ public class Cpu implements InstructionTable {
 
     public Cpu(CpuBehavior behavior) {
         this.behavior = behavior;
-    }
-
-    /**
-     * Return a formatted string representing the last instruction and
-     * operands that were executed.
-     *
-     * @return A string representing the mnemonic and operands of the instruction
-     */
-    public static String disassembleOp(int opCode, int[] args) {
-        if (opCode < 0) {
-            return "Reading";
-        }
-        String mnemonic = opcodeNames[opCode];
-        if (mnemonic == null) {
-            return "???";
-        }
-        StringBuilder sb = new StringBuilder(mnemonic);
-        switch (instructionModes[opCode]) {
-            case ABS:
-                sb.append(" $").append(Utils.wordToHex(Utils.address(args[0], args[1])));
-                break;
-            case AIX:
-                sb.append(" ($").append(Utils.wordToHex(Utils.address(args[0], args[1]))).append(",X)");
-                break;
-            case ABX:
-                sb.append(" $").append(Utils.wordToHex(Utils.address(args[0], args[1]))).append(",X");
-                break;
-            case ABY:
-                sb.append(" $").append(Utils.wordToHex(Utils.address(args[0], args[1]))).append(",Y");
-                break;
-            case IMM:
-                sb.append(" #$").append(Utils.byteToHex(args[0]));
-                break;
-            case IND:
-                sb.append(" ($").append(Utils.wordToHex(Utils.address(args[0], args[1]))).append(")");
-                break;
-            case ZPI:
-                sb.append(" ($").append(Utils.byteToHex(args[0])).append(")");
-                break;
-            case XIN:
-                sb.append(" ($").append(Utils.byteToHex(args[0])).append(",X)");
-                break;
-            case INY:
-                sb.append(" ($").append(Utils.byteToHex(args[0])).append("),Y");
-                break;
-            case REL:
-            case ZPR:
-            case ZPG:
-                sb.append(" $").append(Utils.byteToHex(args[0]));
-                break;
-            case ZPX:
-                sb.append(" $").append(Utils.byteToHex(args[0])).append(",X");
-                break;
-            case ZPY:
-                sb.append(" $").append(Utils.byteToHex(args[0])).append(",Y");
-                break;
-        }
-        return sb.toString();
     }
 
     /**
@@ -1337,16 +1264,16 @@ public class Cpu implements InstructionTable {
      * Add with Carry (BCD).
      */
     private int adcDecimal(int acc, int operand) {
-        int l, h, result;
-        l = (acc & 0x0f) + (operand & 0x0f) + getCarryBit();
-        if ((l & 0xff) > 9) {
-            l += 6;
+        int i, h, result;
+        i = (acc & 0x0f) + (operand & 0x0f) + getCarryBit();
+        if ((i & 0xff) > 9) {
+            i += 6;
         }
-        h = (acc >> 4) + (operand >> 4) + (l > 15 ? 1 : 0);
+        h = (acc >> 4) + (operand >> 4) + (i > 15 ? 1 : 0);
         if ((h & 0xff) > 9) {
             h += 6;
         }
-        result = (l & 0x0f) | (h << 4);
+        result = (i & 0x0f) | (h << 4);
         result &= 0xff;
         setCarryFlag(h > 15);
         setZeroFlag(result == 0);
@@ -1375,16 +1302,16 @@ public class Cpu implements InstructionTable {
      * Subtract with Carry, BCD mode.
      */
     private int sbcDecimal(int acc, int operand) {
-        int l, h, result;
-        l = (acc & 0x0f) - (operand & 0x0f) - (state.carryFlag ? 0 : 1);
-        if ((l & 0x10) != 0) {
-            l -= 6;
+        int i, h, result;
+        i = (acc & 0x0f) - (operand & 0x0f) - (state.carryFlag ? 0 : 1);
+        if ((i & 0x10) != 0) {
+            i -= 6;
         }
-        h = (acc >> 4) - (operand >> 4) - ((l & 0x10) != 0 ? 1 : 0);
+        h = (acc >> 4) - (operand >> 4) - ((i & 0x10) != 0 ? 1 : 0);
         if ((h & 0x10) != 0) {
             h -= 6;
         }
-        result = (l & 0x0f) | (h << 4) & 0xff;
+        result = (i & 0x0f) | (h << 4) & 0xff;
         setCarryFlag((h & 0xff) < 15);
         setZeroFlag(result == 0);
         state.overflowFlag = false; // BCD never sets overflow flag

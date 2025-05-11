@@ -51,8 +51,8 @@ public class CInFallingPin extends FallingEdgePin {
     /*Optimiser constructor*/
     public CInFallingPin(CInFallingPin oldPin, String variantId) {
         super(oldPin, variantId);
-        this.countMask = oldPin.countMask;
-        this.out = oldPin.out;
+        countMask = oldPin.countMask;
+        out = oldPin.out;
         parent = oldPin.parent;
     }
 

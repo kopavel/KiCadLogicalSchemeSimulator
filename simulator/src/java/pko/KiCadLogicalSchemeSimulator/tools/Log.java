@@ -39,12 +39,11 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
-@SuppressWarnings({"unused", "UnusedReturnValue", "SameReturnValue"})
-public class Log {
+@SuppressWarnings({"BooleanMethodNameMustStartWithQuestion", "OverloadedMethodsWithSameNumberOfParameters", "OverloadedVarargsMethod", "unused", "UnusedReturnValue",
+        "StaticMethodOnlyUsedInOneClass", "SameReturnValue"})
+public enum Log {
+    ;
     private static final Map<Class<?>, org.apache.logging.log4j.Logger> loggers = new ConcurrentHashMap<>();
-
-    private Log() {
-    }
 
     public static boolean error(Class<?> clazz, String message, Object... o) {
         getLogger(clazz).error(message, o);
@@ -164,6 +163,7 @@ public class Log {
 
     private static Logger getLogger(Class<?> clazz) {
         if (!loggers.containsKey(clazz)) {
+            //noinspection SynchronizeOnThis
             synchronized (Log.class) {
                 if (!loggers.containsKey(clazz)) {
                     loggers.put(clazz, LogManager.getContext(clazz.getClassLoader(), false).getLogger(clazz));
@@ -173,7 +173,6 @@ public class Log {
         return loggers.get(clazz);
     }
 
-    @SuppressWarnings("deprecation")
     private static org.apache.logging.log4j.util.Supplier<?>[] t(java.util.function.Supplier<?>[] suppliers) {
         return Arrays.stream(suppliers)
                 .map(old -> (org.apache.logging.log4j.util.Supplier<?>) old::get).toArray(org.apache.logging.log4j.util.Supplier[]::new);

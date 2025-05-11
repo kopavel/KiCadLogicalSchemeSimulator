@@ -44,7 +44,7 @@ public class BusInInterconnect extends InBus {
         this.destination = destination;
         used = true;
         this.interconnectMask = interconnectMask;
-        this.senseMask = 1 << offset;
+        senseMask = 1 << offset;
     }
 
     /*Optimiser constructor*/

@@ -44,7 +44,7 @@ public class BufferCsPin extends InPin {
     public BufferCsPin(String id, Buffer parent, Bus dBus) {
         super(id, parent);
         this.parent = parent;
-        this.qBus = parent.getOutBus("Q");
+        qBus = parent.getOutBus("Q");
         this.dBus = dBus;
     }
 

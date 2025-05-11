@@ -101,7 +101,7 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus>, SupportMa
             newState = newState >> -applyOffset;
             /*Optimiser line o*/
         }
-        assert Log.debug(this.getClass(),
+        assert Log.debug(getClass(),
                 "Bus merger change. before: newState:{}, Source:{} (state:{},  hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{})",
                 newState,
                 getName(),
@@ -119,7 +119,7 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus>, SupportMa
                 if (merger.strongPins != 0) {
                     if (parent.net.stabilizing) {
                         parent.net.forResend.add(this);
-                        assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
+                        assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
                         return;
                     } else {
                         throw new ShortcutException(merger.sources);
@@ -165,7 +165,7 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus>, SupportMa
                 if ((merger.strongPins & mask) != 0) {
                     if (parent.net.stabilizing) {
                         parent.net.forResend.add(this);
-                        assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
+                        assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
                         return;
                     } else {
                         throw new ShortcutException(merger.sources);
@@ -203,7 +203,7 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus>, SupportMa
             }
             /*Optimiser blockEnd otherMask line o*/
         }
-        assert Log.debug(this.getClass(),
+        assert Log.debug(getClass(),
                 "Bus merger change. after: newState:{}, Source:{} (state:{},  hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{})",
                 newState,
                 getName(),
@@ -223,7 +223,7 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus>, SupportMa
         hiImpedance = true;
         BusMerger merger = this.merger;
         int newState;
-        assert Log.debug(this.getClass(),
+        assert Log.debug(getClass(),
                 "Bus merger setImpedance. before: Source:{} (state:{},  hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{})",
                 getName(),
                 getState(),
@@ -296,7 +296,7 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus>, SupportMa
             }
             /*Optimiser line o blockEnd otherMask*/
         }
-        assert Log.debug(this.getClass(),
+        assert Log.debug(getClass(),
                 "Bus merger setImpedance. after: Source:{} (state:{},  hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{})",
                 getName(),
                 getState(),

@@ -36,8 +36,8 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 public class RomCsPin extends InPin {
     public final RomABus aBus;
     public Bus dBus;
-    Rom parent;
-    int[] words;
+    final Rom parent;
+    final int[] words;
 
     public RomCsPin(String id, Rom parent) {
         super(id, parent);
@@ -50,10 +50,10 @@ public class RomCsPin extends InPin {
     @Override
     public void setHi() {
         state = true;
-        aBus.csActive = state;
+        aBus.csActive = true;
         int word;
         Bus bus;
-        if ((bus = dBus).state != (word = words[(int) aBus.state]) || bus.hiImpedance) {
+        if ((bus = dBus).state != (word = words[aBus.state]) || bus.hiImpedance) {
             bus.setState(word);
         }
     }
@@ -61,7 +61,7 @@ public class RomCsPin extends InPin {
     @Override
     public void setLo() {
         state = false;
-        aBus.csActive = state;
+        aBus.csActive = false;
         Bus bus;
         if (!(bus = dBus).hiImpedance) {
             bus.setHiImpedance();

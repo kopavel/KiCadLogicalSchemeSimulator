@@ -33,7 +33,7 @@ package pko.KiCadLogicalSchemeSimulator.tools.asyncConsumer;
 import java.util.concurrent.atomic.AtomicReference;
 
 public abstract class WeakAsyncConsumers<T> extends AsyncConsumers<T> {
-    public WeakAsyncConsumers(int size, int threads) {
+    protected WeakAsyncConsumers(int size, int threads) {
         super(size, threads);
     }
 
@@ -41,8 +41,8 @@ public abstract class WeakAsyncConsumers<T> extends AsyncConsumers<T> {
     public void accept(T payload) {
         Queue<T> currentQueue = queue;
         while (currentQueue != null) {
-            final Slot<T> slot = currentQueue.writeSlot;
-            final AtomicReference<T> currentPayload = slot.payload;
+            Slot<T> slot = currentQueue.writeSlot;
+            AtomicReference<T> currentPayload = slot.payload;
             if (currentPayload.getOpaque() == null) {
                 currentPayload.setOpaque(payload);
                 currentQueue.writeSlot = slot.nextSlot;

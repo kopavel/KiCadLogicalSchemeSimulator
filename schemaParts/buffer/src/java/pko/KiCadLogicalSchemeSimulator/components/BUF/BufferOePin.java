@@ -43,7 +43,7 @@ public class BufferOePin extends InPin {
     public BufferOePin(String id, Buffer parent) {
         super(id, parent);
         this.parent = parent;
-        this.qBus = parent.getOutBus("Q");
+        qBus = parent.getOutBus("Q");
     }
 
     /*Optimiser constructor*/

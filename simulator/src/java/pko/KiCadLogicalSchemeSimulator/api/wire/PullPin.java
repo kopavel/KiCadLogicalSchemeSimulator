@@ -37,7 +37,7 @@ import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
 public class PullPin extends OutPin implements MergerInput<Pin> {
     public PullPin(String id, SchemaPart parent, boolean state) {
         super(id, parent);
-        this.strong = false;
+        strong = false;
         hiImpedance = false;
         this.state = state;
     }

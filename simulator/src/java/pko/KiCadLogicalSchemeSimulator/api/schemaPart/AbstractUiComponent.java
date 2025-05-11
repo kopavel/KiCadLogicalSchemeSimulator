@@ -48,7 +48,7 @@ public abstract class AbstractUiComponent extends Component {
     public boolean sized;
     private int mouseX, mouseY;
 
-    public AbstractUiComponent(String title, int size) {
+    protected AbstractUiComponent(String title, int size) {
         this.title = title;
         this.size = size;
         addMouseListener(new MouseAdapter() {

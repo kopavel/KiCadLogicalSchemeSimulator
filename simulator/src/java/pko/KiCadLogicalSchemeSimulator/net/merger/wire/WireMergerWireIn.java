@@ -54,7 +54,8 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
         triStateIn = true;
     }
 
-    /*Optimiser constructor unroll destination:destinations*/
+    @SuppressWarnings("unused")
+    /*Optimiser constructor unroll destination:destinations*///
     public WireMergerWireIn(WireMergerWireIn oldPin, String variantId) {
         super(oldPin, variantId);
         destinations = oldPin.destinations;

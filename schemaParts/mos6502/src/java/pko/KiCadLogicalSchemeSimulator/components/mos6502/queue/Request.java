@@ -41,6 +41,6 @@ public class Request {
     public Request next;
 
     public String toString() {
-        return read ? "R:" + Utils.wordToHex(address) : "W:" + Utils.byteToHex((int) payload) + "->" + Utils.wordToHex(address);
+        return read ? "R:" + Utils.wordToHex(address) : "W:" + Utils.byteToHex(payload) + "->" + Utils.wordToHex(address);
     }
 }

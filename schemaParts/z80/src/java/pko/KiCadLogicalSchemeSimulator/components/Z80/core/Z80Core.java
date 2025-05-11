@@ -17,6 +17,7 @@
     Source gotten from https://github.com/codesqueak/Z80Processor and tuned for generating IO request in queue instead us read/write to/from BUS directly.
 */
 package pko.KiCadLogicalSchemeSimulator.components.Z80.core;
+import lombok.Getter;
 import pko.KiCadLogicalSchemeSimulator.components.Z80.core.queue.Callback;
 import pko.KiCadLogicalSchemeSimulator.components.Z80.core.queue.IoQueue;
 
@@ -74,26 +75,9 @@ public class Z80Core {
      * Public interfaces to processor control functions
      */
     private final Callback regPcCallback = word -> reg_PC = word;
-    int idxCBReg;
-    int idxCBAddress;
-    int idxCBBit;
-    private final Callback testIndexBitAddresscallback = temp ->
-            // check the bit position
-            testBitGeneric(idxCBBit, temp);
-    int testBitInMemoryBit;
-    private final Callback testBitInMemoryCallback = b -> testBitGeneric(testBitInMemoryBit, b);
     private IoQueue ioQueue;
-    private final Callback decode34Callback = b -> ioQueue.writeByte(getHL(), ALU8BitInc(b));
-    private final Callback decode35Callback = b -> ioQueue.writeByte(getHL(), ALU8BitDec(b));
-    private final Callback writeHLPCCallback = b -> {
-        ioQueue.writeByte(getHL(), b);
-        incPC();
-    };
-    private final Callback writeHl2PCCallback = word -> {
-        ioQueue.writeWord(word, getHL());
-        inc2PC();
-    };
-    private final Callback readWordToHl2PCCallback = fromPc -> ioQueue.readWord(fromPc, regHL2PCCallback);
+    private final Callback decode34Callback = i -> ioQueue.writeByte(getHL(), ALU8BitInc(i));
+    private final Callback decode35Callback = i -> ioQueue.writeByte(getHL(), ALU8BitDec(i));
     /*
      * *****************************************************************************
      *
@@ -139,11 +123,29 @@ public class Z80Core {
     private final Callback cbEECallback = b -> ioQueue.writeByte(getHL(), b | setBit5);
     private final Callback cbF6Callback = b -> ioQueue.writeByte(getHL(), b | setBit6);
     private final Callback cbFECallback = b -> ioQueue.writeByte(getHL(), b | setBit7);
+    private final Callback readWordToHl2PCCallback = fromPc -> ioQueue.readWord(fromPc, regHL2PCCallback);
+    private final Callback writeHLPCCallback = i -> {
+        ioQueue.writeByte(getHL(), i);
+        incPC();
+    };
+    private final Callback writeHl2PCCallback = word -> {
+        ioQueue.writeWord(word, getHL());
+        inc2PC();
+    };
+    private int idxCBReg;
+    private int idxCBAddress;
+    private int idxCBBit;
+    private final Callback testIndexBitAddresscallback = temp ->
+            // check the bit position
+            testBitGeneric(idxCBBit, temp);
     private final Callback testIndexBitCallback = idxCBAddress -> {
         this.idxCBAddress = idxCBAddress;
         ioQueue.readByte(idxCBAddress, testIndexBitAddresscallback);
     };
+    private int testBitInMemoryBit;
+    private final Callback testBitInMemoryCallback = i -> testBitGeneric(testBitInMemoryBit, i);
     private boolean halt;
+    @Getter
     private int tStates;
     /* registers */
     private int reg_B, reg_C, reg_D, reg_E, reg_H, reg_L;
@@ -853,7 +855,7 @@ public class Z80Core {
     };
     private int shiftRLCIndexedReg;
     private Callback getInOutAddressRegAConsumer;
-    private final Callback getInOutAddressRegACallback = b -> this.getInOutAddressRegAConsumer.accept((reg_A << 8) + b);
+    private final Callback getInOutAddressRegACallback = b -> getInOutAddressRegAConsumer.accept((reg_A << 8) + b);
     /* IN rr,(c) */
     private int inCReg;
     private final Callback inCCallback = temp -> {
@@ -1014,12 +1016,47 @@ public class Z80Core {
         loadIndex8BitImmediateAddress = address;
         ioQueue.readByte(reg_PC, loadIndex8BitImmediateAddressCallback);
     };
-
     public Z80Core(IoQueue ioQueue) {
         this.ioQueue = ioQueue;
         tStates = 0;
         //
         resetAddress = 0x0000;
+    }
+
+    /**
+     * Get the processor major CPU version number
+     *
+     * @return major revision number
+     */
+    public static String getMajorVersion() {
+        return "4";
+    }
+
+    /**
+     * Get the processor major CPU minor number
+     *
+     * @return minor revision number
+     */
+    public static String getMinorVersion() {
+        return "0";
+    }
+
+    /**
+     * Get the processor major CPU patch number
+     *
+     * @return patch number
+     */
+    public static String getPatchVersion() {
+        return "0";
+    }
+
+    /**
+     * Get the CPU name string
+     *
+     * @return name string
+     */
+    public static String getName() {
+        return "Z80A_NMOS";
     }
 
     /**
@@ -1048,27 +1085,13 @@ public class Z80Core {
     }
 
     /**
-     * Returns the state of the halt flag
-     *
-     * @return True if the processor has executed a HALT instruction
-     */
-    public boolean getHalt() {
-        return halt;
-    }
-
-    /**
      * Recover the present program counter (PC) value
      *
      * @return Value in the range 0x0000 to 0xFFFF
      */
     public int getProgramCounter() {
         return reg_PC;
-    }    private final Callback executeOneInstructionCallback = b -> {
-        instruction = b;
-        incPC();
-//            EIDIFlag = false; // clear before decoding next instruction
-        decodeOneByteInstruction(instruction);
-    };
+    }
 
     /**
      * Force load the program counter (PC)
@@ -1077,6 +1100,20 @@ public class Z80Core {
      */
     public void setProgramCounter(int pc) {
         reg_PC = pc & 0xFFFF;
+    }    private final Callback executeOneInstructionCallback = b -> {
+        instruction = b;
+        incPC();
+//            EIDIFlag = false; // clear before decoding next instruction
+        decodeOneByteInstruction(instruction);
+    };
+
+    /**
+     * Returns the state of the halt flag
+     *
+     * @return True if the processor has executed a HALT instruction
+     */
+    public boolean getHalt() {
+        return halt;
     }
 
     /**
@@ -1162,55 +1199,10 @@ public class Z80Core {
     }
 
     /**
-     * Return the number of T states since last reset
-     *
-     * @return Processor T states
-     */
-    public int getTStates() {
-        return tStates;
-    }
-
-    /**
      * Reset the T state counter to zero
      */
     public void resetTStates() {
         tStates = 0;
-    }
-
-    /**
-     * Get the processor major CPU version number
-     *
-     * @return major revision number
-     */
-    public String getMajorVersion() {
-        return "4";
-    }
-
-    /**
-     * Get the processor major CPU minor number
-     *
-     * @return minor revision number
-     */
-    public String getMinorVersion() {
-        return "0";
-    }
-
-    /**
-     * Get the processor major CPU patch number
-     *
-     * @return patch number
-     */
-    public String getPatchVersion() {
-        return "0";
-    }
-
-    /**
-     * Get the CPU name string
-     *
-     * @return name string
-     */
-    public String getName() {
-        return "Z80A_NMOS";
     }
 
     /**
@@ -1220,6 +1212,14 @@ public class Z80Core {
      */
     public String toString() {
         return getName() + " Revision " + getMajorVersion() + "." + getMinorVersion() + "." + getPatchVersion();
+    }
+
+    /*
+     * increment (and wrap) the program counter
+     */
+    private void incPC() {
+        reg_PC++;
+        reg_PC = reg_PC & MAX_ADDRESS;
     }
 
     private int shiftGenericRR(int temp) {
@@ -1743,123 +1743,6 @@ public class Z80Core {
         }
     }
 
-    private final Callback extendedEDCallback = instructionByte -> {
-        instruction = instructionByte;
-        incPC();
-        tStates = tStates + OPCODE_ED_STATES[instruction];
-        if ((instruction < 0x40) || (instruction >= 0xC0)) {
-            // A does nothing operation, similar to NOP but not interrupt capable
-            return;
-        }
-        switch (instruction) {
-            case 0x40 -> inC(regCodeB);
-            case 0x41 -> outC(regCodeB);
-            case 0x42 -> ALU16BitSBC(regCodeBC);
-            case 0x43 -> LDnnnnRegInd16Bit(regCodeBC);
-            case 0x44 -> NEG();
-            case 0x45 -> retn();
-            case 0x46 -> IM(0);
-            case 0x47 -> LDIA();
-            case 0x48 -> inC(regCodeC);
-            case 0x49 -> outC(regCodeC);
-            case 0x4A -> ALU16BitADC(regCodeBC);
-            case 0x4B -> LDRegnnnnInd16Bit(regCodeBC);
-            case 0x4C -> NEG();
-            case 0x4D -> reti();
-            case 0x4E -> IM(0);
-            case 0x4F -> LDRA();
-            //
-            case 0x50 -> inC(regCodeD);
-            case 0x51 -> outC(regCodeD);
-            case 0x52 -> ALU16BitSBC(regCodeDE);
-            case 0x53 -> LDnnnnRegInd16Bit(regCodeDE);
-            case 0x54 -> NEG();
-            case 0x55 -> retn();
-            case 0x56 -> IM(1);
-            case 0x57 -> LDAI();
-            case 0x58 -> inC(regCodeE);
-            case 0x59 -> outC(regCodeE);
-            case 0x5A -> ALU16BitADC(regCodeDE);
-            case 0x5B -> LDRegnnnnInd16Bit(regCodeDE);
-            case 0x5C -> NEG();
-            case 0x5D -> retn();
-            case 0x5E -> IM(2);
-            case 0x5F -> LDAR();
-            //
-            case 0x60 -> inC(regCodeH);
-            case 0x61 -> outC(regCodeH);
-            case 0x62 -> ALU16BitSBC(regCodeHL);
-            case 0x63 -> LDnnnnRegInd16Bit(regCodeHL);
-            case 0x64 -> NEG();
-            case 0x65 -> retn();
-            case 0x66 -> IM(1);
-            case 0x67 -> RRD();
-            case 0x68 -> inC(regCodeL);
-            case 0x69 -> outC(regCodeL);
-            case 0x6A -> ALU16BitADC(regCodeHL);
-            case 0x6B -> LDRegnnnnInd16Bit(regCodeHL);
-            case 0x6C -> NEG();
-            case 0x6D -> retn();
-            case 0x6E -> IM(1);
-            case 0x6F -> RLD();
-            //
-            case 0x70 -> inC(regCodeF);
-            case 0x71 -> outC(regCodeF);
-            case 0x72 -> ALU16BitSBC(regCodeSP);
-            case 0x73 -> LDnnnnRegInd16Bit(regCodeSP);
-            case 0x74 -> NEG();
-            case 0x75 -> retn();
-            case 0x76 -> IM(1);
-            case 0x77 -> {
-            } // NOP
-            case 0x78 -> inC(regCodeA);
-            case 0x79 -> outC(regCodeA);
-            case 0x7A -> ALU16BitADC(regCodeSP);
-            case 0x7B -> LDRegnnnnInd16Bit(regCodeSP);
-            case 0x7C -> NEG();
-            case 0x7D -> retn();
-            case 0x7E -> IM(2);
-            case 0x7F -> {
-            } // NOP
-            case 0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89, 0x8A, 0x8B, 0x8C, 0x8D, 0x8E, 0x8F -> {
-            } // NOP
-            case 0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97, 0x98, 0x99, 0x9A, 0x9B, 0x9C, 0x9D, 0x9E, 0x9F -> {
-            } // NOP
-            case 0xA0 -> ioQueue.readByte(getHL(), ldiCallback);
-            case 0xA1 -> ioQueue.readByte(getHL(), cpiCallback);
-            case 0xA2 -> ioQueue.ioRead(getBC(), iniCallback);
-            case 0xA3 -> ioQueue.readByte(getHL(), outiCallback);
-            case 0xA4, 0xA5, 0xA6, 0xA7 -> {
-            } // NOP
-            case 0xA8 -> ioQueue.readByte(getHL(), lddCallback);
-            case 0xA9 -> ioQueue.readByte(getHL(), cpdCallback);
-            case 0xAA -> ioQueue.ioRead(getBC(), indCallback);
-            case 0xAB -> ioQueue.readByte(getHL(), outdCallback);
-            case 0xAC, 0xAD, 0xAE, 0xAF -> {
-            } // NOP
-            case 0xB0 -> LDIR();
-            case 0xB1 -> CPIR();
-            case 0xB2 -> INIR();
-            case 0xB3 -> OTIR();
-            case 0xB4, 0xB5, 0xB6, 0xB7 -> {
-            } // NOP
-            case 0xB8 -> LDDR();
-            case 0xB9 -> CPDR();
-            case 0xBA -> INDR();
-            case 0xBB -> OTDR();
-            case 0xBC, 0xBD, 0xBE, 0xBF -> {
-            } // NOP
-        }
-    };
-
-    /*
-     * increment (and wrap) the program counter
-     */
-    private void incPC() {
-        reg_PC++;
-        reg_PC = reg_PC & MAX_ADDRESS;
-    }
-
     /*
      * ALU Operations
      */
@@ -1878,6 +1761,27 @@ public class Z80Core {
         reg_PC = reg_PC & MAX_ADDRESS;
     }
 
+    /* 8 bit CP */
+    private void ALU8BitCp(int b) {
+        int a = reg_A;
+        int wans = a - b;
+        int ans = wans & 0xff;
+        reg_F = 0x02;
+        setS((ans & flag_S) != 0);
+        set3((b & flag_3) != 0);
+        set5((b & flag_5) != 0);
+        setZ(ans == 0);
+        setC((wans & 0x100) != 0);
+        setH((((a & 0x0F) - (b & 0x0F)) & flag_H) != 0);
+        setPV(((a ^ b) & (a ^ ans) & 0x80) != 0);
+    }
+
+    /* 16 bit INC */
+    private static int ALU16BitInc(int value) {
+        value++;
+        return (value & lsw);
+    }
+
     /*
      * increment / decrement (and wrap) the stack pointer
      */
@@ -1890,7 +1794,84 @@ public class Z80Core {
     private void dec2SP() {
         reg_SP = reg_SP - 2;
         reg_SP = reg_SP & MAX_ADDRESS;
-    }
+    }    private final Callback extendedEDCallback = instructionByte -> {
+        instruction = instructionByte;
+        incPC();
+        tStates = tStates + OPCODE_ED_STATES[instruction];
+        if ((instruction < 0x40) || (instruction >= 0xC0)) {
+            // A does nothing operation, similar to NOP but not interrupt capable
+            return;
+        }
+        switch (instruction) {
+            case 0x40 -> inC(regCodeB);
+            case 0x41 -> outC(regCodeB);
+            case 0x42 -> ALU16BitSBC(regCodeBC);
+            case 0x43 -> LDnnnnRegInd16Bit(regCodeBC);
+            case 0x44, 0x7C, 0x74, 0x6C, 0x64, 0x5C, 0x54, 0x4C -> NEG();
+            case 0x45, 0x7D, 0x75, 0x6D, 0x65, 0x5D, 0x55 -> retn();
+            case 0x46, 0x4E -> IM(0);
+            case 0x47 -> LDIA();
+            case 0x48 -> inC(regCodeC);
+            case 0x49 -> outC(regCodeC);
+            case 0x4A -> ALU16BitADC(regCodeBC);
+            case 0x4B -> LDRegnnnnInd16Bit(regCodeBC);
+            case 0x4D -> reti();
+            case 0x4F -> LDRA();
+            //
+            case 0x50 -> inC(regCodeD);
+            case 0x51 -> outC(regCodeD);
+            case 0x52 -> ALU16BitSBC(regCodeDE);
+            case 0x53 -> LDnnnnRegInd16Bit(regCodeDE);
+            case 0x56, 0x76, 0x6E, 0x66 -> IM(1);
+            case 0x57 -> LDAI();
+            case 0x58 -> inC(regCodeE);
+            case 0x59 -> outC(regCodeE);
+            case 0x5A -> ALU16BitADC(regCodeDE);
+            case 0x5B -> LDRegnnnnInd16Bit(regCodeDE);
+            case 0x5E, 0x7E -> IM(2);
+            case 0x5F -> LDAR();
+            //
+            case 0x60 -> inC(regCodeH);
+            case 0x61 -> outC(regCodeH);
+            case 0x62 -> ALU16BitSBC(regCodeHL);
+            case 0x63 -> LDnnnnRegInd16Bit(regCodeHL);
+            case 0x67 -> RRD();
+            case 0x68 -> inC(regCodeL);
+            case 0x69 -> outC(regCodeL);
+            case 0x6A -> ALU16BitADC(regCodeHL);
+            case 0x6B -> LDRegnnnnInd16Bit(regCodeHL);
+            case 0x6F -> RLD();
+            //
+            case 0x70 -> inC(regCodeF);
+            case 0x71 -> outC(regCodeF);
+            case 0x72 -> ALU16BitSBC(regCodeSP);
+            case 0x73 -> LDnnnnRegInd16Bit(regCodeSP);
+            case 0x77, 0xBC, 0xBD, 0xBE, 0xBF, 0xB4, 0xB5, 0xB6, 0xB7, 0xAC, 0xAD, 0xAE, 0xAF, 0xA4, 0xA5, 0xA6, 0xA7, 0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96,
+                 0x97, 0x98, 0x99, 0x9A, 0x9B, 0x9C, 0x9D, 0x9E, 0x9F, 0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89, 0x8A, 0x8B, 0x8C, 0x8D, 0x8E,
+                 0x8F, 0x7F -> {
+            } // NOP
+            case 0x78 -> inC(regCodeA);
+            case 0x79 -> outC(regCodeA);
+            case 0x7A -> ALU16BitADC(regCodeSP);
+            case 0x7B -> LDRegnnnnInd16Bit(regCodeSP);
+            case 0xA0 -> ioQueue.readByte(getHL(), ldiCallback);
+            case 0xA1 -> ioQueue.readByte(getHL(), cpiCallback);
+            case 0xA2 -> ioQueue.ioRead(getBC(), iniCallback);
+            case 0xA3 -> ioQueue.readByte(getHL(), outiCallback);
+            case 0xA8 -> ioQueue.readByte(getHL(), lddCallback);
+            case 0xA9 -> ioQueue.readByte(getHL(), cpdCallback);
+            case 0xAA -> ioQueue.ioRead(getBC(), indCallback);
+            case 0xAB -> ioQueue.readByte(getHL(), outdCallback);
+            case 0xB0 -> LDIR();
+            case 0xB1 -> CPIR();
+            case 0xB2 -> INIR();
+            case 0xB3 -> OTIR();
+            case 0xB8 -> LDDR();
+            case 0xB9 -> CPDR();
+            case 0xBA -> INDR();
+            case 0xBB -> OTDR();
+        }
+    };
 
     /* half carry flag control */
     private void setHalfCarryFlagAdd(int left, int right, int carry) {
@@ -2080,19 +2061,10 @@ public class Z80Core {
         setUnusedFlags(reg_A);
     }
 
-    /* 8 bit CP */
-    private void ALU8BitCp(int b) {
-        final int a = reg_A;
-        final int wans = a - b;
-        final int ans = wans & 0xff;
-        reg_F = 0x02;
-        setS((ans & flag_S) != 0);
-        set3((b & flag_3) != 0);
-        set5((b & flag_5) != 0);
-        setZ(ans == 0);
-        setC((wans & 0x100) != 0);
-        setH((((a & 0x0F) - (b & 0x0F)) & flag_H) != 0);
-        setPV(((a ^ b) & (a ^ ans) & 0x80) != 0);
+    /* 16 bit DEC */
+    private static int ALU16BitDec(int value) {
+        value--;
+        return (value & lsw);
     }
 
     /* 8 bit INC */
@@ -2123,16 +2095,13 @@ public class Z80Core {
         return (value);
     }
 
-    /* 16 bit INC */
-    private int ALU16BitInc(int value) {
-        value++;
-        return (value & lsw);
+    private int getR() {
+        return reg_R & 0x7F + reg_R8;
     }
 
-    /* 16 bit DEC */
-    private int ALU16BitDec(int value) {
-        value--;
-        return (value & lsw);
+    private void setR(int r) {
+        reg_R = r; // internally reg_R is unbounded
+        reg_R8 = r & 0x80;
     }
 
     /* 16 bit ADD */
@@ -2441,8 +2410,90 @@ public class Z80Core {
         reg_F = reg_F & flag_C_N;
     }
 
-    private int getR() {
-        return reg_R & 0x7F + reg_R8;
+    private int getBC() {
+        return (reg_B << 8) + reg_C;
+    }
+
+    private void setBC(int bc) {
+        reg_B = (bc & 0xFF00) >> 8;
+        reg_C = bc & 0x00FF;
+    }
+
+    private int getDE() {
+        return (reg_D << 8) + reg_E;
+    }
+
+    private void setDE(int de) {
+        reg_D = (de & 0xFF00) >> 8;
+        reg_E = de & 0x00FF;
+    }
+
+    private int getHL() {
+        return (reg_H << 8) + reg_L;
+    }
+
+    private void setHL(int hl) {
+        reg_H = (hl & 0xFF00) >> 8;
+        reg_L = hl & 0x00FF;
+    }
+
+    private void testBit(int v, int bit) {
+        //
+        resetS();
+        set3((v & 0x08) != 0);
+        set5((v & 0x20) != 0);
+        v = switch (bit) {
+            case 0 -> v & setBit0;
+            case 1 -> v & setBit1;
+            case 2 -> v & setBit2;
+            case 3 -> v & setBit3;
+            case 4 -> v & setBit4;
+            case 5 -> v & setBit5;
+            case 6 -> v & setBit6;
+            default -> {
+                var result = v & setBit7;
+                setS(result != 0);
+                yield result;
+            }
+        };
+        setZ(v == 0);
+        setPV(v == 0);
+        resetN();
+        setH();
+    }
+
+    private void testBitGeneric(int bit, int v) {
+        resetS();
+        v = switch (bit) {
+            case 0 -> v & setBit0;
+            case 1 -> v & setBit1;
+            case 2 -> v & setBit2;
+            case 3 -> v & setBit3;
+            case 4 -> v & setBit4;
+            case 5 -> v & setBit5;
+            case 6 -> v & setBit6;
+            default -> {
+                var result = v & setBit7;
+                setS(result != 0);
+                yield result;
+            }
+        };
+        setZ(v == 0);
+        setPV(v == 0);
+        resetN();
+        setH();
+    }
+
+    private int getBC_ALT() {
+        return (reg_B_ALT << 8) + reg_C_ALT;
+    }
+
+    /*
+     * shifts and rotates
+     */
+    private void setBC_ALT(int bc) {
+        reg_B_ALT = (bc & 0xFF00) >> 8;
+        reg_C_ALT = bc & 0x00FF;
     }    private final Callback extendedDFDCallback = instructionByte -> {
         instruction = instructionByte;
         int reg_index = getIndexReg();
@@ -2805,50 +2856,6 @@ public class Z80Core {
             case 0xFF -> rst(7);
         }
     };
-
-    private void setR(int r) {
-        reg_R = r; // internally reg_R is unbounded
-        reg_R8 = r & 0x80;
-    }
-
-    private int getBC() {
-        return (reg_B << 8) + reg_C;
-    }
-
-    private void setBC(int bc) {
-        reg_B = (bc & 0xFF00) >> 8;
-        reg_C = bc & 0x00FF;
-    }
-
-    private int getDE() {
-        return (reg_D << 8) + reg_E;
-    }
-
-    private void setDE(int de) {
-        reg_D = (de & 0xFF00) >> 8;
-        reg_E = de & 0x00FF;
-    }
-
-    private int getHL() {
-        return (reg_H << 8) + reg_L;
-    }
-
-    private void setHL(int hl) {
-        reg_H = (hl & 0xFF00) >> 8;
-        reg_L = hl & 0x00FF;
-    }
-
-    private int getBC_ALT() {
-        return (reg_B_ALT << 8) + reg_C_ALT;
-    }
-
-    /*
-     * shifts and rotates
-     */
-    private void setBC_ALT(int bc) {
-        reg_B_ALT = (bc & 0xFF00) >> 8;
-        reg_C_ALT = bc & 0x00FF;
-    }
 
     private int getDE_ALT() {
         return (reg_D_ALT << 8) + reg_E_ALT;
@@ -3345,56 +3352,9 @@ public class Z80Core {
         ioQueue.ioWrite(getBC(), get8BitRegister(reg));
     }
 
-    private void testBit(int v, int bit) {
-        //
-        resetS();
-        set3((v & 0x08) != 0);
-        set5((v & 0x20) != 0);
-        v = switch (bit) {
-            case 0 -> v & setBit0;
-            case 1 -> v & setBit1;
-            case 2 -> v & setBit2;
-            case 3 -> v & setBit3;
-            case 4 -> v & setBit4;
-            case 5 -> v & setBit5;
-            case 6 -> v & setBit6;
-            default -> {
-                var result = v & setBit7;
-                setS(result != 0);
-                yield result;
-            }
-        };
-        setZ(0 == v);
-        setPV(0 == v);
-        resetN();
-        setH();
-    }
-
     private void testBitInMemory(int bit) {
         testBitInMemoryBit = bit;
         ioQueue.readByte(getHL(), testBitInMemoryCallback);
-    }
-
-    private void testBitGeneric(int bit, int v) {
-        resetS();
-        v = switch (bit) {
-            case 0 -> v & setBit0;
-            case 1 -> v & setBit1;
-            case 2 -> v & setBit2;
-            case 3 -> v & setBit3;
-            case 4 -> v & setBit4;
-            case 5 -> v & setBit5;
-            case 6 -> v & setBit6;
-            default -> {
-                var result = v & setBit7;
-                setS(result != 0);
-                yield result;
-            }
-        };
-        setZ(0 == v);
-        setPV(0 == v);
-        resetN();
-        setH();
     }
 
     /*
@@ -3720,15 +3680,15 @@ public class Z80Core {
 
 
 
-    private final Callback LDIRCallback = b -> {
-        LDI(b);
+    private final Callback LDIRCallback = i -> {
+        LDI(i);
         if (getBC() != 0) {
             LDIR();
         }
     };
-    private final Callback LDDRCallback = b -> {
+    private final Callback LDDRCallback = i -> {
         tStates += 21;
-        LDD(b);
+        LDD(i);
         if (getBC() != 0) {
             LDDR();
         }

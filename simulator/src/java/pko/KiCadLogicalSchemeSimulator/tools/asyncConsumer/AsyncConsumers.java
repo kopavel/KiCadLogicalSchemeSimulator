@@ -34,16 +34,17 @@ import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 import java.lang.invoke.VarHandle;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 public abstract class AsyncConsumers<T> implements Consumer<T>, AutoCloseable {
     final Queue<T> queue;
-    private final List<Thread> consumerThreads = new ArrayList<>();
+    private final Collection<Thread> consumerThreads = new ArrayList<>();
     boolean run;
 
-    public AsyncConsumers(int size, int threads) {
+    protected AsyncConsumers(int size, int threads) {
         registerShutdown();
         Slot<T>[] rings = createSlots(size, threads);
         if (threads == 0) {
@@ -59,7 +60,7 @@ public abstract class AsyncConsumers<T> implements Consumer<T>, AutoCloseable {
                         while (run) {
                             while ((payload = currentSlot.payload.getOpaque()) != null) {
                                 sleepCounter = 0;
-                                final AtomicReference<T> sharedPayload = currentSlot.payload;
+                                AtomicReference<T> sharedPayload = currentSlot.payload;
                                 consume(payload);
                                 sharedPayload.setOpaque(null);
                                 currentSlot = currentSlot.nextSlot;
@@ -108,8 +109,8 @@ public abstract class AsyncConsumers<T> implements Consumer<T>, AutoCloseable {
         do {
             Queue<T> currentQueue = queue;
             while (currentQueue != null) {
-                final Slot<T> slot = currentQueue.writeSlot;
-                final AtomicReference<T> currentPayload = slot.payload;
+                Slot<T> slot = currentQueue.writeSlot;
+                AtomicReference<T> currentPayload = slot.payload;
                 if (currentPayload.getOpaque() == null) {
                     currentPayload.setOpaque(payload);
                     currentQueue.writeSlot = slot.nextSlot;
@@ -154,9 +155,9 @@ public abstract class AsyncConsumers<T> implements Consumer<T>, AutoCloseable {
 */
     }
 
-    static class Queue<T> {
-        final Queue<T> next;
-        Slot<T> writeSlot;
+    public static final class Queue<T> {
+        public final Queue<T> next;
+        public Slot<T> writeSlot;
 
         private Queue(Slot<T> writeSlot, Queue<T> next) {
             this.writeSlot = writeSlot;
@@ -164,8 +165,8 @@ public abstract class AsyncConsumers<T> implements Consumer<T>, AutoCloseable {
         }
     }
 
-    static class Slot<T> {
-        final AtomicReference<T> payload = new AtomicReference<>(null);
-        Slot<T> nextSlot;
+    public static final class Slot<T> {
+        public final AtomicReference<T> payload = new AtomicReference<>(null);
+        public Slot<T> nextSlot;
     }
 }

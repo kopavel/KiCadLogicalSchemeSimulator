@@ -37,7 +37,6 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.ResourceBundle;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -47,8 +46,7 @@ import java.util.concurrent.TimeUnit;
 //ToDo navigate to start/end
 //ToDo add 'time' tags
 public class Oscilloscope extends JFrame {
-    public static final ResourceBundle localization = ResourceBundle.getBundle("i81n_clock/clock");
-    final Diagram diagram;
+    public final Diagram diagram;
     final JPanel watchedItemNamesPanel;
     private final ScheduledExecutorService scheduler;
     private final OscillatorUi oscillatorUi;
@@ -56,7 +54,7 @@ public class Oscilloscope extends JFrame {
     public Oscilloscope(OscillatorUi oscillatorUi) {
         this.oscillatorUi = oscillatorUi;
         setJMenuBar(new OscilloscopeMenu(this));
-        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -116,7 +114,7 @@ public class Oscilloscope extends JFrame {
         private final Diagram diagram;
         int movedFromIndex;
 
-        public FixedHeightLabel(String text, JPanel parent, Diagram diagram) {
+        FixedHeightLabel(String text, JPanel parent, Diagram diagram) {
             this.parent = parent;
             this.diagram = diagram;
             setMaximumSize(new Dimension(200, 20));

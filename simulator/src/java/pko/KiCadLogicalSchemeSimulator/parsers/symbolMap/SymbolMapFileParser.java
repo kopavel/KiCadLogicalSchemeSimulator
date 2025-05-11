@@ -40,7 +40,9 @@ import pko.KiCadLogicalSchemeSimulator.parsers.xml.XmlParser;
 
 import java.io.IOException;
 
-public class SymbolMapFileParser {
+public enum SymbolMapFileParser {
+    ;
+
     public static void parse(String mapPath, ParameterResolver parameterResolver) throws IOException {
         if (mapPath != null) {
             SymbolMap xmlSymbolMap = XmlParser.parse(mapPath, SymbolMap.class);

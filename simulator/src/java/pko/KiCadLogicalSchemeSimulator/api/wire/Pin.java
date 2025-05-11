@@ -49,7 +49,7 @@ public abstract class Pin extends ModelItem<Pin> {
     //for a passive pin (don't lost it on optimisation)
     public OutPin merger;
 
-    public Pin(Pin oldPin, String variantId) {
+    protected Pin(Pin oldPin, String variantId) {
         this(oldPin.id, oldPin.parent);
         this.variantId = variantId + (oldPin.variantId == null ? "" : ":" + oldPin.variantId);
         state = oldPin.state;
@@ -58,18 +58,18 @@ public abstract class Pin extends ModelItem<Pin> {
         priority = oldPin.priority;
         triStateIn = oldPin.triStateIn;
         triStateOut = oldPin.triStateOut;
-        hiImpedance = oldPin.hiImpedance & isTriState(source);
+        hiImpedance = oldPin.hiImpedance && isTriState(source);
         source = oldPin;
     }
 
-    public Pin(String id, SchemaPart parent) {
+    protected Pin(String id, SchemaPart parent) {
         super(id, parent);
     }
 
     @Override
-    public Pin copyState(IModelItem<Pin> oldPin) {
+    public Pin copyState(IModelItem<? extends Pin> oldPin) {
         used = true;
-        this.strong = oldPin.isStrong();
+        strong = oldPin.isStrong();
         hiImpedance = oldPin.isHiImpedance();
         Pin pin = oldPin.getThis();
         this.state = pin.state;

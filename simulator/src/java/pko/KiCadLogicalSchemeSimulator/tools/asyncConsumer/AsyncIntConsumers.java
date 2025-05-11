@@ -32,14 +32,15 @@
 package pko.KiCadLogicalSchemeSimulator.tools.asyncConsumer;
 import java.lang.invoke.VarHandle;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public abstract class AsyncIntConsumers implements AutoCloseable {
     final Queue queue;
-    private final List<Thread> consumerThreads = new ArrayList<>();
+    private final Collection<Thread> consumerThreads = new ArrayList<>();
     boolean run;
 
-    public AsyncIntConsumers(int size, int threads) {
+    protected AsyncIntConsumers(int size, int threads) {
         registerShutdown();
         Slot[] rings = createSlots(size, threads);
         if (threads == 0) {
@@ -103,7 +104,7 @@ public abstract class AsyncIntConsumers implements AutoCloseable {
         do {
             Queue currentQueue = queue;
             while (currentQueue != null) {
-                final Slot slot = currentQueue.writeSlot;
+                Slot slot = currentQueue.writeSlot;
                 if (slot.payload == -1L) {
                     slot.payload = payload;
                     currentQueue.writeSlot = slot.nextSlot;
@@ -114,7 +115,7 @@ public abstract class AsyncIntConsumers implements AutoCloseable {
         } while (run);
     }
 
-    private Slot[] createSlots(int size, int threads) {
+    private static Slot[] createSlots(int size, int threads) {
         List<Slot> rings = new ArrayList<>();
         for (int i = 0; i < threads; i++) {
             Slot head = new Slot();
@@ -147,9 +148,9 @@ public abstract class AsyncIntConsumers implements AutoCloseable {
 */
     }
 
-    static class Queue {
-        final Queue next;
-        Slot writeSlot;
+    public final static class Queue {
+        public final Queue next;
+        public Slot writeSlot;
 
         private Queue(Slot writeSlot, Queue next) {
             this.writeSlot = writeSlot;
@@ -157,8 +158,8 @@ public abstract class AsyncIntConsumers implements AutoCloseable {
         }
     }
 
-    static class Slot {
-        int payload = -1;
-        Slot nextSlot;
+    public static class Slot {
+        public int payload = -1;
+        public Slot nextSlot;
     }
 }

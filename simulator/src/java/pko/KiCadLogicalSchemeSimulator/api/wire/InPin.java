@@ -33,15 +33,15 @@ package pko.KiCadLogicalSchemeSimulator.api.wire;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 
 public abstract class InPin extends Pin {
-    public InPin(String id, SchemaPart parent) {
+    protected InPin(String id, SchemaPart parent) {
         super(id, parent);
     }
 
-    public InPin(Pin oldPin, String variantId) {
+    protected InPin(Pin oldPin, String variantId) {
         super(oldPin, variantId);
     }
 
-    public InPin(String id, SchemaPart parent, boolean state) {
+    protected InPin(String id, SchemaPart parent, boolean state) {
         super(id, parent);
         this.state = state;
     }

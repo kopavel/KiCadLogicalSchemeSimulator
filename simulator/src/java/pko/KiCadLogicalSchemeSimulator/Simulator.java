@@ -57,15 +57,18 @@ import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.none;
 import static pko.KiCadLogicalSchemeSimulator.parsers.symbolMap.SymbolMapFileParser.parse;
 
+@SuppressWarnings({"StaticVariableMayNotBeInitialized", "StaticMethodOnlyUsedInOneClass"})
 @CommandLine.Command(name = "", description = "Start Kicad scheme interactive simulation")
 public class Simulator implements Runnable {
     private static final Map<String, SchemaPartMonitor> monitoredParts = new HashMap<>();
     private static final Method addReadsMethod;
+    private static final Pattern NEW_LINE_PATTERN = Pattern.compile("[\r\n]+");
     public static Map<String, SchemaPartSpi> schemaPartSpiMap;
     public static MainUI ui;
     public static String netFilePathNoExtension;
@@ -127,20 +130,20 @@ public class Simulator implements Runnable {
             //FixMe check current screen boundaries
             List<InteractiveSchemaPart> layoutParts = net.schemaParts.values()
                     .stream()
-                    .filter(i -> i instanceof InteractiveSchemaPart)
-                    .map(i -> (InteractiveSchemaPart) i)
+                    .filter(part -> part instanceof InteractiveSchemaPart)
+                    .map(part -> (InteractiveSchemaPart) part)
                     .collect(Collectors.toCollection(ArrayList::new));
             File layoutFile = new File(netFilePathNoExtension + ".sym_layout");
             if (layoutFile.isFile()) {
                 String content = Utils.readFileToString(layoutFile);
-                for (String pos : content.split("[\r\n]+")) {
+                for (String pos : NEW_LINE_PATTERN.split(content)) {
                     String[] parts = pos.split(":");
-                    if (parts[0].equals("main")) {
+                    if ("main".equals(parts[0])) {
                         ui.setBounds(new Rectangle(Integer.parseInt(parts[1]), Integer.parseInt(parts[2]), Integer.parseInt(parts[3]), Integer.parseInt(parts[4])));
-                    } else if (parts[0].equals("mon")) {
+                    } else if ("mon".equals(parts[0])) {
                         addMonitoringPart(parts[1],
                                 new Rectangle(Integer.parseInt(parts[2]), Integer.parseInt(parts[3]), Integer.parseInt(parts[4]), Integer.parseInt(parts[5])));
-                    } else if (!parts[0].equals("locale")) {
+                    } else if (!"locale".equals(parts[0])) {
                         SchemaPart component = net.schemaParts.get(parts[0]);
                         if (component instanceof InteractiveSchemaPart uiComponent) {
                             layoutParts.remove(component);
@@ -180,14 +183,15 @@ public class Simulator implements Runnable {
             bw.write("\n");
             String content = net.schemaParts.values()
                     .stream()
-                    .filter(c -> c instanceof InteractiveSchemaPart)
-                    .map(c -> c.id + ":" + ((InteractiveSchemaPart) c).getComponent().getX() + ":" + ((InteractiveSchemaPart) c).getComponent().getY())
+                    .filter(part -> part instanceof InteractiveSchemaPart)
+                    .map(part -> part.id + ":" + ((InteractiveSchemaPart) part).getComponent().getX() + ":" + ((InteractiveSchemaPart) part).getComponent().getY())
                     .collect(Collectors.joining("\n"));
             bw.write(content);
             bw.write("\n");
             content = monitoredParts.values()
                     .stream()
-                    .map(c -> "mon:" + c.schemaPart.id + ":" + c.getX() + ":" + c.getY() + ":" + c.getWidth() + ":" + c.getHeight())
+                    .map(monitor -> "mon:" + monitor.schemaPart.id + ":" + monitor.getX() + ":" + monitor.getY() + ":" + monitor.getWidth() + ":" +
+                            monitor.getHeight())
                     .collect(Collectors.joining("\n"));
             bw.write(content);
             bw.write("\n");
@@ -227,7 +231,7 @@ public class Simulator implements Runnable {
             if (!new File(netFilePath).exists()) {
                 throw new Exception("Cant fine NET file " + netFilePath);
             }
-            netFilePathNoExtension = netFilePath.substring(0, netFilePath.lastIndexOf("."));
+            netFilePathNoExtension = netFilePath.substring(0, netFilePath.lastIndexOf('.'));
             Params params = null;
             if (new File(netFilePathNoExtension + ".sym_param").exists()) {
                 params = XmlParser.parse(netFilePathNoExtension + ".sym_param", Params.class);
@@ -325,7 +329,7 @@ public class Simulator implements Runnable {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(layoutFile), StandardCharsets.UTF_8))) {
                 String content = reader.readLine();
                 String[] split = content.split(":");
-                if (split[0].equals("locale")) {
+                if ("locale".equals(split[0])) {
                     Locale.setDefault(Locale.of(split[1]));
                 }
             } catch (IOException ignore) {

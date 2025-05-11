@@ -41,10 +41,12 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 import static pko.KiCadLogicalSchemeSimulator.ui.main.MainMenu.mainI81n;
 
 public class OscilloscopeMenu extends JMenuBar {
+    public static final ResourceBundle localization = ResourceBundle.getBundle("i81n_clock/clock");
     private final Oscilloscope oscilloscope;
 
     public OscilloscopeMenu(Oscilloscope parent) {
@@ -52,23 +54,17 @@ public class OscilloscopeMenu extends JMenuBar {
         JMenu pins = new JMenu(mainI81n.getString("schemaParts"));
         add(pins);
         fillPinsMenu(pins);
-        JMenu presets = new JMenu(Oscilloscope.localization.getString("preset"));
+        JMenu presets = new JMenu(localization.getString("preset"));
         add(presets);
-        JMenuItem reset = new JMenuItem(Oscilloscope.localization.getString("reset"));
+        JMenuItem reset = new JMenuItem(localization.getString("reset"));
         presets.add(reset);
-        reset.addActionListener(e -> {
-            parent.reset(true);
-        });
-        JMenuItem load = new JMenuItem(Oscilloscope.localization.getString("load"));
+        reset.addActionListener(e -> parent.reset(true));
+        JMenuItem load = new JMenuItem(localization.getString("load"));
         presets.add(load);
-        load.addActionListener(e -> {
-            loadPreset(parent);
-        });
-        JMenuItem save = new JMenuItem(Oscilloscope.localization.getString("saveAs"));
+        load.addActionListener(e -> loadPreset(parent));
+        JMenuItem save = new JMenuItem(localization.getString("saveAs"));
         presets.add(save);
-        save.addActionListener(e -> {
-            savePreset(parent);
-        });
+        save.addActionListener(e -> savePreset(parent));
     }
 
     private void fillPinsMenu(JMenu schemaParts) {
@@ -78,7 +74,7 @@ public class OscilloscopeMenu extends JMenuBar {
             letterMenus.putIfAbsent(firstLetter, new JMenu(String.valueOf(firstLetter)));
             JMenu schemaPartItem = new JMenu(schemaPart.id);
             letterMenus.get(firstLetter).add(schemaPartItem);
-            schemaPartItem.add(new JLabel(Oscilloscope.localization.getString("inPins")));
+            schemaPartItem.add(new JLabel(localization.getString("inPins")));
             schemaPart.inPins.values()
                     .stream().distinct().sorted().forEach(inItem -> {
                           JMenuItem inPinItem = new JMenuItem(schemaPart.ids.get(inItem));
@@ -86,7 +82,7 @@ public class OscilloscopeMenu extends JMenuBar {
                           schemaPartItem.add(inPinItem);
                       });
             schemaPartItem.addSeparator();
-            schemaPartItem.add(new JLabel(Oscilloscope.localization.getString("outPins")));
+            schemaPartItem.add(new JLabel(localization.getString("outPins")));
             schemaPart.outPins.values()
                     .stream().distinct().sorted().forEach(inItem -> {
                           JMenuItem inPinItem = new JMenuItem(schemaPart.ids.get(inItem));
@@ -101,11 +97,11 @@ public class OscilloscopeMenu extends JMenuBar {
         }
     }
 
-    private void savePreset(Oscilloscope parent) {
+    private static void savePreset(Oscilloscope parent) {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
-        fileChooser.setDialogTitle(Oscilloscope.localization.getString("saveAs"));
-        FileNameExtensionFilter filter = new FileNameExtensionFilter(Oscilloscope.localization.getString("presetFile"), "sym_oscill");
+        fileChooser.setDialogTitle(localization.getString("saveAs"));
+        FileNameExtensionFilter filter = new FileNameExtensionFilter(localization.getString("presetFile"), "sym_oscill");
         fileChooser.setFileFilter(filter);
         int userSelection = fileChooser.showSaveDialog(null);
         if (userSelection == JFileChooser.APPROVE_OPTION) {
@@ -133,8 +129,8 @@ public class OscilloscopeMenu extends JMenuBar {
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         fileChooser.setAcceptAllFileFilterUsed(false);
         fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
-        fileChooser.setDialogTitle(Oscilloscope.localization.getString("load"));
-        FileNameExtensionFilter filter = new FileNameExtensionFilter(Oscilloscope.localization.getString("presetFile"), "sym_oscill");
+        fileChooser.setDialogTitle(localization.getString("load"));
+        FileNameExtensionFilter filter = new FileNameExtensionFilter(localization.getString("presetFile"), "sym_oscill");
         fileChooser.setFileFilter(filter);
         int userSelection = fileChooser.showSaveDialog(null);
         if (userSelection == JFileChooser.APPROVE_OPTION) {

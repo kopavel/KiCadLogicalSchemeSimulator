@@ -47,7 +47,7 @@ public class AsyncInPin extends Pin {
 
     public AsyncInPin(Pin oldPin) {
         super(oldPin, "async");
-        this.inPin = oldPin;
+        inPin = oldPin;
     }
 
     @Override

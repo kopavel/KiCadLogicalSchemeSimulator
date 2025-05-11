@@ -39,10 +39,10 @@ class CRInPin extends InPin {
     private final Counter counter;
     Bus out;
 
-    public CRInPin(Counter counter) {
+    CRInPin(Counter counter) {
         super("R", counter);
         this.counter = counter;
-        this.out = counter.outBus;
+        out = counter.outBus;
     }
 
     @Override

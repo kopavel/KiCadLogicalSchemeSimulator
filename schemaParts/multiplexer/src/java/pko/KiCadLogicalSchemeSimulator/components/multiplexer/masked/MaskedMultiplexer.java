@@ -35,12 +35,12 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 public class MaskedMultiplexer extends SchemaPart {
     public final InBus[] inBuses;
-    public final List<MaskedMultiplexerOEPin> oePins = new ArrayList<>();
-    public final List<MaskedMultiplexerNPin> nPins = new ArrayList<>();
+    public final Collection<MaskedMultiplexerOEPin> oePins = new ArrayList<>();
+    public final Collection<MaskedMultiplexerNPin> nPins = new ArrayList<>();
     public MaskedMultiplexerOEPin oePin;
     public int outMask;
     public int nState;

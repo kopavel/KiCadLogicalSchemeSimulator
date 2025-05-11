@@ -39,7 +39,8 @@ import com.fasterxml.jackson.module.jakarta.xmlbind.JakartaXmlBindAnnotationModu
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 
 @SuppressWarnings("unused")
-public class XmlMarshaller {
+public enum XmlMarshaller {
+    ;
     private static volatile XmlMapper xmlMapper;
 
     public static String toXml(Object o) throws JsonProcessingException {

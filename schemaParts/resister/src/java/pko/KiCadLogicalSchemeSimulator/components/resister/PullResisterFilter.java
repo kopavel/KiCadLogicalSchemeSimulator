@@ -49,8 +49,9 @@ public class PullResisterFilter implements NetFilter {
         for (Net net : netFile.getNets().getNet()) {
             Boolean powerState = parameterResolver.getPowerState(net);
             if (powerState != null) {
+                Iterator<Node> iterator = net.getNode().iterator();
                 node:
-                for (Iterator<Node> iterator = net.getNode().iterator(); iterator.hasNext(); ) {
+                while (iterator.hasNext()) {
                     Node node = iterator.next();
                     SchemaPartConfig schemaPartConfig = parameterResolver.getSchemaPartConfig(node);
                     if (schemaPartConfig != null && schemaPartConfig.clazz.equals(Resister.class.getSimpleName())) {

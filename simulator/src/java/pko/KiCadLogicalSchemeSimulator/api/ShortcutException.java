@@ -33,13 +33,13 @@ package pko.KiCadLogicalSchemeSimulator.api;
 import lombok.Getter;
 import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
 
-import java.util.Set;
+import java.util.Collection;
 
 @Getter
 public class ShortcutException extends RuntimeException {
     private final String message;
 
-    public ShortcutException(Set<? extends IModelItem<?>> pins) {
+    public ShortcutException(Collection<? extends IModelItem<?>> pins) {
         this(pins.toArray(IModelItem<?>[]::new));
     }
 

@@ -60,6 +60,48 @@ dependencyResolutionManagement {
 }
 //hack to enable INFO log level by default
 /*
+
+class TimestampOutputStream extends OutputStream {
+    private final OutputStream delegate
+    private final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+    private final ByteArrayOutputStream buffer = new ByteArrayOutputStream()
+    private boolean startOfLine = true
+
+    TimestampOutputStream(OutputStream delegate) {
+        this.delegate = delegate
+    }
+
+    @Override
+    void write(int b) throws IOException {
+        if (startOfLine) {
+            String timestamp = formatter.format(new Date()) + " "
+            delegate.write(timestamp.getBytes("UTF-8"))
+            startOfLine = false
+        }
+
+        buffer.write(b)
+
+        if (b == '\n') {
+            buffer.writeTo(delegate)
+            buffer.reset()
+            startOfLine = true
+        }
+    }
+
+    @Override
+    void flush() throws IOException {
+        buffer.flush()
+        delegate.flush()
+    }
+
+    @Override
+    void close() throws IOException {
+        buffer.close()
+        delegate.close()
+    }
+}
+
+
 def LoggerFactory = Class.forName("org.slf4j.LoggerFactory")
 def OutputEventListenerBackedLoggerContext = Class.forName("org.gradle.internal.logging.slf4j.OutputEventListenerBackedLoggerContext")
 def OutputEventListener = Class.forName("org.gradle.internal.logging.events.OutputEventListener")
@@ -76,7 +118,9 @@ def newStyledTextOutputBackedRenderer = StyledTextOutputBackedRenderer.getDeclar
 def gradleLoggerFactory = LoggerFactory.getDeclaredMethod("getILoggerFactory").invoke(null)
 OutputEventListenerBackedLoggerContext.getDeclaredMethod("setLevel", LogLevel.class).invoke(gradleLoggerFactory, LogLevel.INFO)
 
-def streamBackedStandardOutputListener = newStreamBackedStandardOutputListener.newInstance(new FileOutputStream(new File("$rootDir/gradle.log")))
+def streamBackedStandardOutputListener = newStreamBackedStandardOutputListener.newInstance(
+        new TimestampOutputStream(new FileOutputStream(new File("$rootDir/gradle.log")))
+)
 def streamingStyledTextOutput = newStreamingStyledTextOutput.newInstance(streamBackedStandardOutputListener)
 def styledTextOutputBackedRenderer = newStyledTextOutputBackedRenderer.newInstance(streamingStyledTextOutput)
 OutputEventListenerBackedLoggerContext.getDeclaredMethod("setOutputEventListener", OutputEventListener).invoke(gradleLoggerFactory, styledTextOutputBackedRenderer)

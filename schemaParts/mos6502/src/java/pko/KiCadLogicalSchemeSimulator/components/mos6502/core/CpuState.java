@@ -25,6 +25,15 @@ package pko.KiCadLogicalSchemeSimulator.components.mos6502.core;
  * A compact, struct-like representation of CPU state.
  */
 public class CpuState {
+    public static final int P_CARRY = 0x01;
+    public static final int P_ZERO = 0x02;
+    public static final int P_IRQ_DISABLE = 0x04;
+    public static final int P_DECIMAL = 0x08;
+    public static final int P_BREAK = 0x10;
+    // Bit 5 always '1'
+    public static final int P_OVERFLOW = 0x40;
+    public static final int P_NEGATIVE = 0x80;
+
     /**
      * Accumulator
      */
@@ -53,8 +62,8 @@ public class CpuState {
      * Peek-Ahead to next IR
      */
     public int lastIr = -1;
-    public int[] args = new int[2];
-    public int[] lastArgs = new int[2];
+    public final int[] args = new int[2];
+    public final int[] lastArgs = new int[2];
     public int instSize;
     public boolean opTrap;
     public boolean irqAsserted;
@@ -69,9 +78,64 @@ public class CpuState {
     public boolean decimalModeFlag;
     public boolean breakFlag;
     public boolean overflowFlag;
-    public int stepCounter = 0;
+    public int stepCounter;
 
-    public CpuState() {
+    /**
+     * Return a formatted string representing the last instruction and
+     * operands that were executed.
+     *
+     * @return A string representing the mnemonic and operands of the instruction
+     */
+    public static String disassembleOp(int opCode, int[] args) {
+        if (opCode < 0) {
+            return "Reading";
+        }
+        String mnemonic = InstructionTable.opcodeNames[opCode];
+        if (mnemonic == null) {
+            return "???";
+        }
+        StringBuilder sb = new StringBuilder(mnemonic);
+        switch (InstructionTable.instructionModes[opCode]) {
+            case ABS:
+                sb.append(" $").append(Utils.wordToHex(Utils.address(args[0], args[1])));
+                break;
+            case AIX:
+                sb.append(" ($").append(Utils.wordToHex(Utils.address(args[0], args[1]))).append(",X)");
+                break;
+            case ABX:
+                sb.append(" $").append(Utils.wordToHex(Utils.address(args[0], args[1]))).append(",X");
+                break;
+            case ABY:
+                sb.append(" $").append(Utils.wordToHex(Utils.address(args[0], args[1]))).append(",Y");
+                break;
+            case IMM:
+                sb.append(" #$").append(Utils.byteToHex(args[0]));
+                break;
+            case IND:
+                sb.append(" ($").append(Utils.wordToHex(Utils.address(args[0], args[1]))).append(")");
+                break;
+            case ZPI:
+                sb.append(" ($").append(Utils.byteToHex(args[0])).append(")");
+                break;
+            case XIN:
+                sb.append(" ($").append(Utils.byteToHex(args[0])).append(",X)");
+                break;
+            case INY:
+                sb.append(" ($").append(Utils.byteToHex(args[0])).append("),Y");
+                break;
+            case REL:
+            case ZPR:
+            case ZPG:
+                sb.append(" $").append(Utils.byteToHex(args[0]));
+                break;
+            case ZPX:
+                sb.append(" $").append(Utils.byteToHex(args[0])).append(",X");
+                break;
+            case ZPY:
+                sb.append(" $").append(Utils.byteToHex(args[0])).append(",Y");
+                break;
+        }
+        return sb.toString();
     }
 
     /**
@@ -80,7 +144,7 @@ public class CpuState {
      * @return a string formatted for the trace log.
      */
     public String toTraceEvent() {
-        String opcode = Cpu.disassembleOp(lastIr, lastArgs);
+        String opcode = disassembleOp(lastIr, lastArgs);
         return getInstructionByteStatus() + "\n" + String.format("%-14s", opcode) + "\nA:" + Utils.byteToHex(a) + "\nX:" + Utils.byteToHex(x) + "\nY:" +
                 Utils.byteToHex(y) + "\nF:" + Utils.byteToHex(getStatusFlag()) + "\nS:1" + Utils.byteToHex(sp) + "\n" + getProcessorStatusString() + "\n";
     }
@@ -91,25 +155,25 @@ public class CpuState {
     public int getStatusFlag() {
         int status = 0x20;
         if (carryFlag) {
-            status |= Cpu.P_CARRY;
+            status |= P_CARRY;
         }
         if (zeroFlag) {
-            status |= Cpu.P_ZERO;
+            status |= P_ZERO;
         }
         if (irqDisableFlag) {
-            status |= Cpu.P_IRQ_DISABLE;
+            status |= P_IRQ_DISABLE;
         }
         if (decimalModeFlag) {
-            status |= Cpu.P_DECIMAL;
+            status |= P_DECIMAL;
         }
         if (breakFlag) {
-            status |= Cpu.P_BREAK;
+            status |= P_BREAK;
         }
         if (overflowFlag) {
-            status |= Cpu.P_OVERFLOW;
+            status |= P_OVERFLOW;
         }
         if (negativeFlag) {
-            status |= Cpu.P_NEGATIVE;
+            status |= P_NEGATIVE;
         }
         return status;
     }

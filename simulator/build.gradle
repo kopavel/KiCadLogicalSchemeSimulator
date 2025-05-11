@@ -113,6 +113,7 @@ run {
                  "-XX:MaxInlineLevel=20",
                  "-XX:FreqInlineSize=360",
                  "-XX:ParallelGCThreads=1",
+//                 "-XX:-Inline",
                  "-XX:+UnlockDiagnosticVMOptions", "-XX:+DebugNonSafepoints", //"-XX:+UseCountedLoopSafepoints", "-XX:LoopStripMiningIter=1",
                  "--add-opens", "java.base/java.lang=KiCadLogicalSchemeSimulator.simulator",
                  "--enable-native-access=com.formdev.flatlaf",

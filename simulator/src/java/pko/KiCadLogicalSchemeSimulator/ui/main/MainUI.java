@@ -43,7 +43,7 @@ public class MainUI extends JFrame {
         var1.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
         var1.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(50, 0, 0, 0), null, 0, 0, null, null));
         setContentPane(var1);
-        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {

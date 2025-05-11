@@ -59,7 +59,7 @@ public class Z80CPin extends InPin {
 
     public Z80CPin(String id, Z80Cpu parent) {
         super(id, parent);
-        this.waitPin = parent.waitPin;
+        waitPin = parent.waitPin;
         refreshPin = parent.refreshPin;
         aOut = parent.aOut;
         dOut = parent.dOut;
@@ -127,7 +127,7 @@ public class Z80CPin extends InPin {
             }
             case 3 -> {
                 if (lM == 1) {
-                    queue.request.callback.accept((int) dIn.state);
+                    queue.request.callback.accept(dIn.state);
                     mReqPin.setHi();
                     rdPin.setHi();
                     m1Pin.setHi();
@@ -166,7 +166,7 @@ public class Z80CPin extends InPin {
                     mReqPin.setLo();
                 } else if (ioRequest.memory) {
                     if (ioRequest.read) {
-                        ioRequest.callback.accept((int) dIn.state);
+                        ioRequest.callback.accept(dIn.state);
                         mReqPin.setHi();
                         rdPin.setHi();
                     } else {
@@ -175,7 +175,7 @@ public class Z80CPin extends InPin {
                     }
                 } else {
                     if (ioRequest.read) {
-                        ioRequest.callback.accept((int) dIn.state);
+                        ioRequest.callback.accept(dIn.state);
                         rdPin.setHi();
                     } else {
                         wrPin.setHi();

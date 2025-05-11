@@ -40,10 +40,9 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@SuppressWarnings("unused")
-public class Utils {
-    private Utils() {
-    }
+@SuppressWarnings({"unused", "StaticMethodOnlyUsedInOneClass"})
+public enum Utils {
+    ;
 
     public static String getStackTrace() {
         return getStackTrace(3);
@@ -84,9 +83,9 @@ public class Utils {
         return content.toString();
     }
 
-    public static <T> T[] addToArray(final T[] array, final T item) {
-        final int length = array.length;
-        final T[] newArray = Arrays.copyOf(array, length + 1);
+    public static <T> T[] addToArray(T[] array, T item) {
+        int length = array.length;
+        T[] newArray = Arrays.copyOf(array, length + 1);
         newArray[length] = item;
         return newArray;
     }

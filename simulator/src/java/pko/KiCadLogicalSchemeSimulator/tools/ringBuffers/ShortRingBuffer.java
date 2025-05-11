@@ -39,7 +39,7 @@ public class ShortRingBuffer extends RingBuffer {
 
     public ShortRingBuffer(int capacity) {
         super((capacity < 1) ? DEFAULT_CAPACITY : capacity);
-        this.data = new short[this.capacity];
+        data = new short[capacity];
     }
 
     @Override

@@ -51,8 +51,8 @@ public class CInRaisingPin extends RaisingEdgePin {
     /*Optimiser constructor*/
     public CInRaisingPin(CInRaisingPin oldPin, String variantId) {
         super(oldPin, variantId);
-        this.countMask = oldPin.countMask;
-        this.out = oldPin.out;
+        countMask = oldPin.countMask;
+        out = oldPin.out;
         parent = oldPin.parent;
     }
 
@@ -84,7 +84,7 @@ public class CInRaisingPin extends RaisingEdgePin {
             optimiser.cut("r");
         }
         CInRaisingPin build = optimiser.build();
-        ((Counter) parent).in = build;
+        parent.in = build;
         parent.replaceIn(this, build);
         build.source = source;
         return build;

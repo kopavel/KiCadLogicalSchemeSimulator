@@ -36,7 +36,7 @@ import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 
 public class MultiPartRIn extends InPin {
     public final boolean reverse;
-    public MultiPartCIn[] cIns;
+    public final MultiPartCIn[] cIns;
     public final MultiPartCounter parent;
     public final int mask;
     public final int nMask;

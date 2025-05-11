@@ -45,7 +45,7 @@ public class AndGateIn extends InPin {
         super(id, parent);
         this.parent = parent;
         this.mask = mask;
-        this.nMask = ~mask;
+        nMask = ~mask;
         out = parent.getOutPin("OUT");
     }
 
@@ -81,7 +81,6 @@ public class AndGateIn extends InPin {
                 }
                 /*Optimiser line o blockEnd nr*/
             }
-            return;
         } else {
             /*Optimiser bind nMask*/
             parent.inState = state & nMask;
@@ -111,7 +110,6 @@ public class AndGateIn extends InPin {
                 out.setLo();
                 /*Optimiser line o blockEnd nr*/
             }
-            return;
         } else {
             /*Optimiser bind mask*/
             parent.inState = state | mask;

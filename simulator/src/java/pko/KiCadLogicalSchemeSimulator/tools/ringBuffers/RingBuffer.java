@@ -36,9 +36,9 @@ public abstract class RingBuffer {
     protected boolean isFull;
     protected int writePos;
 
-    public RingBuffer(int capacity) {
+    protected RingBuffer(int capacity) {
         this.capacity = capacity;
-        this.writePos = -1;
+        writePos = -1;
     }
 
     public int available() {

@@ -57,8 +57,8 @@ public class Led7SegmentDisplayUiComponent extends AbstractUiComponent {
         setBackground(new Color(0, 0, 0, 0));
         width = 0.5f * size;
         height = size - 5;
-        segmentWidth = 6f;
-        segmentHeight = 6f;
+        segmentWidth = 6.0f;
+        segmentHeight = 6.0f;
         halfHeight = height / 2;
         //noinspection resource
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this::repaint, 0, redrawPeriod, TimeUnit.MILLISECONDS);

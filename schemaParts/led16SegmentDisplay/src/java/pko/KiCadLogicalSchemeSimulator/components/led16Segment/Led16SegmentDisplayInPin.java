@@ -39,13 +39,13 @@ public class Led16SegmentDisplayInPin extends InPin {
 
     public Led16SegmentDisplayInPin(String id, Led16SegmentDisplay parent, int bit) {
         super(id, parent);
-        this.display = parent;
+        display = parent;
         if (parent.reverse) {
-            this.mask = ~(1 << bit);
+            mask = ~(1 << bit);
         } else {
-            this.mask = 1 << bit;
+            mask = 1 << bit;
         }
-        this.nMask = ~this.mask;
+        nMask = ~mask;
     }
 
     @Override

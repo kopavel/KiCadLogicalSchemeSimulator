@@ -46,8 +46,10 @@ public abstract class Bus extends ModelItem<Bus> {
     public final Map<String, Byte> aliasOffsets;
     public int state;
     public boolean useBitPresentation;
+    //Fixme why not just 'mask'?
+    public int applyMask;
 
-    public Bus(String id, SchemaPart parent, int size, String... aliases) {
+    protected Bus(String id, SchemaPart parent, int size, String... aliases) {
         super(id, parent);
         this.size = size;
         if (aliases == null || aliases.length == 0) {
@@ -55,8 +57,8 @@ public abstract class Bus extends ModelItem<Bus> {
                 throw new RuntimeException("Use Pin for Bus with size 1:" + getName());
             } else {
                 aliasOffsets = new HashMap<>();
-                for (byte i = 0; i < size; i++) {
-                    aliasOffsets.put(id + i, i);
+                for (byte b = 0; b < size; b++) {
+                    aliasOffsets.put(id + b, b);
                 }
             }
         } else if (aliases.length != size) {
@@ -65,13 +67,13 @@ public abstract class Bus extends ModelItem<Bus> {
             aliasOffsets = Collections.singletonMap(id, (byte) 0);
         } else {
             aliasOffsets = new HashMap<>();
-            for (byte i = 0; i < aliases.length; i++) {
-                aliasOffsets.put(aliases[i], i);
+            for (byte b = 0; b < aliases.length; b++) {
+                aliasOffsets.put(aliases[b], b);
             }
         }
     }
 
-    public Bus(Bus oldBus, String variantId) {
+    protected Bus(Bus oldBus, String variantId) {
         this(oldBus.id, oldBus.parent, oldBus.size);
         this.variantId = variantId + (oldBus.variantId == null ? "" : ":" + oldBus.variantId);
         aliasOffsets.clear();
@@ -80,10 +82,10 @@ public abstract class Bus extends ModelItem<Bus> {
         state = oldBus.state;
         used = oldBus.used;
         priority = oldBus.priority;
-        triStateIn=oldBus.triStateIn;
-        triStateOut=oldBus.triStateOut;
-        hiImpedance = oldBus.hiImpedance & isTriState(source);
-        source=oldBus;
+        triStateIn = oldBus.triStateIn;
+        triStateOut = oldBus.triStateOut;
+        hiImpedance = oldBus.hiImpedance && isTriState(source);
+        source = oldBus;
     }
 
     @Override
@@ -104,9 +106,9 @@ public abstract class Bus extends ModelItem<Bus> {
     abstract public void setState(int newState);
 
     @Override
-    public Bus copyState(IModelItem<Bus> oldBus) {
-        this.state = oldBus.getThis().state;
-        this.hiImpedance = oldBus.isHiImpedance();
+    public Bus copyState(IModelItem<? extends Bus> oldBus) {
+        state = oldBus.getThis().state;
+        hiImpedance = oldBus.isHiImpedance();
         return this;
     }
 

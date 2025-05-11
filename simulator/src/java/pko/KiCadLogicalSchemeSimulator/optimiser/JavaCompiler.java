@@ -43,7 +43,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 
-public class JavaCompiler {
+public enum JavaCompiler {
+    ;
     private static final javax.tools.JavaCompiler compiler;
     private static final List<String> optionList;
     private static final DynamicClassLoader classLoader = new DynamicClassLoader(ClassLoader.getSystemClassLoader());
@@ -54,7 +55,7 @@ public class JavaCompiler {
                 throw new IllegalStateException("No Java compiler available");
             }
             String path = JavaCompiler.class.getProtectionDomain().getCodeSource().getLocation().getFile();
-            if (System.getProperty("os.name").toLowerCase().contains("win") && path.startsWith("/")) {
+            if (System.getProperty("os.name").toLowerCase().contains("win") && !path.isEmpty() && path.charAt(0) == '/') {
                 path = path.substring(1);
             }
             StringBuilder paths = new StringBuilder(path);
@@ -67,7 +68,7 @@ public class JavaCompiler {
             }
             Simulator.schemaPartSpiMap.values().forEach(spi -> {
                 String spiPath = spi.getClass().getProtectionDomain().getCodeSource().getLocation().getFile();
-                if (System.getProperty("os.name").toLowerCase().contains("win") && spiPath.startsWith("/")) {
+                if (System.getProperty("os.name").toLowerCase().contains("win") && !spiPath.isEmpty() && spiPath.charAt(0) == '/') {
                     spiPath = spiPath.substring(1);
                 }
                 paths.append(";").append(spiPath);
@@ -86,7 +87,7 @@ public class JavaCompiler {
         InMemoryJavaFileManager fileManager = new InMemoryJavaFileManager(compiler.getStandardFileManager(null, null, null));
         JavaFileObject javaFileObject = new InMemoryJavaFileObject(className, sourceCode);
         List<JavaFileObject> javaFileObjects = Collections.singletonList(javaFileObject);
-        final DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
+        DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
         javax.tools.JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, diagnostics, optionList, null, javaFileObjects);
         if (task.call()) {
             Class<?>[] retClass = new Class[1];
@@ -110,7 +111,7 @@ public class JavaCompiler {
             return retClass[0];
         } else {
             Log.error(JavaCompiler.class, "Can't compile source");
-            for (final Diagnostic<? extends JavaFileObject> diagnostic : diagnostics.getDiagnostics()) {
+            for (Diagnostic<? extends JavaFileObject> diagnostic : diagnostics.getDiagnostics()) {
                 if (diagnostic.getPosition() >= 0) {
                     Log.error(JavaCompiler.class,
                             "{} at {}:{} {} \n   {}",
@@ -160,7 +161,7 @@ public class JavaCompiler {
     static class InMemoryJavaFileManager extends ForwardingJavaFileManager<JavaFileManager> {
         private final Map<String, ByteArrayOutputStream> classBytes = new HashMap<>();
 
-        public InMemoryJavaFileManager(JavaFileManager fileManager) {
+        InMemoryJavaFileManager(JavaFileManager fileManager) {
             super(fileManager);
         }
 

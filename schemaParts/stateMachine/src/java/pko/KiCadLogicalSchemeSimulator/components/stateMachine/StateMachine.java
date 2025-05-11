@@ -41,7 +41,6 @@ public class StateMachine extends SchemaPart {
     private final InBus in;
     private final InPin dPin;
     private final int mask;
-    private InPin cPin;
     private Bus out;
     private boolean cActive;
     private int outState;
@@ -92,7 +91,7 @@ public class StateMachine extends SchemaPart {
             @Override
             public void setHi() {
                 state = true;
-                int newOutState = 0 ^ outMask;
+                int newOutState = outMask;
                 if (out.state != newOutState) {
                     out.setState(newOutState);
                 }
@@ -131,7 +130,7 @@ public class StateMachine extends SchemaPart {
             }
         });
         if (params.containsKey("cReverse")) {
-            cPin = addInPin(new InPin("C", this) {
+            addInPin(new InPin("C", this) {
                 @Override
                 public void setHi() {
                     cActive = false;
@@ -142,7 +141,7 @@ public class StateMachine extends SchemaPart {
                 public void setLo() {
                     state = false;
                     cActive = true;
-                    outState = states[(int) in.state];
+                    outState = states[in.state];
                     int newOutState = (dPin.state ? 0 : outState) ^ outMask;
                     if (out.state != newOutState) {
                         out.setState(newOutState);
@@ -151,12 +150,12 @@ public class StateMachine extends SchemaPart {
             });
             cActive = true;
         } else {
-            cPin = addInPin(new InPin("C", this) {
+            addInPin(new InPin("C", this) {
                 @Override
                 public void setHi() {
                     state = true;
                     cActive = true;
-                    outState = states[(int) in.state];
+                    outState = states[in.state];
                     int newOutState = (dPin.state ? 0 : outState) ^ outMask;
                     if (out.state != newOutState) {
                         out.setState(newOutState);
@@ -178,7 +177,7 @@ public class StateMachine extends SchemaPart {
                 public void setState(int newState) {
                     state = newState;
                     if (cActive) {
-                        outState = states[(int) newState];
+                        outState = states[newState];
                         int newOutState = (dPin.state ? 0 : outState) ^ outMask;
                         if (out.state != newOutState) {
                             out.setState(newOutState);

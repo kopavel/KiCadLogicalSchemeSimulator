@@ -51,9 +51,9 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
     public long ticks;
     public Pin out;
     ScheduledExecutorService scheduler;
-    AtomicReference<Double> currentFreq = new AtomicReference<>(0d);
+    final AtomicReference<Double> currentFreq = new AtomicReference<>(0.00d);
     @Getter
-    private double clockFreq = 0;
+    private double clockFreq;
     private Thread fullSpeedThread;
     private long timerStart;
     private long tickStart;
@@ -82,7 +82,7 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
             if (fullSpeedThread == null || !fullSpeedThread.isAlive()) {
                 fullSpeedAlive.setOpaque(true);
                 fullSpeedThread = Thread.ofPlatform().priority(MAX_PRIORITY).start(() -> {
-                    final Pin local = out;
+                    Pin local = out;
                     try {
                         while (fullSpeedAlive.getOpaque()) {
                             ticks += 20;
@@ -118,7 +118,7 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
             tickStart = ticks;
             int period = Math.max(1, (int) (1000000.0 / clockFreq / 2));
             scheduler.scheduleAtFixedRate(() -> {
-                final Pin local = out;
+                Pin local = out;
                 long target = Math.min(10000, (long) ((System.currentTimeMillis() - timerStart) * clockFreq * 2) - ticks + tickStart);
                 ticks += target;
                 for (int i = 0; i < target; i++) {

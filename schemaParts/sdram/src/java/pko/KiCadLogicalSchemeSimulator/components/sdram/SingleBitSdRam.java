@@ -59,7 +59,7 @@ public class SingleBitSdRam extends SchemaPart {
         if (size > 15) {
             throw new RuntimeException("Component " + id + " max size is 15");
         }
-        int ramSize = (int) Math.pow(2, size * 2);
+        int ramSize = (int) Math.pow(2, size << 1);
         mem = new boolean[ramSize];
         for (int i = 0; i < ramSize; i++) {
             mem[i] = ThreadLocalRandom.current().nextBoolean();
@@ -77,7 +77,7 @@ public class SingleBitSdRam extends SchemaPart {
                 @Override
                 public void setLo() {
                     state = false;
-                    hiPart = (int) (addrPin.state << size);
+                    hiPart = addrPin.state << size;
                 }
             });
             addInPin(new InPin("~{CAS}", this) {
@@ -92,7 +92,7 @@ public class SingleBitSdRam extends SchemaPart {
                 @Override
                 public void setLo() {
                     state = false;
-                    addr = (int) (hiPart + addrPin.state);
+                    addr = hiPart + addrPin.state;
                     if (we.state) {
                         if (dOut.state != mem[addr] || dOut.hiImpedance) {
                             if (mem[addr]) {
@@ -111,7 +111,7 @@ public class SingleBitSdRam extends SchemaPart {
                 @Override
                 public void setHi() {
                     state = true;
-                    hiPart = (int) (addrPin.state << size);
+                    hiPart = addrPin.state << size;
                 }
 
                 @Override
@@ -123,7 +123,7 @@ public class SingleBitSdRam extends SchemaPart {
                 @Override
                 public void setHi() {
                     state = true;
-                    addr = (int) (hiPart + addrPin.state);
+                    addr = hiPart + addrPin.state;
                     if (we.state) {
                         mem[addr] = dIn.state;
                     } else {
@@ -151,7 +151,7 @@ public class SingleBitSdRam extends SchemaPart {
 
     @Override
     public String extraState() {
-        return "A:" + String.format("%" + (int) Math.ceil(size / 4d) + "X", addr) + "\nD:" + dIn.state;
+        return "A:" + String.format("%" + (int) Math.ceil(size / 4.0d) + "X", addr) + "\nD:" + dIn.state;
     }
 
     @Override

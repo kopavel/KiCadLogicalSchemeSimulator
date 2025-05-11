@@ -42,7 +42,7 @@ public class RepeaterInPin extends InPin {
     /*Optimiser constructor*/
     public RepeaterInPin(RepeaterInPin oldPin, String variantId) {
         super(oldPin, variantId);
-        this.out = oldPin.out;
+        out = oldPin.out;
         parent = oldPin.parent;
     }
 

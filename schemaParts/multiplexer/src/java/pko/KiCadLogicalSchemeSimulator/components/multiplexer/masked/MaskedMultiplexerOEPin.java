@@ -40,7 +40,7 @@ public class MaskedMultiplexerOEPin extends InPin {
     public final int mask;
     public final int nMask;
     public Bus outBus;
-    public Bus[] inBuses;
+    public final Bus[] inBuses;
 
     public MaskedMultiplexerOEPin(String id, MaskedMultiplexer parent, int mask) {
         super(id, parent);
@@ -54,11 +54,11 @@ public class MaskedMultiplexerOEPin extends InPin {
     /*Optimiser constructor*/
     public MaskedMultiplexerOEPin(MaskedMultiplexerOEPin oldPin, String variantId) {
         super(oldPin, variantId);
-        this.parent = oldPin.parent;
-        this.mask = oldPin.mask;
-        this.nMask = oldPin.nMask;
-        this.outBus = oldPin.outBus;
-        this.inBuses = oldPin.inBuses;
+        parent = oldPin.parent;
+        mask = oldPin.mask;
+        nMask = oldPin.nMask;
+        outBus = oldPin.outBus;
+        inBuses = oldPin.inBuses;
     }
 
     @Override

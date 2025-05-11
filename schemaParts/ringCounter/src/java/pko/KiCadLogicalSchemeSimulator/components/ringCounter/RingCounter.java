@@ -107,13 +107,13 @@ public class RingCounter extends SchemaPart {
                 @Override
                 public void setHi() {
                     state = true;
-                    clockEnabled = state;
+                    clockEnabled = true;
                 }
 
                 @Override
                 public void setLo() {
                     state = false;
-                    clockEnabled = state;
+                    clockEnabled = false;
                     if (outBus.state != 1) {
                         outBus.setState(1);
                     }

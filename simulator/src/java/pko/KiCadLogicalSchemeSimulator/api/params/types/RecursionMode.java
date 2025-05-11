@@ -33,5 +33,5 @@ package pko.KiCadLogicalSchemeSimulator.api.params.types;
 public enum RecursionMode {
     all,
     none,
-    warn;
+    warn
 }

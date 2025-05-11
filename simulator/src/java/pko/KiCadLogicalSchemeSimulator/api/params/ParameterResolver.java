@@ -56,11 +56,11 @@ public class ParameterResolver {
     public final Map<String, Map<String, SymbolConfig>> symbols = new HashMap<>();
     private final Map<String, Comp> compMap = new HashMap<>();
     public RecursionMode recursionMode = warn;
-    Pattern pwrPattern = Pattern.compile("\\+[0-9]+v", Pattern.CASE_INSENSITIVE);
+    final Pattern pwrPattern = Pattern.compile("\\+[0-9]+v", Pattern.CASE_INSENSITIVE);
 
-    public static void setParams(String params, Map<String, String> paramMap) {
+    public static void setParams(String params, Map<? super String, ? super String> paramMap) {
         for (String param : params.split(";")) {
-            int equalPos = param.indexOf("=");
+            int equalPos = param.indexOf('=');
             String paramName;
             String value;
             if (equalPos >= 0) {
@@ -84,8 +84,8 @@ public class ParameterResolver {
         Map<String, List<String>> cliRecursivePin = new HashMap<>();
         if (recursiveOut != null) {
             for (String pin : recursiveOut) {
-                String pinName = pin.substring(pin.lastIndexOf("_") + 1);
-                String partId = pin.substring(0, pin.lastIndexOf("_") - 1);
+                String pinName = pin.substring(pin.lastIndexOf('_') + 1);
+                String partId = pin.substring(0, pin.lastIndexOf('_') - 1);
                 cliRecursivePin.computeIfAbsent(partId, e -> new ArrayList<>()).add(pinName);
             }
         }
@@ -94,7 +94,7 @@ public class ParameterResolver {
         }
         compMap.putAll(export.getComponents().getComp()
                 .stream()
-                .collect(Collectors.toMap(i -> i.ref, i -> i)));
+                .collect(Collectors.toMap(comp -> comp.ref, comp -> comp)));
         for (Comp comp : export.getComponents().getComp()) {
             Part part = null;
             if (params != null && params.part != null) {
@@ -146,7 +146,7 @@ public class ParameterResolver {
                     }
                     if (part.priority != null) {
                         conf.priority = Arrays.stream(part.priority.split(";"))
-                                .collect(Collectors.toMap(p -> p.startsWith("-") ? p.substring(1) : p, p -> !p.startsWith("-")));
+                                .collect(Collectors.toMap(p -> !p.isEmpty() && p.charAt(0) == '-' ? p.substring(1) : p, p -> !(!p.isEmpty() && p.charAt(0) == '-')));
                     }
                     if (cliRecursivePin.containsKey(comp.getRef())) {
                         conf.recursivePins.addAll(cliRecursivePin.get(comp.getRef()));
@@ -169,7 +169,8 @@ public class ParameterResolver {
                         }
                         if (unit.priority != null) {
                             conf.priority = Arrays.stream(unit.priority.split(";"))
-                                    .collect(Collectors.toMap(p -> p.startsWith("-") ? p.substring(1) : p, p -> !p.startsWith("-")));
+                                    .collect(Collectors.toMap(p -> !p.isEmpty() && p.charAt(0) == '-' ? p.substring(1) : p,
+                                            p -> !(!p.isEmpty() && p.charAt(0) == '-')));
                         }
                         if (cliRecursivePin.containsKey(comp.getRef() + "#" + unit.name)) {
                             conf.recursivePins.addAll(cliRecursivePin.get(comp.getRef() + "#" + unit.name));

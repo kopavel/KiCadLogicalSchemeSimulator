@@ -61,8 +61,8 @@ public class BusMerger extends OutBus {
         destination.source = this;
         Bus d = destination;
         while (d instanceof BusInInterconnect interconnect) {
-            this.mask &= ~interconnect.interconnectMask;
-            this.mask |= interconnect.senseMask;
+            mask &= ~interconnect.interconnectMask;
+            mask |= interconnect.senseMask;
             d = interconnect.destination;
         }
         destinations = new Bus[]{destination};
@@ -73,8 +73,8 @@ public class BusMerger extends OutBus {
         destination.source = this;
         switch (destination) {
             case BusInInterconnect interconnect -> {
-                this.mask &= ~interconnect.interconnectMask;
-                this.mask |= interconnect.senseMask;
+                mask &= ~interconnect.interconnectMask;
+                mask |= interconnect.senseMask;
                 destinations = Utils.addToArray(destinations, interconnect);
             }
             case InBus bus -> destinations = Utils.addToArray(destinations, bus);
@@ -85,7 +85,7 @@ public class BusMerger extends OutBus {
 
     public void addSource(OutBus bus, int srcMask, byte offset) {
         bus.used = true;
-        triStateOut |= bus.triStateOut;
+        triStateOut = triStateOut || bus.triStateOut;
         int destinationMask = offset == 0 ? srcMask : (offset > 0 ? srcMask << offset : srcMask >> -offset);
         BusMergerBusIn input = new BusMergerBusIn(bus, destinationMask, this);
         bus.addDestination(input, srcMask, offset);
@@ -117,7 +117,7 @@ public class BusMerger extends OutBus {
         }
     }
 
-    public void addSource(Net net, List<OutPin> pins, List<PassivePin> passivePins, Byte offset) {
+    public void addSource(Net net, List<? extends OutPin> pins, List<? extends PassivePin> passivePins, Byte offset) {
         int destinationMask = 1 << offset;
         BusMergerWireIn input = new BusMergerWireIn(destinationMask, this);
         Pin pin = net.processWire(input, pins, passivePins, Collections.emptyMap());
@@ -141,7 +141,7 @@ public class BusMerger extends OutBus {
     }
 
     private void processPin(Pin pin, BusMergerWireIn input, int destinationMask) {
-        triStateOut |= pin.triStateOut;
+        triStateOut = triStateOut || pin.triStateOut;
         input.source = pin;
         input.triStateOut = pin.triStateOut;
         input.oldStrong = pin.strong;
@@ -163,7 +163,7 @@ public class BusMerger extends OutBus {
                 if ((weakPins & destinationMask) != 0 && ((weakState & destinationMask) == 0) == pin.state) {
                     if (parent.net.stabilizing) {
                         parent.net.forResend.add(this);
-                        assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
+                        assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
                         return;
                     } else {
                         throw new ShortcutException(sources);

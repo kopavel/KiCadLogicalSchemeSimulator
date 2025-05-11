@@ -22,9 +22,29 @@
  */
 
 package pko.KiCadLogicalSchemeSimulator.components.mos6502.core;
-
-public interface InstructionTable {
-    int BRK = 0x00;
+public class InstructionTable {
+    /**
+     * Size, in bytes, required for each instruction. This table
+     * includes sizes for all instructions for NMOS 6502, CMOS 65C02,
+     * and CMOS 65C816
+     */
+    public static int[] instructionSizes = {1, 2, 2, 1, 2, 2, 2, 2, 1, 2, 1, 1, 3, 3, 3, 3,   // 0x00-0x0f
+            2, 2, 2, 1, 2, 2, 2, 2, 1, 3, 1, 1, 3, 3, 3, 3,   // 0x10-0x1f
+            3, 2, 2, 1, 2, 2, 2, 2, 1, 2, 1, 1, 3, 3, 3, 3,   // 0x20-0x2f
+            2, 2, 2, 1, 2, 2, 2, 2, 1, 3, 1, 1, 3, 3, 3, 3,   // 0x30-0x3f
+            1, 2, 2, 1, 2, 2, 2, 2, 1, 2, 1, 1, 3, 3, 3, 3,   // 0x40-0x4f
+            2, 2, 2, 1, 2, 2, 2, 2, 1, 3, 1, 1, 3, 3, 3, 3,   // 0x50-0x5f
+            1, 2, 2, 1, 2, 2, 2, 2, 1, 2, 1, 1, 3, 3, 3, 3,   // 0x60-0x6f
+            2, 2, 2, 1, 2, 2, 2, 2, 1, 3, 1, 1, 3, 3, 3, 3,   // 0x70-0x7f
+            2, 2, 2, 1, 2, 2, 2, 2, 1, 2, 1, 1, 3, 3, 3, 3,   // 0x80-0x8f
+            2, 2, 2, 1, 2, 2, 2, 2, 1, 3, 1, 1, 3, 3, 3, 3,   // 0x90-0x9f
+            2, 2, 2, 1, 2, 2, 2, 2, 1, 2, 1, 1, 3, 3, 3, 3,   // 0xa0-0xaf
+            2, 2, 2, 1, 2, 2, 2, 2, 1, 3, 1, 1, 3, 3, 3, 3,   // 0xb0-0xbf
+            2, 2, 2, 1, 2, 2, 2, 2, 1, 2, 1, 1, 3, 3, 3, 3,   // 0xc0-0xcf
+            2, 2, 2, 1, 2, 2, 2, 2, 1, 3, 1, 1, 3, 3, 3, 3,   // 0xd0-0xdf
+            2, 2, 2, 1, 2, 2, 2, 2, 1, 2, 1, 1, 3, 3, 3, 3,   // 0xe0-0xef
+            2, 2, 2, 1, 2, 2, 2, 2, 1, 3, 1, 1, 3, 3, 3, 3    // 0xf0-0xff
+    };
     int JSR = 0x20;
     int RTS = 0x60;
     /**
@@ -34,7 +54,7 @@ public interface InstructionTable {
      * TODO (2025-03-14): This table is clearly wrong for 65C816.
      * TODO (2025-03-14): Rockwell/WDC 65C02 names conflict with 65C816 names.
      */
-    String[] opcodeNames = {"BRK", "ORA", "NOP", "NOP", "TSB", "ORA", "ASL", "RMB0",  // 0x00-0x07
+    static String[] opcodeNames = {"BRK", "ORA", "NOP", "NOP", "TSB", "ORA", "ASL", "RMB0",  // 0x00-0x07
             "PHP", "ORA", "ASL", "NOP", "TSB", "ORA", "ASL", "BBR0",  // 0x08-0x0f
             "BPL", "ORA", "ORA", "NOP", "TRB", "ORA", "ASL", "RMB1",  // 0x10-0x17
             "CLC", "ORA", "INC", "NOP", "TRB", "ORA", "ASL", "BBR1",  // 0x18-0x1f
@@ -72,7 +92,7 @@ public interface InstructionTable {
      * for all instructions for NMOS 6502, CMOS 65C02,
      * and CMOS 65C816
      */
-    Mode[] instructionModes = {Mode.IMP, Mode.XIN, Mode.NUL, Mode.NUL,   // 0x00-0x03
+    static Mode[] instructionModes = {Mode.IMP, Mode.XIN, Mode.NUL, Mode.NUL,   // 0x00-0x03
             Mode.ZPG, Mode.ZPG, Mode.ZPG, Mode.ZPG,   // 0x04-0x07
             Mode.IMP, Mode.IMM, Mode.ACC, Mode.NUL,   // 0x08-0x0b
             Mode.ABS, Mode.ABS, Mode.ABS, Mode.ZPR,   // 0x0c-0x0f
@@ -143,7 +163,7 @@ public interface InstructionTable {
      * Number of clock cycles required for each instruction when
      * in NMOS mode.
      */
-    int[] instructionClocksNmos = {7, 6, 1, 8, 3, 3, 5, 5, 3, 2, 2, 2, 4, 4, 6, 6,   // 0x00-0x0f
+    static int[] instructionClocksNmos = {7, 6, 1, 8, 3, 3, 5, 5, 3, 2, 2, 2, 4, 4, 6, 6,   // 0x00-0x0f
             2, 5, 1, 8, 4, 4, 6, 6, 2, 4, 2, 7, 4, 4, 7, 7,   // 0x10-0x1f
             6, 6, 1, 8, 3, 3, 5, 5, 4, 2, 2, 2, 4, 4, 6, 6,   // 0x20-0x2f
             2, 5, 1, 8, 4, 4, 6, 6, 2, 4, 2, 7, 4, 4, 7, 7,   // 0x30-0x3f
@@ -164,7 +184,7 @@ public interface InstructionTable {
      * Number of clock cycles required for each instruction when
      * in CMOS mode
      */
-    int[] instructionClocksCmos = {7, 6, 2, 1, 5, 3, 5, 5, 3, 2, 2, 1, 6, 4, 6, 5,   // 0x00-0x0f
+    static int[] instructionClocksCmos = {7, 6, 2, 1, 5, 3, 5, 5, 3, 2, 2, 1, 6, 4, 6, 5,   // 0x00-0x0f
             2, 5, 5, 1, 5, 4, 6, 5, 2, 4, 2, 1, 6, 4, 6, 5,   // 0x10-0x1f
             6, 6, 2, 1, 3, 3, 5, 5, 4, 2, 2, 1, 4, 4, 6, 5,   // 0x20-0x2f
             2, 5, 5, 1, 4, 4, 6, 5, 2, 4, 2, 1, 4, 4, 6, 5,   // 0x30-0x3f
@@ -181,30 +201,7 @@ public interface InstructionTable {
             2, 6, 2, 1, 3, 3, 5, 5, 2, 2, 2, 1, 4, 4, 6, 5,   // 0xe0-0xef
             2, 5, 5, 1, 4, 4, 6, 5, 2, 4, 4, 1, 4, 4, 7, 5    // 0xf0-0xff
     };
-
-
-    /**
-     * Size, in bytes, required for each instruction. This table
-     * includes sizes for all instructions for NMOS 6502, CMOS 65C02,
-     * and CMOS 65C816
-     */
-    int[] instructionSizes = {1, 2, 2, 1, 2, 2, 2, 2, 1, 2, 1, 1, 3, 3, 3, 3,   // 0x00-0x0f
-            2, 2, 2, 1, 2, 2, 2, 2, 1, 3, 1, 1, 3, 3, 3, 3,   // 0x10-0x1f
-            3, 2, 2, 1, 2, 2, 2, 2, 1, 2, 1, 1, 3, 3, 3, 3,   // 0x20-0x2f
-            2, 2, 2, 1, 2, 2, 2, 2, 1, 3, 1, 1, 3, 3, 3, 3,   // 0x30-0x3f
-            1, 2, 2, 1, 2, 2, 2, 2, 1, 2, 1, 1, 3, 3, 3, 3,   // 0x40-0x4f
-            2, 2, 2, 1, 2, 2, 2, 2, 1, 3, 1, 1, 3, 3, 3, 3,   // 0x50-0x5f
-            1, 2, 2, 1, 2, 2, 2, 2, 1, 2, 1, 1, 3, 3, 3, 3,   // 0x60-0x6f
-            2, 2, 2, 1, 2, 2, 2, 2, 1, 3, 1, 1, 3, 3, 3, 3,   // 0x70-0x7f
-            2, 2, 2, 1, 2, 2, 2, 2, 1, 2, 1, 1, 3, 3, 3, 3,   // 0x80-0x8f
-            2, 2, 2, 1, 2, 2, 2, 2, 1, 3, 1, 1, 3, 3, 3, 3,   // 0x90-0x9f
-            2, 2, 2, 1, 2, 2, 2, 2, 1, 2, 1, 1, 3, 3, 3, 3,   // 0xa0-0xaf
-            2, 2, 2, 1, 2, 2, 2, 2, 1, 3, 1, 1, 3, 3, 3, 3,   // 0xb0-0xbf
-            2, 2, 2, 1, 2, 2, 2, 2, 1, 2, 1, 1, 3, 3, 3, 3,   // 0xc0-0xcf
-            2, 2, 2, 1, 2, 2, 2, 2, 1, 3, 1, 1, 3, 3, 3, 3,   // 0xd0-0xdf
-            2, 2, 2, 1, 2, 2, 2, 2, 1, 2, 1, 1, 3, 3, 3, 3,   // 0xe0-0xef
-            2, 2, 2, 1, 2, 2, 2, 2, 1, 3, 1, 1, 3, 3, 3, 3    // 0xf0-0xff
-    };
+    int BRK;
 
     /**
      * Enumeration of valid CPU behaviors. These determine what behavior and instruction

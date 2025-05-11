@@ -52,7 +52,7 @@ public class RomNCsPin extends RomCsPin {
         aBus.csActive = true;
         int word;
         Bus bus;
-        if ((bus = dBus).state != (word = words[(int) aBus.state]) || bus.hiImpedance) {
+        if ((bus = dBus).state != (word = words[aBus.state]) || bus.hiImpedance) {
             bus.setState(word);
         }
     }

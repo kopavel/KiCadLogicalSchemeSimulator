@@ -32,10 +32,10 @@
 package pko.KiCadLogicalSchemeSimulator.api.params.types;
 import pko.KiCadLogicalSchemeSimulator.api.params.ParameterResolver;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class SchemaPartConfig {
@@ -43,12 +43,12 @@ public class SchemaPartConfig {
     public Map<String, Boolean> priority;
     public String clazz;
     public boolean ignore;
-    public Set<String> recursivePins = new HashSet<>();
+    public final Collection<String> recursivePins = new HashSet<>();
 
     public SchemaPartConfig(SymbolConfig symbolConfig, int unitNo) {
-        this.clazz = symbolConfig.clazz;
-        this.params = new HashMap<>(symbolConfig.symbolParams);
-        this.ignore = symbolConfig.ignoredUnits.contains(unitNo);
+        clazz = symbolConfig.clazz;
+        params = new HashMap<>(symbolConfig.symbolParams);
+        ignore = symbolConfig.ignoredUnits.contains(unitNo);
     }
 
     public void setParams(String param) {

@@ -34,18 +34,18 @@ import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 import java.lang.invoke.VarHandle;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class BatchedAsyncConsumer implements AutoCloseable {
     private static final int maxIndex = 511;
-    private final List<Thread> consumerThreads = new ArrayList<>();
+    private final Collection<Thread> consumerThreads = new ArrayList<>();
     private int pos;
     private Slot writeSlot;
     private static boolean run;
     private int[] writePayload;
 
-    public BatchedAsyncConsumer(int size) {
+    protected BatchedAsyncConsumer(int size) {
         pos = maxIndex;
         registerShutdown();
         Slot ring = createRings(size);
@@ -90,7 +90,7 @@ public abstract class BatchedAsyncConsumer implements AutoCloseable {
         }
     }
 
-    public void accept(final int payload) {
+    public void accept(int payload) {
         int lPos;
         if ((lPos = pos) == 0) {
             writePayload[0] = payload;
@@ -111,7 +111,7 @@ public abstract class BatchedAsyncConsumer implements AutoCloseable {
         }
     }
 
-    private Slot createRings(int size) {
+    private static Slot createRings(int size) {
         Slot head = new Slot(maxIndex + 1);
         Slot currentSlot = head;
         for (int i = 1; i < size; i++) {
@@ -133,7 +133,7 @@ public abstract class BatchedAsyncConsumer implements AutoCloseable {
         private Slot nextSlot;
 
         Slot(int size) {
-            this.payload = new int[size];
+            payload = new int[size];
         }
     }
 }

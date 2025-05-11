@@ -75,7 +75,7 @@ public class SchemaPartMonitor extends JFrame {
         setContentPane(panel);
         setLocationRelativeTo(Simulator.ui);
         setType(Window.Type.UTILITY);
-        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -95,7 +95,7 @@ public class SchemaPartMonitor extends JFrame {
                           for (int j = 0; j < bus.size; j++) {
                               label = new JLabel(schemaPart.ids.get(bus) + j);
                               label.setBorder(BorderFactory.createEmptyBorder(3, 2, 4, 0));
-                              label.setAlignmentX(Component.LEFT_ALIGNMENT);
+                              label.setAlignmentX(LEFT_ALIGNMENT);
                               label.setFont(AbstractUiComponent.monospacedFont);
                               inputsNames.add(label);
                               label = new JLabel(String.valueOf(bits[j]));
@@ -109,7 +109,7 @@ public class SchemaPartMonitor extends JFrame {
                       } else {
                           label = new JLabel(schemaPart.ids.get(inItem));
                           label.setBorder(BorderFactory.createEmptyBorder(3, 2, 4, 0));
-                          label.setAlignmentX(Component.LEFT_ALIGNMENT);
+                          label.setAlignmentX(LEFT_ALIGNMENT);
                           label.setFont(AbstractUiComponent.monospacedFont);
                           inputsNames.add(label);
                           label = new JLabel(String.valueOf(inItem.getState()));
@@ -129,7 +129,7 @@ public class SchemaPartMonitor extends JFrame {
                           for (int j = 0; j < bus.size; j++) {
                               label = new JLabel(schemaPart.ids.get(bus) + j);
                               label.setBorder(BorderFactory.createEmptyBorder(3, 0, 4, 2));
-                              label.setAlignmentX(Component.RIGHT_ALIGNMENT);
+                              label.setAlignmentX(RIGHT_ALIGNMENT);
                               label.setFont(AbstractUiComponent.monospacedFont);
                               outputsNames.add(label);
                               label = new JLabel(String.valueOf(bits[j]));
@@ -143,7 +143,7 @@ public class SchemaPartMonitor extends JFrame {
                       } else {
                           label = new JLabel(schemaPart.ids.get(outItem));
                           label.setBorder(BorderFactory.createEmptyBorder(3, 0, 4, 2));
-                          label.setAlignmentX(Component.RIGHT_ALIGNMENT);
+                          label.setAlignmentX(RIGHT_ALIGNMENT);
                           label.setFont(AbstractUiComponent.monospacedFont);
                           outputsNames.add(label);
                           label = new JLabel(String.valueOf(outItem.getState()));
@@ -160,10 +160,10 @@ public class SchemaPartMonitor extends JFrame {
         extraPanel.setEditable(false);
         if (schemaPart.outPins.size() > schemaPart.inPins.size()) {
             inputsNames.add(extraPanel);
-            extraPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+            extraPanel.setAlignmentX(LEFT_ALIGNMENT);
         } else {
             outputsNames.add(extraPanel);
-            extraPanel.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            extraPanel.setAlignmentX(RIGHT_ALIGNMENT);
         }
         extraPanel.setFont(AbstractUiComponent.monospacedFont);
         if (schemaPart.extraState() != null) {
@@ -195,10 +195,10 @@ public class SchemaPartMonitor extends JFrame {
             });
             if (schemaPart.outPins.size() > schemaPart.inPins.size()) {
                 inputsNames.add(extraPanelButton);
-                extraPanelButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+                extraPanelButton.setAlignmentX(LEFT_ALIGNMENT);
             } else {
                 outputsNames.add(extraPanelButton);
-                extraPanelButton.setAlignmentX(Component.RIGHT_ALIGNMENT);
+                extraPanelButton.setAlignmentX(RIGHT_ALIGNMENT);
             }
         }
         //setSize(new Dimension(250, 90 + Math.max(schemaPart.inMap.size(), schemaPart.outMap.size()) * 16));
@@ -216,7 +216,7 @@ public class SchemaPartMonitor extends JFrame {
                 } else if (in.item instanceof Bus bus && bus.useBitPresentation) {
                     in.label.setText((bus.state & in.mask) > 0 ? "1" : "0");
                 } else {
-                    in.label.setText(String.format("%" + (int) Math.ceil(in.item.getSize() / 4d) + "X", in.item.getState()));
+                    in.label.setText(String.format("%" + (int) Math.ceil(in.item.getSize() / 4.0d) + "X", in.item.getState()));
                 }
             }
             for (Item out : outs) {
@@ -225,7 +225,7 @@ public class SchemaPartMonitor extends JFrame {
                 } else if (out.item instanceof Bus bus && bus.useBitPresentation) {
                     out.label.setText((bus.state & out.mask) != 0 ? "1" : "0");
                 } else {
-                    out.label.setText(String.format("%" + (int) Math.ceil(out.item.getSize() / 4d) + "X", out.item.getState()));
+                    out.label.setText(String.format("%" + (int) Math.ceil(out.item.getSize() / 4.0d) + "X", out.item.getState()));
                 }
             }
             String extraState = schemaPart.extraState();
@@ -247,25 +247,25 @@ public class SchemaPartMonitor extends JFrame {
     }
 
     private void setupUI() {
-        this.createUIComponents();
+        createUIComponents();
         JPanel var1 = new JPanel();
-        this.panel = var1;
+        panel = var1;
         var1.setLayout(new GridLayoutManager(2, 3, new Insets(0, 0, 0, 0), 0, 0, false, false));
         JPanel var2 = new JPanel();
-        this.schemaPartBox = var2;
+        schemaPartBox = var2;
         var2.setLayout(new GridLayoutManager(1, 2, new Insets(0, 0, 0, 0), 0, 0, false, false));
         var1.add(var2, new GridConstraints(1, 1, 1, 1, 0, 3, 7, 3, null, null, null));
-        JPanel var3 = this.inputsNames;
+        JPanel var3 = inputsNames;
         var2.add(var3, new GridConstraints(0, 0, 1, 1, 0, 3, 3, 3, null, null, null));
-        JPanel var4 = this.outputsNames;
+        JPanel var4 = outputsNames;
         var2.add(var4, new GridConstraints(0, 1, 1, 1, 0, 3, 3, 3, null, null, null));
         JLabel var5 = new JLabel();
-        this.title = var5;
+        title = var5;
         var5.setText("Label");
         var1.add(var5, new GridConstraints(0, 1, 1, 1, 1, 0, 0, 0, null, null, null));
-        JPanel var6 = this.inputsValues;
+        JPanel var6 = inputsValues;
         var1.add(var6, new GridConstraints(1, 0, 1, 1, 4, 2, 3, 3, null, null, null));
-        JPanel var7 = this.outputsValues;
+        JPanel var7 = outputsValues;
         var1.add(var7, new GridConstraints(1, 2, 1, 1, 8, 2, 3, 3, null, null, null));
     }
 

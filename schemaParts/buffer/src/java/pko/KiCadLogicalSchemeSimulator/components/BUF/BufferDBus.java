@@ -43,7 +43,7 @@ public class BufferDBus extends InBus {
 
     public BufferDBus(String id, Buffer parent, int size, String... names) {
         super(id, parent, size, names);
-        this.qBus = parent.getOutBus("Q");
+        qBus = parent.getOutBus("Q");
         this.parent = parent;
     }
 

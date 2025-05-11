@@ -60,7 +60,7 @@ public class MultiOutDecoder extends SchemaPart {
             part.CSs = new boolean[csItems.length];
             part.csPins = new MultiOutDecoderCsPin[csItems.length];
             for (int csNo = 0; csNo < csItems.length; csNo++) {
-                part.CSs[csNo] = csItems[csNo].equals("R");
+                part.CSs[csNo] = "R".equals(csItems[csNo]);
                 part.csPins[csNo] = addInPin(new MultiOutDecoderCsPin("CS" + ((char) ('a' + partNo)) + csNo, part, csNo, this));
                 if (!part.CSs[csNo]) {
                     part.csState |= 1 << csNo;

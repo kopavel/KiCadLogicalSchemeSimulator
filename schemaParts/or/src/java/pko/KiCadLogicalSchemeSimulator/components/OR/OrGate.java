@@ -54,7 +54,7 @@ public class OrGate extends SchemaPart {
         }
         int pinAmount = Integer.parseInt(params.get("size"));
         for (int i = 0; i < pinAmount; i++) {
-            final int mask = 1 << i;
+            int mask = 1 << i;
             ins.put("IN" + i, addInPin(new OrGateIn("IN" + i, this, mask)));
         }
     }

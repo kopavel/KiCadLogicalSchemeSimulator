@@ -132,8 +132,10 @@ public class Rom extends SchemaPart {
 
     @Override
     public String extraState() {
-        return "A:" + String.format("%0" + (int) Math.ceil(aSize / 4d) + "X", aBus.state) + (aBus.csActive ? ("\nD:" +
-                (aBus.state >= words.length ? "OutOfRange" : String.format("%0" + (int) Math.ceil(size / 4d) + "X", words[(int) aBus.state]))) : "");
+        return "A:" + String.format("%0" + (int) Math.ceil(aSize / 4.0d) + "X", aBus.state) + (aBus.csActive
+                                                                                               ? ("\nD:" +
+                (aBus.state >= words.length ? "OutOfRange" : String.format("%0" + (int) Math.ceil(size / 4.0d) + "X", words[aBus.state])))
+                                                                                               : "");
     }
 
     @Override

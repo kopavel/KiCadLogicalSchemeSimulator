@@ -66,13 +66,13 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
         } catch (NumberFormatException r) {
             throw new RuntimeException("Component " + id + " size must be positive number");
         }
-        final Runnable reshapeRunnable = () -> SwingUtilities.invokeLater(() -> {
+        Runnable reshapeRunnable = () -> SwingUtilities.invokeLater(() -> {
             //noinspection deprecation
             display.reshape(display.currentX, display.currentY, hSize * display.scaleFactor, vSize * display.scaleFactor);
         });
         Thread.ofVirtual().start(() -> {
             try {
-                final Runnable repaintRunnable = display::repaint;
+                Runnable repaintRunnable = display::repaint;
                 //noinspection InfiniteLoopStatement
                 while (true) {
                     while (!refresh.getOpaque()) {

@@ -45,7 +45,7 @@ public class Shifter extends SchemaPart {
     private final InPin ciPin;
     private final boolean clearReverse;
     private final boolean inhibitReverse;
-    private int latch = 0;
+    private int latch;
     private Bus out;
     private boolean parallelLoad;
     private boolean clockEnabled = true;

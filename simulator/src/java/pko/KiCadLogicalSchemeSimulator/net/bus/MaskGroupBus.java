@@ -60,7 +60,7 @@ public class MaskGroupBus extends OutBus {
         bus.state = state & mask;
         bus.hiImpedance = hiImpedance;
         used = true;
-        triStateIn |= bus.triStateIn;
+        triStateIn = triStateIn || bus.triStateIn;
         destinations = Utils.addToArray(destinations, bus);
     }
 
@@ -110,7 +110,6 @@ public class MaskGroupBus extends OutBus {
                 }
                 case 2: {
                     recurseError();
-                    return;
                 }
             }
             /*Optimiser blockEnd ar*/
@@ -146,7 +145,6 @@ public class MaskGroupBus extends OutBus {
             }
             case 2: {
                 recurseError();
-                return;
             }
         }
         /*Optimiser blockEnd ar blockEnd ts*/

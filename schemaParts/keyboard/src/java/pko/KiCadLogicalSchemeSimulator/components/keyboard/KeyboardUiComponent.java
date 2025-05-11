@@ -36,11 +36,11 @@ import pko.KiCadLogicalSchemeSimulator.api.schemaPart.AbstractUiComponent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 public class KeyboardUiComponent extends AbstractUiComponent implements KeyListener {
     public final Keyboard parent;
-    private final List<String> keys = new ArrayList<>();
+    private final Collection<String> keys = new ArrayList<>();
     private String label;
 
     public KeyboardUiComponent(String title, int size, Keyboard parent) {

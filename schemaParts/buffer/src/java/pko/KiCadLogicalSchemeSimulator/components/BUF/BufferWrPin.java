@@ -47,7 +47,7 @@ public class BufferWrPin extends InPin {
         this.parent = parent;
         this.dBus = dBus;
         this.oePin = oePin;
-        this.qBus = parent.getOutBus("Q");
+        qBus = parent.getOutBus("Q");
     }
 
     /*Optimiser constructor*/

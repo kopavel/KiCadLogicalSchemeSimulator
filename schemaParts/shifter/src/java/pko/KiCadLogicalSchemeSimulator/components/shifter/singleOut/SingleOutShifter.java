@@ -44,7 +44,7 @@ public class SingleOutShifter extends SchemaPart {
     public final int outMask;
     final SingleOutShifterRPin rPin;
     final SingleOutShifterCIPin ciPin;
-    public int latch = 0;
+    public int latch;
     public Pin out;
     public boolean parallelLoad;
     public boolean clockEnabled;

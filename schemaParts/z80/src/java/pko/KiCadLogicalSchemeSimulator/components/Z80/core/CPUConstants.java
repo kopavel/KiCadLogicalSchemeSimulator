@@ -16,12 +16,14 @@ package pko.KiCadLogicalSchemeSimulator.components.Z80.core;
 /**
  * Various constant data structures and types to support the CPU
  */
-public class CPUConstants {
+@SuppressWarnings("StaticMethodOnlyUsedInOneClass")
+public enum CPUConstants {
+    ;
     // Pre-calculate parity table
     static final boolean[] PARITY_TABLE = new boolean[256];
     //
     // T States for all instructions (Where fixed) - If variable, handled locally
-    final static byte[] OPCODE_T_STATES = new byte[]{4, 16, 7, 6, 4, 4, 7, 4, 4, 11, 7, 6, 4, 4, 7, 4,        // 0
+    final static byte[] OPCODE_T_STATES = {4, 16, 7, 6, 4, 4, 7, 4, 4, 11, 7, 6, 4, 4, 7, 4,        // 0
             0, 16, 7, 6, 4, 4, 7, 4, 12, 11, 7, 6, 4, 4, 7, 4,                                                                // 10
             0, 16, 7, 6, 4, 4, 7, 4, 0, 11, 7, 6, 4, 4, 7, 4,                                                                // 20
             0, 16, 7, 6, 4, 4, 7, 4, 0, 11, 7, 6, 4, 4, 7, 4,                                                                // 30
@@ -38,7 +40,7 @@ public class CPUConstants {
             0, 10, 0, 19, 0, 11, 7, 0, 0, 4, 0, 4, 0, 0, 7, 0,                                                                // E0
             0, 4, 0, 4, 0, 11, 7, 0, 0, 0, 0, 0, 0, 4, 7, 0                                                                    // F0
     };
-    final static byte[] OPCODE_CB_STATES = new byte[]{8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8,        // 0
+    final static byte[] OPCODE_CB_STATES = {8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8,        // 0
             8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8,                                                                // 10
             8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8,                                                                // 20
             8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8,                                                                // 30
@@ -55,7 +57,7 @@ public class CPUConstants {
             8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8,                                                                // E0
             8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8                                                                // F0
     };
-    final static byte[] OPCODE_DD_FD_STATES = new byte[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 0, 0, 0, 0, 0, 0,            // 0
+    final static byte[] OPCODE_DD_FD_STATES = {0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 0, 0, 0, 0, 0, 0,            // 0
             0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 0, 0, 0, 0, 0, 0,                                                                // 10
             0, 14, 20, 10, 8, 8, 11, 0, 0, 15, 14, 10, 8, 8, 11, 0,                                                            // 20
             0, 0, 0, 0, 23, 23, 19, 0, 0, 15, 0, 0, 0, 0, 0, 0,                                                                // 30
@@ -72,7 +74,7 @@ public class CPUConstants {
             0, 14, 0, 23, 0, 15, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0,                                                                // E0
             0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0                                                                    // F0
     };
-    final static byte[] OPCODE_ED_STATES = new byte[]{8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,            // 0
+    final static byte[] OPCODE_ED_STATES = {8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,            // 0
             8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,                                                                    // 10
             8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,                                                                    // 20
             8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,                                                                    // 30
@@ -89,7 +91,7 @@ public class CPUConstants {
             8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,                                                                    // E0
             8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8                                                                    // F0
     };
-    final static byte[] OPCODE_INDEXED_CB_STATES = new byte[]{23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,        // 0
+    final static byte[] OPCODE_INDEXED_CB_STATES = {23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,        // 0
             23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,                                                          // 10
             23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,                                                          // 20
             23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,                                                          // 30
@@ -169,18 +171,12 @@ public class CPUConstants {
             for (int fill = 0; fill < position; fill++) {
                 PARITY_TABLE[position + fill] = !PARITY_TABLE[fill];
             }
-            position = position * 2;
+            position = position << 1;
         }
     }
 
-    /*
-    Constructor - don't!
-   */
-    private CPUConstants() {
-    }
-
     /**
-     * All supported processor registers which can be accessed externally to the core
+     * All supported processor registers, which can be accessed externally to the core
      */
     public enum RegisterNames {
         /**

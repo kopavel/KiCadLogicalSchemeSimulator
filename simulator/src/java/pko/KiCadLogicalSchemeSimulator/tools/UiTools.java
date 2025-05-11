@@ -43,8 +43,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-@SuppressWarnings("unused")
-public class UiTools {
+@SuppressWarnings({"unused", "StaticMethodOnlyUsedInOneClass"})
+public enum UiTools {
+    ;
     private static final BufferedImage font;
     private static final Map<Byte, BufferedImage> letters = new HashMap<>();
     static {
@@ -68,7 +69,7 @@ public class UiTools {
             x -= 5;
             int pos = value & 0xf;
             value = value >> 4;
-            BufferedImage letter = letters.computeIfAbsent((byte) pos, c -> font.getSubimage(c * 5, 0, 4, 7));
+            BufferedImage letter = letters.computeIfAbsent((byte) pos, aPos -> font.getSubimage(aPos * 5, 0, 4, 7));
             dest.drawImage(letter, x, y, null);
         }
     }
@@ -88,6 +89,7 @@ public class UiTools {
                 "+6+NbFty5syUgIGcQL0pqakgV388AJMdOQMxquiEkpuCA6R8KhCpSADVdU0XeKMVbxQ8RZFTkdRFRMjeImoadouq6zRKiYtBS3rBGEEixztX8yo49Ar7MmxPCk7gMuCs0lGN50scRFqrkMw14XMS5ize0wbO8UPGpujyHTRYqLZdcnJLoocHHQ3DOGkBrhQkAfMz4Qrsy7HpKwgZ6nNKFCeOdPFjRqj/jNqaWYUhHRQY4gnG8CYhRjOhlxRPQUawJQxCh6CVGFXmdBSowMVYzIaRAzAxSwoKQ2ilcGEZKQsfuur/gfvnV867jrnj/4L8gVvwNYaEhhAAAAAElFTkSuQmCC";
     }
 
+    @SuppressWarnings("AbstractClassWithOnlyOneDirectInheritor")
     public abstract static class TextChangeListener implements DocumentListener {
         @Override
         public void insertUpdate(DocumentEvent e) {

@@ -25,7 +25,8 @@ package pko.KiCadLogicalSchemeSimulator.components.mos6502.core;
 /**
  * Various Utilities
  */
-public class Utils {
+public enum Utils {
+    ;
     static final String NON_PRINTABLE = ".";
     static final String[] ASCII_CONSTANTS =
             {" ", "!", "\"", "#", "$", "%", "&", "'", "(", ")", "*", "+", ",", "-", ".", "/", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ":", ";", "<", "=",

@@ -117,7 +117,7 @@ public class SingleBitRam extends SchemaPart {
                 public void setLo() {
                     state = false;
                     if (!csPin.state) {
-                        data[(int) aBus.state] = dIn.state;
+                        data[aBus.state] = dIn.state;
                     }
                 }
             });
@@ -162,7 +162,7 @@ public class SingleBitRam extends SchemaPart {
                 public void setHi() {
                     state = true;
                     if (csPin.state) {
-                        data[(int) aBus.state] = dIn.state;
+                        data[aBus.state] = dIn.state;
                     }
                 }
 
@@ -181,13 +181,13 @@ public class SingleBitRam extends SchemaPart {
 
     @Override
     public String extraState() {
-        return "A:" + String.format("%0" + (int) Math.ceil(size / 4d) + "X", (int) aBus.state) + "\nD:" + data[(int) aBus.state];
+        return "A:" + String.format("%0" + (int) Math.ceil(size / 4.0d) + "X", aBus.state) + "\nD:" + data[aBus.state];
     }
 
     private void out() {
         if (oePin.state && csPin.state) {
-            if (dOut.state != data[(int) aBus.state] || dOut.hiImpedance) {
-                if (data[(int) aBus.state]) {
+            if (dOut.state != data[aBus.state] || dOut.hiImpedance) {
+                if (data[aBus.state]) {
                     dOut.setHi();
                 } else {
                     dOut.setLo();
@@ -201,13 +201,13 @@ public class SingleBitRam extends SchemaPart {
     }
 
     private void rOut() {
-        if (oePin.state | csPin.state) {
+        if (oePin.state || csPin.state) {
             if (!dOut.hiImpedance) {
                 dOut.setHiImpedance();
             }
         } else {
-            if (dOut.state != data[(int) aBus.state] || dOut.hiImpedance) {
-                if (data[(int) aBus.state]) {
+            if (dOut.state != data[aBus.state] || dOut.hiImpedance) {
+                if (data[aBus.state]) {
                     dOut.setHi();
                 } else {
                     dOut.setLo();

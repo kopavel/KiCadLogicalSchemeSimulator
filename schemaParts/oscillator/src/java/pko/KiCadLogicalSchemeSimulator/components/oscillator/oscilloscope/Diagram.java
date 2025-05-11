@@ -48,15 +48,15 @@ public class Diagram extends JPanel {
     private static final int BAR_BOTTOM = 12;
     private static final int BAR_HEIGHT = BAR_BOTTOM - BAR_TOP;
     final List<PinItem> pins = new CopyOnWriteArrayList<>();
-    double tickWidth = 10;
-    int offset = 0;
+    private double tickWidth = 10;
+    private int offset;
     private Color currentColor;
 
     public Diagram() {
         setBackground(Color.black);
         addMouseWheelListener(e -> {
             int notches = e.getWheelRotation();
-            int diagramWidth = Diagram.this.getWidth();
+            int diagramWidth = getWidth();
             int oldSize = (int) ((diagramWidth - 10) / tickWidth);
             if (e.isControlDown()) {
                 if (notches < 0) {
@@ -132,7 +132,7 @@ public class Diagram extends JPanel {
                         } else if (singlePin) {
                             currDiagramState = curState != 0 ? Hi : Lo;
                         } else if (currDiagramState != BusChange) {
-                            currDiagramState = curState != prevState ? BusChange : BusActive;
+                            currDiagramState = curState == prevState ? BusActive : BusChange;
                         }
                         if (curState != prevState) {
                             if (hasChanges) {
@@ -186,7 +186,7 @@ public class Diagram extends JPanel {
                             linePos = yPos + BAR_BOTTOM;
                             g2d.drawLine((int) previousX, linePos, (int) xPos, linePos);
                             if (prevDiagramState == MultiChange) {
-                                UiTools.print(curState, (int) previousX + 5, yPos, (int) Math.ceil(pinItem.pin.getSize() / 4f), g2d);
+                                UiTools.print(curState, (int) previousX + 5, yPos, (int) Math.ceil(pinItem.pin.getSize() / 4.0f), g2d);
                             }
                             break;
                         case BusChange:
@@ -204,7 +204,7 @@ public class Diagram extends JPanel {
                                 g2d.drawLine((int) previousX, linePos2, (int) previousX + 2, linePos);
                                 g2d.drawLine((int) previousX, linePos, (int) previousX + 2, linePos2);
                             }
-                            UiTools.print(curState, (int) previousX + 5, yPos, (int) Math.ceil(pinItem.pin.getSize() / 4f), g2d);
+                            UiTools.print(curState, (int) previousX + 5, yPos, (int) Math.ceil(pinItem.pin.getSize() / 4.0f), g2d);
                             break;
                         case MultiChange:
                             setColor(g2d, Color.green);
@@ -243,11 +243,11 @@ public class Diagram extends JPanel {
             this.pin = pin;
             this.out = out;
             if (pin.getSize() < 8) {
-                this.buffer = new ByteRingBuffer();
+                buffer = new ByteRingBuffer();
             } else if (pin.getSize() < 16) {
-                this.buffer = new ShortRingBuffer();
+                buffer = new ShortRingBuffer();
             } else {
-                this.buffer = new IntRingBuffer();
+                buffer = new IntRingBuffer();
             }
         }
     }

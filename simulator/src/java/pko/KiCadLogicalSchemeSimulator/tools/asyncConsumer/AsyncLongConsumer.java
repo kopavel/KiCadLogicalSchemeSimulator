@@ -31,13 +31,13 @@
  */
 package pko.KiCadLogicalSchemeSimulator.tools.asyncConsumer;
 public abstract class AsyncLongConsumer extends AsyncIntConsumers {
-    public AsyncLongConsumer(int size) {
+    protected AsyncLongConsumer(int size) {
         super(size, 1);
     }
 
     public void accept(int payload) {
         do {
-            final Slot slot = queue.writeSlot;
+            Slot slot = queue.writeSlot;
             if (slot.payload == -1L) {
                 slot.payload = payload;
                 queue.writeSlot = slot.nextSlot;

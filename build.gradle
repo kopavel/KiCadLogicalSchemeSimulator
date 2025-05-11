@@ -50,7 +50,7 @@ project.ext.deleteEmptyDirsRecursively = { dir ->
 }
 
 tasks.register("cleanBuild", Delete).configure() {
-    def fnc = project.ext.deleteEmptyDirsRecursively;
+    def fnc = project.ext.deleteEmptyDirsRecursively
     doLast {
         delete fileTree(dir: "$rootDir/distro/")
         fnc(file("$rootDir/distro/"))

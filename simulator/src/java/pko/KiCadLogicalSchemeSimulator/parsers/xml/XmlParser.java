@@ -30,14 +30,14 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.parsers.xml;
-import lombok.Getter;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 import java.io.File;
 import java.io.IOException;
 
-@Getter
-public class XmlParser {
+public enum XmlParser {
+    ;
+
     public static <T> T parse(String filePath, Class<T> clazz) throws IOException {
         String xml = Utils.readFileToString(new File(filePath));
         return XmlMarshaller.fromXml(xml, clazz);

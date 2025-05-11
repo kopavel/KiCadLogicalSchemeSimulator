@@ -33,6 +33,7 @@ package pko.KiCadLogicalSchemeSimulator.api;
 import pko.KiCadLogicalSchemeSimulator.api.params.ParameterResolver;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Export;
 
+@FunctionalInterface
 public interface NetFilter {
     boolean doFilter(Export netFile, ParameterResolver schemaParts);
 }
