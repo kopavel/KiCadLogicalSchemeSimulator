@@ -31,18 +31,20 @@
  */
 package pko.KiCadLogicalSchemeSimulator.components.resister.test;
 import org.junit.jupiter.api.Test;
+import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.test.schemaPartTester.NetTester;
+import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class ResisterTest extends NetTester {
-    String[] in1 =
+    private final String[] in1 =
             {"hi", "w0", "w1", "s0", "s1", "hi", "w0", "w1", "s0", "s1", "hi", "w0", "w1", "s0", "s1", "hi", "w0", "w1", "s0", "s1", "hi", "w0", "w1", "s0", "s1"};
-    String[] in2 =
+    private final String[] in2 =
             {"hi", "hi", "hi", "hi", "hi", "w0", "w0", "w0", "w0", "w0", "w1", "w1", "w1", "w1", "w1", "s0", "s0", "s0", "s0", "s0", "s1", "s1", "s1", "s1", "s1"};
-    String[] state1 =
+    private final String[] state1 =
             {"hi", "w0", "w1", "s0", "s1", "w0", "w0", "er", "s0", "er", "w1", "er", "w1", "er", "s1", "w0", "w0", "er", "s0", "er", "w1", "er", "w1", "s0", "s1"};
-    String[] state2 =
+    private final String[] state2 =
             {"hi", "W0", "w1", "w0", "w1", "w0", "w0", "er", "w0", "er", "w1", "er", "w1", "er", "w1", "s0", "s0", "er", "s0", "er", "s1", "er", "s1", "s1", "s1"};
 
     @Override
@@ -57,54 +59,65 @@ public class ResisterTest extends NetTester {
 
     @Test
     protected void resisterTest() {
+        Pin out1 = outPin("OUT1");
+        Pin out2 = outPin("OUT2");
         for (int i = 0; i < state1.length; i++) {
-            if (state1[i].equals("er")) {
+            if ("er".equals(state1[i])) {
                 continue;
             }
-            if (!outPin("OUT1").hiImpedance) {
-                outPin("OUT1").setHiImpedance();
-            }
+            Log.debug(ResisterTest.class, "{},{},{},{}", in1[i], in2[i], state1[i], state2[i]);
             switch (in1[i]) {
                 case "hi" -> {
+                    if (!out1.hiImpedance) {
+                        out1.setHiImpedance();
+                    }
                 }
                 case "w0" -> {
-                    outPin("OUT1").strong = false;
-                    setLo("OUT1");
+                    out1.strong = false;
+                    out1.setLo();
                 }
                 case "w1" -> {
-                    outPin("OUT1").strong = false;
-                    setHi("OUT1");
+                    out1.strong = false;
+                    out1.setHi();
                 }
                 case "s0" -> {
-                    outPin("OUT1").strong = true;
-                    setLo("OUT1");
+                    out1.strong = true;
+                    out1.setLo();
                 }
                 case "s1" -> {
-                    outPin("OUT1").strong = true;
-                    setHi("OUT1");
+                    out1.strong = true;
+                    out1.setHi();
                 }
-            }
-            if (!outPin("OUT2").hiImpedance) {
-                outPin("OUT2").setHiImpedance();
             }
             switch (in2[i]) {
                 case "hi" -> {
+                    if (!out2.hiImpedance) {
+                        out2.setHiImpedance();
+                    }
                 }
                 case "w0" -> {
-                    outPin("OUT2").strong = false;
-                    setLo("OUT2");
+                    if (out2.strong || out2.state) {
+                        out2.strong = false;
+                        out2.setLo();
+                    }
                 }
                 case "w1" -> {
-                    outPin("OUT2").strong = false;
-                    setHi("OUT2");
+                    if (out2.strong || !out2.state) {
+                        out2.strong = false;
+                        out2.setHi();
+                    }
                 }
                 case "s0" -> {
-                    outPin("OUT2").strong = true;
-                    setLo("OUT2");
+                    if (!out2.strong || out2.state) {
+                        out2.strong = true;
+                        out2.setLo();
+                    }
                 }
                 case "s1" -> {
-                    outPin("OUT2").strong = true;
-                    setHi("OUT2");
+                    if (!out2.strong || !out2.state) {
+                        out2.strong = true;
+                        out2.setHi();
+                    }
                 }
             }
             switch (state1[i]) {
