@@ -212,19 +212,15 @@ public class Net {
                 case passive -> passivePins.add((PassivePin) schemaPart.getOutPin(pinName));
             }
         });
-        if (powerState != null) {
-            //if on a power rail – connect all pin to individual power out and don't add to any others nets.
-            passivePins.forEach(passivePin -> passivePin.merger = new PassiveInMerger(passivePin, powerState));
-            passivePins.clear();
-        } else {
-            //If no destination pins, but has passive (no out only) pins – use NcPin as destination. In other way passive pins don't get any changes.
-            if ((destinationPins.isEmpty())) {
-                Optional<PassivePin> passivePin = passivePins.stream().findAny();
-                if (passivePin.isPresent()) {
-                    destinationPins.add(new TriStateNCWire(passivePin.get()));
-                } else if (destinationBusesOffsets.isEmpty()) {
-                    sourcesOffset.forEach((out, offset) -> Log.warn(Net.class, "Unconnected Out:" + out.getName() + offset));
-                }
+        if ((destinationPins.isEmpty())) {
+            if (passivePins.size() == 1) {
+                //Passive pin work as input-only
+                destinationPins.add(new PassiveIn(passivePins.getFirst()));
+                passivePins.clear();
+            } else if (!passivePins.isEmpty()) {
+                destinationPins.add(new NCWire(passivePins.getFirst()));
+            } else if (destinationBusesOffsets.isEmpty()) {
+                sourcesOffset.forEach((out, offset) -> Log.warn(Net.class, "Unconnected Out:" + out.getName() + offset));
             }
         }
         //

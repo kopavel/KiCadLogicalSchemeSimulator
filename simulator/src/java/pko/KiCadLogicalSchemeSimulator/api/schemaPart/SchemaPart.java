@@ -102,14 +102,14 @@ public abstract class SchemaPart {
         return pin;
     }
 
-    public void addPassivePin(String pinId) {
-        if (pinType.containsKey(pinId)) {
-            throw new RuntimeException("Double pin name in " + id + ":" + pinId);
+    public void addPassivePin(PassivePin pin) {
+        if (pinType.containsKey(pin.id)) {
+            throw new RuntimeException("Double pin name in " + id + ":" + pin.id);
         } else {
-            pinType.put(pinId, passive);
+            pinType.put(pin.id, passive);
         }
-        outPins.put(pinId, new PassivePin(pinId, this));
-        ids.put(outPins.get(pinId), pinId);
+        outPins.put(pin.id, pin);
+        ids.put(pin, pin.id);
     }
 
     public void addPullPin(String pinId, boolean state) {
@@ -286,9 +286,6 @@ public abstract class SchemaPart {
 
     public Supplier<JPanel> extraPanel() {
         return null;
-    }
-
-    public void onPassivePinChange(Pin merger) {
     }
 
     public abstract void initOuts();

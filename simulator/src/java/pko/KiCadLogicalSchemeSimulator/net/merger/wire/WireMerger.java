@@ -38,18 +38,21 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.PullPin;
 import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
-import pko.KiCadLogicalSchemeSimulator.net.merger.bus.BusMergerWireIn;
 import pko.KiCadLogicalSchemeSimulator.net.wire.NCWire;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 //Todo with one source only and only weak others - use simpler "Weak pin" implementation
 public class WireMerger extends OutPin {
-    public final Set<PassivePin> passivePins = new TreeSet<>();
-    public final Set<BusMergerWireIn> mergers = new TreeSet<>();
     public final Set<MergerInput<?>> sources = new TreeSet<>(Comparator.comparing(mergerInput -> mergerInput.getMask() + ":" + mergerInput.getName()));
+    public Set<PassivePin> passivePins = new TreeSet<>();
+    public int weakState;
 
-    public WireMerger(Pin destination, List<OutPin> pins, List<PassivePin> passivePins, Map<OutBus, Integer> buses) {
+    public WireMerger(Pin destination, Iterable<? extends OutPin> pins, Iterable<? extends PassivePin> passivePins, Map<? extends OutBus, Integer> buses) {
         super(destination.id, destination.parent);
         variantId = destination.variantId == null ? "" : destination.variantId + ":";
         variantId += "merger";
@@ -59,9 +62,6 @@ public class WireMerger extends OutPin {
         destinations = new Pin[]{destination};
         split();
         strong = false;
-        if (destination instanceof PassivePin passivePin) {
-            passivePin.merger = this;
-        }
         pins.forEach(this::addSource);
         passivePins.forEach(this::addSource);
         if (buses != null) {
@@ -77,9 +77,69 @@ public class WireMerger extends OutPin {
         }
     }
 
+    @Override
+    public Pin getOptimised(ModelItem<?> source) {
+        hiImpedance = isTriState(null) && weakState == 0;
+        for (int i = 0; i < destinations.length; i++) {
+            destinations[i] = destinations[i].getOptimised(this);
+        }
+        passivePins = sources.stream()
+                .map(mergerInput -> ((ModelItem<?>) mergerInput).source)
+                .filter(inputSource -> inputSource instanceof PassivePin)
+                .map(inputSource -> (PassivePin) inputSource)
+                .collect(Collectors.toSet());
+        split();
+        return this;
+    }
+
+    public void recalculatePassivePins() {
+        if (hiImpedance) {
+            //all in impedance
+            passivePins.forEach(pin -> {
+                pin.otherImpedance = true;
+                pin.onChange();
+            });
+        } else {
+            for (PassivePin pin : passivePins) {
+                if (pin.hiImpedance) {
+                    //we in impedance - clone merger
+                    pin.otherState = state;
+                    pin.otherStrong = strong;
+                    pin.otherImpedance = false;
+                } else if (pin.strong) {
+                    //we strong
+                    if (weakState == 0) {
+                        //no other weak
+                        pin.otherImpedance = true;
+                    } else {
+                        //other weak
+                        pin.otherImpedance = false;
+                        pin.otherStrong = false;
+                        pin.otherState = weakState > 0;
+                    }
+                    //we are weak
+                } else if (strong) {
+                    //has other strong - clone merger
+                    pin.otherState = state;
+                    pin.otherStrong = true;
+                    pin.otherImpedance = false;
+                } else if (weakState == 1 || weakState == -1) {
+                    //we only weak on merger - hiImpedance
+                    pin.otherImpedance = true;
+                } else {
+                    //merger are many weaks - sp state same as we are.
+                    pin.otherImpedance = false;
+                    pin.otherStrong = false;
+                    pin.otherState = state;
+                }
+                pin.onChange();
+            }
+        }
+    }
+
     private void addSource(OutBus bus, int mask) {
-        triStateOut |= bus.triStateOut;
-        WireMergerBusIn input = new WireMergerBusIn(bus, mask, this);
+        triStateOut = triStateOut || bus.triStateOut;
+        WireMergerBusIn input = new WireMergerBusIn(bus, this);
         bus.addDestination(input, mask, (byte) 0);
         sources.add(input);
         if (!bus.hiImpedance) {
@@ -91,7 +151,7 @@ public class WireMerger extends OutPin {
     }
 
     private void addSource(OutPin pin) {
-        triStateOut |= pin.triStateOut;
+        triStateOut = triStateOut || pin.triStateOut;
         if (pin instanceof PullPin pullPin) {
             sources.add(pullPin);
             if (weakState != 0 && pin.state != (weakState > 0)) {
@@ -104,8 +164,7 @@ public class WireMerger extends OutPin {
         } else if (pin instanceof PassivePin passivePin) {
             if (!passivePins.contains(passivePin)) {
                 passivePins.add(passivePin);
-                passivePin.merger = this;
-                WireMergerWireIn input = new WireMergerWireIn(pin, this);
+                WireMergerWireIn input = new WireMergerWireIn(passivePin, this);
                 pin.addDestination(input);
                 sources.add(input);
                 if (!passivePin.hiImpedance && !passivePin.strong) {
@@ -124,15 +183,5 @@ public class WireMerger extends OutPin {
                 state = pin.state;
             }
         }
-    }
-
-    @Override
-    public Pin getOptimised(ModelItem<?> source) {
-     hiImpedance = isTriState(null) & weakState==0;
-        for (int i = 0; i < destinations.length; i++) {
-            destinations[i] = destinations[i].getOptimised(this);
-        }
-        split();
-        return this;
     }
 }

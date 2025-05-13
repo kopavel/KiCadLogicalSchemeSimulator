@@ -29,39 +29,73 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.net.merger.wire;
+package pko.KiCadLogicalSchemeSimulator.net.wire;
 import pko.KiCadLogicalSchemeSimulator.api.ShortcutException;
+import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.TriStateOutPin;
 
-public class PassiveInMerger extends TriStateOutPin {
-    final PassivePin source;
+public class PassiveIn extends TriStateOutPin {
+    public final PassivePin destination;
 
-    public PassiveInMerger(PassivePin source, Boolean powerState) {
-        super(source, "PassiveInMerger");
-        this.source = source;
-        state = powerState;
-        hiImpedance = false;
-        merger = this;
-        strong = true;
-        triStateIn=true;
+    public PassiveIn(PassivePin destination) {
+        super(destination, null);//always after merger - so no parent.
+        this.destination = destination;
+        CheckShortCut checker = new CheckShortCut(destination);
+        destination.addDestination(checker);
+        triStateIn = true;
     }
 
     @Override
     public void setHi() {
-        if (source.strong) {
-            throw new ShortcutException(source);
+        destination.otherState = true;
+        destination.otherImpedance = false;
+        if (source != null) {
+            destination.otherStrong = ((Pin) source).strong;
+        } else {
+            destination.otherStrong = strong;
         }
+        destination.onChange();
     }
 
     @Override
     public void setLo() {
-        if (source.strong) {
-            throw new ShortcutException(source);
+        destination.otherState = false;
+        destination.otherImpedance = false;
+        if (source != null) {
+            destination.otherStrong = ((Pin) source).strong;
+        } else {
+            destination.otherStrong = strong;
         }
-    }
-    @Override
-    public void setHiImpedance() {
+        destination.onChange();
     }
 
+    @Override
+    public void setHiImpedance() {
+        destination.otherImpedance = true;
+    }
+
+    private final class CheckShortCut extends InPin {
+        private final PassivePin source;
+
+        private CheckShortCut(PassivePin source) {
+            super(source, "ShortcutChecker");
+            this.source = source;
+        }
+
+        @Override
+        public void setHi() {
+            if (source != null && !source.hiImpedance) {
+                throw new ShortcutException(destinations);
+            }
+        }
+
+        @Override
+        public void setLo() {
+            if (source != null && !source.hiImpedance) {
+                throw new ShortcutException(destinations);
+            }
+        }
+    }
 }

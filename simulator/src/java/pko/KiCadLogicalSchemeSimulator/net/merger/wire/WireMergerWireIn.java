@@ -33,7 +33,6 @@ package pko.KiCadLogicalSchemeSimulator.net.merger.wire;
 import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.ShortcutException;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.OutPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
@@ -42,6 +41,7 @@ import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 //FixMe where recursion support?
 public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
+    public final WireMerger merger;
     public Pin[] destinations;
     public boolean oldStrong;
 
@@ -52,6 +52,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
         hiImpedance = source.hiImpedance;
         destinations = merger.destinations;
         triStateIn = true;
+        strengthSensitive = (source instanceof PassivePin);
     }
 
     @SuppressWarnings("unused")
@@ -64,9 +65,11 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
         merger = oldPin.merger;
     }
 
+    //FixMe optimiser separate "this is passive pin" and "merger has passive pins"
     @Override
     public void setHi() {
-        OutPin merger = this.merger;
+        WireMerger merger = this.merger;
+        //region assert
         assert Log.debug(getClass(),
                 "Pin merger change. before: newState:{}, Source:{} (state:{}, oldStrong:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, " +
                         "strong:{}, hiImpedance:{}, weakState:{})",
@@ -81,28 +84,30 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                 merger.strong,
                 merger.hiImpedance,
                 merger.weakState);
+        //endregion
         boolean oldState = merger.state;
         /*Optimiser line passivePins*/
         boolean strengthChange = false;
-        /*Optimiser line setters*/
-        state = true;
         /*Optimiser line passivePins*/
         if (strong) { //to strong
+            merger.state = true;
             /*Optimiser block hiAndPassive*/
             if (hiImpedance
                     /*Optimiser line passivePins*///
                     || !oldStrong//
             ) { //from hiImpedance or weak
                 if (merger.strong) { //strong pins shortcut
+                    //region shortcut
                     if (parent.net.stabilizing) {
                         parent.net.forResend.add(this);
-                        assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
+                        assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
                         return;
                     } else {
                         /*Optimiser line ts*/
                         hiImpedance = false;
-                        throw new ShortcutException(((WireMerger) merger).sources);
+                        throw new ShortcutException(merger.sources);
                     }
+                    //endregion
                 } else {
                     merger.strong = true;
                 }
@@ -119,36 +124,63 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                 strengthChange = true;
                 /*Optimiser blockEnd passivePins*/
             }
-            /*Optimiser blockEnd hiAndPassive*/
-            merger.state = true;
-            /*Optimiser block passivePins*/
+            /*Optimiser blockEnd hiAndPassive block passivePins*/
         } else { //to weak
-            if (merger.weakState != 0 && (!(merger.weakState > 0))) { //opposite weak state
-                if (parent.net.stabilizing) {
-                    parent.net.forResend.add(this);
-                    assert Log.debug(this.getClass(), "Weak state shortcut on setting pin {}, try resend later", this);
-                    return;
-                } else {
-                    /*Optimiser line ts*/
-                    hiImpedance = false;
-                    throw new ShortcutException(((WireMerger) merger).sources);
-                }
-            }
             /*Optimiser block ts*/
             if (hiImpedance) { // from impedance
+                if (merger.weakState < 0) { //opposite weak state
+                    //region shortcut
+                    if (parent.net.stabilizing) {
+                        parent.net.forResend.add(this);
+                        assert Log.debug(getClass(), "Weak state shortcut on setting pin {}, try resend later", this);
+                        return;
+                    } else {
+                        /*Optimiser line ts*/
+                        hiImpedance = false;
+                        throw new ShortcutException(merger.sources);
+                    }
+                    //endregion
+                }
                 hiImpedance = false;
                 if (merger.hiImpedance) {
-                    merger.strong = false;
                     merger.state = true;
                 }
-                merger.weakState += (1);
+                merger.weakState += 1;
             } else
                 /*Optimiser blockEnd ts*/
                 if (oldStrong) { //from strong
+                    if (merger.weakState < 0) { //opposite weak state
+                        //region shortcut
+                        if (parent.net.stabilizing) {
+                            parent.net.forResend.add(this);
+                            assert Log.debug(getClass(), "Weak state shortcut on setting pin {}, try resend later", this);
+                            return;
+                        } else {
+                            throw new ShortcutException(merger.sources);
+                        }
+                        //endregion
+                    }
                     merger.strong = false;
                     strengthChange = true;
-                    merger.weakState += (1);
+                    merger.weakState += 1;
                     merger.state = true;
+                } else if (!oldState) {
+                    //from opposite weak
+                    if (merger.weakState < -1) { //opposite weak state
+                        //region shortcut
+                        if (parent.net.stabilizing) {
+                            parent.net.forResend.add(this);
+                            assert Log.debug(getClass(), "Weak state shortcut on setting pin {}, try resend later", this);
+                            return;
+                        } else {
+                            throw new ShortcutException(merger.sources);
+                        }
+                        //endregion
+                    }
+                    merger.weakState += 2;
+                    if (!merger.strong) {
+                        merger.state = merger.weakState > 0;
+                    }
                 }
         }
         /*Optimiser blockEnd passivePins*/
@@ -158,6 +190,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
         ) {
             merger.hiImpedance = false;
             for (Pin destination : destinations) {
+                //Fixme 'optimiser' it?
                 destination.strong = strong;
                 /*Optimiser line passivePins*/
                 if (merger.state) {
@@ -169,26 +202,17 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                 /*Optimiser blockEnd passivePins*/
             }
             /*Optimiser block passivePins*/
-            for (PassivePin passivePin : ((WireMerger) merger).passivePins) {
-                passivePin.parent.onPassivePinChange(merger);
-            }
+            merger.recalculatePassivePins();
         } else if (strengthChange) {
-            for (Pin destination : ((WireMerger) merger).mergers) {
-                destination.strong = strong;
-                if (merger.state) {
-                    destination.setHi();
-                } else {
-                    destination.setLo();
-                }
-            }
-            for (PassivePin passivePin : ((WireMerger) merger).passivePins) {
-                passivePin.parent.onPassivePinChange(merger);
-            }
+            //FixMe what about bus merger pin inputs??
+            merger.recalculatePassivePins();
             /*Optimiser blockEnd passivePins*/
         }
-        /*Optimiser block passivePins*/
+        /*Optimiser line setters*/
+        state = true;
+        /*Optimiser line passivePins*/
         oldStrong = strong;
-        /*Optimiser blockEnd passivePins*/
+        //region assert
         assert Log.debug(getClass(),
                 "Pin merger change. after: newState:{}, Source:{} (state:{}, oldStrong:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, " +
                         "strong:{}, hiImpedance:{}, weakState:{})",
@@ -203,11 +227,13 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                 merger.strong,
                 merger.hiImpedance,
                 merger.weakState);
+        //endregion
     }
 
     @Override
     public void setLo() {
-        OutPin merger = this.merger;
+        WireMerger merger = this.merger;
+        //region assert
         assert Log.debug(getClass(),
                 "Pin merger change. before: newState:{}, Source:{} (state:{}, oldStrong:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, " +
                         "strong:{}, hiImpedance:{}, weakState:{})",
@@ -222,6 +248,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                 merger.strong,
                 merger.hiImpedance,
                 merger.weakState);
+        //endregion
         boolean oldState = merger.state;
         /*Optimiser line passivePins*/
         boolean strengthChange = false;
@@ -229,21 +256,24 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
         state = false;
         /*Optimiser line passivePins*/
         if (strong) { //to strong
+            merger.state = false;
             /*Optimiser block hiAndPassive*/
             if (hiImpedance
                     /*Optimiser line passivePins*///
                     || !oldStrong//
             ) { //from hiImpedance or weak
                 if (merger.strong) { //strong pins shortcut
+                    //region shortcut
                     if (parent.net.stabilizing) {
                         parent.net.forResend.add(this);
-                        assert Log.debug(this.getClass(), "Shortcut on setting pin {}, try resend later", this);
+                        assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
                         return;
                     } else {
                         /*Optimiser line ts*/
                         hiImpedance = false;
-                        throw new ShortcutException(((WireMerger) merger).sources);
+                        throw new ShortcutException(merger.sources);
                     }
+                    //endregion
                 } else {
                     merger.strong = true;
                 }
@@ -260,36 +290,63 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                 strengthChange = true;
                 /*Optimiser blockEnd passivePins*/
             }
-            /*Optimiser blockEnd hiAndPassive*/
-            merger.state = false;
-            /*Optimiser block passivePins*/
+            /*Optimiser blockEnd hiAndPassive block passivePins*/
         } else { //to weak
-            if (merger.weakState > 0) { //opposite weak state
-                if (parent.net.stabilizing) {
-                    parent.net.forResend.add(this);
-                    assert Log.debug(this.getClass(), "Weak state shortcut on setting pin {}, try resend later", this);
-                    return;
-                } else {
-                    /*Optimiser line ts*/
-                    hiImpedance = false;
-                    throw new ShortcutException(((WireMerger) merger).sources);
-                }
-            }
             /*Optimiser block ts*/
             if (hiImpedance) { // from impedance
+                if (merger.weakState > 0) { //opposite weak state
+                    //region shortcut
+                    if (parent.net.stabilizing) {
+                        parent.net.forResend.add(this);
+                        assert Log.debug(getClass(), "Weak state shortcut on setting pin {}, try resend later", this);
+                        return;
+                    } else {
+                        /*Optimiser line ts*/
+                        hiImpedance = false;
+                        throw new ShortcutException(merger.sources);
+                    }
+                    //endregion
+                }
                 hiImpedance = false;
                 if (merger.hiImpedance) {
-                    merger.strong = false;
                     merger.state = false;
                 }
-                merger.weakState += (-1);
+                merger.weakState -= 1;
             } else
                 /*Optimiser blockEnd ts*/
                 if (oldStrong) { //from strong
+                    if (merger.weakState > 0) { //opposite weak state
+                        //region shortcut
+                        if (parent.net.stabilizing) {
+                            parent.net.forResend.add(this);
+                            assert Log.debug(getClass(), "Weak state shortcut on setting pin {}, try resend later", this);
+                            return;
+                        } else {
+                            throw new ShortcutException(merger.sources);
+                        }
+                        //endregion
+                    }
                     merger.strong = false;
                     strengthChange = true;
-                    merger.weakState += (-1);
+                    merger.weakState -= 1;
                     merger.state = false;
+                } else if (oldState) {
+                    //from opposite weak
+                    if (merger.weakState > 1) { //opposite weak state
+                        //region shortcut
+                        if (parent.net.stabilizing) {
+                            parent.net.forResend.add(this);
+                            assert Log.debug(getClass(), "Weak state shortcut on setting pin {}, try resend later", this);
+                            return;
+                        } else {
+                            throw new ShortcutException(merger.sources);
+                        }
+                        //endregion
+                    }
+                    merger.weakState -= 2;
+                    if (!merger.strong) {
+                        merger.state = merger.weakState > 0;
+                    }
                 }
         }
         /*Optimiser blockEnd passivePins*/
@@ -310,26 +367,15 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                 }
             }
             /*Optimiser block passivePins*/
-            for (PassivePin passivePin : ((WireMerger) merger).passivePins) {
-                passivePin.parent.onPassivePinChange(merger);
-            }
+            merger.recalculatePassivePins();
         } else if (strengthChange) {
-            for (Pin destination : ((WireMerger) merger).mergers) {
-                destination.strong = strong;
-                if (merger.state) {
-                    destination.setHi();
-                } else {
-                    destination.setLo();
-                }
-            }
-            for (PassivePin passivePin : ((WireMerger) merger).passivePins) {
-                passivePin.parent.onPassivePinChange(merger);
-            }
+            //FixMe what about bus merger pin input?
+            merger.recalculatePassivePins();
             /*Optimiser blockEnd passivePins*/
         }
-        /*Optimiser block passivePins*/
+        /*Optimiser line passivePins*/
         oldStrong = strong;
-        /*Optimiser blockEnd passivePins*/
+        //region assert
         assert Log.debug(getClass(),
                 "Pin merger change. after: newState:{}, Source:{} (state:{}, oldStrong:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, " +
                         "strong:{}, hiImpedance:{}, weakState:{})",
@@ -344,12 +390,14 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                 merger.strong,
                 merger.hiImpedance,
                 merger.weakState);
+        //endregion
     }
 
     @Override
     public void setHiImpedance() {
         /*Optimiser block ts*/
-        OutPin merger = this.merger;
+        WireMerger merger = this.merger;
+        //region assert
         assert Log.debug(getClass(),
                 "Pin merger setImpedance. before: Source:{} (state:{}, oldStrong:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{} " +
                         "hiImpedance:{}, weakState:{})",
@@ -364,6 +412,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                 merger.hiImpedance,
                 merger.weakState);
         assert !hiImpedance : "Already in hiImpedance:" + this;
+        //endregion
         boolean oldState = merger.state;
         if (oldStrong) {
             if (merger.weakState == 0) {
@@ -372,15 +421,11 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                 for (Pin destination : destinations) {
                     destination.setHiImpedance();
                 }
-                /*Optimiser block passivePins*/
-                for (PassivePin passivePin : ((WireMerger) merger).passivePins) {
-                    passivePin.parent.onPassivePinChange(merger);
-                }
-                /*Optimiser blockEnd passivePins*/
+                /*Optimiser line passivePins*/
+                merger.recalculatePassivePins();
             } else {
-                merger.state = merger.weakState > 0;
                 merger.strong = false;
-                if (oldState != merger.state) {
+                if (oldState != (merger.state = merger.weakState > 0)) {
                     for (Pin destination : destinations) {
                         if (merger.state) {
                             destination.setHi();
@@ -388,12 +433,9 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                             destination.setLo();
                         }
                     }
-                    /*Optimiser block passivePins*/
-                    for (PassivePin passivePin : ((WireMerger) merger).passivePins) {
-                        passivePin.parent.onPassivePinChange(merger);
-                    }
-                    /*Optimiser blockEnd passivePins*/
                 }
+                /*Optimiser line passivePins*/
+                merger.recalculatePassivePins();
             }
         } else {
             merger.weakState -= (merger.weakState > 0 ? 1 : -1);
@@ -402,17 +444,15 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                     destination.setHiImpedance();
                 }
                 merger.hiImpedance = true;
-                /*Optimiser block passivePins*/
-                for (PassivePin passivePin : ((WireMerger) merger).passivePins) {
-                    passivePin.parent.onPassivePinChange(merger);
-                }
-                /*Optimiser blockEnd passivePins*/
+                /*Optimiser line passivePins*/
+                merger.recalculatePassivePins();
             }
         }
         hiImpedance = true;
         strong = false;
         /*Optimiser line passivePins*/
         oldStrong = false;
+        //region assert
         assert Log.debug(getClass(),
                 "Pin merger setImpedance. after: Source:{} (state:{}, oldStrong:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{} " +
                         "hiImpedance:{}, weakState:{})",
@@ -426,6 +466,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                 merger.strong,
                 merger.hiImpedance,
                 merger.weakState);
+        //endregion
         /*Optimiser blockEnd ts*/
     }
 
@@ -442,29 +483,30 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
         }
     }
 
+    //FixMe filter out "not me" passive pins and bind this list.
     @Override
-    public WireMergerWireIn getOptimised(ModelItem<?> source) {
-        ((WireMerger) merger).sources.remove(this);
+    public WireMergerWireIn getOptimised(ModelItem<?> inSource) {
+        merger.sources.remove(this);
         destinations = merger.destinations;
         for (int i = 0; i < destinations.length; i++) {
             destinations[i] = destinations[i].getOptimised(merger);
-            triStateIn |= destinations[i].triStateIn;
+            triStateIn = triStateIn || destinations[i].triStateIn;
         }
         ClassOptimiser<WireMergerWireIn> optimiser = new ClassOptimiser<>(this).unroll(destinations.length);
-        if (((WireMerger) merger).passivePins.isEmpty()) {
+        if (merger.passivePins.isEmpty()) {
             optimiser.cut("passivePins");
             if (!triStateIn) {
                 optimiser.cut("hiAndPassive");
             }
         }
-        if (source != null) {
+        if (inSource != null) {
             optimiser.cut("setters");
         }
         if (!triStateIn) {
             optimiser.cut("ts");
         }
         WireMergerWireIn build = optimiser.build();
-        ((WireMerger) merger).sources.add(build);
+        merger.sources.add(build);
         build.source = source;
         return build;
     }

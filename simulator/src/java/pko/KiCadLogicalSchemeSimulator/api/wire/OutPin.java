@@ -42,12 +42,12 @@ import java.util.Comparator;
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.none;
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.warn;
 
+//FixMe - No optimiser on passive pin, sore strength only fot passive pin out.
 public class OutPin extends Pin {
     public Pin[] destinations = new Pin[0];
     public Pin[] toImp = new Pin[0];
     public Pin[] toLow = new Pin[0];
     public Pin[] toHi = new Pin[0];
-    public int weakState;
 
     public OutPin(String id, SchemaPart parent) {
         super(id, parent);
@@ -85,6 +85,7 @@ public class OutPin extends Pin {
             case 0: {
                 /*Optimiser blockEnd ar*/
                 for (Pin hi : toHi) {
+                    hi.strong = strong;
                     hi.setHi();
                 }
                 /*Optimiser block r block ar*/
@@ -98,10 +99,12 @@ public class OutPin extends Pin {
                         /*Optimiser blockEnd ts*/
                         if (state) {
                             for (Pin hi : toHi) {
+                                hi.strong = strong;
                                 hi.setHi();
                             }
                         } else {
                             for (Pin low : toLow) {
+                                low.strong = strong;
                                 low.setLo();
                             }
                         }
@@ -129,6 +132,7 @@ public class OutPin extends Pin {
             case 0: {
                 /*Optimiser blockEnd ar*/
                 for (Pin low : toLow) {
+                    low.strong = strong;
                     low.setLo();
                 }
                 /*Optimiser block r block ar*/
@@ -142,10 +146,12 @@ public class OutPin extends Pin {
                         /*Optimiser blockEnd ts*/
                         if (state) {
                             for (Pin hi : toHi) {
+                                hi.strong = strong;
                                 hi.setHi();
                             }
                         } else {
                             for (Pin low : toLow) {
+                                low.strong = strong;
                                 low.setLo();
                             }
                         }

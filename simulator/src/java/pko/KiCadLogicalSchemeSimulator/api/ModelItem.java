@@ -55,7 +55,6 @@ public abstract class ModelItem<T> implements IModelItem<T> {
     public boolean triStateIn;
     public boolean triStateOut;
     public int processing;
-    public int applyMask;
     public byte applyOffset;
     public boolean used;
     public ModelItem<?> source;
@@ -120,8 +119,9 @@ public abstract class ModelItem<T> implements IModelItem<T> {
         }
     }
 
-    public RecursionMode getRecursionMode() {
-        return parent.net.parameterResolver.getRecursionMode(parent.id, id);
+    @Override
+    public int compareTo(IModelItem<T> other) {
+        return getName().compareTo(other.getName());
     }
 
     @Override

@@ -32,36 +32,31 @@
 package pko.KiCadLogicalSchemeSimulator.api.wire;
 import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.net.merger.wire.PassiveOutMerger;
+import pko.KiCadLogicalSchemeSimulator.net.merger.wire.WireMergerWireIn;
 
-public class PassivePin extends TriStateOutPin {
-    public PassivePin(String id, SchemaPart parent) {
+public abstract class PassivePin extends TriStateOutPin {
+    public boolean otherImpedance = true;
+    public boolean otherState;
+    public boolean otherStrong = true;
+
+    protected PassivePin(String id, SchemaPart parent) {
         super(id, parent);
         strong = false;
+        strengthSensitive = true;
     }
+
+    public abstract void onChange();
 
     @Override
     public Pin getOptimised(ModelItem<?> source) {
-        if (merger == null) {
-            merger = new PassiveOutMerger(this);
-            return merger;
+        if (destinations.length != 1 || !(destinations[0] instanceof WireMergerWireIn)) {
+            return new TriStateOutPin(this, "PassiveOut").getOptimised(source);
         } else {
-            return super.getOptimised(source);
-        }
-    }
-
-    public enum State {
-        HiImp(false, false),
-        Hi(true, true),
-        Lo(false, true),
-        WeakHi(true, false),
-        WeakLo(false, false);
-        public final boolean state;
-        public final boolean strong;
-
-        State(boolean state, boolean strong) {
-            this.state = state;
-            this.strong = strong;
+            for (int i = 0; i < destinations.length; i++) {
+                destinations[i] = destinations[i].getOptimised(this);
+            }
+            split();
+            return this;
         }
     }
 }
