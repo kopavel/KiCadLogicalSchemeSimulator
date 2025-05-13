@@ -30,13 +30,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.net.wire;
+import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.ShortcutException;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.TriStateOutPin;
 
-public class PassiveIn extends TriStateOutPin {
+public class PassiveIn extends InPin {
     public final PassivePin destination;
 
     public PassiveIn(PassivePin destination) {
@@ -76,7 +76,12 @@ public class PassiveIn extends TriStateOutPin {
         destination.otherImpedance = true;
     }
 
-    private final class CheckShortCut extends InPin {
+    @Override
+    public Pin getOptimised(ModelItem<?> source) {
+        return this;
+    }
+
+    private static final class CheckShortCut extends InPin {
         private final PassivePin source;
 
         private CheckShortCut(PassivePin source) {
@@ -87,14 +92,14 @@ public class PassiveIn extends TriStateOutPin {
         @Override
         public void setHi() {
             if (source != null && !source.hiImpedance) {
-                throw new ShortcutException(destinations);
+                throw new ShortcutException(source.destinations);
             }
         }
 
         @Override
         public void setLo() {
             if (source != null && !source.hiImpedance) {
-                throw new ShortcutException(destinations);
+                throw new ShortcutException(source.destinations);
             }
         }
     }

@@ -43,13 +43,27 @@ public class Diode extends SchemaPart {
         addPassivePin(new PassivePin("A", this) {
             @Override
             public void onChange() {
-                setCathode();
+                if (otherImpedance || !otherState) {
+                    if (!cathode.hiImpedance) {
+                        cathode.setHiImpedance();
+                    }
+                } else if (cathode.hiImpedance || !cathode.state || (cathode.strengthSensitive && cathode.strong != otherStrong)) {
+                    cathode.strong = otherStrong;
+                    cathode.setHi();
+                }
             }
         });
         addPassivePin(new PassivePin("K", this) {
             @Override
             public void onChange() {
-                setAnode();
+                if (otherImpedance || otherState) {
+                    if (!anode.hiImpedance) {
+                        anode.setHiImpedance();
+                    }
+                } else if (anode.hiImpedance || anode.state || (anode.strengthSensitive && anode.strong != otherStrong)) {
+                    anode.strong = otherStrong;
+                    anode.setLo();
+                }
             }
         });
     }
@@ -58,29 +72,5 @@ public class Diode extends SchemaPart {
     public void initOuts() {
         anode = getOutPin("A");
         cathode = getOutPin("K");
-    }
-
-    public void setAnode() {
-        PassivePin cathodePin = (PassivePin) cathode;
-        if (cathodePin.otherImpedance || cathodePin.otherState) {
-            if (!anode.hiImpedance) {
-                anode.setHiImpedance();
-            }
-        } else if (anode.hiImpedance || anode.state || (anode.strengthSensitive && anode.strong != cathodePin.otherStrong)) {
-            anode.strong = cathodePin.otherStrong;
-            anode.setLo();
-        }
-    }
-
-    public void setCathode() {
-        PassivePin anodePin = (PassivePin) anode;
-        if (anodePin.otherImpedance || !anodePin.otherState) {
-            if (!cathode.hiImpedance) {
-                cathode.setHiImpedance();
-            }
-        } else if (cathode.hiImpedance || !cathode.state || (cathode.strengthSensitive && cathode.strong != anodePin.otherStrong)) {
-            cathode.strong = anodePin.otherStrong;
-            cathode.setHi();
-        }
     }
 }

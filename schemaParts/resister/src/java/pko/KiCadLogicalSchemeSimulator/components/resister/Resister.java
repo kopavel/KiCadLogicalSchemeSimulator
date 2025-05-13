@@ -34,7 +34,6 @@ package pko.KiCadLogicalSchemeSimulator.components.resister;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 public class Resister extends SchemaPart {
     private Pin in1;
@@ -45,35 +44,28 @@ public class Resister extends SchemaPart {
         addPassivePin(new PassivePin("IN1", this) {
             @Override
             public void onChange() {
-                PassivePin pin1 = (PassivePin) in1;
                 if (in2 instanceof PassivePin pin2) {
-                    if (pin1.otherImpedance || (!pin2.otherImpedance && pin1.otherState == pin2.otherState && pin2.otherStrong == pin1.otherStrong)) {
+                    if (otherImpedance || (!pin2.otherImpedance && otherState == pin2.otherState && pin2.otherStrong == otherStrong)) {
                         if (!in2.hiImpedance) {
-                            Log.debug(Resister.class, "IN2 -> imp");
                             in2.setHiImpedance();
                         }
-                    } else if (pin1.otherState) {
+                    } else if (otherState) {
                         if (!in2.state || in2.hiImpedance) {
-                            Log.debug(Resister.class, "IN2 -> hi");
                             in2.setHi();
                         }
                     } else if (in2.state || in2.hiImpedance) {
-                        Log.debug(Resister.class, "IN2 -> lo");
                         in2.setLo();
                     }
                 } else {
-                    if (pin1.otherImpedance) {
+                    if (otherImpedance) {
                         if (!in2.hiImpedance) {
-                            Log.debug(Resister.class, "IN2 -> imp");
                             in2.setHiImpedance();
                         }
-                    } else if (!in2.hiImpedance && pin1.otherState == in2.state) {
+                    } else if (!in2.hiImpedance && otherState == in2.state) {
                         in2.setHiImpedance();
-                    } else if (pin1.otherState) {
-                        Log.debug(Resister.class, "IN2 -> hi");
+                    } else if (otherState) {
                         in2.setHi();
                     } else {
-                        Log.debug(Resister.class, "IN2 -> lo");
                         in2.setLo();
                     }
                 }
@@ -82,36 +74,28 @@ public class Resister extends SchemaPart {
         addPassivePin(new PassivePin("IN2", this) {
             @Override
             public void onChange() {
-                PassivePin pin2 = (PassivePin) in2;
                 if (in1 instanceof PassivePin pin1) {
-                    if (pin2.otherImpedance || (!pin1.otherImpedance && pin2.otherState == pin1.otherState && pin1.otherStrong == pin2.otherStrong)) {
+                    if (otherImpedance || (!pin1.otherImpedance && otherState == pin1.otherState && pin1.otherStrong == otherStrong)) {
                         if (!in1.hiImpedance) {
-                            Log.debug(Resister.class, "IN1 -> imp");
                             in1.setHiImpedance();
                         }
-                    } else if (pin2.otherState) {
+                    } else if (otherState) {
                         if (!in1.state || in1.hiImpedance) {
-                            Log.debug(Resister.class, "IN1 -> hi");
                             in1.setHi();
                         }
                     } else if (in1.state || in1.hiImpedance) {
-                        Log.debug(Resister.class, "IN1 -> lo");
                         in1.setLo();
                     }
                 } else {
-                    if (pin2.otherImpedance) {
+                    if (otherImpedance) {
                         if (!in1.hiImpedance) {
-                            Log.debug(Resister.class, "IN1 -> imp");
                             in1.setHiImpedance();
                         }
-                    } else if (!in1.hiImpedance && pin2.otherState == in1.state) {
-                        Log.debug(Resister.class, "IN1 -> imp");
+                    } else if (!in1.hiImpedance && otherState == in1.state) {
                         in1.setHiImpedance();
-                    } else if (pin2.otherState) {
-                        Log.debug(Resister.class, "IN1 -> hi");
+                    } else if (otherState) {
                         in1.setHi();
                     } else {
-                        Log.debug(Resister.class, "IN1 -> lo");
                         in1.setLo();
                     }
                 }

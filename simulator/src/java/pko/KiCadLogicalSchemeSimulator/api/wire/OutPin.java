@@ -33,6 +33,7 @@ package pko.KiCadLogicalSchemeSimulator.api.wire;
 import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.net.wire.NCWire;
+import pko.KiCadLogicalSchemeSimulator.net.wire.TriStateNCWire;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
@@ -213,7 +214,7 @@ public class OutPin extends Pin {
     @Override
     public Pin getOptimised(ModelItem<?> source) {
         if (destinations.length == 0) {
-            return new NCWire(this);
+            return triStateOut ? new TriStateNCWire(this) : new NCWire(this);
         } else if (destinations.length == 1) {
             return destinations[0].getOptimised(source).copyState(this);
         } else {

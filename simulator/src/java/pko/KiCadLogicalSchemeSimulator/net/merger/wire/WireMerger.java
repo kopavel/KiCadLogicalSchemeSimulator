@@ -137,6 +137,12 @@ public class WireMerger extends OutPin {
         }
     }
 
+    @Override
+    public void resend() {
+        super.resend();
+        recalculatePassivePins();
+    }
+
     private void addSource(OutBus bus, int mask) {
         triStateOut = triStateOut || bus.triStateOut;
         WireMergerBusIn input = new WireMergerBusIn(bus, this);

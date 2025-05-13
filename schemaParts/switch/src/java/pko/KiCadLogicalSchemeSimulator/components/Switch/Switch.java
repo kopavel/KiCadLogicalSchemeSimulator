@@ -33,75 +33,87 @@ package pko.KiCadLogicalSchemeSimulator.components.Switch;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.AbstractUiComponent;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.InteractiveSchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 
 public class Switch extends SchemaPart implements InteractiveSchemaPart {
+    private final PassivePin pin1;
+    private final PassivePin pin2;
     public boolean toggled;
-    private Pin pin1;
-    private Pin pin2;
-    private pko.KiCadLogicalSchemeSimulator.components.Switch.SwitchUiComponent switchUiComponent;
+    private Pin in1;
+    private Pin in2;
+    private SwitchUiComponent switchUiComponent;
 
     protected Switch(String id, String sParams) {
         super(id, sParams);
-        addPassivePin("IN1");
-        addPassivePin("IN2");
+        addPassivePin(new PassivePin("IN1", this) {
+            @Override
+            public void onChange() {
+                recalculate(in2, this);
+            }
+        });
+        addPassivePin(new PassivePin("IN2", this) {
+            @Override
+            public void onChange() {
+                recalculate(in1, this);
+            }
+        });
         toggled = reverse;
+        pin1 = (PassivePin) getOutPin("IN1");
+        pin2 = (PassivePin) getOutPin("IN2");
     }
 
     @Override
     public void initOuts() {
-        pin1 = getOutPin("IN1");
-        pin2 = getOutPin("IN2");
+        in1 = getOutPin("IN1");
+        in2 = getOutPin("IN2");
     }
 
     @Override
     public AbstractUiComponent getComponent() {
         if (switchUiComponent == null) {
-            switchUiComponent = new pko.KiCadLogicalSchemeSimulator.components.Switch.SwitchUiComponent(this, id, toggled);
+            switchUiComponent = new SwitchUiComponent(this, id, toggled);
         }
         return switchUiComponent;
     }
 
     public void toggle(boolean toggled) {
         this.toggled = toggled;
-        recalculate(pin1, pin2);
-        recalculate(pin2, pin1);
+        recalculate(in1, pin2);
+        recalculate(in2, pin1);
     }
 
-    @Override
-    public void onPassivePinChange(Pin merger) {
-        if (pin1.merger != merger) {
-            recalculate(pin1, pin2);
-        } else {
-            recalculate(pin2, pin1);
-        }
-    }
-
-    public void recalculate(Pin pin, Pin otherPin) {
-        if (!toggled || otherPin.merger.hiImpedance) {
+    private void recalculate(Pin pin, PassivePin otherPin) {
+        if (!toggled) {
             if (!pin.hiImpedance) {
                 pin.setHiImpedance();
             }
-        } else if (otherPin.merger.strong && !otherPin.strong) {
-            if (!pin.strong || pin.state != otherPin.merger.state) {
-                pin.strong = true;
-                if (otherPin.merger.state) {
+        } else if (pin instanceof PassivePin pp) {
+            if (otherPin.otherImpedance || (otherPin.otherState == pp.otherState && otherPin.otherStrong == pp.otherStrong)) {
+                if (!pin.hiImpedance) {
+                    pin.setHiImpedance();
+                }
+            } else {
+                pin.strong = otherPin.otherStrong;
+                if (otherPin.otherState) {
                     pin.setHi();
                 } else {
                     pin.setLo();
                 }
             }
-        } else if ((otherPin.strong || otherPin.hiImpedance) ? otherPin.merger.weakState != 0 : Math.abs(otherPin.merger.weakState) > 1) {
-            if (pin.hiImpedance || pin.strong || pin.state != otherPin.merger.weakState > 0) {
-                pin.strong = false;
-                if (otherPin.merger.weakState > 0) {
+        } else {
+            if (otherPin.otherImpedance || (otherPin.otherState == pin.state && otherPin.otherStrong == pin.strong)) {
+                if (!pin.hiImpedance) {
+                    pin.setHiImpedance();
+                }
+            } else {
+                pin.strong = otherPin.otherStrong;
+                if (otherPin.otherState) {
                     pin.setHi();
                 } else {
                     pin.setLo();
                 }
             }
-        } else if (!pin.hiImpedance) {
-            pin.setHiImpedance();
         }
     }
 }
