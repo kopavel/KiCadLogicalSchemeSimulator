@@ -31,6 +31,7 @@
  */
 package pko.KiCadLogicalSchemeSimulator.components.diode;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 
 public class Diode extends SchemaPart {
@@ -39,8 +40,18 @@ public class Diode extends SchemaPart {
 
     protected Diode(String id, String sParams) {
         super(id, sParams);
-        addPassivePin("A");
-        addPassivePin("K");
+        addPassivePin(new PassivePin("A", this) {
+            @Override
+            public void onChange() {
+                setCathode();
+            }
+        });
+        addPassivePin(new PassivePin("K", this) {
+            @Override
+            public void onChange() {
+                setAnode();
+            }
+        });
     }
 
     @Override
@@ -49,51 +60,27 @@ public class Diode extends SchemaPart {
         cathode = getOutPin("K");
     }
 
-    public void onPassivePinChange(Pin merger) {
-        if (anode.merger != merger) {
-            setAnode();
-        } else {
-            setCathode();
-        }
-    }
-
     public void setAnode() {
-        if (cathode.merger.state || cathode.merger.hiImpedance) {
+        PassivePin cathodePin = (PassivePin) cathode;
+        if (cathodePin.otherImpedance || cathodePin.otherState) {
             if (!anode.hiImpedance) {
                 anode.setHiImpedance();
             }
-        } else if (cathode.merger.strong && !cathode.strong) {
-            if (!anode.strong) {
-                anode.strong = true;
-                anode.setLo();
-            }
-        } else if ((cathode.strong || cathode.hiImpedance) ? cathode.merger.weakState != 0 : Math.abs(cathode.merger.weakState) > 1) {
-            if (anode.hiImpedance || anode.strong || cathode.merger.weakState > 0) {
-                anode.strong = false;
-                anode.setLo();
-            }
-        } else if (!anode.hiImpedance) {
-            anode.setHiImpedance();
+        } else if (anode.hiImpedance || anode.state || (anode.strengthSensitive && anode.strong != cathodePin.otherStrong)) {
+            anode.strong = cathodePin.otherStrong;
+            anode.setLo();
         }
     }
 
     public void setCathode() {
-        if (!anode.merger.state || anode.merger.hiImpedance) {
+        PassivePin anodePin = (PassivePin) anode;
+        if (anodePin.otherImpedance || !anodePin.otherState) {
             if (!cathode.hiImpedance) {
                 cathode.setHiImpedance();
             }
-        } else if (anode.merger.strong && !anode.strong) {
-            if (!cathode.strong) {
-                cathode.strong = true;
-                cathode.setHi();
-            }
-        } else if ((anode.strong || anode.hiImpedance) ? anode.merger.weakState != 0 : Math.abs(anode.merger.weakState) > 1) {
-            if (cathode.hiImpedance || cathode.strong || anode.merger.weakState > 0) {
-                cathode.strong = false;
-                cathode.setHi();
-            }
-        } else if (!cathode.hiImpedance) {
-            cathode.setHiImpedance();
+        } else if (cathode.hiImpedance || !cathode.state || (cathode.strengthSensitive && cathode.strong != anodePin.otherStrong)) {
+            cathode.strong = anodePin.otherStrong;
+            cathode.setHi();
         }
     }
 }

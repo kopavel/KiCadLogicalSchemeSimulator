@@ -31,19 +31,20 @@
  */
 package pko.KiCadLogicalSchemeSimulator.components.diode.test;
 import org.junit.jupiter.api.Test;
+import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.test.schemaPartTester.NetTester;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class DiodeTest extends NetTester {
-    String[] anodeIn =
-            {"h", "w0", "w1", "s0", "s1", "h", "w0", "w1", "s0", "s1", "h", "w0", "w1", "s0", "s1", "h", "w0", "w1", "s0", "s1", "h", "w0", "w1", "s0", "s1"};
-    String[] cathodeIn =
-            {"h", "h", "h", "h", "h", "w0", "w0", "w0", "w0", "w0", "w1", "w1", "w1", "w1", "w1", "s0", "s0", "s0", "s0", "s0", "s1", "s1", "s1", "s1", "s1"};
-    String[] anodeState =
-            {"h", "w0", "w1", "s0", "s1", "w0", "w0", "er", "s0", "s1", "h", "er", "w1", "s0", "s1", "s0", "s0", "s0", "er", "er", "h", "w0", "w1", "s0", "er"};
-    String[] cathodeState =
-            {"h", "h", "w1", "h", "s1", "w0", "w0", "er", "w0", "s1", "w1", "er", "w1", "w1", "s1", "s0", "s0", "s0", "er", "er", "s1", "s1", "s1", "s1", "er"};
+    private static final String[] anodeIn =
+            {"hi", "w0", "w1", "s0", "s1", "hi", "w0", "w1", "s0", "s1", "hi", "w0", "w1", "s0", "s1", "hi", "w0", "w1", "s0", "s1", "hi", "w0", "w1", "s0", "s1"};
+    private static final String[] cathodeIn =
+            {"hi", "hi", "hi", "hi", "hi", "w0", "w0", "w0", "w0", "w0", "w1", "w1", "w1", "w1", "w1", "s0", "s0", "s0", "s0", "s0", "s1", "s1", "s1", "s1", "s1"};
+    private static final String[] anodeState =
+            {"hi", "w0", "w1", "s0", "s1", "w0", "w0", "er", "s0", "s1", "hi", "er", "w1", "s0", "s1", "s0", "s0", "s0", "er", "er", "hi", "w0", "w1", "s0", "er"};
+    private static final String[] cathodeState =
+            {"hi", "hi", "w1", "hi", "s1", "w0", "w0", "er", "w0", "s1", "w1", "er", "w1", "w1", "s1", "s0", "s0", "s0", "er", "er", "s1", "s1", "s1", "s1", "er"};
 
     @Override
     protected String getNetFilePath() {
@@ -57,58 +58,68 @@ public class DiodeTest extends NetTester {
 
     @Test
     protected void diodeTest() {
+        Pin anode = outPin("A");
+        Pin cathode = outPin("K");
         for (int i = 0; i < anodeState.length; i++) {
-            if (anodeState[i].equals("er")) {
+            if ("er".equals(anodeState[i])) {
                 continue;
             }
-            if (!outPin("A").hiImpedance) {
-                outPin("A").setHiImpedance();
-            }
             switch (anodeIn[i]) {
-                case "h" -> {
+                case "hi" -> {
+                    if (!anode.hiImpedance) {
+                        anode.setHiImpedance();
+                    }
                 }
                 case "w0" -> {
-                    outPin("A").strong = false;
-                    setLo("A");
+                    anode.strong = false;
+                    anode.setLo();
                 }
                 case "w1" -> {
-                    outPin("A").strong = false;
-                    setHi("A");
+                    anode.strong = false;
+                    anode.setHi();
                 }
                 case "s0" -> {
-                    outPin("A").strong = true;
-                    setLo("A");
+                    anode.strong = true;
+                    anode.setLo();
                 }
                 case "s1" -> {
-                    outPin("A").strong = true;
-                    setHi("A");
+                    anode.strong = true;
+                    anode.setHi();
                 }
-            }
-            if (!outPin("K").hiImpedance) {
-                outPin("K").setHiImpedance();
             }
             switch (cathodeIn[i]) {
-                case "h" -> {
+                case "hi" -> {
+                    if (!cathode.hiImpedance) {
+                        cathode.setHiImpedance();
+                    }
                 }
                 case "w0" -> {
-                    outPin("K").strong = false;
-                    setLo("K");
+                    if (cathode.strong || cathode.state) {
+                        cathode.strong = false;
+                        cathode.setLo();
+                    }
                 }
                 case "w1" -> {
-                    outPin("K").strong = false;
-                    setHi("K");
+                    if (cathode.strong || !cathode.state) {
+                        cathode.strong = false;
+                        cathode.setHi();
+                    }
                 }
                 case "s0" -> {
-                    outPin("K").strong = true;
-                    setLo("K");
+                    if (!cathode.strong || cathode.state) {
+                        cathode.strong = true;
+                        cathode.setLo();
+                    }
                 }
                 case "s1" -> {
-                    outPin("K").strong = true;
-                    setHi("K");
+                    if (!cathode.strong || !cathode.state) {
+                        cathode.strong = true;
+                        cathode.setHi();
+                    }
                 }
             }
             switch (anodeState[i]) {
-                case "h" -> checkPinImpedance("inA", "With A=" + anodeIn[i] + " and k=" + cathodeIn[i] + " Anode must be in hiImpedance");
+                case "hi" -> checkPinImpedance("inA", "With A=" + anodeIn[i] + " and k=" + cathodeIn[i] + " Anode must be in hiImpedance");
                 case "w0" -> {
                     assertFalse(inPin("inA").hiImpedance, "With A=" + anodeIn[i] + " and k=" + cathodeIn[i] + " Anode not to be in hiImpedance");
                     checkPin("inA", false, "With A=" + anodeIn[i] + " and k=" + cathodeIn[i] + " Anode must be weak Lo");
@@ -127,7 +138,7 @@ public class DiodeTest extends NetTester {
                 }
             }
             switch (cathodeState[i]) {
-                case "h" -> checkPinImpedance("inK", "With A=" + anodeIn[i] + " and k=" + cathodeIn[i] + " Cathode must be in hiImpedance");
+                case "hi" -> checkPinImpedance("inK", "With A=" + anodeIn[i] + " and k=" + cathodeIn[i] + " Cathode must be in hiImpedance");
                 case "w0" -> {
                     assertFalse(inPin("inK").hiImpedance, "With A=" + anodeIn[i] + " and k=" + cathodeIn[i] + " Cathode not to be in hiImpedance");
                     checkPin("inK", false, "With A=" + anodeIn[i] + " and k=" + cathodeIn[i] + " Cathode must be weak Lo");
