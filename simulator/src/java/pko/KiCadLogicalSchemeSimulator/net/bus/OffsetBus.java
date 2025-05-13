@@ -80,8 +80,8 @@ public class OffsetBus extends OutBus implements SupportOffset, SupportMask {
     public void setState(int newState) {
         /*Optimiser line setter*/
         state = newState;
-        int newMaskState = newState & mask;
-        /*Optimiser block mask bind m:mask*/
+        /*Optimiser block mask bind m:applyMask*/
+        int newMaskState = newState & applyMask;
         if (maskState != newMaskState
                 /*Optimiser line ts*///
                 || hiImpedance //
