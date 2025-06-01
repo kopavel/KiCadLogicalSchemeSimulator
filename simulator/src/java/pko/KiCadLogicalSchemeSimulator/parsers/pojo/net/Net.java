@@ -49,6 +49,12 @@ import java.util.List;
 @Accessors(chain = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Net {
-    protected List<Node> node;
-    protected String name;
+    public Nets parent;
+    public List<Node> node;
+    public String name;
+
+    public void fillParent(Nets nets) {
+        parent=nets;
+        node.forEach(n->n.fillParent(this));
+    }
 }

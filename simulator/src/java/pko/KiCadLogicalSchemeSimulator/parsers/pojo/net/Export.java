@@ -45,4 +45,7 @@ import lombok.Setter;
 public class Export {
     protected Components components;
     protected Nets nets;
+    public void fillParents(){
+        nets.fillParents(this);
+    };
 }

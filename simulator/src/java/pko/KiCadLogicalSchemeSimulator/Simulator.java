@@ -288,6 +288,7 @@ public class Simulator implements Runnable {
             Export export;
             if (netFilePath.endsWith("xml")) {
                 export = XmlParser.parse(netFilePath, Export.class);
+                export.fillParents();
             } else if (netFilePath.endsWith(".net")) {
                 export = NetFileParser.parse(netFilePath);
             } else {

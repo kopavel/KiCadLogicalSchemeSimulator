@@ -41,8 +41,13 @@ import lombok.Setter;
 @XmlAccessorType(XmlAccessType.FIELD)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Node {
-    protected String pinfunction;
-    protected String pintype;
-    protected String pin;
-    protected String ref;
+    public Net parent;
+    public String pinfunction;
+    public String pintype;
+    public String pin;
+    public String ref;
+
+    public void fillParent(Net net) {
+        parent=net;
+    }
 }

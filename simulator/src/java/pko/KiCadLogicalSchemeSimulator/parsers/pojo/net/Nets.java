@@ -43,5 +43,11 @@ import java.util.List;
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Nets {
-    protected List<Net> net;
+    public Export parent;
+    public List<Net> net;
+
+    public void fillParents(Export export) {
+        parent=export;
+        net.forEach(n->n.fillParent(this));
+    }
 }

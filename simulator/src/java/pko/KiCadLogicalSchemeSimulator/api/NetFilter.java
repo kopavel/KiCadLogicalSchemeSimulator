@@ -31,9 +31,56 @@
  */
 package pko.KiCadLogicalSchemeSimulator.api;
 import pko.KiCadLogicalSchemeSimulator.api.params.ParameterResolver;
+import pko.KiCadLogicalSchemeSimulator.api.params.types.PinConfig;
+import pko.KiCadLogicalSchemeSimulator.api.params.types.SchemaPartConfig;
+import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Export;
+import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Net;
+import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Node;
+
+import java.util.Arrays;
+import java.util.Map;
+import java.util.function.BiConsumer;
 
 @FunctionalInterface
 public interface NetFilter {
-    boolean doFilter(Export netFile, ParameterResolver schemaParts);
+    boolean doFilter(Export netFile, ParameterResolver parameterResolver);
+    default void modifyOtherNodes(ParameterResolver parameterResolver, Node node, BiConsumer<Node, PinConfig> nodeModifier) {
+        int pinNo = Integer.parseInt(node.getPin());
+        for (Map.Entry<Integer, PinConfig> pin : parameterResolver.getPinMap(node).entrySet()) {
+            if (!pin.getKey().equals(pinNo)) {
+                for (Net otherNet : node.parent.parent.parent.getNets().getNet()) {
+                    if (otherNet != node.parent) {
+                        for (Node otherNode : otherNet.getNode()) {
+                            if (otherNode.getRef().equals(node.getRef())) {
+                                nodeModifier.accept(otherNode, pin.getValue());
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        throw new RuntimeException("Can't find other nodes, Net:" + node.parent.name + ", Node:" + node.ref + "." + node.pin);
+    }
+    default boolean replaceSchemaPart(ParameterResolver parameterResolver,
+            Node currentNode,
+            Class<? extends SchemaPart> oldClass,
+            Class<? extends SchemaPart> newClass,
+            String sParams,
+            BiConsumer<Node, PinConfig> nodeModifier) {
+        SchemaPartConfig schemaPartConfig = parameterResolver.getSchemaPartConfig(currentNode);
+        if (schemaPartConfig != null && schemaPartConfig.clazz.equals(oldClass.getSimpleName())) {
+            schemaPartConfig.clazz = newClass.getSimpleName();
+            if (sParams != null && !sParams.isBlank()) {
+                Arrays.stream(sParams.split(";")).forEach(param -> {
+                    String[] paramPair = param.split(":");
+                    schemaPartConfig.params.put(paramPair[0], paramPair[1]);
+                });
+            }
+            modifyOtherNodes(parameterResolver, currentNode, nodeModifier);
+            return true;
+        }
+        return false;
+    }
 }

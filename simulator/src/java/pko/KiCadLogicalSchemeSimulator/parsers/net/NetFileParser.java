@@ -41,7 +41,9 @@ public class NetFileParser {
     private int currentChar;
 
     public static Export parse(String filePath) throws Exception {
-        return new NetFileParser().process(filePath);
+        Export result = new NetFileParser().process(filePath);
+        result.fillParents();
+        return result;
     }
 
     private Export process(String filePath) throws Exception {
