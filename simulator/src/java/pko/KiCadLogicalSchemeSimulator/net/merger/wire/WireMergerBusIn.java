@@ -131,12 +131,12 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus>, SupportM
             }
             /*Optimiser block passivePins*/
             merger.strong = true;
-            merger.recalculatePassivePins();
         } else if (!merger.strong) {
             merger.strong = true;
-            merger.recalculatePassivePins();
             /*Optimiser blockEnd passivePins*/
         }
+        /*Optimiser line passivePins*/
+        merger.recalculatePassivePins();
         //region assert
         assert Log.debug(getClass(),
                 "Pin merger change. after: newState:{}, Source:{} (state:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{}, hiImpedance:{})",

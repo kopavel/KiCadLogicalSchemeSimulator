@@ -353,15 +353,12 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                     /*Optimiser line passivePins*/
                 }
             }
-            /*Optimiser block passivePins*/
-            merger.recalculatePassivePins();
         }
-            //FixMe what about bus merger pin input?
-        /*Optimiser line passivePins*/
+        //FixMe what about bus merger pin input?
+        /*Optimiser block passivePins*/
         merger.recalculatePassivePins();
-
-        /*Optimiser line passivePins*/
         oldStrong = strong;
+        /*Optimiser blockEnd passivePins*/
         //region assert
         assert Log.debug(getClass(),
                 "Pin merger change. after: newState:{}, Source:{} (state:{}, oldStrong:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, " +

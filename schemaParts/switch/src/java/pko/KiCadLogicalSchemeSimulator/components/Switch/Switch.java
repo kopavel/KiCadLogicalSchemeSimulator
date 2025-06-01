@@ -93,7 +93,7 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
                 if (!pin.hiImpedance) {
                     pin.setHiImpedance();
                 }
-            } else {
+            } else if (pin.hiImpedance || pin.strong != otherPin.otherStrong || pin.state!=otherPin.otherState){
                 pin.strong = otherPin.otherStrong;
                 if (otherPin.otherState) {
                     pin.setHi();

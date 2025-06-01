@@ -47,7 +47,7 @@ public class Diode extends SchemaPart {
                     if (!cathode.hiImpedance) {
                         cathode.setHiImpedance();
                     }
-                } else if (cathode.hiImpedance || !cathode.state) {
+                } else if (cathode.hiImpedance || !cathode.state || cathode.strong != otherStrong) {
                     cathode.strong = otherStrong;
                     cathode.setHi();
                 }
@@ -60,7 +60,7 @@ public class Diode extends SchemaPart {
                     if (!anode.hiImpedance) {
                         anode.setHiImpedance();
                     }
-                } else if (anode.hiImpedance || anode.state) {
+                } else if (anode.hiImpedance || anode.state || anode.strong != otherStrong) {
                     anode.strong = otherStrong;
                     anode.setLo();
                 }
