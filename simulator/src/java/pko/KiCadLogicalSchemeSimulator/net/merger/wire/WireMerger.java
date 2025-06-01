@@ -40,16 +40,12 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.PullPin;
 import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
 import pko.KiCadLogicalSchemeSimulator.net.wire.NCWire;
 
-import java.util.Comparator;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
+import java.util.*;
 
 //Todo with one source only and only weak others - use simpler "Weak pin" implementation
 public class WireMerger extends OutPin {
     public final Set<MergerInput<?>> sources = new TreeSet<>(Comparator.comparing(mergerInput -> mergerInput.getMask() + ":" + mergerInput.getName()));
-    public Set<PassivePin> passivePins = new TreeSet<>();
+    public Collection<PassivePin> passivePins = new TreeSet<>();
     public int weakState;
 
     public WireMerger(Pin destination, Iterable<? extends OutPin> pins, Iterable<? extends PassivePin> passivePins, Map<? extends OutBus, Integer> buses) {
@@ -86,54 +82,14 @@ public class WireMerger extends OutPin {
         passivePins = sources.stream()
                 .map(mergerInput -> ((ModelItem<?>) mergerInput).source)
                 .filter(inputSource -> inputSource instanceof PassivePin)
-                .map(inputSource -> (PassivePin) inputSource)
-                .collect(Collectors.toSet());
+                .map(inputSource -> (PassivePin) inputSource).toList();
         split();
         return this;
     }
 
     public void recalculatePassivePins() {
-        if (hiImpedance) {
-            //all in impedance
-            passivePins.forEach(pin -> {
-                pin.otherImpedance = true;
-                pin.onChange();
-            });
-        } else {
-            for (PassivePin pin : passivePins) {
-                if (pin.hiImpedance) {
-                    //we in impedance - clone merger
-                    pin.otherState = state;
-                    pin.otherStrong = strong;
-                    pin.otherImpedance = false;
-                } else if (pin.strong) {
-                    //we strong
-                    if (weakState == 0) {
-                        //no other weak
-                        pin.otherImpedance = true;
-                    } else {
-                        //other weak
-                        pin.otherImpedance = false;
-                        pin.otherStrong = false;
-                        pin.otherState = weakState > 0;
-                    }
-                    //we are weak
-                } else if (strong) {
-                    //has other strong - clone merger
-                    pin.otherState = state;
-                    pin.otherStrong = true;
-                    pin.otherImpedance = false;
-                } else if (weakState == 1 || weakState == -1) {
-                    //we only weak on merger - hiImpedance
-                    pin.otherImpedance = true;
-                } else {
-                    //merger are many weaks - sp state same as we are.
-                    pin.otherImpedance = false;
-                    pin.otherStrong = false;
-                    pin.otherState = state;
-                }
-                pin.onChange();
-            }
+        for (PassivePin pin : passivePins) {
+            pin.recalculateOtherState(hiImpedance, state, weakState, strong);
         }
     }
 
