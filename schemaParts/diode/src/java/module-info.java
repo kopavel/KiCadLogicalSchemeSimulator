@@ -33,6 +33,7 @@ import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
 import pko.KiCadLogicalSchemeSimulator.components.diode.DiodeSpi;
 
 module KiCadLogicalSchemeSimulator.components.Diode {
+    exports pko.KiCadLogicalSchemeSimulator.components.diode;
     requires KiCadLogicalSchemeSimulator.simulator;
     provides SchemaPartSpi with DiodeSpi;
 }

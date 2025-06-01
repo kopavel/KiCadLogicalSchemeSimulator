@@ -40,15 +40,15 @@ public class PassiveIn extends InPin {
     public final PassivePin destination;
 
     public PassiveIn(PassivePin destination) {
-        super(destination, null);//always after merger - so no parent.
+        super(destination, null);
         this.destination = destination;
-        CheckShortCut checker = new CheckShortCut(destination);
-        destination.addDestination(checker);
         triStateIn = true;
     }
 
     @Override
     public void setHi() {
+        state = true;
+        hiImpedance = false;
         destination.otherState = true;
         destination.otherImpedance = false;
         if (source != null) {
@@ -61,6 +61,8 @@ public class PassiveIn extends InPin {
 
     @Override
     public void setLo() {
+        state = false;
+        hiImpedance = false;
         destination.otherState = false;
         destination.otherImpedance = false;
         if (source != null) {
@@ -73,34 +75,14 @@ public class PassiveIn extends InPin {
 
     @Override
     public void setHiImpedance() {
+        hiImpedance = true;
         destination.otherImpedance = true;
+        destination.onChange();
     }
 
     @Override
     public Pin getOptimised(ModelItem<?> source) {
+        this.source = source;
         return this;
-    }
-
-    private static final class CheckShortCut extends InPin {
-        private final PassivePin source;
-
-        private CheckShortCut(PassivePin source) {
-            super(source, "ShortcutChecker");
-            this.source = source;
-        }
-
-        @Override
-        public void setHi() {
-            if (source != null && !source.hiImpedance) {
-                throw new ShortcutException(source.destinations);
-            }
-        }
-
-        @Override
-        public void setLo() {
-            if (source != null && !source.hiImpedance) {
-                throw new ShortcutException(source.destinations);
-            }
-        }
     }
 }

@@ -29,44 +29,18 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.components.LED;
-import pko.KiCadLogicalSchemeSimulator.api.schemaPart.AbstractUiComponent;
+package pko.KiCadLogicalSchemeSimulator.components.led.indicator;
+import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
 
-import java.awt.*;
-import java.awt.geom.Ellipse2D;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
-public class LedUiComponent extends AbstractUiComponent {
-    private final Color on;
-    private final Color off;
-    private Ellipse2D circle;
-    public boolean state;
-
-    public LedUiComponent(int size, Color on, Color off, String title) {
-        super(title, size);
-        this.on = on;
-        this.off = off;
-        setBackground(new Color(0, 0, 0, 0));
-        //noinspection resource
-        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this::repaint, 0, redrawPeriod, TimeUnit.MILLISECONDS);
+public class LedIndicatorSpi implements SchemaPartSpi {
+    @Override
+    public SchemaPart getSchemaPart(String id, String params) {
+        return new LedIndicator(id, params);
     }
 
     @Override
-    public Dimension getPreferredSize() {
-        return new Dimension(size, size);
-    }
-
-    @Override
-    protected void draw() {
-        // Set color and draw the circle
-        if (circle == null) {
-            circle = new Ellipse2D.Float((float) (getWidth() - size) / 2, getHeight() - size - 2, size, size);
-        }
-        g2d.setColor(state ? on : off);
-        g2d.fill(circle);
-        // Draw the circle border
-        g2d.setColor(Color.black);
-        g2d.draw(circle);
+    public Class<? extends SchemaPart> getSchemaPartClass() {
+        return LedIndicator.class;
     }
 }

@@ -78,6 +78,7 @@ public enum JavaCompiler {
             optionList.add("-Xlint:none");
             optionList.add("-cp");
             optionList.add(paths.toString());
+            optionList.add("-g");
             optionList.add("-proc:none");
         } catch (Exception e) {
             throw new RuntimeException(e);

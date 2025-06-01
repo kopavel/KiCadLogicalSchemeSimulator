@@ -705,6 +705,9 @@
 		<symbol name="R_Small" class="Resister">
 			<unit pinMap="1=IN1;2=IN2"/>
 		</symbol>
+		<symbol name="LED" class="Led">
+			<unit pinMap="1=K;2=A"/>
+		</symbol>
 		<symbol name="R_Pack08_Split" class="DipSwitch">
 			<unit pinMap="ignore;1;16"/>
 			<unit pinMap="ignore;2;15"/>

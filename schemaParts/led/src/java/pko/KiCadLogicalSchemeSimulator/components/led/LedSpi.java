@@ -29,15 +29,18 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
+package pko.KiCadLogicalSchemeSimulator.components.led;
+import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
-import pko.KiCadLogicalSchemeSimulator.components.led.LedSpi;
-import pko.KiCadLogicalSchemeSimulator.components.led.indicator.LedIndicatorSpi;
 
-module KiCadLogicalSchemeSimulator.schemaParts.led.main {
-    requires KiCadLogicalSchemeSimulator.simulator;
-    requires java.desktop;
-    requires KiCadLogicalSchemeSimulator.components.Diode;
-    provides SchemaPartSpi with LedSpi, LedIndicatorSpi;
+public class LedSpi implements SchemaPartSpi {
+    @Override
+    public SchemaPart getSchemaPart(String id, String params) {
+        return new Led(id, params);
+    }
 
+    @Override
+    public Class<? extends SchemaPart> getSchemaPartClass() {
+        return Led.class;
+    }
 }

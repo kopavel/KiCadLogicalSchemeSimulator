@@ -29,15 +29,49 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+package pko.KiCadLogicalSchemeSimulator.components.led.indicator;
+import pko.KiCadLogicalSchemeSimulator.api.schemaPart.AbstractUiComponent;
+import pko.KiCadLogicalSchemeSimulator.api.schemaPart.InteractiveSchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
+import pko.KiCadLogicalSchemeSimulator.components.led.LedUiComponent;
+import pko.KiCadLogicalSchemeSimulator.tools.UiTools;
 
-import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
-import pko.KiCadLogicalSchemeSimulator.components.led.LedSpi;
-import pko.KiCadLogicalSchemeSimulator.components.led.indicator.LedIndicatorSpi;
+import java.awt.*;
 
-module KiCadLogicalSchemeSimulator.schemaParts.led.main {
-    requires KiCadLogicalSchemeSimulator.simulator;
-    requires java.desktop;
-    requires KiCadLogicalSchemeSimulator.components.Diode;
-    provides SchemaPartSpi with LedSpi, LedIndicatorSpi;
+public class LedIndicator extends SchemaPart implements InteractiveSchemaPart {
+    private final LedUiComponent ledUiComponent;
 
+    protected LedIndicator(String id, String sParams) {
+        super(id, sParams);
+        InPin inPin = addInPin(new InPin("IN", this) {
+            @Override
+            public void setHiImpedance() {
+                state = false;
+            }
+
+            @Override
+            public void setHi() {
+                state = true;
+            }
+
+            @Override
+            public void setLo() {
+                state = false;
+            }
+        });
+        int size = Integer.parseInt(params.getOrDefault("size", "20"));
+        Color on = UiTools.getColor(params.getOrDefault("onColor", "#ff0000"));
+        Color off = UiTools.getColor(params.getOrDefault("offColor", "#808080"));
+        ledUiComponent = new LedUiComponent(size, on, off, id,()-> inPin.state);
+    }
+
+    @Override
+    public void initOuts() {
+    }
+
+    @Override
+    public AbstractUiComponent getComponent() {
+        return ledUiComponent;
+    }
 }

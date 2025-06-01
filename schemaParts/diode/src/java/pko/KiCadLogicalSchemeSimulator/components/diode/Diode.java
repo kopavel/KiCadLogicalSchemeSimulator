@@ -35,19 +35,19 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 
 public class Diode extends SchemaPart {
-    private Pin anode;
-    private Pin cathode;
+    protected Pin anode;
+    protected Pin cathode;
 
     protected Diode(String id, String sParams) {
         super(id, sParams);
         addPassivePin(new PassivePin("A", this) {
             @Override
             public void onChange() {
-                if (otherImpedance || !otherState) {
+                if (otherImpedance || !otherState || (cathode.strengthSensitive && !otherStrong && cathode.strong)) {
                     if (!cathode.hiImpedance) {
                         cathode.setHiImpedance();
                     }
-                } else if (cathode.hiImpedance || !cathode.state || (cathode.strengthSensitive && cathode.strong != otherStrong)) {
+                } else if (cathode.hiImpedance || !cathode.state) {
                     cathode.strong = otherStrong;
                     cathode.setHi();
                 }
@@ -56,11 +56,11 @@ public class Diode extends SchemaPart {
         addPassivePin(new PassivePin("K", this) {
             @Override
             public void onChange() {
-                if (otherImpedance || otherState) {
+                if (otherImpedance || otherState || (anode.strengthSensitive && !otherStrong && anode.strong)) {
                     if (!anode.hiImpedance) {
                         anode.setHiImpedance();
                     }
-                } else if (anode.hiImpedance || anode.state || (anode.strengthSensitive && anode.strong != otherStrong)) {
+                } else if (anode.hiImpedance || anode.state) {
                     anode.strong = otherStrong;
                     anode.setLo();
                 }

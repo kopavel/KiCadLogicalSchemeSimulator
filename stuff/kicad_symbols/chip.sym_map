@@ -26,7 +26,7 @@
 			<unit pinMap="1=A0;2=A1;3=A2;4=Q0;5=Q1;6=Q2;7=Q3;8=Q4;9=Q5;10=Q6;11=Q7;12=CS"/>
 		</symbol>
 		<symbol name="DISPLAY" class="Display" param="reverse"/>
-		<symbol name="LED" class="Led" param="size=30;onColor=#FF0000;offColor=#808080"/>
+		<symbol name="LED" class="LedIndicator" param="size=30;onColor=#FF0000;offColor=#808080"/>
 		<symbol name="MUX2x1" class="SingleBitMultiplexer" param="size=1;nSize=1;reverse"/>
 		<symbol name="MUX2x2" class="Multiplexer" param="size=2;nSize=1;reverse"/>
 		<symbol name="MUX2x4" class="Multiplexer" param="size=4;nSize=1;reverse"/>
