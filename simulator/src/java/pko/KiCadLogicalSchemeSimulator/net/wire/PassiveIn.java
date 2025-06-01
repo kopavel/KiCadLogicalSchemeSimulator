@@ -31,7 +31,6 @@
  */
 package pko.KiCadLogicalSchemeSimulator.net.wire;
 import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
-import pko.KiCadLogicalSchemeSimulator.api.ShortcutException;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
@@ -41,6 +40,8 @@ public class PassiveIn extends InPin {
 
     public PassiveIn(PassivePin destination) {
         super(destination, null);
+        id+="_in";
+        destination.source=this;
         this.destination = destination;
         triStateIn = true;
     }
