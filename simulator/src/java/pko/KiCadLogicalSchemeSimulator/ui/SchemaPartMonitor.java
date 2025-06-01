@@ -87,6 +87,7 @@ public class SchemaPartMonitor extends JFrame {
         schemaPart = Simulator.net.schemaParts.get(id);
         title.setText(id);
         schemaPartBox.setBorder(BorderFactory.createLineBorder(borderColor));
+        //FixMe passive pin like IN?
         schemaPart.inPins.values()
                 .stream().distinct().sorted(Comparator.comparing(ModelItem::getId)).forEach(inItem -> {
                       JLabel label;

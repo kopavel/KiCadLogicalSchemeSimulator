@@ -158,7 +158,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                     merger.strong = false;
                     merger.weakState += 1;
                     merger.state = true;
-                } else if (!oldState) {
+                } else if (!state) {
                     //from opposite weak
                     if (merger.weakState < -1) { //opposite weak state
                         //region shortcut
@@ -177,6 +177,8 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                     }
                 }
         }
+        /*Optimiser line setters*/
+        state = true;
         /*Optimiser blockEnd passivePins*/
         if (merger.hiImpedance || !oldState
                 /*Optimiser line passivePins*///
@@ -200,8 +202,6 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
         /*Optimiser line passivePins*/
         merger.recalculatePassivePins();
 
-        /*Optimiser line setters*/
-        state = true;
         /*Optimiser line passivePins*/
         oldStrong = strong;
         //region assert
@@ -242,8 +242,6 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                 merger.weakState);
         //endregion
         boolean oldState = merger.state;
-        /*Optimiser line setters*/
-        state = false;
         /*Optimiser line passivePins*/
         if (strong) { //to strong
             merger.state = false;
@@ -317,7 +315,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                     merger.strong = false;
                     merger.weakState -= 1;
                     merger.state = false;
-                } else if (oldState) {
+                } else if (state) {
                     //from opposite weak
                     if (merger.weakState > 1) { //opposite weak state
                         //region shortcut
@@ -336,6 +334,8 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                     }
                 }
         }
+        /*Optimiser line setters*/
+        state = false;
         /*Optimiser blockEnd passivePins*/
         if (merger.hiImpedance || oldState
                 /*Optimiser line passivePins*///
@@ -478,9 +478,9 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
             if (!triStateIn) {
                 optimiser.cut("hiAndPassive");
             }
-        }
-        if (inSource != null) {
-            optimiser.cut("setters");
+            if (inSource != null) {
+                optimiser.cut("setters");
+            }
         }
         if (!triStateIn) {
             optimiser.cut("ts");

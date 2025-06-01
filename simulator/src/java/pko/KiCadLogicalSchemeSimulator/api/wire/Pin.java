@@ -64,7 +64,7 @@ public abstract class Pin extends ModelItem<Pin> {
     public Pin copyState(IModelItem<? extends Pin> oldPin) {
         used = true;
         strong = oldPin.isStrong();
-        hiImpedance = oldPin.isHiImpedance();
+        hiImpedance = triStateIn && oldPin.isHiImpedance();
         Pin pin = oldPin.getThis();
         state = pin.state;
         priority += oldPin.getPriority();
