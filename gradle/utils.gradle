@@ -33,7 +33,6 @@
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
-
 project.ext.downloadFileIfNotExists = { String fileUrl, File destinationFile ->
     if (!destinationFile.exists()) {
         println "Downloading file from ${fileUrl}..."

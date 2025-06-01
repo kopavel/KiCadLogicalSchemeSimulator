@@ -37,10 +37,10 @@ plugins {
 
 group = 'pko'
 version = '0.1'
-project.ext.deleteEmptyDirsRecursively = { dir ->
+def deleteEmptyDirsRecursively(dir){
     if (dir.exists() && dir.isDirectory()) {
         dir.eachDir { subDir ->
-            project.ext.deleteEmptyDirsRecursively(subDir) // Recursive call for subdirectories
+            deleteEmptyDirsRecursively(subDir) // Recursive call for subdirectories
         }
         if (dir.listFiles().length == 0) {
             println("Deleting empty directory: ${dir.absolutePath}")
@@ -50,10 +50,9 @@ project.ext.deleteEmptyDirsRecursively = { dir ->
 }
 
 tasks.register("cleanBuild", Delete).configure() {
-    def fnc = project.ext.deleteEmptyDirsRecursively
     doLast {
         delete fileTree(dir: "$rootDir/distro/")
-        fnc(file("$rootDir/distro/"))
+        deleteEmptyDirsRecursively(file("$rootDir/distro/"))
     }
 }
 
@@ -73,7 +72,7 @@ tasks.register("copyToLib", Copy) {
     into "$rootDir/distro"
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     def filesToCopy = subprojects.collect { subproject ->
-        return subproject.configurations.runtimeClasspath.files
+        return configurations.runtimeClasspath.files
     }.flatten()
     from(filesToCopy) {
         // Exclude JAR outputs from subprojects

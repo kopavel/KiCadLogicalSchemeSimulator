@@ -31,8 +31,6 @@
  */
 def scriptName = System.getProperty('os.name').toLowerCase().contains('win') ? 'run.bat' : 'run.sh'
 def scriptPath = file("$rootDir/distro/$scriptName")
-apply from: "$rootDir/gradle/utils.gradle"
-
 tasks.register('counters') {
     group = 'examples'
     dependsOn tasks.named('assemble')
@@ -85,6 +83,7 @@ tasks.register('trs80') {
 }
 tasks.register("downloadCharGenBin") {
     doLast {
+        apply from: "$rootDir/gradle/utils.gradle"
         project.ext.downloadFileIfNotExists(
                 "https://raw.githubusercontent.com/RetroStack/Character_Generator_ROMs/main/TRS-80%20Model%201/Individual/character_set_10.bin",
                 file("$rootDir/stuff/examples/trs80/character_set_10.bin")
@@ -93,6 +92,7 @@ tasks.register("downloadCharGenBin") {
 }
 tasks.register("downloadRomA") {
     doLast {
+        apply from: "$rootDir/gradle/utils.gradle"
         project.ext.downloadFileIfNotExists(
                 "https://raw.githubusercontent.com/RetroStack/TRS-80-Model-I-System-ROMs/refs/heads/main/1-Option_2x64/rom_a_L2_v13.bin",
                 file("$rootDir/stuff/examples/trs80/rom_a_L2.bin")
@@ -101,6 +101,7 @@ tasks.register("downloadRomA") {
 }
 tasks.register("downloadRomB") {
     doLast {
+        apply from: "$rootDir/gradle/utils.gradle"
         project.ext.downloadFileIfNotExists(
                 "https://raw.githubusercontent.com/RetroStack/TRS-80-Model-I-System-ROMs/refs/heads/main/1-Option_2x64/rom_b_L2_v13.bin",
                 file("$rootDir/stuff/examples/trs80/rom_b_L2.bin")

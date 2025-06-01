@@ -32,33 +32,33 @@
 
 module KiCadLogicalSchemeSimulator.simulator {
     exports pko.KiCadLogicalSchemeSimulator.api.bus;
+    exports pko.KiCadLogicalSchemeSimulator.api.params.types;
+    exports pko.KiCadLogicalSchemeSimulator.api.params;
     exports pko.KiCadLogicalSchemeSimulator.api.schemaPart;
     exports pko.KiCadLogicalSchemeSimulator.api.wire;
-    exports pko.KiCadLogicalSchemeSimulator.api.params.types;
     exports pko.KiCadLogicalSchemeSimulator.api;
     exports pko.KiCadLogicalSchemeSimulator.net;
     exports pko.KiCadLogicalSchemeSimulator.optimiser;
-    exports pko.KiCadLogicalSchemeSimulator.parsers.pojo.symbolMap;
     exports pko.KiCadLogicalSchemeSimulator.parsers.pojo.net;
     exports pko.KiCadLogicalSchemeSimulator.parsers.pojo.param;
+    exports pko.KiCadLogicalSchemeSimulator.parsers.pojo.symbolMap;
+    exports pko.KiCadLogicalSchemeSimulator.parsers.symbolMap;
     exports pko.KiCadLogicalSchemeSimulator.tools.ringBuffers;
     exports pko.KiCadLogicalSchemeSimulator.tools;
-    exports pko.KiCadLogicalSchemeSimulator;
     exports pko.KiCadLogicalSchemeSimulator.ui.main;
-    opens pko.KiCadLogicalSchemeSimulator.net;
+    exports pko.KiCadLogicalSchemeSimulator;
+    opens pko.KiCadLogicalSchemeSimulator.api.params;
     opens pko.KiCadLogicalSchemeSimulator.net.bus;
-    opens pko.KiCadLogicalSchemeSimulator.net.wire;
     opens pko.KiCadLogicalSchemeSimulator.net.merger.bus;
     opens pko.KiCadLogicalSchemeSimulator.net.merger.wire;
+    opens pko.KiCadLogicalSchemeSimulator.net.wire;
+    opens pko.KiCadLogicalSchemeSimulator.net;
     opens pko.KiCadLogicalSchemeSimulator.optimiser;
-    opens pko.KiCadLogicalSchemeSimulator.parsers.pojo.symbolMap;
     opens pko.KiCadLogicalSchemeSimulator.parsers.pojo.net;
     opens pko.KiCadLogicalSchemeSimulator.parsers.pojo.param;
-    opens pko.KiCadLogicalSchemeSimulator;
-    exports pko.KiCadLogicalSchemeSimulator.parsers.symbolMap;
+    opens pko.KiCadLogicalSchemeSimulator.parsers.pojo.symbolMap;
     opens pko.KiCadLogicalSchemeSimulator.parsers.symbolMap;
-    exports pko.KiCadLogicalSchemeSimulator.api.params;
-    opens pko.KiCadLogicalSchemeSimulator.api.params;
+    opens pko.KiCadLogicalSchemeSimulator;
     requires com.fasterxml.jackson.annotation;
     requires com.fasterxml.jackson.core;
     requires com.fasterxml.jackson.databind;
@@ -81,10 +81,10 @@ module KiCadLogicalSchemeSimulator.simulator {
     requires org.apache.logging.log4j.jul;
     requires org.apache.logging.log4j.slf4j.impl;
     requires org.apache.logging.log4j;
-    requires org.tukaani.xz;
-    requires org.objectweb.asm;
     requires org.objectweb.asm.tree;
     requires org.objectweb.asm.util;
-    uses pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
+    requires org.objectweb.asm;
+    requires org.tukaani.xz;
     uses pko.KiCadLogicalSchemeSimulator.api.NetFilter;
+    uses pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
 }

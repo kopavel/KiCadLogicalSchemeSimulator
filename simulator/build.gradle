@@ -55,7 +55,6 @@ dependencies {
     implementation libs.log4j.jpl
     implementation libs.xz
     implementation libs.commons.compress
-    runtimeOnly(project(":schemaParts"))
     implementation libs.jackson.databind
     implementation libs.jaxb.api
     implementation libs.jakarta.api
@@ -67,11 +66,12 @@ dependencies {
     implementation libs.asm
     implementation libs.asm.util
     implementation libs.asm.tree
+    implementation libs.lombok
+    runtimeOnly(project(":schemaParts"))
     testImplementation libs.jmh
     testAnnotationProcessor libs.jmh.annotations
-    optimisedCompileOnly(project(":simulator"))
+    optimisedCompileOnly(project)
     optimisedCompileOnly(project(path: ':schemaParts', configuration: 'default'))
-    implementation libs.lombok
     optimisedCompileOnly(libs.lombok)
 }
 
