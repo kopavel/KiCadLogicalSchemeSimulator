@@ -51,6 +51,7 @@ import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.all
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.warn;
 
 public class ParameterResolver {
+    //  <Ref><unitNo>
     public final Map<String, Map<Integer, SchemaPartConfig>> schemaParts = new HashMap<>();
     public final Map<String, SchemaPartConfig> schemaPartsById = new HashMap<>();
     public final Map<String, Map<String, SymbolConfig>> symbols = new HashMap<>();

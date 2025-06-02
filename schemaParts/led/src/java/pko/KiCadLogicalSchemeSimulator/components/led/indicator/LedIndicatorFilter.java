@@ -33,13 +33,13 @@ package pko.KiCadLogicalSchemeSimulator.components.led.indicator;
 import pko.KiCadLogicalSchemeSimulator.api.NetFilter;
 import pko.KiCadLogicalSchemeSimulator.api.params.ParameterResolver;
 import pko.KiCadLogicalSchemeSimulator.api.params.types.PinConfig;
+import pko.KiCadLogicalSchemeSimulator.api.params.types.SchemaPartConfig;
 import pko.KiCadLogicalSchemeSimulator.components.led.Led;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Export;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Net;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Node;
 
 import java.util.Iterator;
-import java.util.Map;
 
 public class LedIndicatorFilter implements NetFilter {
     @Override
@@ -51,16 +51,19 @@ public class LedIndicatorFilter implements NetFilter {
                 Iterator<Node> nodes = currentNet.getNode().iterator();
                 while (nodes.hasNext()) {
                     Node node = nodes.next();
-                    Map<Integer, PinConfig> pinMap = parameterResolver.getPinMap(node);
-                    boolean anode = "A".equals(pinMap.get(Integer.parseInt(node.getPin())).pinName);
-                    if (powerState && anode || !powerState && !anode) {
-                        if (replaceSchemaPart(parameterResolver, node, Led.class, LedIndicator.class, anode ? "reverse" : null, (otherNode, pinConfig) -> {
-                            otherNode.setPin(null);
-                            otherNode.setPinfunction("IN");
-                            otherNode.setPintype("input");
-                        })) {
-                            nodes.remove();
-                            result = true;
+                    SchemaPartConfig schemaPartConfig = parameterResolver.getSchemaPartConfig(node);
+                    if (schemaPartConfig!=null && Led.class.getSimpleName().equals(schemaPartConfig.clazz)) {
+                        PinConfig pinConfig = parameterResolver.getPinMap(node).get(Integer.parseInt(node.getPin()));
+                        boolean anode = "A".equals(pinConfig != null ? pinConfig.pinName : node.pinfunction);
+                        if (powerState && anode || !powerState && !anode) {
+                            if (replaceSchemaPart(parameterResolver, node, Led.class, LedIndicator.class, anode ? "reverse" : null, (otherNode, pc) -> {
+                                otherNode.setPin(null);
+                                otherNode.setPinfunction("IN");
+                                otherNode.setPintype("input");
+                            })) {
+                                nodes.remove();
+                                result = true;
+                            }
                         }
                     }
                 }

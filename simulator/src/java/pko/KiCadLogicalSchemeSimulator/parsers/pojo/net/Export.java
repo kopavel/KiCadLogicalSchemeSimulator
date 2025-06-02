@@ -43,8 +43,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Export {
-    protected Components components;
-    protected Nets nets;
+    public Components components;
+    public Nets nets;
     public void fillParents(){
         nets.fillParents(this);
     };
