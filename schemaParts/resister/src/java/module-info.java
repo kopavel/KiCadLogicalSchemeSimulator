@@ -32,7 +32,7 @@
 import pko.KiCadLogicalSchemeSimulator.api.NetFilter;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
 import pko.KiCadLogicalSchemeSimulator.components.resister.PullResisterFilter;
-import pko.KiCadLogicalSchemeSimulator.components.resister.ResisterOnLedIndicatorFilter;
+import pko.KiCadLogicalSchemeSimulator.components.resister.ResisterFilter;
 import pko.KiCadLogicalSchemeSimulator.components.resister.ResisterSpi;
 
 module KiCadLogicalSchemeSimulator.components.resister {
@@ -41,5 +41,5 @@ module KiCadLogicalSchemeSimulator.components.resister {
     requires KiCadLogicalSchemeSimulator.simulator;
     requires KiCadLogicalSchemeSimulator.schemaParts.led.main;
     provides SchemaPartSpi with ResisterSpi;
-    provides NetFilter with PullResisterFilter, ResisterOnLedIndicatorFilter;
+    provides NetFilter with PullResisterFilter, ResisterFilter;
 }

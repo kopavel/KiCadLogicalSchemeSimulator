@@ -34,14 +34,13 @@ import pko.KiCadLogicalSchemeSimulator.api.NetFilter;
 import pko.KiCadLogicalSchemeSimulator.api.params.ParameterResolver;
 import pko.KiCadLogicalSchemeSimulator.api.params.types.PinConfig;
 import pko.KiCadLogicalSchemeSimulator.api.params.types.SchemaPartConfig;
-import pko.KiCadLogicalSchemeSimulator.components.led.indicator.LedIndicator;
+import pko.KiCadLogicalSchemeSimulator.components.power.Power;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Export;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Node;
 
-import java.util.List;
 import java.util.Map;
 
-public class ResisterOnLedIndicatorFilter implements NetFilter {
+public class ResisterFilter implements NetFilter {
     String otherPinNo;
 
     @Override
@@ -52,21 +51,25 @@ public class ResisterOnLedIndicatorFilter implements NetFilter {
     private Boolean doMerge(ParameterResolver parameterResolver, Node currentNode) {
         SchemaPartConfig schemaPartConfig = parameterResolver.getSchemaPartConfig(currentNode);
         if (schemaPartConfig != null && schemaPartConfig.clazz.equals(Resister.class.getSimpleName())) {
-            List<Node> otherNodes = currentNode.parent.node.stream()
-                    .filter(node -> node != currentNode).toList();
-            if (otherNodes.size() == 1) {
-                Node otherNode = otherNodes.getFirst();
-                SchemaPartConfig otherPartConfig = parameterResolver.getSchemaPartConfig(otherNode);
-                if (otherPartConfig.clazz.equals(LedIndicator.class.getSimpleName())) {
-                    Map<Integer, PinConfig> pinMap = parameterResolver.getPinMap(currentNode);
-                    int currentPinNo = Integer.parseInt(currentNode.pin);
-                    int unitNo = pinMap.get(currentPinNo).unitNo;
-                    otherPinNo = String.valueOf(pinMap.entrySet()
-                            .stream()
-                            .filter(p -> p.getValue().unitNo == unitNo && !p.getKey().equals(currentPinNo))
-                            .map(Map.Entry::getKey).findFirst().orElseThrow());
-                    return true;
-                }
+            if (currentNode.parent.node.stream()
+                    .noneMatch(node -> {
+                        if (node != currentNode) {
+                            if ("passive".equals(node.pintype)) {
+                                return true;
+                            }
+                            SchemaPartConfig otherPartConfig = parameterResolver.getSchemaPartConfig(node);
+                            return !otherPartConfig.clazz.equals(Power.class.getSimpleName()) && otherPartConfig.params.containsKey("strong");
+                        }
+                        return false;
+                    })) {
+                Map<Integer, PinConfig> pinMap = parameterResolver.getPinMap(currentNode);
+                int currentPinNo = Integer.parseInt(currentNode.pin);
+                int unitNo = pinMap.get(currentPinNo).unitNo;
+                otherPinNo = String.valueOf(pinMap.entrySet()
+                        .stream()
+                        .filter(p -> p.getValue().unitNo == unitNo && !p.getKey().equals(currentPinNo))
+                        .map(Map.Entry::getKey).findFirst().orElseThrow());
+                return true;
             }
         }
         return false;
