@@ -47,23 +47,26 @@ public class LedIndicator extends SchemaPart implements InteractiveSchemaPart {
         InPin inPin = addInPin(new InPin("IN", this) {
             @Override
             public void setHiImpedance() {
-                state = false;
+                hiImpedance=true;
             }
 
             @Override
             public void setHi() {
+                hiImpedance=false;
                 state = true;
             }
 
             @Override
             public void setLo() {
+                hiImpedance=false;
                 state = false;
             }
         });
+        inPin.triStateIn=true;
         int size = Integer.parseInt(params.getOrDefault("size", "20"));
         Color on = UiTools.getColor(params.getOrDefault("onColor", "#ff0000"));
         Color off = UiTools.getColor(params.getOrDefault("offColor", "#808080"));
-        ledUiComponent = new LedUiComponent(size, on, off, id,()-> inPin.state);
+        ledUiComponent = new LedUiComponent(size, on, off, id,()-> reverse^inPin.state);
     }
 
     @Override

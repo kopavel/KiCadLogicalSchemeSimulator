@@ -75,7 +75,11 @@ public interface NetFilter {
             if (sParams != null && !sParams.isBlank()) {
                 Arrays.stream(sParams.split(";")).forEach(param -> {
                     String[] paramPair = param.split(":");
-                    schemaPartConfig.params.put(paramPair[0], paramPair[1]);
+                    if (paramPair.length == 2) {
+                        schemaPartConfig.params.put(paramPair[0], paramPair[1]);
+                    } else {
+                        schemaPartConfig.params.put(paramPair[0], "true");
+                    }
                 });
             }
             modifyOtherNodes(parameterResolver, currentNode, nodeModifier);

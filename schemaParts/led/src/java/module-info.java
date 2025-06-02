@@ -29,9 +29,10 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
+import pko.KiCadLogicalSchemeSimulator.api.NetFilter;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
 import pko.KiCadLogicalSchemeSimulator.components.led.LedSpi;
+import pko.KiCadLogicalSchemeSimulator.components.led.indicator.LedIndicatorFilter;
 import pko.KiCadLogicalSchemeSimulator.components.led.indicator.LedIndicatorSpi;
 
 module KiCadLogicalSchemeSimulator.schemaParts.led.main {
@@ -39,5 +40,5 @@ module KiCadLogicalSchemeSimulator.schemaParts.led.main {
     requires java.desktop;
     requires KiCadLogicalSchemeSimulator.components.Diode;
     provides SchemaPartSpi with LedSpi, LedIndicatorSpi;
-
+    provides NetFilter with LedIndicatorFilter;
 }
