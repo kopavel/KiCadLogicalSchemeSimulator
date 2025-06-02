@@ -39,8 +39,10 @@ import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Net;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Node;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 
 @FunctionalInterface
 public interface NetFilter {
@@ -86,5 +88,36 @@ public interface NetFilter {
             return true;
         }
         return false;
+    }
+    default boolean mergeNets(Export netFile,
+            ParameterResolver parameterResolver,
+            BiFunction<ParameterResolver,Node, Boolean> doMerge,
+            BiFunction<ParameterResolver, Node, String> otherPinProvider) {
+        boolean retVal = false;
+        Iterator<Net> currentNetIterator = netFile.nets.net.iterator();
+        nextNet:
+        while (currentNetIterator.hasNext()) {
+            Net currentNet = currentNetIterator.next();
+            for (Node currentNode : currentNet.node) {
+                if (doMerge.apply(parameterResolver,currentNode)) {
+                    String otherPinNo = otherPinProvider.apply(parameterResolver, currentNode);
+                    for (Net otherNet : netFile.nets.net) {
+                        if (currentNet != otherNet) {
+                            for (Node otherNode : otherNet.node) {
+                                if (otherNode.ref.equals(currentNode.ref) && otherNode.pin.equals(otherPinNo)) {
+                                    otherNet.node.addAll(currentNet.node);
+                                    otherNet.node.remove(currentNode);
+                                    otherNet.node.remove(otherNode);
+                                    retVal = true;
+                                    currentNetIterator.remove();
+                                    continue nextNet;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return retVal;
     }
 }

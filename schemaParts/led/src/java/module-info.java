@@ -36,6 +36,7 @@ import pko.KiCadLogicalSchemeSimulator.components.led.indicator.LedIndicatorFilt
 import pko.KiCadLogicalSchemeSimulator.components.led.indicator.LedIndicatorSpi;
 
 module KiCadLogicalSchemeSimulator.schemaParts.led.main {
+    exports pko.KiCadLogicalSchemeSimulator.components.led.indicator;
     requires KiCadLogicalSchemeSimulator.simulator;
     requires java.desktop;
     requires KiCadLogicalSchemeSimulator.components.Diode;

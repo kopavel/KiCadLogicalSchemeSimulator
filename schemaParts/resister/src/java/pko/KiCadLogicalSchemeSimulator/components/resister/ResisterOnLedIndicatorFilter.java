@@ -29,34 +29,50 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.components.dipSwitch;
+package pko.KiCadLogicalSchemeSimulator.components.resister;
 import pko.KiCadLogicalSchemeSimulator.api.NetFilter;
 import pko.KiCadLogicalSchemeSimulator.api.params.ParameterResolver;
 import pko.KiCadLogicalSchemeSimulator.api.params.types.PinConfig;
 import pko.KiCadLogicalSchemeSimulator.api.params.types.SchemaPartConfig;
+import pko.KiCadLogicalSchemeSimulator.components.led.indicator.LedIndicator;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Export;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Node;
 
+import java.util.List;
 import java.util.Map;
 
-public class DipSwitch implements NetFilter {
+public class ResisterOnLedIndicatorFilter implements NetFilter {
+    String otherPinNo;
+
     @Override
     public boolean doFilter(Export netFile, ParameterResolver parameterResolver) {
-        return mergeNets(netFile, parameterResolver, DipSwitch::doMerge, DipSwitch::otherPinProvider);
+        return mergeNets(netFile, parameterResolver, this::doMerge, this::otherPinProvider);
     }
 
-    private static Boolean doMerge(ParameterResolver parameterResolver, Node currentNode) {
+    private Boolean doMerge(ParameterResolver parameterResolver, Node currentNode) {
         SchemaPartConfig schemaPartConfig = parameterResolver.getSchemaPartConfig(currentNode);
-        return schemaPartConfig != null && schemaPartConfig.clazz.equals(DipSwitch.class.getSimpleName()) && schemaPartConfig.params.containsKey("On");
+        if (schemaPartConfig != null && schemaPartConfig.clazz.equals(Resister.class.getSimpleName())) {
+            List<Node> otherNodes = currentNode.parent.node.stream()
+                    .filter(node -> node != currentNode).toList();
+            if (otherNodes.size() == 1) {
+                Node otherNode = otherNodes.getFirst();
+                SchemaPartConfig otherPartConfig = parameterResolver.getSchemaPartConfig(otherNode);
+                if (otherPartConfig.clazz.equals(LedIndicator.class.getSimpleName())) {
+                    Map<Integer, PinConfig> pinMap = parameterResolver.getPinMap(currentNode);
+                    int currentPinNo = Integer.parseInt(currentNode.pin);
+                    int unitNo = pinMap.get(currentPinNo).unitNo;
+                    otherPinNo = String.valueOf(pinMap.entrySet()
+                            .stream()
+                            .filter(p -> p.getValue().unitNo == unitNo && !p.getKey().equals(currentPinNo))
+                            .map(Map.Entry::getKey).findFirst().orElseThrow());
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
-    private static String otherPinProvider(ParameterResolver parameterResolver, Node currentNode) {
-        Map<Integer, PinConfig> pinMap = parameterResolver.getPinMap(currentNode);
-        int currentPinNo = Integer.parseInt(currentNode.pin);
-        int unitNo = pinMap.get(currentPinNo).unitNo;
-        return String.valueOf(pinMap.entrySet()
-                .stream()
-                .filter(p -> p.getValue().unitNo == unitNo && !p.getKey().equals(currentPinNo))
-                .map(Map.Entry::getKey).findFirst().orElseThrow());
+    private String otherPinProvider(ParameterResolver parameterResolver, Node currentNode) {
+        return otherPinNo;
     }
 }
