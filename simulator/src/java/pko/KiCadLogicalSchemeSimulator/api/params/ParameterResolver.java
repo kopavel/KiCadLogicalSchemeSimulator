@@ -47,17 +47,20 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static java.lang.Boolean.TRUE;
+import static pko.KiCadLogicalSchemeSimulator.api.params.ParameterResolver.PowerState.*;
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.all;
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.warn;
 
 public class ParameterResolver {
+    static final List<String> gndNames = List.of("gnd");
+    static final List<String> pwrNames = List.of("pwr", "vcc", "vdd");
     //  <Ref><unitNo>
     public final Map<String, Map<Integer, SchemaPartConfig>> schemaParts = new HashMap<>();
     public final Map<String, SchemaPartConfig> schemaPartsById = new HashMap<>();
     public final Map<String, Map<String, SymbolConfig>> symbols = new HashMap<>();
+    final Pattern pwrPattern = Pattern.compile("\\+[0-9]+v", Pattern.CASE_INSENSITIVE);
     private final Map<String, Comp> compMap = new HashMap<>();
     public RecursionMode recursionMode = warn;
-    final Pattern pwrPattern = Pattern.compile("\\+[0-9]+v", Pattern.CASE_INSENSITIVE);
 
     public static void setParams(String params, Map<? super String, ? super String> paramMap) {
         for (String param : params.split(";")) {
@@ -226,13 +229,38 @@ public class ParameterResolver {
         return schemaPartsById.containsKey(partId) && schemaPartsById.get(partId).recursivePins.contains(pinName) ? all : recursionMode;
     }
 
-    public Boolean getPowerState(Net net) {
-        if ("gnd".equalsIgnoreCase(net.getName())) {
-            return false;
-        } else if ("pwr".equalsIgnoreCase(net.getName()) || pwrPattern.matcher(net.getName()).matches()) {
-            return true;
+    public PowerState getPowerState(Net net) {
+        if (gndNames.contains(net.getName().toLowerCase())) {
+            return gnd;
+        } else if (pwrNames.contains(net.getName().toLowerCase()) || pwrPattern.matcher(net.getName()).matches()) {
+            return pwr;
         } else {
-            return null;
+            if (net.node.stream()
+                    .noneMatch(node -> "passive".equals(node.pintype))) {
+                return net.node.stream()
+                        .map(this::getSchemaPartConfig)
+                        .filter(Objects::nonNull)
+                        .filter(config -> "Power".equals(config.clazz))
+                        .map(config -> config.params.containsKey("strong")
+                                       ? ((config.params.containsKey("hi") ? pwr : gnd))
+                                       : (config.params.containsKey("hi") ? pullUp : pullDown)).findFirst().orElse(none);
+            }
+            return none;
+        }
+    }
+
+    public enum PowerState {
+        pwr(true, true),
+        gnd(false, true),
+        pullUp(true, false),
+        pullDown(false, false),
+        none(null, false);
+        public final Boolean state;
+        public final Boolean strong;
+
+        PowerState(Boolean state, Boolean strong) {
+            this.state = state;
+            this.strong = strong;
         }
     }
 }

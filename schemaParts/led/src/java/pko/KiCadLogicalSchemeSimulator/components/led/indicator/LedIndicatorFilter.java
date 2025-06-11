@@ -46,8 +46,8 @@ public class LedIndicatorFilter implements NetFilter {
     public boolean doFilter(Export netFile, ParameterResolver parameterResolver) {
         boolean result = false;
         for (Net currentNet : netFile.getNets().getNet()) {
-            Boolean powerState = parameterResolver.getPowerState(currentNet);
-            if (powerState != null) {
+            ParameterResolver.PowerState powerState = parameterResolver.getPowerState(currentNet);
+            if (powerState.state != null) {
                 Iterator<Node> nodes = currentNet.getNode().iterator();
                 while (nodes.hasNext()) {
                     Node node = nodes.next();
@@ -55,7 +55,7 @@ public class LedIndicatorFilter implements NetFilter {
                     if (schemaPartConfig!=null && Led.class.getSimpleName().equals(schemaPartConfig.clazz)) {
                         PinConfig pinConfig = parameterResolver.getPinMap(node).get(Integer.parseInt(node.getPin()));
                         boolean anode = "A".equals(pinConfig != null ? pinConfig.pinName : node.pinfunction);
-                        if (powerState && anode || !powerState && !anode) {
+                        if (powerState.state && anode || !powerState.state && !anode) {
                             if (replaceSchemaPart(parameterResolver, node, Led.class, LedIndicator.class, anode ? "reverse" : null, (otherNode, pc) -> {
                                 otherNode.setPin(null);
                                 otherNode.setPinfunction("IN");

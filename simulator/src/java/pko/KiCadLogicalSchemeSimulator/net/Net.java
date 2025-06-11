@@ -57,8 +57,8 @@ import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static java.lang.Boolean.FALSE;
-import static java.lang.Boolean.TRUE;
+import static pko.KiCadLogicalSchemeSimulator.api.params.ParameterResolver.PowerState.gnd;
+import static pko.KiCadLogicalSchemeSimulator.api.params.ParameterResolver.PowerState.pwr;
 
 public class Net {
     public final Queue<IModelItem<?>> forResend = new LinkedList<>();
@@ -148,7 +148,7 @@ public class Net {
         Collection<Pin> destinationPins = new ArrayList<>();
         Map<InBus, SortedSet<Byte>> destinationBusesOffsets = new HashMap<>();
         List<PassivePin> passivePins = new ArrayList<>();
-        Boolean powerState = parameterResolver.getPowerState(net);
+        ParameterResolver.PowerState powerState = parameterResolver.getPowerState(net);
         net.getNode().forEach(node -> {
             SchemaPartConfig schemaPartConfig = parameterResolver.getSchemaPartConfig(node);
             if (schemaPartConfig == null || schemaPartConfig.ignore) {
@@ -178,7 +178,7 @@ public class Net {
                     }
                 }
                 case output -> {
-                    if (powerState != null) {
+                    if (powerState.strong) {
                         throw new AssertionError("OUt pin " + id + "_" + pinName + " on power rail");
                     }
                     IModelItem<?> source = schemaPart.getOutItem(pinName);
@@ -195,7 +195,7 @@ public class Net {
                     sourcesOffset.put(source, aliasOffset);
                 }
                 case bidirectional -> {
-                    if (powerState != null) {
+                    if (powerState.strong) {
                         throw new AssertionError("OUt pin on power rail");
                     }
                     IModelItem<?> destination = schemaPart.getInItem(pinName);
@@ -228,11 +228,11 @@ public class Net {
         //
         destinationPins.forEach((destinationPin) -> {
             DestinationWireDescriptor descriptor = destinationWireDescriptors.computeIfAbsent(destinationPin, pin -> new DestinationWireDescriptor(passivePins));
-            if (TRUE == powerState) {
+            if (powerState == pwr) {
                 SchemaPart pwr = createSchemaPart("Power", "pwr_" + destinationPin.getName(), "hi;strong");
                 schemaParts.put(pwr.id, pwr);
                 descriptor.add(pwr.getOutItem("OUT"), (byte) 0);
-            } else if (FALSE == powerState) {
+            } else if (powerState == gnd) {
                 SchemaPart gnd = createSchemaPart("Power", "gnd_" + destinationPin.getName(), "strong");
                 schemaParts.put(gnd.id, gnd);
                 descriptor.add(gnd.getOutItem("OUT"), (byte) 0);
@@ -246,14 +246,14 @@ public class Net {
         destinationBusesOffsets.forEach((destinationBus, destinationOffsets) -> {
             DestinationBusDescriptor descriptor =
                     destinationBusDescriptors.computeIfAbsent((Bus) replacement.getOrDefault(destinationBus, destinationBus), p -> new DestinationBusDescriptor());
-            if (TRUE == powerState) {
+            if (powerState == pwr) {
                 for (Byte destinationOffset : destinationOffsets) {
                     SchemaPart pwr = createSchemaPart("Power", "pwr_" + destinationBus.getName(), "hi;strong");
                     schemaParts.put(pwr.id, pwr);
                     descriptor.add(pwr.getOutItem("OUT"), (byte) 0, destinationOffset);
                     sourcesOffset.put(pwr.getOutItem("OUT"), (byte) 0);
                 }
-            } else if (FALSE == powerState) {
+            } else if (powerState == gnd) {
                 for (Byte destinationOffset : destinationOffsets) {
                     SchemaPart gnd = createSchemaPart("Power", "gnd_" + destinationBus.getName(), "strong");
                     schemaParts.put(gnd.id, gnd);
@@ -325,7 +325,8 @@ public class Net {
                 .stream()
                 .flatMap(p -> p.outPins.values()
                         .stream().distinct().toList()
-                        .stream()).forEach(Net::replaceOut);
+                        .stream())
+                .forEach(Net::replaceOut);
         for (OutPin wireMerger : wireMergers.values()) {
             wireMerger.getOptimised(null);
         }
@@ -463,7 +464,8 @@ public class Net {
                     if (!lists.passivePins.isEmpty()/*stream().anyMatch(p -> p.source != null)*/) {
                         //clean up all buses mask
                         buses.values()
-                                .stream().flatMap(map -> map.entrySet()
+                                .stream()
+                                .flatMap(map -> map.entrySet()
                                         .stream())
                                 .filter(o -> o.getKey() <= pinsOffset)
                                 .forEach(pair -> {

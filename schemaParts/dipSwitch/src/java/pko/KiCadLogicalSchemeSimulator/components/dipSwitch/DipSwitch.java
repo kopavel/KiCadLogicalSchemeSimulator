@@ -32,31 +32,18 @@
 package pko.KiCadLogicalSchemeSimulator.components.dipSwitch;
 import pko.KiCadLogicalSchemeSimulator.api.NetFilter;
 import pko.KiCadLogicalSchemeSimulator.api.params.ParameterResolver;
-import pko.KiCadLogicalSchemeSimulator.api.params.types.PinConfig;
 import pko.KiCadLogicalSchemeSimulator.api.params.types.SchemaPartConfig;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Export;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Node;
 
-import java.util.Map;
-
 public class DipSwitch implements NetFilter {
     @Override
     public boolean doFilter(Export netFile, ParameterResolver parameterResolver) {
-        return mergeNets(netFile, parameterResolver, DipSwitch::doMerge, DipSwitch::otherPinProvider);
+        return mergeNets(netFile, parameterResolver, DipSwitch::doMerge, (config -> true));
     }
 
     private static Boolean doMerge(ParameterResolver parameterResolver, Node currentNode) {
         SchemaPartConfig schemaPartConfig = parameterResolver.getSchemaPartConfig(currentNode);
         return schemaPartConfig != null && schemaPartConfig.clazz.equals(DipSwitch.class.getSimpleName()) && schemaPartConfig.params.containsKey("On");
-    }
-
-    private static String otherPinProvider(ParameterResolver parameterResolver, Node currentNode) {
-        Map<Integer, PinConfig> pinMap = parameterResolver.getPinMap(currentNode);
-        int currentPinNo = Integer.parseInt(currentNode.pin);
-        int unitNo = pinMap.get(currentPinNo).unitNo;
-        return String.valueOf(pinMap.entrySet()
-                .stream()
-                .filter(p -> p.getValue().unitNo == unitNo && !p.getKey().equals(currentPinNo))
-                .map(Map.Entry::getKey).findFirst().orElseThrow());
     }
 }

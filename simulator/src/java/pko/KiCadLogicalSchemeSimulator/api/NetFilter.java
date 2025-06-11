@@ -38,32 +38,44 @@ import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Export;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Net;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Node;
 
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 @FunctionalInterface
 public interface NetFilter {
     boolean doFilter(Export netFile, ParameterResolver parameterResolver);
     default void modifyOtherNodes(ParameterResolver parameterResolver, Node node, BiConsumer<Node, PinConfig> nodeModifier) {
+        Set<Map.Entry<Node, PinConfig>> pins = otherNodes(parameterResolver, node).entrySet();
+        if (pins.isEmpty()) {
+            throw new RuntimeException("Can't find other nodes, Net:" + node.parent.name + ", Node:" + node.ref + "." + node.pin);
+        } else {
+            for (Map.Entry<Node, PinConfig> pin : pins) {
+                nodeModifier.accept(pin.getKey(), pin.getValue());
+            }
+        }
+    }
+    default Map<Node, PinConfig> otherNodes(ParameterResolver parameterResolver, Node node) {
+        Map<Node, PinConfig> retVal = new HashMap<>();
         int pinNo = Integer.parseInt(node.getPin());
-        for (Map.Entry<Integer, PinConfig> pin : parameterResolver.getPinMap(node).entrySet()) {
-            if (!pin.getKey().equals(pinNo)) {
+        Map<Integer, PinConfig> pins = parameterResolver.getPinMap(node);
+        PinConfig currentPinConfig = pins.get(pinNo);
+        int unitNo = currentPinConfig.unitNo;
+        for (Map.Entry<Integer, PinConfig> pin : pins.entrySet()) {
+            if (!pin.getKey().equals(pinNo) && pin.getValue().unitNo == unitNo) {
                 for (Net otherNet : node.parent.parent.parent.getNets().getNet()) {
                     if (otherNet != node.parent) {
                         for (Node otherNode : otherNet.getNode()) {
                             if (otherNode.getRef().equals(node.getRef())) {
-                                nodeModifier.accept(otherNode, pin.getValue());
-                                return;
+                                retVal.put(otherNode, pin.getValue());
                             }
                         }
                     }
                 }
             }
         }
-        throw new RuntimeException("Can't find other nodes, Net:" + node.parent.name + ", Node:" + node.ref + "." + node.pin);
+        return retVal;
     }
     default boolean replaceSchemaPart(ParameterResolver parameterResolver,
             Node currentNode,
@@ -91,28 +103,24 @@ public interface NetFilter {
     }
     default boolean mergeNets(Export netFile,
             ParameterResolver parameterResolver,
-            BiFunction<ParameterResolver,Node, Boolean> doMerge,
-            BiFunction<ParameterResolver, Node, String> otherPinProvider) {
+            BiFunction<ParameterResolver, Node, Boolean> doMerge,
+            Function<PinConfig, Boolean> nodeFilter) {
         boolean retVal = false;
         Iterator<Net> currentNetIterator = netFile.nets.net.iterator();
         nextNet:
         while (currentNetIterator.hasNext()) {
             Net currentNet = currentNetIterator.next();
             for (Node currentNode : currentNet.node) {
-                if (doMerge.apply(parameterResolver,currentNode)) {
-                    String otherPinNo = otherPinProvider.apply(parameterResolver, currentNode);
-                    for (Net otherNet : netFile.nets.net) {
-                        if (currentNet != otherNet) {
-                            for (Node otherNode : otherNet.node) {
-                                if (otherNode.ref.equals(currentNode.ref) && otherNode.pin.equals(otherPinNo)) {
-                                    otherNet.node.addAll(currentNet.node);
-                                    otherNet.node.remove(currentNode);
-                                    otherNet.node.remove(otherNode);
-                                    retVal = true;
-                                    currentNetIterator.remove();
-                                    continue nextNet;
-                                }
-                            }
+                if (doMerge.apply(parameterResolver, currentNode)) {
+                    for (Map.Entry<Node, PinConfig> otherNodeConfigs : otherNodes(parameterResolver, currentNode).entrySet()) {
+                        if (nodeFilter.apply(otherNodeConfigs.getValue())) {
+                            List<Node> otherNode = otherNodeConfigs.getKey().parent.node;
+                            otherNode.addAll(currentNet.node);
+                            otherNode.remove(currentNode);
+                            otherNode.remove(otherNodeConfigs.getKey());
+                            retVal = true;
+                            currentNetIterator.remove();
+                            continue nextNet;
                         }
                     }
                 }
