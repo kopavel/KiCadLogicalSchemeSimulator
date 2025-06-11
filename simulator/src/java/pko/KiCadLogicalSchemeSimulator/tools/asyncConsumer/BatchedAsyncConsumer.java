@@ -35,30 +35,29 @@ import pko.KiCadLogicalSchemeSimulator.tools.Log;
 import java.lang.invoke.VarHandle;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class BatchedAsyncConsumer implements AutoCloseable {
-    private static final int maxIndex = 511;
+    private final int maxIndex;
     private final Collection<Thread> consumerThreads = new ArrayList<>();
+    private volatile boolean run = true;
     private int pos;
     private Slot writeSlot;
-    private static boolean run;
     private int[] writePayload;
 
-    protected BatchedAsyncConsumer(int size) {
-        pos = maxIndex;
+    protected BatchedAsyncConsumer(int batches, int batchSize) {
+        pos = maxIndex = (batchSize - 1);
         registerShutdown();
-        Slot ring = createRings(size);
+        Slot ring = createRings(batches);
         consumerThreads.add(Thread.ofPlatform().start(() -> {
             try {
                 Slot currentSlot = ring;
-                run = true;
                 while (run) {
-                    while (currentSlot.full.getAcquire()) {
-                        for (int payload : currentSlot.payload) {
-                            consume(payload);
+                    while (currentSlot.full) {
+                        int[] ints = currentSlot.payload;
+                        for (int i = ints.length - 1; i >= 0; i--) {
+                            consume(ints[i]);
                         }
-                        currentSlot.full.setOpaque(false);
+                        currentSlot.full = false;
                         currentSlot = currentSlot.nextSlot;
                     }
                     Thread.onSpinWait();
@@ -77,41 +76,41 @@ public abstract class BatchedAsyncConsumer implements AutoCloseable {
     public abstract void consume(int payload);
 
     @Override
-    public synchronized void close() {
+    public void close() {
         run = false;
-        VarHandle.releaseFence();
-        try {
-            for (Thread consumerThread : consumerThreads) {
-                consumerThread.join();
+        //noinspection SynchronizeOnThis
+        synchronized (this) {
+            try {
+                for (Thread consumerThread : consumerThreads) {
+                    consumerThread.join();
+                }
+            } catch (InterruptedException e) {
+                Log.error(BatchedAsyncConsumer.class, "Error waiting consumer for close", e);
+                throw new RuntimeException(e);
             }
-        } catch (InterruptedException e) {
-            Log.error(BatchedAsyncConsumer.class, "Error waiting consumer for close", e);
-            throw new RuntimeException(e);
         }
     }
 
     public void accept(int payload) {
-        int lPos;
-        if ((lPos = pos) == 0) {
+        if (pos == 0) {
             writePayload[0] = payload;
             pos = maxIndex;
-            Slot slot;
-            (slot = writeSlot).full.setRelease(true);
-            if ((slot = slot.nextSlot).full.getOpaque()) {
-                while (slot.full.getAcquire()) {
+            writeSlot.full = true;
+            if ((writeSlot = writeSlot.nextSlot).full) {
+//                long wait=0;
+                while (writeSlot.full) {
                     Thread.onSpinWait();
+//                    wait++;
                 }
+//                System.out.println("wait time:"+wait);
             }
-            writePayload = (writeSlot = slot).payload;
-            //noinspection UnnecessaryReturnStatement
-            return;
+            writePayload = writeSlot.payload;
         } else {
-            writePayload[lPos] = payload;
-            pos = --lPos;
+            writePayload[pos--] = payload;
         }
     }
 
-    private static Slot createRings(int size) {
+    private Slot createRings(int size) {
         Slot head = new Slot(maxIndex + 1);
         Slot currentSlot = head;
         for (int i = 1; i < size; i++) {
@@ -120,6 +119,7 @@ public abstract class BatchedAsyncConsumer implements AutoCloseable {
             currentSlot = consumerSlot;
         }
         currentSlot.nextSlot = head;
+        VarHandle.releaseFence();
         return head;
     }
 
@@ -129,8 +129,8 @@ public abstract class BatchedAsyncConsumer implements AutoCloseable {
 
     static class Slot {
         private final int[] payload;
-        private final AtomicBoolean full = new AtomicBoolean();
         private Slot nextSlot;
+        private volatile boolean full;
 
         Slot(int size) {
             payload = new int[size];

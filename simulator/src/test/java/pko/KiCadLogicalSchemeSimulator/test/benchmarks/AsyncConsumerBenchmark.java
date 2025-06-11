@@ -55,10 +55,12 @@ public class AsyncConsumerBenchmark {
         if (TEST) {
             Options options = new OptionsBuilder()//
                                                   .include(AsyncConsumerBenchmark.class.getSimpleName())
-                                                  .warmupIterations(3)
-                                                  .warmupTime(TimeValue.seconds(1))
-                                                  .measurementIterations(5)
-                                                  .measurementTime(TimeValue.seconds(1)).mode(Mode.Throughput).timeUnit(TimeUnit.SECONDS)
+                                                  .warmupIterations(5)
+                                                  .warmupTime(TimeValue.seconds(2))
+                                                  .measurementIterations(10)
+                                                  .measurementTime(TimeValue.seconds(3))
+                                                  .mode(Mode.Throughput)
+                                                  .timeUnit(TimeUnit.SECONDS)
                                                   .forks(1)
                                                   .build();
             new Runner(options).run();
@@ -84,10 +86,11 @@ public class AsyncConsumerBenchmark {
             asyncConsumer = this::process;
         } else if (THREADS == 1) {
 */
-        asyncConsumer = new BatchedAsyncConsumer(4) {
+        asyncConsumer = new BatchedAsyncConsumer(4,512) {
             @Override
             public void consume(int payload) {
-//                    process(payload);
+                    blackhole.consume(payload);
+//                process(payload);
             }
         };
 /*
