@@ -67,7 +67,7 @@ public interface NetFilter {
                 for (Net otherNet : node.parent.parent.parent.getNets().getNet()) {
                     if (otherNet != node.parent) {
                         for (Node otherNode : otherNet.getNode()) {
-                            if (otherNode.getRef().equals(node.getRef())) {
+                            if (otherNode.getRef().equals(node.getRef()) && pin.getKey().equals(Integer.parseInt(otherNode.pin))) {
                                 retVal.put(otherNode, pin.getValue());
                             }
                         }
