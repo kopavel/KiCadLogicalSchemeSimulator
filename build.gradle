@@ -71,9 +71,13 @@ tasks.register("copyToLib", Copy) {
     }
     into "$rootDir/distro"
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    def filesToCopy = subprojects.collect { subproject ->
-        return configurations.runtimeClasspath.files
-    }.flatten()
+    def filesToCopy = subprojects.collectMany { subproject ->
+        if (subproject.plugins.hasPlugin('java')) {
+            return subproject.configurations.runtimeClasspath.files
+        } else {
+            return []
+        }
+    }
     from(filesToCopy) {
         // Exclude JAR outputs from subprojects
         subprojects.each { subproject ->
