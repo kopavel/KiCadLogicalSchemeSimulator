@@ -29,11 +29,12 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
-import pko.KiCadLogicalSchemeSimulator.components.repeater.RepeaterSpi;
 
-open module KiCadLogicalSchemeSimulator.components.repeater {
+import pko.KiCadLogicalSchemeSimulator.api.NetFilter;
+import pko.KiCadLogicalSchemeSimulator.components.transistor.Transistor;
+
+module KiCadLogicalSchemeSimulator.components.transistor {
     requires KiCadLogicalSchemeSimulator.simulator;
-    exports pko.KiCadLogicalSchemeSimulator.components.repeater;
-    provides SchemaPartSpi with RepeaterSpi;
+    requires KiCadLogicalSchemeSimulator.components.repeater;
+    provides NetFilter with Transistor;
 }

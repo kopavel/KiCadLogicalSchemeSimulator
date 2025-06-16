@@ -37,7 +37,8 @@ plugins {
 
 group = 'pko'
 version = '0.1'
-def deleteEmptyDirsRecursively(dir){
+
+def deleteEmptyDirsRecursively(dir) {
     if (dir.exists() && dir.isDirectory()) {
         dir.eachDir { subDir ->
             deleteEmptyDirsRecursively(subDir) // Recursive call for subdirectories

@@ -719,4 +719,9 @@
 			<unit pinMap="ignore;8;9"/>
 		</symbol>
 	</lib>
+	<lib name="Transistor_BJT">
+		<symbol name="2N2219" class="Transistor">
+			<unit pinMap="1=E;2=B;3=K"/>
+		</symbol>
+	</lib>
 </symbolMap>

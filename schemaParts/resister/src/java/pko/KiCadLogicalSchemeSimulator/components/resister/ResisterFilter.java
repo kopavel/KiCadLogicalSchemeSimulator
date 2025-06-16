@@ -50,7 +50,7 @@ public class ResisterFilter implements NetFilter {
     private static Boolean doMerge(ParameterResolver parameterResolver, Node currentNode) {
         SchemaPartConfig schemaPartConfig = parameterResolver.getSchemaPartConfig(currentNode);
         if (schemaPartConfig != null && schemaPartConfig.clazz.equals(Resister.class.getSimpleName())) {
-            ParameterResolver.PowerState powerState = parameterResolver.getPowerState(currentNode.parent);
+            ParameterResolver.PowerState powerState = parameterResolver.getPowerState(currentNode);
             if (powerState == pwr || powerState == gnd) {
                 return false;
             }

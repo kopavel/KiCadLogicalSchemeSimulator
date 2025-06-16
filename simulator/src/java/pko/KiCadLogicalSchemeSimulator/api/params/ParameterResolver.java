@@ -230,12 +230,21 @@ public class ParameterResolver {
     }
 
     public PowerState getPowerState(Net net) {
+        return getPowerState(net, null);
+    }
+
+    public PowerState getPowerState(Node node) {
+        return getPowerState(node.parent, node);
+    }
+
+    private PowerState getPowerState(Net net, Node exclusion) {
         if (gndNames.contains(net.getName().toLowerCase())) {
             return gnd;
         } else if (pwrNames.contains(net.getName().toLowerCase()) || pwrPattern.matcher(net.getName()).matches()) {
             return pwr;
         } else {
             if (net.node.stream()
+                    .filter(node -> node != exclusion)
                     .noneMatch(node -> "passive".equals(node.pintype))) {
                 return net.node.stream()
                         .map(this::getSchemaPartConfig)
