@@ -40,8 +40,6 @@ import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Export;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Net;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Node;
 
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import static pko.KiCadLogicalSchemeSimulator.api.params.ParameterResolver.PowerState.none;
@@ -50,60 +48,63 @@ public class Transistor implements NetFilter {
     @Override
     public boolean doFilter(Export netFile, ParameterResolver parameterResolver) {
         boolean result = false;
-        Iterator<Net> currentNetIterator = netFile.getNets().getNet().iterator();
-        net:
-        while (currentNetIterator.hasNext()) {
-            Net currentNet = currentNetIterator.next();
+        for (Net currentNet : netFile.getNets().getNet()) {
             for (Node currentNode : currentNet.getNode()) {
                 SchemaPartConfig schemaPartConfig = parameterResolver.getSchemaPartConfig(currentNode);
                 if (schemaPartConfig != null && Transistor.class.getSimpleName().equals(schemaPartConfig.clazz)) {
                     PinConfig pinConfig = parameterResolver.getPinMap(currentNode).get(Integer.parseInt(currentNode.getPin()));
-                    if ("B".equals(pinConfig != null ? pinConfig.pinName : currentNode.pinfunction)) {
+                    PowerState powerState = parameterResolver.getPowerState(currentNode);
+                    if (powerState != none) {
+                        result = true;
+                        String pinName = pinConfig.pinName;
+                        boolean doCut = false;
                         Map<Node, PinConfig> otherNodes = otherNodes(parameterResolver, currentNode);
-                        List<State> otherPins = otherNodes.entrySet()
-                                .stream()
-                                .map(entry -> new State(entry.getKey(), entry.getValue(), parameterResolver.getPowerState(entry.getKey()))).toList();
-                        if (otherPins.stream()
-                                .anyMatch(p -> p.powerState != none)) {
-                            result = true;
-                            PowerState powerState = none;
-                            State targetPin = null;
-                            for (State otherPin : otherPins) {
-                                if (otherPin.powerState != none) {
-                                    otherPin.node.parent.node.remove(otherPin.node);
-                                    powerState = otherPin.powerState;
-                                } else {
-                                    targetPin = otherPin;
-                                }
+                        if (schemaPartConfig.params.containsKey("PNP")) {
+                            if (("B".equals(pinName) || "K".equals(pinName)) && powerState.state || "E".equals(pinName) && !powerState.state) {
+                                doCut = true;
                             }
-                            if (targetPin == null) {
-                                throw new RuntimeException("Can't identify target pin" + currentNode.ref + ":" + currentNode.pin);
-                            }
-                            if ("E".equals(targetPin.config.pinName) != powerState.state) {
-                                schemaPartConfig.clazz = Repeater.class.getSimpleName();
-                                schemaPartConfig.params.put("reverse", "true");
-                                targetPin.node.pin = null;
-                                targetPin.node.pinfunction = "OUT";
-                                targetPin.node.pintype = "output";
-                                currentNode.pin = null;
-                                currentNode.pinfunction = "IN";
-                                currentNode.pintype = "input";
-                            } else {
-                                List<Node> targetNet = targetPin.node.parent.node;
-                                targetNet.addAll(currentNet.node);
-                                targetNet.remove(targetPin.node);
-                                targetNet.remove(currentNode);
-                                currentNetIterator.remove();
-                                break net;
+                        } else if (("B".equals(pinName) || "K".equals(pinName)) && !powerState.state || "E".equals(pinName) && powerState.state) {
+                            doCut = true;
+                        }
+                        if (doCut) {
+                            otherNodes.keySet().forEach(otherNode -> otherNode.parent.node.remove(otherNode));
+                        } else {
+                            schemaPartConfig.clazz = Repeater.class.getSimpleName();
+                            switch (pinName) {
+                                case "B":
+                                    schemaPartConfig.params.put(powerState.state ? "openCollector" : "openEmitter", "true");
+                                    otherNodes.forEach((e, c) -> {
+                                        e.pin = null;
+                                        if ("K".equals(c.pinName)) {
+                                            e.pintype = "output";
+                                            e.pinfunction = "OUT";
+                                        } else {
+                                            e.pintype = "input";
+                                            e.pinfunction = "IN";
+                                        }
+                                    });
+                                    break;
+                                case "E":
+                                    schemaPartConfig.params.put("reverse", "true");
+                                case "K":
+                                    schemaPartConfig.params.put(powerState.state ? "openEmitter" : "openCollector", "true");
+                                    otherNodes.forEach((e, c) -> {
+                                        e.pin = null;
+                                        if ("B".equals(c.pinName)) {
+                                            e.pintype = "input";
+                                            e.pinfunction = "IN";
+                                        } else {
+                                            e.pintype = "output";
+                                            e.pinfunction = "OUT";
+                                        }
+                                    });
                             }
                         }
+                        currentNode.parent.node.remove(currentNode);
                     }
                 }
             }
         }
         return result;
-    }
-
-    private record State(Node node, PinConfig config, PowerState powerState) {
     }
 }
