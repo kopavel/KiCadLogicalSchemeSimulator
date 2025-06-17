@@ -118,6 +118,7 @@ public interface NetFilter {
                             otherNode.addAll(currentNet.node);
                             otherNode.remove(currentNode);
                             otherNode.remove(otherNodeConfigs.getKey());
+                            currentNet.node.forEach(n -> n.fillParent(otherNodeConfigs.getKey().parent));
                             retVal = true;
                             currentNetIterator.remove();
                             continue nextNet;
