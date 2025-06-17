@@ -55,6 +55,7 @@ public class ResisterFilter implements NetFilter {
                 return false;
             }
             return currentNode.parent.node.stream()
+                    .filter(node -> node != currentNode)
                     .filter(node -> !"input".equals(node.pintype))
                     .map(parameterResolver::getSchemaPartConfig)
                     .filter(Objects::nonNull).allMatch(config -> "Power".equals(config.clazz));
