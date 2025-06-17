@@ -7,6 +7,7 @@ Layout a stored at application exit in a file near '.net' or in KiKad project (i
 Some interactive parts has additional interfaces/functionality if you click on it.
 
 * [AndGate](and/README.md) — Logical AND gate.
+* [Bipolar Transistor](transistor/README.md) — Bipolar transistor.
 * [Buffer](buffer/README.md) — Buffer or latch.
 * [BusDriver](busDriver/README.md) — Bus driver/buffer.
 * [Counter](counter/README.md) — Binary counter.

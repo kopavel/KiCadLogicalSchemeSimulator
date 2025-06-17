@@ -723,5 +723,30 @@
 		<symbol name="2N2219" class="Transistor">
 			<unit pinMap="1=E;2=B;3=K"/>
 		</symbol>
+		<symbol name="2N3055" class="Transistor">
+			<unit pinMap="1=B;2=E;3=K"/>
+		</symbol>
+		<symbol name="2N3904" class="Transistor">
+			<unit pinMap="1=E;2=B;3=K"/>
+		</symbol>
+		<symbol name="2N3905" class="Transistor" param="PNP">
+			<unit pinMap="1=E;2=B;3=K"/>
+		</symbol>
+		<symbol name="2N3906" class="Transistor" param="PNP">
+			<unit pinMap="1=E;2=B;3=K"/>
+		</symbol>
+		<symbol name="2SA1015" class="Transistor" param="PNP">
+			<unit pinMap="1=E;2=K;3=B"/>
+		</symbol>
+		<symbol name="2SB631" class="Transistor" param="PNP">
+			<unit pinMap="1=E;2=K;3=B"/>
+		</symbol>
+		<symbol name="2SB817" class="Transistor" param="PNP">
+			<unit pinMap="1=B;2=K;3=E"/>
+		</symbol>
+		<symbol name="2SC1815" class="Transistor">
+			<unit pinMap="1=E;2=K;3=B"/>
+		</symbol>
+		<!-- ToDo to many to add, may be later -->
 	</lib>
 </symbolMap>
