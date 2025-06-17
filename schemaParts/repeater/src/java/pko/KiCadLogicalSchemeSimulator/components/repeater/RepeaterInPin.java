@@ -58,11 +58,18 @@ public class RepeaterInPin extends InPin {
         state = true;
         /*Optimiser line o block r*/
         if (parent.reverse) {
-            out.setLo();
+            /*Optimiser line o block oe*/
+            if (parent.params.containsKey("openEmitter")) {
+                out.setHiImpedance();
+                /*Optimiser line o blockEnd oe block re*/
+            } else {
+                out.setLo();
+                /*Optimiser line o blockEnd re*/
+            }
             /*Optimiser line o blockEnd r block nr*/
         } else {
             /*Optimiser line o block oc*/
-            if (parent.params.containsKey("openCollector")){
+            if (parent.params.containsKey("openCollector")) {
                 out.setHiImpedance();
                 /*Optimiser line o blockEnd oc block rc*/
             } else {
@@ -80,7 +87,7 @@ public class RepeaterInPin extends InPin {
         /*Optimiser line o block r*/
         if (parent.reverse) {
             /*Optimiser line o block oc*/
-            if (parent.params.containsKey("openCollector")){
+            if (parent.params.containsKey("openCollector")) {
                 out.setHiImpedance();
                 /*Optimiser line o blockEnd oc block rc*/
             } else {
@@ -89,7 +96,14 @@ public class RepeaterInPin extends InPin {
             }
             /*Optimiser line o blockEnd r block nr*/
         } else {
-            out.setLo();
+            /*Optimiser line o block oe*/
+            if (parent.params.containsKey("openEmitter")) {
+                out.setHiImpedance();
+                /*Optimiser line o blockEnd oe block re*/
+            } else {
+                out.setLo();
+                /*Optimiser line o blockEnd re*/
+            }
             /*Optimiser line o blockEnd nr*/
         }
     }
@@ -106,6 +120,11 @@ public class RepeaterInPin extends InPin {
             optimiser.cut("rc");
         } else {
             optimiser.cut("oc");
+        }
+        if (parent.params.containsKey("openEmitter")) {
+            optimiser.cut("re");
+        } else {
+            optimiser.cut("oe");
         }
         if (source != null) {
             optimiser.cut("setter");
