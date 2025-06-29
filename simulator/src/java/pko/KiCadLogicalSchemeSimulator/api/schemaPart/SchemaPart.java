@@ -56,7 +56,7 @@ public abstract class SchemaPart {
     public final Map<String, PinType> pinType = new HashMap<>();
     public final Map<IModelItem<?>, String> ids = new HashMap<>();
     public final Map<String, ModelItem<?>> outPins = new HashMap<>();
-    public final boolean reverse;
+    public boolean reverse;
     public final Map<String, String> params = new HashMap<>();
     public final boolean nReverse;
     public Net net;

@@ -33,40 +33,26 @@ package pko.KiCadLogicalSchemeSimulator.components.led7Segment;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 
 //ToDo optimiser
-public class Led7SegmentDisplayInPin extends InPin {
+public class Led7SegmentDisplayEnabledPin extends InPin {
     private final Led7SegmentDisplay display;
-    private final int mask;
-    private final int nMask;
 
-    public Led7SegmentDisplayInPin(String id, Led7SegmentDisplay parent, int bit) {
+    public Led7SegmentDisplayEnabledPin(String id, Led7SegmentDisplay parent) {
         super(id, parent);
         display = parent;
-        mask = 1 << bit;
-        nMask = ~mask;
     }
 
     @Override
     public void setHiImpedance() {
-        display.segmentsOff |= mask;
+        display.enabled = false;
     }
 
     @Override
     public void setHi() {
-        if (display.reverse || !display.enabled) {
-            display.segmentsOff |= mask;
-        } else {
-            display.segmentsOn |= mask;
-            display.segmentsOff &= nMask;
-        }
+        display.enabled = display.reverse;
     }
 
     @Override
     public void setLo() {
-        if (display.reverse && display.enabled) {
-            display.segmentsOn |= mask;
-            display.segmentsOff &= nMask;
-        } else {
-            display.segmentsOff |= mask;
-        }
+        display.enabled = !display.reverse;
     }
 }

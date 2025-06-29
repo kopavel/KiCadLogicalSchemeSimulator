@@ -82,25 +82,31 @@ public class Led7SegmentDisplayUiComponent extends AbstractUiComponent {
         if (segmentsUi == null) {
             segmentsUi = new Shape[8];
             int y = titleHeight + 5;
-            // Top segments
-            segmentsUi[0] = new Line2D.Float(segmentWidth, y, width - segmentWidth, y);
-            // Middle segments
-            segmentsUi[1] = new Line2D.Float(segmentWidth, y + halfHeight, width - segmentWidth, y + halfHeight);
-            // Bottom segments
-            segmentsUi[2] = new Line2D.Float(segmentWidth, y + height, width - segmentWidth, y + height);
-            // Vertical segments
-            segmentsUi[3] = new Line2D.Float(1, y + segmentHeight, 1, y + halfHeight - segmentHeight);
-            segmentsUi[4] = new Line2D.Float(width, y + segmentHeight, width, y + halfHeight - segmentHeight);
-            segmentsUi[5] = new Line2D.Float(1, y + halfHeight + segmentHeight, 1, y + height - segmentHeight);
-            segmentsUi[6] = new Line2D.Float(width, y + halfHeight + segmentHeight, width, y + height - segmentHeight);
+            float offset = 0;
             // Decimal point
-            segmentsUi[7] = new Rectangle2D.Float(width + 2 * segmentWidth, y + height - segmentHeight, segmentWidth, segmentHeight);
+            if (parent.params.containsKey("dpLeft")) {
+                segmentsUi[7] = new Rectangle2D.Float(1, y + height - segmentHeight, segmentWidth, segmentHeight);
+                offset = segmentWidth * 3;
+            } else {
+                segmentsUi[7] = new Rectangle2D.Float(width + 2 * segmentWidth, y + height - segmentHeight, segmentWidth, segmentHeight);
+            }
+            // Top segments
+            segmentsUi[0] = new Line2D.Float(offset + segmentWidth, y, offset + width - segmentWidth, y);
+            // Middle segments
+            segmentsUi[1] = new Line2D.Float(offset + segmentWidth, y + halfHeight, offset + width - segmentWidth, y + halfHeight);
+            // Bottom segments
+            segmentsUi[2] = new Line2D.Float(offset + segmentWidth, y + height, offset + width - segmentWidth, y + height);
+            // Vertical segments
+            segmentsUi[3] = new Line2D.Float(offset + 1, y + segmentHeight, offset + 1, y + halfHeight - segmentHeight);
+            segmentsUi[4] = new Line2D.Float(offset + width, y + segmentHeight, offset + width, y + halfHeight - segmentHeight);
+            segmentsUi[5] = new Line2D.Float(offset + 1, y + halfHeight + segmentHeight, offset + 1, y + height - segmentHeight);
+            segmentsUi[6] = new Line2D.Float(offset + width, y + halfHeight + segmentHeight, offset + width, y + height - segmentHeight);
         }
         g2d.setStroke(new BasicStroke(5)); // Sets line thickness to 5
         for (int i = 0; i < 8; i++) {
             int bit = 1 << i;
             if ((parent.segmentsOn & bit) > 0) {
-                if ((parent.segmentsOff & bit) == 0) {
+                if ((parent.segmentsOff & bit) == 0 && parent.enabled) {
                     segmentsTime[i] = inertia;
                 } else if (segmentsTime[i] == 0) {
                     parent.segmentsOn &= ~bit;

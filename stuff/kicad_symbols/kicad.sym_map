@@ -4,6 +4,10 @@
 		<symbol name="HDSP-A153" class="Led7SegmentDisplay">
 			<unit pinMap="10=A;9=B;8=C;5=D;4=E;2=F;3=G;7=DP"/>
 		</symbol>
+		<symbol name="MAN72A" class="Led7SegmentDisplay" param="dpLeft;commonAnode">
+			<unit pinMap="1=A;13=B;10=C;8=D;7=E;2=F;11=G;6=DP;14=CA;3=CA"/>
+			<unit pinMap="ignore;4;5;9;12"/>
+		</symbol>
 	</lib>
 	<lib name="Diode">
 		<symbol name="BA157" class="Diode"/>
@@ -527,6 +531,11 @@
 			<unit pinMap="12=IN0;13=IN1;11=OUT"/>
 			<unit pinMap="ignore;7;14"/>
 		</symbol>
+		<symbol name="74LS138" class="MultiOutDecoder" param="size=3;reverse;cs=N:R:R">
+			<unit pinMap="6=CSa0;5=CSa1;4=CSa2;1=A0;2=A1;3=A2;15=Qa0;14=Qa1;13=Qa2;12=Qa3;11=Qa4;10=Qa5;9=Qa6;7=Qa7"/>
+			<unit pinMap="ignore;8;16"/>
+		</symbol>
+
 		<symbol name="74LS153" class="MaskedMultiplexer" param="size=2;nSize=2;reverse">
 			<unit pinMap="6=A0;5=A1;4=A2;3=A3;1=OEa;10=B0;11=B1;12=B2;13=B3;15=OEb;14=N0;2=N1;7=QA;9=QB"/>
 			<unit pinMap="ignore;8;16"/>

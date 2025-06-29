@@ -41,6 +41,7 @@ public class Led7SegmentDisplay extends SchemaPart implements InteractiveSchemaP
     private final Led7SegmentDisplayUiComponent led7SegmentDisplayUiComponent;
     public int segmentsOn;
     public int segmentsOff;
+    public boolean enabled;
 
     protected Led7SegmentDisplay(String id, String sParams) {
         super(id, sParams);
@@ -51,6 +52,10 @@ public class Led7SegmentDisplay extends SchemaPart implements InteractiveSchemaP
         addInPin(new Led7SegmentDisplayInPin("E", this, 5));
         addInPin(new Led7SegmentDisplayInPin("F", this, 3));
         addInPin(new Led7SegmentDisplayInPin("G", this, 1));
+        if (params.containsKey("commonAnode") || params.containsKey("commonCathode")) {
+            reverse = params.containsKey("commonAnode");
+            addInPin(new Led7SegmentDisplayEnabledPin("CS", this));
+        }
         addInPin(new Led7SegmentDisplayInPin("DP", this, 7));
         int size = Integer.parseInt(params.getOrDefault("size", "60"));
         Color on = UiTools.getColor(params.getOrDefault("onColor", "#ff0000"));
