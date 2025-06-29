@@ -39,8 +39,8 @@ import java.awt.*;
 
 public class Led16SegmentDisplay extends SchemaPart implements InteractiveSchemaPart {
     private final Led16SegmentDisplayUiComponent led16SegmentDisplayUiComponent;
-    public int segments;
-
+    public int segmentsOn;
+    public int segmentsOff;
     protected Led16SegmentDisplay(String id, String sParams) {
         super(id, sParams);
         addInPin(new Led16SegmentDisplayInPin("A1", this, 0));
@@ -63,7 +63,7 @@ public class Led16SegmentDisplay extends SchemaPart implements InteractiveSchema
         int size = Integer.parseInt(params.getOrDefault("size", "60"));
         Color on = UiTools.getColor(params.getOrDefault("onColor", "#ff0000"));
         Color off = UiTools.getColor(params.getOrDefault("offColor", "#808080"));
-        led16SegmentDisplayUiComponent = new Led16SegmentDisplayUiComponent(size, on, off, id);
+        led16SegmentDisplayUiComponent = new Led16SegmentDisplayUiComponent(this,size, on, off, id);
     }
 
     @Override

@@ -40,26 +40,32 @@ public class Led16SegmentDisplayInPin extends InPin {
     public Led16SegmentDisplayInPin(String id, Led16SegmentDisplay parent, int bit) {
         super(id, parent);
         display = parent;
-        if (parent.reverse) {
-            mask = ~(1 << bit);
-        } else {
-            mask = 1 << bit;
-        }
+        mask = 1 << bit;
         nMask = ~mask;
     }
 
     @Override
     public void setHiImpedance() {
-        display.segments &= nMask;
+        display.segmentsOff |= mask;
     }
 
     @Override
     public void setHi() {
-        display.segments |= mask;
+        if (display.reverse) {
+            display.segmentsOff |= mask;
+        } else {
+            display.segmentsOn |= mask;
+            display.segmentsOff &= nMask;
+        }
     }
 
     @Override
     public void setLo() {
-        display.segments &= nMask;
+        if (display.reverse) {
+            display.segmentsOn |= mask;
+            display.segmentsOff &= nMask;
+        } else {
+            display.segmentsOff |= mask;
+        }
     }
 }

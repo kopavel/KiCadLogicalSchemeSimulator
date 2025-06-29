@@ -47,10 +47,19 @@ public class Led16SegmentDisplayUiComponent extends AbstractUiComponent {
     private final float width;
     private final float height;
     public int state;
-    private Line2D[] segment;
+    private final int[] segmentsTime = new int[8];
+    private final int inertia;
+    private Shape[] segmentsUi;
+    private Led16SegmentDisplay parent;
 
-    public Led16SegmentDisplayUiComponent(int size, Color on, Color off, String title) {
+    public Led16SegmentDisplayUiComponent(Led16SegmentDisplay parent, int size, Color on, Color off, String title) {
         super(title, size);
+        this.parent = parent;
+        if (parent.params.containsKey("inertia")) {
+            inertia = Integer.parseInt(parent.params.get("inertia"));
+        } else {
+            inertia = 1;
+        }
         this.on = on;
         this.off = off;
         setBackground(new Color(0, 0, 0, 0));
@@ -72,41 +81,48 @@ public class Led16SegmentDisplayUiComponent extends AbstractUiComponent {
     @Override
     protected void draw() {
         // Set color and draw the circle
-        if (segment == null) {
-            segment = new Line2D[17];
+        if (segmentsUi == null) {
+            segmentsUi = new Line2D[17];
             int y = titleHeight + 5;
             // Top segments
-            segment[0] = new Line2D.Float(segmentWidth, y, halfWidth - segmentWidth, y);
-            segment[1] = new Line2D.Float(halfWidth + segmentWidth, y, width - segmentWidth, y);
+            segmentsUi[0] = new Line2D.Float(segmentWidth, y, halfWidth - segmentWidth, y);
+            segmentsUi[1] = new Line2D.Float(halfWidth + segmentWidth, y, width - segmentWidth, y);
             // Middle segments
-            segment[2] = new Line2D.Float(segmentWidth, y + halfHeight, halfWidth - segmentWidth, y + halfHeight);
-            segment[3] = new Line2D.Float(halfWidth + segmentWidth, y + halfHeight, width - segmentWidth, y + halfHeight);
+            segmentsUi[2] = new Line2D.Float(segmentWidth, y + halfHeight, halfWidth - segmentWidth, y + halfHeight);
+            segmentsUi[3] = new Line2D.Float(halfWidth + segmentWidth, y + halfHeight, width - segmentWidth, y + halfHeight);
             // Bottom segments
-            segment[4] = new Line2D.Float(segmentWidth, y + height, halfWidth - segmentWidth, y + height);
-            segment[5] = new Line2D.Float(halfWidth + segmentWidth, y + height, width - segmentWidth, y + height);
+            segmentsUi[4] = new Line2D.Float(segmentWidth, y + height, halfWidth - segmentWidth, y + height);
+            segmentsUi[5] = new Line2D.Float(halfWidth + segmentWidth, y + height, width - segmentWidth, y + height);
             // Vertical segments
-            segment[6] = new Line2D.Float(1, y + segmentHeight, 1, y + halfHeight - segmentHeight);
-            segment[7] = new Line2D.Float(halfWidth, y + segmentHeight, halfWidth, y + halfHeight - segmentHeight);
-            segment[8] = new Line2D.Float(width, y + segmentHeight, width, y + halfHeight - segmentHeight);
-            segment[9] = new Line2D.Float(1, y + halfHeight + segmentHeight, 1, y + height - segmentHeight);
-            segment[10] = new Line2D.Float(halfWidth, y + halfHeight + segmentHeight, halfWidth, y + height - segmentHeight);
-            segment[11] = new Line2D.Float(width, y + halfHeight + segmentHeight, width, y + height - segmentHeight);
+            segmentsUi[6] = new Line2D.Float(1, y + segmentHeight, 1, y + halfHeight - segmentHeight);
+            segmentsUi[7] = new Line2D.Float(halfWidth, y + segmentHeight, halfWidth, y + halfHeight - segmentHeight);
+            segmentsUi[8] = new Line2D.Float(width, y + segmentHeight, width, y + halfHeight - segmentHeight);
+            segmentsUi[9] = new Line2D.Float(1, y + halfHeight + segmentHeight, 1, y + height - segmentHeight);
+            segmentsUi[10] = new Line2D.Float(halfWidth, y + halfHeight + segmentHeight, halfWidth, y + height - segmentHeight);
+            segmentsUi[11] = new Line2D.Float(width, y + halfHeight + segmentHeight, width, y + height - segmentHeight);
             // Diagonal segments
-            segment[12] = new Line2D.Float(segmentWidth + 2, y + segmentHeight + 1, halfWidth - segmentWidth, y + halfHeight - segmentHeight - 1);
-            segment[13] = new Line2D.Float(halfWidth + segmentWidth + 1, y + halfHeight - segmentHeight - 1, width - segmentWidth - 1, y + segmentHeight + 1);
-            segment[14] = new Line2D.Float(segmentWidth + 2, y + height - segmentHeight - 1, halfWidth - segmentWidth, y + halfHeight + segmentHeight + 1);
-            segment[15] =
+            segmentsUi[12] = new Line2D.Float(segmentWidth + 2, y + segmentHeight + 1, halfWidth - segmentWidth, y + halfHeight - segmentHeight - 1);
+            segmentsUi[13] = new Line2D.Float(halfWidth + segmentWidth + 1, y + halfHeight - segmentHeight - 1, width - segmentWidth - 1, y + segmentHeight + 1);
+            segmentsUi[14] = new Line2D.Float(segmentWidth + 2, y + height - segmentHeight - 1, halfWidth - segmentWidth, y + halfHeight + segmentHeight + 1);
+            segmentsUi[15] =
                     new Line2D.Float(halfWidth + segmentWidth + 1, y + halfHeight + segmentHeight + 1, width - segmentWidth - 1, y + height - segmentHeight - 1);
             // Decimal point
-            segment[16] = new Line2D.Float(width + 1.3f * segmentWidth, y + height, width + 1.3f * segmentWidth, y + height);
+            segmentsUi[16] = new Line2D.Float(width + 1.3f * segmentWidth, y + height, width + 1.3f * segmentWidth, y + height);
         }
         g2d.setStroke(new BasicStroke(3)); // Sets line thickness to 5
         for (int i = 0; i < 17; i++) {
-            if (segment[i] != null) {
-                int bit = 1 << i;
-                g2d.setColor((state & bit) > 0 ? on : off);
-                g2d.draw(segment[i]);
+            int bit = 1 << i;
+            if ((parent.segmentsOn & bit) > 0) {
+                if ((parent.segmentsOff & bit) == 0) {
+                    segmentsTime[i] = inertia;
+                } else if (segmentsTime[i] == 0) {
+                    parent.segmentsOn &= ~bit;
+                } else {
+                    segmentsTime[i]--;
+                }
             }
+            g2d.setColor((segmentsTime[i] > 0) ? on : off);
+            g2d.draw(segmentsUi[i]);
         }
     }
 }
