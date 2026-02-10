@@ -60,11 +60,11 @@ module KiCadLogicalSchemeSimulator.simulator {
     opens pko.KiCadLogicalSchemeSimulator.parsers.symbolMap;
     opens pko.KiCadLogicalSchemeSimulator;
     requires com.fasterxml.jackson.annotation;
-    requires com.fasterxml.jackson.core;
-    requires com.fasterxml.jackson.databind;
-    requires com.fasterxml.jackson.dataformat.xml;
-    requires com.fasterxml.jackson.module.jakarta.xmlbind;
-    requires com.fasterxml.jackson.module.jaxb;
+    requires tools.jackson.core;
+    requires tools.jackson.databind;
+    requires tools.jackson.dataformat.xml;
+    requires tools.jackson.module.jakarta.xmlbind;
+    requires tools.jackson.module.jaxb;
     requires com.formdev.flatlaf;
     requires info.picocli;
     requires jakarta.xml.bind;
@@ -81,9 +81,6 @@ module KiCadLogicalSchemeSimulator.simulator {
     requires org.apache.logging.log4j.jul;
     requires org.apache.logging.log4j.slf4j.impl;
     requires org.apache.logging.log4j;
-    requires org.objectweb.asm.tree;
-    requires org.objectweb.asm.util;
-    requires org.objectweb.asm;
     requires org.tukaani.xz;
     uses pko.KiCadLogicalSchemeSimulator.api.NetFilter;
     uses pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;

@@ -11,7 +11,7 @@
     </properties>
     <border type="none"/>
     <children>
-      <component id="2c834" class="javax.swing.JTextField" binding="periodTextField" default-binding="true">
+      <component id="2c834" class="javax.swing.JTextField" binding="freqTextField">
         <constraints>
           <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
             <preferred-size width="40" height="30"/>
@@ -30,7 +30,7 @@
         <properties>
           <horizontalAlignment value="4"/>
           <labelFor value="2c834"/>
-          <text resource-bundle="i81n_clock/clock" key="period"/>
+          <text resource-bundle="i81n_clock/clock" key="freq"/>
         </properties>
       </component>
       <component id="67a18" class="javax.swing.JLabel">
@@ -42,10 +42,10 @@
         <properties>
           <horizontalAlignment value="4"/>
           <labelFor value="18d77"/>
-          <text resource-bundle="i81n_clock/clock" key="freq"/>
+          <text resource-bundle="i81n_clock/clock" key="resultFreq"/>
         </properties>
       </component>
-      <component id="18d77" class="javax.swing.JTextField" binding="freqTextField" default-binding="true">
+      <component id="18d77" class="javax.swing.JTextField" binding="achievedTextField">
         <constraints>
           <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
             <preferred-size width="40" height="30"/>

@@ -32,7 +32,6 @@
 
 
 plugins {
-//    alias libs.plugins.guidesigner
     id "application"
 }
 
@@ -56,16 +55,11 @@ dependencies {
     implementation libs.xz
     implementation libs.commons.compress
     implementation libs.jackson.databind
-    implementation libs.jaxb.api
     implementation libs.jakarta.api
     implementation libs.jackson.jakarta.annotations
     implementation libs.jackson.dataformat.xml
-    implementation libs.jackson.datatype.jsr310
     implementation libs.jackson.jaxb.annotations
     implementation libs.picocli
-    implementation libs.asm
-    implementation libs.asm.util
-    implementation libs.asm.tree
     implementation libs.lombok
     runtimeOnly(project(":schemaParts"))
     testImplementation libs.jmh

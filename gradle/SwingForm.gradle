@@ -1,0 +1,90 @@
+def formsClasspath = project.configurations.create('formsClasspath')
+formsClasspath.extendsFrom project.configurations.implementation
+formsClasspath.defaultDependencies {
+    it.add project.dependencies.create("com.jetbrains.intellij.java:java-compiler-ant-tasks:+")
+    it.add project.dependencies.create("com.jetbrains.intellij.java:java-gui-forms-rt:+")
+}
+
+def instrumentedClassesDir = project.layout.buildDirectory.dir("instrumented-classes/main").get().asFile
+def sourceSets = project.extensions.getByType(JavaPluginExtension).sourceSets
+def mainClassesDirs = sourceSets.main.output.classesDirs
+def mainSourceDirs = sourceSets.main.allSource.sourceDirectories
+
+def formFiles = mainSourceDirs.collect { dir ->
+    fileTree(dir).matching { include '**/*.form' }.files
+}.flatten() as Set<File>
+
+def instrumentedPairs = formFiles.collect { formFile ->
+    def sourceDir = mainSourceDirs.find { formFile.path.startsWith(it.path) } as File
+    if (!sourceDir) return null
+    def relativePath = formFile.path - sourceDir.path - File.separator
+    def classRelativePath = relativePath.replaceFirst(/\.form$/, '.class') as String
+    def originalClass = mainClassesDirs.collect { classDir ->
+        new File(classDir, classRelativePath)
+    }.find { it.exists() }
+    if (!originalClass) return null
+    def destClass = new File(instrumentedClassesDir, classRelativePath)
+    [source: originalClass, destination: destClass]
+}.findAll { it != null }
+
+def instrumentForms = tasks.register("instrumentForms") {
+
+    def inputFiles = formFiles.collectMany { formFile ->
+        def sourceDir = mainSourceDirs.find { formFile.path.startsWith(it.path) }
+        if (!sourceDir) return []
+        def relativePath = formFile.path - sourceDir.path - File.separator
+        def classRelativePath = relativePath.replaceFirst(/\.form$/, '.class') as String
+        mainClassesDirs.collect { classDir ->
+            [
+                    new File(classDir, classRelativePath),
+                    formFile
+            ]
+        }
+    }.flatten()
+//    logger.lifecycle("Input files $inputFiles")
+    inputs.files(inputFiles)
+
+//  logger.lifecycle("Output files "+instrumentedPairs.collect { it.destination })
+    outputs.files(instrumentedPairs.collect { it.destination })
+    outputs.upToDateWhen {
+        instrumentedPairs.collect { it.destination }.every { it.exists() }
+    }
+    doLast {
+        ant.echo(message: "Patching GUI Designer form binding .class files")
+        ant.taskdef(
+                name: "javac2",
+                classname: "com.intellij.ant.InstrumentIdeaExtensions",
+                classpath: formsClasspath.asPath
+        )
+        instrumentedPairs.each { pair ->
+            copy {
+                from pair.source
+                into pair.destination.parentFile
+            }
+        }
+        mainClassesDirs.filter { it.directory }.forEach { classDir ->
+            ant.javac2(
+                    includeantruntime: false,
+                    srcdir: mainSourceDirs.filter { it.directory }.asPath,
+                    destdir: instrumentedClassesDir.path,
+                    classpath: formsClasspath.asPath
+            )
+        }
+        if (!instrumentedPairs.collect { it.destination }.every { it.exists() }) {
+            throw new GradleException("instrumentForms did not generate all expected instrumented .class files")
+        }
+    }
+
+    dependsOn compileJava
+}
+
+tasks.named("jar") {
+    eachFile { f ->
+        def path = f.file.path
+        if (instrumentedPairs.any { it.source.path == path }) {
+            f.exclude()
+        }
+    }
+    from(instrumentedClassesDir)
+    dependsOn instrumentForms
+}

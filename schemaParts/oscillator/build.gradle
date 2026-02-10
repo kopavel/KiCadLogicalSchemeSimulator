@@ -30,12 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-
-/*
-plugins {
-    alias libs.plugins.guidesigner
-}
-*/
+apply from: "$rootDir/gradle/SwingForm.gradle"
 
 dependencies {
     implementation(project(":unnamedModules:ideaGui"))

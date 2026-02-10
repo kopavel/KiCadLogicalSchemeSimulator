@@ -32,7 +32,6 @@
 
 plugins {
     id 'idea'
-//    alias libs.plugins.guidesigner
 }
 
 group = 'pko'
@@ -115,8 +114,8 @@ configure(subprojects) {
         testRuntimeOnly libs.junit.launcher
     }
     java {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
+        sourceCompatibility = JavaVersion.VERSION_25
+        targetCompatibility = JavaVersion.VERSION_25
     }
     compileJava {
         options.encoding = 'UTF-8'
@@ -142,6 +141,9 @@ configure(subprojects) {
     tasks.withType(Test).configureEach {
         outputs.upToDateWhen { false }
         outputs.cacheIf { false }
+    }
+    tasks.withType(AbstractArchiveTask).configureEach {
+        preserveFileTimestamps = true
     }
 }
 

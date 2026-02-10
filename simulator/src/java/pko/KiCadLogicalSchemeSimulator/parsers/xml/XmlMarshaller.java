@@ -31,23 +31,22 @@
  */
 package pko.KiCadLogicalSchemeSimulator.parsers.xml;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.fasterxml.jackson.module.jakarta.xmlbind.JakartaXmlBindAnnotationModule;
-import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.cfg.DateTimeFeature;
+import tools.jackson.dataformat.xml.XmlMapper;
+import tools.jackson.module.jakarta.xmlbind.JakartaXmlBindAnnotationModule;
+import tools.jackson.module.jaxb.JaxbAnnotationModule;
 
 @SuppressWarnings("unused")
 public enum XmlMarshaller {
     ;
     private static volatile XmlMapper xmlMapper;
 
-    public static String toXml(Object o) throws JsonProcessingException {
+    public static String toXml(Object o) throws JacksonException {
         return getMapper().writeValueAsString(o);
     }
 
-    public static <T> T fromXml(String xml, Class<T> clazz) throws JsonProcessingException {
+    public static <T> T fromXml(String xml, Class<T> clazz) throws JacksonException {
         return getMapper().readValue(xml, clazz);
     }
 
@@ -59,9 +58,10 @@ public enum XmlMarshaller {
                                          .defaultUseWrapper(false)
                                          .addModule(new JaxbAnnotationModule())
                                          .addModule(new JakartaXmlBindAnnotationModule())
-                                         .serializationInclusion(JsonInclude.Include.NON_NULL)
-                                         .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-                                         .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+                                         .changeDefaultPropertyInclusion(old -> JsonInclude.Value.construct(JsonInclude.Include.NON_NULL,
+                                                 JsonInclude.Include.NON_NULL))
+                                         .configure(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+                                         .disable(DateTimeFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
                                          .build();
                 }
             }
