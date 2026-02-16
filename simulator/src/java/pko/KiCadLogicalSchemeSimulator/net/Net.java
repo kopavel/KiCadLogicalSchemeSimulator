@@ -179,7 +179,7 @@ public class Net {
                 }
                 case output -> {
                     if (powerState.strong) {
-                        throw new AssertionError("OUt pin " + id + "_" + pinName + " on power rail");
+                        throw new AssertionError("OUT pin " + id + "_" + pinName + " on power rail");
                     }
                     IModelItem<?> source = schemaPart.getOutItem(pinName);
                     if (source == null) {
@@ -196,7 +196,7 @@ public class Net {
                 }
                 case bidirectional -> {
                     if (powerState.strong) {
-                        throw new AssertionError("OUt pin on power rail");
+                        throw new AssertionError("OUT pin on power rail");
                     }
                     IModelItem<?> destination = schemaPart.getInItem(pinName);
                     switch (destination) {
@@ -209,12 +209,18 @@ public class Net {
                     assert source.getAliasOffset(pinName) != null : "No alias for pin " + pinName;
                     sourcesOffset.put(source, source.getAliasOffset(pinName));
                 }
-                case passive -> passivePins.add((PassivePin) schemaPart.getOutPin(pinName));
+                case passive -> {
+                    if (powerState.strong) {
+                        destinationPins.add(new PassiveIn((PassivePin) schemaPart.getOutPin(pinName)));
+                    } else {
+                        passivePins.add((PassivePin) schemaPart.getOutPin(pinName));
+                    }
+                }
             }
         });
         if ((destinationPins.isEmpty())) {
             if (passivePins.size() == 1) {
-                //Passive pin work as input-only
+                //Passive pin works as input-only
                 destinationPins.add(new PassiveIn(passivePins.getFirst()));
                 passivePins.clear();
             } else if (!passivePins.isEmpty()) {

@@ -32,8 +32,6 @@
 package pko.KiCadLogicalSchemeSimulator.api.wire;
 import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.net.merger.wire.WireMergerWireIn;
-import pko.KiCadLogicalSchemeSimulator.net.wire.PassiveIn;
 
 public abstract class PassivePin extends TriStateOutPin {
     public boolean otherImpedance = true;
@@ -50,27 +48,23 @@ public abstract class PassivePin extends TriStateOutPin {
 
     @Override
     public Pin getOptimised(ModelItem<?> source) {
-        if (!(this.source instanceof PassiveIn) && (destinations.length != 1 || !(destinations[0] instanceof WireMergerWireIn))) {
-            return new TriStateOutPin(this, "PassiveOut").getOptimised(source);
-        } else {
-            for (int i = 0; i < destinations.length; i++) {
-                destinations[i] = destinations[i].getOptimised(this);
-            }
-            split();
-            return this;
+        for (int i = 0; i < destinations.length; i++) {
+            destinations[i] = destinations[i].getOptimised(this);
         }
+        split();
+        return this;
     }
 
     public void recalculateOtherState(boolean mergerImpedance, boolean mergerState, int mergerWeakState, boolean mergerStrong) {
         if (mergerImpedance) {
             otherImpedance = true;
         } else if (hiImpedance) {
-            //we in impedance - clone merger
+            //we are in impedance - clone merger
             otherState = mergerState;
             otherStrong = mergerStrong;
             otherImpedance = false;
         } else if (strong) {
-            //we strong
+            //we are strong
             if (mergerWeakState == 0) {
                 //no other weak
                 otherImpedance = true;
@@ -82,7 +76,7 @@ public abstract class PassivePin extends TriStateOutPin {
             }
             //we are weak
         } else if (mergerStrong) {
-            //has other strong - clone merger
+            //has a strong pin, clone merger state.
             otherState = mergerState;
             otherStrong = true;
             otherImpedance = false;
@@ -90,7 +84,7 @@ public abstract class PassivePin extends TriStateOutPin {
             //we only weak on merger - hiImpedance
             otherImpedance = true;
         } else {
-            //merger are many weaks - sp state same as we are.
+            //merger has many weak - state is the same as we are.
             otherImpedance = false;
             otherStrong = false;
             otherState = mergerState;

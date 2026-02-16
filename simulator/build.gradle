@@ -96,7 +96,9 @@ test {
     ]
 }
 */
-
+test{
+    failOnNoDiscoveredTests=false
+}
 run {
     def jvm_args = []
     jvm_args += ["-Dlog4j.configurationFile=${sourceSets.main.resources.srcDirs.first().absolutePath}/log4j2.xml",

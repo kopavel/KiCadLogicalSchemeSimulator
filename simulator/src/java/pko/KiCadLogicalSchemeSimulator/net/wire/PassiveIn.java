@@ -84,6 +84,7 @@ public class PassiveIn extends InPin {
     @Override
     public Pin getOptimised(ModelItem<?> source) {
         this.source = source;
+        destination.getOptimised(this);
         return this;
     }
 }
