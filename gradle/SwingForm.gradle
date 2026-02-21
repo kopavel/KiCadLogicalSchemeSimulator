@@ -62,11 +62,9 @@ def instrumentForms = tasks.register("instrumentForms") {
 }
 
 tasks.named("jar") {
-    doFirst {
-        project.ext.replacedClassPaths = instrumentedTuples.collect { it.source.path }.toSet() as Set<String>
-    }
+    def replacedClassPaths = instrumentedTuples.collect { it.source.path }.toSet() as Set<String>
     eachFile { f ->
-        if (project.ext.replacedClassPaths.contains(f.file.path)) {
+        if (replacedClassPaths.contains(f.file.path)) {
             f.exclude()
         }
     }
