@@ -39,7 +39,7 @@ public class IntRingBuffer extends RingBuffer {
 
     public IntRingBuffer(int capacity) {
         super((capacity < 1) ? DEFAULT_CAPACITY : capacity);
-        data = new int[capacity];
+        data = new int[this.capacity];
     }
 
     @Override
