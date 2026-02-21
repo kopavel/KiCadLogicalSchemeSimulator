@@ -35,6 +35,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 
+@SuppressWarnings("StaticMethodOnlyUsedInOneClass")
 public abstract class AbstractUiComponent extends Component {
     public static final int redrawPeriod = 50;
     public static final Font arialFont = new Font("Arial", Font.BOLD, 14);
