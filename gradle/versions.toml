@@ -10,7 +10,9 @@ jmh = '1.37'
 bom-junit = { module = 'org.junit:junit-bom', version.ref = 'jUnit' }
 junit-jupiter = { module = 'org.junit.jupiter:junit-jupiter' }
 junit-launcher = { module = 'org.junit.platform:junit-platform-launcher' }
-idea-gui = 'com.jetbrains.intellij.java:java-gui-forms-rt:253.30387.127'
+idea-gui = 'com.jetbrains.intellij.java:java-gui-forms-rt:+'
+idea-gui-compiller= 'com.jetbrains.intellij.java:java-compiler-ant-tasks:+'
+
 swing-flatlaf = 'com.formdev:flatlaf:3.7'
 lombok = { module = 'org.projectlombok:lombok', version.ref = 'lombok' }
 jackson-databind = { module = 'tools.jackson.core:jackson-databind', version.ref = 'jackson' }
