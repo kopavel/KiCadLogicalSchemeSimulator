@@ -35,7 +35,6 @@ import pko.KiCadLogicalSchemeSimulator.tools.Log;
 import java.lang.invoke.VarHandle;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
@@ -90,6 +89,7 @@ public abstract class AsyncConsumers<T> implements Consumer<T>, AutoCloseable {
 
     public abstract void consume(T payload);
 
+    @SuppressWarnings("SynchronizedMethod")
     @Override
     public synchronized void close() {
         run = false;
@@ -121,8 +121,9 @@ public abstract class AsyncConsumers<T> implements Consumer<T>, AutoCloseable {
         } while (run);
     }
 
+    @SuppressWarnings("unchecked")
     private Slot<T>[] createSlots(int size, int threads) {
-        List<Slot<T>> rings = new ArrayList<>();
+        Collection<Slot<T>> rings = new ArrayList<>();
         for (int i = 0; i < threads; i++) {
             Slot<T> head = new Slot<>();
             rings.add(head);
@@ -136,8 +137,7 @@ public abstract class AsyncConsumers<T> implements Consumer<T>, AutoCloseable {
             }
             currentSlot.nextSlot = head;
         }
-        //noinspection unchecked
-        return rings.toArray(new Slot[0]);
+        return rings.toArray(Slot[]::new);
     }
 
     private void registerShutdown() {

@@ -135,6 +135,7 @@ configure(subprojects) { subproject ->
     }
     dependencies {
         implementation project(":simulator")
+        implementation libs.jakarta.api
         testImplementation project(":simulator").sourceSets.test.output
         testRuntimeOnly project(":simulator")
         testImplementation libs.jmh

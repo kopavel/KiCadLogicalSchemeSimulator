@@ -62,6 +62,7 @@ def instrumentForms = tasks.register("instrumentForms") {
                 into pair.destination.parentFile
             }
         }
+        mkdir instrumentedClassesDir
         mainClassesDirs.filter { it.directory }.forEach { classDir ->
             ant.javac2(
                     includeantruntime: false,
