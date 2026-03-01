@@ -8,7 +8,9 @@ ROM with a defined amount of address inputs and data outputs.
 
 - `Ax`
   x - sequential number in range [0…aSize-1].
-- `CS`- Chip Select.
+- `CSx`- Chip Select.
+  x - sequential number in range [0…csCount-1]. Ommited, if `csCount=1`.
+ 
 
 #### Output names:
 
@@ -28,6 +30,8 @@ ROM with a defined amount of address inputs and data outputs.
 
 #### Optional parameters:
 
+- `csCount`- count of `CS` inputs.
+  If omitted, the default value 1.
 - `reverse`- input `CS` reversed.
 
 ### Example

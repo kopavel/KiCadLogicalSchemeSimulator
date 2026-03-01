@@ -593,6 +593,11 @@
 			<unit pinMap="10=A0;9=A1;8=A2;7=A3;6=A4;5=A5;4=A6;3=A7;25=A8;24=A9;21=A10;23=A11;2=A12;20=~{CS};11=D0;12=D1;13=D2;15=D3;16=D4;17=D5;18=D6;19=D7"/>
 			<unit pinMap="ignore;14;28"/>
 		</symbol>
+		<!--ToDo No programmable part - Is it better map it as RAM with data preload?-->
+		<symbol name="27C64" class="Rom" param="aSize=13;size=8;reverse;csCount=2">
+			<unit pinMap="10=A0;9=A1;8=A2;7=A3;6=A4;5=A5;4=A6;3=A7;25=A8;24=A9;21=A10;23=A11;2=A12;20=~{CS1};22=~{CS2};11=D0;12=D1;13=D2;15=D3;16=D4;17=D5;18=D6;19=D7"/>
+			<unit pinMap="ignore;14;28;1;27"/>
+		</symbol>
 	</lib>
 	<lib name="Switch">
 		<symbol name="SW_Push" class="Switch">

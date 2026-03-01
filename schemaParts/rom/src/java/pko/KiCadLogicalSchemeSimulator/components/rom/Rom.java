@@ -46,7 +46,8 @@ import java.util.function.Supplier;
 public class Rom extends SchemaPart {
     public final int[] words;
     public final RomABus aBus;
-    public final RomCsPin csPin;
+    public final RomCsPin[] csPins;
+    public int csCount = 1;
     private int size;
     private int aSize;
 
@@ -58,12 +59,20 @@ public class Rom extends SchemaPart {
         if (!sParam.contains("size")) {
             throw new RuntimeException("Rom component " + id + " need \"size\" parameter");
         }
+        if (sParam.contains("csCount")) {
+            try {
+                csCount = Integer.parseInt(params.get("csCount"));
+            } catch (NumberFormatException e) {
+                throw new RuntimeException("Rom component " + id + " \"csCount\" parameter must be numeric");
+            }
+        }
         if (!sParam.contains("aSize")) {
             throw new RuntimeException("Rom component " + id + " need \"aSize\" parameter");
         }
         try {
             size = Integer.parseInt(params.get("size"));
-        } catch (NumberFormatException ignore) {
+        } catch (NumberFormatException e) {
+            throw new RuntimeException("Rom component " + id + " \"size\" parameter must be numeric");
         }
         int mask = Utils.getMaskForSize(size);
         if (size < 1) {
@@ -74,7 +83,8 @@ public class Rom extends SchemaPart {
         }
         try {
             aSize = Integer.parseInt(params.get("aSize"));
-        } catch (NumberFormatException ignore) {
+        } catch (NumberFormatException e) {
+            throw new RuntimeException("Rom component " + id + " \"aSize\" parameter must be numeric");
         }
         if (aSize < 1) {
             throw new RuntimeException("Component " + id + " aSize must be positive number");
@@ -114,28 +124,35 @@ public class Rom extends SchemaPart {
         }
         addTriStateOutBus("D", size);
         aBus = addInBus(new RomABus("A", this, aSize));
-        if (reverse) {
-            csPin = addInPin(new RomNCsPin("~{CS}", this));
-        } else {
-            csPin = addInPin(new RomCsPin("CS", this));
+        csPins = new RomCsPin[csCount];
+        for (int i = 0; i < csCount; i++) {
+            String name = csCount == 1 ? "CS" : "CS" + (i + 1);
+            if (reverse) {
+                csPins[i] = addInPin(new RomNCsPin("~{" + name + "}", this));
+            } else {
+                csPins[i] = addInPin(new RomCsPin(name, this));
+            }
         }
     }
 
     @Override
     public void initOuts() {
         Bus dBus = getOutBus("D");
-        dBus.hiImpedance=nReverse;
-        aBus.csActive=reverse;
+        dBus.hiImpedance = nReverse;
+        aBus.csActive = reverse ? 1 : 0;
         aBus.dBus = dBus;
-        csPin.dBus = dBus;
+        for (RomCsPin csPin : csPins) {
+            csPin.dBus = dBus;
+        }
     }
 
     @Override
     public String extraState() {
-        return "A:" + String.format("%0" + (int) Math.ceil(aSize / 4.0d) + "X", aBus.state) + (aBus.csActive
-                                                                                               ? ("\nD:" +
-                (aBus.state >= words.length ? "OutOfRange" : String.format("%0" + (int) Math.ceil(size / 4.0d) + "X", words[aBus.state])))
-                                                                                               : "");
+        return "A:" + String.format("%0" + (int) Math.ceil(aSize / 4.0d) + "X", aBus.state) + (aBus.csActive > 0 ? ("\nD:" + (aBus.state >= words.length
+                                                                                                                              ? "OutOfRange"
+                                                                                                                              : String.format("%0" + (int) Math.ceil(
+                                                                                                                                              size / 4.0d) + "X",
+                                                                                                                                      words[aBus.state]))) : "");
     }
 
     @Override

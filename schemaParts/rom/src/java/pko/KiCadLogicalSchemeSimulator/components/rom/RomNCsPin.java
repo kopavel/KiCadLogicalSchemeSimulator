@@ -40,7 +40,7 @@ public class RomNCsPin extends RomCsPin {
     @Override
     public void setHi() {
         state = true;
-        aBus.csActive = false;
+        aBus.csActive += 1;
         if (!dBus.hiImpedance) {
             dBus.setHiImpedance();
         }
@@ -49,10 +49,10 @@ public class RomNCsPin extends RomCsPin {
     @Override
     public void setLo() {
         state = false;
-        aBus.csActive = true;
+        aBus.csActive -= 1;
         int word;
         Bus bus;
-        if ((bus = dBus).state != (word = words[aBus.state]) || bus.hiImpedance) {
+        if ((bus = dBus).state != (word = words[aBus.state]) && aBus.csActive == 0 || bus.hiImpedance) {
             bus.setState(word);
         }
     }
