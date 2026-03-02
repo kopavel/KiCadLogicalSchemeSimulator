@@ -45,11 +45,11 @@ import java.util.function.Supplier;
 
 public class Rom extends SchemaPart {
     public final int[] words;
-    public final RomABus aBus;
     public final RomCsPin[] csPins;
+    private final int size;
+    private final int aSize;
+    public RomABus aBus;
     public int csCount = 1;
-    private int size;
-    private int aSize;
 
     protected Rom(String id, String sParam) {
         super(id, sParam);
@@ -127,11 +127,7 @@ public class Rom extends SchemaPart {
         csPins = new RomCsPin[csCount];
         for (int i = 0; i < csCount; i++) {
             String name = csCount == 1 ? "CS" : "CS" + (i + 1);
-            if (reverse) {
-                csPins[i] = addInPin(new RomNCsPin("~{" + name + "}", this));
-            } else {
-                csPins[i] = addInPin(new RomCsPin(name, this));
-            }
+            csPins[i] = addInPin(new RomCsPin(name, this));
         }
     }
 
@@ -139,7 +135,8 @@ public class Rom extends SchemaPart {
     public void initOuts() {
         Bus dBus = getOutBus("D");
         dBus.hiImpedance = nReverse;
-        aBus.csActive = reverse ? 1 : 0;
+        aBus.iCsActive = reverse ? 0 : 1;
+        aBus.bCsActive = reverse;
         aBus.dBus = dBus;
         for (RomCsPin csPin : csPins) {
             csPin.dBus = dBus;
@@ -148,11 +145,13 @@ public class Rom extends SchemaPart {
 
     @Override
     public String extraState() {
-        return "A:" + String.format("%0" + (int) Math.ceil(aSize / 4.0d) + "X", aBus.state) + (aBus.csActive > 0 ? ("\nD:" + (aBus.state >= words.length
-                                                                                                                              ? "OutOfRange"
-                                                                                                                              : String.format("%0" + (int) Math.ceil(
-                                                                                                                                              size / 4.0d) + "X",
-                                                                                                                                      words[aBus.state]))) : "");
+        return "A:" + String.format("%0" + (int) Math.ceil(aSize / 4.0d) + "X", aBus.state) + (aBus.iCsActive > 0 ? ("\nD:" + (aBus.state >= words.length
+                                                                                                                               ? "OutOfRange"
+                                                                                                                               : String.format("%0" +
+                                                                                                                                               (int) Math.ceil(
+                                                                                                                                                       size / 4.0d) +
+                                                                                                                                               "X",
+                                                                                                                                       words[aBus.state]))) : "");
     }
 
     @Override

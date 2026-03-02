@@ -30,41 +30,105 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.rom;
+import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
+import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 
 public class RomCsPin extends InPin {
-    public final RomABus aBus;
-    public Bus dBus;
+    protected final int[] words;
     final Rom parent;
-    final int[] words;
+    public RomABus aBus;
+    public Bus dBus;
 
     public RomCsPin(String id, Rom parent) {
-        super(id, parent);
+        super(parent.reverse ? "~{" + id + "}" : id, parent);
         this.parent = parent;
         aBus = parent.aBus;
         words = parent.words;
         priority = 1;
     }
 
+    /*Optimiser constructor*/
+    public RomCsPin(RomCsPin oldPin, String variantId) {
+        super(oldPin, variantId);
+        parent = oldPin.parent;
+        words = oldPin.words;
+        dBus = oldPin.dBus;
+        aBus = oldPin.aBus;
+    }
+
     @Override
     public void setHi() {
+        /*Optimiser line setter*/
         state = true;
-        aBus.csActive-=1;
-        int word;
-        Bus bus;
-        if ((bus = dBus).state != (word = words[aBus.state]) && aBus.csActive==0 || bus.hiImpedance) {
-            bus.setState(word);
+        /*Optimiser line useI*/
+        aBus.iCsActive += parent.reverse ? 1 : -1;
+        /*Optimiser line useB bind bHi:aBus.iCsActive\s==\s0*/
+        aBus.bCsActive = aBus.iCsActive == 0;
+        /*Optimiser line o block reverse*/
+        if (parent.reverse) {
+            if (!dBus.hiImpedance) {
+                dBus.setHiImpedance();
+            }
+            /*Optimiser line o bockEnd reverse block nReverse*/
+        } else {
+            int word;
+            Bus bus;
+            if ((bus = dBus).state != (word = words[aBus.state]) && aBus.bCsActive || bus.hiImpedance) {
+                bus.setState(word);
+            }
+            /*Optimiser line o blockEnd nReverse*/
         }
     }
 
     @Override
     public void setLo() {
+        /*Optimiser line setter*/
         state = false;
-        aBus.csActive += 1;
+        /*Optimiser line useI*/
+        aBus.iCsActive += parent.reverse ? -1 : 1;
+        /*Optimiser line useB bLo bState:aBus.iCsActive\s==\s0*/
+        aBus.bCsActive = aBus.iCsActive == 0;
         Bus bus;
-        if (!(bus = dBus).hiImpedance) {
-            bus.setHiImpedance();
+        int word;
+        /*Optimiser line o block reverse*/
+        if (parent.reverse) {
+            if ((bus = dBus).state != (word = words[aBus.state]) && aBus.bCsActive || bus.hiImpedance) {
+                bus.setState(word);
+            }
+            /*Optimiser line o bockEnd reverse block nReverse*/
+        } else {
+            if (!(bus = dBus).hiImpedance) {
+                bus.setHiImpedance();
+            }
+            /*Optimiser line o blockEnd nReverse*/
         }
+    }
+
+    @Override
+    public RomCsPin getOptimised(ModelItem<?> source) {
+        ClassOptimiser<RomCsPin> optimiser = new ClassOptimiser<>(this).cut("o");
+        if (source != null) {
+            optimiser.cut("setter");
+        }
+        if (parent.csCount == 1) {
+            optimiser.cut("useI");
+            optimiser.bind("bHi", !parent.reverse);
+            optimiser.bind("bLo", parent.reverse);
+        } else {
+            optimiser.cut("useB");
+        }
+        optimiser.cut(parent.reverse ? "nReverse" : "reverse");
+        RomCsPin build = optimiser.build();
+        build.source = source;
+        parent.replaceIn(this, build);
+        RomCsPin[] csPins = parent.csPins;
+        for (int i = 0; i < csPins.length; i++) {
+            if (csPins[i] == this) {
+                csPins[i] = build;
+            }
+        }
+        return build;
     }
 }
