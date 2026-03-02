@@ -48,7 +48,7 @@ public class RomABus extends InBus {
     public void setState(int newState) {
         state = newState;
         int word;
-        if (csActive>0 && dBus.state != (word = words[newState])) {
+        if (csActive==0 && dBus.state != (word = words[newState])) {
             dBus.setState(word);
         }
     }
