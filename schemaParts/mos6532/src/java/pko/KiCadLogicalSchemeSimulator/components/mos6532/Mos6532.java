@@ -309,7 +309,7 @@ public class Mos6532 extends SchemaPart {
                 } else {
                     ins[i] = addInPin("P" + suffix + i);
                 }
-                addOutPin("P" + suffix + i);
+                addTriStateOutPin("P" + suffix + i);
             }
         }
 
@@ -324,6 +324,8 @@ public class Mos6532 extends SchemaPart {
                     } else {
                         out.setLo();
                     }
+                } else {
+                    out.setHiImpedance();
                 }
                 mask <<= 1;
             }
@@ -331,7 +333,7 @@ public class Mos6532 extends SchemaPart {
 
         public void reset() {
             for (Pin out : outs) {
-                out.setLo();
+                out.setHiImpedance();
             }
             data = 0;
             direction = 0;

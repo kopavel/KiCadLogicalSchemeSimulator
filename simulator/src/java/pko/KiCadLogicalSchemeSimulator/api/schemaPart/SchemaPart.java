@@ -56,9 +56,9 @@ public abstract class SchemaPart {
     public final Map<String, PinType> pinType = new HashMap<>();
     public final Map<IModelItem<?>, String> ids = new HashMap<>();
     public final Map<String, ModelItem<?>> outPins = new HashMap<>();
-    public boolean reverse;
     public final Map<String, String> params = new HashMap<>();
     public final boolean nReverse;
+    public boolean reverse;
     public Net net;
     public Map<Integer, String> pinNumberMap;
 
@@ -143,7 +143,11 @@ public abstract class SchemaPart {
 
     public void addTriStateOutPin(String pinId) {
         if (pinType.containsKey(pinId)) {
-            throw new RuntimeException("Double pin name in " + id + ":" + pinId);
+            if (pinType.get(pinId) == input) {
+                pinType.put(pinId, bidirectional);
+            } else {
+                throw new RuntimeException("Double pin name in " + id + ":" + pinId);
+            }
         } else {
             pinType.put(pinId, output);
         }
