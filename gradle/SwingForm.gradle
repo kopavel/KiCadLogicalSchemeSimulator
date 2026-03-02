@@ -5,20 +5,19 @@ configurations {
 }
 dependencies {
     formsClasspath libs.idea.gui.compiller
-    formsClasspath libs.idea.gui
 }
-def instrumentedClassesDir = project.layout.buildDirectory.dir("swing-classes/main").get().asFile
-def sourceSets = project.extensions.getByType(JavaPluginExtension).sourceSets
-def instrumentedTuples = []
+File instrumentedClassesDir = project.layout.buildDirectory.dir("swing-classes/main").get().asFile
+SourceSetContainer sourceSets = project.extensions.getByType(JavaPluginExtension).sourceSets
+List<Map<String, File>> instrumentedTuples = []
 sourceSets.each { ss ->
     def outDir = ss.output.classesDirs.singleFile
     ss.allSource.srcDirs.each { srcDir ->
         fileTree(srcDir).matching { include '**/*.form' }.files.each { formFile ->
             def relativePath = formFile.path - srcDir.path - File.separator
             def classRelativePath = relativePath.replaceFirst(/\.form$/, '.class') as String
-            def originalClassFiles = new File(outDir, classRelativePath)
+            def originalClassFile = new File(outDir, classRelativePath)
             def destClass = new File(instrumentedClassesDir, classRelativePath)
-            instrumentedTuples << [form: formFile, source: originalClassFiles, destination: destClass]
+            instrumentedTuples << [form: formFile, source: originalClassFile, destination: destClass]
         }
     }
 }

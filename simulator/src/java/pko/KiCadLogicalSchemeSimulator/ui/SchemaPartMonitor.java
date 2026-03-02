@@ -30,8 +30,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.ui;
-import com.intellij.uiDesigner.core.GridConstraints;
-import com.intellij.uiDesigner.core.GridLayoutManager;
 import pko.KiCadLogicalSchemeSimulator.Simulator;
 import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
@@ -53,6 +51,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
+import static java.awt.GridBagConstraints.BOTH;
+import static java.awt.GridBagConstraints.CENTER;
 import static org.apache.commons.lang3.StringUtils.leftPad;
 
 public class SchemaPartMonitor extends JFrame {
@@ -236,38 +236,28 @@ public class SchemaPartMonitor extends JFrame {
         });
     }
 
-    private void createUIComponents() {
+    private void setupUI() {
+        panel = new JPanel(new GridBagLayout());
+        title = new JLabel("Label");
+        panel.add(title, createBagConstraints(1, 0, 1, 0, CENTER));
+        schemaPartBox = new JPanel(new GridBagLayout());
+        panel.add(schemaPartBox, createBagConstraints(1, 1, 1, 1, BOTH));
         inputsNames = new JPanel();
         inputsNames.setLayout(new BoxLayout(inputsNames, BoxLayout.Y_AXIS));
+        schemaPartBox.add(inputsNames, createBagConstraints(0, 0, 0.5, 1, BOTH));
         outputsNames = new JPanel();
         outputsNames.setLayout(new BoxLayout(outputsNames, BoxLayout.Y_AXIS));
+        schemaPartBox.add(outputsNames, createBagConstraints(1, 0, 0.5, 1, BOTH));
         inputsValues = new JPanel();
         inputsValues.setLayout(new BoxLayout(inputsValues, BoxLayout.Y_AXIS));
+        panel.add(inputsValues, createBagConstraints(0, 1, 0.3, 0, BOTH));
         outputsValues = new JPanel();
         outputsValues.setLayout(new BoxLayout(outputsValues, BoxLayout.Y_AXIS));
+        panel.add(outputsValues, createBagConstraints(2, 1, 0.3, 1, BOTH));
     }
 
-    private void setupUI() {
-        createUIComponents();
-        JPanel var1 = new JPanel();
-        panel = var1;
-        var1.setLayout(new GridLayoutManager(2, 3, new Insets(0, 0, 0, 0), 0, 0, false, false));
-        JPanel var2 = new JPanel();
-        schemaPartBox = var2;
-        var2.setLayout(new GridLayoutManager(1, 2, new Insets(0, 0, 0, 0), 0, 0, false, false));
-        var1.add(var2, new GridConstraints(1, 1, 1, 1, 0, 3, 7, 3, null, null, null));
-        JPanel var3 = inputsNames;
-        var2.add(var3, new GridConstraints(0, 0, 1, 1, 0, 3, 3, 3, null, null, null));
-        JPanel var4 = outputsNames;
-        var2.add(var4, new GridConstraints(0, 1, 1, 1, 0, 3, 3, 3, null, null, null));
-        JLabel var5 = new JLabel();
-        title = var5;
-        var5.setText("Label");
-        var1.add(var5, new GridConstraints(0, 1, 1, 1, 1, 0, 0, 0, null, null, null));
-        JPanel var6 = inputsValues;
-        var1.add(var6, new GridConstraints(1, 0, 1, 1, 4, 2, 3, 3, null, null, null));
-        JPanel var7 = outputsValues;
-        var1.add(var7, new GridConstraints(1, 2, 1, 1, 8, 2, 3, 3, null, null, null));
+    private static GridBagConstraints createBagConstraints(int gridx, int gridY, double weightX, double weightY, int fill) {
+        return new GridBagConstraints(gridx, gridY, 1, 1, weightX, weightY, GridBagConstraints.CENTER, fill, new Insets(0, 0, 0, 0), 0, 0);
     }
 
     private record Item(IModelItem<?> item, JLabel label, Integer mask) {

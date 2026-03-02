@@ -44,7 +44,6 @@ sourceSets {
     }
 }
 dependencies {
-    implementation(project(":unnamedModules:ideaGui"))
     implementation libs.swing.flatlaf
     implementation libs.log4j.slf4j
     implementation libs.log4j.old

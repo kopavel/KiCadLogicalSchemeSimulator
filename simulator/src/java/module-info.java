@@ -69,7 +69,7 @@ module KiCadLogicalSchemeSimulator.simulator {
     requires info.picocli;
     requires jakarta.xml.bind;
     requires java.desktop;
-    requires java.gui.forms.rt;
+//    requires java.gui.forms.rt;
     requires java.xml.bind;
     requires lombok;
     requires org.apache.commons.compress;

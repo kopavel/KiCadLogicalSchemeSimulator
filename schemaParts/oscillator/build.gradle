@@ -33,6 +33,5 @@
 apply from: "$rootDir/gradle/SwingForm.gradle"
 
 dependencies {
-    implementation(project(":unnamedModules:ideaGui"))
     implementation libs.swing.flatlaf
 }

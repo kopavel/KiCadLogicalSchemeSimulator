@@ -35,7 +35,6 @@ include 'schemaParts:transistor'
 include 'schemaParts:xor'
 include 'schemaParts:z80'
 include 'simulator'
-include 'unnamedModules:ideaGui'
 
 dependencyResolutionManagement {
 //    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)

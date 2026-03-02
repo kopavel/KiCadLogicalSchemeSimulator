@@ -35,7 +35,6 @@ import pko.KiCadLogicalSchemeSimulator.components.oscillator.OscillatorSpi;
 module KiCadLogicalSchemeSimulator.components.oscillator {
     requires KiCadLogicalSchemeSimulator.simulator;
     requires java.desktop;
-    requires java.gui.forms.rt;
     requires static lombok;
     provides SchemaPartSpi with OscillatorSpi;
 }
