@@ -41,7 +41,6 @@ import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Node;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 
 @FunctionalInterface
 public interface NetFilter {
@@ -104,7 +103,7 @@ public interface NetFilter {
     default boolean mergeNets(Export netFile,
             ParameterResolver parameterResolver,
             BiFunction<ParameterResolver, Node, Boolean> doMerge,
-            Function<PinConfig, Boolean> nodeFilter) {
+            BiFunction<PinConfig,PinConfig, Boolean> destinationFilter) {
         boolean retVal = false;
         Iterator<Net> currentNetIterator = netFile.nets.net.iterator();
         nextNet:
@@ -112,13 +111,13 @@ public interface NetFilter {
             Net currentNet = currentNetIterator.next();
             for (Node currentNode : currentNet.node) {
                 if (doMerge.apply(parameterResolver, currentNode)) {
-                    for (Map.Entry<Node, PinConfig> otherNodeConfigs : otherNodes(parameterResolver, currentNode).entrySet()) {
-                        if (nodeFilter.apply(otherNodeConfigs.getValue())) {
-                            List<Node> otherNode = otherNodeConfigs.getKey().parent.node;
+                    for (Map.Entry<Node, PinConfig> otherNodeConfig : otherNodes(parameterResolver, currentNode).entrySet()) {
+                        if (destinationFilter.apply(parameterResolver.getPinConfig(currentNode),otherNodeConfig.getValue())) {
+                            List<Node> otherNode = otherNodeConfig.getKey().parent.node;
                             otherNode.addAll(currentNet.node);
                             otherNode.remove(currentNode);
-                            otherNode.remove(otherNodeConfigs.getKey());
-                            currentNet.node.forEach(n -> n.fillParent(otherNodeConfigs.getKey().parent));
+                            otherNode.remove(otherNodeConfig.getKey());
+                            currentNet.node.forEach(node -> node.fillParent(otherNodeConfig.getKey().parent));
                             retVal = true;
                             currentNetIterator.remove();
                             continue nextNet;

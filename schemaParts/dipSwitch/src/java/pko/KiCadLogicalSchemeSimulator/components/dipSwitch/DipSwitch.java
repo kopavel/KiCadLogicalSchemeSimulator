@@ -39,7 +39,7 @@ import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Node;
 public class DipSwitch implements NetFilter {
     @Override
     public boolean doFilter(Export netFile, ParameterResolver parameterResolver) {
-        return mergeNets(netFile, parameterResolver, DipSwitch::doMerge, (config -> true));
+        return mergeNets(netFile, parameterResolver, DipSwitch::doMerge, (_,_) -> true);
     }
 
     private static Boolean doMerge(ParameterResolver parameterResolver, Node currentNode) {

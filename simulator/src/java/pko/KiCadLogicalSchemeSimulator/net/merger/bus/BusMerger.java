@@ -117,7 +117,7 @@ public class BusMerger extends OutBus {
         }
     }
 
-    public void addSource(Net net, List<? extends OutPin> pins, List<? extends PassivePin> passivePins, Byte offset) {
+    public void addSource(Net net, Set<? extends OutPin> pins, List<? extends PassivePin> passivePins, Byte offset) {
         int destinationMask = 1 << offset;
         BusMergerWireIn input = new BusMergerWireIn(destinationMask, this);
         Pin pin = net.processWire(input, pins, passivePins, Collections.emptyMap());

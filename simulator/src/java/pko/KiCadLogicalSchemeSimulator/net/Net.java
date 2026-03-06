@@ -95,7 +95,7 @@ public class Net {
         Log.info(Net.class, "Net build complete");
     }
 
-    public Pin processWire(Pin destination, List<? extends OutPin> pins, List<? extends PassivePin> passivePins, Map<OutBus, Integer> buses) {
+    public Pin processWire(Pin destination, Set<? extends OutPin> pins, List<? extends PassivePin> passivePins, Map<OutBus, Integer> buses) {
         Pin retVal = null;
         if (buses.size() + pins.size() + passivePins.size() > 1) {
             //connect a destination to multiple sources throe Merger
@@ -414,7 +414,7 @@ public class Net {
     }
 
     private static class BusPinsOffset {
-        public final List<OutPin> pins = new ArrayList<>();
+        public final Set<OutPin> pins = new HashSet<>();
         public final List<PassivePin> passivePins = new ArrayList<>();
     }
 
@@ -422,7 +422,7 @@ public class Net {
         //Bus, offset
         public final Map<OutBus, Integer> buses = new HashMap<>();
         //Pin, offset
-        public final List<OutPin> pins = new ArrayList<>();
+        public final Set<OutPin> pins = new HashSet<>();
         public final List<PassivePin> passivePins;
 
         public DestinationWireDescriptor(List<PassivePin> passivePins) {
