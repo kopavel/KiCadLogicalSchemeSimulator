@@ -37,7 +37,7 @@ import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 
 public class RomCsPin extends InPin {
     protected final int[] words;
-    final Rom parent;
+    protected final Rom parent;
     public RomABus aBus;
     public Bus dBus;
 
