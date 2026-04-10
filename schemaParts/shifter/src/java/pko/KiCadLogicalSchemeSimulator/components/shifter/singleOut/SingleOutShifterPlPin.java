@@ -54,8 +54,11 @@ public class SingleOutShifterPlPin extends InPin {
     public void setHi() {
         /*Optimiser line setter*/
         state = true;
-        /*Optimiser bind r:plReverse*/
-        parent.parallelLoad = plReverse;
+        parent.parallelLoad =
+                /*Optimiser line o*/
+                !
+                        /*Optimiser bind r:plReverse*/
+                plReverse;
     }
 
     @Override
@@ -63,8 +66,6 @@ public class SingleOutShifterPlPin extends InPin {
         /*Optimiser line setter*/
         state = false;
         parent.parallelLoad =
-                /*Optimiser line o*/
-                !
                         /*Optimiser bind nr:plReverse*/
                         plReverse;
     }
