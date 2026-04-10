@@ -141,15 +141,16 @@ configure(subprojects) { subproject ->
         testImplementation libs.jmh
         testAnnotationProcessor libs.jmh.annotations
     }
+    def delSrc=tasks.register("delSrc",Delete){
+        fileTree(dir: layout.buildDirectory.dir("classes/java/main"), include: '**/*.java')
+        dependsOn classes
+    }
     tasks.named("jar") {
-        doFirst {
-            delete fileTree(dir: layout.buildDirectory.dir("classes/java/main"), include: '**/*.java')
-        }
         destinationDirectory = file("$rootDir/distro/schemaParts")
         from(sourceSets.main.allSource) {
             include '**/*.java'  // Filter to include only Java files
         }
-
+        dependsOn(delSrc)
     }
     test {
         useJUnitPlatform()

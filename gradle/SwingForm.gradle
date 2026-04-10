@@ -53,6 +53,14 @@ sourceSets.each { ss ->
         }
     }
 }
+def copyInstrumentedClasses=tasks.register("copyInstrumentedClasses", Copy) {
+    instrumentedTuples.each { tuple ->
+        from tuple.source
+        into tuple.destination.parentFile
+    }
+    dependsOn classes
+}
+
 def instrumentForms = tasks.register("instrumentForms") {
     def projectRoot = project.projectDir.toPath()
     inputs.files(project.provider { instrumentedTuples.collect { [it.source, it.form] }.flatten() })
@@ -66,30 +74,27 @@ def instrumentForms = tasks.register("instrumentForms") {
             throw new GradleException("Swing forms do not have associated compiled classes:\n${lines}\nDid you compile the project?")
         }
     }
+    def sSets=sourceSets.main.allSource.sourceDirectories.filter { it.directory }
+    def cPath=configurations.formsClasspath.asPath
     doLast {
         ant.echo(message: "Patching GUI Designer form binding .class files")
         ant.taskdef(
                 name: "javac2",
                 classname: "com.intellij.ant.InstrumentIdeaExtensions",
-                classpath: configurations.formsClasspath.asPath
+                classpath: cPath
         )
-        instrumentedTuples.each { tuple ->
-            copy {
-                from tuple.source
-                into tuple.destination.parentFile
-            }
-        }
-        sourceSets.main.allSource.sourceDirectories.filter { it.directory }.forEach { srcDir ->
+        sSets.forEach { srcDir ->
             ant.javac2(
                     includeantruntime: false,
                     srcdir: srcDir.path,
                     destdir: instrumentedClassesDir.path,
-                    classpath: configurations.formsClasspath.asPath,
+                    classpath: cPath,
                     failOnError: true
             )
         }
     }
     dependsOn classes
+    dependsOn copyInstrumentedClasses
 }
 
 tasks.named("jar") {
