@@ -55,11 +55,12 @@ public enum JavaCompiler {
                 throw new IllegalStateException("No Java compiler available");
             }
             String path = JavaCompiler.class.getProtectionDomain().getCodeSource().getLocation().getFile();
-            if (System.getProperty("os.name").toLowerCase().contains("win") && !path.isEmpty() && path.charAt(0) == '/') {
+            boolean win = System.getProperty("os.name").toLowerCase().contains("win");
+            if (win && !path.isEmpty() && path.charAt(0) == '/') {
                 path = path.substring(1);
             }
             StringBuilder paths = new StringBuilder(path);
-            if (System.getProperty("os.name").toLowerCase().contains("win")) {
+            if (win) {
                 paths.append(";").append(Lombok.class.getProtectionDomain().getCodeSource().getLocation().getFile().substring(1));
                 paths.append(";").append(Logger.class.getProtectionDomain().getCodeSource().getLocation().getFile().substring(1));
             } else {
@@ -68,10 +69,10 @@ public enum JavaCompiler {
             }
             Simulator.schemaPartSpiMap.values().forEach(spi -> {
                 String spiPath = spi.getClass().getProtectionDomain().getCodeSource().getLocation().getFile();
-                if (System.getProperty("os.name").toLowerCase().contains("win") && !spiPath.isEmpty() && spiPath.charAt(0) == '/') {
+                if (win && !spiPath.isEmpty() && spiPath.charAt(0) == '/') {
                     spiPath = spiPath.substring(1);
                 }
-                paths.append(";").append(spiPath);
+                paths.append(win ? ";" : ":").append(spiPath);
             });
             Log.debug(JavaCompiler.class, "Use class path for compiler: {}", paths);
             optionList = new ArrayList<>();
