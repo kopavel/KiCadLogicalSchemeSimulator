@@ -49,7 +49,7 @@ public class ResisterTest extends NetTester {
 
     @Override
     protected String getNetFilePath() {
-        return "test/resources/Resister.net";
+        return "test/resources/resister.net";
     }
 
     @Override

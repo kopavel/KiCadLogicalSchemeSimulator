@@ -48,7 +48,7 @@ public class DiodeTest extends NetTester {
 
     @Override
     protected String getNetFilePath() {
-        return "test/resources/Diode.net";
+        return "test/resources/diode.net";
     }
 
     @Override
