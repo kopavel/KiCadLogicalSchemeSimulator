@@ -75,7 +75,18 @@ public class RomCsPin extends InPin {
         } else {
             int word;
             Bus bus;
-            if ((bus = dBus).state != (word = words[aBus.state]) && aBus.bCsActive || bus.hiImpedance) {
+            if (((bus = dBus).state != (word = words[aBus.state]) || bus.hiImpedance) &&//
+                    /*Optimiser line o*/
+                    (//
+                            /*Optimiser line useB*/
+                            aBus.bCsActive//
+                                    /*Optimiser line o*///
+                                    ||
+                                    /*Optimiser line useI*/
+                                    aBus.iCsActive == 0//
+                            /*Optimiser line o*///
+                    )//
+            ) {
                 bus.setState(word);
             }
             /*Optimiser line o blockEnd nReverse*/
@@ -94,7 +105,18 @@ public class RomCsPin extends InPin {
         int word;
         /*Optimiser line o block reverse*/
         if (parent.reverse) {
-            if ((bus = dBus).state != (word = words[aBus.state]) && aBus.bCsActive || bus.hiImpedance) {
+            if (((bus = dBus).state != (word = words[aBus.state]) || bus.hiImpedance) &&//
+                    /*Optimiser line o*/
+                    (//
+                            /*Optimiser line useB*/
+                            aBus.bCsActive//
+                                    /*Optimiser line o*///
+                                    ||
+                                    /*Optimiser line useI*/
+                                    aBus.iCsActive == 0//
+                            /*Optimiser line o*///
+                    )//
+            ) {
                 bus.setState(word);
             }
             /*Optimiser line o bockEnd reverse block nReverse*/

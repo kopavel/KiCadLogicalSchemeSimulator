@@ -64,7 +64,7 @@ public class RomABus extends InBus {
         if (
             /*Optimiser line useI*/
                 iCsActive == 0 &&
-                        /*Optimiser line userB*/
+                        /*Optimiser line useB*/
                         bCsActive &&//
                         dBus.state != (word = words[newState])) {
             dBus.setState(word);
@@ -80,7 +80,7 @@ public class RomABus extends InBus {
         if (parent.csCount == 1) {
             optimiser.cut("useI");
         } else {
-            optimiser.cut("userB");
+            optimiser.cut("useB");
         }
         RomABus build = optimiser.build();
         build.source = source;

@@ -135,7 +135,7 @@ public class Rom extends SchemaPart {
     public void initOuts() {
         Bus dBus = getOutBus("D");
         dBus.hiImpedance = nReverse;
-        aBus.iCsActive = reverse ? 0 : 1;
+        aBus.iCsActive = reverse ? 0 : csPins.length;
         aBus.bCsActive = reverse;
         aBus.dBus = dBus;
         for (RomCsPin csPin : csPins) {
