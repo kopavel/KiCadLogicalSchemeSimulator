@@ -418,12 +418,22 @@ public class ClassOptimiser<T> {
 
     private void loadSource() {
         Log.trace(JavaCompiler.class, "Load source for {}", sourceClass.getSimpleName());
-        try (InputStream is = sourceClass.getResourceAsStream(sourceClass.getSimpleName() + ".java")) {
+        try {
+            InputStream is = sourceClass.getResourceAsStream(sourceClass.getSimpleName() + ".java");
             if (is == null) {
-                throw new RuntimeException("Can't find source for class " + sourceClass.getName());
+                is = sourceClass.getClassLoader().getResourceAsStream(sourceClass.getName().replace(".","/") + ".java");
             }
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
-                source = reader.lines().toList();
+            try {
+                if (is == null) {
+                    throw new RuntimeException("Can't find source for class " + sourceClass.getName());
+                }
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
+                    source = reader.lines().toList();
+                }
+            } finally {
+                if (is != null) {
+                    is.close();
+                }
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

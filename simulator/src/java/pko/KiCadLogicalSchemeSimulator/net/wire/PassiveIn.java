@@ -41,7 +41,6 @@ public class PassiveIn extends InPin {
     public PassiveIn(PassivePin destination) {
         super(destination, null);
         id+="_in";
-        destination.source=this;
         this.destination = destination;
         triStateIn = true;
     }
