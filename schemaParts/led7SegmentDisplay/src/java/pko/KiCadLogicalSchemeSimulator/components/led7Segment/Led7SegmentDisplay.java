@@ -55,6 +55,9 @@ public class Led7SegmentDisplay extends SchemaPart implements InteractiveSchemaP
         if (params.containsKey("commonAnode") || params.containsKey("commonCathode")) {
             reverse = params.containsKey("commonAnode");
             addInPin(new Led7SegmentDisplayEnabledPin("CS", this));
+            enabled=!reverse;
+        } else {
+            enabled = true;
         }
         addInPin(new Led7SegmentDisplayInPin("DP", this, 7));
         int size = Integer.parseInt(params.getOrDefault("size", "60"));
