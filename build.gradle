@@ -37,7 +37,8 @@ plugins {
 group = 'pko'
 version = '0.1'
 
-def deleteEmptyDirsRecursively(dir) {
+def deleteEmptyDirsRecursively
+deleteEmptyDirsRecursively = { File dir ->
     if (dir.exists() && dir.isDirectory()) {
         dir.eachDir { subDir ->
             deleteEmptyDirsRecursively(subDir) // Recursive call for subdirectories
@@ -50,45 +51,55 @@ def deleteEmptyDirsRecursively(dir) {
 }
 
 tasks.register("cleanBuild", Delete).configure() {
+    File root = file("$rootDir/distro/")
+    delete fileTree(dir: "$rootDir/distro/")
     doLast {
-        delete fileTree(dir: "$rootDir/distro/")
-        deleteEmptyDirsRecursively(file("$rootDir/distro/"))
+        deleteEmptyDirsRecursively(root)
     }
 }
 
 tasks.register("copyToLib", Copy) {
-    from {
-        [
-                "$rootDir/stuff/scripts/run.bat",
-                "$rootDir/stuff/scripts/run.sh",
-                "$rootDir/stuff/scripts/start.bat",
-                "$rootDir/stuff/scripts/start.sh",
-                "$rootDir/stuff/scripts/simulate.py",
-                "$rootDir/stuff/kicad_symbols/kicad.sym_map",
-                "$rootDir/stuff/kicad_symbols/chip.sym_map",
-                "$rootDir/stuff/kicad_symbols/retro.sym_map"
-        ]
-    }
+    from(files(
+            "$rootDir/stuff/scripts/run.bat",
+            "$rootDir/stuff/scripts/run.sh",
+            "$rootDir/stuff/scripts/start.bat",
+            "$rootDir/stuff/scripts/start.sh",
+            "$rootDir/stuff/scripts/simulate.py",
+            "$rootDir/stuff/kicad_symbols/kicad.sym_map",
+            "$rootDir/stuff/kicad_symbols/chip.sym_map",
+            "$rootDir/stuff/kicad_symbols/retro.sym_map"
+    ))
     into "$rootDir/distro"
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    def filesToCopy = subprojects.collectMany { subproject ->
-        if (subproject.plugins.hasPlugin('java')) {
-            return subproject.configurations.runtimeClasspath.files
-        } else {
-            return []
-        }
+
+    def javaSubprojects = subprojects.findAll { it.plugins.hasPlugin('java') }
+
+    // Зависимость — чтобы JAR собрался раньше
+    dependsOn(javaSubprojects.collect { sp -> sp.tasks.named('jar') })
+
+    def runtimeFiles = javaSubprojects
+            .collectMany { sp -> sp.configurations.runtimeClasspath.files }
+            .toSet()
+
+    def subprojectJarNames = javaSubprojects
+            .collectMany { sp -> sp.tasks.named('jar').get().outputs.files.files }
+            .collect { it.name }
+            .toSet()
+
+    // ✅ Ключевое — JAR файлы как inputs
+    // Если ни один JAR не пересобрался → copyToLib будет UP-TO-DATE → пропустится
+    inputs.files(javaSubprojects.collectMany { sp ->
+        sp.tasks.named('jar').get().outputs.files.files
+    })
+
+
+    from(files(runtimeFiles)) {
+        exclude { it.file.name in subprojectJarNames }
+        into "lib"
     }
-    from(filesToCopy) {
-        // Exclude JAR outputs from subprojects
-        subprojects.each { subproject ->
-            subprojects.jar.each { it.outputs.files.each { exclude it.getName() } }
-        }
-        into "lib"  // Change this to your desired output directory
-    }
-    onlyIf {
-        subprojects.any { it.tasks.jar.state.executed }
-    }
+
 }
+
 
 configure(subprojects) {
     apply {
