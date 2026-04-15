@@ -29,6 +29,8 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 
 configurations {
     formsClasspath {
@@ -46,25 +48,15 @@ sourceSets.each { ss ->
     ss.allSource.srcDirs.each { srcDir ->
         fileTree(srcDir).matching { include '**/*.form' }.files.each { formFile ->
             def relativePath = formFile.path - srcDir.path - File.separator
-            def classRelativePath = relativePath.replaceFirst(/\.form$/, '.class') as String
-            def originalClassFile = new File(outDir, classRelativePath)
-            def destClass = new File(instrumentedClassesDir, classRelativePath)
-            instrumentedTuples << [form: formFile, source: originalClassFile, destination: destClass]
+            String classRelativePath = relativePath.replaceFirst(/\.form$/, '.class') as String
+            instrumentedTuples << [form: formFile, source: new File(outDir, classRelativePath), destination: new File(instrumentedClassesDir, classRelativePath)]
         }
     }
 }
-def copyInstrumentedClasses=tasks.register("copyInstrumentedClasses", Copy) {
-    instrumentedTuples.each { tuple ->
-        from tuple.source
-        into tuple.destination.parentFile
-    }
-    dependsOn classes
-}
-
 def instrumentForms = tasks.register("instrumentForms") {
     def projectRoot = project.projectDir.toPath()
     inputs.files(project.provider { instrumentedTuples.collect { [it.source, it.form] }.flatten() })
-    outputs.dir(instrumentedClassesDir)
+    outputs.files(project.provider { instrumentedTuples.collect { it.destination }.flatten() })
     doFirst {
         def missing = instrumentedTuples.findAll { !it.source.exists() }
         if (!missing.isEmpty()) {
@@ -74,8 +66,8 @@ def instrumentForms = tasks.register("instrumentForms") {
             throw new GradleException("Swing forms do not have associated compiled classes:\n${lines}\nDid you compile the project?")
         }
     }
-    def sSets=sourceSets.main.allSource.sourceDirectories.filter { it.directory }
-    def cPath=configurations.formsClasspath.asPath
+    def javaSrcDirs = sourceSets.main.java.sourceDirectories.files
+    def cPath = configurations.formsClasspath.asPath
     doLast {
         ant.echo(message: "Patching GUI Designer form binding .class files")
         ant.taskdef(
@@ -83,10 +75,15 @@ def instrumentForms = tasks.register("instrumentForms") {
                 classname: "com.intellij.ant.InstrumentIdeaExtensions",
                 classpath: cPath
         )
-        sSets.forEach { srcDir ->
+        instrumentedTuples.each { tuple ->
+            tuple.destination.createParentDirectories()
+            ant.echo(message: "instrument: $tuple.source")
+            Files.copy(tuple.source.toPath(), tuple.destination.toPath(), StandardCopyOption.REPLACE_EXISTING)
+        }
+        javaSrcDirs.forEach { javaSrcDir ->
             ant.javac2(
                     includeantruntime: false,
-                    srcdir: srcDir.path,
+                    srcdir: javaSrcDir.path,
                     destdir: instrumentedClassesDir.path,
                     classpath: cPath,
                     failOnError: true
@@ -94,7 +91,6 @@ def instrumentForms = tasks.register("instrumentForms") {
         }
     }
     dependsOn classes
-    dependsOn copyInstrumentedClasses
 }
 
 tasks.named("jar") {
