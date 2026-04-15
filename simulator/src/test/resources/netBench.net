@@ -1,6 +1,5 @@
 (export (version "E")
   (design
-    (source "D:\\soft_a\\verilog\\KiCadLogicalSchemeSimulator\\simulator\\src\\test\\resources\\netBench.kicad_sch")
     (date "04/05/2025 20:00:48")
     (tool "Eeschema 7.0.9")
     (sheet (number "1") (name "/") (tstamps "/")
@@ -54,9 +53,6 @@
         (pin (num "5") (name "Out5") (type "output"))
         (pin (num "6") (name "Out6") (type "output"))
         (pin (num "7") (name "Out7") (type "output")))))
-  (libraries
-    (library (logical "Tests")
-      (uri "C:/Users/kopavel/Documents/KiCad/7.0/symbols/Tests.kicad_sym")))
   (nets
     (net (code "1") (name "Net-(InPin1-In)")
       (node (ref "InPin1") (pin "1") (pinfunction "In") (pintype "input"))
