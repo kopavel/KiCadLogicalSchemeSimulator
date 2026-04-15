@@ -73,7 +73,8 @@ public class Diagram extends JPanel {
                 int newSize = (int) ((diagramWidth - 10) / tickWidth);
                 offset += (int) ((oldSize - newSize) * relPos);
             } else {
-                offset += oldSize * notches / 30;
+                double delta=0.03*oldSize * notches;
+                offset += (int)(delta > 0 ? Math.ceil(delta) : Math.floor(delta));
             }
             if (offset < 0) {
                 offset = 0;

@@ -78,7 +78,7 @@ public class OscilloscopeMenu extends JMenuBar {
             schemaPart.inPins.values()
                     .stream().distinct().sorted().forEach(inItem -> {
                           JMenuItem inPinItem = new JMenuItem(schemaPart.ids.get(inItem));
-                          inPinItem.addActionListener(e -> oscilloscope.addPin(inItem, schemaPart.ids.get(inItem), false));
+                          inPinItem.addActionListener(e -> oscilloscope.addPin(inItem, schemaPart.id+":"+schemaPart.ids.get(inItem), false));
                           schemaPartItem.add(inPinItem);
                       });
             schemaPartItem.addSeparator();
@@ -86,7 +86,7 @@ public class OscilloscopeMenu extends JMenuBar {
             schemaPart.outPins.values()
                     .stream().distinct().sorted().forEach(inItem -> {
                           JMenuItem inPinItem = new JMenuItem(schemaPart.ids.get(inItem));
-                          inPinItem.addActionListener(e -> oscilloscope.addPin(inItem, schemaPart.ids.get(inItem), true));
+                          inPinItem.addActionListener(e -> oscilloscope.addPin(inItem, schemaPart.id+":"+schemaPart.ids.get(inItem), true));
                           schemaPartItem.add(inPinItem);
                       });
         }
@@ -152,10 +152,10 @@ public class OscilloscopeMenu extends JMenuBar {
                     ModelItem<?> inItem;
                     if ("I".equals(split[1])) {
                         inItem = schemaPart.inPins.get(split[2]);
-                        oscilloscope.addPin(inItem, schemaPart.ids.get(inItem), false);
+                        oscilloscope.addPin(inItem, schemaPart.id+":"+schemaPart.ids.get(inItem), false);
                     } else {
                         inItem = schemaPart.outPins.get(split[2]);
-                        oscilloscope.addPin(inItem, schemaPart.ids.get(inItem), true);
+                        oscilloscope.addPin(inItem, schemaPart.id+":"+schemaPart.ids.get(inItem), true);
                     }
                 }
             } catch (IOException e) {

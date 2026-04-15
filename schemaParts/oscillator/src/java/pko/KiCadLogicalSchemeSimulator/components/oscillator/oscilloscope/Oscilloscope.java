@@ -31,6 +31,7 @@
  */
 package pko.KiCadLogicalSchemeSimulator.components.oscillator.oscilloscope;
 import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
+import pko.KiCadLogicalSchemeSimulator.api.wire.OutPin;
 import pko.KiCadLogicalSchemeSimulator.components.oscillator.OscillatorUi;
 
 import javax.swing.*;
@@ -102,7 +103,8 @@ public class Oscilloscope extends JFrame {
         watchedItemNamesPanel.removeAll();
         if (addClock) {
             watchedItemNamesPanel.add(new FixedHeightLabel("clock", watchedItemNamesPanel, diagram));
-            diagram.addPin(oscillatorUi.parent.parent.out, oscillatorUi.parent.parent.out.getName(), true);
+            OscilloscopePin out= (OscilloscopePin) oscillatorUi.parent.parent.out;
+            diagram.addPin(out, out.getName(), out.wrapped instanceof OutPin);
         }
         diagram.revalidate();
         watchedItemNamesPanel.revalidate();
