@@ -82,8 +82,14 @@ public class MultiOutDecoder extends SchemaPart {
             Part part = parts[partNo];
             for (int outNo = 0; outNo < outSize; outNo++) {
                 part.outs[outNo] = getOutPin("Q" + ((char) ('a' + partNo)) + outNo);
-                if (params.containsKey("openCollector") && part.csState > 0) {
-                    part.outs[outNo].hiImpedance = true;
+                if (part.csState > 0) {
+                    if (params.containsKey("openCollector")) {
+                        part.outs[outNo].hiImpedance = true;
+                    } else if (reverse) {
+                        part.outs[outNo].state=true;
+                    }
+                } else if (!reverse) {
+                    part.outs[outNo].state=true;
                 }
             }
         }

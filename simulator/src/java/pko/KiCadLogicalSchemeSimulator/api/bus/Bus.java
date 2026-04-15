@@ -48,10 +48,12 @@ public abstract class Bus extends ModelItem<Bus> {
     public boolean useBitPresentation;
     //Fixme why not just 'mask'?
     public int applyMask;
+    public int maxState;
 
     protected Bus(String id, SchemaPart parent, int size, String... aliases) {
         super(id, parent);
         this.size = size;
+        maxState = Integer.MAX_VALUE & ((1 << size) - 1);
         if (aliases == null || aliases.length == 0) {
             if (size == 1) {
                 throw new RuntimeException("Use Pin for Bus with size 1:" + getName());
@@ -101,6 +103,10 @@ public abstract class Bus extends ModelItem<Bus> {
     @Override
     public int getState() {
         return (source == null || source == this) ? state : source.getState();
+    }
+
+    public void setHi() {
+        setState(maxState);
     }
 
     abstract public void setState(int newState);

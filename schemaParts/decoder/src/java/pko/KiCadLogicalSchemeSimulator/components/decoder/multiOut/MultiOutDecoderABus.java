@@ -70,6 +70,7 @@ public class MultiOutDecoderABus extends InBus {
                     part.outs[state].setLo();
                     /*Optimiser line o blockEnd r block nr*/
                 } else {
+                    //FixMe check pin state if already valid??
                     /*Optimiser line o block oc*/
                     if (parent.params.containsKey("openCollector")) {
                         part.outs[state].setHiImpedance();
