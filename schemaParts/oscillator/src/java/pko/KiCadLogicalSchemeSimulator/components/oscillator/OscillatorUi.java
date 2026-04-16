@@ -118,13 +118,15 @@ public class OscillatorUi extends JFrame {
             @Override
             public void mouseClicked(MouseEvent e) {
                 Thread.ofPlatform().start(() -> {
-                    try {
-                        int amount = Integer.parseInt(tickAmount.getText());
-                        for (int i = 0; i < amount; i++) {
-                            parent.parent.tick();
+                    if (!tickAmount.getText().isBlank()) {
+                        try {
+                            int amount = Integer.parseInt(tickAmount.getText());
+                            for (int i = 0; i < amount; i++) {
+                                parent.parent.tick();
+                            }
+                        } catch (Exception ex) {
+                            Log.error(OscillatorUi.class, "Error in tick", ex);
                         }
-                    } catch (Exception ex) {
-                        Log.error(OscillatorUi.class, "Error in tick", ex);
                     }
                 });
             }
