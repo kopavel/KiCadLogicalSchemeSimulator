@@ -48,6 +48,7 @@ public class LedIndicator extends SchemaPart implements InteractiveSchemaPart {
             @Override
             public void setHiImpedance() {
                 hiImpedance=true;
+                state = false;
             }
 
             @Override
