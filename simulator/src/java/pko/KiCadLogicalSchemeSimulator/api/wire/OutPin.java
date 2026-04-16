@@ -43,7 +43,7 @@ import java.util.Comparator;
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.none;
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.warn;
 
-//FixMe - No optimiser on passive pin, sore strength only fot passive pin out.
+//FixMe - No optimiser on passive pin, store strength only for passive pin out.
 public class OutPin extends Pin {
     public Pin[] destinations = new Pin[0];
     public Pin[] toImp = new Pin[0];
