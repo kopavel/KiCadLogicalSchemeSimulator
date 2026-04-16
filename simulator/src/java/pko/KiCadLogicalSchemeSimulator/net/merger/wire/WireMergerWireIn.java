@@ -487,7 +487,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
         }
         WireMergerWireIn build = optimiser.build();
         merger.sources.add(build);
-        build.source = source;
+        build.source = inSource;
         return build;
     }
 
