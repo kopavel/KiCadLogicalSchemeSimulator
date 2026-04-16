@@ -41,7 +41,7 @@ public class SamePinFilter implements NetFilter {
         return mergeNets(netFile, parameterResolver, (_, _) -> true, SamePinFilter::checkPin);
     }
 
-    private static Boolean checkPin(PinConfig sourceConfig, PinConfig destinationConfig) {
+    private static boolean checkPin(PinConfig sourceConfig, PinConfig destinationConfig) {
         return sourceConfig.symbolConfig == destinationConfig.symbolConfig && sourceConfig.pinName.equals(destinationConfig.pinName);
     }
 }

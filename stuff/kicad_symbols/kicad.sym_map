@@ -761,6 +761,9 @@
 		<symbol name="2SC1815" class="Transistor">
 			<unit pinMap="1=E;2=K;3=B"/>
 		</symbol>
+		<symbol name="BC327" class="Transistor" param="PNP">
+			<unit pinMap="1=K;2=B;3=E"/>
+		</symbol>
 		<!-- ToDo to many to add, may be later -->
 	</lib>
 </symbolMap>

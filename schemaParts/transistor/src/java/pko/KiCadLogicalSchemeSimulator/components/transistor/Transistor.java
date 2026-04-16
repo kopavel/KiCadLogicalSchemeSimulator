@@ -40,6 +40,7 @@ import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Export;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Net;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Node;
 
+import java.util.Iterator;
 import java.util.Map;
 
 import static pko.KiCadLogicalSchemeSimulator.api.params.ParameterResolver.PowerState.none;
@@ -49,7 +50,8 @@ public class Transistor implements NetFilter {
     public boolean doFilter(Export netFile, ParameterResolver parameterResolver) {
         boolean result = false;
         for (Net currentNet : netFile.getNets().getNet()) {
-            for (Node currentNode : currentNet.getNode()) {
+            for (Iterator<Node> nodes = currentNet.getNode().iterator(); nodes.hasNext(); ) {
+                Node currentNode = nodes.next();
                 SchemaPartConfig schemaPartConfig = parameterResolver.getSchemaPartConfig(currentNode);
                 if (schemaPartConfig != null && Transistor.class.getSimpleName().equals(schemaPartConfig.clazz)) {
                     PinConfig pinConfig = parameterResolver.getPinMap(currentNode).get(Integer.parseInt(currentNode.getPin()));
@@ -100,7 +102,7 @@ public class Transistor implements NetFilter {
                                     });
                             }
                         }
-                        currentNode.parent.node.remove(currentNode);
+                        nodes.remove();
                     }
                 }
             }
