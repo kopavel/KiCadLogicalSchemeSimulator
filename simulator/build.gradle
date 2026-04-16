@@ -102,18 +102,19 @@ run {
     def jvm_args = []
     jvm_args += ["-Dlog4j.configurationFile=${sourceSets.main.resources.srcDirs.first().absolutePath}/log4j2.xml",
                  "-Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager",
-                 "-XX:+UseParallelGC",
-                 "-XX:CompileThreshold=10",
-                 "-XX:MaxInlineSize=64",
-                 "-XX:MaxInlineLevel=20",
-                 "-XX:FreqInlineSize=360",
-                 "-XX:ParallelGCThreads=1",
+//                 "-XX:+UseParallelGC",
+//                 "-XX:CompileThreshold=10",
+//                 "-XX:MaxInlineSize=64",
+//                 "-XX:MaxInlineLevel=20",
+//                 "-XX:FreqInlineSize=360",
+//                 "-XX:ParallelGCThreads=1",
                  "-Dsun.java2d.uiScale=2",
 //                 "-XX:-Inline",
-                 "-XX:+UnlockDiagnosticVMOptions", "-XX:+DebugNonSafepoints", //"-XX:+UseCountedLoopSafepoints", "-XX:LoopStripMiningIter=1",
+//                 "-XX:+UnlockDiagnosticVMOptions", "-XX:+DebugNonSafepoints", //"-XX:+UseCountedLoopSafepoints", "-XX:LoopStripMiningIter=1",
                  "--add-opens", "java.base/java.lang=KiCadLogicalSchemeSimulator.simulator",
                  "--enable-native-access=com.formdev.flatlaf",
-                 "-Xmx256m"//, "-XX:+UseLargePages"
+                 "-Xms64m",
+                 "-Xmx4g"//, "-XX:+UseLargePages"
 
     ]
     if (project.hasProperty('ea')) {

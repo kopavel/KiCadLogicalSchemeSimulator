@@ -32,7 +32,10 @@
 package pko.KiCadLogicalSchemeSimulator.components.oscillator.oscilloscope;
 import pko.KiCadLogicalSchemeSimulator.Simulator;
 import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
+import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.OutPin;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
@@ -116,7 +119,8 @@ public class OscilloscopeMenu extends JMenuBar {
             }
             try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath))) {
                 for (Diagram.PinItem pin : parent.diagram.pins) {
-                    bw.write(pin.pin.parent.id + ':' + ((pin.out) ? 'O' : 'I') + ':' + pin.pin.id + '\n');
+                    boolean in=pin.pin instanceof InPin || pin.pin instanceof InBus;
+                    bw.write(pin.pin.parent.id + ':' + (in ? 'I' : 'O') + ':' + pin.pin.id + '\n');
                 }
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
@@ -155,6 +159,9 @@ public class OscilloscopeMenu extends JMenuBar {
                         oscilloscope.addPin(inItem, schemaPart.id+":"+schemaPart.ids.get(inItem), false);
                     } else {
                         inItem = schemaPart.outPins.get(split[2]);
+                        if (inItem == null){
+                            inItem = schemaPart.inPins.get(split[2]);
+                        }
                         oscilloscope.addPin(inItem, schemaPart.id+":"+schemaPart.ids.get(inItem), true);
                     }
                 }
