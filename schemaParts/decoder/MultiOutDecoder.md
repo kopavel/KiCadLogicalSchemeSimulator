@@ -23,17 +23,18 @@ Implements a binary decoder with multiple output pin groups.
 #### Mandatory parameters:
 
 - `size`- amount of `A` pins in range [1…6]
-- `cs`- CS pins  
-  is a comma-separated list like `<part>,<part>`,
-    - `<part>`- a colon-separated list like `N:R:R`.
-        - `R`- reverse mode - `Low` active
-        - `N`- normal mode - `Hi` active
 
 #### Optional parameters:
 
 - `reverse`- outputs reversed.
 - `openCollector`- outputs in openCollector mode.
-
+- `cs`- CS pins  
+   is a comma-separated list like `<part>,<part>`,
+    - `<part>`- a colon-separated list like `N:R:R`.
+        - `R`- reverse mode - `Low` active
+        - `N`- normal mode - `Hi` active
+   
+    if no CS pins are specified, the decoder has one part with no CS pin.
 ### Example
 
 - With two `A` pins: `size=2`.

@@ -330,13 +330,13 @@
 		</symbol>
 	</lib>
 	<lib name="74xx_IEEE">
-		<symbol name="74145" class="Decoder" param="outReverse;decimal;size=4">
-			<unit pinMap="1=Q0;2=Q1;3=Q2;4=Q3;5=Q4;6=Q5;7=Q6;9=Q7;10=Q8;11=Q9;12=A3;13=A2;14=A1;15=A0"/>
+		<symbol name="74145" class="MultiOutDecoder" param="reverse;size=4;openCollector">
+			<unit pinMap="1=Qa0;2=Qa1;3=Qa2;4=Qa3;5=Qa4;6=Qa5;7=Qa6;9=Qa7;10=Qa8;11=Qa9;12=A3;13=A2;14=A1;15=A0"/>
 			<unit pinMap="ignore;8;16"/>
 		</symbol>
 	</lib>
 	<lib name="74xx">
-		<symbol name="7445" class="Decoder" param="outReverse;decimal;size=4">
+		<symbol name="7445" class="Decoder" param="outReverse;decimal;size=4;reverse">
 			<unit pinMap="1=Q0;2=Q1;3=Q2;4=Q3;5=Q4;6=Q5;7=Q6;9=Q7;10=Q8;11=Q9;12=A3;13=A2;14=A1;15=A0"/>
 			<unit pinMap="ignore;8;16"/>
 		</symbol>
