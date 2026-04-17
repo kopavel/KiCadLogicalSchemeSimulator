@@ -31,7 +31,7 @@
  */
 package pko.KiCadLogicalSchemeSimulator.net.merger.wire;
 import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
-import pko.KiCadLogicalSchemeSimulator.api.ShortcutException;
+import pko.KiCadLogicalSchemeSimulator.net.merger.ShortcutException;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
@@ -407,8 +407,9 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                 }
             } else {
                 merger.strong = false;
-                if (oldState != (merger.state = merger.weakState > 0)) {
+                if (oldState != (merger.state = (merger.weakState > 0))) {
                     for (Pin destination : destinations) {
+                        destination.strong = false;
                         if (merger.state) {
                             destination.setHi();
                         } else {

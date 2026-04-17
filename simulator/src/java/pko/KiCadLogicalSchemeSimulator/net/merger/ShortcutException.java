@@ -29,30 +29,31 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.api;
+package pko.KiCadLogicalSchemeSimulator.net.merger;
 import lombok.Getter;
-import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
 
 @Getter
 public class ShortcutException extends RuntimeException {
     private final String message;
 
-    public ShortcutException(Iterable<? extends IModelItem<?>> pins) {
+    public ShortcutException(Iterable<? extends MergerInput<?>> pins) {
         StringBuilder message = new StringBuilder("Shortcut on ");
-        for (IModelItem<?> pin : pins) {
-            if (pin instanceof MergerInput<?> mergerInput) {
-                message.append(Integer.toBinaryString(mergerInput.getMask())).append(":");
-            }
-            message.append(pin.getName()).append(":");
-            if (pin.isHiImpedance()) {
-                message.append("H");
-            } else {
-                if (!pin.isStrong()) {
-                    message.append("W");
+        int states=0;
+        for (MergerInput<?> pin : pins) {
+            if (!pin.isHiImpedance() && (states & pin.getMask()) == 0) {
+                states |= pin.getMask();
+                message.append(Integer.toBinaryString(pin.getMask())).append(":");
+                message.append(pin.getName()).append(":");
+                if (pin.isHiImpedance()) {
+                    message.append("H");
+                } else {
+                    if (!pin.isStrong()) {
+                        message.append("W");
+                    }
+                    message.append(pin.getState());
                 }
-                message.append(pin.getState());
+                message.append("; ");
             }
-            message.append("; ");
         }
         this.message = message.toString();
     }

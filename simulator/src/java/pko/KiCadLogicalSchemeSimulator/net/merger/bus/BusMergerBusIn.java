@@ -32,7 +32,7 @@
 package pko.KiCadLogicalSchemeSimulator.net.merger.bus;
 import lombok.Getter;
 import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
-import pko.KiCadLogicalSchemeSimulator.api.ShortcutException;
+import pko.KiCadLogicalSchemeSimulator.net.merger.ShortcutException;
 import pko.KiCadLogicalSchemeSimulator.api.SupportMask;
 import pko.KiCadLogicalSchemeSimulator.api.SupportOffset;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
