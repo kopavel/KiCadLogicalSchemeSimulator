@@ -31,7 +31,7 @@
  */
 package pko.KiCadLogicalSchemeSimulator.net.merger.wire;
 import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
-import pko.KiCadLogicalSchemeSimulator.net.merger.ShortcutException;
+import pko.KiCadLogicalSchemeSimulator.api.ShortcutException;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
 import pko.KiCadLogicalSchemeSimulator.api.wire.OutPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;

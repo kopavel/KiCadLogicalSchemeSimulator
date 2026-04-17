@@ -52,7 +52,7 @@ public class PassiveIn extends InPin {
         destination.otherState = true;
         destination.otherImpedance = false;
         if (source != null) {
-            destination.otherStrong = ((Pin) source).strong;
+            destination.otherStrong =  source.isStrong();
         } else {
             destination.otherStrong = strong;
         }
@@ -66,7 +66,7 @@ public class PassiveIn extends InPin {
         destination.otherState = false;
         destination.otherImpedance = false;
         if (source != null) {
-            destination.otherStrong = ((Pin) source).strong;
+            destination.otherStrong = source.isStrong();
         } else {
             destination.otherStrong = strong;
         }

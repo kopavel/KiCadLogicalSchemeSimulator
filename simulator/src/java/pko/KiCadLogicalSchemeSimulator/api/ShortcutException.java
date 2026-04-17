@@ -29,17 +29,19 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.net.merger;
+package pko.KiCadLogicalSchemeSimulator.api;
 import lombok.Getter;
+import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
 
 @Getter
 public class ShortcutException extends RuntimeException {
     private final String message;
 
-    public ShortcutException(Iterable<? extends MergerInput<?>> pins) {
+    public <T> ShortcutException(Iterable<? extends IModelItem<? extends T>> pins) {
         StringBuilder message = new StringBuilder("Shortcut on ");
         int states=0;
-        for (MergerInput<?> pin : pins) {
+        for (IModelItem<? extends T> iPpin : pins) {
+            MergerInput<? extends T> pin = (MergerInput<? extends T>) iPpin;
             if (!pin.isHiImpedance() && (states & pin.getMask()) == 0) {
                 states |= pin.getMask();
                 message.append(Integer.toBinaryString(pin.getMask())).append(":");
