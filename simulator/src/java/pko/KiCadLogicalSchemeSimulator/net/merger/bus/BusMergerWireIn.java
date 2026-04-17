@@ -172,11 +172,10 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                     }
                     /*Optimiser line nr blockEnd r*/
                     processing = 0;
-                    return;
+                    break;
                 }
                 case 2: {
                     recurseError();
-                    return;
                 }
             }
             /*Optimiser blockEnd ar*/
@@ -297,11 +296,10 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                     }
                     /*Optimiser line nr blockEnd r*/
                     processing = 0;
-                    return;
+                    break;
                 }
                 case 2: {
                     recurseError();
-                    return;
                 }
             }
             /*Optimiser blockEnd ar*/
@@ -373,11 +371,10 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                     }
                     /*Optimiser line nr blockEnd r*/
                     processing = 0;
-                    return;
+                    break;
                 }
                 case 2: {
                     recurseError();
-                    return;
                 }
             }
             /*Optimiser blockEnd ar*/

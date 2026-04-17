@@ -146,11 +146,10 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus>, SupportMa
                         }
                         /*Optimiser line nr blockEnd r*/
                         processing = 0;
-                        return;
+                        break;
                     }
                     case 2: {
                         recurseError();
-                        return;
                     }
                 }
                 /*Optimiser blockEnd ar*/
@@ -192,11 +191,10 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus>, SupportMa
                         }
                         /*Optimiser line nr blockEnd r*/
                         processing = 0;
-                        return;
+                        break;
                     }
                     case 2: {
                         recurseError();
-                        return;
                     }
                 }
                 /*Optimiser blockEnd ar*/
@@ -253,11 +251,10 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus>, SupportMa
                         }
                         /*Optimiser line nr blockEnd r*/
                         processing = 0;
-                        return;
+                        break;
                     }
                     case 2: {
                         recurseError();
-                        return;
                     }
                 }
                 /*Optimiser blockEnd ar*/
@@ -285,11 +282,10 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus>, SupportMa
                         }
                         /*Optimiser line nr blockEnd r*/
                         processing = 0;
-                        return;
+                        break;
                     }
                     case 2: {
                         recurseError();
-                        return;
                     }
                 }
                 /*Optimiser blockEnd ar*/

@@ -33,6 +33,7 @@ package pko.KiCadLogicalSchemeSimulator.api.wire;
 import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 
+//FixMe add target and use it, uze optimiser on top of it.
 public abstract class PassivePin extends TriStateOutPin {
     public boolean otherImpedance = true;
     public boolean otherState;
