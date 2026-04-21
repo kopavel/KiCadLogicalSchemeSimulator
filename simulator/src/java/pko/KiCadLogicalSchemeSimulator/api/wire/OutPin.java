@@ -175,7 +175,7 @@ public class OutPin extends Pin {
     @Override
     public void setHiImpedance() {
         /*Optimiser block ts*/
-        assert !hiImpedance : "Already in hiImpedance:" + this;
+        assert !hiImpedance || parent.net.stabilizing: "Already in hiImpedance:" + this;
         hiImpedance = true;
         /*Optimiser block ar*/
         switch (processing++) {

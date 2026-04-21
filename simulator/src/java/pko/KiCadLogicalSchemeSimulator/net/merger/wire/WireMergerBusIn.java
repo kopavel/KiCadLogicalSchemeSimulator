@@ -166,7 +166,7 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus>, SupportM
                 merger.state,
                 merger.strong,
                 merger.hiImpedance);
-        assert !hiImpedance : "Already in hiImpedance:" + this;
+        assert !hiImpedance || parent.net.stabilizing: "Already in hiImpedance:" + this;
         //endregion
         /*Optimiser line weakOnly block strongOnly*/
         if (merger.weakState == 0) {

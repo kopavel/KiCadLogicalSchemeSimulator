@@ -319,7 +319,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
     @Override
     public void setHiImpedance() {
         /*Optimiser block ts*/
-        assert !hiImpedance : "Already in hiImpedance:" + this;
+        assert !hiImpedance || parent.net.stabilizing: "Already in hiImpedance:" + this;
         hiImpedance = true;
         BusMerger merger = this.merger;
         assert Log.debug(getClass(),

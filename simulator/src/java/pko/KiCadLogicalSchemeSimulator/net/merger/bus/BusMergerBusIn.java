@@ -217,7 +217,7 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus>, SupportMa
     @Override
     public void setHiImpedance() {
         /*Optimiser block ts*/
-        assert !hiImpedance : "Already in hiImpedance:" + this;
+        assert !hiImpedance || parent.net.stabilizing: "Already in hiImpedance:" + this;
         hiImpedance = true;
         BusMerger merger = this.merger;
         int newState;
