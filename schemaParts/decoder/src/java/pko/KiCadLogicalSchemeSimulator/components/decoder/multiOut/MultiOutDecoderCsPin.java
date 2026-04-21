@@ -82,7 +82,6 @@ public class MultiOutDecoderCsPin extends InPin {
             part.csState |= mask;
             /*Optimiser line o block r*/
             if (parent.reverse) {
-                //FixMe check pin state if already valid??
                 /*Optimiser line o block oc*/
                 if (parent.params.containsKey("openCollector")) {
                     outs[aBus.state].setHiImpedance();

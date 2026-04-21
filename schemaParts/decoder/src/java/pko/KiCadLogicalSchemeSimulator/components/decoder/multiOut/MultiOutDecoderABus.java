@@ -32,6 +32,7 @@
 package pko.KiCadLogicalSchemeSimulator.components.decoder.multiOut;
 import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
+import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 
 import static pko.KiCadLogicalSchemeSimulator.components.decoder.multiOut.MultiOutDecoder.Part;
@@ -59,34 +60,59 @@ public class MultiOutDecoderABus extends InBus {
     @Override
     public void setState(int newState) {
         for (Part part : parts) {
+            Pin oldPin = part.outs[state];
+            Pin newPin = part.outs[newState];
             /*Optimiser block hasCs*/
             if (part.csState == 0
-                    /*Optimiser line o*/
-                    && hasCs
+                    /*Optimiser line o*///
+                    && hasCs//
             ) {
                 /*Optimiser line o block r blockEnd hasCs*/
                 if (parent.reverse) {
                     /*Optimiser line o block oc*/
                     if (parent.params.containsKey("openCollector")) {
-                        part.outs[state].setHiImpedance();
+                        if (!oldPin.hiImpedance) {
+                            oldPin.setHiImpedance();
+                        }
                         /*Optimiser line o blockEnd oc block noc*/
                     } else {
-                        part.outs[state].setHi();
+                        if (!oldPin.state) {
+                            oldPin.setHi();
+                        }
                         /*Optimiser line o blockEnd noc*/
                     }
-                    part.outs[newState].setLo();
+                    if (
+                        /*Optimiser line noc*///
+                            newPin.state//
+                                    /*Optimiser line o*///
+                                    ||
+                                    /*Optimiser line oc*/
+                                    newPin.hiImpedance//
+                    ) {
+                        newPin.setLo();
+                    }
                     /*Optimiser line o blockEnd r block nr*/
                 } else {
-                    //FixMe check pin state if already valid??
                     /*Optimiser line o block oc*/
                     if (parent.params.containsKey("openCollector")) {
-                        part.outs[state].setHiImpedance();
+                        oldPin.setHiImpedance();
                         /*Optimiser line o blockEnd oc block noc*/
                     } else {
-                        part.outs[state].setLo();
+                        if (oldPin.state) {
+                            oldPin.setLo();
+                        }
                         /*Optimiser line o blockEnd noc*/
                     }
-                    part.outs[newState].setHi();
+                    if (
+                        /*Optimiser line noc*///
+                            !newPin.state//
+                                    /*Optimiser line o*///
+                                    ||
+                                    /*Optimiser line oc*/
+                                    newPin.hiImpedance//
+                    ) {
+                        newPin.setHi();
+                    }
                     /*Optimiser line o blockEnd nr*/
                 }
                 /*Optimiser line hasCs*/
