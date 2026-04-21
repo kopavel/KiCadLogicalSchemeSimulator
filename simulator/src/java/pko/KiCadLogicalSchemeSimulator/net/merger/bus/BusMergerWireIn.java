@@ -136,6 +136,8 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
             if (hiImpedance) { // from impedance
                 /*Optimiser bind m:mask*/
                 merger.weakPins |= mask;
+                /*Optimiser bind m:mask*/
+                merger.weakState |= mask;
                 hiImpedance = false;
             } else
                 /*Optimiser blockEnd ts*/
@@ -144,6 +146,8 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                     merger.strongPins &= nMask;
                     /*Optimiser bind m:mask*/
                     merger.weakPins |= mask;
+                    /*Optimiser bind m:mask*/
+                    merger.weakState |= mask;
                 }
             /*Optimiser bind m:mask*/
             if ((merger.strongPins & mask) == 0) {
