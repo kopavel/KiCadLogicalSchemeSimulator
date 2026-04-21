@@ -40,8 +40,9 @@ public class ShortcutException extends RuntimeException {
     private final String message;
 
     public <T> ShortcutException(IModelItem<?> source, Integer state, Iterable<? extends IModelItem<? extends T>> pins) {
-        StringBuilder message = new StringBuilder(
-                source.getName() + ":" + (source instanceof Pin ? state > 0 : Utils.LPad(16, '0', Integer.toBinaryString(state))) + " Shortcut with: \n");
+        StringBuilder message = new StringBuilder(source.getName() + ":" +
+                (source instanceof Pin ? (((Pin) source).strong ? "" : "W") + (state > 0 ? "1" : "0") : Utils.LPad(16, '0', Integer.toBinaryString(state))) +
+                " Shortcut with: \n");
         int states = 0;
         for (IModelItem<? extends T> iPpin : pins) {
             MergerInput<? extends T> pin = (MergerInput<? extends T>) iPpin;
