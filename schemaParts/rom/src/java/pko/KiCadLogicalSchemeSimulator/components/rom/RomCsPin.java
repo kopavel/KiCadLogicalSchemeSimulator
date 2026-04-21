@@ -62,31 +62,27 @@ public class RomCsPin extends InPin {
     public void setHi() {
         /*Optimiser line setter*/
         state = true;
-        /*Optimiser line useI*/
-        aBus.iCsActive += parent.reverse ? 1 : -1;
-        /*Optimiser line useB bind bHi:aBus.iCsActive\s==\s0*/
-        aBus.bCsActive = aBus.iCsActive == 0;
         /*Optimiser line o block reverse*/
         if (parent.reverse) {
+            /*Optimiser line useI*/
+            aBus.iCsActive++;
+            /*Optimiser line useB*/
+            aBus.bCsActive = false;
             if (!dBus.hiImpedance) {
                 dBus.setHiImpedance();
             }
             /*Optimiser line o bockEnd reverse block nReverse*/
         } else {
+            /*Optimiser line useI*/
+            aBus.iCsActive--;
+            /*Optimiser line useB bind bHi:aBus.iCsActive\s==\s0*/
+            aBus.bCsActive = aBus.iCsActive == 0;
             int word;
             Bus bus;
-            if (((bus = dBus).state != (word = words[aBus.state]) || bus.hiImpedance) &&//
-                    /*Optimiser line o*/
-                    (//
-                            /*Optimiser line useB*/
-                            aBus.bCsActive//
-                                    /*Optimiser line o*///
-                                    ||
-                                    /*Optimiser line useI*/
-                                    aBus.iCsActive == 0//
-                            /*Optimiser line o*///
-                    )//
-            ) {
+            if (
+                /*Optimiser line useI*///
+                    aBus.iCsActive == 0 &&//
+                            ((bus = dBus).state != (word = words[aBus.state]) || bus.hiImpedance)) {
                 bus.setState(word);
             }
             /*Optimiser line o blockEnd nReverse*/
@@ -97,30 +93,26 @@ public class RomCsPin extends InPin {
     public void setLo() {
         /*Optimiser line setter*/
         state = false;
-        /*Optimiser line useI*/
-        aBus.iCsActive += parent.reverse ? -1 : 1;
-        /*Optimiser line useB bLo bState:aBus.iCsActive\s==\s0*/
-        aBus.bCsActive = aBus.iCsActive == 0;
         Bus bus;
         int word;
         /*Optimiser line o block reverse*/
         if (parent.reverse) {
-            if (((bus = dBus).state != (word = words[aBus.state]) || bus.hiImpedance) &&//
-                    /*Optimiser line o*/
-                    (//
-                            /*Optimiser line useB*/
-                            aBus.bCsActive//
-                                    /*Optimiser line o*///
-                                    ||
-                                    /*Optimiser line useI*/
-                                    aBus.iCsActive == 0//
-                            /*Optimiser line o*///
-                    )//
-            ) {
+            /*Optimiser line useI*/
+            aBus.iCsActive--;
+            /*Optimiser line useB bind bHi:aBus.iCsActive\s==\s0*/
+            aBus.bCsActive = aBus.iCsActive == 0;
+            if (
+                /*Optimiser line useI*///
+                    aBus.iCsActive == 0 &&//
+                            ((bus = dBus).state != (word = words[aBus.state]) || bus.hiImpedance)) {
                 bus.setState(word);
             }
             /*Optimiser line o bockEnd reverse block nReverse*/
         } else {
+            /*Optimiser line useI*/
+            aBus.iCsActive++;
+            /*Optimiser line useB*/
+            aBus.bCsActive = false;
             if (!(bus = dBus).hiImpedance) {
                 bus.setHiImpedance();
             }
@@ -136,12 +128,12 @@ public class RomCsPin extends InPin {
         }
         if (parent.csCount == 1) {
             optimiser.cut("useI");
-            optimiser.bind("bHi", !parent.reverse);
-            optimiser.bind("bLo", parent.reverse);
+            optimiser.bind("bHi", true);
         } else {
             optimiser.cut("useB");
         }
         optimiser.cut(parent.reverse ? "nReverse" : "reverse");
+        optimiser.bind("rev", parent.reverse ? "-1" : "1");
         RomCsPin build = optimiser.build();
         build.source = source;
         parent.replaceIn(this, build);
