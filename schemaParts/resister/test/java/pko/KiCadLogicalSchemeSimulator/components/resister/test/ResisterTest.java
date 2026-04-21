@@ -73,20 +73,16 @@ public class ResisterTest extends NetTester {
                     }
                 }
                 case "w0" -> {
-                    out1.strong = false;
-                    out1.setLo();
+                    out1.setLo(false);
                 }
                 case "w1" -> {
-                    out1.strong = false;
-                    out1.setHi();
+                    out1.setHi(false);
                 }
                 case "s0" -> {
-                    out1.strong = true;
-                    out1.setLo();
+                    out1.setLo(true);
                 }
                 case "s1" -> {
-                    out1.strong = true;
-                    out1.setHi();
+                    out1.setHi(true);
                 }
             }
             switch (in2[i]) {
@@ -97,26 +93,22 @@ public class ResisterTest extends NetTester {
                 }
                 case "w0" -> {
                     if (out2.strong || out2.state) {
-                        out2.strong = false;
-                        out2.setLo();
+                        out2.setLo(false);
                     }
                 }
                 case "w1" -> {
                     if (out2.strong || !out2.state) {
-                        out2.strong = false;
-                        out2.setHi();
+                        out2.setHi(false);
                     }
                 }
                 case "s0" -> {
                     if (!out2.strong || out2.state) {
-                        out2.strong = true;
-                        out2.setLo();
+                        out2.setLo(true);
                     }
                 }
                 case "s1" -> {
                     if (!out2.strong || !out2.state) {
-                        out2.strong = true;
-                        out2.setHi();
+                        out2.setHi(true);
                     }
                 }
             }

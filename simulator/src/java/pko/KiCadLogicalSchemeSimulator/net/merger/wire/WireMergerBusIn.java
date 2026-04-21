@@ -178,9 +178,10 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus>, SupportM
         } else {
             /*Optimiser blockEnd strongOnly line passivePins*/
             merger.strong = false;
-            if (merger.state != (merger.weakState > 0)) {
-                merger.state = merger.weakState > 0;
-                if (merger.state) {
+            boolean newMergerState;
+            if (merger.state != (newMergerState=(merger.weakState > 0))) {
+                merger.state = newMergerState;
+                if (newMergerState) {
                     for (Pin destination : destinations) {
                         destination.setHi();
                     }

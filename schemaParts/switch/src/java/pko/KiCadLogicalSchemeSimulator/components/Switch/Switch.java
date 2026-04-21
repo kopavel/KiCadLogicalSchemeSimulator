@@ -94,11 +94,10 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
                     pin.setHiImpedance();
                 }
             } else if (pin.hiImpedance || pin.strong != otherPin.otherStrong || pin.state!=otherPin.otherState){
-                pin.strong = otherPin.otherStrong;
                 if (otherPin.otherState) {
-                    pin.setHi();
+                    pin.setHi(otherPin.otherStrong);
                 } else {
-                    pin.setLo();
+                    pin.setLo(otherPin.otherStrong);
                 }
             }
         } else {
@@ -107,11 +106,10 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
                     pin.setHiImpedance();
                 }
             } else {
-                pin.strong = otherPin.otherStrong;
                 if (otherPin.otherState) {
-                    pin.setHi();
+                    pin.setHi(otherPin.otherStrong);
                 } else {
-                    pin.setLo();
+                    pin.setLo(otherPin.otherStrong);
                 }
             }
         }

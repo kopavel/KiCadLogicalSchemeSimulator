@@ -71,20 +71,16 @@ public class DiodeTest extends NetTester {
                     }
                 }
                 case "w0" -> {
-                    anode.strong = false;
-                    anode.setLo();
+                    anode.setLo(false);
                 }
                 case "w1" -> {
-                    anode.strong = false;
-                    anode.setHi();
+                    anode.setHi(false);
                 }
                 case "s0" -> {
-                    anode.strong = true;
-                    anode.setLo();
+                    anode.setLo(true);
                 }
                 case "s1" -> {
-                    anode.strong = true;
-                    anode.setHi();
+                    anode.setHi(true);
                 }
             }
             switch (cathodeIn[i]) {
@@ -95,26 +91,22 @@ public class DiodeTest extends NetTester {
                 }
                 case "w0" -> {
                     if (cathode.strong || cathode.state) {
-                        cathode.strong = false;
-                        cathode.setLo();
+                        cathode.setLo(false);
                     }
                 }
                 case "w1" -> {
                     if (cathode.strong || !cathode.state) {
-                        cathode.strong = false;
-                        cathode.setHi();
+                        cathode.setHi(false);
                     }
                 }
                 case "s0" -> {
                     if (!cathode.strong || cathode.state) {
-                        cathode.strong = true;
-                        cathode.setLo();
+                        cathode.setLo(true);
                     }
                 }
                 case "s1" -> {
                     if (!cathode.strong || !cathode.state) {
-                        cathode.strong = true;
-                        cathode.setHi();
+                        cathode.setHi(true);
                     }
                 }
             }

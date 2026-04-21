@@ -88,8 +88,7 @@ public class OutPin extends Pin {
             case 0: {
                 /*Optimiser blockEnd ar*/
                 for (Pin hi : toHi) {
-                    hi.strong = strong;
-                    hi.setHi();
+                    hi.setHi(strong);
                 }
                 /*Optimiser block r block ar*/
                 while (--processing > 0) {
@@ -102,13 +101,11 @@ public class OutPin extends Pin {
                         /*Optimiser blockEnd ts*/
                         if (state) {
                             for (Pin hi : toHi) {
-                                hi.strong = strong;
-                                hi.setHi();
+                                hi.setHi(strong);
                             }
                         } else {
                             for (Pin low : toLow) {
-                                low.strong = strong;
-                                low.setLo();
+                                low.setLo(strong);
                             }
                         }
                         /*Optimiser line ts*/
@@ -135,8 +132,7 @@ public class OutPin extends Pin {
             case 0: {
                 /*Optimiser blockEnd ar*/
                 for (Pin low : toLow) {
-                    low.strong = strong;
-                    low.setLo();
+                    low.setLo(strong);
                 }
                 /*Optimiser block r block ar*/
                 while (--processing > 0) {
@@ -149,13 +145,11 @@ public class OutPin extends Pin {
                         /*Optimiser blockEnd ts*/
                         if (state) {
                             for (Pin hi : toHi) {
-                                hi.strong = strong;
-                                hi.setHi();
+                                hi.setHi(strong);
                             }
                         } else {
                             for (Pin low : toLow) {
-                                low.strong = strong;
-                                low.setLo();
+                                low.setLo(strong);
                             }
                         }
                         /*Optimiser line ts*/

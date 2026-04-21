@@ -81,6 +81,16 @@ public abstract class Pin extends ModelItem<Pin> {
         return (source == null || source == this) ? (state ? 1 : 0) : source.getState();
     }
 
+    public void setHi(boolean strong) {
+        this.strong = strong;
+        setHi();
+    }
+
+    public void setLo(boolean strong) {
+        this.strong = strong;
+        setLo();
+    }
+
     abstract public void setHi();
     abstract public void setLo();
 

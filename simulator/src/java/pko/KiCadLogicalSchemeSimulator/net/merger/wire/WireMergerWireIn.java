@@ -182,14 +182,14 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
         ) {
             merger.hiImpedance = false;
             for (Pin destination : destinations) {
-                //Fixme 'optimiser' it?
-                destination.strong = strong;
                 /*Optimiser line passivePins*/
                 if (merger.state) {
-                    destination.setHi();
+                    //Fixme 'optimiser' strong field?
+                    destination.setHi(strong);
                     /*Optimiser block passivePins*/
                 } else {
-                    destination.setLo();
+                    //Fixme 'optimiser' strong field?
+                    destination.setLo(strong);
                 }
                 /*Optimiser blockEnd passivePins*/
             }
@@ -335,13 +335,12 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
         ) {
             merger.hiImpedance = false;
             for (Pin destination : destinations) {
-                destination.strong = strong;
                 /*Optimiser block passivePins*/
                 if (merger.state) {
-                    destination.setHi();
+                    destination.setHi(strong);
                 } else {
                     /*Optimiser blockEnd passivePins*/
-                    destination.setLo();
+                    destination.setLo(strong);
                     /*Optimiser line passivePins*/
                 }
             }
@@ -401,11 +400,10 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                 merger.strong = false;
                 if (oldState != (merger.state = (merger.weakState > 0))) {
                     for (Pin destination : destinations) {
-                        destination.strong = false;
                         if (merger.state) {
-                            destination.setHi();
+                            destination.setHi(false);
                         } else {
-                            destination.setLo();
+                            destination.setLo(false);
                         }
                     }
                 }
