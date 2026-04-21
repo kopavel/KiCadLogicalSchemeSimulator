@@ -141,9 +141,9 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
     void startIfDefault() {
         if (fullSpeedThread == null) {
             Thread.ofVirtual().start(() -> {
-                while (net.stabilizing || out == null) {
+                while (net==null || net.stabilizing || out == null) {
                     try {
-                        Thread.sleep(1);
+                        Thread.sleep(10);
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }

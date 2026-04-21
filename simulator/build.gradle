@@ -114,7 +114,7 @@ run {
                  "--add-opens", "java.base/java.lang=KiCadLogicalSchemeSimulator.simulator",
                  "--enable-native-access=com.formdev.flatlaf",
                  "-Xms64m",
-                 "-Xmx4g"//, "-XX:+UseLargePages"
+                 "-Xmx4g", "-XX:+UseLargePages"
 
     ]
     if (project.hasProperty('ea')) {
