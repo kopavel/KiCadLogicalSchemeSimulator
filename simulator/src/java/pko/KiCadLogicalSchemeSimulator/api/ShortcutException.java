@@ -31,20 +31,23 @@
  */
 package pko.KiCadLogicalSchemeSimulator.api;
 import lombok.Getter;
+import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
+import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 @Getter
 public class ShortcutException extends RuntimeException {
     private final String message;
 
-    public <T> ShortcutException(Iterable<? extends IModelItem<? extends T>> pins) {
-        StringBuilder message = new StringBuilder("Shortcut on ");
-        int states=0;
+    public <T> ShortcutException(IModelItem<?> source, Integer state, Iterable<? extends IModelItem<? extends T>> pins) {
+        StringBuilder message = new StringBuilder(
+                source.getName() + ":" + (source instanceof Pin ? state > 0 : Utils.LPad(16, '0', Integer.toBinaryString(state))) + " Shortcut with: \n");
+        int states = 0;
         for (IModelItem<? extends T> iPpin : pins) {
             MergerInput<? extends T> pin = (MergerInput<? extends T>) iPpin;
             if (!pin.isHiImpedance() && (states & pin.getMask()) == 0) {
                 states |= pin.getMask();
-                message.append(Integer.toBinaryString(pin.getMask())).append(":");
+                message.append(Utils.LPad(16, '0', Integer.toBinaryString(pin.getMask()))).append(":");
                 message.append(pin.getName()).append(":");
                 if (pin.isHiImpedance()) {
                     message.append("H");
@@ -52,9 +55,9 @@ public class ShortcutException extends RuntimeException {
                     if (!pin.isStrong()) {
                         message.append("W");
                     }
-                    message.append(pin.getState());
+                    message.append(Integer.toBinaryString(pin.getState()));
                 }
-                message.append("; ");
+                message.append(";\n");
             }
         }
         this.message = message.toString();

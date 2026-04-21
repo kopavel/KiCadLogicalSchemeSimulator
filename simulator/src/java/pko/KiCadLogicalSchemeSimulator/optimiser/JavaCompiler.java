@@ -80,7 +80,7 @@ public enum JavaCompiler {
             optionList.add("-cp");
             optionList.add(paths.toString());
             optionList.add("-g");
-            optionList.add("-proc:none");
+            optionList.add("-proc:full");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

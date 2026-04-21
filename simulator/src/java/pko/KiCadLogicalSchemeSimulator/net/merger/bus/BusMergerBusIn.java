@@ -122,7 +122,7 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus>, SupportMa
                         assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
                         return;
                     } else {
-                        throw new ShortcutException(merger.sources);
+                        throw new ShortcutException(this,newState,merger.sources);
                     }
                 }
                 /*Optimiser bind m:mask*/
@@ -167,7 +167,7 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus>, SupportMa
                         assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
                         return;
                     } else {
-                        throw new ShortcutException(merger.sources);
+                        throw new ShortcutException(this,newState,merger.sources);
                     }
                 }
                 /*Optimiser bind m:mask*/

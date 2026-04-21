@@ -106,7 +106,7 @@ public class WireMerger extends OutPin {
         sources.add(input);
         if (!bus.hiImpedance) {
             if (strong) {
-                throw new ShortcutException(sources);
+                throw new ShortcutException(this,(bus.state & mask),sources);
             }
             state = (bus.state & mask) != 0;
         }
@@ -117,7 +117,7 @@ public class WireMerger extends OutPin {
         if (pin instanceof PullPin pullPin) {
             sources.add(pullPin);
             if (weakState != 0 && pin.state != (weakState > 0)) {
-                throw new ShortcutException(sources);
+                throw new ShortcutException(this,weakState,sources);
             }
             weakState += pin.state ? 1 : -1;
             if (!strong) {
@@ -139,7 +139,7 @@ public class WireMerger extends OutPin {
             sources.add(input);
             if (!pin.hiImpedance) {
                 if (strong) {
-                    throw new ShortcutException(sources);
+                    throw new ShortcutException(this,pin.state?1:0,sources);
                 }
                 strong = true;
                 state = pin.state;

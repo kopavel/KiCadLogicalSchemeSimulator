@@ -106,7 +106,7 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus>, SupportM
                     assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
                     return;
                 } else {
-                    throw new ShortcutException(merger.sources);
+                    throw new ShortcutException(this,newState,merger.sources);
                 }
                 //endregion
             }

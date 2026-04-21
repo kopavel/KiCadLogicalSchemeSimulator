@@ -100,9 +100,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                         assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
                         return;
                     } else {
-                        /*Optimiser line ts*/
-                        hiImpedance = false;
-                        throw new ShortcutException(merger.sources);
+                        throw new ShortcutException(this,1,merger.sources);
                     }
                     //endregion
                 } else {
@@ -130,9 +128,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                         assert Log.debug(getClass(), "Weak state shortcut on setting pin {}, try resend later", this);
                         return;
                     } else {
-                        /*Optimiser line ts*/
-                        hiImpedance = false;
-                        throw new ShortcutException(merger.sources);
+                        throw new ShortcutException(this,1,merger.sources);
                     }
                     //endregion
                 }
@@ -151,7 +147,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                             assert Log.debug(getClass(), "Weak state shortcut on setting pin {}, try resend later", this);
                             return;
                         } else {
-                            throw new ShortcutException(merger.sources);
+                            throw new ShortcutException(this,1,merger.sources);
                         }
                         //endregion
                     }
@@ -167,7 +163,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                             assert Log.debug(getClass(), "Weak state shortcut on setting pin {}, try resend later", this);
                             return;
                         } else {
-                            throw new ShortcutException(merger.sources);
+                            throw new ShortcutException(this,1,merger.sources);
                         }
                         //endregion
                     }
@@ -257,9 +253,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                         assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
                         return;
                     } else {
-                        /*Optimiser line ts*/
-                        hiImpedance = false;
-                        throw new ShortcutException(merger.sources);
+                        throw new ShortcutException(this,0,merger.sources);
                     }
                     //endregion
                 } else {
@@ -287,9 +281,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                         assert Log.debug(getClass(), "Weak state shortcut on setting pin {}, try resend later", this);
                         return;
                     } else {
-                        /*Optimiser line ts*/
-                        hiImpedance = false;
-                        throw new ShortcutException(merger.sources);
+                        throw new ShortcutException(this,0,merger.sources);
                     }
                     //endregion
                 }
@@ -308,7 +300,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                             assert Log.debug(getClass(), "Weak state shortcut on setting pin {}, try resend later", this);
                             return;
                         } else {
-                            throw new ShortcutException(merger.sources);
+                            throw new ShortcutException(this,0,merger.sources);
                         }
                         //endregion
                     }
@@ -324,7 +316,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                             assert Log.debug(getClass(), "Weak state shortcut on setting pin {}, try resend later", this);
                             return;
                         } else {
-                            throw new ShortcutException(merger.sources);
+                            throw new ShortcutException(this,0,merger.sources);
                         }
                         //endregion
                     }

@@ -155,4 +155,12 @@ public enum Utils {
             array[i] = array[i].getOptimised(source);
         }
     }
+
+    public static String LPad(int i, char c, String string) {
+        int pad = i - string.length();
+        if (pad <= 0) {
+            return string;
+        }
+        return String.valueOf(c).repeat(pad) + string;
+    }
 }

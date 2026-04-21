@@ -42,7 +42,7 @@ import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.none;
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.warn;
-//Fixme cleanup "strong/weak" logic in case of non passive pin
+//Fixme cleanup "strong/weak" logic in case of nonpassive pin
 
 public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
     public final int nMask;
@@ -103,9 +103,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                         assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
                         return;
                     } else {
-                        /*Optimiser line ts*/
-                        hiImpedance = false;
-                        throw new ShortcutException(merger.sources);
+                        throw new ShortcutException(this,1,merger.sources);
                     }
                 }
                 /*Optimiser line ts*/
@@ -131,9 +129,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                     assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
                     return;
                 } else {
-                    /*Optimiser line ts*/
-                    hiImpedance = false;
-                    throw new ShortcutException(merger.sources);
+                    throw new ShortcutException(this,1,merger.sources);
                 }
             }
             /*Optimiser block ts*/
@@ -227,9 +223,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                         assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
                         return;
                     } else {
-                        /*Optimiser line ts*/
-                        hiImpedance = false;
-                        throw new ShortcutException(merger.sources);
+                        throw new ShortcutException(this,0,merger.sources);
                     }
                 }
                 /*Optimiser line ts*/
@@ -255,9 +249,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                     assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
                     return;
                 } else {
-                    /*Optimiser line ts*/
-                    hiImpedance = false;
-                    throw new ShortcutException(merger.sources);
+                    throw new ShortcutException(this,0,merger.sources);
                 }
             }
             /*Optimiser block ts*/
