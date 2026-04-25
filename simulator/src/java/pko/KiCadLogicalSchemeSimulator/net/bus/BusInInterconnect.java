@@ -57,10 +57,10 @@ public class BusInInterconnect extends InBus {
 
     @Override
     public void setState(int newState) {
-        /*Optimiser block setters line ts*/
+        /*Optimiser block setter line ts*/
         hiImpedance = false;
         state = newState;
-        /*Optimiser blockEnd setters bind m:interconnectMask*/
+        /*Optimiser blockEnd setter bind m:interconnectMask*/
         if ((newState & interconnectMask) != 0) {
             /*Optimiser bind m:interconnectMask*/
             destination.setState(newState | interconnectMask);
@@ -71,7 +71,7 @@ public class BusInInterconnect extends InBus {
 
     @Override
     public void setHiImpedance() {
-        /*Optimiser block ts line setters*/
+        /*Optimiser block ts line setter*/
         hiImpedance = true;
         destination.setHiImpedance();
         /*Optimiser blockEnd ts*/
@@ -82,13 +82,14 @@ public class BusInInterconnect extends InBus {
         destination = destination.getOptimised(this);
         ClassOptimiser<BusInInterconnect> optimiser = new ClassOptimiser<>(this).bind("m", interconnectMask);
         if (source != null) {
-            optimiser.cut("setters");
+            optimiser.cut("setter");
         }
         if (!isTriState(source)) {
             optimiser.cut("ts");
         }
         InBus build = optimiser.build();
         build.source = source;
+        build.withState=source!=null;
         destination.source = build;
         return build;
     }

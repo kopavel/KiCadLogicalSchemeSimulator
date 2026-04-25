@@ -54,6 +54,7 @@ public abstract class Pin extends ModelItem<Pin> {
         triStateOut = oldPin.triStateOut;
         hiImpedance = oldPin.hiImpedance && isTriState(source);
         source = oldPin.source;
+        withState=oldPin.withState;
     }
 
     protected Pin(String id, SchemaPart parent) {

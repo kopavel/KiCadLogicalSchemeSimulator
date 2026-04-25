@@ -81,7 +81,7 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus>, SupportM
                 merger.strong,
                 merger.hiImpedance);
         //endregion
-        /*Optimiser line setters*/
+        /*Optimiser line setter*/
         state = newState;
         /*Optimiser line o block byMask*/
         if (applyMask != 0) {
@@ -229,7 +229,7 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus>, SupportM
             }
         }
         if (source != null) {
-            optimiser.cut("setters");
+            optimiser.cut("setter");
         }
         if (!triStateIn) {
             optimiser.cut("ts");
@@ -240,8 +240,9 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus>, SupportM
             optimiser.bind("gm", applyMask);
         }
         WireMergerBusIn build = optimiser.build();
-        merger.sources.add(build);
+        build.withState=source!=null;
         build.source = source;
+        merger.sources.add(build);
         return build;
     }
 }
