@@ -90,7 +90,7 @@ public class MultiOutDecoder extends SchemaPart {
                 part.outs[outNo] = getOutPin("Q" + ((char) ('a' + partNo)) + outNo);
                 if (!hasCs || part.csState > 0) {
                     if (outNo == aBus.state && params.containsKey("openCollector")) {
-                        part.outs[outNo].hiImpedance = true;
+                        part.outs[outNo].hiImpedance = false;
                     } else if (reverse) {
                         part.outs[outNo].state = true;
                     }
