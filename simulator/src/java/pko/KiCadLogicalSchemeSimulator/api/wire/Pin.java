@@ -78,7 +78,7 @@ public abstract class Pin extends ModelItem<Pin> {
 
     @Override
     public int getState() {
-        return (source == null || source == this) ? (state ? 1 : 0) : source.getState();
+        return (withState || source == null || source == this) ? (state ? 1 : 0) : source.getState();
     }
 
     public void setHi(boolean strong) {

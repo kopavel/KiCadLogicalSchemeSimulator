@@ -140,6 +140,7 @@ public class MultiPartCFallingIn extends FallingEdgePin implements MultiPartCIn 
             optimiser.cut("setter");
         }
         MultiPartCFallingIn build = optimiser.build();
+        build.withState=source!=null;
         parent.cIns[partNo] = build;
         parent.inPins.put(id, build);
         for (MultiPartRIn rPin : parent.rIns.values()) {

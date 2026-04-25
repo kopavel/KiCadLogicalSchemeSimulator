@@ -148,7 +148,7 @@ public class OffsetBus extends OutBus implements SupportOffset, SupportMask {
 
     @Override
     public void setHiImpedance() {
-        /*Optimiser block ts line setter*/
+        /*Optimiser block ts*/
         hiImpedance = true;
         /*Optimiser block ar */
         switch (processing++) {
@@ -211,9 +211,6 @@ public class OffsetBus extends OutBus implements SupportOffset, SupportMask {
             } else {
                 optimiser.bind("o", -offset);
                 optimiser.cut("positive");
-            }
-            if (inSource != null) {
-                optimiser.cut("setter");
             }
             if (!isTriState(inSource)) {
                 optimiser.cut("ts");

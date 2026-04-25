@@ -136,6 +136,7 @@ public class MultiPartRIn extends InPin {
             optimiser.cut("setter");
         }
         MultiPartRIn build = optimiser.build();
+        build.withState=source!=null;
         parent.rIns.put(id, build);
         parent.replaceIn(this, build);
         build.source = source;

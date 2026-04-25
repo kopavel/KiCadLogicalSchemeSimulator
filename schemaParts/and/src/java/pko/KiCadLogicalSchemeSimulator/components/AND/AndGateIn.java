@@ -134,6 +134,7 @@ public class AndGateIn extends InPin {
         }
         AndGateIn build = optimiser.build();
         build.source = source;
+        build.withState = source != null;
         parent.replaceIn(this, build);
         return build;
     }

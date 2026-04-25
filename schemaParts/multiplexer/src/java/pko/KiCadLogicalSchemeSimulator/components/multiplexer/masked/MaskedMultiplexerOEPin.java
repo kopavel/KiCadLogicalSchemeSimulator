@@ -117,6 +117,7 @@ public class MaskedMultiplexerOEPin extends InPin {
             optimiser.cut("r");
         }
         MaskedMultiplexerOEPin build = optimiser.build();
+        build.withState=source!=null;
         build.source = source;
         parent.replaceIn(this, build);
         if (parent.oePin == this) {

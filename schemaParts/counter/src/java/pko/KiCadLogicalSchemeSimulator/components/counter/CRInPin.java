@@ -67,6 +67,7 @@ class CRInPin extends InPin {
             optimiser.cut("setter");
         }
         CRInPin build = optimiser.build();
+        build.withState=source!=null;
         counter.rPin = build;
         parent.replaceIn(this, build);
         build.source = source;

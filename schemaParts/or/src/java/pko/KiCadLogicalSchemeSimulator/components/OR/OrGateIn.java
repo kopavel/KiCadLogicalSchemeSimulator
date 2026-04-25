@@ -136,8 +136,9 @@ public class OrGateIn extends InPin {
             optimiser.cut("setter");
         }
         OrGateIn build = optimiser.build();
-        orGate.replaceIn(this, build);
         build.source = inSource;
+        build.withState=inSource!=null;
+        orGate.replaceIn(this, build);
         return build;
     }
 }

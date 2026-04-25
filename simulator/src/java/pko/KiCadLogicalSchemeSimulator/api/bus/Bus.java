@@ -102,7 +102,7 @@ public abstract class Bus extends ModelItem<Bus> {
 
     @Override
     public int getState() {
-        return (source == null || source == this) ? state : source.getState();
+        return (withState || source == null || source == this) ? state : source.getState();
     }
 
     public void setHi() {

@@ -135,6 +135,7 @@ public class RomCsPin extends InPin {
         optimiser.cut(parent.reverse ? "nReverse" : "reverse");
         optimiser.bind("rev", parent.reverse ? "-1" : "1");
         RomCsPin build = optimiser.build();
+        build.withState=source!=null;
         build.source = source;
         parent.replaceIn(this, build);
         RomCsPin[] csPins = parent.csPins;

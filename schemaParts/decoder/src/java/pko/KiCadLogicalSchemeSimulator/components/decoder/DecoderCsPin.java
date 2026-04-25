@@ -128,6 +128,7 @@ public class DecoderCsPin extends InPin {
         optimiser.cut(parent.reverse ? "nr" : "r");
         optimiser.cut(parent.params.containsKey("outReverse") ? "onr" : "or");
         DecoderCsPin build = optimiser.build();
+        build.withState=source!=null;
         build.source = source;
         parent.replaceIn(this, build);
         parent.csPin = build;

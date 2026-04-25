@@ -85,6 +85,7 @@ public class CInFallingPin extends FallingEdgePin {
         }
         CInFallingPin build = optimiser.build();
         parent.nIn = build;
+        build.withState=source!=null;
         parent.replaceIn(this, build);
         build.source = source;
         return build;

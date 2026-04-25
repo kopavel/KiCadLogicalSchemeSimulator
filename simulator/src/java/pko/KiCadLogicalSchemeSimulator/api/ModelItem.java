@@ -59,6 +59,7 @@ public abstract class ModelItem<T> implements IModelItem<T> {
     public boolean used;
     public ModelItem<?> source;
     private boolean reportedRecurse;
+    public boolean withState=true;
     protected ModelItem(String id, SchemaPart parent) {
         this.id = id;
         this.parent = parent;

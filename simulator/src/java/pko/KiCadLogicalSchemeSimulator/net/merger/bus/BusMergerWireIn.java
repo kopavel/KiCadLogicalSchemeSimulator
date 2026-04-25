@@ -425,6 +425,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
             optimiser.cut("nr");
         }
         BusMergerWireIn build = optimiser.build();
+        build.withState=source!=null;
         merger.sources.add(build);
         build.source = source;
         return build;

@@ -99,11 +99,12 @@ public class BufferWrPin extends InPin {
         } else {
             optimiser.cut("r");
         }
-        BufferWrPin build = optimiser.build();
         if (source != null) {
             optimiser.cut("setter");
         }
+        BufferWrPin build = optimiser.build();
         build.source = source;
+        build.withState=source!=null;
         parent.wrPin = build;
         parent.replaceIn(this, build);
         return build;

@@ -176,6 +176,7 @@ public class MaskGroupBus extends OutBus {
                 optimiser.cut("ts");
             }
             MaskGroupBus build = optimiser.build();
+            build.withState=inSource!=null;
             build.source = inSource;
             for (Bus destination : destinations) {
                 destination.source = build;

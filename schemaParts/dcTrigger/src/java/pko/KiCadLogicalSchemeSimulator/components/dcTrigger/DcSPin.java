@@ -180,6 +180,7 @@ public class DcSPin extends InPin {
             optimiser.cut("nq");
         }
         DcSPin build = optimiser.build();
+        build.withState=source!=null;
         parent.sPin = build;
         parent.rPin.sPin = build;
         parent.replaceIn(this, build);

@@ -347,6 +347,7 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus>, SupportMa
             destinations[i] = destinations[i].getOptimised(merger);
         }
         BusMergerBusIn build = optimiser.build();
+        build.withState=source!=null;
         merger.sources.add(build);
         build.source = source;
         return build;
