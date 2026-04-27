@@ -111,14 +111,14 @@ public class SingleBitRam extends SchemaPart {
                 @Override
                 public void setHi() {
                     state = true;
+                    if (!csPin.state) {
+                        data[aBus.state] = dIn.state;
+                    }
                 }
 
                 @Override
                 public void setLo() {
                     state = false;
-                    if (!csPin.state) {
-                        data[aBus.state] = dIn.state;
-                    }
                 }
             });
         } else {
@@ -161,14 +161,14 @@ public class SingleBitRam extends SchemaPart {
                 @Override
                 public void setHi() {
                     state = true;
-                    if (csPin.state) {
-                        data[aBus.state] = dIn.state;
-                    }
                 }
 
                 @Override
                 public void setLo() {
                     state = false;
+                    if (csPin.state) {
+                        data[aBus.state] = dIn.state;
+                    }
                 }
             });
         }

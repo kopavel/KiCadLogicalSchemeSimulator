@@ -129,14 +129,14 @@ public class Ram extends SchemaPart {
                 @Override
                 public void setHi() {
                     state = true;
+                    if (!csPin.state) {
+                        words[aBus.state] = dIn.state;
+                    }
                 }
 
                 @Override
                 public void setLo() {
                     state = false;
-                    if (!csPin.state) {
-                        words[aBus.state] = dIn.state;
-                    }
                 }
             });
         } else {
@@ -179,14 +179,14 @@ public class Ram extends SchemaPart {
                 @Override
                 public void setHi() {
                     state = true;
-                    if (csPin.state) {
-                        words[aBus.state] = dIn.state;
-                    }
                 }
 
                 @Override
                 public void setLo() {
                     state = false;
+                    if (csPin.state) {
+                        words[aBus.state] = dIn.state;
+                    }
                 }
             });
         }
