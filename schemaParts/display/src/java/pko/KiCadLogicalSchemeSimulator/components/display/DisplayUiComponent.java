@@ -32,13 +32,13 @@
 package pko.KiCadLogicalSchemeSimulator.components.display;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.AbstractUiComponent;
 
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 
 public class DisplayUiComponent extends AbstractUiComponent {
-    public final int scaleFactor;
     private final Display parent;
+    private BufferedImage image;
+    private WritableRaster raster;
 
     public DisplayUiComponent(String title, int size, int scaleFactor, Display parent) {
         super(title, size);
@@ -46,21 +46,25 @@ public class DisplayUiComponent extends AbstractUiComponent {
         this.parent = parent;
     }
 
+    int hScaled;
+    int vScaled;
+
     @Override
     protected void draw() {
         if (parent.vSize > 0) {
-            BufferedImage image = new BufferedImage(parent.hSize, parent.vSize, BufferedImage.TYPE_BYTE_GRAY);
-            byte[][] snapshot = parent.ram;
-            WritableRaster raster = image.getRaster();
-            for (int x = 0; x < parent.hSize; x++) {
-                for (int y = 0; y < parent.vSize; y++) {
-                    byte pixelValue = snapshot[y][x];
-                    raster.setSample(x, y, 0, pixelValue);
-                }
+            int vSize = parent.vSize;
+            int hSize = parent.hSize;
+            if (image == null || image.getWidth() != hSize || image.getHeight() != vSize) {
+                hScaled = hSize * scaleFactor;
+                vScaled = vSize * scaleFactor;
+                image = new BufferedImage(hSize, vSize, BufferedImage.TYPE_BYTE_GRAY);
+                raster = image.getRaster();
             }
-            AffineTransform at = AffineTransform.getScaleInstance(scaleFactor, scaleFactor);
-            g2d.transform(at);
-            g2d.drawImage(image, 0, titleHeight, this);
+            byte[][] snapshot = parent.ram;
+            for (int y = 0; y < vSize; y++) {
+                raster.setDataElements(0, y, hSize, 1, snapshot[y]);
+            }
+            g2d.drawImage(image, 0, titleHeight + 5, hScaled, vScaled, this);
         }
     }
 }

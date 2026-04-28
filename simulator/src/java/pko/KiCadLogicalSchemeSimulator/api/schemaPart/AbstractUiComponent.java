@@ -37,6 +37,7 @@ import java.awt.event.MouseMotionAdapter;
 
 @SuppressWarnings("StaticMethodOnlyUsedInOneClass")
 public abstract class AbstractUiComponent extends Component {
+    public int scaleFactor=1;
     public static final int redrawPeriod = 50;
     public static final Font arialFont = new Font("Arial", Font.BOLD, 14);
     public static final Font monospacedFont = new Font("Courier New", Font.PLAIN, 12);
@@ -80,7 +81,7 @@ public abstract class AbstractUiComponent extends Component {
     @Override
     public void paint(Graphics g) {
         super.paint(g);
-        g2d = (Graphics2D) g.create();
+        g2d = (Graphics2D) g;
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setFont(arialFont);
         if (!sized) {
@@ -92,7 +93,6 @@ public abstract class AbstractUiComponent extends Component {
         }
         g2d.drawString(title, 0, titleHeight);
         draw();
-        g2d.dispose();
     }
 
     abstract protected void draw();
