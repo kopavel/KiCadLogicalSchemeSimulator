@@ -74,7 +74,7 @@ public class F0Pin extends InPin {
                 syncPin.setLo();
                 opCode = false;
             }
-            request = (curentRequest = queue.pop());
+            request = curentRequest = queue.pop();
         }
         f2Pin.setLo();
         if (!dOut.hiImpedance) {
@@ -94,7 +94,7 @@ public class F0Pin extends InPin {
                 syncPin.setHi();
             }
         }
-        isReady = rdyPin.state || !request.read;
+        isReady = !request.read || rdyPin.state;
     }
 
     @Override
@@ -103,7 +103,7 @@ public class F0Pin extends InPin {
         f1Pin.setLo();
         Request request;
         f2Pin.setHi();
-        if (!curentRequest.read && (request = curentRequest).address >= 0) {
+        if (!(request = curentRequest).read && request.address >= 0) {
             dOut.setState(request.payload);
             request.address = -1;
         }

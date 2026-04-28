@@ -29,7 +29,6 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
 package pko.KiCadLogicalSchemeSimulator.components.mos6502.queue;
 import pko.KiCadLogicalSchemeSimulator.components.mos6502.F0Pin;
 import pko.KiCadLogicalSchemeSimulator.components.mos6502.core.Cpu;
@@ -84,10 +83,9 @@ public class IoQueue {
         arrayLength = length;
         arrayCallback = callback;
         for (int i = 0; i < length; i++) {
-            int address = addresses[i];
             shiftWrite();
             Request request;
-            (request = tail).address = address;
+            (request = tail).address = addresses[i];
             request.callback = arrayReadCallback;
             request.read = true;
         }
@@ -156,12 +154,11 @@ public class IoQueue {
     }
 
     private void shiftWrite() {
-        if (tail.address >= 0) {
-            Request next = tail.next;
-            if (next.address != -1) {
-                Request newRequest = new Request();
-                newRequest.next = next;
-                tail = (tail.next = newRequest);
+        Request lTail;
+        if ((lTail = tail).address >= 0) {
+            Request next;
+            if ((next = lTail.next).address != -1) {
+                (tail = lTail.next = new Request()).next = next;
             } else {
                 tail = next;
             }

@@ -208,34 +208,35 @@ public class Cpu extends InstructionTable {
     private final Callback step3Callback = effectiveAddress -> {
         int hi, lo; // Address calculation
         // Execute
-        switch (state.ir) {
+        CpuState lState;
+        switch ((lState = state).ir) {
             // Single Byte Instructions; Implied and Relative
             case 0x00: // BRK - Force Interrupt - Implied
-                handleBrk(state.pc + 1);
+                handleBrk(lState.pc + 1);
                 return;
             case 0x08: // PHP - Push Processor Status - Implied
                 // Break flag always set in the stack value.
-                stackPush(state.getStatusFlag() | 0x10);
+                stackPush(lState.getStatusFlag() | 0x10);
                 return;
             case 0x10: // BPL - Branch if Positive - Relative
-                if (!state.negativeFlag) {
-                    state.pc = relAddress(state.args[0]);
+                if (!lState.negativeFlag) {
+                    lState.pc = relAddress(lState.args[0]);
                 }
                 return;
             case 0x18: // CLC - Clear Carry Flag - Implied
                 clearCarryFlag();
                 return;
             case 0x20: // JSR - Jump to Subroutine - Implied
-                stackPush((state.pc - 1 >> 8) & 0xff); // PC high byte
-                stackPush(state.pc - 1 & 0xff);        // PC low byte
-                state.pc = Utils.address(state.args[0], state.args[1]);
+                stackPush((lState.pc - 1 >> 8) & 0xff); // PC high byte
+                stackPush(lState.pc - 1 & 0xff);        // PC low byte
+                lState.pc = Utils.address(lState.args[0], lState.args[1]);
                 return;
             case 0x28: // PLP - Pull Processor Status - Implied
                 stackPop(setProcessorStatus);
                 return;
             case 0x30: // BMI - Branch if Minus - Relative
-                if (state.negativeFlag) {
-                    state.pc = relAddress(state.args[0]);
+                if (lState.negativeFlag) {
+                    lState.pc = relAddress(lState.args[0]);
                 }
                 return;
             case 0x38: // SEC - Set Carry Flag - Implied
@@ -246,11 +247,11 @@ public class Cpu extends InstructionTable {
                 stackWordPop(statePcCallback);
                 return;
             case 0x48: // PHA - Push Accumulator - Implied
-                stackPush(state.a);
+                stackPush(lState.a);
                 return;
             case 0x50: // BVC - Branch if Overflow Clear - Relative
-                if (!state.overflowFlag) {
-                    state.pc = relAddress(state.args[0]);
+                if (!lState.overflowFlag) {
+                    lState.pc = relAddress(lState.args[0]);
                 }
                 return;
             case 0x58: // CLI - Clear Interrupt Disable - Implied
@@ -260,7 +261,7 @@ public class Cpu extends InstructionTable {
                 if (behavior == CpuBehavior.NMOS_6502 || behavior == CpuBehavior.NMOS_WITH_ROR_BUG) {
                     return;
                 }
-                stackPush(state.y);
+                stackPush(lState.y);
                 return;
             case 0x60: // RTS - Return from Subroutine - Implied
                 stackWordPop(rstCallback);
@@ -269,8 +270,8 @@ public class Cpu extends InstructionTable {
                 stackPop(setArithmeticFlagsStateA);
                 return;
             case 0x70: // BVS - Branch if Overflow Set - Relative
-                if (state.overflowFlag) {
-                    state.pc = relAddress(state.args[0]);
+                if (lState.overflowFlag) {
+                    lState.pc = relAddress(lState.args[0]);
                 }
                 return;
             case 0x78: // SEI - Set Interrupt Disable - Implied
@@ -284,85 +285,85 @@ public class Cpu extends InstructionTable {
                 return;
             case 0x80: // 65C02 BRA - Branch Always
                 if (behavior == CpuBehavior.CMOS_6502 || behavior == CpuBehavior.CMOS_65816) {
-                    state.pc = relAddress(state.args[0]);
+                    lState.pc = relAddress(lState.args[0]);
                 }
                 return;
             case 0x88: // DEY - Decrement Y Register - Implied
-                state.y = --state.y & 0xff;
-                setArithmeticFlags(state.y);
+                lState.y = --lState.y & 0xff;
+                setArithmeticFlags(lState.y);
                 return;
             case 0x8a: // TXA - Transfer X to Accumulator - Implied
-                state.a = state.x;
-                setArithmeticFlags(state.a);
+                lState.a = lState.x;
+                setArithmeticFlags(lState.a);
                 return;
             case 0x90: // BCC - Branch if Carry Clear - Relative
                 if (!getCarryFlag()) {
-                    state.pc = relAddress(state.args[0]);
+                    lState.pc = relAddress(lState.args[0]);
                 }
                 return;
             case 0x98: // TYA - Transfer Y to Accumulator - Implied
-                state.a = state.y;
-                setArithmeticFlags(state.a);
+                lState.a = lState.y;
+                setArithmeticFlags(lState.a);
                 return;
             case 0x9a: // TXS - Transfer X to Stack Pointer - Implied
-                state.sp = state.x;
+                lState.sp = lState.x;
                 return;
             case 0xa8: // TAY - Transfer Accumulator to Y - Implied
-                state.y = state.a;
-                setArithmeticFlags(state.y);
+                lState.y = lState.a;
+                setArithmeticFlags(lState.y);
                 return;
             case 0xaa: // TAX - Transfer Accumulator to X - Implied
-                state.x = state.a;
-                setArithmeticFlags(state.x);
+                lState.x = lState.a;
+                setArithmeticFlags(lState.x);
                 return;
             case 0xb0: // BCS - Branch if Carry Set - Relative
                 if (getCarryFlag()) {
-                    state.pc = relAddress(state.args[0]);
+                    lState.pc = relAddress(lState.args[0]);
                 }
                 return;
             case 0xb8: // CLV - Clear Overflow Flag - Implied
-                state.overflowFlag = false;
+                lState.overflowFlag = false;
                 return;
             case 0xba: // TSX - Transfer Stack Pointer to X - Implied
-                state.x = state.sp;
-                setArithmeticFlags(state.x);
+                lState.x = lState.sp;
+                setArithmeticFlags(lState.x);
                 return;
             case 0xc8: // INY - Increment Y Register - Implied
-                state.y = ++state.y & 0xff;
-                setArithmeticFlags(state.y);
+                lState.y = ++lState.y & 0xff;
+                setArithmeticFlags(lState.y);
                 return;
             case 0xca: // DEX - Decrement X Register - Implied
-                state.x = --state.x & 0xff;
-                setArithmeticFlags(state.x);
+                lState.x = --lState.x & 0xff;
+                setArithmeticFlags(lState.x);
                 return;
             case 0xd0: // BNE - Branch if Not Equal to Zero - Relative
                 if (!getZeroFlag()) {
-                    state.pc = relAddress(state.args[0]);
+                    lState.pc = relAddress(lState.args[0]);
                 }
                 return;
             case 0xd8: // CLD - Clear Decimal Mode - Implied
-                state.decimalModeFlag = false;
+                lState.decimalModeFlag = false;
                 return;
             case 0xda: // 65C02 PHX - Push X to stack
                 if (behavior == CpuBehavior.NMOS_6502 || behavior == CpuBehavior.NMOS_WITH_ROR_BUG) {
                     return;
                 }
-                stackPush(state.x);
+                stackPush(lState.x);
                 return;
             case 0xe8: // INX - Increment X Register - Implied
-                state.x = ++state.x & 0xff;
-                setArithmeticFlags(state.x);
+                lState.x = ++lState.x & 0xff;
+                setArithmeticFlags(lState.x);
                 return;
             case 0xea: // NOP
                 // Do nothing.
                 return;
             case 0xf0: // BEQ - Branch if Equal to Zero - Relative
                 if (getZeroFlag()) {
-                    state.pc = relAddress(state.args[0]);
+                    lState.pc = relAddress(lState.args[0]);
                 }
                 return;
             case 0xf8: // SED - Set Decimal Flag - Implied
-                state.decimalModeFlag = true;
+                lState.decimalModeFlag = true;
                 return;
             case 0xfa: // 65C02 PLX - Pull X from Stack
                 if (behavior == CpuBehavior.NMOS_6502 || behavior == CpuBehavior.NMOS_WITH_ROR_BUG) {
@@ -372,12 +373,12 @@ public class Cpu extends InstructionTable {
                 return;
             // JMP
             case 0x4c: // JMP - Absolute
-                state.pc = Utils.address(state.args[0], state.args[1]);
+                lState.pc = Utils.address(lState.args[0], lState.args[1]);
                 return;
             case 0x6c: // JMP - Indirect
-                lo = Utils.address(state.args[0], state.args[1]); // Address of low byte
-                if (state.args[0] == 0xff && (behavior == CpuBehavior.NMOS_6502 || behavior == CpuBehavior.NMOS_WITH_ROR_BUG)) {
-                    hi = Utils.address(0x00, state.args[1]);
+                lo = Utils.address(lState.args[0], lState.args[1]); // Address of low byte
+                if (lState.args[0] == 0xff && (behavior == CpuBehavior.NMOS_6502 || behavior == CpuBehavior.NMOS_WITH_ROR_BUG)) {
+                    hi = Utils.address(0x00, lState.args[1]);
                 } else {
                     hi = lo + 1;
                 }
@@ -398,14 +399,14 @@ public class Cpu extends InstructionTable {
                 if (behavior == CpuBehavior.NMOS_6502 || behavior == CpuBehavior.NMOS_WITH_ROR_BUG) {
                     return;
                 }
-                lo = (((state.args[1] << 8) | state.args[0]) + state.x) & 0xffff;
+                lo = (((lState.args[1] << 8) | lState.args[0]) + lState.x) & 0xffff;
                 hi = lo + 1;
                 ioQueue.readWord(lo, hi, statePcCallback);
                 return;
             // ORA - Logical Inclusive Or
             case 0x09: // #Immediate
-                state.a |= state.args[0];
-                setArithmeticFlags(state.a);
+                lState.a |= lState.args[0];
+                setArithmeticFlags(lState.a);
                 return;
             case 0x12: // 65C02 ORA (ZP)
                 if (behavior == CpuBehavior.NMOS_6502 || behavior == CpuBehavior.NMOS_WITH_ROR_BUG) {
@@ -422,8 +423,8 @@ public class Cpu extends InstructionTable {
                 return;
             // ASL - Arithmetic Shift Left
             case 0x0a: // Accumulator
-                state.a = asl(state.a);
-                setArithmeticFlags(state.a);
+                lState.a = asl(lState.a);
+                setArithmeticFlags(lState.a);
                 return;
             case 0x06, // Zero Page
                  0x0e, // Absolute
@@ -434,7 +435,7 @@ public class Cpu extends InstructionTable {
                 return;
             // BIT - Bit Test
             case 0x89: // 65C02 #Immediate
-                setZeroFlag((state.a & state.args[0]) == 0);
+                setZeroFlag((lState.a & lState.args[0]) == 0);
                 return;
             case 0x34: // 65C02 Zero Page,X
                 if (behavior == CpuBehavior.NMOS_6502 || behavior == CpuBehavior.NMOS_WITH_ROR_BUG) {
@@ -447,8 +448,8 @@ public class Cpu extends InstructionTable {
                 return;
             // AND - Logical AND
             case 0x29: // #Immediate
-                state.a &= state.args[0];
-                setArithmeticFlags(state.a);
+                lState.a &= lState.args[0];
+                setArithmeticFlags(lState.a);
                 return;
             case 0x32: // 65C02 AND (ZP)
                 if (behavior == CpuBehavior.NMOS_6502 || behavior == CpuBehavior.NMOS_WITH_ROR_BUG) {
@@ -465,8 +466,8 @@ public class Cpu extends InstructionTable {
                 return;
             // ROL - Rotate Left
             case 0x2a: // Accumulator
-                state.a = rol(state.a);
-                setArithmeticFlags(state.a);
+                lState.a = rol(lState.a);
+                setArithmeticFlags(lState.a);
                 return;
             case 0x26: // Zero Page
             case 0x2e: // Absolute
@@ -477,8 +478,8 @@ public class Cpu extends InstructionTable {
                 return;
             // EOR - Exclusive OR
             case 0x49: // #Immediate
-                state.a ^= state.args[0];
-                setArithmeticFlags(state.a);
+                lState.a ^= lState.args[0];
+                setArithmeticFlags(lState.a);
                 return;
             case 0x52: // 65C02 EOR (ZP)
                 if (behavior == CpuBehavior.NMOS_6502 || behavior == CpuBehavior.NMOS_WITH_ROR_BUG) {
@@ -495,8 +496,8 @@ public class Cpu extends InstructionTable {
                 return;
             // LSR - Logical Shift Right
             case 0x4a: // Accumulator
-                state.a = lsr(state.a);
-                setArithmeticFlags(state.a);
+                lState.a = lsr(lState.a);
+                setArithmeticFlags(lState.a);
                 return;
             case 0x46: // Zero Page
             case 0x4e: // Absolute
@@ -507,10 +508,10 @@ public class Cpu extends InstructionTable {
                 return;
             // ADC - Add with Carry
             case 0x69: // #Immediate
-                if (state.decimalModeFlag) {
-                    state.a = adcDecimal(state.a, state.args[0]);
+                if (lState.decimalModeFlag) {
+                    lState.a = adcDecimal(lState.a, lState.args[0]);
                 } else {
-                    state.a = adc(state.a, state.args[0]);
+                    lState.a = adc(lState.a, lState.args[0]);
                 }
                 return;
             case 0x72: // 65C02 ADC (ZP)
@@ -528,8 +529,8 @@ public class Cpu extends InstructionTable {
                 return;
             // ROR - Rotate Right
             case 0x6a: // Accumulator
-                state.a = ror(state.a);
-                setArithmeticFlags(state.a);
+                lState.a = ror(lState.a);
+                setArithmeticFlags(lState.a);
                 return;
             case 0x66: // Zero Page
             case 0x6e: // Absolute
@@ -550,19 +551,19 @@ public class Cpu extends InstructionTable {
                  0x95, // Zero Page,X
                  0x99, // Absolute,Y
                  0x9d: // Absolute,X
-                ioQueue.write(effectiveAddress, state.a);
+                ioQueue.write(effectiveAddress, lState.a);
                 return;
             // STY - Store Y Register
             case 0x84: // Zero Page
             case 0x8c: // Absolute
             case 0x94: // Zero Page,X
-                ioQueue.write(effectiveAddress, state.y);
+                ioQueue.write(effectiveAddress, lState.y);
                 return;
             // STX - Store X Register
             case 0x86: // Zero Page
             case 0x8e: // Absolute
             case 0x96: // Zero Page,Y
-                ioQueue.write(effectiveAddress, state.x);
+                ioQueue.write(effectiveAddress, lState.x);
                 return;
             // STZ - 65C02 Store Zero
             case 0x64: // Zero Page
@@ -576,8 +577,8 @@ public class Cpu extends InstructionTable {
                 return;
             // LDY - Load Y Register
             case 0xa0: // #Immediate
-                state.y = state.args[0];
-                setArithmeticFlags(state.y);
+                lState.y = lState.args[0];
+                setArithmeticFlags(lState.y);
                 return;
             case 0xa4: // Zero Page
             case 0xac: // Absolute
@@ -587,8 +588,8 @@ public class Cpu extends InstructionTable {
                 return;
             // LDX - Load X Register
             case 0xa2: // #Immediate
-                state.x = state.args[0];
-                setArithmeticFlags(state.x);
+                lState.x = lState.args[0];
+                setArithmeticFlags(lState.x);
                 return;
             case 0xa6: // Zero Page
             case 0xae: // Absolute
@@ -598,8 +599,8 @@ public class Cpu extends InstructionTable {
                 return;
             // LDA - Load Accumulator
             case 0xa9: // #Immediate
-                state.a = state.args[0];
-                setArithmeticFlags(state.a);
+                lState.a = lState.args[0];
+                setArithmeticFlags(lState.a);
                 return;
             case 0xb2: // 65C02 LDA (ZP)
                 if (behavior == CpuBehavior.NMOS_6502 || behavior == CpuBehavior.NMOS_WITH_ROR_BUG) {
@@ -616,7 +617,7 @@ public class Cpu extends InstructionTable {
                 return;
             // CPY - Compare Y Register
             case 0xc0: // #Immediate
-                cmp(state.y, state.args[0]);
+                cmp(lState.y, lState.args[0]);
                 return;
             case 0xc4: // Zero Page
             case 0xcc: // Absolute
@@ -624,7 +625,7 @@ public class Cpu extends InstructionTable {
                 return;
             // CMP - Compare Accumulator
             case 0xc9: // #Immediate
-                cmp(state.a, state.args[0]);
+                cmp(lState.a, lState.args[0]);
                 return;
             case 0xd2: // 65C02 CMP (ZP)
                 if (behavior == CpuBehavior.NMOS_6502 || behavior == CpuBehavior.NMOS_WITH_ROR_BUG) {
@@ -644,8 +645,8 @@ public class Cpu extends InstructionTable {
                 if (behavior == CpuBehavior.NMOS_6502 || behavior == CpuBehavior.NMOS_WITH_ROR_BUG) {
                     return;
                 }
-                state.a = --state.a & 0xFF;
-                setArithmeticFlags(state.a);
+                lState.a = --lState.a & 0xFF;
+                setArithmeticFlags(lState.a);
                 return;
             case 0xc6: // Zero Page
             case 0xce: // Absolute
@@ -656,7 +657,7 @@ public class Cpu extends InstructionTable {
                 return;
             // CPX - Compare X Register
             case 0xe0: // #Immediate
-                cmp(state.x, state.args[0]);
+                cmp(lState.x, lState.args[0]);
                 return;
             case 0xe4: // Zero Page
             case 0xec: // Absolute
@@ -664,10 +665,10 @@ public class Cpu extends InstructionTable {
                 return;
             // SBC - Subtract with Carry (Borrow)
             case 0xe9: // #Immediate
-                if (state.decimalModeFlag) {
-                    state.a = sbcDecimal(state.a, state.args[0]);
+                if (lState.decimalModeFlag) {
+                    lState.a = sbcDecimal(lState.a, lState.args[0]);
                 } else {
-                    state.a = sbc(state.a, state.args[0]);
+                    lState.a = sbc(lState.a, lState.args[0]);
                 }
                 return;
             case 0xf2: // 65C02 SBC (ZP)
@@ -688,8 +689,8 @@ public class Cpu extends InstructionTable {
                 if (behavior == CpuBehavior.NMOS_6502 || behavior == CpuBehavior.NMOS_WITH_ROR_BUG) {
                     return;
                 }
-                state.a = ++state.a & 0xff;
-                setArithmeticFlags(state.a);
+                lState.a = ++lState.a & 0xff;
+                setArithmeticFlags(lState.a);
                 return;
             case 0xe6: // Zero Page
             case 0xee: // Absolute
@@ -930,18 +931,19 @@ public class Cpu extends InstructionTable {
             // Unimplemented Instructions
             // TODO: Create a flag to enable highly-accurate emulation of unimplemented instructions.
             default:
-                state.opTrap = true;
+                lState.opTrap = true;
         }
     };
     private final Callback step2_1Callback = read -> step3Callback.accept((read + state.y) & 0xffff);
     private final ArrayCallback step2Callback = () -> {
-        state.lastIr = state.ir;
-        state.lastPc = state.irPc;
-        state.lastArgs[0] = state.args[0];
-        state.lastArgs[1] = state.args[1];
-        int irAddressMode = (state.ir >> 2) & 0x07;  // Bits 3-5 of IR:  [ | | |X|X|X| | ]
-        int irOpMode = state.ir & 0x03;              // Bits 6-7 of IR:  [ | | | | | |X|X]
-        state.stepCounter++;
+        CpuState lState=state;
+        lState.lastIr = state.ir;
+        lState.lastPc = lState.irPc;
+        lState.lastArgs[0] = lState.args[0];
+        lState.lastArgs[1] = lState.args[1];
+        int irAddressMode = (lState.ir >> 2) & 0x07;  // Bits 3-5 of IR:  [ | | |X|X|X| | ]
+        int irOpMode = lState.ir & 0x03;              // Bits 6-7 of IR:  [ | | | | | |X|X]
+        lState.stepCounter++;
         // Get the data from the effective address (if any)
         int tmp; // Temporary storage
         switch (irOpMode) {
@@ -952,36 +954,36 @@ public class Cpu extends InstructionTable {
                         step3Callback.accept(-1);
                         return;
                     case 1: // Zero Page
-                        step3Callback.accept(state.args[0]);
+                        step3Callback.accept(lState.args[0]);
                         return;
                     case 2: // Accumulator - ignored
                         step3Callback.accept(-1);
                         return;
                     case 3: // Absolute
-                        step3Callback.accept(Utils.address(state.args[0], state.args[1]));
+                        step3Callback.accept(Utils.address(lState.args[0], lState.args[1]));
                         return;
                     case 4: // 65C02 (Zero Page)
                         if (behavior == CpuBehavior.CMOS_6502 || behavior == CpuBehavior.CMOS_65816) {
-                            ioQueue.readWord(state.args[0], (state.args[0] + 1) & 0xff, step3Callback);
+                            ioQueue.readWord(lState.args[0], (lState.args[0] + 1) & 0xff, step3Callback);
                         }
                         step3Callback.accept(-1);
                         return;
                     case 5: // Zero Page,X / Zero Page,Y
-                        if (state.ir == 0x14) { // 65C02 TRB Zero Page
-                            step3Callback.accept(state.args[0]);
-                        } else if (state.ir == 0x96 || state.ir == 0xb6) {
-                            step3Callback.accept(zpyAddress(state.args[0]));
+                        if (lState.ir == 0x14) { // 65C02 TRB Zero Page
+                            step3Callback.accept(lState.args[0]);
+                        } else if (lState.ir == 0x96 || lState.ir == 0xb6) {
+                            step3Callback.accept(zpyAddress(lState.args[0]));
                         } else {
-                            step3Callback.accept(zpxAddress(state.args[0]));
+                            step3Callback.accept(zpxAddress(lState.args[0]));
                         }
                         return;
                     case 7:
-                        if (state.ir == 0x9c || state.ir == 0x1c) { // 65C02 STZ & TRB Absolute
-                            step3Callback.accept(Utils.address(state.args[0], state.args[1]));
-                        } else if (state.ir == 0xbe) { // Absolute,X / Absolute,Y
-                            step3Callback.accept(yAddress(state.args[0], state.args[1]));
+                        if (lState.ir == 0x9c || lState.ir == 0x1c) { // 65C02 STZ & TRB Absolute
+                            step3Callback.accept(Utils.address(lState.args[0], lState.args[1]));
+                        } else if (lState.ir == 0xbe) { // Absolute,X / Absolute,Y
+                            step3Callback.accept(yAddress(lState.args[0], lState.args[1]));
                         } else {
-                            step3Callback.accept(xAddress(state.args[0], state.args[1]));
+                            step3Callback.accept(xAddress(lState.args[0], lState.args[1]));
                         }
                         return;
                 }
@@ -992,53 +994,55 @@ public class Cpu extends InstructionTable {
                     case 3:
                     case 5:
                     case 7: // Zero Page, Relative
-                        step3Callback.accept(state.args[0]);
+                        step3Callback.accept(lState.args[0]);
                         return;
                 }
                 return;
             case 1:
                 switch (irAddressMode) {
                     case 0: // (Zero Page,X)
-                        tmp = (state.args[0] + state.x) & 0xff;
+                        tmp = (lState.args[0] + lState.x) & 0xff;
                         ioQueue.readWord(tmp, tmp + 1, step3Callback);
                         return;
                     case 1: // Zero Page
-                        step3Callback.accept(state.args[0]);
+                        step3Callback.accept(lState.args[0]);
                         return;
                     case 2: // #Immediate
                         step3Callback.accept(-1);
                         return;
                     case 3: // Absolute
-                        step3Callback.accept(Utils.address(state.args[0], state.args[1]));
+                        step3Callback.accept(Utils.address(lState.args[0], lState.args[1]));
                         return;
                     case 4: // (Zero Page),Y
-                        ioQueue.readWord(state.args[0], (state.args[0] + 1) & 0xff, step2_1Callback);
+                        ioQueue.readWord(lState.args[0], (lState.args[0] + 1) & 0xff, step2_1Callback);
                         return;
                     case 5: // Zero Page,X
-                        step3Callback.accept(zpxAddress(state.args[0]));
+                        step3Callback.accept(zpxAddress(lState.args[0]));
                         return;
                     case 6: // Absolute, Y
-                        step3Callback.accept(yAddress(state.args[0], state.args[1]));
+                        step3Callback.accept(yAddress(lState.args[0], lState.args[1]));
                         return;
                     case 7: // Absolute, X
-                        step3Callback.accept(xAddress(state.args[0], state.args[1]));
+                        step3Callback.accept(xAddress(lState.args[0], lState.args[1]));
                 }
         }
     };
     private final Callback step1Callback = read -> {
-        state.ir = read;
+        CpuState lState;
+        (lState = state).ir = read;
         incrementPC();
-        state.opTrap = false;
+        lState.opTrap = false;
         // Decode the instruction and operands
-        state.instSize = instructionSizes[state.ir];
-        int length = state.instSize - 1;
+        lState.instSize = instructionSizes[lState.ir];
+        int length = lState.instSize - 1;
         if (length > 0) {
+            int[] lArray = addressArray;
             for (int i = 0; i < length; i++) {
-                addressArray[i] = state.pc;
+                lArray[i] = lState.pc;
                 // Increment PC after reading
                 incrementPC();
             }
-            ioQueue.readArray(addressArray, state.args, length, step2Callback);
+            ioQueue.readArray(lArray, lState.args, length, step2Callback);
         } else {
             step2Callback.accept();
         }
