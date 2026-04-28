@@ -84,7 +84,8 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
                 fullSpeedThread = Thread.ofPlatform().priority(MAX_PRIORITY).start(() -> {
                     Pin local = out;
                     try {
-                        while (fullSpeedAlive.getOpaque()) {
+                        AtomicReference<Boolean> lSpeed = fullSpeedAlive;
+                        while (lSpeed.getOpaque()) {
                             ticks += 20;
                             local.setHi();
                             local.setLo();

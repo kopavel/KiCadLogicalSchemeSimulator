@@ -46,6 +46,7 @@ public class SingleOutShifter extends SchemaPart {
     final SingleOutShifterCIPin ciPin;
     public int latch;
     public Pin out;
+    //Todo Migrate to 'hot pin' locals
     public boolean parallelLoad;
     public boolean clockEnabled;
     public SingleOutShifterCPin cp;
