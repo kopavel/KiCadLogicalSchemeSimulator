@@ -61,14 +61,15 @@ public class DcCRaisingPin extends RaisingEdgePin {
 
     @Override
     public void setHi() {
+        Pin lPin;
         /*Optimiser line setter*/
         state = true;
         /*Optimiser line anyRS*/
         if (parent.clockEnabled) {
             if (dPin.state) {
                 /*Optimiser block q bind nq:!qOut*/
-                if (!qOut.state) {
-                    qOut.setHi();
+                if (!(lPin=qOut).state) {
+                    lPin.setHi();
                     /*Optimiser line bothRS block nq*/
                 }
                 /*Optimiser line bothRSQ blockEnd q*/
@@ -80,8 +81,8 @@ public class DcCRaisingPin extends RaisingEdgePin {
                 return;
             } else {
                 /*Optimiser block q*/
-                if (qOut.state) {
-                    qOut.setLo();
+                if ((lPin=qOut).state) {
+                    lPin.setLo();
                     /*Optimiser line bothRS block nq*/
                 }
                 /*Optimiser line bothRSQ blockEnd q*/

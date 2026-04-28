@@ -67,14 +67,15 @@ public class DcCFallingPin extends FallingEdgePin {
 
     @Override
     public void setLo() {
+        Pin lPin;
         /*Optimiser line setter*/
         state = false;
         /*Optimiser line anyRS*/
         if (parent.clockEnabled) {
             if (dPin.state) {
                 /*Optimiser block q bind nq:!qOut*/
-                if (!qOut.state) {
-                    qOut.setHi();
+                if (!(lPin=qOut).state) {
+                    lPin.setHi();
                     /*Optimiser line bothRS block nq*/
                 }
                 /*Optimiser line bothRSQ blockEnd q*/
@@ -84,8 +85,8 @@ public class DcCFallingPin extends FallingEdgePin {
                 }
             } else {
                 /*Optimiser block q*/
-                if (qOut.state) {
-                    qOut.setLo();
+                if ((lPin=qOut).state) {
+                    lPin.setLo();
                     /*Optimiser line bothRS block nq*/
                 }
                 /*Optimiser line bothRSQ blockEnd q*/
