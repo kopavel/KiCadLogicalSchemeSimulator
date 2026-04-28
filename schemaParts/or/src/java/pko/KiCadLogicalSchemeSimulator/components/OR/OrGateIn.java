@@ -63,10 +63,8 @@ public class OrGateIn extends InPin {
     public void setHi() {
         /*Optimiser line setter*/
         state = true;
-        int inState = orGate.inState;
-        if (inState == 0) {
-            /*Optimiser bind mask*/
-            inState = mask;
+        int inState;
+        if ((inState = orGate.inState) == 0) {
             /*Optimiser line o block r*/
             if (orGate.reverse) {
                 out.setLo();
@@ -82,21 +80,21 @@ public class OrGateIn extends InPin {
                 }
                 /*Optimiser line o blockEnd nr*/
             }
+            /*Optimiser bind mask*/
+            orGate.inState = mask;
         } else {
             /*Optimiser bind mask*/
-            inState |= mask;
+            orGate.inState = inState | mask;
         }
-        orGate.inState = inState;
     }
 
     @Override
     public void setLo() {
         /*Optimiser line setter*/
         state = false;
-        int inState = orGate.inState;
+        int inState;
         /*Optimiser bind mask*/
-        if (inState == mask) {
-            inState = 0;
+        if ((inState = orGate.inState) == mask) {
             /*Optimiser line o block r*/
             if (orGate.reverse) {
                 /*Optimiser line o block oc*/
@@ -112,11 +110,11 @@ public class OrGateIn extends InPin {
                 out.setLo();
                 /*Optimiser line o blockEnd nr*/
             }
+            orGate.inState = 0;
         } else {
             /*Optimiser bind nMask*/
-            inState &= nMask;
+            orGate.inState = inState & nMask;
         }
-        orGate.inState = inState;
     }
 
     @Override
@@ -137,7 +135,7 @@ public class OrGateIn extends InPin {
         }
         OrGateIn build = optimiser.build();
         build.source = inSource;
-        build.withState=inSource!=null;
+        build.withState = inSource != null;
         orGate.replaceIn(this, build);
         return build;
     }
