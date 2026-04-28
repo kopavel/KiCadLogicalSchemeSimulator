@@ -51,8 +51,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
-import static java.awt.GridBagConstraints.BOTH;
-import static java.awt.GridBagConstraints.CENTER;
 import static org.apache.commons.lang3.StringUtils.leftPad;
 
 public class SchemaPartMonitor extends JFrame {
@@ -65,7 +63,6 @@ public class SchemaPartMonitor extends JFrame {
     private JPanel inputsValues;
     private JPanel outputsNames;
     private JPanel outputsValues;
-    private JLabel title;
     private JPanel panel;
     private JPanel schemaPartBox;
 
@@ -75,6 +72,7 @@ public class SchemaPartMonitor extends JFrame {
         setContentPane(panel);
         setLocationRelativeTo(Simulator.ui);
         setType(Window.Type.UTILITY);
+        setTitle(id);
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             @Override
@@ -85,7 +83,6 @@ public class SchemaPartMonitor extends JFrame {
             }
         });
         schemaPart = Simulator.net.schemaParts.get(id);
-        title.setText(id);
         schemaPartBox.setBorder(BorderFactory.createLineBorder(borderColor));
         //FixMe passive pin like IN?
         schemaPart.inPins.values()
@@ -238,26 +235,24 @@ public class SchemaPartMonitor extends JFrame {
 
     private void setupUI() {
         panel = new JPanel(new GridBagLayout());
-        title = new JLabel("Label");
-        panel.add(title, createBagConstraints(1, 0, 1, 0, CENTER));
         schemaPartBox = new JPanel(new GridBagLayout());
-        panel.add(schemaPartBox, createBagConstraints(1, 1, 1, 1, BOTH));
+        panel.add(schemaPartBox, createBagConstraints(1, 1, 1, 1));
         inputsNames = new JPanel();
         inputsNames.setLayout(new BoxLayout(inputsNames, BoxLayout.Y_AXIS));
-        schemaPartBox.add(inputsNames, createBagConstraints(0, 0, 0.5, 1, BOTH));
+        schemaPartBox.add(inputsNames, createBagConstraints(0, 0, 0.5, 1));
         outputsNames = new JPanel();
         outputsNames.setLayout(new BoxLayout(outputsNames, BoxLayout.Y_AXIS));
-        schemaPartBox.add(outputsNames, createBagConstraints(1, 0, 0.5, 1, BOTH));
+        schemaPartBox.add(outputsNames, createBagConstraints(1, 0, 0.5, 1));
         inputsValues = new JPanel();
         inputsValues.setLayout(new BoxLayout(inputsValues, BoxLayout.Y_AXIS));
-        panel.add(inputsValues, createBagConstraints(0, 1, 0.3, 0, BOTH));
+        panel.add(inputsValues, createBagConstraints(0, 1, 0.3, 0));
         outputsValues = new JPanel();
         outputsValues.setLayout(new BoxLayout(outputsValues, BoxLayout.Y_AXIS));
-        panel.add(outputsValues, createBagConstraints(2, 1, 0.3, 1, BOTH));
+        panel.add(outputsValues, createBagConstraints(2, 1, 0.3, 1));
     }
 
-    private static GridBagConstraints createBagConstraints(int gridx, int gridY, double weightX, double weightY, int fill) {
-        return new GridBagConstraints(gridx, gridY, 1, 1, weightX, weightY, GridBagConstraints.CENTER, fill, new Insets(0, 0, 0, 0), 0, 0);
+    private static GridBagConstraints createBagConstraints(int gridx, int gridY, double weightX, double weightY) {
+        return new GridBagConstraints(gridx, gridY, 1, 1, weightX, weightY, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0);
     }
 
     private record Item(IModelItem<?> item, JLabel label, Integer mask) {

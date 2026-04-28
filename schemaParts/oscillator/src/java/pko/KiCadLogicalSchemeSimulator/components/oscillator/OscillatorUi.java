@@ -64,6 +64,7 @@ public class OscillatorUi extends JFrame {
         setDefaultCloseOperation(HIDE_ON_CLOSE);
         setContentPane(panel);
         setLocationRelativeTo(parent); // Center the frame
+        setTitle("Oscillator "+ parent.parent.id);
         startButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {

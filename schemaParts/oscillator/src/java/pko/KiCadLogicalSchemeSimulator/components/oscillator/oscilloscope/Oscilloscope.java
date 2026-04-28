@@ -54,6 +54,7 @@ public class Oscilloscope extends JFrame {
 
     public Oscilloscope(OscillatorUi oscillatorUi) {
         this.oscillatorUi = oscillatorUi;
+        setTitle("Oscilloscope "+ oscillatorUi.parent.parent.id);
         setJMenuBar(new OscilloscopeMenu(this));
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {

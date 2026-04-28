@@ -281,6 +281,8 @@ public class Simulator implements Runnable {
                 }
                 ui = new MainUI();
                 ui.setVisible(true);
+                String fileName = netFilePathNoExtension.substring(netFilePathNoExtension.lastIndexOf(File.separator) + 1);
+                ui.setTitle(fileName+ " : Simulator");
             });
             if (recursionMode != null) {
                 parameterResolver.recursionMode = recursionMode;
