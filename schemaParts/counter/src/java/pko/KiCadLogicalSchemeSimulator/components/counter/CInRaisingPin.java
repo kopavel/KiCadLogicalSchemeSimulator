@@ -40,6 +40,7 @@ public class CInRaisingPin extends RaisingEdgePin {
     public final int countMask;
     private final Counter parent;
     public Bus out;
+    public int oState;
 
     public CInRaisingPin(String id, Counter parent, int countMask) {
         super(id, parent);
@@ -62,8 +63,9 @@ public class CInRaisingPin extends RaisingEdgePin {
         state = true;
         /*Optimiser line r*/
         if (parent.enabled) {
+            int lState;
             /*Optimiser bind countMask*/
-            out.setState((out.state + 1) & countMask);
+            out.setState(oState = ((lState = oState) == countMask ? 0 : lState + 1));
             /*Optimiser line r*/
         }
     }
@@ -86,7 +88,7 @@ public class CInRaisingPin extends RaisingEdgePin {
         CInRaisingPin build = optimiser.build();
         parent.in = build;
         parent.replaceIn(this, build);
-        build.withState=source!=null;
+        build.withState = source != null;
         build.source = source;
         return build;
     }

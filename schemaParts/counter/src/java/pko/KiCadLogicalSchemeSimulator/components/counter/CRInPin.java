@@ -49,8 +49,14 @@ class CRInPin extends InPin {
     public void setHi() {
         /*Optimiser line setter*/
         state = true;
-        counter.enabled = false;
+        Counter lCounter;
+        (lCounter = counter).enabled = false;
         out.setState(0);
+        if (lCounter.reverse) {
+            lCounter.nIn.oState=0;
+        } else {
+            lCounter.in.oState=0;
+        }
     }
 
     @Override

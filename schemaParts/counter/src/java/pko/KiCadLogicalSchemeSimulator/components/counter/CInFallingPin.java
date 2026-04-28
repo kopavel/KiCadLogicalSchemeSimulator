@@ -40,6 +40,7 @@ public class CInFallingPin extends FallingEdgePin {
     public final int countMask;
     public final Counter parent;
     public Bus out;
+    public int oState;
 
     public CInFallingPin(String id, Counter parent, int countMask) {
         super(id, parent);
@@ -68,8 +69,9 @@ public class CInFallingPin extends FallingEdgePin {
         state = false;
         /*Optimiser line r*/
         if (parent.enabled) {
+            int lState;
             /*Optimiser bind countMask*/
-            out.setState(out.state == countMask ? 0 : out.state + 1);
+            out.setState(oState = ((lState = oState) == countMask ? 0 : lState + 1));
             /*Optimiser line r*/
         }
     }
@@ -85,7 +87,7 @@ public class CInFallingPin extends FallingEdgePin {
         }
         CInFallingPin build = optimiser.build();
         parent.nIn = build;
-        build.withState=source!=null;
+        build.withState = source != null;
         parent.replaceIn(this, build);
         build.source = source;
         return build;
