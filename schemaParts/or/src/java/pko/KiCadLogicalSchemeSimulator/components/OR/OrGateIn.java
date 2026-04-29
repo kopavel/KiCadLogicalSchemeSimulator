@@ -61,17 +61,18 @@ public class OrGateIn extends InPin {
 
     @Override
     public void setHi() {
+        OrGate gate;
         /*Optimiser line setter*/
         state = true;
         int inState;
-        if ((inState = orGate.inState) == 0) {
+        if ((inState = (gate = orGate).inState) == 0) {
             /*Optimiser line o block r*/
-            if (orGate.reverse) {
+            if (gate.reverse) {
                 out.setLo();
                 /*Optimiser line o blockEnd r block nr*/
             } else {
                 /*Optimiser line o block oc*/
-                if (orGate.params.containsKey("openCollector")) {
+                if (gate.params.containsKey("openCollector")) {
                     out.setHiImpedance();
                     /*Optimiser line o blockEnd oc block rc*/
                 } else {
@@ -81,24 +82,26 @@ public class OrGateIn extends InPin {
                 /*Optimiser line o blockEnd nr*/
             }
             /*Optimiser bind mask*/
-            orGate.inState = mask;
+            gate.inState = mask;
+            return;
         } else {
             /*Optimiser bind mask*/
-            orGate.inState = inState | mask;
+            gate.inState = inState | mask;
         }
     }
 
     @Override
     public void setLo() {
+        OrGate gate;
         /*Optimiser line setter*/
         state = false;
         int inState;
         /*Optimiser bind mask*/
-        if ((inState = orGate.inState) == mask) {
+        if ((inState = (gate = orGate).inState) == mask) {
             /*Optimiser line o block r*/
-            if (orGate.reverse) {
+            if (gate.reverse) {
                 /*Optimiser line o block oc*/
-                if (orGate.params.containsKey("openCollector")) {
+                if (gate.params.containsKey("openCollector")) {
                     out.setHiImpedance();
                     /*Optimiser line o blockEnd oc block rc*/
                 } else {
@@ -110,10 +113,11 @@ public class OrGateIn extends InPin {
                 out.setLo();
                 /*Optimiser line o blockEnd nr*/
             }
-            orGate.inState = 0;
+            gate.inState = 0;
+            return;
         } else {
             /*Optimiser bind nMask*/
-            orGate.inState = inState & nMask;
+            gate.inState = inState & nMask;
         }
     }
 

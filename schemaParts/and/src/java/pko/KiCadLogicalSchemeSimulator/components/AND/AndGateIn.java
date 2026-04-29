@@ -36,23 +36,23 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 
 public class AndGateIn extends InPin {
-    public final AndGate parent;
+    public final AndGate andGate;
     public final int mask;
     public final int nMask;
     public Pin out;
 
-    public AndGateIn(String id, AndGate parent, int mask) {
-        super(id, parent);
-        this.parent = parent;
+    public AndGateIn(String id, AndGate andGate, int mask) {
+        super(id, andGate);
+        this.andGate = andGate;
         this.mask = mask;
         nMask = ~mask;
-        out = parent.getOutPin("OUT");
+        out = andGate.getOutPin("OUT");
     }
 
     /*Optimiser constructor*/
     public AndGateIn(AndGateIn oldPin, String variantId) {
         super(oldPin, variantId);
-        parent = oldPin.parent;
+        andGate = oldPin.andGate;
         mask = oldPin.mask;
         nMask = oldPin.nMask;
         out = oldPin.out;
@@ -60,19 +60,20 @@ public class AndGateIn extends InPin {
 
     @Override
     public void setHi() {
+        AndGate gate;
         /*Optimiser line setter*/
         state = true;
         int state;
         /*Optimiser bind mask*/
-        if ((state = parent.inState) == mask) {
-            parent.inState = 0;
+        if ((state = (gate = andGate).inState) == mask) {
+            gate.inState = 0;
             /*Optimiser line o block r*/
-            if (parent.reverse) {
+            if (gate.reverse) {
                 out.setLo();
                 /*Optimiser line o blockEnd r block nr*/
             } else {
                 /*Optimiser line o block oc*/
-                if (parent.params.containsKey("openCollector")){
+                if (gate.params.containsKey("openCollector")){
                     out.setHiImpedance();
                     /*Optimiser line o blockEnd oc block rc*/
                 } else {
@@ -83,22 +84,23 @@ public class AndGateIn extends InPin {
             }
         } else {
             /*Optimiser bind nMask*/
-            parent.inState = state & nMask;
+            gate.inState = state & nMask;
         }
     }
 
     @Override
     public void setLo() {
+        AndGate lParent;
         /*Optimiser line setter*/
         state = false;
         int state;
-        if ((state = parent.inState) == 0) {
+        if ((state = (lParent = andGate).inState) == 0) {
             /*Optimiser bind mask*/
-            parent.inState = mask;
+            lParent.inState = mask;
             /*Optimiser line o block r*/
-            if (parent.reverse) {
+            if (lParent.reverse) {
                 /*Optimiser line o block oc*/
-                if (parent.params.containsKey("openCollector")){
+                if (lParent.params.containsKey("openCollector")){
                     out.setHiImpedance();
                     /*Optimiser line o blockEnd oc block rc*/
                 } else {
@@ -112,19 +114,19 @@ public class AndGateIn extends InPin {
             }
         } else {
             /*Optimiser bind mask*/
-            parent.inState = state | mask;
+            lParent.inState = state | mask;
         }
     }
 
     @Override
     public InPin getOptimised(ModelItem<?> source) {
         ClassOptimiser<AndGateIn> optimiser = new ClassOptimiser<>(this).bind("mask", mask).bind("nMask", nMask).cut("o");
-        if (parent.reverse) {
+        if (andGate.reverse) {
             optimiser.cut("nr");
         } else {
             optimiser.cut("r");
         }
-        if (parent.params.containsKey("openCollector")) {
+        if (andGate.params.containsKey("openCollector")) {
             optimiser.cut("rc");
         } else {
             optimiser.cut("oc");
@@ -135,7 +137,7 @@ public class AndGateIn extends InPin {
         AndGateIn build = optimiser.build();
         build.source = source;
         build.withState = source != null;
-        parent.replaceIn(this, build);
+        andGate.replaceIn(this, build);
         return build;
     }
 }
