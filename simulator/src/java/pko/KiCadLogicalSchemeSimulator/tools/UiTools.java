@@ -34,6 +34,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -107,5 +108,16 @@ public enum UiTools {
         }
 
         protected abstract void textChanged();
+    }
+
+    public static double[] getFontSize(Font font) {
+        JLabel label = new JLabel();
+        FontMetrics metrics = label.getFontMetrics(font);
+        String chars = "0123456789ABCDEF";
+        double maxWidth = 0;
+        for (int i = 0; i < chars.length(); i++) {
+            maxWidth = Math.max(maxWidth, metrics.charWidth(chars.charAt(i)));
+        }
+        return new double[]{maxWidth, metrics.getHeight()};
     }
 }

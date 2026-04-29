@@ -167,7 +167,7 @@ public class SdRam extends SchemaPart {
 
     @Override
     public String extraState() {
-        return "A:" + String.format("%" + (int) Math.ceil(aSize / 4.0d) + "X", addr) + "\nD:" + String.format("%" + (int) Math.ceil(size / 4.0d) + "X", dIn.state);
+        return "A:" + String.format("%0" + (int) Math.ceil(aSize / 4.0d) + "X", addr) + "\nD:" + String.format("%" + (int) Math.ceil(size / 4.0d) + "X", dIn.state);
     }
 
     @Override

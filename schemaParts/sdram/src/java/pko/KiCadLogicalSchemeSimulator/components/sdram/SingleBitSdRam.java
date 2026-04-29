@@ -151,7 +151,7 @@ public class SingleBitSdRam extends SchemaPart {
 
     @Override
     public String extraState() {
-        return "A:" + String.format("%" + (int) Math.ceil(size / 4.0d) + "X", addr) + "\nD:" + dIn.state;
+        return "A:" + String.format("%0" + (int) Math.ceil(size / 4.0d) + "X", addr) + "\nD:" + dIn.state;
     }
 
     @Override

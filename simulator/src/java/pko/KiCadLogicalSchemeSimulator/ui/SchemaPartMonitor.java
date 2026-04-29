@@ -36,9 +36,10 @@ import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.AbstractUiComponent;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
-import pko.KiCadLogicalSchemeSimulator.tools.Utils;
+import pko.KiCadLogicalSchemeSimulator.tools.UiTools;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -46,14 +47,20 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
+import static javax.swing.SwingConstants.LEADING;
+import static javax.swing.SwingConstants.LEFT;
+import static javax.swing.SwingConstants.RIGHT;
+import static javax.swing.SwingConstants.TRAILING;
 import static org.apache.commons.lang3.StringUtils.leftPad;
 
 public class SchemaPartMonitor extends JFrame {
+    public static final Font FONT = AbstractUiComponent.monospacedFont;
     public final SchemaPart schemaPart;
     private final ScheduledExecutorService scheduler;
     private final JTextArea extraPanel;
@@ -65,14 +72,17 @@ public class SchemaPartMonitor extends JFrame {
     private JPanel outputsValues;
     private JPanel panel;
     private JPanel schemaPartBox;
+    private double[] fontSize;
 
     public SchemaPartMonitor(String id) {
+        //region init
         setupUI();
         Color borderColor = UIManager.getColor("TextField.border");
         setContentPane(panel);
         setLocationRelativeTo(Simulator.ui);
         setType(Window.Type.UTILITY);
         setTitle(id);
+        fontSize = UiTools.getFontSize(FONT);
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             @Override
@@ -84,77 +94,27 @@ public class SchemaPartMonitor extends JFrame {
         });
         schemaPart = Simulator.net.schemaParts.get(id);
         schemaPartBox.setBorder(BorderFactory.createLineBorder(borderColor));
+        //endregion
+        //region In pins
         //FixMe passive pin like IN?
-        schemaPart.inPins.values()
-                .stream().distinct().sorted(Comparator.comparing(ModelItem::getId)).forEach(inItem -> {
-                      JLabel label;
-                      if (inItem instanceof Bus bus && bus.useBitPresentation) {
-                          char[] bits = leftPad(Integer.toBinaryString(bus.state), bus.size, '0').toCharArray();
-                          for (int j = 0; j < bus.size; j++) {
-                              label = new JLabel(schemaPart.ids.get(bus) + j);
-                              label.setBorder(BorderFactory.createEmptyBorder(3, 2, 4, 0));
-                              label.setAlignmentX(LEFT_ALIGNMENT);
-                              label.setFont(AbstractUiComponent.monospacedFont);
-                              inputsNames.add(label);
-                              label = new JLabel(String.valueOf(bits[j]));
-                              label.setFont(AbstractUiComponent.monospacedFont);
-                              label.setAlignmentX(RIGHT_ALIGNMENT);
-                              label.setBorder(new CompoundBorder(BorderFactory.createEmptyBorder(2, 2, 1, 0),
-                                      new CompoundBorder(BorderFactory.createLineBorder(borderColor), BorderFactory.createEmptyBorder(1, 5, 1, 5))));
-                              ins = Utils.addToArray(ins, new Item(inItem, label, 1 << j));
-                              inputsValues.add(label);
-                          }
-                      } else {
-                          label = new JLabel(schemaPart.ids.get(inItem));
-                          label.setBorder(BorderFactory.createEmptyBorder(3, 2, 4, 0));
-                          label.setAlignmentX(LEFT_ALIGNMENT);
-                          label.setFont(AbstractUiComponent.monospacedFont);
-                          inputsNames.add(label);
-                          label = new JLabel(String.valueOf(inItem.getState()));
-                          label.setFont(AbstractUiComponent.monospacedFont);
-                          label.setAlignmentX(RIGHT_ALIGNMENT);
-                          label.setBorder(new CompoundBorder(BorderFactory.createEmptyBorder(2, 2, 1, 0),
-                                  new CompoundBorder(BorderFactory.createLineBorder(borderColor), BorderFactory.createEmptyBorder(1, 5, 1, 5))));
-                          ins = Utils.addToArray(ins, new Item(inItem, label, 1));
-                          inputsValues.add(label);
-                      }
-                  });
-        schemaPart.outPins.values()
-                .stream().distinct().sorted(Comparator.comparing(schemaPart.ids::get)).forEach(outItem -> {
-                      JLabel label;
-                      if (outItem instanceof Bus bus && bus.useBitPresentation) {
-                          char[] bits = leftPad(Integer.toBinaryString(bus.state), bus.size, '0').toCharArray();
-                          for (int j = 0; j < bus.size; j++) {
-                              label = new JLabel(schemaPart.ids.get(bus) + j);
-                              label.setBorder(BorderFactory.createEmptyBorder(3, 0, 4, 2));
-                              label.setAlignmentX(RIGHT_ALIGNMENT);
-                              label.setFont(AbstractUiComponent.monospacedFont);
-                              outputsNames.add(label);
-                              label = new JLabel(String.valueOf(bits[j]));
-                              label.setFont(AbstractUiComponent.monospacedFont);
-                              label.setAlignmentX(LEFT_ALIGNMENT);
-                              label.setBorder(new CompoundBorder(BorderFactory.createEmptyBorder(2, 0, 1, 2),
-                                      new CompoundBorder(BorderFactory.createLineBorder(borderColor), BorderFactory.createEmptyBorder(1, 5, 1, 5))));
-                              outputsValues.add(label);
-                              outs = Utils.addToArray(outs, new Item(outItem, label, 1 << j));
-                          }
-                      } else {
-                          label = new JLabel(schemaPart.ids.get(outItem));
-                          label.setBorder(BorderFactory.createEmptyBorder(3, 0, 4, 2));
-                          label.setAlignmentX(RIGHT_ALIGNMENT);
-                          label.setFont(AbstractUiComponent.monospacedFont);
-                          outputsNames.add(label);
-                          label = new JLabel(String.valueOf(outItem.getState()));
-                          label.setFont(AbstractUiComponent.monospacedFont);
-                          label.setAlignmentX(LEFT_ALIGNMENT);
-                          label.setBorder(new CompoundBorder(BorderFactory.createEmptyBorder(2, 0, 1, 2),
-                                  new CompoundBorder(BorderFactory.createLineBorder(borderColor), BorderFactory.createEmptyBorder(1, 5, 1, 5))));
-                          outputsValues.add(label);
-                          outs = Utils.addToArray(outs, new Item(outItem, label, 1));
-                      }
-                  });
+        ins = getItems(inputsNames,
+                inputsValues,
+                schemaPart.inPins.values()
+                        .stream().distinct().sorted(Comparator.comparing(ModelItem::getId)).toList(),
+                borderColor,
+                false);
+        //endregion
+        //region Out pins
+        outs = getItems(outputsNames,
+                outputsValues,
+                schemaPart.outPins.values()
+                        .stream().distinct().sorted(Comparator.comparing(schemaPart.ids::get)).toList(),
+                borderColor,
+                true);
+        //endregion
+        //region info panel
         extraPanel = new JTextArea();
-        extraPanel.setFont(AbstractUiComponent.monospacedFont);
+        extraPanel.setFont(FONT);
         extraPanel.setEditable(false);
         if (schemaPart.outPins.size() > schemaPart.inPins.size()) {
             inputsNames.add(extraPanel);
@@ -163,7 +123,7 @@ public class SchemaPartMonitor extends JFrame {
             outputsNames.add(extraPanel);
             extraPanel.setAlignmentX(RIGHT_ALIGNMENT);
         }
-        extraPanel.setFont(AbstractUiComponent.monospacedFont);
+        extraPanel.setFont(FONT);
         if (schemaPart.extraState() != null) {
             extraPanel.setVisible(true);
             extraPanel.setText(schemaPart.extraState());
@@ -172,6 +132,8 @@ public class SchemaPartMonitor extends JFrame {
         } else {
             extraPanel.setVisible(false);
         }
+        //endregion
+        //region Extra Panel Setup
         Supplier<JPanel> extraPannelSupplier = schemaPart.extraPanel();
         if (extraPannelSupplier != null) {
             JButton extraPanelButton = new JButton();
@@ -181,7 +143,7 @@ public class SchemaPartMonitor extends JFrame {
                 public void mouseClicked(MouseEvent e) {
                     SwingUtilities.invokeLater(() -> {
                         JFrame jFrame = new JFrame();
-                        jFrame.setTitle(schemaPart.id);
+                        jFrame.setTitle(schemaPart.id+":extra");
                         JPanel extraPanel = extraPannelSupplier.get();
                         jFrame.getContentPane().add(extraPanel, BorderLayout.LINE_START);
                         jFrame.pack();
@@ -199,11 +161,65 @@ public class SchemaPartMonitor extends JFrame {
                 extraPanelButton.setAlignmentX(RIGHT_ALIGNMENT);
             }
         }
-        //setSize(new Dimension(250, 90 + Math.max(schemaPart.inMap.size(), schemaPart.outMap.size()) * 16));
+        //endregion
         pack();
-//        setSize(new Dimension(200, 78));
         scheduler = Executors.newSingleThreadScheduledExecutor();
         scheduler.scheduleAtFixedRate(this::reDraw, 0, 100, TimeUnit.MILLISECONDS);
+    }
+
+    private Item[] getItems(JPanel names, JPanel values, List<ModelItem<?>> items, Color borderColor, boolean right) {
+        Item[] retVal = new Item[items.size()];
+        for (int i = 0; i < items.size(); i++) {
+            ModelItem<?> item = items.get(i);
+            if (item instanceof Bus bus) {
+                if (bus.useBitPresentation) {
+                    for (int j = 0; j < bus.size; j++) {
+                        char[] bits = leftPad(Integer.toBinaryString(bus.state), bus.size, '0').toCharArray();
+                        retVal[i] = new Item(item, getLabel(schemaPart.ids.get(bus) + j, String.valueOf(bits[j]), names, values, borderColor, right), 1 << j);
+                    }
+                } else {
+                    retVal[i] = new Item(item,
+                            getLabel(schemaPart.ids.get(bus), leftPad("", (int) Math.floor(bus.size / 4.0), '0'), names, values, borderColor, right),
+                            1);
+                }
+            } else {
+                retVal[i] = new Item(item, getLabel(schemaPart.ids.get(item), String.valueOf(item.getState()), names, values, borderColor, right), 1);
+            }
+        }
+        return retVal;
+    }
+
+    private JLabel getLabel(String id, String value, JPanel namePan, JPanel valuePan, Color borderColor, boolean right) {
+        //region name
+        JLabel label = new JLabel(id);
+        if (right) {
+            label.setBorder(BorderFactory.createEmptyBorder(3, 0, 4, 2));
+        } else {
+            label.setBorder(BorderFactory.createEmptyBorder(3, 2, 4, 0));
+        }
+        label.setAlignmentX(right ? RIGHT_ALIGNMENT : LEFT_ALIGNMENT);
+        label.setFont(FONT);
+        namePan.add(label);
+        //endregion
+        //region value
+        label = new JLabel(value);
+        label.setFont(FONT);
+        label.setAlignmentX(right ? LEFT_ALIGNMENT : RIGHT_ALIGNMENT);
+        label.setHorizontalAlignment(right ? LEADING : TRAILING);
+        Border border = new CompoundBorder((right ? BorderFactory.createEmptyBorder(2, 0, 1, 2) : BorderFactory.createEmptyBorder(2, 2, 1, 0)),
+                new CompoundBorder(BorderFactory.createLineBorder(borderColor), BorderFactory.createEmptyBorder(1, 5, 1, 5)));
+        label.setBorder(border);
+        Insets borderInsets = border.getBorderInsets(label);
+        int maxTextWidth = (int) Math.floor(fontSize[0] * value.length());
+        label.setPreferredSize(new Dimension(maxTextWidth + borderInsets.left + borderInsets.right,
+                (int) Math.floor(fontSize[1] + borderInsets.top + borderInsets.bottom)));
+        label.setMinimumSize(new Dimension(maxTextWidth + borderInsets.left + borderInsets.right,
+                (int) Math.floor(fontSize[1] + borderInsets.top + borderInsets.bottom)));
+        label.setMaximumSize(new Dimension(maxTextWidth + borderInsets.left + borderInsets.right,
+                (int) Math.floor(fontSize[1] + borderInsets.top + borderInsets.bottom)));
+        valuePan.add(label);
+        //endregion
+        return label;
     }
 
     private void reDraw() {
@@ -214,7 +230,7 @@ public class SchemaPartMonitor extends JFrame {
                 } else if (in.item instanceof Bus bus && bus.useBitPresentation) {
                     in.label.setText((bus.state & in.mask) > 0 ? "1" : "0");
                 } else {
-                    in.label.setText(String.format("%" + (int) Math.ceil(in.item.getSize() / 4.0d) + "X", in.item.getState()));
+                    in.label.setText(String.format("%0" + (int) Math.ceil(in.item.getSize() / 4.0d) + "X", in.item.getState()));
                 }
             }
             for (Item out : outs) {
@@ -223,8 +239,9 @@ public class SchemaPartMonitor extends JFrame {
                 } else if (out.item instanceof Bus bus && bus.useBitPresentation) {
                     out.label.setText((bus.state & out.mask) != 0 ? "1" : "0");
                 } else {
-                    out.label.setText(String.format("%" + (int) Math.ceil(out.item.getSize() / 4.0d) + "X", out.item.getState()));
+                    out.label.setText(String.format("%0" + (int) Math.ceil(out.item.getSize() / 4.0d) + "X", out.item.getState()));
                 }
+                out.label.setHorizontalAlignment( LEFT );
             }
             String extraState = schemaPart.extraState();
             if (extraState != null) {
