@@ -182,7 +182,6 @@ public class ClassOptimiser<T> {
         StringBuilder resultSource = new StringBuilder();
         StringBuilder iteratorSource = new StringBuilder();
         StringBuilder functionSource = new StringBuilder();
-        StringBuilder addFunctionSource = new StringBuilder();
         try {
             ListIterator<String> lines = source.listIterator();
             while (lines.hasNext()) {
@@ -261,35 +260,23 @@ public class ClassOptimiser<T> {
                                     String blockTab = " ".repeat(functionOffset);
                                     if (unrolls.containsKey(id)) {
                                         unrolls.get(id).variable = iteratorParams[0];
-                                        functionSource.append(lineTab)
-                                                      .append(iteratorParams[1])
-                                                      .append("=")
-                                                      .append(oldItemName)
-                                                      .append(".")
-                                                      .append(iteratorParams[1])
-                                                      .append(";\n");
-                                        if (addFunctionSource.isEmpty()) {
-                                            addFunctionSource.append(lineTab)
-                                                             .append("splitDestinations();\n")
-                                                             .append(blockTab)
-                                                             .append("}\n\n")
-                                                             .append(blockTab)
-                                                             .append("private void splitDestinations () {\n");
-                                        }
                                         int amount = unrolls.get(id).size;
                                         for (int j = 0; j < amount; j++) {
                                             //add destination variables initialisation
-                                            addFunctionSource.append(lineTab)
-                                                             .append(iteratorParams[0])
-                                                             .append(j)
-                                                             .append(" = ")
-                                                             .append(iteratorParams[1])
-                                                             .append("[")
-                                                             .append(j)
-                                                             .append("];\n");
+                                            functionSource.append(lineTab)
+                                                          .append(blockTab)
+                                                          .append(iteratorParams[0])
+                                                          .append(j)
+                                                          .append(" = ")
+                                                          .append(oldItemName)
+                                                          .append(".")
+                                                          .append(iteratorParams[1])
+                                                          .append("[")
+                                                          .append(j)
+                                                          .append("];\n");
                                             //add destination variable definitions
                                             resultSource.append(blockTab)
-                                                        .append("private ")
+                                                        .append("private final ")
                                                         .append(iteratorItemType)
                                                         .append(" ")
                                                         .append(iteratorParams[0])
@@ -317,7 +304,7 @@ public class ClassOptimiser<T> {
                         // class definition
                     } else if (line.contains("public class " + sourceClass.getSimpleName())) {
                         //rename class definition
-                        resultSource.append("public class ")
+                        resultSource.append("public final class ")
                                     .append(sourceClass.getSimpleName())
                                     .append(suffix)
                                     .append(" extends ")
@@ -334,10 +321,6 @@ public class ClassOptimiser<T> {
                     } else if (lineOffset <= functionOffset && !line.isBlank()) {
                         //function end
                         if ("}".equals(line.trim())) {
-                            if (!addFunctionSource.isEmpty()) {
-                                functionSource.append(addFunctionSource);
-                                addFunctionSource = new StringBuilder();
-                            }
                             functionSource.append(line).append("\n");
                             if (preserveFunction && keepFunction) {
                                 resultSource.append("\n").append(functionSource);
@@ -421,7 +404,7 @@ public class ClassOptimiser<T> {
         try {
             InputStream is = sourceClass.getResourceAsStream(sourceClass.getSimpleName() + ".java");
             if (is == null) {
-                is = sourceClass.getClassLoader().getResourceAsStream(sourceClass.getName().replace(".","/") + ".java");
+                is = sourceClass.getClassLoader().getResourceAsStream(sourceClass.getName().replace(".", "/") + ".java");
             }
             try {
                 if (is == null) {
