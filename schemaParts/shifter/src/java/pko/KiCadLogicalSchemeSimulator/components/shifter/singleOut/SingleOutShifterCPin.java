@@ -189,7 +189,7 @@ public class SingleOutShifterCPin extends InPin {
             optimiser.cut("cn");
         }
         SingleOutShifterCPin build = optimiser.build();
-        build.withState=source!=null;
+        build.withState = source == null;
         if (cn) {
             parent.cn = build;
         } else {

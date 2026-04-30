@@ -68,7 +68,7 @@ public class DcCRaisingPin extends RaisingEdgePin {
         if (parent.clockEnabled) {
             if (dPin.state) {
                 /*Optimiser block q bind nq:!qOut*/
-                if (!(lPin=qOut).state) {
+                if (!(lPin = qOut).state) {
                     lPin.setHi();
                     /*Optimiser line bothRS block nq*/
                 }
@@ -81,7 +81,7 @@ public class DcCRaisingPin extends RaisingEdgePin {
                 return;
             } else {
                 /*Optimiser block q*/
-                if ((lPin=qOut).state) {
+                if ((lPin = qOut).state) {
                     lPin.setLo();
                     /*Optimiser line bothRS block nq*/
                 }
@@ -127,7 +127,7 @@ public class DcCRaisingPin extends RaisingEdgePin {
             optimiser.cut("q");
         }
         DcCRaisingPin build = optimiser.build();
-        build.withState=source!=null;
+        build.withState = source == null;
         parent.cPin = build;
         parent.replaceIn(this, build);
         build.source = source;

@@ -73,7 +73,7 @@ public class AndGateIn extends InPin {
                 /*Optimiser line o blockEnd r block nr*/
             } else {
                 /*Optimiser line o block oc*/
-                if (gate.params.containsKey("openCollector")){
+                if (gate.params.containsKey("openCollector")) {
                     out.setHiImpedance();
                     /*Optimiser line o blockEnd oc block rc*/
                 } else {
@@ -100,7 +100,7 @@ public class AndGateIn extends InPin {
             /*Optimiser line o block r*/
             if (lParent.reverse) {
                 /*Optimiser line o block oc*/
-                if (lParent.params.containsKey("openCollector")){
+                if (lParent.params.containsKey("openCollector")) {
                     out.setHiImpedance();
                     /*Optimiser line o blockEnd oc block rc*/
                 } else {
@@ -136,7 +136,7 @@ public class AndGateIn extends InPin {
         }
         AndGateIn build = optimiser.build();
         build.source = source;
-        build.withState = source != null;
+        build.withState = source == null;
         andGate.replaceIn(this, build);
         return build;
     }

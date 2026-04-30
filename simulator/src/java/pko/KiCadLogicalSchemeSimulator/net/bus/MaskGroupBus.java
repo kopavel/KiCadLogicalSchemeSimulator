@@ -93,7 +93,7 @@ public class MaskGroupBus extends OutBus {
                             }
                         } else {
                             /*Optimiser blockEnd ts*/
-                            newMaskState=queueState;
+                            newMaskState = queueState;
                             for (Bus destination : destinations) {
                                 destination.setState(newMaskState);
                             }
@@ -176,7 +176,7 @@ public class MaskGroupBus extends OutBus {
                 optimiser.cut("ts");
             }
             MaskGroupBus build = optimiser.build();
-            build.withState=inSource!=null;
+            build.withState = inSource == null;
             build.source = inSource;
             for (Bus destination : destinations) {
                 destination.source = build;

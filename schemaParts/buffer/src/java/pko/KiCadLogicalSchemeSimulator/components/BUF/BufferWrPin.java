@@ -29,7 +29,6 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
 package pko.KiCadLogicalSchemeSimulator.components.BUF;
 import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
@@ -104,7 +103,7 @@ public class BufferWrPin extends InPin {
         }
         BufferWrPin build = optimiser.build();
         build.source = source;
-        build.withState=source!=null;
+        build.withState = source == null;
         parent.wrPin = build;
         parent.replaceIn(this, build);
         return build;

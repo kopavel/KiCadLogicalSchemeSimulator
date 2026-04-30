@@ -74,7 +74,7 @@ public class DcCFallingPin extends FallingEdgePin {
         if (parent.clockEnabled) {
             if (dPin.state) {
                 /*Optimiser block q bind nq:!qOut*/
-                if (!(lPin=qOut).state) {
+                if (!(lPin = qOut).state) {
                     lPin.setHi();
                     /*Optimiser line bothRS block nq*/
                 }
@@ -85,7 +85,7 @@ public class DcCFallingPin extends FallingEdgePin {
                 }
             } else {
                 /*Optimiser block q*/
-                if ((lPin=qOut).state) {
+                if ((lPin = qOut).state) {
                     lPin.setLo();
                     /*Optimiser line bothRS block nq*/
                 }
@@ -125,7 +125,7 @@ public class DcCFallingPin extends FallingEdgePin {
             optimiser.cut("q");
         }
         DcCFallingPin build = optimiser.build();
-        build.withState=source!=null;
+        build.withState = source == null;
         parent.ncPin = build;
         parent.replaceIn(this, build);
         build.source = source;

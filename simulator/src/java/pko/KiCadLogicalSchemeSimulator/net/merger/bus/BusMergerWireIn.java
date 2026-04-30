@@ -103,7 +103,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                         assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
                         return;
                     } else {
-                        throw new ShortcutException(this,1,merger.sources);
+                        throw new ShortcutException(this, 1, merger.sources);
                     }
                 }
                 /*Optimiser line ts*/
@@ -129,7 +129,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                     assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
                     return;
                 } else {
-                    throw new ShortcutException(this,1,merger.sources);
+                    throw new ShortcutException(this, 1, merger.sources);
                 }
             }
             /*Optimiser block ts*/
@@ -227,7 +227,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                         assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
                         return;
                     } else {
-                        throw new ShortcutException(this,0,merger.sources);
+                        throw new ShortcutException(this, 0, merger.sources);
                     }
                 }
                 /*Optimiser line ts*/
@@ -253,7 +253,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
                     assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
                     return;
                 } else {
-                    throw new ShortcutException(this,0,merger.sources);
+                    throw new ShortcutException(this, 0, merger.sources);
                 }
             }
             /*Optimiser block ts*/
@@ -319,7 +319,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
     @Override
     public void setHiImpedance() {
         /*Optimiser block ts*/
-        assert !hiImpedance || parent.net.stabilizing: "Already in hiImpedance:" + this;
+        assert !hiImpedance || parent.net.stabilizing : "Already in hiImpedance:" + this;
         hiImpedance = true;
         BusMerger merger = this.merger;
         assert Log.debug(getClass(),
@@ -425,7 +425,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
             optimiser.cut("nr");
         }
         BusMergerWireIn build = optimiser.build();
-        build.withState=source!=null;
+        build.withState = source == null;
         merger.sources.add(build);
         build.source = source;
         return build;

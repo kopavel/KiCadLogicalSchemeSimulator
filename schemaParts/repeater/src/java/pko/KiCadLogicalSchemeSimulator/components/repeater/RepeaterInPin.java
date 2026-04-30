@@ -130,7 +130,7 @@ public class RepeaterInPin extends InPin {
             optimiser.cut("setter");
         }
         RepeaterInPin build = optimiser.build();
-        build.withState=source!=null;
+        build.withState = source == null;
         parent.inPin = build;
         parent.replaceIn(this, build);
         build.source = source;

@@ -63,7 +63,7 @@ public class F0Pin extends InPin {
 
     @Override
     public void setLo() {
-        state = true;
+        state = false;
         Request request = curentRequest;
         if (isReady) {
             if (request.read) {
@@ -99,7 +99,7 @@ public class F0Pin extends InPin {
 
     @Override
     public void setHi() {
-        state = false;
+        state = true;
         f1Pin.setLo();
         Request request;
         f2Pin.setHi();

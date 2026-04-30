@@ -91,7 +91,7 @@ public class MultiPartCFallingIn extends FallingEdgePin implements MultiPartCIn 
             /*Optimiser line o*/
             if (size == 1) {
                 /*Optimiser block pin*/
-                if ((lPin=outPin).state) {
+                if ((lPin = outPin).state) {
                     lPin.setLo();
                 } else {
                     lPin.setHi();
@@ -99,7 +99,7 @@ public class MultiPartCFallingIn extends FallingEdgePin implements MultiPartCIn 
                 /*Optimiser line o blockEnd pin*/
             } else if (skipMask != 0) {
                 /*Optimiser line skip bind skip:skipMask bind countMask*///
-                (bus = outBus).setState(((lState=bus.state) + (((lState & skipMask) == skipMask) ? 2 : 1)) & countMask);
+                (bus = outBus).setState(((lState = bus.state) + (((lState & skipMask) == skipMask) ? 2 : 1)) & countMask);
                 /*Optimiser line o*/
             } else {
                 /*Optimiser line bus bind countMask*///
@@ -142,7 +142,7 @@ public class MultiPartCFallingIn extends FallingEdgePin implements MultiPartCIn 
             optimiser.cut("setter");
         }
         MultiPartCFallingIn build = optimiser.build();
-        build.withState = source != null;
+        build.withState = source == null;
         parent.cIns[partNo] = build;
         parent.inPins.put(id, build);
         for (MultiPartRIn rPin : parent.rIns.values()) {

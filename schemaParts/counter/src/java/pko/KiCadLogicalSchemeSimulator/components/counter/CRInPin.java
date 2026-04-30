@@ -53,9 +53,9 @@ class CRInPin extends InPin {
         (lCounter = counter).enabled = false;
         out.setState(0);
         if (lCounter.reverse) {
-            lCounter.nIn.oState=0;
+            lCounter.nIn.oState = 0;
         } else {
-            lCounter.in.oState=0;
+            lCounter.in.oState = 0;
         }
     }
 
@@ -73,7 +73,7 @@ class CRInPin extends InPin {
             optimiser.cut("setter");
         }
         CRInPin build = optimiser.build();
-        build.withState=source!=null;
+        build.withState = source == null;
         counter.rPin = build;
         parent.replaceIn(this, build);
         build.source = source;

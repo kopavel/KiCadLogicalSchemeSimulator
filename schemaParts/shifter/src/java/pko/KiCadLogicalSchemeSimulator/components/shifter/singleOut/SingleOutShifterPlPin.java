@@ -58,7 +58,7 @@ public class SingleOutShifterPlPin extends InPin {
                 /*Optimiser line o*/
                 !
                         /*Optimiser bind r:plReverse*/
-                plReverse;
+                        plReverse;
     }
 
     @Override
@@ -66,8 +66,8 @@ public class SingleOutShifterPlPin extends InPin {
         /*Optimiser line setter*/
         state = false;
         parent.parallelLoad =
-                        /*Optimiser bind nr:plReverse*/
-                        plReverse;
+                /*Optimiser bind nr:plReverse*/
+                plReverse;
     }
 
     @Override
@@ -84,7 +84,7 @@ public class SingleOutShifterPlPin extends InPin {
             optimiser.bind("r", "true");
         }
         SingleOutShifterPlPin build = optimiser.build();
-        build.withState=source!=null;
+        build.withState = source == null;
         parent.replaceIn(this, build);
         build.source = source;
         return build;

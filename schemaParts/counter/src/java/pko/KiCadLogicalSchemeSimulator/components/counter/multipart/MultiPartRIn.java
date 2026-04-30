@@ -36,11 +36,11 @@ import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 
 public class MultiPartRIn extends InPin {
     public final boolean reverse;
-    public MultiPartCIn[] cIns;
     public final MultiPartCounter parent;
     public final int mask;
     public final int nMask;
     public final int no;
+    public MultiPartCIn[] cIns;
 
     public MultiPartRIn(String id, MultiPartCounter parent, boolean reverse, int no) {
         super(id, parent);
@@ -136,7 +136,7 @@ public class MultiPartRIn extends InPin {
             optimiser.cut("setter");
         }
         MultiPartRIn build = optimiser.build();
-        build.withState=source!=null;
+        build.withState = source == null;
         parent.rIns.put(id, build);
         parent.replaceIn(this, build);
         build.source = source;

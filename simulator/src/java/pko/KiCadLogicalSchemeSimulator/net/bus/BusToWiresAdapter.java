@@ -74,7 +74,7 @@ public class BusToWiresAdapter extends OutBus implements SupportMask, SupportOff
 
     @Override
     public int getState() {
-        return ((withState||source == null ? state : source.getState()) & mask) > 0 ? 1 : 0;
+        return ((withState || source == null ? state : source.getState()) & mask) > 0 ? 1 : 0;
     }
 
     @Override
@@ -232,7 +232,7 @@ public class BusToWiresAdapter extends OutBus implements SupportMask, SupportOff
                 optimiser.cut("lo").bind("eq", "!==");
             }
             BusToWiresAdapter build = optimiser.build();
-            build.withState=inSource!=null;
+            build.withState = inSource == null;
             build.source = inSource;
             for (Pin destination : pinDestinations) {
                 destination.source = build;

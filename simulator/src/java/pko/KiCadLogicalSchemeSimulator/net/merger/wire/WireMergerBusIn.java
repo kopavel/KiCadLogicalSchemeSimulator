@@ -106,7 +106,7 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus>, SupportM
                     assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
                     return;
                 } else {
-                    throw new ShortcutException(this,newState,merger.sources);
+                    throw new ShortcutException(this, newState, merger.sources);
                 }
                 //endregion
             }
@@ -166,7 +166,7 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus>, SupportM
                 merger.state,
                 merger.strong,
                 merger.hiImpedance);
-        assert !hiImpedance || parent.net.stabilizing: "Already in hiImpedance:" + this;
+        assert !hiImpedance || parent.net.stabilizing : "Already in hiImpedance:" + this;
         //endregion
         /*Optimiser line weakOnly block strongOnly*/
         if (merger.weakState == 0) {
@@ -179,7 +179,7 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus>, SupportM
             /*Optimiser blockEnd strongOnly line passivePins*/
             merger.strong = false;
             boolean newMergerState;
-            if (merger.state != (newMergerState=(merger.weakState > 0))) {
+            if (merger.state != (newMergerState = (merger.weakState > 0))) {
                 merger.state = newMergerState;
                 if (newMergerState) {
                     for (Pin destination : destinations) {
@@ -240,7 +240,7 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus>, SupportM
             optimiser.bind("gm", applyMask);
         }
         WireMergerBusIn build = optimiser.build();
-        build.withState=source!=null;
+        build.withState = source == null;
         build.source = source;
         merger.sources.add(build);
         return build;

@@ -84,7 +84,7 @@ public class RomABus extends InBus {
         }
         RomABus build = optimiser.build();
         build.source = source;
-        build.withState=source!=null;
+        build.withState = source == null;
         parent.replaceIn(this, build);
         parent.aBus = build;
         for (RomCsPin csPin : parent.csPins) {

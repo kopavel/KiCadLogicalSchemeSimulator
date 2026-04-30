@@ -55,7 +55,6 @@ import java.util.function.Supplier;
 
 import static javax.swing.SwingConstants.LEADING;
 import static javax.swing.SwingConstants.LEFT;
-import static javax.swing.SwingConstants.RIGHT;
 import static javax.swing.SwingConstants.TRAILING;
 import static org.apache.commons.lang3.StringUtils.leftPad;
 
@@ -143,7 +142,7 @@ public class SchemaPartMonitor extends JFrame {
                 public void mouseClicked(MouseEvent e) {
                     SwingUtilities.invokeLater(() -> {
                         JFrame jFrame = new JFrame();
-                        jFrame.setTitle(schemaPart.id+":extra");
+                        jFrame.setTitle(schemaPart.id + ":extra");
                         JPanel extraPanel = extraPannelSupplier.get();
                         jFrame.getContentPane().add(extraPanel, BorderLayout.LINE_START);
                         jFrame.pack();
@@ -179,7 +178,7 @@ public class SchemaPartMonitor extends JFrame {
                     }
                 } else {
                     retVal[i] = new Item(item,
-                            getLabel(schemaPart.ids.get(bus), leftPad("", (int) Math.floor(bus.size / 4.0), '0'), names, values, borderColor, right),
+                            getLabel(schemaPart.ids.get(bus), leftPad("", (int) Math.ceil(bus.size / 4.0), '0'), names, values, borderColor, right),
                             1);
                 }
             } else {
@@ -210,13 +209,13 @@ public class SchemaPartMonitor extends JFrame {
                 new CompoundBorder(BorderFactory.createLineBorder(borderColor), BorderFactory.createEmptyBorder(1, 5, 1, 5)));
         label.setBorder(border);
         Insets borderInsets = border.getBorderInsets(label);
-        int maxTextWidth = (int) Math.floor(fontSize[0] * value.length());
+        int maxTextWidth = (int) Math.ceil(fontSize[0] * Math.max(2, value.length()));
         label.setPreferredSize(new Dimension(maxTextWidth + borderInsets.left + borderInsets.right,
-                (int) Math.floor(fontSize[1] + borderInsets.top + borderInsets.bottom)));
+                (int) Math.ceil(fontSize[1] + borderInsets.top + borderInsets.bottom)));
         label.setMinimumSize(new Dimension(maxTextWidth + borderInsets.left + borderInsets.right,
-                (int) Math.floor(fontSize[1] + borderInsets.top + borderInsets.bottom)));
+                (int) Math.ceil(fontSize[1] + borderInsets.top + borderInsets.bottom)));
         label.setMaximumSize(new Dimension(maxTextWidth + borderInsets.left + borderInsets.right,
-                (int) Math.floor(fontSize[1] + borderInsets.top + borderInsets.bottom)));
+                (int) Math.ceil(fontSize[1] + borderInsets.top + borderInsets.bottom)));
         valuePan.add(label);
         //endregion
         return label;
@@ -241,7 +240,7 @@ public class SchemaPartMonitor extends JFrame {
                 } else {
                     out.label.setText(String.format("%0" + (int) Math.ceil(out.item.getSize() / 4.0d) + "X", out.item.getState()));
                 }
-                out.label.setHorizontalAlignment( LEFT );
+                out.label.setHorizontalAlignment(LEFT);
             }
             String extraState = schemaPart.extraState();
             if (extraState != null) {

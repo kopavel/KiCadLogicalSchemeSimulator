@@ -135,7 +135,7 @@ public class MultiPartCRaisingIn extends RaisingEdgePin implements MultiPartCIn 
             optimiser.cut("setter");
         }
         MultiPartCRaisingIn build = optimiser.build();
-        build.withState=source!=null;
+        build.withState = source == null;
         parent.cIns[partNo] = build;
         parent.inPins.put(id, build);
         for (MultiPartRIn rPin : parent.rIns.values()) {

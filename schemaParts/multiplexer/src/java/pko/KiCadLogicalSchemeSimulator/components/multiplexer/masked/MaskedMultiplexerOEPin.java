@@ -39,8 +39,8 @@ public class MaskedMultiplexerOEPin extends InPin {
     public final MaskedMultiplexer parent;
     public final int mask;
     public final int nMask;
-    public Bus outBus;
     public final Bus[] inBuses;
+    public Bus outBus;
 
     public MaskedMultiplexerOEPin(String id, MaskedMultiplexer parent, int mask) {
         super(id, parent);
@@ -117,7 +117,7 @@ public class MaskedMultiplexerOEPin extends InPin {
             optimiser.cut("r");
         }
         MaskedMultiplexerOEPin build = optimiser.build();
-        build.withState=source!=null;
+        build.withState = source == null;
         build.source = source;
         parent.replaceIn(this, build);
         if (parent.oePin == this) {

@@ -89,7 +89,7 @@ public class BusInInterconnect extends InBus {
         }
         InBus build = optimiser.build();
         build.source = source;
-        build.withState=source!=null;
+        build.withState = source == null;
         destination.source = build;
         return build;
     }

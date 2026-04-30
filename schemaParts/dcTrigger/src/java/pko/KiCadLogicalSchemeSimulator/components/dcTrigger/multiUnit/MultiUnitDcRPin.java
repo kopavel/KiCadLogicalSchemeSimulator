@@ -125,7 +125,7 @@ public class MultiUnitDcRPin extends InPin {
         }
         optimiser.unroll(pins.length);
         MultiUnitDcRPin build = optimiser.build();
-        build.withState=source!=null;
+        build.withState = source == null;
         parent.rPin = build;
         parent.replaceIn(this, build);
         build.source = source;
