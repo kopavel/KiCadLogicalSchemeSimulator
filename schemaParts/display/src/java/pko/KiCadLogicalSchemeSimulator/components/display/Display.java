@@ -47,11 +47,10 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
     public int hSize;
     public int vSize;
     int rows;
-    byte pixel;
     double fps;
-    private int hPos;
-    private int vPos;
-    private byte[] row;
+    public int hPos;
+    public int vPos;
+    public byte[] row;
 
     public Display(String id, String sParam) {
         super(id, sParam);
@@ -197,31 +196,20 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                 }
             });
         }
+        ClockIn clock = addInPin(new ClockIn("Clock", this));
         addInPin(new InPin("Vin", this) {
             @Override
             public void setHi() {
                 state = true;
-                pixel = (byte) 0xff;
+                clock.pixel = (byte) 0xff;
             }
 
             @Override
             public void setLo() {
                 state = false;
-                pixel = 0;
+                clock.pixel = 0;
             }
         }).hiImpedance = false;
-        addInPin(new InPin("Clock", this) {
-            @Override
-            public void setHi() {
-                state = true;
-            }
-
-            @Override
-            public void setLo() {
-                state = false;
-                row[hPos++] = pixel;
-            }
-        });
     }
 
     @Override

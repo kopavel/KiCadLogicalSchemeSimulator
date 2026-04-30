@@ -75,9 +75,10 @@ public class Multiplexer extends SchemaPart {
             });
         }
         for (int i = 0; i < nSize; i++) {
-            int mask = 1 << i;
-            int nMask = ~mask;
-            addInPin(new InPin("N" + i, this) {
+            int finalI = i;
+            addInPin(new InPin("N" + finalI, this) {
+                int mask = 1 << finalI;
+                int nMask = ~mask;
                 @Override
                 public void setHi() {
                     state = true;
