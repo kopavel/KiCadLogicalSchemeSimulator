@@ -41,6 +41,11 @@ import javax.swing.*;
 import java.util.function.Supplier;
 
 public class Mos6532 extends SchemaPart {
+    private static final int TIMER = 0b100;
+    private static final int TIMER_DEVIDER = 0b10000;
+    private static final int DDR = 0b1;
+    private static final int B_PART = 0b10;
+    private static final int ENABLE_INTERRUPT = 0b1000;
     Bus dOut;
     InBus dIn;
     InBus aBus;
@@ -52,11 +57,11 @@ public class Mos6532 extends SchemaPart {
     Pin IRQPin;
     Pins aPart = new Pins("A", this);
     Pins bPart = new Pins("B", this);
-    boolean timerFlag;
-    boolean pa7Flag;
-    boolean pa7Interrupt;
-    boolean timerInterrupt;
-    boolean pa7PositiveEdge;
+    boolean timerInterruptOccured;
+    boolean timerInterruptEnabled;
+    boolean pa7InterruptOccured;
+    boolean pa7InterruptEnabled;
+    boolean pa7PositiveEdgeSensetive;
     int timerDivider = 1;
     int timerCount;
     final int[] ram = new int[128];
@@ -81,11 +86,11 @@ public class Mos6532 extends SchemaPart {
                 selected = false;
                 aPart.reset();
                 bPart.reset();
-                pa7Interrupt = false;
-                pa7PositiveEdge = false;
-                timerInterrupt = false;
-                timerFlag = false;
-                pa7Flag = false;
+                pa7InterruptEnabled = false;
+                pa7PositiveEdgeSensetive = false;
+                timerInterruptEnabled = false;
+                timerInterruptOccured = false;
+                pa7InterruptOccured = false;
                 if (!IRQPin.hiImpedance) {
                     IRQPin.setHiImpedance();
                 }
@@ -140,52 +145,41 @@ public class Mos6532 extends SchemaPart {
             @Override
             public void setHi() {
                 state = true;
-                if (timerCount == 0) {
+                if (timerInterruptEnabled & timerCount == 0) {
                     timerCount = 255;
                     timerDivider = 1;
-                    timerFlag = true;
-                    if (timerInterrupt && IRQPin.hiImpedance) {
-                        IRQPin.setLo();
-                    }
+                    timerInterruptOccured = true;
                 }
-                if (selected) {
-                    if (RWPin.state) {
-                        if (RSPin.state) {
-                            int addr = aBus.state;
-                            if ((addr & 0b100) == 0) {
-                                int mask;
-                                if ((mask = (addr & 3)) == 0) {
-                                    dOut.setState(aPart.getState());
-                                } else if (mask == 1) {
-                                    dOut.setState(aPart.direction);
-                                } else if (mask == 2) {
-                                    dOut.setState(bPart.getState());
+                if (!timerInterruptOccured && !pa7InterruptOccured) {
+                    if (!IRQPin.hiImpedance) {
+                        IRQPin.setHiImpedance();
+                    }
+                } else if (IRQPin.hiImpedance) {
+                    IRQPin.setLo();
+                }
+                //Cpu read -> we write.
+                if (selected && RWPin.state) {
+                    if (RSPin.state) {
+                        int addr = aBus.state;
+                        if ((addr & TIMER) != 0) {
+                            if ((addr & TIMER_DEVIDER) != 0) {
+                                if ((addr & 1) == 0) {
+                                    timerInterruptEnabled = (aBus.state & ENABLE_INTERRUPT) > 0;
+                                    dOut.setState(timerCount / timerDivider);
+                                    timerInterruptOccured = false;
                                 } else {
-                                    dOut.setState(bPart.direction);
-                                }
-                                return;
-                            }
-                            if ((addr & 1) == 0) {
-                                timerInterrupt = (aBus.state & 0b1000) > 0;
-                                dOut.setState(timerCount / timerDivider);
-                                timerFlag = false;
-                                if (!pa7Interrupt || !pa7Flag) {
-                                    if (!IRQPin.hiImpedance) {
-                                        IRQPin.setHiImpedance();
-                                    }
-                                }
-                                return;
-                            }
-                            dOut.setState((timerFlag ? 128 : 0) | (pa7Flag ? 65 : 0));
-                            pa7Flag = false;
-                            if (!timerInterrupt || !timerFlag) {
-                                if (!IRQPin.hiImpedance) {
-                                    IRQPin.setHiImpedance();
+                                    dOut.setState((timerInterruptOccured ? 0x80 : 0) | (pa7InterruptOccured ? 0x40 : 0));
+                                    pa7InterruptOccured = false;
                                 }
                             }
+                        } else if ((addr & DDR) != 0) {
+                            dOut.setState((addr & B_PART) == 0 ? aPart.direction : bPart.direction);
                         } else {
-                            dOut.setState(ram[aBus.state]);
+                            dOut.setState((addr & B_PART) == 0 ? aPart.getState() : bPart.getState());
                         }
+                        //RAM
+                    } else {
+                        dOut.setState(ram[aBus.state]);
                     }
                 }
             }
@@ -193,29 +187,19 @@ public class Mos6532 extends SchemaPart {
             @Override
             public void setLo() {
                 state = false;
-                timerCount--;
-                if (selected) {
-                    if (!RWPin.state) {
-                        if (RSPin.state) {
-                            int addr = aBus.state;
-                            if ((addr & 0b100) == 0) {
-                                int mask;
-                                if ((mask = (addr & 3)) == 0) {
-                                    aPart.setState();
-                                    return;
-                                } else if (mask == 1) {
-                                    aPart.direction = dIn.state;
-                                    return;
-                                } else if (mask == 2) {
-                                    bPart.setState();
-                                    return;
-                                } else {
-                                    bPart.direction = dIn.state;
-                                    return;
-                                }
-                            }
-                            if ((addr & 0b10000) > 0) {
-                                timerInterrupt = (aBus.state & 0b1000) > 0;
+                if (!dOut.hiImpedance) {
+                    dOut.setHiImpedance();
+                }
+                if (timerInterruptEnabled) {
+                    timerCount--;
+                }
+                //Cpu write -> we read.
+                if (selected && !RWPin.state) {
+                    if (RSPin.state) {
+                        int addr = aBus.state;
+                        if ((addr & TIMER) != 0) {
+                            if ((addr & TIMER_DEVIDER) != 0) {
+                                timerInterruptEnabled = (aBus.state & ENABLE_INTERRUPT) > 0;
                                 timerCount = (timerDivider = switch ((aBus.state & 3)) {
                                     case 0 -> 1;
                                     case 1 -> 8;
@@ -223,24 +207,27 @@ public class Mos6532 extends SchemaPart {
                                     case 3 -> 1024;
                                     default -> throw new IllegalStateException("unreachable");
                                 }) * dIn.state;
-                                timerFlag = false;
-                                if (!pa7Interrupt || !pa7Flag) {
-                                    if (!IRQPin.hiImpedance) {
-                                        IRQPin.setHiImpedance();
-                                    }
-                                }
+                                timerInterruptOccured = false;
                             } else {
-                                pa7Interrupt = (aBus.state & 2) > 0;
-                                pa7PositiveEdge = (aBus.state & 1) > 0;
+                                pa7InterruptEnabled = (aBus.state & 0b10) > 0;
+                                pa7PositiveEdgeSensetive = (aBus.state & 0b1) > 0;
                             }
-                            return;
+                        } else if ((addr & DDR) != 0) {
+                            if ((addr & B_PART) == 0) {
+                                aPart.direction = dIn.state;
+                            } else {
+                                bPart.direction = dIn.state;
+                            }
                         } else {
-                            ram[aBus.state] = dIn.state;
+                            if ((addr & B_PART) == 0) {
+                                aPart.setState();
+                            } else {
+                                bPart.setState();
+                            }
                         }
+                    } else {
+                        ram[aBus.state] = dIn.state;
                     }
-                }
-                if (!dOut.hiImpedance) {
-                    dOut.setHiImpedance();
                 }
             }
         });
@@ -259,13 +246,13 @@ public class Mos6532 extends SchemaPart {
     public String extraState() {
         return "DDRA:" + Integer.toBinaryString(aPart.direction) + "\n" +//
                 "DDRB:" + Integer.toBinaryString(bPart.direction) + "\n" +//
-                "pa7 Flag:" + pa7Flag + "\n" +//
-                "pa7 PositiveEdge:" + pa7PositiveEdge + "\n" +//
-                "pa7 Interrupt:" + pa7Interrupt + "\n" +//
-                "Timer count:" + timerCount + "\n" +//
+                "PA7 Irq enabled:" + pa7InterruptEnabled + "\n" +//
+                "PA7 Irq occured:" + pa7InterruptOccured + "\n" +//
+                "PA7 PositiveEdgeSense:" + pa7PositiveEdgeSensetive + "\n" +//
                 "Timer divider:" + timerDivider + "\n" +//
-                "timer Flag:" + timerFlag + "\n" +//
-                "timer Interrupt:" + timerInterrupt;
+                "Timer count:" + timerCount + "\n" +//
+                "Timer Irq enabled:" + timerInterruptEnabled + "\n" +//
+                "Timer Irq occuder:" + timerInterruptOccured;
     }
 
     public Supplier<JPanel> extraPanel() {
@@ -287,9 +274,9 @@ public class Mos6532 extends SchemaPart {
                         @Override
                         public void setHi() {
                             state = true;
-                            if (pa7PositiveEdge) {
-                                pa7Flag = true;
-                                if (pa7Interrupt && IRQPin.hiImpedance) {
+                            if (pa7PositiveEdgeSensetive) {
+                                pa7InterruptOccured = true;
+                                if (pa7InterruptEnabled && IRQPin.hiImpedance) {
                                     IRQPin.setLo();
                                 }
                             }
@@ -298,9 +285,9 @@ public class Mos6532 extends SchemaPart {
                         @Override
                         public void setLo() {
                             state = false;
-                            if (!pa7PositiveEdge) {
-                                pa7Flag = true;
-                                if (pa7Interrupt && IRQPin.hiImpedance) {
+                            if (!pa7PositiveEdgeSensetive) {
+                                pa7InterruptOccured = true;
+                                if (pa7InterruptEnabled && IRQPin.hiImpedance) {
                                     IRQPin.setLo();
                                 }
                             }
