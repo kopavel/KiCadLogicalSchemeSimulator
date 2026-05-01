@@ -51,6 +51,7 @@ public class F0Pin extends InPin {
     public Bus dOut;
     public Bus aOut;
     public boolean opCode;
+    public int resetCoutner=6;
 
     public F0Pin(String id, Mos6502 parent) {
         super(id, parent);
@@ -64,48 +65,66 @@ public class F0Pin extends InPin {
     @Override
     public void setLo() {
         state = false;
-        Request request = curentRequest;
-        if (isReady) {
-            if (request.read) {
-                request.address = -1;
-                request.callback.accept(dIn.state);
-            }
-            if (opCode) {
-                syncPin.setLo();
-                opCode = false;
-            }
-            request = curentRequest = queue.pop();
-        }
-        f2Pin.setLo();
-        if (!dOut.hiImpedance) {
-            dOut.setHiImpedance();
-        }
-        f1Pin.setHi();
-        if (isReady) {
-            aOut.setState(request.address);
-            if (request.read) {
-                if (!rwPin.state) {
-                    rwPin.setHi();
+        if (resetCoutner == 0) {
+            Request request = curentRequest;
+            if (isReady) {
+                if (request.read) {
+                    request.address = -1;
+                    request.callback.accept(dIn.state);
                 }
-            } else if (rwPin.state) {
-                rwPin.setLo();
+                if (opCode) {
+                    syncPin.setLo();
+                    opCode = false;
+                }
+                request = curentRequest = queue.pop();
             }
-            if (opCode) {
-                syncPin.setHi();
+            f2Pin.setLo();
+            if (!dOut.hiImpedance) {
+                dOut.setHiImpedance();
             }
+            f1Pin.setHi();
+            if (isReady) {
+                aOut.setState(request.address);
+                if (request.read) {
+                    if (!rwPin.state) {
+                        rwPin.setHi();
+                    }
+                } else if (rwPin.state) {
+                    rwPin.setLo();
+                }
+                if (opCode) {
+                    syncPin.setHi();
+                }
+            }
+            isReady = !request.read || rdyPin.state;
         }
-        isReady = !request.read || rdyPin.state;
     }
 
     @Override
     public void setHi() {
         state = true;
-        f1Pin.setLo();
-        Request request;
-        f2Pin.setHi();
-        if (!(request = curentRequest).read && request.address >= 0) {
-            dOut.setState(request.payload);
-            request.address = -1;
+        if (resetCoutner == 0) {
+            f1Pin.setLo();
+            Request request;
+            f2Pin.setHi();
+            if (!(request = curentRequest).read && request.address >= 0) {
+                dOut.setState(request.payload);
+                request.address = -1;
+            }
+        } else {
+            if (resetCoutner == 6) {
+                reset();
+            }
+            resetCoutner--;
         }
+    }
+
+    public void reset() {
+        queue.clear();
+        isReady = rdyPin.state;
+        opCode = false;
+        resetCoutner = 6;
+        curentRequest = new Request();
+        ((Mos6502) parent).core.reset();
     }
 }

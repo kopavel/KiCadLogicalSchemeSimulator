@@ -115,12 +115,7 @@ public class Mos6502 extends SchemaPart {
 
     @Override
     public void reset() {
-        f0Pin.isReady = false;
-        if (!dOut.hiImpedance) {
-            dOut.setHiImpedance();
-        }
-        f0Pin.queue.clear();
-        core.reset();
+        f0Pin.resetCoutner=6;
     }
 
     @Override
