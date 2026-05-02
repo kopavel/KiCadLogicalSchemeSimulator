@@ -133,12 +133,14 @@ configure(subprojects) { subproject ->
                 "pko.KiCadLogicalSchemeSimulator.components.${project.name.toUpperCase()}.test.Benchmark.bench"//
         ]
     }
+    def simulatorSourceSets = project(":simulator")
+            .extensions
+            .getByName("sourceSets")
     dependencies {
         implementation project(":simulator")
         implementation libs.jakarta.api
-        testImplementation project(":simulator").sourceSets.test.output
+        testImplementation simulatorSourceSets.named("test").get().output
         testRuntimeOnly project(":simulator")
-        testRuntimeOnly files(sourceSets.main.java.srcDirs)
         testImplementation libs.jmh
         testAnnotationProcessor libs.jmh.annotations
     }

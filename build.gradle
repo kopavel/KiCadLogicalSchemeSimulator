@@ -74,7 +74,6 @@ tasks.register("copyToLib", Copy) {
 
     def javaSubprojects = subprojects.findAll { it.plugins.hasPlugin('java') }
 
-    // Зависимость — чтобы JAR собрался раньше
     dependsOn(javaSubprojects.collect { sp -> sp.tasks.named('jar') })
 
     def runtimeFiles = javaSubprojects
@@ -86,8 +85,6 @@ tasks.register("copyToLib", Copy) {
             .collect { it.name }
             .toSet()
 
-    // ✅ Ключевое — JAR файлы как inputs
-    // Если ни один JAR не пересобрался → copyToLib будет UP-TO-DATE → пропустится
     inputs.files(javaSubprojects.collectMany { sp ->
         sp.tasks.named('jar').get().outputs.files.files
     })
@@ -162,8 +159,12 @@ idea {
     module {
         excludeDirs += file('distro')
         excludeDirs += file('stuff/work')
-        fileTree(rootDir).visit { FileVisitDetails details ->
-            if (details.isDirectory() && (details.name == 'logs' /*|| details.name == 'optimised'*/) || details.name.endsWith(".log")) {
+        fileTree(rootDir) {
+            exclude '.gradle/**'
+            exclude '.git/**'
+            exclude '.idea/**'
+        }.visit { FileVisitDetails details ->
+            if (details.isDirectory() && (details.name == 'logs'|| details.name == 'optimised') || details.name.endsWith(".log")) {
                 excludeDirs += details.file
             }
         }
