@@ -46,7 +46,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -57,6 +56,7 @@ import static javax.swing.SwingConstants.LEADING;
 import static javax.swing.SwingConstants.LEFT;
 import static javax.swing.SwingConstants.TRAILING;
 import static org.apache.commons.lang3.StringUtils.leftPad;
+import static pko.KiCadLogicalSchemeSimulator.tools.Utils.AlphanumericComparator;
 
 public class SchemaPartMonitor extends JFrame {
     public static final Font FONT = AbstractUiComponent.monospacedFont;
@@ -99,7 +99,7 @@ public class SchemaPartMonitor extends JFrame {
         ins = getItems(inputsNames,
                 inputsValues,
                 schemaPart.inPins.values()
-                        .stream().distinct().sorted(Comparator.comparing(ModelItem::getId)).toList(),
+                        .stream().distinct().sorted(AlphanumericComparator.comparing(ModelItem::getId)).toList(),
                 borderColor,
                 false);
         //endregion
@@ -107,7 +107,7 @@ public class SchemaPartMonitor extends JFrame {
         outs = getItems(outputsNames,
                 outputsValues,
                 schemaPart.outPins.values()
-                        .stream().distinct().sorted(Comparator.comparing(schemaPart.ids::get)).toList(),
+                        .stream().distinct().sorted(AlphanumericComparator.comparing(ModelItem::getId)).toList(),
                 borderColor,
                 true);
         //endregion

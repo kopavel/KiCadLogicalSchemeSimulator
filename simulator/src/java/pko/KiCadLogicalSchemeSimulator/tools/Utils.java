@@ -37,12 +37,16 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @SuppressWarnings({"unused", "StaticMethodOnlyUsedInOneClass"})
 public enum Utils {
     ;
+    private static final Pattern NON_DIGIT_PATTERN = Pattern.compile("^\\D+");
 
     public static String getStackTrace() {
         return getStackTrace(3);
@@ -162,5 +166,47 @@ public enum Utils {
             return string;
         }
         return String.valueOf(c).repeat(pad) + string;
+    }
+
+    public static final class AlphanumericComparator implements Comparator<String> {
+        public static <T> Comparator<T> comparing(Function<? super T, String> keyExtractor) {
+            return Comparator.comparing(keyExtractor, new AlphanumericComparator());
+        }
+
+        @Override
+        public int compare(String s1, String s2) {
+            int i1 = lastNonDigitIndex(s1);
+            int i2 = lastNonDigitIndex(s2);
+            // prefix
+            String p1 = s1.substring(0, i1 + 1);
+            String p2 = s2.substring(0, i2 + 1);
+            int cmp = p1.compareTo(p2);
+            if (cmp != 0) {
+                return cmp;
+            }
+            // number part
+            String n1 = s1.substring(i1 + 1);
+            String n2 = s2.substring(i2 + 1);
+            if (n1.isEmpty() || n2.isEmpty()) {
+                return n1.isEmpty() ? (n2.isEmpty() ? 0 : -1) : 1;
+            }
+            cmp = Integer.compare(n1.length(), n2.length());
+            if (cmp != 0) {
+                return cmp;
+            }
+            return n1.compareTo(n2);
+        }
+
+        private static int lastNonDigitIndex(String s) {
+            int i = s.length() - 1;
+            while (i >= 0 && isDigit(s.charAt(i))) {
+                i--;
+            }
+            return i;
+        }
+
+        private static boolean isDigit(char c) {
+            return c >= '0' && c <= '9';
+        }
     }
 }
