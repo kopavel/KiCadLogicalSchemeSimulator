@@ -243,9 +243,11 @@ public class ParameterResolver {
         } else if (pwrNames.contains(net.getName().toLowerCase()) || pwrPattern.matcher(net.getName()).matches()) {
             return pwr;
         } else {
+/*
             if (net.node.stream()
                     .filter(node -> node != exclusion)
                     .noneMatch(node -> "passive".equals(node.pintype))) {
+*/
                 return net.node.stream()
                         .map(this::getSchemaPartConfig)
                         .filter(Objects::nonNull)
@@ -253,8 +255,10 @@ public class ParameterResolver {
                         .map(config -> config.params.containsKey("strong")
                                        ? ((config.params.containsKey("hi") ? pwr : gnd))
                                        : (config.params.containsKey("hi") ? pullUp : pullDown)).findFirst().orElse(none);
+/*
             }
             return none;
+*/
         }
     }
 

@@ -33,6 +33,7 @@ package pko.KiCadLogicalSchemeSimulator.api;
 import pko.KiCadLogicalSchemeSimulator.api.params.ParameterResolver;
 import pko.KiCadLogicalSchemeSimulator.api.params.types.PinConfig;
 import pko.KiCadLogicalSchemeSimulator.api.params.types.SchemaPartConfig;
+import pko.KiCadLogicalSchemeSimulator.api.params.types.SymbolConfig;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Export;
 import pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Net;
@@ -103,7 +104,7 @@ public interface NetFilter {
     default boolean mergeNets(Export netFile,
             ParameterResolver parameterResolver,
             BiFunction<ParameterResolver, Node, Boolean> doMerge,
-            BiFunction<PinConfig,PinConfig, Boolean> destinationFilter) {
+            BiFunction<PinConfig, PinConfig, Boolean> destinationFilter) {
         boolean retVal = false;
         Iterator<Net> currentNetIterator = netFile.nets.net.iterator();
         nextNet:
@@ -112,7 +113,7 @@ public interface NetFilter {
             for (Node currentNode : currentNet.node) {
                 if (doMerge.apply(parameterResolver, currentNode)) {
                     for (Map.Entry<Node, PinConfig> otherNodeConfig : otherNodes(parameterResolver, currentNode).entrySet()) {
-                        if (destinationFilter.apply(parameterResolver.getPinConfig(currentNode),otherNodeConfig.getValue())) {
+                        if (destinationFilter.apply(parameterResolver.getPinConfig(currentNode), otherNodeConfig.getValue())) {
                             List<Node> otherNode = otherNodeConfig.getKey().parent.node;
                             otherNode.addAll(currentNet.node);
                             otherNode.remove(currentNode);
@@ -127,5 +128,8 @@ public interface NetFilter {
             }
         }
         return retVal;
+    }
+    default void addPart(ParameterResolver parameterResolver, String id, String clazz, String params) {
+        parameterResolver.schemaParts.computeIfAbsent(id, _ -> new HashMap<>()).put(0, new SchemaPartConfig(new SymbolConfig(clazz, params), 0));
     }
 }

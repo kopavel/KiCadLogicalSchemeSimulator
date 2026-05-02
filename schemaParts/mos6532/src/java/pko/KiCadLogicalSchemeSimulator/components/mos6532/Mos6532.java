@@ -145,7 +145,7 @@ public class Mos6532 extends SchemaPart {
             @Override
             public void setHi() {
                 state = true;
-                if (timerInterruptEnabled & timerCount == 0) {
+                if (timerInterruptEnabled && timerCount == 0) {
                     timerCount = 255;
                     timerDivider = 1;
                     timerInterruptOccured = true;
@@ -263,7 +263,6 @@ public class Mos6532 extends SchemaPart {
         final InPin[] ins = new InPin[8];
         final String suffix;
         final Pin[] outs = new Pin[8];
-        int data;
         int direction;
 
         private Pins(String suffix, Mos6532 parent) {
@@ -301,7 +300,7 @@ public class Mos6532 extends SchemaPart {
         }
 
         public void setState() {
-            int data = (this.data = dIn.state);
+            int data = dIn.state;
             int direction = this.direction;
             int mask = 1;
             for (Pin out : outs) {
@@ -322,12 +321,10 @@ public class Mos6532 extends SchemaPart {
             for (Pin out : outs) {
                 out.setHiImpedance();
             }
-            data = 0;
             direction = 0;
         }
 
         private int getState() {
-            int data = this.data;
             int direction = this.direction;
             int result = 0;
             int mask = 1;
@@ -337,7 +334,7 @@ public class Mos6532 extends SchemaPart {
                         result |= mask;
                     }
                 } else {
-                    result |= (data & mask);
+                    result |= in.state ? mask : 0;
                 }
                 mask <<= 1;
             }

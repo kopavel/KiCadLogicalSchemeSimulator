@@ -155,7 +155,7 @@ public class Net {
                 return;
             }
             PinConfig pinConfig = parameterResolver.getPinConfig(node);
-            String id = parameterResolver.getId(node);
+            String id = pinConfig == null ? node.ref : parameterResolver.getId(node);
             SchemaPart schemaPart = schemaParts.computeIfAbsent(id, s -> createSchemaPart(schemaPartConfig.clazz, id, schemaPartConfig.getParamString()));
             String pinName = pinConfig == null ? node.getPinfunction() : pinConfig.pinName;
             SchemaPart.PinType pinType = schemaPart.getPinType(pinName);
