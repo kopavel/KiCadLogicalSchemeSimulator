@@ -71,7 +71,7 @@ public class SchemaPartMonitor extends JFrame {
     private JPanel outputsValues;
     private JPanel panel;
     private JPanel schemaPartBox;
-    private double[] fontSize;
+    private final double[] fontSize;
 
     public SchemaPartMonitor(String id) {
         //region init

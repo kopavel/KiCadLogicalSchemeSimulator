@@ -52,6 +52,7 @@ public class Led7SegmentDisplayInPin extends InPin {
 
     @Override
     public void setHi() {
+        state=true;
         if (display.reverse || !display.enabled) {
             display.segmentsOff |= mask;
         } else {
@@ -62,6 +63,7 @@ public class Led7SegmentDisplayInPin extends InPin {
 
     @Override
     public void setLo() {
+        state=false;
         if (display.reverse && display.enabled) {
             display.segmentsOn |= mask;
             display.segmentsOff &= nMask;
