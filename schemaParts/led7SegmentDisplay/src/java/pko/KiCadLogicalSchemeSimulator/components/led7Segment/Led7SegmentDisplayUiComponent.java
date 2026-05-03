@@ -78,7 +78,7 @@ public class Led7SegmentDisplayUiComponent extends AbstractUiComponent {
 
     @Override
     protected void draw() {
-        // Set color and draw the circle
+        // Set colour and draw the circle
         if (segmentsUi == null) {
             segmentsUi = new Shape[8];
             int y = titleHeight + 5;

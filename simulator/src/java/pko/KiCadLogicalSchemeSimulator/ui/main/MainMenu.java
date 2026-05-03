@@ -51,11 +51,13 @@ public class MainMenu extends JMenuBar {
         Map<Character, JMenu> letterMenus = new HashMap<>();
         add(schemaParts);
         for (SchemaPart schemaPart : Simulator.net.schemaParts.values()) {
-            char firstLetter = Character.toUpperCase(schemaPart.id.charAt(0));
-            letterMenus.putIfAbsent(firstLetter, new JMenu(String.valueOf(firstLetter)));
-            JMenuItem schemaPartItem = new JMenuItem(schemaPart.id);
-            schemaPartItem.addActionListener(e -> Simulator.addMonitoringPart(schemaPart.id, null));
-            letterMenus.get(firstLetter).add(schemaPartItem);
+            if (!"Power".equals(schemaPart.getClass().getSimpleName())) {
+                char firstLetter = Character.toUpperCase(schemaPart.id.charAt(0));
+                letterMenus.putIfAbsent(firstLetter, new JMenu(String.valueOf(firstLetter)));
+                JMenuItem schemaPartItem = new JMenuItem(schemaPart.id);
+                schemaPartItem.addActionListener(e -> Simulator.addMonitoringPart(schemaPart.id, null));
+                letterMenus.get(firstLetter).add(schemaPartItem);
+            }
         }
         for (char letter = '0'; letter <= 'Z'; letter++) {
             if (letterMenus.containsKey(letter)) {

@@ -164,7 +164,7 @@ idea {
             exclude '.git/**'
             exclude '.idea/**'
         }.visit { FileVisitDetails details ->
-            if (details.isDirectory() && (details.name == 'logs'|| details.name == 'optimised') || details.name.endsWith(".log")) {
+            if (details.isDirectory() && details.name == 'logs' || details.name.endsWith(".log")) {
                 excludeDirs += details.file
             }
         }

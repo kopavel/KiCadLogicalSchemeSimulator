@@ -39,14 +39,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.function.Function;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @SuppressWarnings({"unused", "StaticMethodOnlyUsedInOneClass"})
 public enum Utils {
     ;
-    private static final Pattern NON_DIGIT_PATTERN = Pattern.compile("^\\D+");
 
     public static String getStackTrace() {
         return getStackTrace(3);
@@ -79,7 +76,7 @@ public enum Utils {
         BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
         String line;
         while ((line = reader.readLine()) != null) {
-            if (!content.toString().isEmpty()) {
+            if (!content.isEmpty()) {
                 content.append(System.lineSeparator());
             }
             content.append(line);
@@ -95,36 +92,20 @@ public enum Utils {
     }
 
     public static int getMaskForSize(int size) {
-        int retVal = 0;
-        for (int i = 0; i < size; i++) {
-            retVal = (retVal << 1) | 1;
-        }
-        return retVal;
+        return (1 << size) - 1;
     }
 
     @SafeVarargs
     public static String getHash(Collection<? extends ModelItem<?>>... items) {
-        Stream<String> mergedStream = null;
-        for (Collection<? extends ModelItem<?>> item : items) {
-            Stream<String> itemStream = item.stream()
-                    .map(modelItem -> {
-                        String result = modelItem.getName();
-                        if (modelItem instanceof OutBus bus) {
-                            result += ":mask" + bus.mask;
-                        }
-                        return result;
-                    });
-            if (mergedStream == null) {
-                mergedStream = itemStream;
-            } else {
-                mergedStream = Stream.concat(mergedStream, itemStream);
-            }
-        }
-        if (mergedStream != null) {
-            return mergedStream.sorted()
-                    .collect(Collectors.joining(";"));
-        }
-        return "";
+        return Arrays.stream(items).flatMap(Collection::stream)
+                .map(modelItem -> {
+                    String result = modelItem.getName();
+                    if (modelItem instanceof OutBus bus) {
+                        result += ":mask" + bus.mask;
+                    }
+                    return result;
+                }).sorted()
+                .collect(Collectors.joining(";"));
     }
 
     public static int countLeadingSpaces(String text) {
@@ -135,12 +116,16 @@ public enum Utils {
     }
 
     public static String regexEscape(String input) {
-        input = input.replace("\\s", " ");
+        StringBuilder result = new StringBuilder(input.replace("\\s", " "));
         String[] specialChars = {"\\", "^", "$", ".", "|", "?", "*", "+", "(", ")", "[", "{", "]", "}", ":", "!"};
-        for (String ch : specialChars) {
-            input = input.replace(ch, "\\" + ch);
+        for (String s : specialChars) {
+            int index = 0;
+            while ((index = result.indexOf(s, index)) != -1) {
+                result.insert(index, "\\");
+                index += 2;
+            }
         }
-        return input;
+        return result.toString();
     }
 
     public static <T> boolean notContain(T[] array, T item) {
@@ -165,7 +150,7 @@ public enum Utils {
         if (pad <= 0) {
             return string;
         }
-        return String.valueOf(c).repeat(pad) + string;
+        return Character.toString(c).repeat(pad) + string;
     }
 
     public static final class AlphanumericComparator implements Comparator<String> {
@@ -175,34 +160,40 @@ public enum Utils {
 
         @Override
         public int compare(String s1, String s2) {
-            int i1 = lastNonDigitIndex(s1);
-            int i2 = lastNonDigitIndex(s2);
-            // prefix
-            String p1 = s1.substring(0, i1 + 1);
-            String p2 = s2.substring(0, i2 + 1);
-            int cmp = p1.compareTo(p2);
-            if (cmp != 0) {
-                return cmp;
+            int i = 0, j = 0;
+            int len1 = s1.length();
+            int len2 = s2.length();
+            while (i < len1 && j < len2) {
+                char c1 = s1.charAt(i);
+                char c2 = s2.charAt(j);
+                if (isDigit(c1) && isDigit(c2)) {
+                    int startI = i;
+                    int startJ = j;
+                    while (i < len1 && isDigit(s1.charAt(i))) {
+                        i++;
+                    }
+                    while (j < len2 && isDigit(s2.charAt(j))) {
+                        j++;
+                    }
+                    String num1 = s1.substring(startI, i);
+                    String num2 = s2.substring(startJ, j);
+                    int cmp = Integer.compare(num1.length(), num2.length());
+                    if (cmp != 0) {
+                        return cmp;
+                    }
+                    cmp = num1.compareTo(num2);
+                    if (cmp != 0) {
+                        return cmp;
+                    }
+                } else {
+                    if (c1 != c2) {
+                        return Character.compare(c1, c2);
+                    }
+                    i++;
+                    j++;
+                }
             }
-            // number part
-            String n1 = s1.substring(i1 + 1);
-            String n2 = s2.substring(i2 + 1);
-            if (n1.isEmpty() || n2.isEmpty()) {
-                return n1.isEmpty() ? (n2.isEmpty() ? 0 : -1) : 1;
-            }
-            cmp = Integer.compare(n1.length(), n2.length());
-            if (cmp != 0) {
-                return cmp;
-            }
-            return n1.compareTo(n2);
-        }
-
-        private static int lastNonDigitIndex(String s) {
-            int i = s.length() - 1;
-            while (i >= 0 && isDigit(s.charAt(i))) {
-                i--;
-            }
-            return i;
+            return Integer.compare(len1, len2);
         }
 
         private static boolean isDigit(char c) {

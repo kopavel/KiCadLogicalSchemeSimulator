@@ -73,25 +73,27 @@ public class OscilloscopeMenu extends JMenuBar {
     private void fillPinsMenu(JMenu schemaParts) {
         Map<Character, JMenu> letterMenus = new HashMap<>();
         for (SchemaPart schemaPart : Simulator.net.schemaParts.values()) {
-            char firstLetter = Character.toUpperCase(schemaPart.id.charAt(0));
-            letterMenus.putIfAbsent(firstLetter, new JMenu(String.valueOf(firstLetter)));
-            JMenu schemaPartItem = new JMenu(schemaPart.id);
-            letterMenus.get(firstLetter).add(schemaPartItem);
-            schemaPartItem.add(new JLabel(localization.getString("inPins")));
-            schemaPart.inPins.values()
-                    .stream().distinct().sorted().forEach(inItem -> {
-                          JMenuItem inPinItem = new JMenuItem(schemaPart.ids.get(inItem));
-                          inPinItem.addActionListener(e -> oscilloscope.addPin(inItem, schemaPart.id+":"+schemaPart.ids.get(inItem), false));
-                          schemaPartItem.add(inPinItem);
-                      });
-            schemaPartItem.addSeparator();
-            schemaPartItem.add(new JLabel(localization.getString("outPins")));
-            schemaPart.outPins.values()
-                    .stream().distinct().sorted().forEach(inItem -> {
-                          JMenuItem inPinItem = new JMenuItem(schemaPart.ids.get(inItem));
-                          inPinItem.addActionListener(e -> oscilloscope.addPin(inItem, schemaPart.id+":"+schemaPart.ids.get(inItem), true));
-                          schemaPartItem.add(inPinItem);
-                      });
+            if (!"Power".equals(schemaPart.getClass().getSimpleName())) {
+                char firstLetter = Character.toUpperCase(schemaPart.id.charAt(0));
+                letterMenus.putIfAbsent(firstLetter, new JMenu(String.valueOf(firstLetter)));
+                JMenu schemaPartItem = new JMenu(schemaPart.id);
+                letterMenus.get(firstLetter).add(schemaPartItem);
+                schemaPartItem.add(new JLabel(localization.getString("inPins")));
+                schemaPart.inPins.values()
+                        .stream().distinct().sorted().forEach(inItem -> {
+                              JMenuItem inPinItem = new JMenuItem(schemaPart.ids.get(inItem));
+                              inPinItem.addActionListener(e -> oscilloscope.addPin(inItem, schemaPart.id + ":" + schemaPart.ids.get(inItem), false));
+                              schemaPartItem.add(inPinItem);
+                          });
+                schemaPartItem.addSeparator();
+                schemaPartItem.add(new JLabel(localization.getString("outPins")));
+                schemaPart.outPins.values()
+                        .stream().distinct().sorted().forEach(inItem -> {
+                              JMenuItem inPinItem = new JMenuItem(schemaPart.ids.get(inItem));
+                              inPinItem.addActionListener(e -> oscilloscope.addPin(inItem, schemaPart.id + ":" + schemaPart.ids.get(inItem), true));
+                              schemaPartItem.add(inPinItem);
+                          });
+            }
         }
         for (char letter = 'A'; letter <= 'Z'; letter++) {
             if (letterMenus.containsKey(letter)) {

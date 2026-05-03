@@ -62,7 +62,7 @@ import static pko.KiCadLogicalSchemeSimulator.api.params.ParameterResolver.Power
 
 public class Net {
     public final Queue<IModelItem<?>> forResend = new LinkedList<>();
-    public final Map<String, SchemaPart> schemaParts = new TreeMap<>();
+    public final Map<String, SchemaPart> schemaParts = new TreeMap<>(new Utils.AlphanumericComparator());
     public final String optimisedDir;
     public final ParameterResolver parameterResolver;
     private final Map<Pin, DestinationWireDescriptor> destinationWireDescriptors = new HashMap<>();

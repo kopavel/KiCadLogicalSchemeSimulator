@@ -37,17 +37,22 @@ import pko.KiCadLogicalSchemeSimulator.Simulator;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 import javax.tools.*;
+import javax.tools.JavaCompiler.CompilationTask;
+import javax.tools.JavaFileObject.Kind;
 import java.io.*;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.Map.Entry;
 
 public enum JavaCompiler {
     ;
     private static final javax.tools.JavaCompiler compiler;
     private static final List<String> optionList;
     private static final DynamicClassLoader classLoader = new DynamicClassLoader(ClassLoader.getSystemClassLoader());
+    private static final List<Diagnostic<? extends JavaFileObject>> diagnosticsList = new ArrayList<>();
+    private static final InMemoryJavaFileManager fileManager;
     static {
         try {
             compiler = ToolProvider.getSystemJavaCompiler();
@@ -81,52 +86,65 @@ public enum JavaCompiler {
             optionList.add(paths.toString());
             optionList.add("-g");
             optionList.add("-proc:full");
+            fileManager = new InMemoryJavaFileManager(compiler.getStandardFileManager(null, null, null));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
     public static Class<?> compileJavaSource(String classPath, String className, String sourceCode) {
-        InMemoryJavaFileManager fileManager = new InMemoryJavaFileManager(compiler.getStandardFileManager(null, null, null));
+        fileManager.getClassBytes().clear();
+        diagnosticsList.clear();
+        if (performCompilation(className, sourceCode)) {
+            return loadCompiledClasses(classPath);
+        } else {
+            reportCompilationErrors();
+            return null;
+        }
+    }
+
+    private static boolean performCompilation(String className, String sourceCode) {
         JavaFileObject javaFileObject = new InMemoryJavaFileObject(className, sourceCode);
         List<JavaFileObject> javaFileObjects = Collections.singletonList(javaFileObject);
-        DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
-        javax.tools.JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, diagnostics, optionList, null, javaFileObjects);
-        if (task.call()) {
-            Class<?>[] retClass = new Class[1];
-            fileManager.getClassBytes().entrySet()
-                    .stream()
-                    .filter(e -> e.getKey().contains(".optimised.")).sorted(Map.Entry.<String, ByteArrayOutputStream>comparingByKey().reversed()).forEach(entry -> {
+        CompilationTask task = compiler.getTask(null, fileManager, diagnosticsList::add, optionList, null, javaFileObjects);
+        return task.call();
+    }
+
+    private static Class<?> loadCompiledClasses(String classPath) {
+        Class<?>[] retClass = new Class[1];
+        fileManager.getClassBytes().entrySet()
+                .stream()
+                .filter(e -> e.getKey().contains(".optimised.")).sorted(Entry.<String, ByteArrayOutputStream>comparingByKey().reversed()).forEach(entry -> {
+                       try {
                            try {
-                               try {
-                                   Class.forName(entry.getKey());
-                                   Log.warn(JavaCompiler.class, "Class {} already loaded", entry.getKey());
-                               } catch (ClassNotFoundException ignore) {
-                                   Log.debug(JavaCompiler.class, "Cache and load dynamically optimised class {}", entry.getKey());
-                                   byte[] classBytes = entry.getValue().toByteArray();
-                                   storeClass(entry.getKey(), classBytes);
-                                   retClass[0] = classLoader.defineClassInPackage(classPath, classBytes);
-                               }
-                           } catch (Exception e) {
-                               throw new RuntimeException(e);
+                               Class.forName(entry.getKey());
+                               Log.warn(JavaCompiler.class, "Class {} already loaded", entry.getKey());
+                           } catch (ClassNotFoundException ignore) {
+                               Log.debug(JavaCompiler.class, "Cache and load dynamically optimised class {}", entry.getKey());
+                               byte[] classBytes = entry.getValue().toByteArray();
+                               storeClass(entry.getKey(), classBytes);
+                               retClass[0] = classLoader.defineClassInPackage(classPath, classBytes);
                            }
-                       });
-            return retClass[0];
-        } else {
-            Log.error(JavaCompiler.class, "Can't compile source");
-            for (Diagnostic<? extends JavaFileObject> diagnostic : diagnostics.getDiagnostics()) {
-                if (diagnostic.getPosition() >= 0) {
-                    Log.error(JavaCompiler.class,
-                            "{} at {}:{} {} \n   {}",
-                            diagnostic.getKind(),
-                            diagnostic.getLineNumber(),
-                            diagnostic.getColumnNumber(),
-                            diagnostic.getSource().getName(),
-                            diagnostic.getMessage(Locale.getDefault()));
-                } else {
-                    Log.error(JavaCompiler.class, "{}: {}", diagnostic.getKind(), diagnostic.getMessage(Locale.getDefault()));
-                }
+                       } catch (Exception e) {
+                           throw new RuntimeException(e);
+                       }
+                   });
+        return retClass[0];
+    }
+
+    private static void reportCompilationErrors() {
+        Log.error(JavaCompiler.class, "Can't compile source");
+        for (Diagnostic<? extends JavaFileObject> diagnostic : diagnosticsList) {
+            if (diagnostic.getPosition() >= 0) {
+                Log.error(JavaCompiler.class,
+                        "{} at {}:{} {} \n   {}",
+                        diagnostic.getKind(),
+                        diagnostic.getLineNumber(),
+                        diagnostic.getColumnNumber(),
+                        diagnostic.getSource().getName(),
+                        diagnostic.getMessage(Locale.getDefault()));
+            } else {
+                Log.error(JavaCompiler.class, "{}: {}", diagnostic.getKind(), diagnostic.getMessage(Locale.getDefault()));
             }
-            return null;
         }
     }
 
@@ -149,7 +167,7 @@ public enum JavaCompiler {
         private final String sourceCode;
 
         protected InMemoryJavaFileObject(String className, String sourceCode) {
-            super(URI.create("string:///" + className.replace('.', '/') + JavaFileObject.Kind.SOURCE.extension), JavaFileObject.Kind.SOURCE);
+            super(URI.create("string:///" + className.replace('.', '/') + Kind.SOURCE.extension), Kind.SOURCE);
             this.sourceCode = sourceCode;
         }
 
@@ -168,7 +186,7 @@ public enum JavaCompiler {
         }
 
         @Override
-        public JavaFileObject getJavaFileForOutput(JavaFileManager.Location location, String className, JavaFileObject.Kind kind, FileObject sibling) {
+        public JavaFileObject getJavaFileForOutput(Location location, String className, Kind kind, FileObject sibling) {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             classBytes.put(className, outputStream);
             return new SimpleJavaFileObject(URI.create("file:///" + className.replace('.', '/') + kind.extension), kind) {
