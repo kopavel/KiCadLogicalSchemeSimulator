@@ -36,7 +36,7 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 
 //FixME in case of DcTrigger chain on single clock - need C priority in reverse chain order.
 public class DcTrigger extends SchemaPart {
-    public InPin dPin;
+    public final InPin dPin;
     public DcRPin rPin;
     public DcSPin sPin;
     public DcCRaisingPin cPin;

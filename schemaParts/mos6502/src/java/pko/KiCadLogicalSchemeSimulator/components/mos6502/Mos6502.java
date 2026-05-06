@@ -42,7 +42,7 @@ public class Mos6502 extends SchemaPart {
     public final InPin rdyPin;
     public final Cpu core;
     public final F0Pin f0Pin;
-    public InBus dIn;
+    public final InBus dIn;
     public Pin f1Pin;
     public Pin f2Pin;
     public Pin syncPin;

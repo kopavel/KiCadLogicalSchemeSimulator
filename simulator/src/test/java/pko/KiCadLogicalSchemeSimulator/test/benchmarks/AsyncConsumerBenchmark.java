@@ -51,7 +51,7 @@ public class AsyncConsumerBenchmark {
     BatchedAsyncConsumer asyncConsumer;
     private Blackhole blackhole;
 
-    public static void main(String[] args) throws Throwable {
+    static void main(String[] args) throws Throwable {
         if (TEST) {
             Options options = new OptionsBuilder()//
                                                   .include(AsyncConsumerBenchmark.class.getSimpleName())
@@ -79,7 +79,7 @@ public class AsyncConsumerBenchmark {
     }
 
     @Setup
-    public void setup(Blackhole blackhole) throws Exception {
+    public void setup(Blackhole blackhole) {
         this.blackhole = blackhole;
 /*
         if (THREADS == 0) {
@@ -112,7 +112,7 @@ public class AsyncConsumerBenchmark {
         }
     }
 
-    @Benchmark()
+    @Benchmark
     public void asyncConsumer() {
         for (int i = 0; i < cycles; i++) {
             asyncConsumer.accept(i);

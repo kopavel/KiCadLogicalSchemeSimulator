@@ -50,7 +50,7 @@ public class Led16SegmentDisplayUiComponent extends AbstractUiComponent {
     private final int[] segmentsTime = new int[8];
     private final int inertia;
     private Shape[] segmentsUi;
-    private Led16SegmentDisplay parent;
+    private final Led16SegmentDisplay parent;
 
     public Led16SegmentDisplayUiComponent(Led16SegmentDisplay parent, int size, Color on, Color off, String title) {
         super(title, size);

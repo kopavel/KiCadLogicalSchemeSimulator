@@ -80,6 +80,6 @@ public class KeyboardUiComponent extends AbstractUiComponent implements KeyListe
 
     @Override
     protected void draw() {
-        g2d.drawString(label, 0, titleHeight * 2);
+        g2d.drawString(label, 0, titleHeight << 1);
     }
 }

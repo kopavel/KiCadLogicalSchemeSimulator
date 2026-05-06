@@ -54,7 +54,7 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
 
     public Display(String id, String sParam) {
         super(id, sParam);
-        row = ram[vPos];
+        row = ram[0];
         try {
             if (params.containsKey("scale")) {
                 int scale = Integer.parseInt(params.get("scale"));
@@ -196,7 +196,7 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                 }
             });
         }
-        ClockIn clock = addInPin(new ClockIn("Clock", this));
+        ClockIn clock = addInPin(new ClockIn(this));
         addInPin(new InPin("Vin", this) {
             @Override
             public void setHi() {

@@ -45,7 +45,7 @@ public class NetBenchmark extends NetTester {
     private final static boolean TEST = true;
     private Bus out;
 
-    public static void main(String[] args) throws Throwable {
+    static void main(String[] args) throws Throwable {
         if (TEST) {
             Options options = new OptionsBuilder()//
                                                   .include(NetBenchmark.class.getSimpleName())
@@ -73,7 +73,7 @@ public class NetBenchmark extends NetTester {
         out = outBus("OutBus");
     }
 
-    @Benchmark()
+    @Benchmark
     public void netBench() {
         for (int i = 0; i < 10000000; i++) {
             out.setState(0);

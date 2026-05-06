@@ -46,7 +46,7 @@ public class Benchmark extends NetTester {
     private Pin out1;
     private Pin out2;
 
-    public static void main(String[] args) throws Throwable {
+    static void main(String[] args) throws Throwable {
         if (TEST) {
             Options options = new OptionsBuilder()//
                                                   .include(Benchmark.class.getSimpleName())

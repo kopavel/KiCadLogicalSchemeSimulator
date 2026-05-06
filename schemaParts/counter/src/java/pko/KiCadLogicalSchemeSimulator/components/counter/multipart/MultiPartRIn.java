@@ -40,7 +40,7 @@ public class MultiPartRIn extends InPin {
     public final int mask;
     public final int nMask;
     public final int no;
-    public MultiPartCIn[] cIns;
+    public final MultiPartCIn[] cIns;
 
     public MultiPartRIn(String id, MultiPartCounter parent, boolean reverse, int no) {
         super(id, parent);

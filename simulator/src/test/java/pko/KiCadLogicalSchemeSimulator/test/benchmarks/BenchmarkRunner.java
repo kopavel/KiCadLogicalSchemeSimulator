@@ -36,7 +36,7 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import java.io.IOException;
 
 public class BenchmarkRunner {
-    public static void main(String[] args) throws IOException {
+    static void main(String[] args) throws IOException {
         String[] benchmarks = {//
 //                "pko.KiCadLogicalSchemeSimulator.test.benchmarks.OutPinBenchmark.javac",//
 //                "pko.KiCadLogicalSchemeSimulator.test.benchmarks.OutBusBenchmark.javac",//

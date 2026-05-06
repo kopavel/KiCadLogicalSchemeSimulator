@@ -39,8 +39,8 @@ import static pko.KiCadLogicalSchemeSimulator.components.decoder.multiOut.MultiO
 
 public class MultiOutDecoderABus extends InBus {
     public final MultiOutDecoder parent;
-    public Part[] parts;
-    boolean hasCs;
+    public final Part[] parts;
+    final boolean hasCs;
 
     public MultiOutDecoderABus(String id, MultiOutDecoder parent, int size, String... names) {
         super(id, parent, size, names);

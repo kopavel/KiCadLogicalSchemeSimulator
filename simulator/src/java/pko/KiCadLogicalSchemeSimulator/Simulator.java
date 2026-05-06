@@ -101,7 +101,7 @@ public class Simulator implements Runnable {
     @CommandLine.Option(names = {"-m", "--mapFile"}, description = "Path to KiCad symbol mapping file")
     public String[] mapFiles;
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         new CommandLine(new Simulator()).execute(args);
     }
 

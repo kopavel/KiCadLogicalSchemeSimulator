@@ -39,7 +39,7 @@ import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 public class BufferCsPin extends InPin {
     public Bus qBus;
     public Bus dBus;
-    public Buffer parent;
+    final public Buffer parent;
 
     public BufferCsPin(String id, Buffer parent, Bus dBus) {
         super(id, parent);

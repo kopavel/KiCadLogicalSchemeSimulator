@@ -48,7 +48,7 @@ public class BusMergerWireIn extends InPin implements MergerInput<Pin> {
     public final int nMask;
     public final BusMerger merger;
     @Getter
-    public int mask;
+    public final int mask;
     public boolean oldStrong;
     public Bus[] destinations;
 

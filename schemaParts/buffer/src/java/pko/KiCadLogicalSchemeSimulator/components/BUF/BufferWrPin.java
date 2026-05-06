@@ -37,7 +37,7 @@ import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 
 public class BufferWrPin extends InPin {
     public final Buffer parent;
-    public Bus dBus;
+    public final Bus dBus;
     public BufferOePin oePin;
     public Bus qBus;
 

@@ -177,8 +177,8 @@ public abstract class NetTester {
         ParameterResolver parameterResolver = new ParameterResolver();
         Params params = null;
         String netFilePath = getNetFilePath();
-        String netFilePathNoExtension = netFilePath.substring(0, netFilePath.lastIndexOf("."));
-        String[] mapFiles = new String[]{//
+        String netFilePathNoExtension = netFilePath.substring(0, netFilePath.lastIndexOf('.'));
+        String[] mapFiles = {//
                 rootPath + "/stuff/kicad_symbols/kicad.sym_map",//
                 rootPath + "/stuff/kicad_symbols/chip.sym_map",//
                 rootPath + "/stuff/kicad_symbols/test.sym_map"//

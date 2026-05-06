@@ -72,18 +72,10 @@ public class ResisterTest extends NetTester {
                         out1.setHiImpedance();
                     }
                 }
-                case "w0" -> {
-                    out1.setLo(false);
-                }
-                case "w1" -> {
-                    out1.setHi(false);
-                }
-                case "s0" -> {
-                    out1.setLo(true);
-                }
-                case "s1" -> {
-                    out1.setHi(true);
-                }
+                case "w0" -> out1.setLo(false);
+                case "w1" -> out1.setHi(false);
+                case "s0" -> out1.setLo(true);
+                case "s1" -> out1.setHi(true);
             }
             switch (in2[i]) {
                 case "hi" -> {

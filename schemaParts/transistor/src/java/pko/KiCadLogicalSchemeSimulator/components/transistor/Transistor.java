@@ -50,7 +50,8 @@ public class Transistor implements NetFilter {
     public boolean doFilter(Export netFile, ParameterResolver parameterResolver) {
         boolean result = false;
         for (Net currentNet : netFile.getNets().getNet()) {
-            for (Iterator<Node> nodes = currentNet.getNode().iterator(); nodes.hasNext(); ) {
+            Iterator<Node> nodes = currentNet.getNode().iterator();
+            while (nodes.hasNext()) {
                 Node currentNode = nodes.next();
                 SchemaPartConfig schemaPartConfig = parameterResolver.getSchemaPartConfig(currentNode);
                 if (schemaPartConfig != null && Transistor.class.getSimpleName().equals(schemaPartConfig.clazz)) {
@@ -75,9 +76,9 @@ public class Transistor implements NetFilter {
                             switch (pinName) {
                                 case "B":
                                     schemaPartConfig.params.put(powerState.state ? "openCollector" : "openEmitter", "true");
-                                    otherNodes.forEach((e, c) -> {
+                                    otherNodes.forEach((e, conf) -> {
                                         e.pin = null;
-                                        if ("K".equals(c.pinName)) {
+                                        if ("K".equals(conf.pinName)) {
                                             e.pintype = "output";
                                             e.pinfunction = "OUT";
                                         } else {
@@ -88,11 +89,12 @@ public class Transistor implements NetFilter {
                                     break;
                                 case "E":
                                     schemaPartConfig.params.put("reverse", "true");
+                                    //noinspection fallthrough
                                 case "K":
                                     schemaPartConfig.params.put(powerState.state ? "openEmitter" : "openCollector", "true");
-                                    otherNodes.forEach((e, c) -> {
+                                    otherNodes.forEach((e, conf) -> {
                                         e.pin = null;
-                                        if ("B".equals(c.pinName)) {
+                                        if ("B".equals(conf.pinName)) {
                                             e.pintype = "input";
                                             e.pinfunction = "IN";
                                         } else {

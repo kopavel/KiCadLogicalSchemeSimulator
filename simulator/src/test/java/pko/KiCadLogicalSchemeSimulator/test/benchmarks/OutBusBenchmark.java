@@ -40,7 +40,7 @@ import java.util.concurrent.TimeUnit;
 @State(Scope.Benchmark)
 public class OutBusBenchmark {
     @Benchmark
-    @Fork(value = 1)
+    @Fork(1)
     @Warmup(iterations = 1, time = 15)
     @Measurement(iterations = 3, time = 15)
     @OutputTimeUnit(TimeUnit.SECONDS)

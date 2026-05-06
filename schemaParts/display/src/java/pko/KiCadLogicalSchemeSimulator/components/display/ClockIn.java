@@ -5,8 +5,8 @@ public class ClockIn extends InPin {
     private final Display display;
     public byte pixel;
 
-    protected ClockIn(String id, Display parent) {
-        super(id, parent);
+    protected ClockIn(Display parent) {
+        super("Clock", parent);
         display = parent;
     }
 

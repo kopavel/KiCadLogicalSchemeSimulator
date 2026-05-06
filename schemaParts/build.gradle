@@ -139,7 +139,7 @@ configure(subprojects) { subproject ->
     dependencies {
         implementation project(":simulator")
         implementation libs.jakarta.api
-        testImplementation simulatorSourceSets.named("test").get().output
+        testImplementation files(simulatorSourceSets.test.output)
         testRuntimeOnly project(":simulator")
         testImplementation libs.jmh
         testAnnotationProcessor libs.jmh.annotations

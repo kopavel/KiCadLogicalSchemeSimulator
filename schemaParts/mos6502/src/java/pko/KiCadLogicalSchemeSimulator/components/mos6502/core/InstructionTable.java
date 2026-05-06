@@ -28,7 +28,7 @@ public class InstructionTable {
      * includes sizes for all instructions for NMOS 6502, CMOS 65C02,
      * and CMOS 65C816
      */
-    public static int[] instructionSizes = {1, 2, 2, 1, 2, 2, 2, 2, 1, 2, 1, 1, 3, 3, 3, 3,   // 0x00-0x0f
+    public static final int[] instructionSizes = {1, 2, 2, 1, 2, 2, 2, 2, 1, 2, 1, 1, 3, 3, 3, 3,   // 0x00-0x0f
             2, 2, 2, 1, 2, 2, 2, 2, 1, 3, 1, 1, 3, 3, 3, 3,   // 0x10-0x1f
             3, 2, 2, 1, 2, 2, 2, 2, 1, 2, 1, 1, 3, 3, 3, 3,   // 0x20-0x2f
             2, 2, 2, 1, 2, 2, 2, 2, 1, 3, 1, 1, 3, 3, 3, 3,   // 0x30-0x3f
@@ -54,7 +54,7 @@ public class InstructionTable {
      * TODO (2025-03-14): This table is clearly wrong for 65C816.
      * TODO (2025-03-14): Rockwell/WDC 65C02 names conflict with 65C816 names.
      */
-    static String[] opcodeNames = {"BRK", "ORA", "NOP", "NOP", "TSB", "ORA", "ASL", "RMB0",  // 0x00-0x07
+    static final String[] opcodeNames = {"BRK", "ORA", "NOP", "NOP", "TSB", "ORA", "ASL", "RMB0",  // 0x00-0x07
             "PHP", "ORA", "ASL", "NOP", "TSB", "ORA", "ASL", "BBR0",  // 0x08-0x0f
             "BPL", "ORA", "ORA", "NOP", "TRB", "ORA", "ASL", "RMB1",  // 0x10-0x17
             "CLC", "ORA", "INC", "NOP", "TRB", "ORA", "ASL", "BBR1",  // 0x18-0x1f
@@ -92,7 +92,7 @@ public class InstructionTable {
      * for all instructions for NMOS 6502, CMOS 65C02,
      * and CMOS 65C816
      */
-    static Mode[] instructionModes = {Mode.IMP, Mode.XIN, Mode.NUL, Mode.NUL,   // 0x00-0x03
+    static final Mode[] instructionModes = {Mode.IMP, Mode.XIN, Mode.NUL, Mode.NUL,   // 0x00-0x03
             Mode.ZPG, Mode.ZPG, Mode.ZPG, Mode.ZPG,   // 0x04-0x07
             Mode.IMP, Mode.IMM, Mode.ACC, Mode.NUL,   // 0x08-0x0b
             Mode.ABS, Mode.ABS, Mode.ABS, Mode.ZPR,   // 0x0c-0x0f

@@ -48,7 +48,7 @@ public abstract class Bus extends ModelItem<Bus> {
     public boolean useBitPresentation;
     //Fixme why not just 'mask'?
     public int applyMask;
-    public int maxState;
+    public final int maxState;
 
     protected Bus(String id, SchemaPart parent, int size, String... aliases) {
         super(id, parent);

@@ -70,18 +70,10 @@ public class DiodeTest extends NetTester {
                         anode.setHiImpedance();
                     }
                 }
-                case "w0" -> {
-                    anode.setLo(false);
-                }
-                case "w1" -> {
-                    anode.setHi(false);
-                }
-                case "s0" -> {
-                    anode.setLo(true);
-                }
-                case "s1" -> {
-                    anode.setHi(true);
-                }
+                case "w0" -> anode.setLo(false);
+                case "w1" -> anode.setHi(false);
+                case "s0" -> anode.setLo(true);
+                case "s1" -> anode.setHi(true);
             }
             switch (cathodeIn[i]) {
                 case "hi" -> {

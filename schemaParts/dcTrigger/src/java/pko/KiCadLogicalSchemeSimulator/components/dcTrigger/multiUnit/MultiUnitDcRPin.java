@@ -38,7 +38,7 @@ import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 public class MultiUnitDcRPin extends InPin {
     public final boolean reverse;
     public final MultiUnitDcTrigger parent;
-    public Pins[] pins;
+    public final Pins[] pins;
 
     public MultiUnitDcRPin(String id, MultiUnitDcTrigger parent, boolean reverse, Pin[] qOut, Pin[] iqOut) {
         super(id, parent);
