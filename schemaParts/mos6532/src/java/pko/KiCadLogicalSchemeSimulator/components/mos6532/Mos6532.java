@@ -215,8 +215,10 @@ public class Mos6532 extends SchemaPart {
                         } else if ((addr & DDR) != 0) {
                             if ((addr & B_PART) == 0) {
                                 aPart.direction = dIn.state;
+                                aPart.setState();
                             } else {
                                 bPart.direction = dIn.state;
+                                bPart.setState();
                             }
                         } else {
                             if ((addr & B_PART) == 0) {
