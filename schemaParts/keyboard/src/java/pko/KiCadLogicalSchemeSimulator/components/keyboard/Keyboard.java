@@ -31,8 +31,6 @@
  */
 package pko.KiCadLogicalSchemeSimulator.components.keyboard;
 import lombok.AllArgsConstructor;
-import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.AbstractUiComponent;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.InteractiveSchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
@@ -43,12 +41,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Keyboard extends SchemaPart implements InteractiveSchemaPart {
-    private final InBus in;
-    private final InPin enable;
-    private final int[] busMap = new int[256];
+    private final KbdIn[] ins = new KbdIn[8];
+    final InPin enable;
     private final Map<String, KeyDescriptor> keyDescriptors = new HashMap<>();
     private final KeyboardUiComponent keyboardUiComponent;
-    private Bus out;
+    private final OutState[] outs = new OutState[8];
     private Pin event;
 
     protected Keyboard(String id, String sParam) {
@@ -61,33 +58,29 @@ public class Keyboard extends SchemaPart implements InteractiveSchemaPart {
             String[] keyDesc = key.split("_");
             int rMask = 1 << (keyDesc[1].charAt(0) - '0');
             int cMask = 1 << (keyDesc[1].charAt(1) - '0');
-            keyDescriptors.put(keyDesc[0], new KeyDescriptor(rMask, cMask, ~cMask));
+            keyDescriptors.put(keyDesc[0], new KeyDescriptor(keyDesc[1]));
         }
         enable = addInPin(new InPin("En", this) {
             @Override
             public void setHi() {
                 state = true;
-                out.setHiImpedance();
+                for (OutState state : outs) {
+                    state.disable();
+                }
             }
 
             @Override
             public void setLo() {
                 state = false;
-                if (out.state != busMap[in.state] || out.hiImpedance) {
-                    out.setState(busMap[in.state]);
+                for (OutState state : outs) {
+                    state.setOut();
                 }
             }
         });
-        in = addInBus(new InBus("In", this, 8) {
-            @Override
-            public void setState(int newState) {
-                state = newState;
-                if (!enable.state && (out.state != busMap[newState] || out.hiImpedance)) {
-                    out.setState(busMap[newState]);
-                }
-            }
-        });
-        addTriStateOutBus("Out", 8);
+        for (int i = 0; i < 8; i++) {
+            ins[i] = addInPin(new KbdIn(i, this));
+            addOutPin("Out" + i);
+        }
         addOutPin("Ev");
         keyboardUiComponent = new KeyboardUiComponent(id, 125, this);
     }
@@ -96,21 +89,19 @@ public class Keyboard extends SchemaPart implements InteractiveSchemaPart {
         if (keyDescriptors.containsKey(text)) {
             event.setHi();
             KeyDescriptor descriptor = keyDescriptors.get(text);
-            for (int i = 0; i < 255; i++) {
-                if ((i & descriptor.rMask) > 0) {
-                    if (pressed) {
-                        busMap[i] |= descriptor.cMask;
-                    } else {
-                        busMap[i] &= descriptor.ncMask;
-                    }
+                if (pressed) {
+                    ins[descriptor.rNo].addState(outs[descriptor.cNo]);
+                } else {
+                    ins[descriptor.rNo].removeState(outs[descriptor.cNo]);
                 }
-            }
         }
     }
 
     @Override
     public void initOuts() {
-        out = getOutBus("Out");
+        for (int i = 0; i < 8; i++) {
+            outs[i] = new OutState(getOutPin("Out" + i),enable);
+        }
         event = getOutPin("Ev");
     }
 
@@ -121,8 +112,12 @@ public class Keyboard extends SchemaPart implements InteractiveSchemaPart {
 
     @AllArgsConstructor
     private static class KeyDescriptor {
-        public int rMask;
-        public int cMask;
-        public int ncMask;
+        public int rNo;
+        public int cNo;
+
+        public KeyDescriptor(String desc) {
+            rNo = desc.charAt(0) - '0';
+            cNo = desc.charAt(1) - '0';
+        }
     }
 }
