@@ -46,6 +46,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -63,6 +64,7 @@ public class SchemaPartMonitor extends JFrame {
     public final SchemaPart schemaPart;
     private final ScheduledExecutorService scheduler;
     private final JTextArea extraPanel;
+    private final double[] fontSize;
     Item[] ins = new Item[0];
     Item[] outs = new Item[0];
     private JPanel inputsNames;
@@ -71,7 +73,6 @@ public class SchemaPartMonitor extends JFrame {
     private JPanel outputsValues;
     private JPanel panel;
     private JPanel schemaPartBox;
-    private final double[] fontSize;
 
     public SchemaPartMonitor(String id) {
         //region init
@@ -166,26 +167,25 @@ public class SchemaPartMonitor extends JFrame {
         scheduler.scheduleAtFixedRate(this::reDraw, 0, 100, TimeUnit.MILLISECONDS);
     }
 
-    private Item[] getItems(JPanel names, JPanel values, List<ModelItem<?>> items, Color borderColor, boolean right) {
-        Item[] retVal = new Item[items.size()];
-        for (int i = 0; i < items.size(); i++) {
-            ModelItem<?> item = items.get(i);
+    private Item[] getItems(JPanel names, JPanel values, Iterable<ModelItem<?>> items, Color borderColor, boolean right) {
+        List<Item> retVal = new ArrayList<>();
+        for (ModelItem<?> item : items) {
             if (item instanceof Bus bus) {
                 if (bus.useBitPresentation) {
                     for (int j = 0; j < bus.size; j++) {
                         char[] bits = leftPad(Integer.toBinaryString(bus.state), bus.size, '0').toCharArray();
-                        retVal[i] = new Item(item, getLabel(schemaPart.ids.get(bus) + j, String.valueOf(bits[j]), names, values, borderColor, right), 1 << j);
+                        retVal.add(new Item(item, getLabel(schemaPart.ids.get(bus) + j, String.valueOf(bits[j]), names, values, borderColor, right), 1 << j));
                     }
                 } else {
-                    retVal[i] = new Item(item,
+                    retVal.add(new Item(item,
                             getLabel(schemaPart.ids.get(bus), leftPad("", (int) Math.ceil(bus.size / 4.0), '0'), names, values, borderColor, right),
-                            1);
+                            1));
                 }
             } else {
-                retVal[i] = new Item(item, getLabel(schemaPart.ids.get(item), String.valueOf(item.getState()), names, values, borderColor, right), 1);
+                retVal.add(new Item(item, getLabel(schemaPart.ids.get(item), String.valueOf(item.getState()), names, values, borderColor, right), 1));
             }
         }
-        return retVal;
+        return retVal.toArray(new Item[0]);
     }
 
     private JLabel getLabel(String id, String value, JPanel namePan, JPanel valuePan, Color borderColor, boolean right) {
@@ -236,7 +236,7 @@ public class SchemaPartMonitor extends JFrame {
                 if (out.item.isHiImpedance()) {
                     out.label.setText("Hi");
                 } else if (out.item instanceof Bus bus && bus.useBitPresentation) {
-                    out.label.setText((bus.state & out.mask) != 0 ? "1" : "0");
+                    out.label.setText((bus.getState() & out.mask) != 0 ? "1" : "0");
                 } else {
                     out.label.setText(String.format("%0" + (int) Math.ceil(out.item.getSize() / 4.0d) + "X", out.item.getState()));
                 }
