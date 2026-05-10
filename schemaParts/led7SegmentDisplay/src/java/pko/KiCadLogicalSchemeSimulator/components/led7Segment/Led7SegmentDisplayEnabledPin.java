@@ -39,7 +39,7 @@ public class Led7SegmentDisplayEnabledPin extends InPin {
     public Led7SegmentDisplayEnabledPin(String id, Led7SegmentDisplay parent) {
         super(id, parent);
         display = parent;
-        triStateIn=true;
+        triStateIn = true;
     }
 
     @Override

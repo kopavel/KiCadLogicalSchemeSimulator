@@ -40,7 +40,6 @@ import java.awt.*;
 public class Led7SegmentDisplay extends SchemaPart implements InteractiveSchemaPart {
     private final Led7SegmentDisplayUiComponent led7SegmentDisplayUiComponent;
     public int segmentsOn;
-    public int segmentsOff;
     public boolean enabled;
 
     protected Led7SegmentDisplay(String id, String sParams) {

@@ -106,14 +106,12 @@ public class Led7SegmentDisplayUiComponent extends AbstractUiComponent {
         for (int i = 0; i < 8; i++) {
             int bit = 1 << i;
             if ((parent.segmentsOn & bit) > 0) {
-                if ((parent.segmentsOff & bit) == 0 && parent.enabled) {
-                    segmentsTime[i] = inertia;
-                } else if (segmentsTime[i] == 0) {
-                    parent.segmentsOn &= ~bit;
-                } else {
-                    segmentsTime[i]--;
-                }
+                segmentsTime[i] = inertia;
             }
+            if (segmentsTime[i] > 0) {
+                segmentsTime[i]--;
+            }
+            parent.segmentsOn &= ~bit;
             g2d.setColor((segmentsTime[i] > 0) ? on : off);
             g2d.draw(segmentsUi[i]);
         }
