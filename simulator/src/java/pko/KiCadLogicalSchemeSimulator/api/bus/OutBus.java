@@ -201,13 +201,6 @@ public class OutBus extends Bus {
     }
 
     @Override
-    public void resend() {
-        if (!hiImpedance) {
-            setState(state);
-        }
-    }
-
-    @Override
     public Bus getOptimised(ModelItem<?> inSource) {
         if (destinations.length == 0) {
             return new NCBus(this);

@@ -35,19 +35,23 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
+import java.util.Collection;
+import java.util.Comparator;
+
 @Getter
 public class ShortcutException extends RuntimeException {
     private final String message;
 
-    public <T> ShortcutException(IModelItem<?> source, Integer state, Iterable<? extends IModelItem<? extends T>> pins) {
-        StringBuilder message = new StringBuilder(source.getName() + ":" +
-                (source instanceof Pin ? (((Pin) source).strong ? "" : "W") + (state > 0 ? "1" : "0") : Utils.LPad(16, '0', Integer.toBinaryString(state))) +
-                " Shortcut with: \n");
-        int states = 0;
-        for (IModelItem<? extends T> iPpin : pins) {
-            MergerInput<? extends T> pin = (MergerInput<? extends T>) iPpin;
-            if (!pin.isHiImpedance() && (states & pin.getMask()) == 0) {
-                states |= pin.getMask();
+    public <T> ShortcutException(IModelItem<?> source, Integer state, Collection<? extends MergerInput<? extends T>> pins) {
+        StringBuilder message = new StringBuilder(
+                "Setting:\n" + (source instanceof MergerInput<?> input ? Utils.LPad(16, '0', Integer.toBinaryString(input.getMask())) + ":" : "") +
+                        source.getName() + ":" +
+                        (source instanceof Pin ? (((Pin) source).strong ? "" : "W") + (state > 0 ? "1" : "0") : Utils.LPad(16, '0', Integer.toBinaryString(state))) +
+                        " Shortcut with: \n");
+        int[] states = {0};
+        pins.stream().sorted(Comparator.comparingInt((MergerInput<? extends T> pin) -> pin.getMask())).forEach(pin -> {
+            if (!pin.isHiImpedance() && (states[0] & pin.getMask()) == 0) {
+                states[0] |= pin.getMask();
                 message.append(Utils.LPad(16, '0', Integer.toBinaryString(pin.getMask()))).append(":");
                 message.append(pin.getName()).append(":");
                 if (pin.isHiImpedance()) {
@@ -56,11 +60,11 @@ public class ShortcutException extends RuntimeException {
                     if (!pin.isStrong()) {
                         message.append("W");
                     }
-                    message.append(Integer.toBinaryString(pin.getState()));
+                    message.append(Utils.LPad(16, '0', Integer.toBinaryString(pin.getState())));
                 }
                 message.append(";\n");
             }
-        }
+        });
         this.message = message.toString();
     }
 }

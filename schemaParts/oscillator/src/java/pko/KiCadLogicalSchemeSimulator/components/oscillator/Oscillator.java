@@ -35,6 +35,7 @@ import pko.KiCadLogicalSchemeSimulator.api.schemaPart.AbstractUiComponent;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.InteractiveSchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
+import pko.KiCadLogicalSchemeSimulator.net.Net;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 import java.lang.invoke.VarHandle;
@@ -46,12 +47,12 @@ import java.util.concurrent.atomic.AtomicReference;
 import static java.lang.Thread.MAX_PRIORITY;
 
 public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
+    final AtomicReference<Double> currentFreq = new AtomicReference<>(0.00d);
     private final OscillatorUiComponent oscillatorUiComponent;
     private final AtomicReference<Boolean> fullSpeedAlive = new AtomicReference<>(false);
     public long ticks;
     public Pin out;
     ScheduledExecutorService scheduler;
-    final AtomicReference<Double> currentFreq = new AtomicReference<>(0.00d);
     @Getter
     private double clockFreq;
     private Thread fullSpeedThread;
@@ -82,31 +83,52 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
             if (fullSpeedThread == null || !fullSpeedThread.isAlive()) {
                 fullSpeedAlive.setOpaque(true);
                 fullSpeedThread = Thread.ofPlatform().priority(MAX_PRIORITY).start(() -> {
-                    Pin local = out;
+                    Pin lOut = out;
+                    Net lNet = net;
                     try {
                         AtomicReference<Boolean> lSpeed = fullSpeedAlive;
                         while (lSpeed.getOpaque()) {
                             ticks += 20;
-                            local.setHi();
-                            local.setLo();
-                            local.setHi();
-                            local.setLo();
-                            local.setHi();
-                            local.setLo();
-                            local.setHi();
-                            local.setLo();
-                            local.setHi();
-                            local.setLo();
-                            local.setHi();
-                            local.setLo();
-                            local.setHi();
-                            local.setLo();
-                            local.setHi();
-                            local.setLo();
-                            local.setHi();
-                            local.setLo();
-                            local.setHi();
-                            local.setLo();
+                            lOut.setHi();
+                            lNet.resend();
+                            lOut.setLo();
+                            lNet.resend();
+                            lOut.setHi();
+                            lNet.resend();
+                            lOut.setLo();
+                            lNet.resend();
+                            lOut.setHi();
+                            lNet.resend();
+                            lOut.setLo();
+                            lNet.resend();
+                            lOut.setHi();
+                            lNet.resend();
+                            lOut.setLo();
+                            lNet.resend();
+                            lOut.setHi();
+                            lNet.resend();
+                            lOut.setLo();
+                            lNet.resend();
+                            lOut.setHi();
+                            lNet.resend();
+                            lOut.setLo();
+                            lNet.resend();
+                            lOut.setHi();
+                            lNet.resend();
+                            lOut.setLo();
+                            lNet.resend();
+                            lOut.setHi();
+                            lNet.resend();
+                            lOut.setLo();
+                            lNet.resend();
+                            lOut.setHi();
+                            lNet.resend();
+                            lOut.setLo();
+                            lNet.resend();
+                            lOut.setHi();
+                            lNet.resend();
+                            lOut.setLo();
+                            lNet.resend();
                         }
                     } catch (Throwable e) {
                         Log.error(Oscillator.class, "TickError {}", ticks, e);
@@ -119,15 +141,22 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
             tickStart = ticks;
             int period = Math.max(1, (int) (1000000.0 / clockFreq / 2));
             scheduler.scheduleAtFixedRate(() -> {
-                Pin local = out;
-                long target = Math.min(10000, (long) ((System.currentTimeMillis() - timerStart) * clockFreq * 2) - ticks + tickStart);
-                ticks += target;
-                for (int i = 0; i < target; i++) {
-                    if (local.state) {
-                        local.setLo();
-                    } else {
-                        local.setHi();
+                try {
+                    Pin lOut = out;
+                    Net lNet = net;
+                    long target = Math.min(10000, (long) ((System.currentTimeMillis() - timerStart) * clockFreq * 2) - ticks + tickStart);
+                    ticks += target;
+                    for (int i = 0; i < target; i++) {
+                        if (lOut.state) {
+                            lOut.setLo();
+                            lNet.resend();
+                        } else {
+                            lOut.setHi();
+                            lNet.resend();
+                        }
                     }
+                } catch (Throwable e) {
+                    Log.error(Oscillator.class, "TickError {}", ticks, e);
                 }
             }, 0, period, TimeUnit.NANOSECONDS);
         }
@@ -142,7 +171,7 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
     void startIfDefault() {
         if (fullSpeedThread == null) {
             Thread.ofVirtual().start(() -> {
-                while (net==null || net.stabilizing || out == null) {
+                while (net == null || net.stabilizing || out == null) {
                     try {
                         Thread.sleep(10);
                     } catch (InterruptedException e) {
@@ -192,8 +221,10 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
             ticks++;
             if (out.state) {
                 out.setLo();
+                net.resend();
             } else {
                 out.setHi();
+                net.resend();
             }
         } catch (Throwable e) {
             Log.error(Oscillator.class, "TickError {}", ticks, e);

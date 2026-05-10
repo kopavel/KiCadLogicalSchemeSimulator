@@ -36,9 +36,12 @@ import pko.KiCadLogicalSchemeSimulator.api.SupportMask;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
+import pko.KiCadLogicalSchemeSimulator.net.ResendBus;
 import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
+
+import java.util.Set;
 
 //FixMe where recursion support?
 public class WireMergerBusIn extends InBus implements MergerInput<Bus>, SupportMask {
@@ -64,6 +67,11 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus>, SupportM
     @Override
     public int getMask() {
         return applyMask;
+    }
+
+    @Override
+    public Set<MergerInput<?>> getSources() {
+        return merger.sources;
     }
 
     @Override
@@ -98,18 +106,14 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus>, SupportM
         }
         /*Optimiser block ts*/
         if (hiImpedance) {
-            hiImpedance = false;
             if (merger.strong) { // merger not in hiImpedance or weak
                 //region shortcut
-                if (parent.net.stabilizing) {
-                    parent.net.forResend.add(this);
+                    parent.net.forResend(new ResendBus(this, newState));
                     assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
                     return;
-                } else {
-                    throw new ShortcutException(this, newState, merger.sources);
-                }
                 //endregion
             }
+            hiImpedance = false;
         }
         /*Optimiser blockEnd ts*/
         if (merger.state == (newState == 0)

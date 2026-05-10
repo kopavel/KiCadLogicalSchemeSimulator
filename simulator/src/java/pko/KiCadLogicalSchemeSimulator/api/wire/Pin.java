@@ -110,16 +110,6 @@ public abstract class Pin extends ModelItem<Pin> {
         return Set.of(id);
     }
 
-    public void resend() {
-        if (!hiImpedance) {
-            if (state) {
-                setHi();
-            } else {
-                setLo();
-            }
-        }
-    }
-
     @Override
     public String toString() {
         return state + ":" + strong + ":" + super.toString();

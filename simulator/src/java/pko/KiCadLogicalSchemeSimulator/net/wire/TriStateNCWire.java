@@ -60,8 +60,4 @@ public class TriStateNCWire extends OutPin {
         hiImpedance = true;
     }
 
-    @Override
-    public void resend() {
-    }
-
 }

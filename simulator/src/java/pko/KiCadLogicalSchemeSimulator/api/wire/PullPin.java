@@ -34,6 +34,8 @@ import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
 
+import java.util.Set;
+
 public class PullPin extends OutPin implements MergerInput<Pin> {
     public PullPin(String id, SchemaPart parent, boolean state) {
         super(id, parent);
@@ -55,5 +57,10 @@ public class PullPin extends OutPin implements MergerInput<Pin> {
     @Override
     public int getMask() {
         return 0;
+    }
+
+    @Override
+    public Set<MergerInput<?>> getSources() {
+        return Set.of();
     }
 }

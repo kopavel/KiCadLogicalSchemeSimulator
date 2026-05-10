@@ -124,17 +124,6 @@ public abstract class Bus extends ModelItem<Bus> {
     }
 
     @Override
-    public void resend() {
-        if (!hiImpedance) {
-            setState(state);
-        } else {
-            // noinspection ConstantValue,AssertWithSideEffects
-            assert !(hiImpedance = false);
-            setHiImpedance();
-        }
-    }
-
-    @Override
     public boolean isStrong() {
         return true;
     }

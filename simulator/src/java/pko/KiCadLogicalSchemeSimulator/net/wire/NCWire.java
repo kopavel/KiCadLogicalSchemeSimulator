@@ -57,7 +57,4 @@ public class NCWire extends OutPin {
     public void setHiImpedance() {
     }
 
-    @Override
-    public void resend() {
-    }
 }

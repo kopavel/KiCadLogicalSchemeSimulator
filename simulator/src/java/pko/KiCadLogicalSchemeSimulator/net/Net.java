@@ -34,6 +34,7 @@ import pko.KiCadLogicalSchemeSimulator.Simulator;
 import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.NetFilter;
+import pko.KiCadLogicalSchemeSimulator.api.ShortcutException;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
@@ -46,6 +47,7 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.OutPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.net.bus.BusInInterconnect;
+import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
 import pko.KiCadLogicalSchemeSimulator.net.merger.bus.BusMerger;
 import pko.KiCadLogicalSchemeSimulator.net.merger.wire.WireMerger;
 import pko.KiCadLogicalSchemeSimulator.net.wire.NCWire;
@@ -61,16 +63,17 @@ import static pko.KiCadLogicalSchemeSimulator.api.params.ParameterResolver.Power
 import static pko.KiCadLogicalSchemeSimulator.api.params.ParameterResolver.PowerState.pwr;
 
 public class Net {
-    public final Queue<IModelItem<?>> forResend = new LinkedList<>();
     public final Map<String, SchemaPart> schemaParts = new TreeMap<>(new Utils.AlphanumericComparator());
     public final String optimisedDir;
     public final ParameterResolver parameterResolver;
     private final Map<Pin, DestinationWireDescriptor> destinationWireDescriptors = new HashMap<>();
     private final Map<Bus, DestinationBusDescriptor> destinationBusDescriptors = new HashMap<>();
     private final Map<String, BusMerger> busMergers = new TreeMap<>();
-    private final Map<String, OutPin> wireMergers = new TreeMap<>();
+    private final Map<String, WireMerger> wireMergers = new TreeMap<>();
     private final Map<IModelItem<?>, IModelItem<?>> replacement = new HashMap<>();
     public volatile boolean stabilizing = true;
+    private List<ResendItem> forResend = new ArrayList<>();
+    private boolean hasResend = false;
 
     public Net(Export export, String optimisedDir, ParameterResolver parameterResolver) {
         this.optimisedDir = optimisedDir;
@@ -140,6 +143,32 @@ public class Net {
         return retVal;
     }
 
+    public void resend() {
+        if (hasResend) {
+            int resendTry = 10;
+            for (int i = 0; i < resendTry && hasResend; i++) {
+                Iterable<ResendItem> items = forResend;
+                forResend = new ArrayList<>();
+                hasResend = false;
+                items.forEach(item -> {
+                    assert Log.debug(Net.class, "Resend postponed pin {}", item);
+                    item.resend();
+                });
+            }
+            if (hasResend) {
+                IModelItem<?> item = forResend.getFirst().getItem();
+                if (item instanceof MergerInput<?> input) {
+                    throw new ShortcutException(item, item.getState(), input.getSources());
+                }
+            }
+        }
+    }
+
+    public void forResend(ResendItem item) {
+        forResend.add(item);
+        hasResend = true;
+    }
+
     private void groupSourcesByDestinations(pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Net net) {
         if (net.getName().startsWith("unconnected-")) {
             return;
@@ -156,7 +185,7 @@ public class Net {
             }
             PinConfig pinConfig = parameterResolver.getPinConfig(node);
             String id = pinConfig == null ? node.ref : parameterResolver.getId(node);
-            SchemaPart schemaPart = schemaParts.computeIfAbsent(id, s -> createSchemaPart(schemaPartConfig.clazz, id, schemaPartConfig.getParamString()));
+            SchemaPart schemaPart = schemaParts.computeIfAbsent(id, _ -> createSchemaPart(schemaPartConfig.clazz, id, schemaPartConfig.getParamString()));
             String pinName = pinConfig == null ? node.getPinfunction() : pinConfig.pinName;
             SchemaPart.PinType pinType = schemaPart.getPinType(pinName);
             if (pinType == null) {
@@ -170,7 +199,7 @@ public class Net {
                     }
                     switch (destination) {
                         case InPin pin -> destinationPins.add(pin);
-                        case InBus bus -> destinationBusesOffsets.computeIfAbsent(bus, p -> new TreeSet<>()).add(bus.getAliasOffset(pinName));
+                        case InBus bus -> destinationBusesOffsets.computeIfAbsent(bus, _ -> new TreeSet<>()).add(bus.getAliasOffset(pinName));
                         default -> throw new IllegalStateException("Unexpected input type: " + destination.getClass().getName());
                     }
                     if (schemaPartConfig.priority != null && schemaPartConfig.priority.containsKey(destination.getId())) {
@@ -201,7 +230,7 @@ public class Net {
                     IModelItem<?> destination = schemaPart.getInItem(pinName);
                     switch (destination) {
                         case InPin pin -> destinationPins.add(pin);
-                        case InBus bus -> destinationBusesOffsets.computeIfAbsent(bus, p -> new TreeSet<>()).add(bus.getAliasOffset(pinName));
+                        case InBus bus -> destinationBusesOffsets.computeIfAbsent(bus, _ -> new TreeSet<>()).add(bus.getAliasOffset(pinName));
                         default -> throw new IllegalStateException("Unexpected input type: " + destination.getClass().getName());
                     }
                     IModelItem<?> source = schemaPart.getOutItem(pinName);
@@ -233,7 +262,7 @@ public class Net {
         //Process Pin destinations
         //
         destinationPins.forEach((destinationPin) -> {
-            DestinationWireDescriptor descriptor = destinationWireDescriptors.computeIfAbsent(destinationPin, pin -> new DestinationWireDescriptor(passivePins));
+            DestinationWireDescriptor descriptor = destinationWireDescriptors.computeIfAbsent(destinationPin, _ -> new DestinationWireDescriptor(passivePins));
             if (powerState == pwr) {
                 SchemaPart pwr = createSchemaPart("Power", "pwr_" + destinationPin.getName(), "hi;strong");
                 schemaParts.put(pwr.id, pwr);
@@ -251,7 +280,7 @@ public class Net {
         //
         destinationBusesOffsets.forEach((destinationBus, destinationOffsets) -> {
             DestinationBusDescriptor descriptor =
-                    destinationBusDescriptors.computeIfAbsent((Bus) replacement.getOrDefault(destinationBus, destinationBus), p -> new DestinationBusDescriptor());
+                    destinationBusDescriptors.computeIfAbsent((Bus) replacement.getOrDefault(destinationBus, destinationBus), _ -> new DestinationBusDescriptor());
             if (powerState == pwr) {
                 for (Byte destinationOffset : destinationOffsets) {
                     SchemaPart pwr = createSchemaPart("Power", "pwr_" + destinationBus.getName(), "hi;strong");
@@ -366,34 +395,34 @@ public class Net {
                 .distinct()
                 .forEach(item -> {
                     assert Log.debug(Net.class, "Resend pin {}", item);
-                    item.resend();
-                    resend();
+                    forResend.add(item instanceof Pin ? new ResendPin((Pin) item) : new ResendBus((Bus) item));
                 });
         wireMergers.values()
                 .stream()
                 .filter(outPin -> !outPin.isHiImpedance()).distinct().forEach(item -> {
                        assert Log.debug(Net.class, "Resend pin {}", item);
-                       item.resend();
-                       resend();
+                       item.recalculatePassivePins();
+                       forResend.add(new ResendPin(item));
                    });
         busMergers.values()
                 .stream()
                 .filter(merger -> !merger.isHiImpedance()).distinct().forEach(item -> {
                       assert Log.debug(Net.class, "Resend pin {}", item);
-                      item.resend();
-                      resend();
+                      forResend.add(new ResendBus(item));
                   });
+        hasResend = true;
+        resend();
         int resendTry = 10;
-        for (int i = 0; i < resendTry && !forResend.isEmpty(); i++) {
-            resend();
-        }
         for (int i = 0; i < resendTry; i++) {
             schemaParts.values().forEach(SchemaPart::reset);
             resend();
         }
         stabilizing = false;
         if (!forResend.isEmpty()) {
-            forResend.forEach(item -> {
+            List<ResendItem> items = forResend;
+            forResend = new ArrayList<>();
+            hasResend = false;
+            items.forEach(item -> {
                 try {
                     item.resend();
                 } catch (Throwable e) {
@@ -402,15 +431,6 @@ public class Net {
             });
             Log.error(Net.class, "!!! Can't stabilize Net !!!");
         }
-    }
-
-    private void resend() {
-        Iterable<IModelItem<?>> items = new ArrayList<>(forResend);
-        forResend.clear();
-        items.forEach(item -> {
-            assert Log.debug(Net.class, "Resend postponed pin {}", item);
-            item.resend();
-        });
     }
 
     private static class BusPinsOffset {
@@ -451,11 +471,11 @@ public class Net {
 
         public void add(IModelItem<?> item, byte sourceOffset, byte destinationOffset) {
             switch (item) {
-                case PassivePin passivePin -> offsets.computeIfAbsent(destinationOffset, e -> new BusPinsOffset()).passivePins.add(passivePin);
-                case OutPin pin -> offsets.computeIfAbsent(destinationOffset, e -> new BusPinsOffset()).pins.add(pin);
+                case PassivePin passivePin -> offsets.computeIfAbsent(destinationOffset, _ -> new BusPinsOffset()).passivePins.add(passivePin);
+                case OutPin pin -> offsets.computeIfAbsent(destinationOffset, _ -> new BusPinsOffset()).pins.add(pin);
                 case OutBus bus -> {
                     byte offset = (byte) (destinationOffset - sourceOffset);
-                    int newMask = buses.computeIfAbsent(bus, p -> new HashMap<>()).computeIfAbsent(offset, p -> 0) | (1 << sourceOffset);
+                    int newMask = buses.computeIfAbsent(bus, _ -> new HashMap<>()).computeIfAbsent(offset, _ -> 0) | (1 << sourceOffset);
                     buses.get(bus).put(offset, newMask);
                 }
                 default -> throw new IllegalStateException("Unsupported item: " + item.getClass().getName());

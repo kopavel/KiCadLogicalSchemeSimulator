@@ -42,7 +42,6 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.PullPin;
 import pko.KiCadLogicalSchemeSimulator.net.Net;
 import pko.KiCadLogicalSchemeSimulator.net.bus.BusInInterconnect;
 import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
-import pko.KiCadLogicalSchemeSimulator.tools.Log;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 import java.util.*;
@@ -92,7 +91,7 @@ public class BusMerger extends OutBus {
         sources.add(input);
         if (!bus.hiImpedance) {
             if ((strongPins & destinationMask) != 0) {
-                throw new ShortcutException(this,bus.state,sources);
+                throw new ShortcutException(this, bus.state, sources);
             }
             state |= bus.state;
             strongPins |= destinationMask;
@@ -125,13 +124,6 @@ public class BusMerger extends OutBus {
     }
 
     @Override
-    public void resend() {
-        if ((strongPins | weakPins) == mask) {
-            setState(state);
-        }
-    }
-
-    @Override
     public Bus getOptimised(ModelItem<?> inSource) {
         for (int i = 0; i < destinations.length; i++) {
             destinations[i] = destinations[i].getOptimised(this);
@@ -153,7 +145,7 @@ public class BusMerger extends OutBus {
         if (!pin.hiImpedance) {
             if (pin.strong) {
                 if ((strongPins & destinationMask) != 0) {
-                    throw new ShortcutException(this,destinationMask,sources);
+                    throw new ShortcutException(this, destinationMask, sources);
                 }
                 strongPins |= destinationMask;
                 if (pin.state) {
@@ -161,13 +153,7 @@ public class BusMerger extends OutBus {
                 }
             } else {
                 if ((weakPins & destinationMask) != 0 && ((weakState & destinationMask) == 0) == pin.state) {
-                    if (parent.net.stabilizing) {
-                        parent.net.forResend.add(this);
-                        assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
-                        return;
-                    } else {
-                        throw new ShortcutException(this,destinationMask,sources);
-                    }
+                    throw new ShortcutException(this, destinationMask, sources);
                 }
                 weakPins |= destinationMask;
                 weakState |= pin.state ? destinationMask : 0;

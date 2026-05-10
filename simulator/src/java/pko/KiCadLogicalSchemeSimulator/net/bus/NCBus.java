@@ -49,10 +49,6 @@ public class NCBus extends OutBus {
     }
 
     @Override
-    public void resend() {
-    }
-
-    @Override
     public Bus getOptimised(ModelItem<?> inSource) {
         return this;
     }
