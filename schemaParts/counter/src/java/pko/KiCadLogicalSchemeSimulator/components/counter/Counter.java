@@ -79,13 +79,13 @@ public class Counter extends SchemaPart {
 
     @Override
     public void reset() {
-        if (outBus.state > 0 || outBus.hiImpedance) {
+        if (outBus.getState() > 0 || outBus.hiImpedance) {
             outBus.setState(0);
-            if (reverse) {
-                nIn.oState=0;
-            } else {
-                in.oState=0;
-            }
+        }
+        if (reverse) {
+            nIn.oState=0;
+        } else {
+            in.oState=0;
         }
     }
 }
