@@ -43,7 +43,6 @@ import java.util.Comparator;
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.none;
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.warn;
 
-//FixMe - No optimiser on passive pin, store strength only for passive pin out.
 public class OutPin extends Pin {
     public Pin[] destinations = new Pin[0];
     public Pin[] toImp = new Pin[0];
@@ -88,6 +87,7 @@ public class OutPin extends Pin {
             case 0: {
                 /*Optimiser blockEnd ar*/
                 for (Pin hi : toHi) {
+                    /*Optimiser bind strong*/
                     hi.setHi(strong);
                 }
                 /*Optimiser block r block ar*/
@@ -101,10 +101,12 @@ public class OutPin extends Pin {
                         /*Optimiser blockEnd ts*/
                         if (state) {
                             for (Pin hi : toHi) {
+                                /*Optimiser bind strong*/
                                 hi.setHi(strong);
                             }
                         } else {
                             for (Pin low : toLow) {
+                                /*Optimiser bind strong*/
                                 low.setLo(strong);
                             }
                         }
@@ -132,6 +134,7 @@ public class OutPin extends Pin {
             case 0: {
                 /*Optimiser blockEnd ar*/
                 for (Pin low : toLow) {
+                    /*Optimiser bind strong*/
                     low.setLo(strong);
                 }
                 /*Optimiser block r block ar*/
@@ -145,10 +148,12 @@ public class OutPin extends Pin {
                         /*Optimiser blockEnd ts*/
                         if (state) {
                             for (Pin hi : toHi) {
+                                /*Optimiser bind strong*/
                                 hi.setHi(strong);
                             }
                         } else {
                             for (Pin low : toLow) {
+                                /*Optimiser bind strong*/
                                 low.setLo(strong);
                             }
                         }
@@ -169,7 +174,7 @@ public class OutPin extends Pin {
     @Override
     public void setHiImpedance() {
         /*Optimiser block ts*/
-        assert !hiImpedance || parent.net.stabilizing: "Already in hiImpedance:" + this;
+        assert !hiImpedance || parent.net.stabilizing : "Already in hiImpedance:" + this;
         hiImpedance = true;
         /*Optimiser block ar*/
         switch (processing++) {
@@ -187,11 +192,13 @@ public class OutPin extends Pin {
                     } else {
                         if (state) {
                             for (Pin hi : toHi) {
-                                hi.setHi();
+                                /*Optimiser bind strong*/
+                                hi.setHi(strong);
                             }
                         } else {
                             for (Pin low : toLow) {
-                                low.setLo();
+                                /*Optimiser bind strong*/
+                                low.setLo(strong);
                             }
                         }
                     }
@@ -212,7 +219,7 @@ public class OutPin extends Pin {
         if (destinations.length == 0) {
             return triStateOut ? new TriStateNCWire(this) : new NCWire(this);
         } else if (destinations.length == 1) {
-            return destinations[0].getOptimised(source).copyState(this);
+            return destinations[0].copyState(this).getOptimised(source);
         } else {
             for (int i = 0; i < destinations.length; i++) {
                 destinations[i] = destinations[i].getOptimised(this);
@@ -230,6 +237,9 @@ public class OutPin extends Pin {
                 optimiser.unroll("i", toImp.length);
             } else {
                 optimiser.cut("ts");
+            }
+            if (!strengthSensitive) {
+                optimiser.bind("strong", "");
             }
             OutPin build = optimiser.build();
             build.source = source;

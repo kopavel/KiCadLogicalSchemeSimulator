@@ -53,8 +53,9 @@ public abstract class Pin extends ModelItem<Pin> {
         triStateIn = oldPin.triStateIn;
         triStateOut = oldPin.triStateOut;
         hiImpedance = oldPin.hiImpedance && isTriState(source);
-        source = (oldPin.source==oldPin)?this:oldPin.source;
-        withState=oldPin.withState;
+        source = (oldPin.source == oldPin) ? this : oldPin.source;
+        withState = oldPin.withState;
+        strengthSensitive = oldPin.strengthSensitive;
     }
 
     protected Pin(String id, SchemaPart parent) {
@@ -66,9 +67,9 @@ public abstract class Pin extends ModelItem<Pin> {
         used = true;
         strong = oldPin.isStrong();
         hiImpedance = triStateIn && oldPin.isHiImpedance();
-        Pin pin = oldPin.getThis();
-        state = pin.state;
+        state = oldPin.getState() > 0;
         priority += oldPin.getPriority();
+        strengthSensitive = oldPin.getThis().strengthSensitive;
         return this;
     }
 

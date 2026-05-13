@@ -36,7 +36,6 @@ import pko.KiCadLogicalSchemeSimulator.api.SupportMask;
 import pko.KiCadLogicalSchemeSimulator.api.SupportOffset;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
-import pko.KiCadLogicalSchemeSimulator.net.ResendBus;
 import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
@@ -54,6 +53,7 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus>, SupportMa
     public final BusMerger merger;
     public Bus[] destinations;
     public int maskState;
+    protected Integer resendState;
 
     public BusMergerBusIn(Bus source, int mask, BusMerger merger) {
         super(source, "BMergeBIn");
@@ -78,7 +78,12 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus>, SupportMa
     @Override
     public void setState(int newState) {
         BusMerger merger = this.merger;
-        /*Optimiser line setter*/
+        /*Optimiser block ts*/
+        if (resendState != null) {
+            resendState = null;
+            hiImpedance = true;
+        }
+        /*Optimiser line setter blockEnd ts*/
         state = newState;
         /*Optimiser line o*/
         if (applyMask != 0) {
@@ -117,12 +122,13 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus>, SupportMa
         /*Optimiser line o block sameMask block ts*/
         if (merger.mask == mask) {
             if (hiImpedance) {
+                hiImpedance = false;
                 if (merger.strongPins != 0) {
-                    parent.net.forResend(new ResendBus(this, newState));
+                    resendState = newState;
+                    parent.net.forResend(this);
                     assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
                     return;
                 }
-                hiImpedance = false;
                 /*Optimiser bind m:mask*/
                 merger.strongPins = mask;
             }
@@ -157,13 +163,14 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus>, SupportMa
             int mergerState;
             /*Optimiser block ts*/
             if (hiImpedance) {
+                hiImpedance = false;
                 /*Optimiser bind m:mask*/
                 if ((merger.strongPins & mask) != 0) {
-                    parent.net.forResend(new ResendBus(this, newState));
+                    resendState = newState;
+                    parent.net.forResend(this);
                     assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
                     return;
                 }
-                hiImpedance = false;
                 /*Optimiser bind m:mask*/
                 merger.strongPins |= mask;
             }
@@ -211,6 +218,7 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus>, SupportMa
     @Override
     public void setHiImpedance() {
         /*Optimiser block ts*/
+        resendState = null;
         assert !hiImpedance || parent.net.stabilizing : "Already in hiImpedance:" + this;
         hiImpedance = true;
         BusMerger merger = this.merger;
@@ -350,5 +358,12 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus>, SupportMa
     @Override
     public Set<MergerInput<?>> getSources() {
         return merger.sources;
+    }
+
+    @Override
+    public void resend() {
+        if (resendState != null) {
+            setState(resendState);
+        }
     }
 }

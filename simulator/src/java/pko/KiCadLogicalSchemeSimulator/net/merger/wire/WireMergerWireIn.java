@@ -33,18 +33,21 @@ package pko.KiCadLogicalSchemeSimulator.net.merger.wire;
 import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.net.ResendPin;
 import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
 import java.util.Set;
-
 //FixMe where recursion support?
+//Fixme cleanup "strong/weak" logic in case of nonpassive pin
+//FixMe 'optimise' "this is passive pin" and "merger has passive pins"
+
 public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
     public final WireMerger merger;
     public Pin[] destinations;
     public boolean oldStrong;
+    protected Boolean resendState;
+    protected boolean resendImpedance;
 
     public WireMergerWireIn(Pin source, WireMerger merger) {
         super(source, "PMergePIn");
@@ -66,10 +69,13 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
         merger = oldPin.merger;
     }
 
-    //FixMe optimiser separate "this is passive pin" and "merger has passive pins"
     @Override
     public void setHi() {
         WireMerger merger = this.merger;
+        if (resendState != null) {
+            resendState = null;
+            hiImpedance = resendImpedance;
+        }
         //region assert
         assert Log.debug(getClass(),
                 "Pin merger change. before: newState:{}, Source:{} (state:{}, oldStrong:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, " +
@@ -97,7 +103,10 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
             ) { //from hiImpedance or weak
                 if (merger.strong) { //strong pins shortcut
                     //region shortcut
-                    parent.net.forResend(new ResendPin(this,true));
+                    resendState = true;
+                    resendImpedance = hiImpedance;
+                    hiImpedance = false;
+                    parent.net.forResend(this);
                     assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
                     return;
                     //endregion
@@ -121,7 +130,10 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
             if (hiImpedance) { // from impedance
                 if (merger.weakState < 0) { //opposite weak state
                     //region shortcut
-                    parent.net.forResend(new ResendPin(this,true));
+                    resendState = true;
+                    resendImpedance = hiImpedance;
+                    hiImpedance = false;
+                    parent.net.forResend(this);
                     assert Log.debug(getClass(), "Weak state shortcut on setting pin {}, try resend later", this);
                     return;
                     //endregion
@@ -136,7 +148,9 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                 if (oldStrong) { //from strong
                     if (merger.weakState < 0) { //opposite weak state
                         //region shortcut
-                        parent.net.forResend(new ResendPin(this,true));
+                        resendState = true;
+                        resendImpedance = false;
+                        parent.net.forResend(this);
                         assert Log.debug(getClass(), "Weak state shortcut on setting pin {}, try resend later", this);
                         return;
                         //endregion
@@ -148,7 +162,9 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                     //from opposite weak
                     if (merger.weakState < -1) { //opposite weak state
                         //region shortcut
-                        parent.net.forResend(new ResendPin(this,true));
+                        resendState = true;
+                        resendImpedance = false;
+                        parent.net.forResend(this);
                         assert Log.debug(getClass(), "Weak state shortcut on setting pin {}, try resend later", this);
                         return;
                         //endregion
@@ -169,11 +185,11 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
             for (Pin destination : destinations) {
                 /*Optimiser line passivePins*/
                 if (merger.state) {
-                    //Fixme 'optimiser' strong field?
+                    /*Optimiser bind strong*/
                     destination.setHi(strong);
                     /*Optimiser block passivePins*/
                 } else {
-                    //Fixme 'optimiser' strong field?
+                    /*Optimiser bind strong*/
                     destination.setLo(strong);
                 }
                 /*Optimiser blockEnd passivePins*/
@@ -206,6 +222,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
     @Override
     public void setLo() {
         WireMerger merger = this.merger;
+        resendState = null;
         //region assert
         assert Log.debug(getClass(),
                 "Pin merger change. before: newState:{}, Source:{} (state:{}, oldStrong:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, " +
@@ -233,7 +250,10 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
             ) { //from hiImpedance or weak
                 if (merger.strong) { //strong pins shortcut
                     //region shortcut
-                    parent.net.forResend(new ResendPin(this,false));
+                    resendState = false;
+                    resendImpedance = hiImpedance;
+                    hiImpedance = false;
+                    parent.net.forResend(this);
                     assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
                     return;
                     //endregion
@@ -257,7 +277,10 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
             if (hiImpedance) { // from impedance
                 if (merger.weakState > 0) { //opposite weak state
                     //region shortcut
-                    parent.net.forResend(new ResendPin(this,false));
+                    resendState = false;
+                    resendImpedance = true;
+                    hiImpedance = false;
+                    parent.net.forResend(this);
                     assert Log.debug(getClass(), "Weak state shortcut on setting pin {}, try resend later", this);
                     return;
                     //endregion
@@ -272,7 +295,9 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                 if (oldStrong) { //from strong
                     if (merger.weakState > 0) { //opposite weak state
                         //region shortcut
-                        parent.net.forResend(new ResendPin(this,false));
+                        resendState = false;
+                        resendImpedance = false;
+                        parent.net.forResend(this);
                         assert Log.debug(getClass(), "Weak state shortcut on setting pin {}, try resend later", this);
                         return;
                         //endregion
@@ -284,7 +309,9 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                     //from opposite weak
                     if (merger.weakState > 1) { //opposite weak state
                         //region shortcut
-                        parent.net.forResend(new ResendPin(this,false));
+                        resendState = false;
+                        resendImpedance = false;
+                        parent.net.forResend(this);
                         assert Log.debug(getClass(), "Weak state shortcut on setting pin {}, try resend later", this);
                         return;
                         //endregion
@@ -305,9 +332,10 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
             for (Pin destination : destinations) {
                 /*Optimiser block passivePins*/
                 if (merger.state) {
+                    /*Optimiser bind strong*/
                     destination.setHi(strong);
                 } else {
-                    /*Optimiser blockEnd passivePins*/
+                    /*Optimiser blockEnd passivePins bind strong*/
                     destination.setLo(strong);
                     /*Optimiser line passivePins*/
                 }
@@ -338,6 +366,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
 
     @Override
     public void setHiImpedance() {
+        resendState = null;
         /*Optimiser block ts*/
         WireMerger merger = this.merger;
         //region assert
@@ -369,8 +398,10 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                 if (oldState != (merger.state = (merger.weakState > 0))) {
                     for (Pin destination : destinations) {
                         if (merger.state) {
+                            /*Optimiser bind strong:false*/
                             destination.setHi(false);
                         } else {
+                            /*Optimiser bind strong:false*/
                             destination.setLo(false);
                         }
                     }
@@ -425,6 +456,9 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                 optimiser.cut("hiAndPassive");
             }
         }
+        if (!strengthSensitive && merger.passivePins.isEmpty() && merger.weakState == 0) {
+            optimiser.bind("strong", "");
+        }
         if (inSource != null) {
             optimiser.cut("setter");
         }
@@ -446,5 +480,16 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
     @Override
     public Set<MergerInput<?>> getSources() {
         return merger.sources;
+    }
+
+    @Override
+    public void resend() {
+        if (resendState != null) {
+            if (resendState) {
+                setHi();
+            } else {
+                setLo();
+            }
+        }
     }
 }

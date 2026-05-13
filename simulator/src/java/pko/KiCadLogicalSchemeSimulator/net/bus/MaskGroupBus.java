@@ -156,7 +156,7 @@ public class MaskGroupBus extends OutBus {
             throw new RuntimeException("unconnected MaskGroupBus " + getName());
         } else if (destinations.length == 1 && destinations[0] instanceof SupportMask) {
             destinations[0].applyMask = mask;
-            return destinations[0].getOptimised(inSource).copyState(this);
+            return destinations[0].copyState(this).getOptimised(inSource);
         } else {
             for (int i = 0; i < destinations.length; i++) {
                 destinations[i] = destinations[i].getOptimised(this);

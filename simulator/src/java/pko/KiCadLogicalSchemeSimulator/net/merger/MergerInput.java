@@ -37,4 +37,5 @@ import java.util.Collection;
 public interface MergerInput<T> extends IModelItem<T> {
     int getMask();
     Collection<MergerInput<?>> getSources();
+    void resend();
 }

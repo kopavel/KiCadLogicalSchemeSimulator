@@ -31,12 +31,10 @@
  */
 package pko.KiCadLogicalSchemeSimulator.net.merger.wire;
 import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
-import pko.KiCadLogicalSchemeSimulator.api.ShortcutException;
 import pko.KiCadLogicalSchemeSimulator.api.SupportMask;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.net.ResendBus;
 import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
@@ -48,6 +46,7 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus>, SupportM
     public final WireMerger merger;
     public Pin[] destinations;
     public int maskState;
+    protected Integer resendState;
 
     public WireMergerBusIn(Bus source, WireMerger merger) {
         super(source, "PMergeBIn");
@@ -75,8 +74,21 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus>, SupportM
     }
 
     @Override
+    public void resend() {
+        if (resendState != null) {
+            setState(resendState);
+        }
+    }
+
+    @Override
     public void setState(int newState) {
         WireMerger merger = this.merger;
+        /*Optimiser block ts*/
+        if (resendState != null) {
+            resendState = null;
+            hiImpedance = true;
+        }
+        /*Optimiser blockEnd ts*/
         //region assert
         assert Log.debug(getClass(),
                 "Pin merger change. before: newState:{}, Source:{} (state:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{}, hiImpedance:{})",
@@ -106,14 +118,15 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus>, SupportM
         }
         /*Optimiser block ts*/
         if (hiImpedance) {
+            hiImpedance = false;
             if (merger.strong) { // merger not in hiImpedance or weak
                 //region shortcut
-                    parent.net.forResend(new ResendBus(this, newState));
-                    assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
-                    return;
+                resendState = newState;
+                parent.net.forResend(this);
+                assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
+                return;
                 //endregion
             }
-            hiImpedance = false;
         }
         /*Optimiser blockEnd ts*/
         if (merger.state == (newState == 0)
@@ -157,6 +170,7 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus>, SupportM
 
     @Override
     public void setHiImpedance() {
+        resendState = null;
         /*Optimiser block ts*/
         WireMerger merger = this.merger;
         //region assert
@@ -178,7 +192,7 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus>, SupportM
                 destination.setHiImpedance();
             }
             merger.hiImpedance = true;
-            /*Optimiser  block weakOnly*/
+            /*Optimiser block weakOnly*/
         } else {
             /*Optimiser blockEnd strongOnly line passivePins*/
             merger.strong = false;

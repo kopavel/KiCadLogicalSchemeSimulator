@@ -199,7 +199,7 @@ public class OffsetBus extends OutBus implements SupportOffset, SupportMask {
         if (destinations.length == 1 && destinations[0] instanceof SupportOffset && (applyMask == 0 || destinations[0] instanceof SupportMask)) {
             destinations[0].applyMask = applyMask;
             destinations[0].applyOffset = offset;
-            return destinations[0].getOptimised(inSource).copyState(this);
+            return destinations[0].copyState(this).getOptimised(inSource);
         } else {
             for (int i = 0; i < destinations.length; i++) {
                 destinations[i] = destinations[i].getOptimised(this);

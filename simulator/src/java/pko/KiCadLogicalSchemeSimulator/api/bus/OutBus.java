@@ -168,7 +168,7 @@ public class OutBus extends Bus {
     @Override
     public void setHiImpedance() {
         /*Optimiser block ts*/
-        assert !hiImpedance || parent.net.stabilizing: "Already in hiImpedance:" + this;
+        assert !hiImpedance || parent.net.stabilizing : "Already in hiImpedance:" + this;
         hiImpedance = true;
         /*Optimiser block ar*/
         switch (processing++) {
@@ -205,7 +205,7 @@ public class OutBus extends Bus {
         if (destinations.length == 0) {
             return new NCBus(this);
         } else if (destinations.length == 1) {
-            return destinations[0].getOptimised(inSource).copyState(this);
+            return destinations[0].copyState(this).getOptimised(inSource);
         } else {
             for (int i = 0; i < destinations.length; i++) {
                 destinations[i] = destinations[i].getOptimised(this);

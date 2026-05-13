@@ -63,4 +63,8 @@ public class PullPin extends OutPin implements MergerInput<Pin> {
     public Set<MergerInput<?>> getSources() {
         return Set.of();
     }
+
+    @Override
+    public void resend() {
+    }
 }

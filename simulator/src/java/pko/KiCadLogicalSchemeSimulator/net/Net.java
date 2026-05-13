@@ -72,7 +72,7 @@ public class Net {
     private final Map<String, WireMerger> wireMergers = new TreeMap<>();
     private final Map<IModelItem<?>, IModelItem<?>> replacement = new HashMap<>();
     public volatile boolean stabilizing = true;
-    private List<ResendItem> forResend = new ArrayList<>();
+    private List<MergerInput<?>> forResend = new ArrayList<>();
     private boolean hasResend = false;
 
     public Net(Export export, String optimisedDir, ParameterResolver parameterResolver) {
@@ -147,7 +147,7 @@ public class Net {
         if (hasResend) {
             int resendTry = 10;
             for (int i = 0; i < resendTry && hasResend; i++) {
-                Iterable<ResendItem> items = forResend;
+                Iterable<MergerInput<?>> items = forResend;
                 forResend = new ArrayList<>();
                 hasResend = false;
                 items.forEach(item -> {
@@ -156,15 +156,13 @@ public class Net {
                 });
             }
             if (hasResend) {
-                IModelItem<?> item = forResend.getFirst().getItem();
-                if (item instanceof MergerInput<?> input) {
-                    throw new ShortcutException(item, item.getState(), input.getSources());
-                }
+                MergerInput<?> item = forResend.getFirst();
+                throw new ShortcutException(item, item.getState(), item.getSources());
             }
         }
     }
 
-    public void forResend(ResendItem item) {
+    public void forResend(MergerInput<?> item) {
         forResend.add(item);
         hasResend = true;
     }
@@ -395,23 +393,32 @@ public class Net {
                 .distinct()
                 .forEach(item -> {
                     assert Log.debug(Net.class, "Resend pin {}", item);
-                    forResend.add(item instanceof Pin ? new ResendPin((Pin) item) : new ResendBus((Bus) item));
+                    if (item instanceof Pin pin) {
+                        if (pin.state) {
+                            pin.setHi();
+                        } else {
+                            pin.setLo();
+                        }
+                    } else if (item instanceof Bus bus) {
+                        bus.setState(bus.state);
+                    }
                 });
         wireMergers.values()
                 .stream()
                 .filter(outPin -> !outPin.isHiImpedance()).distinct().forEach(item -> {
                        assert Log.debug(Net.class, "Resend pin {}", item);
-                       item.recalculatePassivePins();
-                       forResend.add(new ResendPin(item));
+                       if (item.state) {
+                           item.setHi();
+                       } else {
+                           item.setLo();
+                       }
                    });
         busMergers.values()
                 .stream()
                 .filter(merger -> !merger.isHiImpedance()).distinct().forEach(item -> {
                       assert Log.debug(Net.class, "Resend pin {}", item);
-                      forResend.add(new ResendBus(item));
+                      item.setState(item.state);
                   });
-        hasResend = true;
-        resend();
         int resendTry = 10;
         for (int i = 0; i < resendTry; i++) {
             schemaParts.values().forEach(SchemaPart::reset);
@@ -419,7 +426,7 @@ public class Net {
         }
         stabilizing = false;
         if (!forResend.isEmpty()) {
-            List<ResendItem> items = forResend;
+            List<MergerInput<?>> items = forResend;
             forResend = new ArrayList<>();
             hasResend = false;
             items.forEach(item -> {
