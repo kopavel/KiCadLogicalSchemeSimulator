@@ -56,7 +56,7 @@ public class Led7SegmentDisplayUiComponent extends AbstractUiComponent {
         if (parent.params.containsKey("inertia")) {
             inertia = Integer.parseInt(parent.params.get("inertia"));
         } else {
-            inertia = 1;
+            inertia = 0;
         }
         this.parent = parent;
         this.on = on;
@@ -105,15 +105,31 @@ public class Led7SegmentDisplayUiComponent extends AbstractUiComponent {
         g2d.setStroke(new BasicStroke(5)); // Sets line thickness to 5
         for (int i = 0; i < 8; i++) {
             int bit = 1 << i;
-            if ((parent.segmentsOn & bit) > 0) {
+            if ((parent.segmentsOn & parent.segmentsOff & bit) > 0) {
                 segmentsTime[i] = inertia;
-            }
-            if (segmentsTime[i] > 0) {
+            } else if (segmentsTime[i] > 0) {
                 segmentsTime[i]--;
             }
-            parent.segmentsOn &= ~bit;
-            g2d.setColor((segmentsTime[i] > 0) ? on : off);
+            Color segmentColor;
+            if ((parent.segmentsOn & bit) > 0) {
+                segmentColor = on;
+            } else if (segmentsTime[i] > 0) {
+                float ratio = (float) segmentsTime[i] / inertia;
+                segmentColor = blendColors(on, off, ratio);
+            } else {
+                segmentColor = off;
+            }
+            g2d.setColor(segmentColor);
             g2d.draw(segmentsUi[i]);
         }
+        parent.segmentsOn &= ~parent.segmentsOff;
+    }
+
+    private static Color blendColors(Color c1, Color c2, float ratio) {
+        int red = (int) (c1.getRed() * ratio + c2.getRed() * (1 - ratio));
+        int green = (int) (c1.getGreen() * ratio + c2.getGreen() * (1 - ratio));
+        int blue = (int) (c1.getBlue() * ratio + c2.getBlue() * (1 - ratio));
+        int alpha = (int) (c1.getAlpha() * ratio + c2.getAlpha() * (1 - ratio));
+        return new Color(red, green, blue);
     }
 }

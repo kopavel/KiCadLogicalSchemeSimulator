@@ -48,6 +48,9 @@ public class Led7SegmentDisplayInPin extends InPin {
         state = true;
         if (!display.reverse && display.enabled) {
             display.segmentsOn |= mask;
+            display.segmentsOff &= ~mask;
+        } else {
+            display.segmentsOff |= mask;
         }
     }
 
@@ -56,6 +59,9 @@ public class Led7SegmentDisplayInPin extends InPin {
         state = false;
         if (display.reverse && display.enabled) {
             display.segmentsOn |= mask;
+            display.segmentsOff &= ~mask;
+        } else {
+            display.segmentsOff |= mask;
         }
     }
 }
