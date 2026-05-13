@@ -79,7 +79,7 @@ public class Keyboard extends SchemaPart implements InteractiveSchemaPart {
         });
         for (int i = 0; i < 8; i++) {
             ins[i] = addInPin(new KbdIn(i, this));
-            addOutPin("Out" + i);
+            addTriStateOutPin("Out" + i);
         }
         addOutPin("Ev");
         keyboardUiComponent = new KeyboardUiComponent(id, 125, this);
