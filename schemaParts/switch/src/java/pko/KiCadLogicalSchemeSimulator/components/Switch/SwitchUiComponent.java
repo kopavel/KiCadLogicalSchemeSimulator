@@ -58,7 +58,7 @@ public class SwitchUiComponent extends AbstractUiComponent {
     }
 
     @Override
-    public void draw() {
+    public void draw(Graphics2D g2d) {
         // Draw outer square
         g2d.setColor(Color.BLACK);
         g2d.drawRect(2, titleHeight + 2, size - 4, getHeight() - titleHeight - 4);

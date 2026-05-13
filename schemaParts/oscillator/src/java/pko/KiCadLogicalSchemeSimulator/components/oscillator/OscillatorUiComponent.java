@@ -76,7 +76,7 @@ public class OscillatorUiComponent extends AbstractUiComponent {
     }
 
     @Override
-    protected void draw() {
+    protected void draw(Graphics2D g2d) {
         g2d.drawString(formatter.format((double) parent.currentFreq.getOpaque()), 0, titleHeight << 1);
     }
 

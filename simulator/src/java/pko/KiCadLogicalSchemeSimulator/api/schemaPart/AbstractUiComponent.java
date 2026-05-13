@@ -34,20 +34,20 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.awt.image.BufferedImage;
 
 @SuppressWarnings("StaticMethodOnlyUsedInOneClass")
 public abstract class AbstractUiComponent extends Component {
-    public int scaleFactor=1;
     public static final int redrawPeriod = 50;
     public static final Font arialFont = new Font("Arial", Font.BOLD, 14);
     public static final Font monospacedFont = new Font("Courier New", Font.PLAIN, 12);
     protected final int size;
     private final String title;
+    public int scaleFactor = 1;
     public int currentX, currentY;
     public boolean hasStoredLayout;
-    protected int titleHeight;
-    protected Graphics2D g2d;
     public boolean sized;
+    protected int titleHeight;
     private int mouseX, mouseY;
 
     protected AbstractUiComponent(String title, int size) {
@@ -81,8 +81,10 @@ public abstract class AbstractUiComponent extends Component {
     @Override
     public void paint(Graphics g) {
         super.paint(g);
-        g2d = (Graphics2D) g;
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+        g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED);
+        g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
         g2d.setFont(arialFont);
         if (!sized) {
             FontMetrics metrics = g2d.getFontMetrics(arialFont);
@@ -92,9 +94,9 @@ public abstract class AbstractUiComponent extends Component {
             sized = true;
         }
         g2d.drawString(title, 0, titleHeight);
-        draw();
+        draw(g2d);
     }
 
-    abstract protected void draw();
+    abstract protected void draw(Graphics2D g2d);
 }
 

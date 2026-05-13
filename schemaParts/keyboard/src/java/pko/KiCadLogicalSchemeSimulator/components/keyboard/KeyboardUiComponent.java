@@ -33,6 +33,7 @@ package pko.KiCadLogicalSchemeSimulator.components.keyboard;
 import pko.KiCadLogicalSchemeSimulator.Simulator;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.AbstractUiComponent;
 
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
@@ -79,7 +80,7 @@ public class KeyboardUiComponent extends AbstractUiComponent implements KeyListe
     }
 
     @Override
-    protected void draw() {
+    protected void draw(Graphics2D g2d) {
         g2d.drawString(label, 0, titleHeight << 1);
     }
 }

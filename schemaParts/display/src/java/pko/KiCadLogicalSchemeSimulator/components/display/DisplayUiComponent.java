@@ -32,6 +32,7 @@
 package pko.KiCadLogicalSchemeSimulator.components.display;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.AbstractUiComponent;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 
@@ -50,7 +51,7 @@ public class DisplayUiComponent extends AbstractUiComponent {
     int vScaled;
 
     @Override
-    protected void draw() {
+    protected void draw(Graphics2D g2d) {
         if (parent.vSize > 0) {
             int vSize = parent.vSize;
             int hSize = parent.hSize;
