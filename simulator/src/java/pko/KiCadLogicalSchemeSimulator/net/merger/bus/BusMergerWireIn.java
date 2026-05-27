@@ -241,7 +241,7 @@ public class BusMergerWireIn extends TriStateInPin implements MergerInput<Pin> {
                     assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
                     return;
                 }
-                /*Optimiser line sens*/
+                /*Optimiser block sens*/
                 if (!hiImpedance) { // from weak
                     /*Optimiser bind nm:nMask*/
                     merger.weakState &= nMask;
