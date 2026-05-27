@@ -74,9 +74,6 @@ public class RomABus extends InBus {
     @Override
     public InBus getOptimised(ModelItem<?> source) {
         ClassOptimiser<RomABus> optimiser = new ClassOptimiser<>(this);
-        if (source != null) {
-            optimiser.cut("setter");
-        }
         if (parent.csCount == 1) {
             optimiser.cut("useI");
         } else {
@@ -84,7 +81,6 @@ public class RomABus extends InBus {
         }
         RomABus build = optimiser.build();
         build.source = source;
-        build.withState = source == null;
         parent.replaceIn(this, build);
         parent.aBus = build;
         for (RomCsPin csPin : parent.csPins) {
