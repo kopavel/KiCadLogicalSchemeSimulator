@@ -338,11 +338,11 @@ public class ClassOptimiser<T> {
                         String finalLine = line;
                         //cut lines
                         if (cutLines.stream()
-                                .anyMatch(cutList::contains)) {
+                                .anyMatch(cutLine -> Arrays.stream(cutLine.split("&")).allMatch(cutList::contains))) {
                             preserveFunction = true;
                             //cut blocks
                         } else if (blocks.stream()
-                                .anyMatch(cutList::contains)) {
+                                .anyMatch(block -> Arrays.stream(block.split("&")).allMatch(cutList::contains))) {
                             preserveFunction = true;
                         } else if (iteratorPattern.entrySet()
                                 .stream()
