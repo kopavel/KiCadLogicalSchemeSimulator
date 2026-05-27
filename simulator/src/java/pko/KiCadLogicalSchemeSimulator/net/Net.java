@@ -385,6 +385,21 @@ public class Net {
     }
 
     private void stabilise() {
+        if (schemaParts.values()
+                .stream()
+                .noneMatch(p -> "Oscillator".equals(p.getClass().getSimpleName()))) {
+            Thread.ofPlatform().start(() -> {
+                while (true) {
+                    resend();
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        return;
+                    }
+                }
+            });
+        }
         schemaParts.values()
                 .stream()
                 .flatMap(p -> p.outPins.values()
@@ -412,6 +427,7 @@ public class Net {
                        } else {
                            item.setLo();
                        }
+                       item.recalculatePassivePins();
                    });
         busMergers.values()
                 .stream()
