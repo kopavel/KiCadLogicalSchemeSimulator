@@ -58,11 +58,11 @@ public class BusMerger extends OutBus {
         variantId += "merger";
         destination.used = true;
         destination.source = this;
-        Bus d = destination;
-        while (d instanceof BusInInterconnect interconnect) {
+        Bus currentBus = destination;
+        while (currentBus instanceof BusInInterconnect interconnect) {
             mask &= ~interconnect.interconnectMask;
             mask |= interconnect.senseMask;
-            d = interconnect.destination;
+            currentBus = interconnect.destination;
         }
         destinations = new Bus[]{destination};
     }

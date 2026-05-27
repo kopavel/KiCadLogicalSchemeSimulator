@@ -38,8 +38,4 @@ public class TriStateOutPin extends OutPin {
         hiImpedance = true;
         triStateOut = true;
     }
-
-    public TriStateOutPin(TriStateOutPin oldPin, String variantId) {
-        super(oldPin, variantId);
-    }
 }

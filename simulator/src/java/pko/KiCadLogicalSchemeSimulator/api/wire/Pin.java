@@ -39,6 +39,7 @@ import java.util.Set;
 
 public abstract class Pin extends ModelItem<Pin> {
     public boolean state;
+    //ToDo make it in separate pin type?
     @Getter
     public boolean strong = true;
     public boolean strengthSensitive;

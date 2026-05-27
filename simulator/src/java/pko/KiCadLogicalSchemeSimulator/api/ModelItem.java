@@ -58,8 +58,9 @@ public abstract class ModelItem<T> implements IModelItem<T> {
     public byte applyOffset;
     public boolean used;
     public ModelItem<?> source;
+    public boolean withState = true;
     private boolean reportedRecurse;
-    public boolean withState=true;
+
     protected ModelItem(String id, SchemaPart parent) {
         this.id = id;
         this.parent = parent;
@@ -82,7 +83,7 @@ public abstract class ModelItem<T> implements IModelItem<T> {
 
     @Override
     public String toString() {
-        return hiImpedance + ":" + getName() + (variantId == null ? "" : ":" + variantId) + ":" + super.toString();
+        return isHiImpedance() + ":" + getName() + (variantId == null ? "" : ":" + variantId) + ":" + super.toString();
     }
 
     public void setHiImpedance() {
