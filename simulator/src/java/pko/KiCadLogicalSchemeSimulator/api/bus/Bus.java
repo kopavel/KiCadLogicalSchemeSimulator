@@ -112,7 +112,7 @@ public abstract class Bus extends ModelItem<Bus> {
     abstract public void setState(int newState);
 
     @Override
-    public Bus copyState(IModelItem<? extends Bus> oldBus) {
+    public Bus copyState(IModelItem<? extends Bus> oldBus, ModelItem<?> source) {
         state = oldBus.getState();
         hiImpedance = oldBus.isHiImpedance();
         return this;

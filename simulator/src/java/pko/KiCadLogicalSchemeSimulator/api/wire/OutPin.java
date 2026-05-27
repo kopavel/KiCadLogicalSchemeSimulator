@@ -30,6 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.api.wire;
+import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.net.wire.NCWire;
@@ -219,7 +220,7 @@ public class OutPin extends Pin {
         if (destinations.length == 0) {
             return triStateOut ? new TriStateNCWire(this) : new NCWire(this);
         } else if (destinations.length == 1) {
-            return destinations[0].copyState(this).getOptimised(source);
+            return destinations[0].copyState(this, source).getOptimised(source);
         } else {
             for (int i = 0; i < destinations.length; i++) {
                 destinations[i] = destinations[i].getOptimised(this);

@@ -133,14 +133,12 @@ public class BusMerger extends OutBus {
     }
 
     private void processPin(Pin pin, BusMergerWireIn input, int destinationMask) {
-        triStateOut = triStateOut || pin.triStateOut;
+        input.copyState(pin, null);
         input.source = pin;
-        input.triStateOut = pin.triStateOut;
-        input.oldStrong = pin.strong;
-        input.hiImpedance = pin.hiImpedance;
+        input.triStateOut = pin.isTriState(pin.source);
         input.id = pin.id;
         input.parent = pin.parent;
-        input.copyState(pin);
+        input.oldStrong = input.strong;
         sources.add(input);
         if (!pin.hiImpedance) {
             if (pin.strong) {
