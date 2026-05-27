@@ -108,8 +108,8 @@ public class OffsetBus extends OutBus implements SupportOffset, SupportMask {
                 case 0: {
                     /*Optimiser blockEnd ar*/
                     for (Bus destination : destinations) {
-                            /*Optimiser bind v:newMaskState*/
-                            destination.setState(newMaskState );
+                        /*Optimiser bind v:newMaskState*/
+                        destination.setState(newMaskState);
                     }
                     /*Optimiser block r block ar*/
                     while (--processing > 0) {
@@ -196,7 +196,7 @@ public class OffsetBus extends OutBus implements SupportOffset, SupportMask {
 
     @Override
     public Bus getOptimised(ModelItem<?> inSource) {
-        if (destinations.length == 1 && destinations[0] instanceof SupportOffset && (applyMask == 0 || destinations[0] instanceof SupportMask)) {
+        if (destinations.length == 1 && destinations[0] instanceof SupportOffset && (applyMask == Integer.MAX_VALUE || destinations[0] instanceof SupportMask)) {
             destinations[0].applyMask = applyMask;
             destinations[0].applyOffset = offset;
             return destinations[0].copyState(this).getOptimised(inSource);
@@ -214,7 +214,7 @@ public class OffsetBus extends OutBus implements SupportOffset, SupportMask {
             }
             if (!isTriState(inSource)) {
                 optimiser.cut("ts");
-            } else if (applyMask != 0) {
+            } else if (applyMask != Integer.MAX_VALUE) {
                 optimiser.bind("d", "destination0");
             }
             if (destinations.length < 2 || getRecursionMode() == none) {
@@ -224,7 +224,7 @@ public class OffsetBus extends OutBus implements SupportOffset, SupportMask {
             } else {
                 optimiser.cut("nr");
             }
-            if (applyMask == 0) {
+            if (applyMask == Integer.MAX_VALUE) {
                 optimiser.cut("mask").bind("v", "newState");
             } else {
                 optimiser.bind("m", applyMask);

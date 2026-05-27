@@ -221,7 +221,7 @@ public class BusToWiresAdapter extends OutBus implements SupportMask, SupportOff
             } else {
                 optimiser.cut("nr");
             }
-            if (applyMask == 0) {
+            if (applyMask == Integer.MAX_VALUE) {
                 optimiser.cut("mask").bind("nState", "newState");
             } else {
                 optimiser.bind("m", mask);

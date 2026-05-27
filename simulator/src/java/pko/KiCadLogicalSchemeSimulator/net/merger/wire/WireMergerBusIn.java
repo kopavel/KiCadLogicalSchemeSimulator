@@ -104,7 +104,7 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus>, SupportM
         /*Optimiser line setter*/
         state = newState;
         /*Optimiser line o block byMask*/
-        if (applyMask != 0) {
+        if (applyMask != Integer.MAX_VALUE) {
             /*Optimiser bind gm:applyMask*/
             if (maskState != (newState = newState & applyMask)) {
                 maskState = newState;
@@ -252,7 +252,7 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus>, SupportM
         if (!triStateIn) {
             optimiser.cut("ts");
         }
-        if (applyMask == 0) {
+        if (applyMask == Integer.MAX_VALUE) {
             optimiser.cut("byMask");
         } else {
             optimiser.bind("gm", applyMask);
