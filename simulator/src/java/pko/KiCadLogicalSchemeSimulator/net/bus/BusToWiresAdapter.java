@@ -58,7 +58,6 @@ public class BusToWiresAdapter extends OutBus implements SupportMask, SupportOff
 
     public BusToWiresAdapter(OutBus outBus, int mask) {
         super(outBus, "BusToWire");
-        triStateIn = false;
         this.mask = mask;
     }
 
@@ -66,7 +65,6 @@ public class BusToWiresAdapter extends OutBus implements SupportMask, SupportOff
         pin.used = true;
         pin.state = (state & mask) > 0;
         used = true;
-        triStateIn = triStateIn || pin.triStateIn;
         pinDestinations = Utils.addToArray(pinDestinations, pin);
         priority += pin.priority;
         split();
@@ -209,7 +207,7 @@ public class BusToWiresAdapter extends OutBus implements SupportMask, SupportOff
             if (inSource != null) {
                 optimiser.cut("setter");
             }
-            if (isTriState(inSource)) {
+            if (isTriState(inSource) && hasTriStateIn()) {
                 optimiser.unroll("i", toImp.length);
             } else {
                 optimiser.cut("ts");

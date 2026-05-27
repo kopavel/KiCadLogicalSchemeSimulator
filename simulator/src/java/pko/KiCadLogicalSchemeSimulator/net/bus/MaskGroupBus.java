@@ -46,7 +46,6 @@ public class MaskGroupBus extends OutBus {
 
     public MaskGroupBus(OutBus source, int mask, String variantId) {
         super(source, variantId + ":mask" + mask);
-        triStateIn = false;
         this.mask = mask;
     }
 
@@ -60,7 +59,6 @@ public class MaskGroupBus extends OutBus {
         bus.state = state & mask;
         bus.hiImpedance = hiImpedance;
         used = true;
-        triStateIn = triStateIn || bus.triStateIn;
         destinations = Utils.addToArray(destinations, bus);
     }
 
@@ -172,7 +170,7 @@ public class MaskGroupBus extends OutBus {
             } else {
                 optimiser.cut("nr");
             }
-            if (!isTriState(inSource)) {
+            if (!isTriState(inSource) || !hasTriStateIn()) {
                 optimiser.cut("ts");
             }
             MaskGroupBus build = optimiser.build();

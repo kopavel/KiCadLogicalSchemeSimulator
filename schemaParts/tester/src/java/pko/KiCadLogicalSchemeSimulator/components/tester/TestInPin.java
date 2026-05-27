@@ -32,13 +32,14 @@
 package pko.KiCadLogicalSchemeSimulator.components.tester;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.TriStateInPin;
 
 public class TestInPin extends SchemaPart {
     public final InPin pin;
 
     protected TestInPin(String id, String sParam) {
         super(id, sParam);
-        InPin inPin = new InPin("In", this) {
+        TriStateInPin inPin = new TriStateInPin("In", this) {
             @Override
             public void setHiImpedance() {
                 hiImpedance = true;
@@ -56,7 +57,6 @@ public class TestInPin extends SchemaPart {
                 state = false;
             }
         };
-        inPin.triStateIn = true;
         inPin.hiImpedance=true;
         pin = addInPin(inPin);
     }

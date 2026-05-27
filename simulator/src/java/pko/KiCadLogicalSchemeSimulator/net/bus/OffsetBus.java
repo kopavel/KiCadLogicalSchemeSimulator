@@ -49,7 +49,6 @@ public class OffsetBus extends OutBus implements SupportOffset, SupportMask {
 
     public OffsetBus(OutBus outBus, Bus destination, byte offset) {
         super(outBus, "offset" + offset);
-        triStateIn = destination.triStateIn;
         if (offset == 0) {
             throw new RuntimeException("Offset must not be 0");
         }
@@ -72,7 +71,6 @@ public class OffsetBus extends OutBus implements SupportOffset, SupportMask {
         } else if (offset < 0) {
             item.state = item.state >> -offset;
         }
-        triStateIn = triStateIn || item.triStateIn;
         destinations = Utils.addToArray(destinations, item);
     }
 
@@ -212,7 +210,7 @@ public class OffsetBus extends OutBus implements SupportOffset, SupportMask {
                 optimiser.bind("o", -offset);
                 optimiser.cut("positive");
             }
-            if (!isTriState(inSource)) {
+            if (!isTriState(inSource) || !hasTriStateIn()) {
                 optimiser.cut("ts");
             } else if (applyMask != Integer.MAX_VALUE) {
                 optimiser.bind("d", "destination0");

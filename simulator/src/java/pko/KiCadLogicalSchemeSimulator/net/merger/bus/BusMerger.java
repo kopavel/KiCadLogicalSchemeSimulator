@@ -84,7 +84,6 @@ public class BusMerger extends OutBus {
 
     public void addSource(OutBus bus, int srcMask, byte offset) {
         bus.used = true;
-        triStateOut = triStateOut || bus.triStateOut;
         int destinationMask = offset == 0 ? srcMask : (offset > 0 ? srcMask << offset : srcMask >> -offset);
         BusMergerBusIn input = new BusMergerBusIn(bus, destinationMask, this);
         bus.addDestination(input, srcMask, offset);

@@ -30,9 +30,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.led16Segment;
-import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.TriStateInPin;
 
-public class Led16SegmentDisplayInPin extends InPin {
+public class Led16SegmentDisplayInPin extends TriStateInPin {
     private final Led16SegmentDisplay display;
     private final int mask;
     private final int nMask;

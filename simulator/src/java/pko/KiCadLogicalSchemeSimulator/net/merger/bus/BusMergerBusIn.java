@@ -35,7 +35,7 @@ import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.SupportMask;
 import pko.KiCadLogicalSchemeSimulator.api.SupportOffset;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
-import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
+import pko.KiCadLogicalSchemeSimulator.net.bus.TriStateInBus;
 import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
@@ -46,7 +46,7 @@ import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.non
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.warn;
 
 //Todo with one Bus input and only weak others - use simpler "Weak bus" implementation
-public class BusMergerBusIn extends InBus implements MergerInput<Bus>, SupportMask, SupportOffset {
+public class BusMergerBusIn extends TriStateInBus implements MergerInput<Bus>, SupportMask, SupportOffset {
     @Getter
     public final int mask;
     public final int nMask;
@@ -61,7 +61,6 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus>, SupportMa
         this.merger = merger;
         nMask = ~mask;
         destinations = merger.destinations;
-        triStateIn = true;
         source.used = true;
         used = true;
     }
@@ -321,10 +320,8 @@ public class BusMergerBusIn extends InBus implements MergerInput<Bus>, SupportMa
         if (source != null) {
             optimiser.cut("setter");
         }
-        if (!triStateOut) {
+        if (!isTriState(source)) {
             optimiser.cut("ts");
-        } else {
-            merger.triStateOut = true;
         }
         if (applyMask == Integer.MAX_VALUE) {
             optimiser.cut("byMask");

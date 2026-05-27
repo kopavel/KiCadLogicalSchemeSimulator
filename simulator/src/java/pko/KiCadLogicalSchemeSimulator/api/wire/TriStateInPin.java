@@ -29,60 +29,28 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.net.wire;
-import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
-import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.TriStateInPin;
+package pko.KiCadLogicalSchemeSimulator.api.wire;
+import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 
-public class PassiveIn extends TriStateInPin {
-    public final PassivePin destination;
+public abstract class TriStateInPin extends InPin {
+    protected TriStateInPin(String id, SchemaPart parent) {
+        super(id, parent);
+    }
 
-    public PassiveIn(PassivePin destination) {
-        super(destination, null);
-        id += "_in";
-        this.destination = destination;
+    protected TriStateInPin(Pin oldPin, String variantId) {
+        super(oldPin, variantId);
+    }
+
+    protected TriStateInPin(String id, SchemaPart parent, boolean state) {
+        super(id, parent);
+        this.state = state;
     }
 
     @Override
-    public void setHi() {
-        state = true;
-        hiImpedance = false;
-        destination.otherState = true;
-        destination.otherImpedance = false;
-        if (source != null) {
-            destination.otherStrong = source.isStrong();
-        } else {
-            destination.otherStrong = strong;
-        }
-        destination.onChange();
+    public boolean hasTriStateIn() {
+        return true;
     }
 
     @Override
-    public void setLo() {
-        state = false;
-        hiImpedance = false;
-        destination.otherState = false;
-        destination.otherImpedance = false;
-        if (source != null) {
-            destination.otherStrong = source.isStrong();
-        } else {
-            destination.otherStrong = strong;
-        }
-        destination.onChange();
-    }
-
-    @Override
-    public void setHiImpedance() {
-        hiImpedance = true;
-        destination.otherImpedance = true;
-        destination.onChange();
-    }
-
-    @Override
-    public Pin getOptimised(ModelItem<?> source) {
-        this.source = source;
-        destination.getOptimised(this);
-        return this;
-    }
+    abstract public void setHiImpedance();
 }

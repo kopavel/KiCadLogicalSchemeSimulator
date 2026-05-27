@@ -33,17 +33,14 @@ package pko.KiCadLogicalSchemeSimulator.net.merger.wire;
 import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.ShortcutException;
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
-import pko.KiCadLogicalSchemeSimulator.api.wire.OutPin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.PullPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.*;
 import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
 import pko.KiCadLogicalSchemeSimulator.net.wire.NCWire;
 
 import java.util.*;
 
 //Todo with one source only and only weak others - use simpler "Weak pin" implementation
-public class WireMerger extends OutPin {
+public class WireMerger extends TriStateOutPin {
     public final Set<MergerInput<?>> sources = new TreeSet<>(Comparator.comparing(mergerInput -> mergerInput.getMask() + ":" + mergerInput.getName()));
     public Collection<PassivePin> passivePins = new TreeSet<>();
     public int weakState;
@@ -54,7 +51,6 @@ public class WireMerger extends OutPin {
         variantId += "merger";
         destination.used = true;
         destination.source = this;
-        triStateIn = destination.triStateIn;
         destinations = new Pin[]{destination};
         split();
         strong = false;
@@ -94,7 +90,6 @@ public class WireMerger extends OutPin {
     }
 
     private void addSource(OutBus bus, int mask) {
-        triStateOut = triStateOut || bus.triStateOut;
         WireMergerBusIn input = new WireMergerBusIn(bus, this);
         bus.addDestination(input, mask, (byte) 0);
         sources.add(input);
@@ -107,7 +102,6 @@ public class WireMerger extends OutPin {
     }
 
     private void addSource(OutPin pin) {
-        triStateOut = triStateOut || pin.triStateOut;
         if (pin instanceof PullPin pullPin) {
             sources.add(pullPin);
             if (weakState != 0 && pin.state != (weakState > 0)) {

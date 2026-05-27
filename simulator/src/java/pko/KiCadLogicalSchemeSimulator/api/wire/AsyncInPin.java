@@ -59,4 +59,9 @@ public class AsyncInPin extends Pin {
     public void setLo() {
         consumer.accept(0);
     }
+
+    @Override
+    public boolean hasTriStateIn() {
+        return inPin.hasTriStateIn();
+    }
 }

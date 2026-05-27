@@ -52,7 +52,7 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus>, SupportM
         super(source, "PMergeBIn");
         this.merger = merger;
         destinations = merger.destinations;
-        triStateIn = true;
+        //FixMe - not always!! BUT need process 'this' impedance because of possible weak states on merger
     }
 
     @SuppressWarnings("unused")
@@ -235,9 +235,9 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus>, SupportM
         destinations = merger.destinations;
         for (int i = 0; i < destinations.length; i++) {
             destinations[i] = destinations[i].getOptimised(merger);
-            triStateIn = triStateIn || destinations[i].triStateIn;
         }
         ClassOptimiser<WireMergerBusIn> optimiser = new ClassOptimiser<>(this).unroll(destinations.length).cut("o");
+        boolean triState = hasTriStateIn();
         if (merger.passivePins.isEmpty()) {
             optimiser.cut("passivePins");
             if (merger.weakState == 0) {
@@ -249,7 +249,7 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus>, SupportM
         if (source != null) {
             optimiser.cut("setter");
         }
-        if (!triStateIn) {
+        if (!triState) {
             optimiser.cut("ts");
         }
         if (applyMask == Integer.MAX_VALUE) {
@@ -262,5 +262,14 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus>, SupportM
         build.source = source;
         merger.sources.add(build);
         return build;
+    }
+
+    @Override
+    public boolean hasTriStateIn() {
+        boolean has = merger.weakState != 0;
+        for (Pin destination : destinations) {
+            has = has || destination.hasTriStateIn();
+        }
+        return has;
     }
 }

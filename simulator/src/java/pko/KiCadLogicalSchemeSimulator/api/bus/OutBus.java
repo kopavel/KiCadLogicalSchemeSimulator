@@ -72,7 +72,6 @@ public class OutBus extends Bus {
         bus.source = this;
         bus.state = state;
         bus.hiImpedance = hiImpedance;
-        triStateIn = triStateIn || bus.triStateIn;
         if (offset != 0) {
             if (corrected.containsKey(destMask) && corrected.get(destMask).containsKey(offset)) {
                 corrected.get(destMask).get(offset).addDestination(bus);
@@ -108,7 +107,6 @@ public class OutBus extends Bus {
         pin.used = true;
         pin.state = (state & destMask) > 0;
         pin.hiImpedance = hiImpedance;
-        triStateIn = triStateIn || pin.triStateIn;
         MaskGroupBus maskGroup = Arrays.stream(destinations)
                 .filter(dest -> dest instanceof MaskGroupBus)
                 .map(dest -> ((MaskGroupBus) dest))
@@ -218,7 +216,7 @@ public class OutBus extends Bus {
             } else {
                 optimiser.cut("nr");
             }
-            if (!isTriState(inSource)) {
+            if (!isTriState(inSource) || !hasTriStateIn()) {
                 optimiser.cut("ts");
             }
             OutBus build = optimiser.build();
@@ -228,6 +226,12 @@ public class OutBus extends Bus {
             }
             return build;
         }
+    }
+
+    @Override
+    public boolean hasTriStateIn() {
+        return Arrays.stream(destinations)
+                .anyMatch(Bus::hasTriStateIn);
     }
 
     private void sort() {

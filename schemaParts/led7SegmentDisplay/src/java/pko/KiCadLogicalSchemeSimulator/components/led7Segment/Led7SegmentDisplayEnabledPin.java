@@ -30,16 +30,15 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.components.led7Segment;
-import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.TriStateInPin;
 
 //ToDo optimiser
-public class Led7SegmentDisplayEnabledPin extends InPin {
+public class Led7SegmentDisplayEnabledPin extends TriStateInPin {
     private final Led7SegmentDisplay display;
 
     public Led7SegmentDisplayEnabledPin(String id, Led7SegmentDisplay parent) {
         super(id, parent);
         display = parent;
-        triStateIn = true;
     }
 
     @Override

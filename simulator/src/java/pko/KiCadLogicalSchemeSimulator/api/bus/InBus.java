@@ -43,6 +43,11 @@ public abstract class InBus extends Bus {
     }
 
     @Override
+    public boolean hasTriStateIn() {
+        return false;
+    }
+
+    @Override
     public InBus getOptimised(ModelItem<?> source) {
         return (InBus) super.getOptimised(source);
     }

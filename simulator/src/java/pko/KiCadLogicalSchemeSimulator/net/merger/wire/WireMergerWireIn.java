@@ -55,7 +55,6 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
         oldStrong = source.strong;
         hiImpedance = source.hiImpedance;
         destinations = merger.destinations;
-        triStateIn = true;
         strengthSensitive = source.strengthSensitive;
     }
 
@@ -447,12 +446,12 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
         destinations = merger.destinations;
         for (int i = 0; i < destinations.length; i++) {
             destinations[i] = destinations[i].getOptimised(merger);
-            triStateIn = triStateIn || destinations[i].triStateIn;
         }
         ClassOptimiser<WireMergerWireIn> optimiser = new ClassOptimiser<>(this).unroll(destinations.length);
+        boolean triState = hasTriStateIn();
         if (merger.passivePins.isEmpty()) {
             optimiser.cut("passivePins");
-            if (!triStateIn) {
+            if (!triState) {
                 optimiser.cut("hiAndPassive");
             }
         }
@@ -462,7 +461,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
         if (inSource != null) {
             optimiser.cut("setter");
         }
-        if (!triStateIn) {
+        if (!triState) {
             optimiser.cut("ts");
         }
         WireMergerWireIn build = optimiser.build();
@@ -491,5 +490,13 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                 setLo();
             }
         }
+    }
+
+    public boolean hasTriStateIn() {
+        boolean has = merger.weakState != 0;
+        for (Pin destination : destinations) {
+            has = has || destination.hasTriStateIn();
+        }
+        return has;
     }
 }

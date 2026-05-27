@@ -51,8 +51,7 @@ public abstract class Pin extends ModelItem<Pin> {
         strong = oldPin.strong;
         used = oldPin.used;
         priority = oldPin.priority;
-        triStateIn = oldPin.triStateIn;
-        triStateOut = oldPin.triStateOut;
+        triStateOut = oldPin.isTriState(oldPin.source);
         hiImpedance = oldPin.hiImpedance && isTriState(source);
         source = (oldPin.source == oldPin) ? this : oldPin.source;
         withState = oldPin.withState;
@@ -67,7 +66,7 @@ public abstract class Pin extends ModelItem<Pin> {
     public Pin copyState(IModelItem<? extends Pin> oldPin, ModelItem<?> source) {
         used = true;
         strong = oldPin.isStrong();
-        hiImpedance = triStateIn && oldPin.isHiImpedance();
+        hiImpedance = oldPin.isTriState(source) && oldPin.hasTriStateIn() && oldPin.isHiImpedance();
         state = oldPin.getState() > 0;
         priority += oldPin.getPriority();
         strengthSensitive = oldPin.getThis().strengthSensitive;

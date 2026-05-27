@@ -45,6 +45,7 @@ public interface IModelItem<T> extends Comparable<IModelItem<T>> {
     Set<String> getAliases();
     SchemaPart getParent();
     String getId();
+    boolean hasTriStateIn();
     IModelItem<T> getOptimised(ModelItem<?> source);
     IModelItem<T> copyState(IModelItem<? extends T> oldItem, ModelItem<?> source);
     boolean isTriState(ModelItem<?> source);

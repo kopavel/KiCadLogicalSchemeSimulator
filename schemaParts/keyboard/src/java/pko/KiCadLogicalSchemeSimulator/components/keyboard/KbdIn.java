@@ -1,10 +1,10 @@
 package pko.KiCadLogicalSchemeSimulator.components.keyboard;
-import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.TriStateInPin;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 import java.util.Arrays;
 
-public class KbdIn extends InPin {
+public class KbdIn extends TriStateInPin {
     OutState[] states = new OutState[0];
     final int mask;
     final int nMask;
@@ -13,7 +13,6 @@ public class KbdIn extends InPin {
         super("In" + no, parent);
         mask = 1 << no;
         nMask = ~mask;
-        triStateIn = true;
     }
 
     public void addState(OutState outState) {

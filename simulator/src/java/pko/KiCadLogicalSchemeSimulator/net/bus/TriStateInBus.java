@@ -29,60 +29,31 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.net.wire;
+package pko.KiCadLogicalSchemeSimulator.net.bus;
 import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
-import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.TriStateInPin;
+import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
+import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 
-public class PassiveIn extends TriStateInPin {
-    public final PassivePin destination;
-
-    public PassiveIn(PassivePin destination) {
-        super(destination, null);
-        id += "_in";
-        this.destination = destination;
-    }
-
-    @Override
-    public void setHi() {
-        state = true;
-        hiImpedance = false;
-        destination.otherState = true;
-        destination.otherImpedance = false;
-        if (source != null) {
-            destination.otherStrong = source.isStrong();
-        } else {
-            destination.otherStrong = strong;
-        }
-        destination.onChange();
-    }
-
-    @Override
-    public void setLo() {
-        state = false;
-        hiImpedance = false;
-        destination.otherState = false;
-        destination.otherImpedance = false;
-        if (source != null) {
-            destination.otherStrong = source.isStrong();
-        } else {
-            destination.otherStrong = strong;
-        }
-        destination.onChange();
-    }
-
-    @Override
-    public void setHiImpedance() {
+public abstract class TriStateInBus extends Bus {
+    protected TriStateInBus(String id, SchemaPart parent, int size, String... names) {
+        super(id, parent, size, names);
         hiImpedance = true;
-        destination.otherImpedance = true;
-        destination.onChange();
+    }
+
+    protected TriStateInBus(Bus source, String variantId) {
+        super(source, variantId);
     }
 
     @Override
-    public Pin getOptimised(ModelItem<?> source) {
-        this.source = source;
-        destination.getOptimised(this);
-        return this;
+    public boolean hasTriStateIn() {
+        return true;
     }
+
+    @Override
+    public TriStateInBus getOptimised(ModelItem<?> source) {
+        return (TriStateInBus) super.getOptimised(source);
+    }
+
+    @Override
+    abstract public void setHiImpedance();
 }

@@ -52,7 +52,6 @@ public abstract class ModelItem<T> implements IModelItem<T> {
     public int priority;
     public String variantId;
     public boolean hiImpedance;
-    public boolean triStateIn;
     public boolean triStateOut;
     public int processing;
     public byte applyOffset;
@@ -68,7 +67,7 @@ public abstract class ModelItem<T> implements IModelItem<T> {
     }
 
     public boolean isTriState(ModelItem<?> source) {
-        return triStateIn && ((source == null || source == this) ? triStateOut : source.isTriState(source.source));
+        return ((source == null || source == this) ? triStateOut : source.isTriState(source.source));
     }
 
     @Override

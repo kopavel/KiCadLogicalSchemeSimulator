@@ -37,7 +37,6 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus;
 public class NCBus extends OutBus {
     public NCBus(OutBus outBus) {
         super(outBus, "NC");
-        triStateIn=false;
     }
 
     @Override

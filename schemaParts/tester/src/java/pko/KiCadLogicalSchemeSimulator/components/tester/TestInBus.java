@@ -56,7 +56,6 @@ public class TestInBus extends SchemaPart {
                 state = newState;
             }
         };
-        inBus.triStateIn = true;
         inBus.hiImpedance = true;
         bus = addInBus(inBus);
     }

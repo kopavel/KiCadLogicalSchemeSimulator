@@ -45,4 +45,9 @@ public abstract class InPin extends Pin {
         super(id, parent);
         this.state = state;
     }
+
+    @Override
+    public boolean hasTriStateIn() {
+        return false;
+    }
 }

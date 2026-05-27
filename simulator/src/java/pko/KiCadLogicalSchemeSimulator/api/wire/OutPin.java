@@ -68,7 +68,6 @@ public class OutPin extends Pin {
         pin.source = this;
         pin.state = state;
         pin.hiImpedance = hiImpedance;
-        triStateIn = triStateIn || pin.triStateIn;
         if (!(pin instanceof NCWire)) {
             priority += pin.priority;
             destinations = Utils.addToArray(destinations, pin);
@@ -218,7 +217,7 @@ public class OutPin extends Pin {
     @Override
     public Pin getOptimised(ModelItem<?> source) {
         if (destinations.length == 0) {
-            return triStateOut ? new TriStateNCWire(this) : new NCWire(this);
+            return isTriState(source) ? new TriStateNCWire(this) : new NCWire(this);
         } else if (destinations.length == 1) {
             return destinations[0].copyState(this, source).getOptimised(source);
         } else {
@@ -234,7 +233,7 @@ public class OutPin extends Pin {
             } else {
                 optimiser.cut("nr");
             }
-            if (isTriState(source)) {
+            if (isTriState(source) && hasTriStateIn()) {
                 optimiser.unroll("i", toImp.length);
             } else {
                 optimiser.cut("ts");
@@ -249,6 +248,12 @@ public class OutPin extends Pin {
             }
             return build;
         }
+    }
+
+    @Override
+    public boolean hasTriStateIn() {
+        return Arrays.stream(destinations)
+                .anyMatch(IModelItem::hasTriStateIn);
     }
 
     protected void split() {

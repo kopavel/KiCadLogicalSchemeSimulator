@@ -34,6 +34,7 @@ import pko.KiCadLogicalSchemeSimulator.api.schemaPart.AbstractUiComponent;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.InteractiveSchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
+import pko.KiCadLogicalSchemeSimulator.api.wire.TriStateInPin;
 import pko.KiCadLogicalSchemeSimulator.components.led.LedUiComponent;
 import pko.KiCadLogicalSchemeSimulator.tools.UiTools;
 
@@ -44,7 +45,7 @@ public class LedIndicator extends SchemaPart implements InteractiveSchemaPart {
 
     protected LedIndicator(String id, String sParams) {
         super(id, sParams);
-        InPin inPin = addInPin(new InPin("IN", this) {
+        InPin inPin = addInPin(new TriStateInPin("IN", this) {
             @Override
             public void setHiImpedance() {
                 hiImpedance=true;
@@ -63,7 +64,6 @@ public class LedIndicator extends SchemaPart implements InteractiveSchemaPart {
                 state = false;
             }
         });
-        inPin.triStateIn=true;
         int size = Integer.parseInt(params.getOrDefault("size", "20"));
         Color on = UiTools.getColor(params.getOrDefault("onColor", "#ff0000"));
         Color off = UiTools.getColor(params.getOrDefault("offColor", "#808080"));
