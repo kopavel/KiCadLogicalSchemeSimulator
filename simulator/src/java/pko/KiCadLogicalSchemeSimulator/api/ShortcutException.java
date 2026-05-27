@@ -47,14 +47,12 @@ public class ShortcutException extends RuntimeException {
                 (source instanceof MergerInput<?> input ? Utils.LPad(16, '0', Integer.toBinaryString(input.getMask())) + ":" : "") + source.getName() + ":" +
                 (source instanceof Pin ? (((Pin) source).strong ? "" : "W") + (state > 0 ? "1" : "0") : Utils.LPad(16, '0', Integer.toBinaryString(state))) +
                 " Shortcut with: \n");
-        int[] states = {0};
         pins.stream()
                 .filter(pin -> pin != source).sorted(Comparator.comparingInt((MergerInput<? extends T> pin) -> pin.getMask())).forEach(pin -> {
-                if (!pin.isHiImpedance() && (states[0] & pin.getMask()) == 0) {
-                    states[0] |= pin.getMask();
+                if (!((ModelItem<?>) pin).hiImpedance) {
                     message.append(Utils.LPad(16, '0', Integer.toBinaryString(pin.getMask()))).append(":");
                     message.append(pin.getName()).append(":");
-                    if (pin.isHiImpedance()) {
+                    if (((ModelItem<?>) pin).hiImpedance) {
                         message.append("H");
                     } else {
                         if (!pin.isStrong()) {
