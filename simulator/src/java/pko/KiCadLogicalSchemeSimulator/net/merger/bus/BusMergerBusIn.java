@@ -118,7 +118,7 @@ public class BusMergerBusIn extends TriStateInBus implements MergerInput<Bus>, S
                 merger.strongPins,
                 merger.weakState,
                 merger.weakPins);
-        /*Optimiser line o block sameMask block ts*/
+        /*Optimiser line o block sameMask*/
         if (merger.mask == mask) {
             if (hiImpedance) {
                 hiImpedance = false;
@@ -131,7 +131,6 @@ public class BusMergerBusIn extends TriStateInBus implements MergerInput<Bus>, S
                 /*Optimiser bind m:mask*/
                 merger.strongPins = mask;
             }
-            /*Optimiser blockEnd ts*/
             if (newState != merger.state) {
                 merger.state = newState;
                 /*Optimiser block ar*/
@@ -143,8 +142,10 @@ public class BusMergerBusIn extends TriStateInBus implements MergerInput<Bus>, S
                         }
                         /*Optimiser block r block ar*/
                         while (--processing > 0) {
-                            for (Bus destination : destinations) {
-                                destination.setState(merger.state);
+                            if (hiImpedance) {
+                                for (Bus destination : destinations) {
+                                    destination.setState(merger.state);
+                                }
                             }
                         }
                         /*Optimiser line nr blockEnd r*/
@@ -185,8 +186,12 @@ public class BusMergerBusIn extends TriStateInBus implements MergerInput<Bus>, S
                         }
                         /*Optimiser block r block ar*/
                         while (--processing > 0) {
-                            for (Bus destination : destinations) {
-                                destination.setState(merger.state);
+                            /*Optimiser line ts*/
+                            if (!hiImpedance) {
+                                for (Bus destination : destinations) {
+                                    destination.setState(merger.state);
+                                }
+                                /*Optimiser line ts*/
                             }
                         }
                         /*Optimiser line nr blockEnd r*/
@@ -221,7 +226,6 @@ public class BusMergerBusIn extends TriStateInBus implements MergerInput<Bus>, S
         assert !hiImpedance || parent.net.stabilizing : "Already in hiImpedance:" + this;
         hiImpedance = true;
         BusMerger merger = this.merger;
-        int newState;
         assert Log.debug(getClass(),
                 "Bus merger setImpedance. before: Source:{} (state:{},  hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{})",
                 getName(),
@@ -235,6 +239,8 @@ public class BusMergerBusIn extends TriStateInBus implements MergerInput<Bus>, S
         /*Optimiser block sameMask line o*/
         if (mask == merger.mask) {
             merger.strongPins = 0;
+            /*Optimiser block mw*/
+            int newState;
             if ((newState = merger.weakState) != merger.state) {
                 merger.state = newState;
                 /*Optimiser block ar*/
@@ -246,8 +252,10 @@ public class BusMergerBusIn extends TriStateInBus implements MergerInput<Bus>, S
                         }
                         /*Optimiser block r block ar*/
                         while (--processing > 0) {
-                            for (Bus destination : destinations) {
-                                destination.setState(merger.state);
+                            if (!hiImpedance) {
+                                for (Bus destination : destinations) {
+                                    destination.setState(merger.state);
+                                }
                             }
                         }
                         /*Optimiser line nr blockEnd r*/
@@ -260,13 +268,16 @@ public class BusMergerBusIn extends TriStateInBus implements MergerInput<Bus>, S
                 }
                 /*Optimiser blockEnd ar*/
             }
-            /*Optimiser blockEnd sameMask block otherMask line o*/
+            /*Optimiser blockEnd sameMask blockEnd mw block otherMask line o*/
         } else {
             /*Optimiser bind nm:nMask*/
             merger.strongPins &= nMask;
             int mergerState;
-            /*Optimiser bind m:mask bind nm:nMask*/
-            if ((mergerState = merger.state & nMask | (merger.weakState & mask)) != merger.state) {
+            /*Optimiser bind m:mask bind nm:nMask blockEnd wt*/
+            if ((mergerState = merger.state & nMask
+                    /*Optimiser line mw*///
+                    | (merger.weakState & mask)//
+            ) != merger.state) {
                 merger.state = mergerState;
                 /*Optimiser block ar*/
                 switch (processing++) {
@@ -277,8 +288,10 @@ public class BusMergerBusIn extends TriStateInBus implements MergerInput<Bus>, S
                         }
                         /*Optimiser block r block ar*/
                         while (--processing > 0) {
-                            for (Bus destination : destinations) {
-                                destination.setState(merger.state);
+                            if (!hiImpedance) {
+                                for (Bus destination : destinations) {
+                                    destination.setState(merger.state);
+                                }
                             }
                         }
                         /*Optimiser line nr blockEnd r*/
@@ -316,6 +329,9 @@ public class BusMergerBusIn extends TriStateInBus implements MergerInput<Bus>, S
             optimiser.cut("otherMask");
         } else {
             optimiser.cut("sameMask").bind("nm", nMask);
+        }
+        if (merger.weakState == 0) {
+            optimiser.cut("mw");
         }
         if (source != null) {
             optimiser.cut("setter");

@@ -76,10 +76,13 @@ public class BusMergerWireIn extends TriStateInPin implements MergerInput<Pin> {
     @Override
     public void setHi() {
         BusMerger merger = this.merger;
+        /*Optimiser block ts*/
         if (resendState != null) {
             hiImpedance = resendImpedance;
             resendState = null;
         }
+        /*Optimiser blockEnd ts line setter*/
+        state = true;
         assert Log.debug(getClass(),
                 "Bus merger change. before: newState:{},  Source:{} (state:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, " +
                         "weakState:{}, weakPins:{})",
@@ -94,70 +97,68 @@ public class BusMergerWireIn extends TriStateInPin implements MergerInput<Pin> {
                 merger.weakState,
                 merger.weakPins);
         int mergerState = merger.state;
-        /*Optimiser line setter*/
-        state = true;
+        /*Optimiser line sens*/
         if (strong) { //to strong
-            if (
-                /*Optimiser line ts*/
-                    hiImpedance ||//
-                            !oldStrong) { //from hiImpedance or weak
+            /*Optimiser block ts*/
+            if (hiImpedance
+                    /*Optimiser line sens*///
+                    || !oldStrong//
+            ) {
                 /*Optimiser bind m:mask*/
                 if ((merger.strongPins & mask) != 0) { //strong pins shortcut
                     resendState = true;
                     resendImpedance = hiImpedance;
-                    hiImpedance=false;
+                    hiImpedance = false;
                     parent.net.forResend(this);
                     assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
                     return;
                 }
-                /*Optimiser line ts*/
+                /*Optimiser block sens*/
                 if (!hiImpedance) { // from weak
                     /*Optimiser bind nm:nMask*/
                     merger.weakState &= nMask;
                     /*Optimiser bind nm:nMask*/
                     merger.weakPins &= nMask;
-                    /*Optimiser block ts*/
                 } else {
                     hiImpedance = false;
                 }
-                /*Optimiser blockEnd ts bind m:mask*/
+                /*Optimiser blockEnd sens bind m:mask*/
                 merger.strongPins |= mask;
             }
-            /*Optimiser bind m:mask*/
+            /*Optimiser bind m:mask blockEnd ts*/
             mergerState |= mask;
+            /*Optimiser block sens*/
         } else { //to weak
             /*Optimiser bind m:mask*/
             if ((merger.weakPins & mask) != 0 && ((merger.weakState & mask) == 0)) { //opposite weak state
                 resendState = true;
                 resendImpedance = hiImpedance;
-                hiImpedance=false;
+                hiImpedance = false;
                 parent.net.forResend(this);
                 assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
                 return;
             }
-            /*Optimiser block ts*/
             if (hiImpedance) { // from impedance
                 /*Optimiser bind m:mask*/
                 merger.weakPins |= mask;
                 /*Optimiser bind m:mask*/
                 merger.weakState |= mask;
                 hiImpedance = false;
-            } else
-                /*Optimiser blockEnd ts*/
-                if (oldStrong) { //from strong
-                    /*Optimiser bind nm:nMask*/
-                    merger.strongPins &= nMask;
-                    /*Optimiser bind m:mask*/
-                    merger.weakPins |= mask;
-                    /*Optimiser bind m:mask*/
-                    merger.weakState |= mask;
-                }
+            } else if (oldStrong) { //from strong
+                /*Optimiser bind nm:nMask*/
+                merger.strongPins &= nMask;
+                /*Optimiser bind m:mask*/
+                merger.weakPins |= mask;
+                /*Optimiser bind m:mask*/
+                merger.weakState |= mask;
+            }
             /*Optimiser bind m:mask*/
             if ((merger.strongPins & mask) == 0) {
                 /*Optimiser bind m:mask*/
                 mergerState |= mask;
             }
         }
+        /*Optimiser blockEnd sens*/
         if (mergerState != merger.state) {
             merger.state = mergerState;
             /*Optimiser block ar*/
@@ -183,6 +184,7 @@ public class BusMergerWireIn extends TriStateInPin implements MergerInput<Pin> {
             }
             /*Optimiser blockEnd ar*/
         }
+        /*Optimiser line sens*/
         oldStrong = strong;
         assert Log.debug(getClass(),
                 "Bus merger change. after: newState:{},  Source:{} (state:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, " +
@@ -202,10 +204,13 @@ public class BusMergerWireIn extends TriStateInPin implements MergerInput<Pin> {
     @Override
     public void setLo() {
         BusMerger merger = this.merger;
+        /*Optimiser block ts*/
         if (resendState != null) {
             hiImpedance = resendImpedance;
             resendState = null;
         }
+        /*Optimiser blockEnd ts line setter*/
+        state = false;
         assert Log.debug(getClass(),
                 "Bus merger change. before: newState:{},  Source:{} (state:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, " +
                         "weakState:{}, weakPins:{})",
@@ -220,66 +225,68 @@ public class BusMergerWireIn extends TriStateInPin implements MergerInput<Pin> {
                 merger.weakState,
                 merger.weakPins);
         int mergerState = merger.state;
-        /*Optimiser line setter*/
-        state = false;
+        /*Optimiser line sens*/
         if (strong) { //to strong
-            if (
-                /*Optimiser line ts*/
-                    hiImpedance ||//
-                            !oldStrong) { //from hiImpedance or weak
+            /*Optimiser block ts*/
+            if (hiImpedance
+                    /*Optimiser line sens*///
+                    || !oldStrong//
+            ) {
                 /*Optimiser bind m:mask*/
                 if ((merger.strongPins & mask) != 0) { //strong pins shortcut
                     resendState = false;
                     resendImpedance = hiImpedance;
-                    hiImpedance=false;
+                    hiImpedance = false;
                     parent.net.forResend(this);
                     assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
                     return;
                 }
-                /*Optimiser line ts*/
+                /*Optimiser line sens*/
                 if (!hiImpedance) { // from weak
                     /*Optimiser bind nm:nMask*/
                     merger.weakState &= nMask;
                     /*Optimiser bind nm:nMask*/
                     merger.weakPins &= nMask;
-                    /*Optimiser block ts*/
                 } else {
                     hiImpedance = false;
                 }
-                /*Optimiser blockEnd ts bind m:mask*/
+                /*Optimiser blockEnd sens bind m:mask*/
                 merger.strongPins |= mask;
             }
-            /*Optimiser bind nm:nMask*/
+            /*Optimiser bind nm:nMask blockEnd ts*/
             mergerState &= nMask;
+            /*Optimiser block sens*/
         } else { //to weak
             /*Optimiser bind m:mask*/
             if ((merger.weakPins & mask) != 0 && (merger.weakState & mask) != 0) { //opposite weak state
                 resendState = false;
                 resendImpedance = hiImpedance;
-                hiImpedance=false;
+                hiImpedance = false;
                 parent.net.forResend(this);
                 assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
                 return;
             }
-            /*Optimiser block ts*/
             if (hiImpedance) { // from impedance
                 /*Optimiser bind m:mask*/
                 merger.weakPins |= mask;
+                /*Optimiser bind nm:nMask*/
+                merger.weakState &= nMask;
                 hiImpedance = false;
-            } else
-                /*Optimiser blockEnd ts*/
-                if (oldStrong) { //from strong
-                    /*Optimiser bind nm:nMask*/
-                    merger.strongPins &= nMask;
-                    /*Optimiser bind m:mask*/
-                    merger.weakPins |= mask;
-                }
+            } else if (oldStrong) { //from strong
+                /*Optimiser bind nm:nMask*/
+                merger.strongPins &= nMask;
+                /*Optimiser bind m:mask*/
+                merger.weakPins |= mask;
+                /*Optimiser bind nm:nMask*/
+                merger.weakState &= nMask;
+            }
             /*Optimiser bind m:mask*/
             if ((merger.strongPins & mask) == 0) {
                 /*Optimiser bind nm:nMask*/
                 mergerState &= nMask;
             }
         }
+        /*Optimiser blockEnd sens*/
         if (mergerState != merger.state) {
             merger.state = mergerState;
             /*Optimiser block ar*/
@@ -305,6 +312,7 @@ public class BusMergerWireIn extends TriStateInPin implements MergerInput<Pin> {
             }
             /*Optimiser blockEnd ar*/
         }
+        /*Optimiser line sens*/
         oldStrong = strong;
         assert Log.debug(getClass(),
                 "Bus merger change. after: newState:{},  Source:{} (state:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, " +
@@ -407,8 +415,8 @@ public class BusMergerWireIn extends TriStateInPin implements MergerInput<Pin> {
         if (source != null) {
             optimiser.cut("setter");
         }
-        if (!isTriState(source)) {
-            optimiser.cut("ts");
+        if (!strengthSensitive) {
+            optimiser.cut("sens");
         }
         if (getRecursionMode() == none) {
             optimiser.cut("ar");

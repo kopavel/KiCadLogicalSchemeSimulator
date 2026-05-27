@@ -101,6 +101,9 @@ public class BusMerger extends OutBus {
         int destinationMask = 1 << offset;
         pin.used = true;
         if (pin instanceof PullPin pullPin) {
+            if ((weakPins & destinationMask) != 0 && ((weakState & destinationMask) > 0) != pin.state) {
+                throw new ShortcutException(this, weakState, sources);
+            }
             weakPins |= destinationMask;
             if (pin.state) {
                 weakState |= destinationMask;
@@ -108,8 +111,6 @@ public class BusMerger extends OutBus {
             sources.add(pullPin);
         } else {
             BusMergerWireIn input = new BusMergerWireIn(destinationMask, this);
-            input.id = pin.id;
-            input.parent = pin.parent;
             pin.addDestination(input);
             processPin(pin, input, destinationMask);
         }
@@ -127,7 +128,6 @@ public class BusMerger extends OutBus {
         for (int i = 0; i < destinations.length; i++) {
             destinations[i] = destinations[i].getOptimised(this);
         }
-        hiImpedance = isTriState(null);
         return this;
     }
 

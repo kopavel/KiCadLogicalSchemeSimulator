@@ -53,7 +53,6 @@ public class WireMerger extends TriStateOutPin {
         destination.source = this;
         destinations = new Pin[]{destination};
         split();
-        strong = false;
         pins.forEach(this::addSource);
         passivePins.forEach(this::addSource);
         if (buses != null) {
@@ -66,12 +65,13 @@ public class WireMerger extends TriStateOutPin {
         super.addDestination(pin);
         if (!(pin instanceof NCWire)) {
             id += "/" + pin.getName();
+        } else {
+            throw new RuntimeException("NCWire as merger destination?");
         }
     }
 
     @Override
     public Pin getOptimised(ModelItem<?> source) {
-        hiImpedance = isTriState(null) && weakState == 0;
         for (int i = 0; i < destinations.length; i++) {
             destinations[i] = destinations[i].getOptimised(this);
         }
@@ -94,10 +94,12 @@ public class WireMerger extends TriStateOutPin {
         bus.addDestination(input, mask, (byte) 0);
         sources.add(input);
         if (!bus.hiImpedance) {
-            if (strong) {
-                throw new ShortcutException(this,(bus.state & mask),sources);
+            if (strong && !hiImpedance) {
+                throw new ShortcutException(this, (bus.state & mask), sources);
             }
             state = (bus.state & mask) != 0;
+            hiImpedance = false;
+            strong = true;
         }
     }
 
@@ -105,11 +107,13 @@ public class WireMerger extends TriStateOutPin {
         if (pin instanceof PullPin pullPin) {
             sources.add(pullPin);
             if (weakState != 0 && pin.state != (weakState > 0)) {
-                throw new ShortcutException(this,weakState,sources);
+                throw new ShortcutException(this, weakState, sources);
             }
             weakState += pin.state ? 1 : -1;
-            if (!strong) {
+            if (hiImpedance) {
                 state = weakState > 0;
+                strong = false;
+                hiImpedance = false;
             }
         } else if (pin instanceof PassivePin passivePin) {
             if (!passivePins.contains(passivePin)) {
@@ -117,8 +121,18 @@ public class WireMerger extends TriStateOutPin {
                 WireMergerWireIn input = new WireMergerWireIn(passivePin, this);
                 pin.addDestination(input);
                 sources.add(input);
-                if (!passivePin.hiImpedance && !passivePin.strong) {
-                    weakState += pin.state ? 1 : -1;
+                if (!passivePin.hiImpedance) {
+                    if (!passivePin.strong) {
+                        weakState += pin.state ? 1 : -1;
+                        if (hiImpedance) {
+                            state = weakState > 0;
+                            strong = false;
+                            hiImpedance = false;
+                        }
+                    } else {
+                        strong = true;
+                        state = pin.state;
+                    }
                 }
             }
         } else {
@@ -126,8 +140,8 @@ public class WireMerger extends TriStateOutPin {
             pin.addDestination(input);
             sources.add(input);
             if (!pin.hiImpedance) {
-                if (strong) {
-                    throw new ShortcutException(this,pin.state?1:0,sources);
+                if (!hiImpedance && strong) {
+                    throw new ShortcutException(this, pin.state ? 1 : 0, sources);
                 }
                 strong = true;
                 state = pin.state;
