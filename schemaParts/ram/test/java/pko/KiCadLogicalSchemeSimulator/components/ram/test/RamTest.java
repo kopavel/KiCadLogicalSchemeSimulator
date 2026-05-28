@@ -95,7 +95,7 @@ public class RamTest extends NetTester {
         for (int i = 0; i < testValues.length; i++) {
             setBus("aBus", testAddresses[i]);
             setBus("dOut", testValues[i]);
-            setLo("~{WE}");
+            setHi("~{WE}");
         }
         outBus("dOut").setHiImpedance();
         setLo("~{OE}");
