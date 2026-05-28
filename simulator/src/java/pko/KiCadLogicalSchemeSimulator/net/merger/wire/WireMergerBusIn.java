@@ -251,6 +251,7 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus>, SupportM
         }
         if (!triState) {
             optimiser.cut("ts");
+            hiImpedance = false;
         }
         if (applyMask == Integer.MAX_VALUE) {
             optimiser.cut("byMask");

@@ -172,6 +172,7 @@ public class MaskGroupBus extends OutBus {
             }
             if (!isTriState(inSource) || !hasTriStateIn()) {
                 optimiser.cut("ts");
+                hiImpedance = false;
             }
             MaskGroupBus build = optimiser.build();
             build.withState = inSource == null;

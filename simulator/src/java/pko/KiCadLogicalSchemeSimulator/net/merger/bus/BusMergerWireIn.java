@@ -427,6 +427,7 @@ public class BusMergerWireIn extends TriStateInPin implements MergerInput<Pin> {
         }
         if (!hasTriStateIn()) {
             optimiser.cut("ts");
+            hiImpedance = false;
         }
         BusMergerWireIn build = optimiser.build();
         build.withState = source == null;

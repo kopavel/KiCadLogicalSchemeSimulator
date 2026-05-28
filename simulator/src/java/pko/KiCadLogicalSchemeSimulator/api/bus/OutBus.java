@@ -218,6 +218,7 @@ public class OutBus extends Bus {
             }
             if (!isTriState(inSource) || !hasTriStateIn()) {
                 optimiser.cut("ts");
+                hiImpedance = false;
             }
             OutBus build = optimiser.build();
             build.source = inSource;

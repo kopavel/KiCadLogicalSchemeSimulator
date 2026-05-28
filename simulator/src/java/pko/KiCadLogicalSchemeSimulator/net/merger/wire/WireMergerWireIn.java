@@ -467,6 +467,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
         }
         if (!triState) {
             optimiser.cut("ts");
+            hiImpedance = false;
         }
         WireMergerWireIn build = optimiser.build();
         build.source = inSource;

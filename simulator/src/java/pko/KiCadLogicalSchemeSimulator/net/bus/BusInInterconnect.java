@@ -86,6 +86,7 @@ public class BusInInterconnect extends InBus {
         }
         if (!isTriState(source) || !hasTriStateIn()) {
             optimiser.cut("ts");
+            hiImpedance = false;
         }
         InBus build = optimiser.build();
         build.source = source;

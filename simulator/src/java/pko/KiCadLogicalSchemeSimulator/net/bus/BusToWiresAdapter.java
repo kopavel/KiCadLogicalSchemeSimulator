@@ -30,6 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package pko.KiCadLogicalSchemeSimulator.net.bus;
+import pko.KiCadLogicalSchemeSimulator.api.IModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.SupportMask;
 import pko.KiCadLogicalSchemeSimulator.api.SupportOffset;
@@ -39,6 +40,8 @@ import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.RaisingEdgePin;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Utils;
+
+import java.util.Arrays;
 
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.none;
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.warn;
@@ -54,6 +57,8 @@ public class BusToWiresAdapter extends OutBus implements SupportMask, SupportOff
     /*Optimiser constructor unroll low:toLow:l unroll hi:toHi:h unroll imp:toImp:i*///
     public BusToWiresAdapter(BusToWiresAdapter oldBus, String variantId) {
         super(oldBus, variantId);
+        pinDestinations = oldBus.pinDestinations;
+        split();
     }
 
     public BusToWiresAdapter(OutBus outBus, int mask) {
@@ -211,6 +216,7 @@ public class BusToWiresAdapter extends OutBus implements SupportMask, SupportOff
                 optimiser.unroll("i", toImp.length);
             } else {
                 optimiser.cut("ts");
+                hiImpedance = false;
             }
             if (pinDestinations.length < 2 || getRecursionMode() == none) {
                 optimiser.cut("ar");
@@ -237,6 +243,12 @@ public class BusToWiresAdapter extends OutBus implements SupportMask, SupportOff
             }
             return build;
         }
+    }
+
+    @Override
+    public boolean hasTriStateIn() {
+        return Arrays.stream(pinDestinations)
+                .anyMatch(IModelItem::hasTriStateIn);
     }
 
     protected void split() {

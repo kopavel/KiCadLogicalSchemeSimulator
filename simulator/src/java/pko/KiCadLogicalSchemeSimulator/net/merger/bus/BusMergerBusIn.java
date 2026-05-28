@@ -338,6 +338,7 @@ public class BusMergerBusIn extends TriStateInBus implements MergerInput<Bus>, S
         }
         if (!isTriState(source)) {
             optimiser.cut("ts");
+            hiImpedance = false;
         }
         if (applyMask == Integer.MAX_VALUE) {
             optimiser.cut("byMask");

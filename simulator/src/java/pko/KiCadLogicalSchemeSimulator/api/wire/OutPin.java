@@ -237,6 +237,7 @@ public class OutPin extends Pin {
                 optimiser.unroll("i", toImp.length);
             } else {
                 optimiser.cut("ts");
+                hiImpedance = false;
             }
             if (!strengthSensitive) {
                 optimiser.bind("strong", "");

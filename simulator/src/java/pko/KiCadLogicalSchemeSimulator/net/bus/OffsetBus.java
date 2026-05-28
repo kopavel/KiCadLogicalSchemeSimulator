@@ -212,6 +212,7 @@ public class OffsetBus extends OutBus implements SupportOffset, SupportMask {
             }
             if (!isTriState(inSource) || !hasTriStateIn()) {
                 optimiser.cut("ts");
+                hiImpedance = false;
             } else if (applyMask != Integer.MAX_VALUE) {
                 optimiser.bind("d", "destination0");
             }
