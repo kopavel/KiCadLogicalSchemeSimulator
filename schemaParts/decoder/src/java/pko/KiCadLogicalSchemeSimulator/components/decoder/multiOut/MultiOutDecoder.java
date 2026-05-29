@@ -67,7 +67,7 @@ public class MultiOutDecoder extends SchemaPart {
                 for (int csNo = 0; csNo < csItems.length; csNo++) {
                     part.CSs[csNo] = "R".equals(csItems[csNo]);
                     part.csPins[csNo] = addInPin(new MultiOutDecoderCsPin("CS" + ((char) ('a' + partNo)) + csNo, part, csNo, this));
-                    if (!part.CSs[csNo]) {
+                    if (part.CSs[csNo]) {
                         part.csState |= 1 << csNo;
                     }
                 }
@@ -88,7 +88,7 @@ public class MultiOutDecoder extends SchemaPart {
             Part part = parts[partNo];
             for (int outNo = 0; outNo < outSize; outNo++) {
                 part.outs[outNo] = getOutPin("Q" + ((char) ('a' + partNo)) + outNo);
-                if (!hasCs || part.csState > 0) {
+                if (!hasCs || part.csState == 0) {
                     if (outNo == aBus.state && params.containsKey("openCollector")) {
                         part.outs[outNo].hiImpedance = false;
                     } else if (reverse) {
