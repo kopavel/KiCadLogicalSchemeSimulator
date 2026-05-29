@@ -55,15 +55,20 @@ import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.none;
 import static pko.KiCadLogicalSchemeSimulator.parsers.symbolMap.SymbolMapFileParser.parse;
 
-@SuppressWarnings({"StaticVariableMayNotBeInitialized", "StaticMethodOnlyUsedInOneClass"})
+@SuppressWarnings({"StaticVariableMayNotBeInitialized", "StaticMethodOnlyUsedInOneClass", "StaticVariableUsedBeforeInitialization",
+        "AssignmentToStaticFieldFromInstanceMethod"})
 @CommandLine.Command(name = "", description = "Start Kicad scheme interactive simulation")
 public class Simulator implements Runnable {
     private static final Map<String, SchemaPartMonitor> monitoredParts = new HashMap<>();
@@ -101,7 +106,7 @@ public class Simulator implements Runnable {
     @CommandLine.Option(names = {"-m", "--mapFile"}, description = "Path to KiCad symbol mapping file")
     public String[] mapFiles;
 
-    static void main(String[] args) {
+    public static void main(String[] args) {
         new CommandLine(new Simulator()).execute(args);
     }
 
@@ -246,7 +251,19 @@ public class Simulator implements Runnable {
                 }
             }
             if (mapFiles == null) {
-                mapFiles = new String[]{"kicad"};
+                if (mapFileDir != null) {
+                    File dir = new File(mapFileDir);
+                    if (dir.exists() && dir.isDirectory()) {
+                        try (Stream<Path> paths = Files.walk(Paths.get(mapFileDir))) {
+                            mapFiles = paths.filter(path -> path.toString().endsWith(".sym_map"))
+                                    .map(path -> path.getFileName().toString().replace(".sym_map", "")).toArray(String[]::new);
+                        } catch (IOException e) {
+                            throw new Exception("Error scanning mapFileDir: " + mapFileDir, e);
+                        }
+                    }
+                } else {
+                    throw new Exception("Neither Map file not MapFileDirectory specified");
+                }
             }
             for (int i = 0; i < mapFiles.length; i++) {
                 String mapFile = mapFiles[i];
@@ -282,7 +299,7 @@ public class Simulator implements Runnable {
                 ui = new MainUI();
                 ui.setVisible(true);
                 String fileName = netFilePathNoExtension.substring(netFilePathNoExtension.lastIndexOf(File.separator) + 1);
-                ui.setTitle(fileName+ " : Simulator");
+                ui.setTitle(fileName + " : Simulator");
             });
             if (recursionMode != null) {
                 parameterResolver.recursionMode = recursionMode;
@@ -311,9 +328,9 @@ public class Simulator implements Runnable {
                 ui.setJMenuBar(new MainMenu());
                 ui.revalidate();
                 ui.repaint();
-                for (SchemaPart c : net.schemaParts.values()) {
-                    if (c instanceof InteractiveSchemaPart) {
-                        AbstractUiComponent component = ((InteractiveSchemaPart) c).getComponent();
+                for (SchemaPart schemaPart : net.schemaParts.values()) {
+                    if (schemaPart instanceof InteractiveSchemaPart) {
+                        AbstractUiComponent component = ((InteractiveSchemaPart) schemaPart).getComponent();
                         component.revalidate();
                         component.repaint();
                     }

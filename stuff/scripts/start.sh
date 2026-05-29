@@ -1,28 +1,50 @@
 #!/bin/bash
 
-# Change to the directory where the script is located
-SCRIPT_DIR="$(dirname "$0")"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-# Determine the best available terminal emulator
+run_cmd="bash -c 'export LANG=en_US.UTF-8; cd \"$SCRIPT_DIR\"; pwd; \"$SCRIPT_DIR/run.sh\" $*'"
+
+# Detect terminal
 if [ -n "$TERMINAL" ]; then
-	term_cmd="$TERMINAL"
+    term_cmd="$TERMINAL"
 elif command -v gnome-terminal >/dev/null 2>&1; then
-	term_cmd="gnome-terminal"
+    term_cmd="gnome-terminal"
 elif command -v konsole >/dev/null 2>&1; then
-	term_cmd="konsole"
+    term_cmd="konsole"
+elif command -v foot >/dev/null 2>&1; then
+    term_cmd="foot"
 elif command -v xterm >/dev/null 2>&1; then
-	term_cmd="xterm"
+    term_cmd="xterm"
 elif command -v lxterminal >/dev/null 2>&1; then
-	term_cmd="lxterminal"
+    term_cmd="lxterminal"
 elif command -v x-terminal-emulator >/dev/null 2>&1; then
-	term_cmd="x-terminal-emulator"
+    term_cmd="x-terminal-emulator"
 else
-	echo "No known terminal emulator found. Please install one."
-	echo "Attempted to detect: TERMINAL variable, lxterminal, x-terminal-emulator, gnome-terminal, konsole, xterm."
-	echo "Press any key to continue..."
-	read -n 1 -s -r
-	exit 1
+    echo "No known terminal emulator found."
+    exit 1
 fi
-echo "use ${term_cmd}"
-# Run the script 'run.sh' in the chosen terminal emulator
-$term_cmd -e "bash -c 'LANG=en_US.UTF-8; pwd; ${SCRIPT_DIR}/run.sh $*'"
+
+echo "Using terminal: $term_cmd"
+
+case "$(basename "$term_cmd")" in
+    gnome-terminal)
+        gnome-terminal -- bash -c "cd \"$SCRIPT_DIR\"; LANG=en_US.UTF-8 \"$SCRIPT_DIR/run.sh\" $*"
+        ;;
+
+    konsole)
+        konsole -e bash -c "cd \"$SCRIPT_DIR\"; LANG=en_US.UTF-8 \"$SCRIPT_DIR/run.sh\" $*"
+        ;;
+
+    foot)
+        foot bash -c "cd \"$SCRIPT_DIR\"; LANG=en_US.UTF-8 \"$SCRIPT_DIR/run.sh\" $*"
+        ;;
+
+    xterm|lxterminal|x-terminal-emulator)
+        "$term_cmd" -e bash -c "cd \"$SCRIPT_DIR\"; LANG=en_US.UTF-8 \"$SCRIPT_DIR/run.sh\" $*"
+        ;;
+
+    *)
+        # generic fallback
+        "$term_cmd" bash -c "cd \"$SCRIPT_DIR\"; LANG=en_US.UTF-8 \"$SCRIPT_DIR/run.sh\" $*"
+        ;;
+esac
