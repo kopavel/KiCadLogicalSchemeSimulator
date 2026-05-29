@@ -2,17 +2,19 @@
 <Configuration status="WARN">
 	<Properties>
 		<Property name="logdir">./logs</Property>
-		<Property name="layout">%d [%t] %-5p %c- %m%n</Property>
+		<Property name="consoleLayout">%d{HH:mm:ss.SSS} %-5p %m - %c%n</Property>
+		<Property name="fileLayout">%d [%t] %-5p %replace{%m}{\u001B\[[;?\d]*[ -/]*[@-~]}{} - %c%n</Property>
+		<Property name="mergerLayout">%d{HH:mm:ss.SSS} %replace{%m}{\u001B\[[;?\d]*[ -/]*[@-~]}{} - %c%n</Property>
 	</Properties>
 	<Appenders>
 		<Console name="STDOUT" target="SYSTEM_OUT">
-			<PatternLayout pattern="${layout}" charset="UTF-8"/>
+			<PatternLayout pattern="${consoleLayout}" charset="UTF-8"/>
 		</Console>
 		<RollingRandomAccessFile name="FILE"
 		                         fileName="${logdir}/simulator.log"
 		                         filePattern="${logdir}/%d{yyyy-MM-dd}/simulator.%d{yyyy-MM-dd}.%i.log"
 		                         append="false">
-			<PatternLayout pattern="${layout}" charset="UTF-8"/>
+			<PatternLayout pattern="${fileLayout}" charset="UTF-8"/>
 			<Policies>
 				<OnStartupTriggeringPolicy/>
 				<SizeBasedTriggeringPolicy size="100 MB"/>
@@ -22,7 +24,7 @@
 		</RollingRandomAccessFile>
 		<RollingRandomAccessFile name="MFILE" fileName="${logdir}/mergers.log" filePattern="${logdir}/%d{yyyy-MM-dd}/mergers.%d{yyyy-MM-dd}.%i.log"
 		                         append="false">
-			<PatternLayout pattern="${layout}" charset="UTF-8"/>
+			<PatternLayout pattern="${mergerLayout}" charset="UTF-8"/>
 			<Policies>
 				<OnStartupTriggeringPolicy/>
 				<SizeBasedTriggeringPolicy size="100 MB"/>
@@ -33,6 +35,10 @@
 	</Appenders>
 	<Loggers>
 		<logger name="pko.KiCadLogicalSchemeSimulator.net.merger" level="TRACE" additivity="false">
+			<AppenderRef ref="MFILE"/>
+			<AppenderRef ref="STDOUT"/>
+		</logger>
+		<logger name="pko.KiCadLogicalSchemeSimulator.optimised.net.merger" level="TRACE" additivity="false">
 			<AppenderRef ref="MFILE"/>
 			<AppenderRef ref="STDOUT"/>
 		</logger>
