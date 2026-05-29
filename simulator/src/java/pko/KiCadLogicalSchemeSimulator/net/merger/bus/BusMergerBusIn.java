@@ -108,7 +108,8 @@ public class BusMergerBusIn extends TriStateInBus implements MergerInput<Bus>, S
             /*Optimiser line o*/
         }
         assert Log.debug(getClass(),
-                "Bus merger change. before: newState:{}, Source:{} (state:{},  hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{})",
+                "\u001B[36mBus merger change. before: newState:{}, Source:{} (state:{},  hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, " +
+                        "weakPins:{})\u001B[0m",
                 newState,
                 getName(),
                 getState(),
@@ -207,7 +208,8 @@ public class BusMergerBusIn extends TriStateInBus implements MergerInput<Bus>, S
             /*Optimiser blockEnd otherMask line o*/
         }
         assert Log.debug(getClass(),
-                "Bus merger change. after: newState:{}, Source:{} (state:{},  hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{})",
+                "\u001B[36mBus merger change. after : newState:{}, Source:{} (state:{},  hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, " +
+                        "weakPins:{})\u001B[0m",
                 newState,
                 getName(),
                 getState(),
@@ -227,7 +229,8 @@ public class BusMergerBusIn extends TriStateInBus implements MergerInput<Bus>, S
         hiImpedance = true;
         BusMerger merger = this.merger;
         assert Log.debug(getClass(),
-                "Bus merger setImpedance. before: Source:{} (state:{},  hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{})",
+                "\u001B[36mBus merger setImp. before: Source:{} (state:{},  hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, " +
+                        "weakPins:{})\u001B[0m",
                 getName(),
                 getState(),
                 hiImpedance,
@@ -307,7 +310,8 @@ public class BusMergerBusIn extends TriStateInBus implements MergerInput<Bus>, S
             /*Optimiser line o blockEnd otherMask*/
         }
         assert Log.debug(getClass(),
-                "Bus merger setImpedance. after: Source:{} (state:{},  hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{})",
+                "\u001B[36mBus merger setImp. after : Source:{} (state:{},  hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{})" +
+                        "\u001B[0m",
                 getName(),
                 getState(),
                 hiImpedance,

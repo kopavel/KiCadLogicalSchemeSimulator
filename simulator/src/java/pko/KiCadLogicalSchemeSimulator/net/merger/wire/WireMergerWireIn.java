@@ -75,8 +75,8 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
         }
         //region assert
         assert Log.debug(getClass(),
-                "Pin merger change. before: newState:{}, Source:{} (state:{}, oldStrong:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, " +
-                        "strong:{}, hiImpedance:{}, weakState:{})",
+                "\u001B[36mPin merger change. before: newState:{}, Source:{} (state:{}, oldStrong:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, " +
+                        "strong:{}, hiImpedance:{}, weakState:{})\u001B[0m",
                 true,
                 getName(),
                 state,
@@ -202,8 +202,8 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
         oldStrong = strong;
         //region assert
         assert Log.debug(getClass(),
-                "Pin merger change. after: newState:{}, Source:{} (state:{}, oldStrong:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, " +
-                        "strong:{}, hiImpedance:{}, weakState:{})",
+                "\u001B[36mPin merger change. after : newState:{}, Source:{} (state:{}, oldStrong:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, " +
+                        "strong:{}, hiImpedance:{}, weakState:{})\u001B[0m",
                 true,
                 getName(),
                 state,
@@ -224,8 +224,8 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
         resendState = null;
         //region assert
         assert Log.debug(getClass(),
-                "Pin merger change. before: newState:{}, Source:{} (state:{}, oldStrong:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, " +
-                        "strong:{}, hiImpedance:{}, weakState:{})",
+                "\u001B[36mPin merger change. before: newState:{}, Source:{} (state:{}, oldStrong:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, " +
+                        "strong:{}, hiImpedance:{}, weakState:{})\u001B[0m",
                 false,
                 getName(),
                 state,
@@ -351,8 +351,8 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
         /*Optimiser blockEnd passivePins*/
         //region assert
         assert Log.debug(getClass(),
-                "Pin merger change. after: newState:{}, Source:{} (state:{}, oldStrong:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, " +
-                        "strong:{}, hiImpedance:{}, weakState:{})",
+                "\u001B[36mPin merger change. after : newState:{}, Source:{} (state:{}, oldStrong:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, " +
+                        "strong:{}, hiImpedance:{}, weakState:{})\u001B[0m",
                 false,
                 getName(),
                 state,
@@ -374,8 +374,8 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
         WireMerger merger = this.merger;
         //region assert
         assert Log.debug(getClass(),
-                "Pin merger setImpedance. before: Source:{} (state:{}, oldStrong:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{} " +
-                        "hiImpedance:{}, weakState:{})",
+                "\u001B[36mPin merger setImp. before: Source:{} (state:{}, oldStrong:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{} " +
+                        "hiImpedance:{}, weakState:{})\u001B[0m",
                 getName(),
                 state,
                 oldStrong,
@@ -427,8 +427,8 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
         /*Optimiser blockEnd passivePins*/
         //region assert
         assert Log.debug(getClass(),
-                "Pin merger setImpedance. after: Source:{} (state:{}, oldStrong:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{} " +
-                        "hiImpedance:{}, weakState:{})",
+                "\u001B[36mPin merger setImp. after : Source:{} (state:{}, oldStrong:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{} " +
+                        "hiImpedance:{}, weakState:{})\u001B[0m",
                 getName(),
                 state,
                 oldStrong,

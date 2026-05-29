@@ -91,7 +91,7 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus>, SupportM
         /*Optimiser blockEnd ts*/
         //region assert
         assert Log.debug(getClass(),
-                "Pin merger change. before: newState:{}, Source:{} (state:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{}, hiImpedance:{})",
+                "\u001B[36mPin merger change. before: newState:{}, Source:{} (state:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{}, hiImpedance:{})\u001B[0m",
                 newState,
                 getName(),
                 state,
@@ -156,7 +156,7 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus>, SupportM
         merger.recalculatePassivePins();
         //region assert
         assert Log.debug(getClass(),
-                "Pin merger change. after: newState:{}, Source:{} (state:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{}, hiImpedance:{})",
+                "\u001B[36mPin merger change. after : newState:{}, Source:{} (state:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{}, hiImpedance:{})\u001B[0m",
                 newState,
                 getName(),
                 state,
@@ -175,7 +175,8 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus>, SupportM
         WireMerger merger = this.merger;
         //region assert
         assert Log.debug(getClass(),
-                "Pin merger setImpedance. before: Source:{} (state:{}, oldImpedance:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{}, hiImpedance:{})",
+                "\u001B[36mPin merger setImp. before: Source:{} (state:{}, oldImpedance:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{}, hiImpedance:{})" +
+                        "\u001B[0m",
                 getName(),
                 state,
                 hiImpedance,
@@ -216,7 +217,8 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus>, SupportM
         hiImpedance = true;
         //region assert
         assert Log.debug(getClass(),
-                "Pin merger setImpedance. after: Source:{} (state:{}, oldImpedance:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{}, hiImpedance:{})",
+                "\u001B[36mPin merger setImp. after : Source:{} (state:{}, oldImpedance:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{}, hiImpedance:{})" +
+                        "\u001B[0m",
                 getName(),
                 state,
                 hiImpedance,

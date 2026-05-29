@@ -84,8 +84,8 @@ public class BusMergerWireIn extends TriStateInPin implements MergerInput<Pin> {
         /*Optimiser blockEnd ts line setter*/
         state = true;
         assert Log.debug(getClass(),
-                "Bus merger change. before: newState:{},  Source:{} (state:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, " +
-                        "weakState:{}, weakPins:{})",
+                "\u001B[36mBus merger change. before: newState:{},  Source:{} (state:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, " +
+                        "weakState:{}, weakPins:{})\u001B[0m",
                 true,
                 getName(),
                 getState(),
@@ -187,8 +187,8 @@ public class BusMergerWireIn extends TriStateInPin implements MergerInput<Pin> {
         /*Optimiser line sens*/
         oldStrong = strong;
         assert Log.debug(getClass(),
-                "Bus merger change. after: newState:{},  Source:{} (state:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, " +
-                        "weakState:{}, weakPins:{})",
+                "\u001B[36mBus merger change. after : newState:{},  Source:{} (state:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, " +
+                        "weakState:{}, weakPins:{})\u001B[0m",
                 true,
                 getName(),
                 getState(),
@@ -212,8 +212,8 @@ public class BusMergerWireIn extends TriStateInPin implements MergerInput<Pin> {
         /*Optimiser blockEnd ts line setter*/
         state = false;
         assert Log.debug(getClass(),
-                "Bus merger change. before: newState:{},  Source:{} (state:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, " +
-                        "weakState:{}, weakPins:{})",
+                "\u001B[36mBus merger change. before: newState:{},  Source:{} (state:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, " +
+                        "weakState:{}, weakPins:{})\u001B[0m",
                 false,
                 getName(),
                 getState(),
@@ -315,8 +315,8 @@ public class BusMergerWireIn extends TriStateInPin implements MergerInput<Pin> {
         /*Optimiser line sens*/
         oldStrong = strong;
         assert Log.debug(getClass(),
-                "Bus merger change. after: newState:{},  Source:{} (state:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, " +
-                        "weakState:{}, weakPins:{})",
+                "\u001B[36mBus merger change. after : newState:{},  Source:{} (state:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, " +
+                        "weakState:{}, weakPins:{})\u001B[0m",
                 false,
                 getName(),
                 getState(),
@@ -338,7 +338,8 @@ public class BusMergerWireIn extends TriStateInPin implements MergerInput<Pin> {
         hiImpedance = true;
         BusMerger merger = this.merger;
         assert Log.debug(getClass(),
-                "Bus merger setImpedance. before: Source:{} (state:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{})",
+                "\u001B[36mBus merger setImp. before: Source:{} (state:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, " +
+                        "weakPins:{})\u001B[0m",
                 getName(),
                 getState(),
                 strong,
@@ -391,7 +392,8 @@ public class BusMergerWireIn extends TriStateInPin implements MergerInput<Pin> {
             /*Optimiser blockEnd ar*/
         }
         assert Log.debug(getClass(),
-                "Bus merger setImpedance. after: Source:{} (state:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, weakPins:{})",
+                "\u001B[36mBus merger setImp. after : Source:{} (state:{}, strong:{}, hiImpedance:{}), Merger:{} (state:{}, strongPins:{}, weakState:{}, " +
+                        "weakPins:{})\u001B[0m",
                 getName(),
                 state,
                 strong,
