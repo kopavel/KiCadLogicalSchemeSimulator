@@ -32,6 +32,7 @@
 package pko.KiCadLogicalSchemeSimulator.components.decoder;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
 public class Decoder extends SchemaPart {
     public Bus outBus;
@@ -58,7 +59,7 @@ public class Decoder extends SchemaPart {
         csPin.outBus = outBus;
         outBus.useBitPresentation = true;
         if (reverse) {
-            outBus.state = params.containsKey("outReverse")?~1:1;
+            outBus.state = params.containsKey("outReverse") ? (~1) & Utils.getMaskForSize(outBus.size) : 1;
             outBus.hiImpedance = false;
         }
     }
