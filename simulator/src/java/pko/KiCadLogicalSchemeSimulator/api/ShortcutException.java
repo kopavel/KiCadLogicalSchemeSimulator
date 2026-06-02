@@ -43,23 +43,23 @@ public class ShortcutException extends RuntimeException {
     private final String message;
 
     public <T> ShortcutException(IModelItem<?> source, Integer state, Collection<? extends MergerInput<? extends T>> pins) {
-        StringBuilder message = new StringBuilder(source.getClass().getName() + "\nSetting:\n" +
-                (source instanceof MergerInput<?> input ? Utils.LPad(16, '0', Integer.toBinaryString(input.getMask())) + ":" : "") + source.getName() + ":" +
-                (source instanceof Pin ? (((Pin) source).strong ? "" : "W") + (state > 0 ? "1" : "0") : Utils.LPad(16, '0', Integer.toBinaryString(state))) +
-                " Shortcut with: \n");
+        StringBuilder message = new StringBuilder(source.getClass().getName() + "\nSetting: <mask>:<state>:<pin>\n" +
+                (source instanceof MergerInput<?> input ? Utils.LPad(16, '0', Integer.toBinaryString(input.getMask())) + ":" : "") +
+                (source instanceof Pin ? (((Pin) source).strong ? "" : "W") + (state > 0 ? "1" : "0") : Utils.LPad(16, '0', Integer.toBinaryString(state))) + ":" +
+                source.getName() + " Shortcut with: \n");
         pins.stream()
                 .filter(pin -> pin != source).sorted(Comparator.comparingInt((MergerInput<? extends T> pin) -> pin.getMask())).forEach(pin -> {
                 if (!((ModelItem<?>) pin).hiImpedance) {
                     message.append(Utils.LPad(16, '0', Integer.toBinaryString(pin.getMask()))).append(":");
-                    message.append(pin.getName()).append(":");
                     if (((ModelItem<?>) pin).hiImpedance) {
                         message.append("H");
                     } else {
+                        message.append(Utils.LPad(16, '0', Integer.toBinaryString(pin.getState())));
                         if (!pin.isStrong()) {
                             message.append("W");
                         }
-                        message.append(Utils.LPad(16, '0', Integer.toBinaryString(pin.getState())));
                     }
+                    message.append(":").append(pin.getName());
                     message.append(";\n");
                 }
             });
