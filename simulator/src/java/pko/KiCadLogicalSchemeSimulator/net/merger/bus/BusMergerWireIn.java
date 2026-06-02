@@ -456,7 +456,7 @@ public class BusMergerWireIn extends TriStateInPin implements MergerInput<Pin> {
 
     @Override
     public boolean hasTriStateIn() {
-        boolean has = merger.weakState != 0;
+        boolean has = merger.weakPins != 0;
         for (Bus destination : destinations) {
             has = has || destination.hasTriStateIn();
         }
