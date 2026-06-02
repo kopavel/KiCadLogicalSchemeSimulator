@@ -52,7 +52,6 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus>, SupportM
         super(source, "PMergeBIn");
         this.merger = merger;
         destinations = merger.destinations;
-        //FixMe - not always!! BUT need process 'this' impedance because of possible weak states on merger
     }
 
     @SuppressWarnings("unused")

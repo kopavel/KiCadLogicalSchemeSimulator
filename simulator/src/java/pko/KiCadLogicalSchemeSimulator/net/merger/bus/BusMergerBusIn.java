@@ -276,9 +276,9 @@ public class BusMergerBusIn extends TriStateInBus implements MergerInput<Bus>, S
             /*Optimiser bind nm:nMask*/
             merger.strongPins &= nMask;
             int mergerState;
-            /*Optimiser bind m:mask bind nm:nMask blockEnd wt*/
+            /*Optimiser bind nm:nMask blockEnd wt*/
             if ((mergerState = merger.state & nMask
-                    /*Optimiser line mw*///
+                    /*Optimiser line mw bind m:mask*///
                     | (merger.weakState & mask)//
             ) != merger.state) {
                 merger.state = mergerState;

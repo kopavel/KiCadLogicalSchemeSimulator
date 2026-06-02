@@ -35,7 +35,6 @@
 //   or/and with 1 input -> repeater
 //   repeater on power rail -> power
 //   pull on strong only
-// no need in pull down resisters?
 // "not used" pin -> add "on power rail"
 
 sourceSets {
