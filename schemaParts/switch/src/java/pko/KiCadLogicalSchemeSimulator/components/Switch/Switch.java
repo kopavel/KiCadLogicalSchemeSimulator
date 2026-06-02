@@ -50,12 +50,14 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
             @Override
             public void onChange() {
                 recalculate(in2, this);
+                recalculate(this, pin2);
             }
         });
         addPassivePin(new PassivePin("IN2", this) {
             @Override
             public void onChange() {
                 recalculate(in1, this);
+                recalculate(this, pin1);
             }
         });
         toggled = reverse;
