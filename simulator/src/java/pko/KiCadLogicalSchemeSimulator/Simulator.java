@@ -234,7 +234,7 @@ public class Simulator implements Runnable {
                                 }
                             });
             if (!new File(netFilePath).exists()) {
-                throw new Exception("Cant fine NET file " + netFilePath);
+                throw new Exception("Can't find NET file " + netFilePath);
             }
             netFilePathNoExtension = netFilePath.substring(0, netFilePath.lastIndexOf('.'));
             Params params = null;
