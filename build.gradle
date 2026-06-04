@@ -44,7 +44,7 @@ deleteEmptyDirsRecursively = { File dir ->
             deleteEmptyDirsRecursively(subDir) // Recursive call for subdirectories
         }
         if (dir.listFiles().length == 0) {
-            println("Deleting empty directory: ${dir.absolutePath}")
+//            println("Deleting empty directory: ${dir.absolutePath}")
             dir.delete()
         }
     }
@@ -159,14 +159,14 @@ idea {
     module {
         excludeDirs += file('distro')
         excludeDirs += file('stuff/work')
-        fileTree(rootDir) {
-            exclude '.gradle/**'
-            exclude '.git/**'
-            exclude '.idea/**'
-        }.visit { FileVisitDetails details ->
-            if (details.isDirectory() && details.name == 'logs' || details.name.endsWith(".log")) {
-                excludeDirs += details.file
-            }
+        excludeDirs += subprojects
+                .findAll { project -> project.path.startsWith(':schemaParts:') }
+                .collect { project -> new File(project.projectDir, 'logs') }
+        File examplesRoot = file('stuff/examples')
+        if (examplesRoot.isDirectory()) {
+            excludeDirs += examplesRoot.listFiles()
+                    .findAll { File exampleDir -> exampleDir.isDirectory() }
+                    .collect { File exampleDir -> new File(exampleDir, 'logs') }
         }
     }
 }
