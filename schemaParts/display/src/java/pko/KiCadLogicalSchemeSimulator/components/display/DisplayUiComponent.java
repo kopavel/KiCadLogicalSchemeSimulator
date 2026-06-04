@@ -34,21 +34,22 @@ import pko.KiCadLogicalSchemeSimulator.api.schemaPart.AbstractUiComponent;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.awt.image.WritableRaster;
+import java.awt.image.DataBufferByte;
 
 public class DisplayUiComponent extends AbstractUiComponent {
     private final Display parent;
+    int hScaled;
+    int vScaled;
     private BufferedImage image;
-    private WritableRaster raster;
+    private byte[] imageData;
+    private int length;
+    private byte[] ram;
 
     public DisplayUiComponent(String title, int size, int scaleFactor, Display parent) {
         super(title, size);
         this.scaleFactor = scaleFactor;
         this.parent = parent;
     }
-
-    int hScaled;
-    int vScaled;
 
     @Override
     protected void draw(Graphics2D g2d) {
@@ -59,12 +60,11 @@ public class DisplayUiComponent extends AbstractUiComponent {
                 hScaled = hSize * scaleFactor;
                 vScaled = vSize * scaleFactor;
                 image = new BufferedImage(hSize, vSize, BufferedImage.TYPE_BYTE_GRAY);
-                raster = image.getRaster();
+                imageData = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
+                length = vSize * hSize;
+                ram = parent.clock.ram;
             }
-            byte[][] snapshot = parent.ram;
-            for (int y = 0; y < vSize; y++) {
-                raster.setDataElements(0, y, hSize, 1, snapshot[y]);
-            }
+            System.arraycopy(ram, 0, imageData, 0, length);
             g2d.drawImage(image, 0, titleHeight + 5, hScaled, vScaled, this);
         }
     }

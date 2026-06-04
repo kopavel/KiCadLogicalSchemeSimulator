@@ -43,18 +43,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class Display extends SchemaPart implements InteractiveSchemaPart {
     private final DisplayUiComponent display;
     private final AtomicBoolean refresh = new AtomicBoolean();
-    public byte[][] ram = new byte[10][4096];
     public int hSize;
     public int vSize;
+    public int vPos;
+    ClockIn clock;
     int rows;
     double fps;
-    public int hPos;
-    public int vPos;
-    public byte[] row;
 
     public Display(String id, String sParam) {
         super(id, sParam);
-        row = ram[0];
         try {
             if (params.containsKey("scale")) {
                 int scale = Integer.parseInt(params.get("scale"));
@@ -100,13 +97,12 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                     state = false;
                     if (sized && !net.stabilizing) {
                         sized = false;
-                        hSize = hPos + 3;
-                        byte[] firstRow = Arrays.copyOf(ram[0], hSize);
-                        ram = new byte[2048][hSize];
-                        ram[0] = firstRow;
+                        hSize = clock.ramOffset + 3;
+                        byte[] oldRam = clock.ram;
+                        clock.ram = new byte[2048 * hSize];
+                        System.arraycopy(oldRam, 0, clock.ram, 0, hSize);
                     }
-                    hPos = 0;
-                    row = ram[vPos++];
+                    clock.ramOffset = vPos++ * hSize;
                     rows++;
                 }
             });
@@ -135,11 +131,10 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                             }
                         }
                         Thread.ofVirtual().start(reshapeRunnable);
-                        ram = Arrays.copyOf(ram, vSize);
+                        clock.ram = Arrays.copyOf(clock.ram, vSize * hSize);
                     }
-                    hPos = 0;
                     vPos = 0;
-                    row = ram[0];
+                    clock.ramOffset = 0;
                 }
             });
         } else {
@@ -148,14 +143,12 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                 public void setHi() {
                     state = true;
                     if (hSize == 0 && !parent.net.stabilizing) {
-                        hSize = hPos + 3;
-                        byte[] firstRow = Arrays.copyOf(ram[0], hSize);
-                        ram = new byte[2048][hSize];
-                        ram[0] = firstRow;
+                        hSize = clock.ramOffset + 3;
+                        byte[] oldRam = clock.ram;
+                        clock.ram = new byte[2048 * hSize];
+                        System.arraycopy(oldRam, 0, clock.ram, 0, hSize);
                     }
-                    hPos = 0;
-                    vPos++;
-                    row = ram[vPos];
+                    clock.ramOffset = vPos++ * hSize;
                     rows++;
                 }
 
@@ -183,11 +176,10 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                             }
                         }
                         Thread.ofVirtual().start(reshapeRunnable);
-                        ram = Arrays.copyOf(ram, vSize);
+                        clock.ram = Arrays.copyOf(clock.ram, vSize * hSize);
                     }
-                    hPos = 0;
                     vPos = 0;
-                    row = ram[vPos];
+                    clock.ramOffset = 0;
                 }
 
                 @Override
@@ -196,7 +188,7 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                 }
             });
         }
-        ClockIn clock = addInPin(new ClockIn(this));
+        clock = addInPin(new ClockIn(this));
         addInPin(new InPin("Vin", this) {
             @Override
             public void setHi() {
@@ -209,12 +201,14 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
                 state = false;
                 clock.pixel = 0;
             }
-        }).hiImpedance = false;
+        });
     }
 
     @Override
     public String extraState() {
-        fps = (fps * 0.9) + ((double) rows / vSize);
+        if (vSize > 0) {
+            fps = (fps * 0.9) + ((double) rows / vSize);
+        }
         rows = 0;
         return "Width :" + hSize + "\nHeight:" + vSize + "\nFps:" + String.format("%.2f", fps);
     }
@@ -230,9 +224,12 @@ public class Display extends SchemaPart implements InteractiveSchemaPart {
 
     @Override
     public void reset() {
-        hPos = 0;
+        hSize = 0;
+        vSize = 0;
         vPos = 0;
-        ram = new byte[1][4096];
-        row = ram[vPos];
+        rows = 0;
+        fps = 0;
+        clock.ram = new byte[4096];
+        clock.ramOffset = 0;
     }
 }
