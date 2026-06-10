@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<export version="E">
+	<design>
+		<source>/home/kopavel/Desktop/diodes.kicad_sch</source>
+		<date>2026-06-05T23:22:26+0300</date>
+		<tool>Eeschema 9.0.2+dfsg-1</tool>
+		<sheet number="1" name="/" tstamps="/">
+			<title_block>
+				<title/>
+				<company/>
+				<rev/>
+				<date/>
+				<source>diodes.kicad_sch</source>
+				<comment number="1" value=""/>
+				<comment number="2" value=""/>
+				<comment number="3" value=""/>
+				<comment number="4" value=""/>
+				<comment number="5" value=""/>
+				<comment number="6" value=""/>
+				<comment number="7" value=""/>
+				<comment number="8" value=""/>
+				<comment number="9" value=""/>
+			</title_block>
+		</sheet>
+	</design>
+	<components>
+		<comp ref="D1">
+			<value>BA157</value>
+			<footprint>Diode_THT:D_DO-41_SOD81_P10.16mm_Horizontal</footprint>
+			<datasheet>https://www.vishay.com/docs/88536/ba157.pdf</datasheet>
+			<description>400V 1A Fast recovery Rectifier Diode, DO-41</description>
+			<fields>
+				<field name="Sim.Device">D</field>
+				<field name="Sim.Pins">1=K 2=A</field>
+				<field name="Footprint">Diode_THT:D_DO-41_SOD81_P10.16mm_Horizontal</field>
+				<field name="Datasheet">https://www.vishay.com/docs/88536/ba157.pdf</field>
+				<field name="Description">400V 1A Fast recovery Rectifier Diode, DO-41</field>
+			</fields>
+			<libsource lib="Diode" part="BA157" description="400V 1A Fast recovery Rectifier Diode, DO-41"/>
+			<property name="Sim.Device" value="D"/>
+			<property name="Sim.Pins" value="1=K 2=A"/>
+			<property name="Sheetname" value="Root"/>
+			<property name="Sheetfile" value="diodes.kicad_sch"/>
+			<property name="ki_keywords" value="diode"/>
+			<property name="ki_fp_filters" value="D*DO?41*"/>
+			<sheetpath names="/" tstamps="/"/>
+			<tstamps>89ed7854-485f-4733-9b78-1524f32f32c8</tstamps>
+		</comp>
+		<comp ref="D2">
+			<value>BA157</value>
+			<footprint>Diode_THT:D_DO-41_SOD81_P10.16mm_Horizontal</footprint>
+			<datasheet>https://www.vishay.com/docs/88536/ba157.pdf</datasheet>
+			<description>400V 1A Fast recovery Rectifier Diode, DO-41</description>
+			<fields>
+				<field name="Sim.Device">D</field>
+				<field name="Sim.Pins">1=K 2=A</field>
+				<field name="Footprint">Diode_THT:D_DO-41_SOD81_P10.16mm_Horizontal</field>
+				<field name="Datasheet">https://www.vishay.com/docs/88536/ba157.pdf</field>
+				<field name="Description">400V 1A Fast recovery Rectifier Diode, DO-41</field>
+			</fields>
+			<libsource lib="Diode" part="BA157" description="400V 1A Fast recovery Rectifier Diode, DO-41"/>
+			<property name="Sim.Device" value="D"/>
+			<property name="Sim.Pins" value="1=K 2=A"/>
+			<property name="Sheetname" value="Root"/>
+			<property name="Sheetfile" value="diodes.kicad_sch"/>
+			<property name="ki_keywords" value="diode"/>
+			<property name="ki_fp_filters" value="D*DO?41*"/>
+			<sheetpath names="/" tstamps="/"/>
+			<tstamps>f01d2a5f-9a63-4660-9b3e-47248d0d858a</tstamps>
+		</comp>
+		<comp ref="Led1">
+			<value>~</value>
+			<fields>
+				<field name="Footprint"/>
+				<field name="Datasheet"/>
+				<field name="Description"/>
+			</fields>
+			<libsource lib="chip" part="LED" description=""/>
+			<property name="Sheetname" value="Root"/>
+			<property name="Sheetfile" value="diodes.kicad_sch"/>
+			<property name="ki_fp_filters" value="LED*5.0mm*IRGrey*"/>
+			<sheetpath names="/" tstamps="/"/>
+			<tstamps>e8791cc0-011e-4c75-99b6-da891d205052</tstamps>
+		</comp>
+		<comp ref="pullup1">
+			<value>pull_up</value>
+			<fields>
+				<field name="Footprint"/>
+				<field name="Datasheet"/>
+				<field name="Description"/>
+			</fields>
+			<libsource lib="chip" part="PULLUP" description=""/>
+			<property name="Sheetname" value="Root"/>
+			<property name="Sheetfile" value="diodes.kicad_sch"/>
+			<sheetpath names="/" tstamps="/"/>
+			<tstamps>af663e6f-e22d-46fa-9d02-5c248e8ae2e9</tstamps>
+		</comp>
+		<comp ref="SW1">
+			<value>SWITCH</value>
+			<footprint>Button_Switch_THT:SW_CW_GPTS203211B</footprint>
+			<fields>
+				<field name="Footprint">Button_Switch_THT:SW_CW_GPTS203211B</field>
+				<field name="Datasheet"/>
+				<field name="Description"/>
+			</fields>
+			<libsource lib="chip" part="SWITCH" description=""/>
+			<property name="Sheetname" value="Root"/>
+			<property name="Sheetfile" value="diodes.kicad_sch"/>
+			<property name="ki_fp_filters" value="SWITCH"/>
+			<sheetpath names="/" tstamps="/"/>
+			<tstamps>3ae61105-5928-40ac-8221-444b1dff6ff8</tstamps>
+		</comp>
+		<comp ref="SW2">
+			<value>SWITCH</value>
+			<footprint>Button_Switch_THT:SW_CW_GPTS203211B</footprint>
+			<fields>
+				<field name="Footprint">Button_Switch_THT:SW_CW_GPTS203211B</field>
+				<field name="Datasheet"/>
+				<field name="Description"/>
+			</fields>
+			<libsource lib="chip" part="SWITCH" description=""/>
+			<property name="Sheetname" value="Root"/>
+			<property name="Sheetfile" value="diodes.kicad_sch"/>
+			<property name="ki_fp_filters" value="SWITCH"/>
+			<sheetpath names="/" tstamps="/"/>
+			<tstamps>24fbd08b-d892-48fe-b526-5677b637c3a7</tstamps>
+		</comp>
+	</components>
+	<libparts>
+		<libpart lib="Diode" part="BA157">
+			<description>400V 1A Fast recovery Rectifier Diode, DO-41</description>
+			<docs>https://www.vishay.com/docs/88536/ba157.pdf</docs>
+			<footprints>
+				<fp>D*DO?41*</fp>
+			</footprints>
+			<fields>
+				<field name="Reference">D</field>
+				<field name="Value">BA157</field>
+				<field name="Footprint">Diode_THT:D_DO-41_SOD81_P10.16mm_Horizontal</field>
+				<field name="Datasheet">https://www.vishay.com/docs/88536/ba157.pdf</field>
+				<field name="Description">400V 1A Fast recovery Rectifier Diode, DO-41</field>
+				<field name="Sim.Device">D</field>
+				<field name="Sim.Pins">1=K 2=A</field>
+			</fields>
+			<pins>
+				<pin num="1" name="K" type="passive"/>
+				<pin num="2" name="A" type="passive"/>
+			</pins>
+		</libpart>
+		<libpart lib="chip" part="LED">
+			<footprints>
+				<fp>LED*5.0mm*IRGrey*</fp>
+			</footprints>
+			<fields>
+				<field name="Reference">Led</field>
+				<field name="Value"/>
+				<field name="Footprint"/>
+				<field name="Datasheet"/>
+				<field name="Description"/>
+			</fields>
+			<pins>
+				<pin num="1" name="IN" type="input"/>
+			</pins>
+		</libpart>
+		<libpart lib="chip" part="PULLUP">
+			<fields>
+				<field name="Reference">pullup</field>
+				<field name="Value">pull_up</field>
+				<field name="Footprint"/>
+				<field name="Datasheet"/>
+				<field name="Description"/>
+			</fields>
+			<pins>
+				<pin num="1" name="OUT" type="tri_state"/>
+			</pins>
+		</libpart>
+		<libpart lib="chip" part="SWITCH">
+			<footprints>
+				<fp>SWITCH</fp>
+			</footprints>
+			<fields>
+				<field name="Reference">SW</field>
+				<field name="Value">SWITCH</field>
+				<field name="Footprint">Button_Switch_THT:SW_CW_GPTS203211B</field>
+				<field name="Datasheet"/>
+				<field name="Description"/>
+			</fields>
+			<pins>
+				<pin num="1" name="IN1" type="passive"/>
+				<pin num="2" name="IN2" type="passive"/>
+			</pins>
+		</libpart>
+	</libparts>
+	<libraries>
+		<library logical="Diode">
+			<uri>/usr/share/kicad/symbols//Diode.kicad_sym</uri>
+		</library>
+		<library logical="chip">
+			<uri>/usr/share/kicad/symbols//chip.kicad_sym</uri>
+		</library>
+	</libraries>
+	<nets>
+		<net code="1" name="GND" class="Default">
+			<node ref="SW1" pin="1" pinfunction="IN1" pintype="passive"/>
+			<node ref="SW2" pin="1" pinfunction="IN1" pintype="passive"/>
+		</net>
+		<net code="2" name="Net-(D1-A)" class="Default">
+			<node ref="D1" pin="2" pinfunction="A" pintype="passive"/>
+			<node ref="D2" pin="2" pinfunction="A" pintype="passive"/>
+			<node ref="Led1" pin="1" pinfunction="IN" pintype="input"/>
+			<node ref="pullup1" pin="1" pinfunction="OUT" pintype="tri_state"/>
+		</net>
+		<net code="3" name="Net-(D1-K)" class="Default">
+			<node ref="D1" pin="1" pinfunction="K" pintype="passive"/>
+			<node ref="SW1" pin="2" pinfunction="IN2" pintype="passive"/>
+		</net>
+		<net code="4" name="Net-(D2-K)" class="Default">
+			<node ref="D2" pin="1" pinfunction="K" pintype="passive"/>
+			<node ref="SW2" pin="2" pinfunction="IN2" pintype="passive"/>
+		</net>
+	</nets>
+</export>

@@ -33,15 +33,14 @@
 package pko.KiCadLogicalSchemeSimulator.components.resister;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 
 public class Resister extends SchemaPart {
-    private Pin in1;
-    private Pin in2;
+    private final PassivePin in1;
+    private final PassivePin in2;
 
     protected Resister(String id, String sParams) {
         super(id, sParams);
-        addPassivePin(new PassivePin("IN1", this) {
+        in1 = addPassivePin(new PassivePin("IN1", this) {
             @Override
             public void onChange() {
                 if (in2 instanceof PassivePin pin2) {
@@ -71,7 +70,7 @@ public class Resister extends SchemaPart {
                 }
             }
         });
-        addPassivePin(new PassivePin("IN2", this) {
+        in2 = addPassivePin(new PassivePin("IN2", this) {
             @Override
             public void onChange() {
                 if (in1 instanceof PassivePin pin1) {
@@ -105,7 +104,5 @@ public class Resister extends SchemaPart {
 
     @Override
     public void initOuts() {
-        in1 = getOutPin("IN1");
-        in2 = getOutPin("IN2");
     }
 }

@@ -40,35 +40,29 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
     private final PassivePin pin1;
     private final PassivePin pin2;
     public boolean toggled;
-    private Pin in1;
-    private Pin in2;
     private SwitchUiComponent switchUiComponent;
 
     protected Switch(String id, String sParams) {
         super(id, sParams);
-        addPassivePin(new PassivePin("IN1", this) {
+        pin1 = addPassivePin(new PassivePin("IN1", this) {
             @Override
             public void onChange() {
-                recalculate(in2, this);
+                recalculate(pin2, this);
                 recalculate(this, pin2);
             }
         });
-        addPassivePin(new PassivePin("IN2", this) {
+        pin2 = addPassivePin(new PassivePin("IN2", this) {
             @Override
             public void onChange() {
-                recalculate(in1, this);
+                recalculate(pin1, this);
                 recalculate(this, pin1);
             }
         });
         toggled = reverse;
-        pin1 = (PassivePin) getOutPin("IN1");
-        pin2 = (PassivePin) getOutPin("IN2");
     }
 
     @Override
     public void initOuts() {
-        in1 = getOutPin("IN1");
-        in2 = getOutPin("IN2");
     }
 
     @Override
@@ -81,8 +75,8 @@ public class Switch extends SchemaPart implements InteractiveSchemaPart {
 
     public void toggle(boolean toggled) {
         this.toggled = toggled;
-        recalculate(in1, pin2);
-        recalculate(in2, pin1);
+        recalculate(pin1, pin2);
+        recalculate(pin2, pin1);
     }
 
     private void recalculate(Pin pin, PassivePin otherPin) {

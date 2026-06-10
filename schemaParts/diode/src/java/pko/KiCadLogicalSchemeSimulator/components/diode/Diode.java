@@ -32,15 +32,15 @@
 package pko.KiCadLogicalSchemeSimulator.components.diode;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
 import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 
 public class Diode extends SchemaPart {
-    protected Pin anode;
-    protected Pin cathode;
+    protected PassivePin anode;
+    protected PassivePin cathode;
 
+    //FixMe - dual diode doesn't work!!!
     protected Diode(String id, String sParams) {
         super(id, sParams);
-        addPassivePin(new PassivePin("A", this) {
+        anode = addPassivePin(new PassivePin("A", this) {
             @Override
             public void onChange() {
                 if (otherImpedance || !otherState || (cathode.strengthSensitive && !otherStrong && cathode.strong)) {
@@ -50,9 +50,16 @@ public class Diode extends SchemaPart {
                 } else if (cathode.hiImpedance || !cathode.state || cathode.strong != otherStrong) {
                     cathode.setHi(otherStrong);
                 }
+                if (cathode.otherImpedance || cathode.otherState || (strengthSensitive && !cathode.otherStrong && strong)) {
+                    if (!hiImpedance) {
+                        setHiImpedance();
+                    }
+                } else if (hiImpedance || state || strong != cathode.otherStrong) {
+                    setLo(cathode.otherStrong);
+                }
             }
         });
-        addPassivePin(new PassivePin("K", this) {
+        cathode = addPassivePin(new PassivePin("K", this) {
             @Override
             public void onChange() {
                 if (otherImpedance || otherState || (anode.strengthSensitive && !otherStrong && anode.strong)) {
@@ -62,13 +69,18 @@ public class Diode extends SchemaPart {
                 } else if (anode.hiImpedance || anode.state || anode.strong != otherStrong) {
                     anode.setLo(otherStrong);
                 }
+                if (anode.otherImpedance || !anode.otherState || (strengthSensitive && !anode.otherStrong && strong)) {
+                    if (!hiImpedance) {
+                        setHiImpedance();
+                    }
+                } else if (hiImpedance || !state || strong != anode.otherStrong) {
+                    setHi(anode.otherStrong);
+                }
             }
         });
     }
 
     @Override
     public void initOuts() {
-        anode = getOutPin("A");
-        cathode = getOutPin("K");
     }
 }

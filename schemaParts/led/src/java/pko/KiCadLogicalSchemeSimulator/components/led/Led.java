@@ -32,8 +32,6 @@
 package pko.KiCadLogicalSchemeSimulator.components.led;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.AbstractUiComponent;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.InteractiveSchemaPart;
-import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
-import pko.KiCadLogicalSchemeSimulator.api.wire.PassivePin;
 import pko.KiCadLogicalSchemeSimulator.components.diode.Diode;
 import pko.KiCadLogicalSchemeSimulator.tools.UiTools;
 
@@ -56,16 +54,8 @@ public class Led extends Diode implements InteractiveSchemaPart {
     }
 
     private boolean getState() {
-        boolean anodeState = switch (anode) {
-            case InPin inPin -> !inPin.hiImpedance && inPin.state;
-            case PassivePin pPin -> !pPin.otherImpedance && pPin.otherState;
-            default -> false;
-        };
-        boolean cathodeState = switch (cathode) {
-            case InPin inPin -> !inPin.hiImpedance && !inPin.state;
-            case PassivePin pPin -> !pPin.otherImpedance && !pPin.otherState;
-            default -> false;
-        };
+        boolean anodeState = !anode.otherImpedance && anode.otherState;
+        boolean cathodeState = !cathode.otherImpedance && !cathode.otherState;
         return anodeState && cathodeState;
     }
 }

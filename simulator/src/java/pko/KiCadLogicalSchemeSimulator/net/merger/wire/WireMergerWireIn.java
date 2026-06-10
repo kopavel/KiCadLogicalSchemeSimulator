@@ -498,7 +498,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
     }
 
     public boolean hasTriStateIn() {
-        boolean has = merger.weakState != 0;
+        boolean has = merger.weakState != 0 || !merger.passivePins.isEmpty();
         for (Pin destination : destinations) {
             has = has || destination.hasTriStateIn();
         }

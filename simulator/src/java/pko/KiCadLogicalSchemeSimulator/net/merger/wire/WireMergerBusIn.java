@@ -211,9 +211,9 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus>, SupportM
             }
             /*Optimiser line strongOnly*/
         }
-        /*Optimiser line passivePins blockEnd weakOnly*/
-        merger.recalculatePassivePins();
         hiImpedance = true;
+        /*Optimiser line passivePins blockEnd weakOnly blockEnd ts*/
+        merger.recalculatePassivePins();
         //region assert
         assert Log.debug(getClass(),
                 "\u001B[36mPin merger setImp. after : Source:{} (state:{}, oldImpedance:{}, hiImpedance:{}), Merger:{} (state:{}, strong:{}, hiImpedance:{})" +
@@ -227,7 +227,6 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus>, SupportM
                 merger.strong,
                 merger.hiImpedance);
         //endregion
-        /*Optimiser blockEnd ts*/
     }
 
     @Override
@@ -268,7 +267,7 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus>, SupportM
 
     @Override
     public boolean hasTriStateIn() {
-        boolean has = merger.weakState != 0;
+        boolean has = merger.weakState != 0 || !merger.passivePins.isEmpty();
         for (Pin destination : destinations) {
             has = has || destination.hasTriStateIn();
         }

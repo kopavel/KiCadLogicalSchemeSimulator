@@ -102,7 +102,7 @@ public abstract class SchemaPart {
         return pin;
     }
 
-    public void addPassivePin(PassivePin pin) {
+    public PassivePin addPassivePin(PassivePin pin) {
         if (pinType.containsKey(pin.id)) {
             throw new RuntimeException("Double pin name in " + id + ":" + pin.id);
         } else {
@@ -110,6 +110,7 @@ public abstract class SchemaPart {
         }
         outPins.put(pin.id, pin);
         ids.put(pin, pin.id);
+        return pin;
     }
 
     public void addPullPin(String pinId, boolean state) {
