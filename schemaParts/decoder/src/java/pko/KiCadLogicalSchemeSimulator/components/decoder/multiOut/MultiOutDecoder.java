@@ -94,7 +94,7 @@ public class MultiOutDecoder extends SchemaPart {
                     } else if (reverse) {
                         part.outs[outNo].state = true;
                     }
-                } else if (!reverse) {
+                } else if (reverse) {
                     part.outs[outNo].state = true;
                 }
             }

@@ -59,9 +59,11 @@ public class MultiOutDecoderABus extends InBus {
 
     @Override
     public void setState(int newState) {
+        Pin oldPin;
+        Pin newPin;
         for (Part part : parts) {
-            Pin oldPin = part.outs[state];
-            Pin newPin = part.outs[newState];
+            oldPin = part.outs[state];
+            newPin = part.outs[newState];
             /*Optimiser block hasCs*/
             if (part.csState == 0
                     /*Optimiser line o*///
