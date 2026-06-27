@@ -211,7 +211,7 @@ public class SingleBitBuffer extends SchemaPart {
 
     @Override
     public String extraState() {
-        return params.containsKey("latch") ? "latch" : "";
+        return (params.containsKey("latch") ? "latch" : "") + (params.containsKey("reverse") ? (params.containsKey("latch") ? ";" : "") + "reverse" : "");
     }
 
     @Override

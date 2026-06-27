@@ -144,6 +144,7 @@ public class Net {
     }
 
     public void resend() {
+        assert Log.debug(getClass(), "tick");
         if (hasResend) {
             int resendTry = 10;
             for (int i = 0; i < resendTry && hasResend; i++) {
