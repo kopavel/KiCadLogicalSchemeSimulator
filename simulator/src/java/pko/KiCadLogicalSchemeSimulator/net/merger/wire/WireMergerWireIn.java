@@ -390,6 +390,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
         assert !hiImpedance || parent.net.stabilizing : "Already in hiImpedance:" + this;
         //endregion
         boolean oldState = merger.state;
+        //fixme optimise if no power-sensitive?
         if (oldStrong) {
             if (merger.weakState == 0) {
                 merger.hiImpedance = true;
@@ -423,8 +424,10 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
         hiImpedance = true;
         /*Optimiser block passivePins*/
         merger.recalculatePassivePins();
+/*
         strong = false;
         oldStrong = false;
+*/
         /*Optimiser blockEnd passivePins*/
         //region assert
         assert Log.debug(getClass(),
