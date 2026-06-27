@@ -100,7 +100,7 @@ public class SchemaPartMonitor extends JFrame {
         ins = getItems(inputsNames,
                 inputsValues,
                 schemaPart.inPins.values()
-                        .stream().distinct().sorted(AlphanumericComparator.comparing(ModelItem::getId)).toList(),
+                        .stream().distinct().sorted(AlphanumericComparator.comparing(schemaPart.ids::get)).toList(),
                 borderColor,
                 false);
         //endregion
@@ -108,7 +108,7 @@ public class SchemaPartMonitor extends JFrame {
         outs = getItems(outputsNames,
                 outputsValues,
                 schemaPart.outPins.values()
-                        .stream().distinct().sorted(AlphanumericComparator.comparing(ModelItem::getId)).toList(),
+                        .stream().distinct().sorted(AlphanumericComparator.comparing(schemaPart.ids::get)).toList(),
                 borderColor,
                 true);
         //endregion
