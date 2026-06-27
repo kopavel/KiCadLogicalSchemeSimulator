@@ -63,7 +63,7 @@ dependencies {
     runtimeOnly(project(":schemaParts"))
     testImplementation libs.jmh
     testAnnotationProcessor libs.jmh.annotations
-    optimisedCompileOnly(project)
+    optimisedCompileOnly(project(":simulator"))
     optimisedCompileOnly(project(path: ':schemaParts', configuration: 'default'))
     optimisedCompileOnly(libs.lombok)
 }
@@ -97,6 +97,7 @@ test {
 */
 test{
     failOnNoDiscoveredTests=false
+    dependsOn rootProject.tasks.named("copyToLib")
 }
 run {
     def jvm_args = []
@@ -124,15 +125,15 @@ run {
     }
     jvmArgs(jvm_args)
     if (project.hasProperty('appArgs')) {
-        def appArgsList = project.getProperties().get('appArgs').toString().split(",")
+        def appArgsList = providers.gradleProperty('appArgs').get().toString().split(",")
         appArgsList += ["-od", "$rootDir/simulator/optimised".toString(), "-md", "$rootDir/stuff/kicad_symbols".toString()]
         args(appArgsList)
     }
     if (project.hasProperty('workDir')) {
-        if (project.getProperties().get('workDir').toString().contains(":")) {
-            workingDir = project.getProperties().get('workDir')
+        if (providers.gradleProperty('workDir').get().toString().contains(":")) {
+            workingDir = providers.gradleProperty('workDir').get()
         } else {
-            workingDir = "$rootDir/" + project.getProperties().get('workDir')
+            workingDir = "$rootDir/" + providers.gradleProperty('workDir').get()
         }
     } else {
         workingDir = "$rootDir/stuff/work"

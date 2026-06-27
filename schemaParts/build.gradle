@@ -97,6 +97,7 @@ tasks.named("jar") {
 }
 
 configure(subprojects) { subproject ->
+    def libs = rootProject.libs
     sourceSets {
         test {
             java {
@@ -151,6 +152,7 @@ configure(subprojects) { subproject ->
     }
     test {
         useJUnitPlatform()
+        dependsOn rootProject.tasks.named("copyToLib")
         ignoreFailures = true
         testLogging {
             events "passed", "skipped", "failed"

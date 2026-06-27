@@ -114,6 +114,7 @@ configure(subprojects) {
         }
     }
 
+    def libs = rootProject.libs
     dependencies {
         compileOnly libs.lombok
         annotationProcessor libs.lombok
@@ -129,8 +130,8 @@ configure(subprojects) {
         options.encoding = 'UTF-8'
         options.deprecation = true
         options.compilerArgs.add('-Xlint:unchecked')
+        options.forkOptions.jvmArgs << '--sun-misc-unsafe-memory-access=allow'
     }
-
     plugins.withType(JavaPlugin).configureEach() {
         tasks.named("jar") {
             mustRunAfter rootProject.tasks.named("cleanBuild")
