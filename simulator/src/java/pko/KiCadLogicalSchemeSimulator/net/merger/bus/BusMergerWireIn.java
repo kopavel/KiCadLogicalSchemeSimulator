@@ -39,6 +39,7 @@ import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
+import java.util.Arrays;
 import java.util.Set;
 
 import static pko.KiCadLogicalSchemeSimulator.api.params.types.RecursionMode.none;
@@ -120,9 +121,11 @@ public class BusMergerWireIn extends TriStateInPin implements MergerInput<Pin> {
                     /*Optimiser bind nm:nMask*/
                     merger.weakPins &= nMask;
                 } else {
+                    /*Optimiser blockEnd sens*/
                     hiImpedance = false;
+                    /*Optimiser line sens*/
                 }
-                /*Optimiser blockEnd sens bind m:mask*/
+                /*Optimiser bind m:mask*/
                 merger.strongPins |= mask;
             }
             /*Optimiser bind m:mask blockEnd ts*/
@@ -248,9 +251,11 @@ public class BusMergerWireIn extends TriStateInPin implements MergerInput<Pin> {
                     /*Optimiser bind nm:nMask*/
                     merger.weakPins &= nMask;
                 } else {
+                    /*Optimiser blockEnd sens*/
                     hiImpedance = false;
+                    /*Optimiser line sens*/
                 }
-                /*Optimiser blockEnd sens bind m:mask*/
+                /*Optimiser bind m:mask*/
                 merger.strongPins |= mask;
             }
             /*Optimiser bind nm:nMask blockEnd ts*/
@@ -408,6 +413,7 @@ public class BusMergerWireIn extends TriStateInPin implements MergerInput<Pin> {
 
     @Override
     public BusMergerWireIn getOptimised(ModelItem<?> source) {
+//FixMe separate isTristate from hasTristateOut
         merger.sources.remove(this);
         destinations = merger.destinations;
         for (int i = 0; i < destinations.length; i++) {
@@ -427,7 +433,7 @@ public class BusMergerWireIn extends TriStateInPin implements MergerInput<Pin> {
         } else {
             optimiser.cut("nr");
         }
-        if (!hasTriStateIn()) {
+        if (!isTriState(source)) {
             optimiser.cut("ts");
             hiImpedance = false;
         }
@@ -456,10 +462,7 @@ public class BusMergerWireIn extends TriStateInPin implements MergerInput<Pin> {
 
     @Override
     public boolean hasTriStateIn() {
-        boolean has = merger.weakPins != 0;
-        for (Bus destination : destinations) {
-            has = has || destination.hasTriStateIn();
-        }
-        return has;
+        return merger.weakPins != 0 || Arrays.stream(destinations)
+                .anyMatch(Bus::hasTriStateIn);
     }
 }

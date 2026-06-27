@@ -326,6 +326,7 @@ public class BusMergerBusIn extends TriStateInBus implements MergerInput<Bus>, S
     @Override
     public BusMergerBusIn getOptimised(ModelItem<?> source) {
         //ToDo in case of "no passive pin" weakPins/weakState are known after build phase (incomplete)
+        //FixMe separate isTristate from hasTristateOut
         merger.sources.remove(this);
         destinations = merger.destinations;
         ClassOptimiser<BusMergerBusIn> optimiser = new ClassOptimiser<>(this).cut("o").unroll(merger.destinations.length).bind("m", mask);

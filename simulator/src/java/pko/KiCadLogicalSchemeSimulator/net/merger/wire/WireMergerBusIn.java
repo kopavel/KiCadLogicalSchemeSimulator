@@ -39,6 +39,7 @@ import pko.KiCadLogicalSchemeSimulator.net.merger.MergerInput;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 import pko.KiCadLogicalSchemeSimulator.tools.Log;
 
+import java.util.Arrays;
 import java.util.Set;
 
 //FixMe where recursion support?
@@ -267,10 +268,7 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus>, SupportM
 
     @Override
     public boolean hasTriStateIn() {
-        boolean has = merger.weakState != 0 || !merger.passivePins.isEmpty();
-        for (Pin destination : destinations) {
-            has = has || destination.hasTriStateIn();
-        }
-        return has;
+        return merger.weakState != 0 || !merger.passivePins.isEmpty() || Arrays.stream(destinations)
+                .anyMatch(Pin::hasTriStateIn);
     }
 }
