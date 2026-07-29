@@ -148,6 +148,9 @@ configure(subprojects) {
         dependsOn(rootProject.tasks.named('cleanBuild'))
     }
     tasks.withType(Test).configureEach {
+        doFirst {
+            jvmArgs += ["--sun-misc-unsafe-memory-access=allow"]
+        }
         outputs.upToDateWhen { false }
         outputs.cacheIf { false }
     }
