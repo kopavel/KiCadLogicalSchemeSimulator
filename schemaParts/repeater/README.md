@@ -21,7 +21,7 @@ Buffer/inverter.
 #### Optional parameters:
 
 - `reverse`- output reversed.
-- `openColector`- open collector output.
+- `openCollector`- open collector output.
 - `openEmitter`- open emitter output.
 
 

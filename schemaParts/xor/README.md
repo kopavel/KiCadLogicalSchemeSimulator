@@ -19,7 +19,7 @@
 #### Optional parameters:
 
 - `reverse`- output reversed, resulting in a NXOR gate.
-- `openColector`- openCollector output
+- `openCollector`- openCollector output
 
 ### Example
 

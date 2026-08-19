@@ -20,7 +20,7 @@
 #### Optional parameters:
 
 - `reverse`- reverse output for NAND gate.
-- `openColector`- openCollector output
+- `openCollector`- openCollector output
 
 ### Example
 
