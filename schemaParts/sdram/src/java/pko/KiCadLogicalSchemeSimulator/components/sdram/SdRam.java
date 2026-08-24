@@ -50,7 +50,6 @@ public class SdRam extends SchemaPart {
     private final int aSize;
     private Bus dOut;
     private int hiPart;
-    private int addr;
 
     protected SdRam(String id, String sParam) {
         super(id, sParam);
@@ -112,7 +111,7 @@ public class SdRam extends SchemaPart {
                 @Override
                 public void setLo() {
                     state = false;
-                    int a = (addr = hiPart + aIn.state);
+                    int a = hiPart + aIn.state;
                     if (w.state) {
                         Bus out;
                         int i;
@@ -141,13 +140,12 @@ public class SdRam extends SchemaPart {
                 @Override
                 public void setHi() {
                     state = true;
-                    addr = hiPart + addrPin.state;
                     if (we.state) {
-                        bytes[addr] = dIn.state;
+                        bytes[hiPart + addrPin.state] = dIn.state;
                     } else {
                         Bus out;
                         int i;
-                        if ((out = dOut).state != (i = bytes[addr]) || out.hiImpedance) {
+                        if ((out = dOut).state != (i = bytes[hiPart + addrPin.state]) || out.hiImpedance) {
                             out.setState(i);
                         }
                     }
@@ -167,7 +165,8 @@ public class SdRam extends SchemaPart {
 
     @Override
     public String extraState() {
-        return "A:" + String.format("%0" + (int) Math.ceil(aSize / 4.0d) + "X", addr) + "\nD:" + String.format("%" + (int) Math.ceil(size / 4.0d) + "X", dIn.state);
+        return "A:" + String.format("%0" + (int) Math.ceil(aSize / 4.0d) + "X", hiPart + addrPin.state) + "\nD:" +
+                String.format("%" + (int) Math.ceil(size / 4.0d) + "X", dIn.state);
     }
 
     @Override
