@@ -19,13 +19,10 @@ class LatchTest extends ChipSpec {
     @Unroll("WR:#wr, OE:#oe, D:#d -> Q:#q")
     def "Latch"() {
         when:
-        ins[0].syncState(wr)
-        ins[1].syncState(oe)
-        ins[2].syncState(d)
+        setInputs(wr, oe, d)
 
         then:
-        out[0].hiImpedance && q == 'h' ||
-                out[0].getState() == q && !out[0].hiImpedance
+        checkOutputs(q)
 
         where:
         wr | oe | d  || q

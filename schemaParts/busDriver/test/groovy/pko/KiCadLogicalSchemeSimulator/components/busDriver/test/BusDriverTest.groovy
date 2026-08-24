@@ -19,14 +19,10 @@ class BusDriverTest extends ChipSpec {
     @Unroll("OEa:#oea, Ia:#ia, OEb:#oeb, Ib:#ib -> Oa:#oa, Ob:#ob")
     def "BusDriver"() {
         when:
-        ins[0].syncState(oea)
-        ins[1].syncState(ia)
-        ins[2].syncState(oeb)
-        ins[3].syncState(ib)
+        setInputs(oea, ia, oeb, ib)
 
         then:
-        out[0].hiImpedance && oa == 'h' || out[0].getState() == oa && !out[0].hiImpedance
-        out[1].hiImpedance && ob == 'h' || out[1].getState() == ob && !out[1].hiImpedance
+        checkOutputs(oa, ob)
 
         where:
         oea | ia | oeb | ib || oa  | ob

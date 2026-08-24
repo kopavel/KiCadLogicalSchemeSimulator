@@ -20,11 +20,10 @@ class NandTest extends ChipSpec {
     @Unroll("#a AND #b -> #expected")
     def "NandGate"() {
         when:
-        ins[0].syncState(a)
-        ins[1].syncState(b)
+        setInputs(a, b)
 
         then:
-        out[0].getState() == expected
+        checkOutputs(expected)
 
         where:
         a | b || expected

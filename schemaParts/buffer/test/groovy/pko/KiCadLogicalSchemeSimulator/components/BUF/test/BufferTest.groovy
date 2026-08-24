@@ -19,12 +19,10 @@ class BufferTest extends ChipSpec {
     @Unroll("CS:#cs, D:#d -> Q:#q")
     def "Buffer"() {
         when:
-        ins[0].syncState(cs)
-        ins[1].syncState(d)
+        setInputs(cs, d)
 
         then:
-        out[0].hiImpedance && q == 'h' ||
-                out[0].getState() == q && !out[0].hiImpedance
+        checkOutputs(q)
 
         where:
         cs | d   || q

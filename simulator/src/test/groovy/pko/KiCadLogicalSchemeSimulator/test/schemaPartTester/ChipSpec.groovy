@@ -86,4 +86,25 @@ abstract class ChipSpec extends Specification {
         }
         part.reset()
     }
+
+    protected void setInputs(Object... states) {
+        assert states.length == ins.length
+
+        states.eachWithIndex { state, i ->
+            ins[i].syncState(state as int)
+        }
+    }
+
+    protected void checkOutputs(Object... expected) {
+        assert expected.length == out.length
+
+        expected.eachWithIndex { value, i ->
+            if (value == 'h') {
+                assert out[i].hiImpedance
+            } else {
+                assert !out[i].hiImpedance
+                assert out[i].getState() == value
+            }
+        }
+    }
 }
