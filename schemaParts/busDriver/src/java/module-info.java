@@ -32,7 +32,7 @@
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
 import pko.KiCadLogicalSchemeSimulator.components.busDriver.BusDriverSpi;
 
-module KiCadLogicalSchemeSimulator.components.BusDriver {
+open module KiCadLogicalSchemeSimulator.components.BusDriver {
     requires KiCadLogicalSchemeSimulator.simulator;
     provides SchemaPartSpi with BusDriverSpi;
 }

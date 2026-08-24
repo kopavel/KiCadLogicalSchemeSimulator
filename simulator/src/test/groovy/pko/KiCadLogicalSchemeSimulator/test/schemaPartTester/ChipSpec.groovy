@@ -84,5 +84,6 @@ abstract class ChipSpec extends Specification {
             part.initOuts()
             part.outPins.values().forEach { i -> i.resend() }
         }
+        part.reset()
     }
 }

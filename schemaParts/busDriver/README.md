@@ -22,7 +22,7 @@ Multipart bus driver (buffer) with a defined pins amount in each part.
 
 #### Mandatory parameters:
 
-- `size`- Pin amount in range [0…32] for each part as coma separated list.
+- `size`- Pin amount in range [0…32] for each part as a comma-separated list.
 
 #### Optional parameters:
 
@@ -30,5 +30,5 @@ Multipart bus driver (buffer) with a defined pins amount in each part.
 
 ### Example
 
-Two part driver, where part `A` has 4 pins and part `B` has 2 pins: `size=4,2`
+Two part driver, where part `A` has four pins and part `B` has two pins: `size=4,2`
  
