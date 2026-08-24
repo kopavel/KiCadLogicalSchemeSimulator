@@ -4,33 +4,50 @@ import groovy.transform.DefaultsMode
 import groovy.transform.TupleConstructor
 import pko.KiCadLogicalSchemeSimulator.Simulator
 import pko.KiCadLogicalSchemeSimulator.api.IModelItem
+import pko.KiCadLogicalSchemeSimulator.api.bus.Bus
 import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi
 import pko.KiCadLogicalSchemeSimulator.api.wire.OutPin
+import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser
+import pko.KiCadLogicalSchemeSimulator.tools.Utils
+import spock.lang.Shared
 import spock.lang.Specification
+import spock.lang.Stepwise
 
+@Stepwise
 abstract class ChipSpec extends Specification {
 
     @TupleConstructor(defaultsMode = DefaultsMode.AUTO)
     static final class ChipDefinition {
-        final SchemaPart part
         final SchemaPartSpi spi
+        final String params
         final List<String> inputs
         final List<String> outputs
         final boolean optimise = true
+        final boolean shared = true
     }
 
+    @Shared
     SchemaPart part
+    @Shared
     IModelItem<?>[] ins
+    @Shared
     IModelItem<?>[] out
 
     protected abstract ChipDefinition chip()
 
     def setup() {
         ChipDefinition definition = chip()
+        if (part == null || !definition.shared) {
+            init(definition)
+        }
+    }
 
-        part = definition.part
+    def init(ChipDefinition definition) {
+        ClassOptimiser.force = true;
+
+        part = definition.spi.getSchemaPart("chip", definition.params);
 
         Simulator.schemaPartSpiMap = [
                 "SPI": definition.spi
@@ -42,15 +59,16 @@ abstract class ChipSpec extends Specification {
             IModelItem<?> tester
             if (source instanceof OutPin) {
                 tester = new TesterInPin(name)
+                source.addDestination(tester)
             } else if (source instanceof OutBus) {
                 tester = new TesterInBus(name, source.size)
+                source.addDestination((Bus) tester, Utils.getMaskForSize(source.size), (byte) 0)
             } else {
                 throw new IllegalArgumentException(
                         "Unsupported output ${name}: ${source.class.name}"
                 )
             }
 
-            source.addDestination(tester)
             tester
         } as IModelItem<?>[]
 

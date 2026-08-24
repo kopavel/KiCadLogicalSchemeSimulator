@@ -55,4 +55,5 @@ public interface IModelItem<T> extends Comparable<IModelItem<T>> {
         return (T) this;
     }
     void resend();
+    void syncState(int integer);
 }

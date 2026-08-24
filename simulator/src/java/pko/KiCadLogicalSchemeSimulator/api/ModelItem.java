@@ -138,4 +138,11 @@ public abstract class ModelItem<T> implements IModelItem<T> {
     public int hashCode() {
         return getName().hashCode();
     }
+
+    @Override
+    public void syncState(int state) {
+        if (getState() != state) {
+            setState(state);
+        }
+    }
 }

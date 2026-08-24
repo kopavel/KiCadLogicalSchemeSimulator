@@ -1,26 +1,27 @@
 package pko.KiCadLogicalSchemeSimulator.components.AND.test
 
 
-import pko.KiCadLogicalSchemeSimulator.components.AND.AndGate
 import pko.KiCadLogicalSchemeSimulator.components.AND.AndGateSpi
 import pko.KiCadLogicalSchemeSimulator.test.schemaPartTester.ChipSpec
+import spock.lang.Unroll
 
 class NandTest extends ChipSpec {
 
     @Override
     protected ChipDefinition chip() {
         new ChipDefinition(
-                new AndGate("nand", "size=2;reverse"),
                 new AndGateSpi(),
+                "size=2;reverse",
                 ["IN0", "IN1"],
                 ["OUT"]
         )
     }
 
-    def "NAND: #a AND #b -> #expected"() {
+    @Unroll("#a AND #b -> #expected")
+    def "NandGate"() {
         when:
-        ins[0].setState(a)
-        ins[1].setState(b)
+        ins[0].syncState(a)
+        ins[1].syncState(b)
 
         then:
         out[0].getState() == expected
