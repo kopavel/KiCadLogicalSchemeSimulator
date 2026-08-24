@@ -55,6 +55,7 @@ public class RomABus extends InBus {
         parent = oldPin.parent;
         words = oldPin.words;
         iCsActive = oldPin.iCsActive;
+        dBus = oldPin.dBus;
     }
 
     @Override

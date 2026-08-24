@@ -165,7 +165,6 @@ configure(subprojects) { subproject ->
         }
     }
     test {
-        workingDir = project(":simulator").projectDir
         useJUnitPlatform()
         dependsOn rootProject.tasks.named("copyToLib")
         ignoreFailures = true

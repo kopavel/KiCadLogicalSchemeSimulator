@@ -46,6 +46,7 @@ abstract class ChipSpec extends Specification {
 
     def init(ChipDefinition definition) {
         ClassOptimiser.force = true;
+        Simulator.optimisedDir = "../../simulator/optimised";
 
         part = definition.spi.getSchemaPart("chip", definition.params);
 
