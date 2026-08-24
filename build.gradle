@@ -120,6 +120,8 @@ configure(subprojects) {
         annotationProcessor libs.lombok
         testImplementation platform(libs.bom.junit)
         testImplementation libs.junit.jupiter
+        testImplementation platform(libs.spock.bom)
+        testImplementation libs.spock.core
         testRuntimeOnly libs.junit.launcher
     }
     java {

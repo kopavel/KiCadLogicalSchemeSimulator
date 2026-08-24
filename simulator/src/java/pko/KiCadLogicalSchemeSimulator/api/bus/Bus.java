@@ -44,11 +44,11 @@ public abstract class Bus extends ModelItem<Bus> {
     @Getter
     public final int size;
     public final Map<String, Byte> aliasOffsets;
+    public final int maxState;
     public int state;
     public boolean useBitPresentation;
     //Fixme why not just 'mask'?
-    public int applyMask=Integer.MAX_VALUE;
-    public final int maxState;
+    public int applyMask = Integer.MAX_VALUE;
 
     protected Bus(String id, SchemaPart parent, int size, String... aliases) {
         super(id, parent);
@@ -108,8 +108,6 @@ public abstract class Bus extends ModelItem<Bus> {
         setState(maxState);
     }
 
-    abstract public void setState(int newState);
-
     @Override
     public Bus copyState(IModelItem<? extends Bus> oldBus, ModelItem<?> source) {
         state = oldBus.getState();
@@ -130,5 +128,10 @@ public abstract class Bus extends ModelItem<Bus> {
     @Override
     public String toString() {
         return state + ":" + super.toString();
+    }
+
+    @Override
+    public void resend() {
+        setState(state);
     }
 }

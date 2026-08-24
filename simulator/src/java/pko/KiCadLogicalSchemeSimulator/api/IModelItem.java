@@ -39,6 +39,7 @@ public interface IModelItem<T> extends Comparable<IModelItem<T>> {
     int getPriority();
     int getSize();
     int getState();
+    void setState(int state);
     boolean isHiImpedance();
     boolean isStrong();
     Byte getAliasOffset(String pinName);
@@ -53,4 +54,5 @@ public interface IModelItem<T> extends Comparable<IModelItem<T>> {
     default T getThis() {
         return (T) this;
     }
+    void resend();
 }

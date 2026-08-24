@@ -318,6 +318,12 @@ public abstract class SchemaPart {
     public void reset() {
     }
 
+    public void optimiseOuts() {
+        outPins.values()
+                .stream().distinct().forEach(this::replaceOut);
+        initOuts();
+    }
+
     public enum PinType {
         input,
         output,

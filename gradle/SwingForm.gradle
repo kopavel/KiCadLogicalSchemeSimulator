@@ -44,7 +44,7 @@ File instrumentedClassesDir = project.layout.buildDirectory.dir("swing-classes/m
 SourceSetContainer sourceSets = project.extensions.getByType(JavaPluginExtension).sourceSets
 List<Map<String, File>> instrumentedTuples = []
 sourceSets.each { ss ->
-    def outDir = ss.output.classesDirs.singleFile
+    def outDir = ss.java.destinationDirectory.get().asFile
     ss.allSource.srcDirs.each { srcDir ->
         fileTree(srcDir).matching { include '**/*.form' }.files.each { formFile ->
             def relativePath = formFile.path - srcDir.path - File.separator

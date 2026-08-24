@@ -29,47 +29,22 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.components.AND.test;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import pko.KiCadLogicalSchemeSimulator.test.schemaPartTester.NetTester;
+package pko.KiCadLogicalSchemeSimulator.test.schemaPartTester;
+import pko.KiCadLogicalSchemeSimulator.net.bus.TriStateInBus;
 
-public class NandTest extends NetTester {
-    @BeforeEach
-    public void reset() {
-        setLo(3);
-        setLo(4);
-    }
-
-    @Test
-    @DisplayName("Both input Lo - out Hi")
-    public void bothLo() {
-        checkPin(2, true, "With no input output needs to be Lo");
-    }
-
-    @Test
-    @DisplayName("Only one input Hi - out Hi")
-    public void oneHi() {
-        setHi(4);
-        checkPin(2, true, "With Hi on only one input output needs to be Lo");
-    }
-
-    @Test
-    @DisplayName("Both input Hi - out Lo")
-    public void bothHi() {
-        setHi(3);
-        setHi(4);
-        checkPin(2, false, "With Hi on both inputs output needs to be Hi");
+public class TesterInBus extends TriStateInBus {
+    public TesterInBus(String id, int size) {
+        super(id, null, size);
     }
 
     @Override
-    protected String getNetFilePath() {
-        return "test/resources/and.net";
+    public void setHiImpedance() {
+        hiImpedance = true;
     }
 
     @Override
-    protected String getRootPath() {
-        return "../..";
+    public void setState(int state) {
+        hiImpedance = false;
+        this.state = state;
     }
 }

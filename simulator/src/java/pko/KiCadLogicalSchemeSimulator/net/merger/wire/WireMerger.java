@@ -89,6 +89,12 @@ public class WireMerger extends TriStateOutPin {
         }
     }
 
+    @Override
+    public void resend() {
+        super.resend();
+        recalculatePassivePins();
+    }
+
     private void addSource(OutBus bus, int mask) {
         WireMergerBusIn input = new WireMergerBusIn(bus, this);
         bus.addDestination(input, mask, (byte) 0);

@@ -10,7 +10,7 @@ bom-junit = { module = 'org.junit:junit-bom', version.ref = 'jUnit' }
 junit-jupiter = { module = 'org.junit.jupiter:junit-jupiter' }
 junit-launcher = { module = 'org.junit.platform:junit-platform-launcher' }
 
-idea-gui-compiller= 'com.jetbrains.intellij.java:java-compiler-ant-tasks:+'
+idea-gui-compiller = 'com.jetbrains.intellij.java:java-compiler-ant-tasks:+'
 swing-flatlaf = 'com.formdev:flatlaf:3.7.1'
 
 lombok = { module = 'org.projectlombok:lombok', version.ref = 'lombok' }
@@ -22,6 +22,8 @@ jackson-jaxb-annotations = { module = 'tools.jackson.module:jackson-module-jaxb-
 
 jakarta-api = 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.5'
 picocli = 'info.picocli:picocli:4.7.7'
+spock-bom = "org.spockframework:spock-bom:2.4-groovy-4.0"
+spock-core = { module = 'org.spockframework:spock-core' }
 
 #log4j2
 log4j-slf4j = { version.ref = 'log4j2', module = 'org.apache.logging.log4j:log4j-slf4j-impl' }

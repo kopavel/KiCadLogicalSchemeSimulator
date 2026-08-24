@@ -69,6 +69,7 @@ public abstract class Pin extends ModelItem<Pin> {
         state = oldPin.getState() > 0;
         priority += oldPin.getPriority();
         strengthSensitive = oldPin.getThis().strengthSensitive;
+        parent = oldPin.getParent();
         return this;
     }
 
@@ -80,6 +81,11 @@ public abstract class Pin extends ModelItem<Pin> {
     @Override
     public int getState() {
         return (withState || source == null || source == this) ? (state ? 1 : 0) : source.getState();
+    }
+
+    public void setState(int state) {
+        this.state = state == 1;
+        resend();
     }
 
     public void setHi(boolean strong) {
@@ -113,5 +119,13 @@ public abstract class Pin extends ModelItem<Pin> {
     @Override
     public String toString() {
         return state + ":" + strong + ":" + super.toString();
+    }
+
+    public void resend() {
+        if (state) {
+            setHi();
+        } else {
+            setLo();
+        }
     }
 }

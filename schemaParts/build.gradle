@@ -97,11 +97,24 @@ tasks.named("jar") {
 }
 
 configure(subprojects) { subproject ->
+    apply plugin: 'groovy'
+    def copyToLibTask = rootProject.tasks.named("copyToLib")
+
+    tasks.named("compileTestJava") {
+        mustRunAfter copyToLibTask
+    }
+
+    tasks.named("compileTestGroovy") {
+        mustRunAfter copyToLibTask
+    }
     def libs = rootProject.libs
     sourceSets {
         test {
             java {
                 srcDirs = ["test/java"]
+            }
+            groovy {
+                srcDirs = ["test/groovy"]
             }
             resources {
                 srcDirs = ["test/resources"]
@@ -136,6 +149,7 @@ configure(subprojects) { subproject ->
     def simulatorSourceSets = project(":simulator")
             .extensions
             .getByName("sourceSets")
+    def simulatorRuntimeClasspath = simulatorSourceSets.main.runtimeClasspath
     dependencies {
         implementation project(":simulator")
         implementation libs.jakarta.api
@@ -151,6 +165,7 @@ configure(subprojects) { subproject ->
         }
     }
     test {
+        workingDir = project(":simulator").projectDir
         useJUnitPlatform()
         dependsOn rootProject.tasks.named("copyToLib")
         ignoreFailures = true
@@ -159,7 +174,7 @@ configure(subprojects) { subproject ->
         }
         doFirst {
             jvmArgs += [
-                    '--module-path', classpath.asPath,
+                    '--module-path', simulatorRuntimeClasspath.asPath,
                     '--add-modules', 'KiCadLogicalSchemeSimulator.simulator',
                     '--add-exports', 'KiCadLogicalSchemeSimulator.simulator/pko.KiCadLogicalSchemeSimulator.parsers.net=ALL-UNNAMED',
                     '--add-exports', 'KiCadLogicalSchemeSimulator.simulator/pko.KiCadLogicalSchemeSimulator.parsers.xml=ALL-UNNAMED',

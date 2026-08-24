@@ -29,43 +29,28 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package pko.KiCadLogicalSchemeSimulator.components.AND.test;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import pko.KiCadLogicalSchemeSimulator.test.schemaPartTester.NetTester;
+package pko.KiCadLogicalSchemeSimulator.test.schemaPartTester;
+import pko.KiCadLogicalSchemeSimulator.api.wire.TriStateInPin;
 
-public class AndTest extends NetTester {
-    @Test
-    @DisplayName("Both input Lo - out Lo")
-    public void bothLo() {
-        setLo(1);
-        setLo(2);
-        checkPin(1, false, "With no input output needs to be Lo");
-    }
-
-    @Test
-    @DisplayName("Only one input Hi - out Lo")
-    public void oneHi() {
-        setLo(1);
-        setHi(2);
-        checkPin(1, false, "With Hi on only one input output needs to be Lo");
-    }
-
-    @Test
-    @DisplayName("Both input Hi - out Hi")
-    public void bothHi() {
-        setHi(1);
-        setHi(2);
-        checkPin(1, true, "With Hi on both inputs output needs to be Hi");
+public class TesterInPin extends TriStateInPin {
+    public TesterInPin(String id) {
+        super(id, null);
     }
 
     @Override
-    protected String getNetFilePath() {
-        return "test/resources/and.net";
+    public void setHiImpedance() {
+        hiImpedance = true;
     }
 
     @Override
-    protected String getRootPath() {
-        return "../..";
+    public void setHi() {
+        hiImpedance = false;
+        state = true;
+    }
+
+    @Override
+    public void setLo() {
+        hiImpedance = false;
+        state = false;
     }
 }

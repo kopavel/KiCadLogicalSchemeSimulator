@@ -92,7 +92,6 @@ public class Net {
         }
         export.getNets().getNet().forEach(this::groupSourcesByDestinations);
         buildNet();
-        schemaParts.values().forEach(SchemaPart::initOuts);
         Log.info(Net.class, "Stabilizing net");
         stabilise();
         Log.info(Net.class, "Net build complete");
@@ -355,22 +354,13 @@ public class Net {
                 }
             }
         });
-        schemaParts.values()
-                .stream()
-                .flatMap(p -> p.outPins.values()
-                        .stream().distinct().toList()
-                        .stream())
-                .forEach(Net::replaceOut);
+        schemaParts.values().forEach(SchemaPart::optimiseOuts);
         for (OutPin wireMerger : wireMergers.values()) {
             wireMerger.getOptimised(null);
         }
         for (OutBus busMerger : busMergers.values()) {
             busMerger.getOptimised(null);
         }
-    }
-
-    private static void replaceOut(ModelItem<?> outItem) {
-        outItem.getParent().replaceOut(outItem);
     }
 
     private SchemaPart createSchemaPart(String className, String id, String params) {
@@ -409,32 +399,19 @@ public class Net {
                 .distinct()
                 .forEach(item -> {
                     assert Log.debug(Net.class, "Resend pin {}", item);
-                    if (item instanceof Pin pin) {
-                        if (pin.state) {
-                            pin.setHi();
-                        } else {
-                            pin.setLo();
-                        }
-                    } else if (item instanceof Bus bus) {
-                        bus.setState(bus.state);
-                    }
+                    item.resend();
                 });
         wireMergers.values()
                 .stream()
                 .filter(outPin -> !outPin.isHiImpedance()).distinct().forEach(item -> {
                        assert Log.debug(Net.class, "Resend pin {}", item);
-                       if (item.state) {
-                           item.setHi();
-                       } else {
-                           item.setLo();
-                       }
-                       item.recalculatePassivePins();
+                       item.resend();
                    });
         busMergers.values()
                 .stream()
                 .filter(merger -> !merger.isHiImpedance()).distinct().forEach(item -> {
                       assert Log.debug(Net.class, "Resend pin {}", item);
-                      item.setState(item.state);
+                      item.resend();
                   });
         int resendTry = 10;
         for (int i = 0; i < resendTry; i++) {
