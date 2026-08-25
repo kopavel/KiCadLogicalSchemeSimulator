@@ -38,7 +38,7 @@ import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
 
 public class CInRaisingPin extends RaisingEdgePin {
     public final int countMask;
-    private final Counter parent;
+    public final Counter parent;
     public Bus out;
     public int oState;
 

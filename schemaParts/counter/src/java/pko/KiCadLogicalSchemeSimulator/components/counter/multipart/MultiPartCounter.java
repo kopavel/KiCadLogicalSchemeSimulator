@@ -40,8 +40,8 @@ import java.util.Map;
 public class MultiPartCounter extends SchemaPart {
     public final MultiPartCIn[] cIns;
     public final Map<String, MultiPartRIn> rIns = new HashMap<>();
-    private final Bus[] outBuses;
-    private final Pin[] outPins;
+    private final Bus[] bOuts;
+    private final Pin[] pOuts;
     private final int[] sizes;
     public int resetState;
 
@@ -53,8 +53,8 @@ public class MultiPartCounter extends SchemaPart {
         String[] sSizes = params.get("size").split(",");
         String[] skip = params.getOrDefault("skip", "").split(",");
         int resetAmount = Integer.parseInt(params.getOrDefault("resetAmount", "1"));
-        outBuses = new Bus[sSizes.length];
-        outPins = new Pin[sSizes.length];
+        bOuts = new Bus[sSizes.length];
+        pOuts = new Pin[sSizes.length];
         sizes = new int[sSizes.length];
         cIns = new MultiPartCIn[sSizes.length];
         for (int i = 0; i < sSizes.length; i++) {
@@ -87,12 +87,12 @@ public class MultiPartCounter extends SchemaPart {
     public void initOuts() {
         for (int i = 0; i < sizes.length; i++) {
             if (sizes[i] == 1) {
-                outPins[i] = getOutPin("Q" + (char) ('a' + i));
-                cIns[i].setOut(outPins[i]);
+                pOuts[i] = getOutPin("Q" + (char) ('a' + i));
+                cIns[i].setOut(pOuts[i]);
             } else {
-                outBuses[i] = getOutBus("Q" + (char) ('a' + i));
-                outBuses[i].useBitPresentation = true;
-                cIns[i].setOut(outBuses[i]);
+                bOuts[i] = getOutBus("Q" + (char) ('a' + i));
+                bOuts[i].useBitPresentation = true;
+                cIns[i].setOut(bOuts[i]);
             }
         }
         rIns.values().forEach(pin -> {
@@ -106,11 +106,11 @@ public class MultiPartCounter extends SchemaPart {
     public void reset() {
         for (int i = 0; i < sizes.length; i++) {
             if (sizes[i] == 1) {
-                if (outPins[i].state) {
-                    outPins[i].setLo();
+                if (pOuts[i].state) {
+                    pOuts[i].setLo();
                 }
-            } else if (outBuses[i].state > 0) {
-                outBuses[i].setState(0);
+            } else if (bOuts[i].state > 0) {
+                bOuts[i].setState(0);
             }
         }
     }
