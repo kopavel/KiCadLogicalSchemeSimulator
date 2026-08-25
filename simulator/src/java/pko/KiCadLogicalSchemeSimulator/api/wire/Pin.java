@@ -122,7 +122,9 @@ public abstract class Pin extends ModelItem<Pin> {
     }
 
     public void resend() {
-        if (state) {
+        if (hiImpedance) {
+            setHiImpedance();
+        } else if (state) {
             setHi();
         } else {
             setLo();

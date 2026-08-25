@@ -133,6 +133,10 @@ public abstract class Bus extends ModelItem<Bus> {
 
     @Override
     public void resend() {
-        setState(state);
+        if (hiImpedance) {
+            setHiImpedance();
+        } else {
+            setState(state);
+        }
     }
 }

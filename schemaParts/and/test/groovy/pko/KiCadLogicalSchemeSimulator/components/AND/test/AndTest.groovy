@@ -1,9 +1,11 @@
 package pko.KiCadLogicalSchemeSimulator.components.AND.test
 
-
 import pko.KiCadLogicalSchemeSimulator.components.AND.AndGateSpi
 import pko.KiCadLogicalSchemeSimulator.test.schemaPartTester.ChipSpec
 import spock.lang.Unroll
+
+import static pko.KiCadLogicalSchemeSimulator.test.schemaPartTester.Optimisation.OPT
+import static pko.KiCadLogicalSchemeSimulator.test.schemaPartTester.Optimisation.RAW
 
 class AndTest extends ChipSpec {
 
@@ -17,8 +19,10 @@ class AndTest extends ChipSpec {
         )
     }
 
-    @Unroll("#a AND #b -> #expected")
+    @Unroll("#optimized | #a AND #b -> #expected")
     def "AndGate"() {
+        given:
+        useChip(optimized)
         when:
         setInputs(a, b)
 
@@ -26,6 +30,9 @@ class AndTest extends ChipSpec {
         checkOutputs(expected)
 
         where:
+        optimized << [RAW, OPT]
+
+        combined:
         a | b || expected
         0 | 0 || 0
         0 | 1 || 0

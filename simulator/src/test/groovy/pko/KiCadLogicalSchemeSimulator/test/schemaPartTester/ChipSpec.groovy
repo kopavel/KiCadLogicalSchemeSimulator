@@ -17,34 +17,42 @@ import spock.lang.Stepwise
 
 @Stepwise
 abstract class ChipSpec extends Specification {
-
     @TupleConstructor(defaultsMode = DefaultsMode.AUTO)
     static final class ChipDefinition {
         final SchemaPartSpi spi
         final String params
         final List<String> inputs
         final List<String> outputs
-        final boolean optimise = true
-        final boolean shared = true
+    }
+
+    @TupleConstructor
+    static final class ChipInstance {
+        SchemaPart part
+        IModelItem<?>[] ins
+        IModelItem<?>[] out
     }
 
     @Shared
+    ChipInstance rawChip
+
+    @Shared
+    ChipInstance optimisedChip
+
     SchemaPart part
-    @Shared
     IModelItem<?>[] ins
-    @Shared
     IModelItem<?>[] out
 
     protected abstract ChipDefinition chip()
 
     def setup() {
         ChipDefinition definition = chip()
-        if (part == null || !definition.shared) {
-            init(definition)
+        if (rawChip == null) {
+            rawChip = init(definition, false)
+            optimisedChip = init(definition, true)
         }
     }
 
-    def init(ChipDefinition definition) {
+    ChipInstance init(ChipDefinition definition, boolean optimised) {
         ClassOptimiser.force = true;
         Simulator.optimisedDir = "../../simulator/optimised";
 
@@ -75,16 +83,17 @@ abstract class ChipSpec extends Specification {
 
         ins = definition.inputs.collect { String name ->
             IModelItem<?> inItem = part.getInItem(name)
-            definition.optimise ? inItem.getOptimised(null) : inItem
+            optimised ? inItem.getOptimised(null) : inItem
         } as IModelItem<?>[]
 
-        if (definition.optimise)
+        if (optimised)
             part.optimiseOuts()
         else {
             part.initOuts()
             part.outPins.values().forEach { i -> i.resend() }
         }
         part.reset()
+        new ChipInstance(part, ins, out)
     }
 
     protected void setInputs(Object... states) {
@@ -107,4 +116,17 @@ abstract class ChipSpec extends Specification {
             }
         }
     }
+
+    protected void useChip(Optimisation optimise) {
+        ChipInstance chip = optimise == Optimisation.OPT
+                ? optimisedChip
+                : rawChip
+        part = chip.part
+        ins = chip.ins
+        out = chip.out
+    }
+}
+
+enum Optimisation {
+    OPT, RAW
 }
