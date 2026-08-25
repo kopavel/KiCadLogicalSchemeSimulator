@@ -2,6 +2,7 @@ package pko.KiCadLogicalSchemeSimulator.test.schemaPartTester
 
 import groovy.transform.DefaultsMode
 import groovy.transform.TupleConstructor
+import org.opentest4j.TestAbortedException
 import pko.KiCadLogicalSchemeSimulator.Simulator
 import pko.KiCadLogicalSchemeSimulator.api.IModelItem
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus
@@ -9,6 +10,7 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi
 import pko.KiCadLogicalSchemeSimulator.api.wire.OutPin
+import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser
 import pko.KiCadLogicalSchemeSimulator.tools.Utils
 import spock.lang.Shared
 import spock.lang.Specification
@@ -32,6 +34,12 @@ abstract class ChipSpec extends Specification {
     }
 
     @Shared
+    private Throwable setupFailure
+
+    @Shared
+    private boolean initialized
+
+    @Shared
     ChipInstance rawChip
 
     @Shared
@@ -44,10 +52,23 @@ abstract class ChipSpec extends Specification {
     protected abstract ChipDefinition chip()
 
     def setup() {
-        ChipDefinition definition = chip()
-        if (rawChip == null) {
-            rawChip = init(definition, false)
-            optimisedChip = init(definition, true)
+        if (setupFailure != null) {
+            throw new TestAbortedException(
+                    "Chip initialization failed",
+                    setupFailure
+            )
+        }
+        if (!initialized) {
+            ClassOptimiser.failOnCompileError = true;
+            ChipDefinition definition = chip()
+            try {
+                rawChip = init(definition, false)
+                optimisedChip = init(definition, true)
+                initialized = true
+            } catch (Throwable e) {
+                setupFailure = e
+                throw e
+            }
         }
     }
 
@@ -79,6 +100,7 @@ abstract class ChipSpec extends Specification {
             tester
         } as IModelItem<?>[]
 
+        definition.inputs.stream().forEach { name -> part.getInItem(name).used = true; }
         ins = definition.inputs.collect { String name ->
             IModelItem<?> inItem = part.getInItem(name)
             optimised ? inItem.getOptimised(null) : inItem

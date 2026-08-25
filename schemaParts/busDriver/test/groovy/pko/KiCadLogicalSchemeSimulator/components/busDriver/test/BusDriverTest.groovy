@@ -18,7 +18,7 @@ class BusDriverTest extends ChipSpec {
         )
     }
 
-    @Unroll("OEa:#oea, Ia:#ia, OEb:#oeb, Ib:#ib -> Oa:#oa, Ob:#ob")
+    @Unroll("#optimized | OEa:#oea, Ia:#ia, OEb:#oeb, Ib:#ib -> Oa:#oa, Ob:#ob")
     def "BusDriver"() {
         given:
         useChip(optimized)

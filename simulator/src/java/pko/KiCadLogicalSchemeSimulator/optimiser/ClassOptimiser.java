@@ -50,6 +50,7 @@ public class ClassOptimiser<T> {
     private static final Pattern UNROLL_INDEX_POWER = Pattern.compile("unrollIndexPower");
     private static final Pattern PATTERN = Pattern.compile("[^a-zA-Z0-9_$]");
     private static final Pattern UNROLL_INDEX = Pattern.compile("unrollIndex");
+    public static boolean failOnCompileError;
     private final List<String> cutList = new ArrayList<>();
     private final Map<String, String> binds = new HashMap<>();
     private final T oldInstance;
@@ -132,6 +133,9 @@ public class ClassOptimiser<T> {
                     storeSrc(optimizedFullClassName, optimisedSource);
                     dynamicClass = JavaCompiler.compileJavaSource(optimizedFullClassName, optimizedClassName, optimisedSource);
                     if (dynamicClass == null) {
+                        if (failOnCompileError) {
+                            throw new RuntimeException("Optimised class compile was not successful, file name:" + optimizedFullClassName);
+                        }
                         Log.error(JavaCompiler.class, "Optimised class compile was not successful, fall back to generic class, file name:" + optimizedFullClassName);
                         return oldInstance;
                     } else {
