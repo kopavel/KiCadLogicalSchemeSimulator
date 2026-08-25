@@ -150,6 +150,10 @@ public class BusToWiresAdapter extends OutBus implements SupportMask, SupportOff
         }
     }
 
+    public int getInState() {
+        return withState || source == null ? state : source.getState();
+    }
+
     @Override
     public void setHiImpedance() {
         /*Optimiser block ts*/

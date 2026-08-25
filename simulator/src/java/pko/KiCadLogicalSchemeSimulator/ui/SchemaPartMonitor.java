@@ -36,6 +36,7 @@ import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.AbstractUiComponent;
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart;
+import pko.KiCadLogicalSchemeSimulator.net.bus.BusToWiresAdapter;
 import pko.KiCadLogicalSchemeSimulator.tools.UiTools;
 
 import javax.swing.*;
@@ -236,7 +237,11 @@ public class SchemaPartMonitor extends JFrame {
                 if (out.item.isHiImpedance()) {
                     out.label.setText("Hi");
                 } else if (out.item instanceof Bus bus && bus.useBitPresentation) {
-                    out.label.setText((bus.getState() & out.mask) != 0 ? "1" : "0");
+                    if (out.item instanceof BusToWiresAdapter adapter) {
+                        out.label.setText((adapter.getInState() & out.mask) != 0 ? "1" : "0");
+                    } else {
+                        out.label.setText((bus.getState() & out.mask) != 0 ? "1" : "0");
+                    }
                 } else {
                     out.label.setText(String.format("%0" + (int) Math.ceil(out.item.getSize() / 4.0d) + "X", out.item.getState()));
                 }
