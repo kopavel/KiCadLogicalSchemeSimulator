@@ -9,7 +9,6 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.OutBus
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPart
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi
 import pko.KiCadLogicalSchemeSimulator.api.wire.OutPin
-import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser
 import pko.KiCadLogicalSchemeSimulator.tools.Utils
 import spock.lang.Shared
 import spock.lang.Specification
@@ -53,7 +52,6 @@ abstract class ChipSpec extends Specification {
     }
 
     ChipInstance init(ChipDefinition definition, boolean optimised) {
-        ClassOptimiser.force = true;
         Simulator.optimisedDir = "../../simulator/optimised";
 
         part = definition.spi.getSchemaPart("chip", definition.params);

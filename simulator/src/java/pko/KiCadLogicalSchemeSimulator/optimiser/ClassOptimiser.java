@@ -46,7 +46,6 @@ import static pko.KiCadLogicalSchemeSimulator.tools.Utils.countLeadingSpaces;
 import static pko.KiCadLogicalSchemeSimulator.tools.Utils.regexEscape;
 
 public class ClassOptimiser<T> {
-    public static boolean force;
     private static final Map<String, Class<?>> dynamicClasses = new HashMap<>();
     private static final Pattern UNROLL_INDEX_POWER = Pattern.compile("unrollIndexPower");
     private static final Pattern PATTERN = Pattern.compile("[^a-zA-Z0-9_$]");
@@ -124,9 +123,6 @@ public class ClassOptimiser<T> {
             Class<?> dynamicClass = dynamicClasses.get(optimizedFullClassName);
             if (dynamicClass == null) {
                 try {
-                    if (force) {
-                        throw new ClassNotFoundException();
-                    }
                     dynamicClass = Class.forName(optimizedFullClassName);
                 } catch (ClassNotFoundException ignored) {
                     loadSource();
