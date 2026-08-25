@@ -233,7 +233,7 @@ public class BusToWiresAdapter extends OutBus implements SupportMask, SupportOff
             if (toHi.length == 0) {
                 optimiser.cut("hi");
             } else if (toLow.length == 0) {
-                optimiser.cut("lo").bind("eq", "!==");
+                optimiser.cut("lo").bind("eq", "!=");
             }
             BusToWiresAdapter build = optimiser.build();
             build.withState = inSource == null;

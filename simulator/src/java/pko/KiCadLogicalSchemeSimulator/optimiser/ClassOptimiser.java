@@ -362,12 +362,16 @@ public class ClassOptimiser<T> {
                         } else if (lineOffset == iteratorOffset && !functionSource.isEmpty()) {
                             //iterator block end — unroll it
                             UnrollDescriptor descriptor = unrolls.get(iteratorId);
-                            for (int j = 0; j < descriptor.size; j++) {
-                                functionSource.append(UNROLL_INDEX.matcher(UNROLL_INDEX_POWER.matcher(iteratorSource.toString()
-                                                                                                                    .replaceAll("(?<=\\W|^)" + descriptor.variable +
-                                                                                                                            "(?=\\W|$)", descriptor.variable + j))
-                                                                                             .replaceAll(String.valueOf((int) Math.pow(2, j))))
-                                                                  .replaceAll(String.valueOf(j)));
+                            if (descriptor != null) {
+                                for (int j = 0; j < descriptor.size; j++) {
+                                    functionSource.append(UNROLL_INDEX.matcher(UNROLL_INDEX_POWER.matcher(iteratorSource.toString()
+                                                                                                                        .replaceAll(
+                                                                                                                                "(?<=\\W|^)" + descriptor.variable +
+                                                                                                                                        "(?=\\W|$)",
+                                                                                                                                descriptor.variable + j))
+                                                                                                 .replaceAll(String.valueOf((int) Math.pow(2, j))))
+                                                                      .replaceAll(String.valueOf(j)));
+                                }
                             }
                             iteratorOffset = -1;
                         } else {
