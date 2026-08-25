@@ -52,8 +52,8 @@ public class BusMergerWireIn extends TriStateInPin implements MergerInput<Pin> {
     public final int mask;
     public boolean oldStrong;
     public Bus[] destinations;
-    protected Boolean resendState;
-    protected boolean resendImpedance;
+    protected Boolean retryState;
+    protected boolean retryImpedance;
 
     public BusMergerWireIn(int mask, BusMerger merger) {
         super(merger.id + ":in", merger.parent);
@@ -78,9 +78,9 @@ public class BusMergerWireIn extends TriStateInPin implements MergerInput<Pin> {
     public void setHi() {
         BusMerger merger = this.merger;
         /*Optimiser block ts*/
-        if (resendState != null) {
-            hiImpedance = resendImpedance;
-            resendState = null;
+        if (retryState != null) {
+            hiImpedance = retryImpedance;
+            retryState = null;
         }
         /*Optimiser blockEnd ts line setter*/
         state = true;
@@ -107,10 +107,10 @@ public class BusMergerWireIn extends TriStateInPin implements MergerInput<Pin> {
             ) {
                 /*Optimiser bind m:mask*/
                 if ((merger.strongPins & mask) != 0) { //strong pins shortcut
-                    resendState = true;
-                    resendImpedance = hiImpedance;
+                    retryState = true;
+                    retryImpedance = hiImpedance;
                     hiImpedance = false;
-                    parent.net.forResend(this);
+                    parent.net.forRerty(this);
                     assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
                     return;
                 }
@@ -134,10 +134,10 @@ public class BusMergerWireIn extends TriStateInPin implements MergerInput<Pin> {
         } else { //to weak
             /*Optimiser bind m:mask*/
             if ((merger.weakPins & mask) != 0 && ((merger.weakState & mask) == 0)) { //opposite weak state
-                resendState = true;
-                resendImpedance = hiImpedance;
+                retryState = true;
+                retryImpedance = hiImpedance;
                 hiImpedance = false;
-                parent.net.forResend(this);
+                parent.net.forRerty(this);
                 assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
                 return;
             }
@@ -208,9 +208,9 @@ public class BusMergerWireIn extends TriStateInPin implements MergerInput<Pin> {
     public void setLo() {
         BusMerger merger = this.merger;
         /*Optimiser block ts*/
-        if (resendState != null) {
-            hiImpedance = resendImpedance;
-            resendState = null;
+        if (retryState != null) {
+            hiImpedance = retryImpedance;
+            retryState = null;
         }
         /*Optimiser blockEnd ts line setter*/
         state = false;
@@ -237,10 +237,10 @@ public class BusMergerWireIn extends TriStateInPin implements MergerInput<Pin> {
             ) {
                 /*Optimiser bind m:mask*/
                 if ((merger.strongPins & mask) != 0) { //strong pins shortcut
-                    resendState = false;
-                    resendImpedance = hiImpedance;
+                    retryState = false;
+                    retryImpedance = hiImpedance;
                     hiImpedance = false;
-                    parent.net.forResend(this);
+                    parent.net.forRerty(this);
                     assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
                     return;
                 }
@@ -264,10 +264,10 @@ public class BusMergerWireIn extends TriStateInPin implements MergerInput<Pin> {
         } else { //to weak
             /*Optimiser bind m:mask*/
             if ((merger.weakPins & mask) != 0 && (merger.weakState & mask) != 0) { //opposite weak state
-                resendState = false;
-                resendImpedance = hiImpedance;
+                retryState = false;
+                retryImpedance = hiImpedance;
                 hiImpedance = false;
-                parent.net.forResend(this);
+                parent.net.forRerty(this);
                 assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
                 return;
             }
@@ -337,7 +337,7 @@ public class BusMergerWireIn extends TriStateInPin implements MergerInput<Pin> {
     @Override
     public void setHiImpedance() {
         //FixMe no need after weak/strong optimiser
-        resendState = null;
+        retryState = null;
         /*Optimiser block ts*/
         assert !hiImpedance || parent.net.stabilizing : "Already in hiImpedance:" + this;
         hiImpedance = true;
@@ -450,9 +450,9 @@ public class BusMergerWireIn extends TriStateInPin implements MergerInput<Pin> {
     }
 
     @Override
-    public void resend() {
-        if (resendState != null) {
-            if (resendState) {
+    public void retry() {
+        if (retryState != null) {
+            if (retryState) {
                 setHi();
             } else {
                 setLo();

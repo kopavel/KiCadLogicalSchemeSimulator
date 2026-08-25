@@ -47,7 +47,7 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus>, SupportM
     public final WireMerger merger;
     public Pin[] destinations;
     public int maskState;
-    protected Integer resendState;
+    protected Integer retryState;
 
     public WireMergerBusIn(Bus source, WireMerger merger) {
         super(source, "PMergeBIn");
@@ -74,9 +74,9 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus>, SupportM
     }
 
     @Override
-    public void resend() {
-        if (resendState != null) {
-            setState(resendState);
+    public void retry() {
+        if (retryState != null) {
+            setState(retryState);
         }
     }
 
@@ -84,8 +84,8 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus>, SupportM
     public void setState(int newState) {
         WireMerger merger = this.merger;
         /*Optimiser block ts*/
-        if (resendState != null) {
-            resendState = null;
+        if (retryState != null) {
+            retryState = null;
             hiImpedance = true;
         }
         /*Optimiser blockEnd ts*/
@@ -121,8 +121,8 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus>, SupportM
             hiImpedance = false;
             if (merger.strong) { // merger not in hiImpedance or weak
                 //region shortcut
-                resendState = newState;
-                parent.net.forResend(this);
+                retryState = newState;
+                parent.net.forRerty(this);
                 assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
                 return;
                 //endregion
@@ -170,7 +170,7 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus>, SupportM
 
     @Override
     public void setHiImpedance() {
-        resendState = null;
+        retryState = null;
         /*Optimiser block ts*/
         WireMerger merger = this.merger;
         //region assert

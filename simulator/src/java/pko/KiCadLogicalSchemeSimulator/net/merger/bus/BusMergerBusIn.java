@@ -53,7 +53,7 @@ public class BusMergerBusIn extends TriStateInBus implements MergerInput<Bus>, S
     public final BusMerger merger;
     public Bus[] destinations;
     public int maskState;
-    protected Integer resendState;
+    protected Integer retryState;
 
     public BusMergerBusIn(Bus source, int mask, BusMerger merger) {
         super(source, "BMergeBIn");
@@ -78,8 +78,8 @@ public class BusMergerBusIn extends TriStateInBus implements MergerInput<Bus>, S
     public void setState(int newState) {
         BusMerger merger = this.merger;
         /*Optimiser block ts*/
-        if (resendState != null) {
-            resendState = null;
+        if (retryState != null) {
+            retryState = null;
             hiImpedance = true;
         }
         /*Optimiser line setter blockEnd ts*/
@@ -124,8 +124,8 @@ public class BusMergerBusIn extends TriStateInBus implements MergerInput<Bus>, S
             if (hiImpedance) {
                 hiImpedance = false;
                 if (merger.strongPins != 0) {
-                    resendState = newState;
-                    parent.net.forResend(this);
+                    retryState = newState;
+                    parent.net.forRerty(this);
                     assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
                     return;
                 }
@@ -167,8 +167,8 @@ public class BusMergerBusIn extends TriStateInBus implements MergerInput<Bus>, S
                 hiImpedance = false;
                 /*Optimiser bind m:mask*/
                 if ((merger.strongPins & mask) != 0) {
-                    resendState = newState;
-                    parent.net.forResend(this);
+                    retryState = newState;
+                    parent.net.forRerty(this);
                     assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
                     return;
                 }
@@ -224,7 +224,7 @@ public class BusMergerBusIn extends TriStateInBus implements MergerInput<Bus>, S
     @Override
     public void setHiImpedance() {
         /*Optimiser block ts*/
-        resendState = null;
+        retryState = null;
         assert !hiImpedance || parent.net.stabilizing : "Already in hiImpedance:" + this;
         hiImpedance = true;
         BusMerger merger = this.merger;
@@ -380,9 +380,9 @@ public class BusMergerBusIn extends TriStateInBus implements MergerInput<Bus>, S
     }
 
     @Override
-    public void resend() {
-        if (resendState != null) {
-            setState(resendState);
+    public void retry() {
+        if (retryState != null) {
+            setState(retryState);
         }
     }
 }

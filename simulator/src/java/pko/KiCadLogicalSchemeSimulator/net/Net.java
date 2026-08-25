@@ -72,8 +72,8 @@ public class Net {
     private final Map<String, WireMerger> wireMergers = new TreeMap<>();
     private final Map<IModelItem<?>, IModelItem<?>> replacement = new HashMap<>();
     public volatile boolean stabilizing = true;
-    private List<MergerInput<?>> forResend = new ArrayList<>();
-    private boolean hasResend = false;
+    private List<MergerInput<?>> forRetry = new ArrayList<>();
+    private boolean hasRetry = false;
 
     public Net(Export export, String optimisedDir, ParameterResolver parameterResolver) {
         this.optimisedDir = optimisedDir;
@@ -142,29 +142,29 @@ public class Net {
         return retVal;
     }
 
-    public void resend() {
+    public void retry() {
         assert Log.debug(getClass(), "tick");
-        if (hasResend) {
-            int resendTry = 10;
-            for (int i = 0; i < resendTry && hasResend; i++) {
-                Iterable<MergerInput<?>> items = forResend;
-                forResend = new ArrayList<>();
-                hasResend = false;
+        if (hasRetry) {
+            int tryCount = 10;
+            for (int i = 0; i < tryCount && hasRetry; i++) {
+                Iterable<MergerInput<?>> items = forRetry;
+                forRetry = new ArrayList<>();
+                hasRetry = false;
                 items.forEach(item -> {
-                    assert Log.debug(Net.class, "Resend postponed pin {}", item);
-                    item.resend();
+                    assert Log.debug(Net.class, "Retry sending postponed pin {}", item);
+                    item.retry();
                 });
             }
-            if (hasResend) {
-                MergerInput<?> item = forResend.getFirst();
+            if (hasRetry) {
+                MergerInput<?> item = forRetry.getFirst();
                 throw new ShortcutException(item, item.getState(), item.getSources());
             }
         }
     }
 
-    public void forResend(MergerInput<?> item) {
-        forResend.add(item);
-        hasResend = true;
+    public void forRerty(MergerInput<?> item) {
+        forRetry.add(item);
+        hasRetry = true;
     }
 
     private void groupSourcesByDestinations(pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Net net) {
@@ -381,7 +381,7 @@ public class Net {
                 .noneMatch(p -> "Oscillator".equals(p.getClass().getSimpleName()))) {
             Thread.ofPlatform().start(() -> {
                 while (true) {
-                    resend();
+                    retry();
                     try {
                         Thread.sleep(50);
                     } catch (InterruptedException e) {
@@ -416,16 +416,16 @@ public class Net {
         int resendTry = 10;
         for (int i = 0; i < resendTry; i++) {
             schemaParts.values().forEach(SchemaPart::reset);
-            resend();
+            retry();
         }
         stabilizing = false;
-        if (!forResend.isEmpty()) {
-            List<MergerInput<?>> items = forResend;
-            forResend = new ArrayList<>();
-            hasResend = false;
+        if (!forRetry.isEmpty()) {
+            List<MergerInput<?>> items = forRetry;
+            forRetry = new ArrayList<>();
+            hasRetry = false;
             items.forEach(item -> {
                 try {
-                    item.resend();
+                    item.retry();
                 } catch (Throwable e) {
                     Log.error(Net.class, "Error at resend {}", item, e);
                 }

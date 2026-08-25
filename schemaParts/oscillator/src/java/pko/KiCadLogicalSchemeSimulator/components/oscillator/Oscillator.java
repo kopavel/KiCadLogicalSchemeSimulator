@@ -90,45 +90,45 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
                         while (lSpeed.getOpaque()) {
                             ticks += 20;
                             lOut.setHi();
-                            lNet.resend();
+                            lNet.retry();
                             lOut.setLo();
-                            lNet.resend();
+                            lNet.retry();
                             lOut.setHi();
-                            lNet.resend();
+                            lNet.retry();
                             lOut.setLo();
-                            lNet.resend();
+                            lNet.retry();
                             lOut.setHi();
-                            lNet.resend();
+                            lNet.retry();
                             lOut.setLo();
-                            lNet.resend();
+                            lNet.retry();
                             lOut.setHi();
-                            lNet.resend();
+                            lNet.retry();
                             lOut.setLo();
-                            lNet.resend();
+                            lNet.retry();
                             lOut.setHi();
-                            lNet.resend();
+                            lNet.retry();
                             lOut.setLo();
-                            lNet.resend();
+                            lNet.retry();
                             lOut.setHi();
-                            lNet.resend();
+                            lNet.retry();
                             lOut.setLo();
-                            lNet.resend();
+                            lNet.retry();
                             lOut.setHi();
-                            lNet.resend();
+                            lNet.retry();
                             lOut.setLo();
-                            lNet.resend();
+                            lNet.retry();
                             lOut.setHi();
-                            lNet.resend();
+                            lNet.retry();
                             lOut.setLo();
-                            lNet.resend();
+                            lNet.retry();
                             lOut.setHi();
-                            lNet.resend();
+                            lNet.retry();
                             lOut.setLo();
-                            lNet.resend();
+                            lNet.retry();
                             lOut.setHi();
-                            lNet.resend();
+                            lNet.retry();
                             lOut.setLo();
-                            lNet.resend();
+                            lNet.retry();
                         }
                     } catch (Throwable e) {
                         Log.error(Oscillator.class, "TickError {}", ticks, e);
@@ -149,10 +149,10 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
                     for (int i = 0; i < target; i++) {
                         if (lOut.state) {
                             lOut.setLo();
-                            lNet.resend();
+                            lNet.retry();
                         } else {
                             lOut.setHi();
-                            lNet.resend();
+                            lNet.retry();
                         }
                     }
                 } catch (Throwable e) {
@@ -221,10 +221,10 @@ public class Oscillator extends SchemaPart implements InteractiveSchemaPart {
             ticks++;
             if (out.state) {
                 out.setLo();
-                net.resend();
+                net.retry();
             } else {
                 out.setHi();
-                net.resend();
+                net.retry();
             }
         } catch (Throwable e) {
             Log.error(Oscillator.class, "TickError {}", ticks, e);

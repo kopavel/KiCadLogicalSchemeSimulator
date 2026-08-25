@@ -65,6 +65,6 @@ public class PullPin extends OutPin implements MergerInput<Pin> {
     }
 
     @Override
-    public void resend() {
+    public void retry() {
     }
 }
