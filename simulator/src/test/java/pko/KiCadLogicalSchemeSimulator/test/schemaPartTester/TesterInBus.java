@@ -47,4 +47,9 @@ public class TesterInBus extends TriStateInBus {
         hiImpedance = false;
         this.state = state;
     }
+
+    @Override
+    public String toString() {
+        return "TesterInBus{" + "id='" + id + '\'' + '}';
+    }
 }

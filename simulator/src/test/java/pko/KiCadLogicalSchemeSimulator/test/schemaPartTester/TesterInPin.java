@@ -53,4 +53,9 @@ public class TesterInPin extends TriStateInPin {
         hiImpedance = false;
         state = false;
     }
+
+    @Override
+    public String toString() {
+        return "TesterInPin{" + "id='" + id + '\'' + '}';
+    }
 }

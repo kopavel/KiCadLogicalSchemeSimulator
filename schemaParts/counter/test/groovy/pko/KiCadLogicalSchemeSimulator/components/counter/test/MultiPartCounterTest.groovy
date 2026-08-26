@@ -13,7 +13,7 @@ class MultiPartCounterTest extends ChipSpec {
     protected ChipDefinition chip() {
         return new ChipDefinition(
                 new MultiPartCounterSpi(),
-                "size=1,3;reverse;skip=,2;resetAmount=2",
+                "size=1,3;reverse;skip=,2;resetAmount=2", //74LS92
                 ["Ca", "Cb", "R0", "R1"],
                 ["Qa", "Qb"]
         );
@@ -43,7 +43,19 @@ class MultiPartCounterTest extends ChipSpec {
         1  |  1 |  1 |  0 ||  0 |  2
         0  |  1 |  0 |  1 ||  1 |  2
         1  |  1 |  1 |  1 ||  0 |  0
-        0  |  0 |  1 |  1 ||  0 |  0
+        0  |  1 |  0 |  1 ||  0 |  0
+        1  |  0 |  0 |  1 ||  0 |  1
+        1  |  1 |  0 |  1 ||  0 |  1
+        1  |  0 |  0 |  1 ||  0 |  2
+        1  |  1 |  0 |  1 ||  0 |  2
+        1  |  0 |  0 |  1 ||  0 |  4
+        1  |  1 |  0 |  1 ||  0 |  4
+        1  |  0 |  0 |  1 ||  0 |  5
+        1  |  1 |  0 |  1 ||  0 |  5
+        1  |  0 |  0 |  1 ||  0 |  6
+        1  |  1 |  0 |  1 ||  0 |  6
+        1  |  0 |  0 |  1 ||  0 |  0
+        1  |  1 |  0 |  1 ||  0 |  0
         // @formatter:on
     }
 }

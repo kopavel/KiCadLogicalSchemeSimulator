@@ -61,12 +61,14 @@ public class DCounter extends SchemaPart {
                 public void setHi() {
                     state = true;
                     ciState = false;
+                    setCOut(udPin.state);
                 }
 
                 @Override
                 public void setLo() {
                     state = false;
                     ciState = true;
+                    setCOut(udPin.state);
                 }
             });
             ciState = true;
@@ -122,12 +124,14 @@ public class DCounter extends SchemaPart {
                 public void setHi() {
                     state = true;
                     ciState = true;
+                    setCOut(udPin.state);
                 }
 
                 @Override
                 public void setLo() {
                     state = false;
                     ciState = false;
+                    setCOut(udPin.state);
                 }
             });
             carryHi = true;
@@ -326,43 +330,35 @@ public class DCounter extends SchemaPart {
     private void process() {
         if (ciState && presetDisabled && resetInactive) {
             if (udPin.state) {
-                if (outBus.state + 1 == maxCount) {
-                    if (carryHi) {
-                        cOutPin.setHi();
-                    } else {
-                        cOutPin.setLo();
-                    }
-                } else {
-                    if (carryLo) {
-                        cOutPin.setHi();
-                    } else {
-                        cOutPin.setLo();
-                    }
-                }
                 if (outBus.state == maxCount) {
                     outBus.setState(0);
                 } else {
                     outBus.setState(outBus.state + 1);
                 }
+                setCOut(true);
             } else {
-                if (outBus.state == 1) {
-                    if (carryHi) {
-                        cOutPin.setHi();
-                    } else {
-                        cOutPin.setLo();
-                    }
-                } else {
-                    if (carryLo) {
-                        cOutPin.setHi();
-                    } else {
-                        cOutPin.setLo();
-                    }
-                }
                 if (outBus.state == 0) {
                     outBus.setState(maxCount);
                 } else {
                     outBus.setState(outBus.state - 1);
                 }
+                setCOut(false);
+            }
+        }
+    }
+
+    private void setCOut(boolean udState) {
+        if (ciState && outBus.state == (udState ? maxCount : 0)) {
+            if (carryHi) {
+                cOutPin.setHi();
+            } else {
+                cOutPin.setLo();
+            }
+        } else {
+            if (carryLo) {
+                cOutPin.setHi();
+            } else {
+                cOutPin.setLo();
             }
         }
     }
