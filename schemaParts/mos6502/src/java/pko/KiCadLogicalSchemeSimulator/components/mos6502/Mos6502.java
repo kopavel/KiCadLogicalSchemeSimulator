@@ -115,7 +115,7 @@ public class Mos6502 extends SchemaPart {
 
     @Override
     public void reset() {
-        f0Pin.resetCoutner=6;
+        f0Pin.resetCounter = 6;
     }
 
     @Override

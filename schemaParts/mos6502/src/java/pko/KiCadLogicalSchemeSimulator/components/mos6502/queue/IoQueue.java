@@ -33,20 +33,21 @@ package pko.KiCadLogicalSchemeSimulator.components.mos6502.queue;
 import pko.KiCadLogicalSchemeSimulator.components.mos6502.F0Pin;
 import pko.KiCadLogicalSchemeSimulator.components.mos6502.core.Cpu;
 
+@SuppressWarnings("FieldMayBeFinal")
 public class IoQueue {
     private final Cpu core;
     private final F0Pin f0Pin;
     public Request head;
     public Request tail;
-    int lowByte;
-    private final Callback loReadWordCallback = lowByte -> this.lowByte = lowByte;
-    int[] resultArray;
-    int arrayPos;
-    int arrayLength;
-    Callback finalCallback;
-    private final Callback hiWordReadCallback = hiByte -> finalCallback.accept((hiByte << 8) | lowByte);
-    ArrayCallback arrayCallback;
-    private final Callback arrayReadCallback = read -> {
+    private ArrayCallback arrayCallback;
+    private int lowByte;
+    private int arrayPos;
+    private int arrayLength;
+    private Callback finalCallback;
+    private int[] resultArray;
+    private Callback loReadWordCallback = lowByte -> this.lowByte = lowByte;
+    private Callback hiWordReadCallback = hiByte -> finalCallback.accept((hiByte << 8) | lowByte);
+    private Callback arrayReadCallback = read -> {
         resultArray[arrayPos++] = read;
         if (arrayPos == arrayLength) {
             arrayCallback.accept();
@@ -62,19 +63,17 @@ public class IoQueue {
     }
 
     public void write(int address, int value) {
-        shiftWrite();
-        Request request;
-        (request = tail).address = address;
+        Request request = shiftWrite();
         request.read = false;
         request.payload = value;
+        request.address = address;
     }
 
     public void read(int address, Callback callback) {
-        shiftWrite();
-        Request request;
-        (request = tail).address = address;
+        Request request = shiftWrite();
         request.callback = callback;
         request.read = true;
+        request.address = address;
     }
 
     public void readArray(int[] addresses, int[] destination, int length, ArrayCallback callback) {
@@ -82,61 +81,71 @@ public class IoQueue {
         arrayPos = 0;
         arrayLength = length;
         arrayCallback = callback;
-        for (int i = 0; i < length; i++) {
-            shiftWrite();
-            Request request;
-            (request = tail).address = addresses[i];
-            request.callback = arrayReadCallback;
-            request.read = true;
+        if (length == 0) {
+            callback.accept();
+            return;
+        }
+        Request r = acquire();
+        int i = 0;
+        while (true) {
+            r.callback = arrayReadCallback;
+            r.read = true;
+            r.address = addresses[i];
+            if (++i == length) {
+                return;
+            }
+            r = advance(r);
         }
     }
 
     public void writeWord(int lo, int hi, int value) {
-        shiftWrite();
-        Request request;
-        (request = tail).address = lo;
-        request.read = false;
-        request.payload = value & 0xff;
-        shiftWrite();
-        (request = tail).address = hi;
-        request.read = false;
-        request.payload = value >> 8;
+        Request r = acquire();
+        r.read = false;
+        r.payload = value & 0xff;
+        r.address = lo;
+        r = advance(r);
+        r.read = false;
+        r.payload = value >> 8;
+        r.address = hi;
     }
 
     public void readWord(int lo, int hi, Callback callback) {
-        shiftWrite();
         finalCallback = callback;
-        Request request;
-        (request = tail).address = lo;
+        Request request = acquire();
         request.callback = loReadWordCallback;
         request.read = true;
-        shiftWrite();
-        (request = tail).address = hi;
+        request.address = lo;
+        request = advance(request);
         request.callback = hiWordReadCallback;
         request.read = true;
+        request.address = hi;
     }
 
     public void clear() {
+        Request start = tail;
+        Request r = start;
+        do {
+            r.address = -1;
+            r = r.next;
+        } while (r != start);
         head = tail;
-        tail.address = -1;
-        tail.next = tail;
     }
 
     public Request pop() {
-        Request currentRequest;
-        if ((currentRequest = head).address < 0) {
-            if (currentRequest == tail) {
-                core.step();
-                f0Pin.opCode = true;
-            } else {
-                currentRequest = (head = currentRequest.next);
-                if (currentRequest.address < 0) {
-                    core.step();
-                    f0Pin.opCode = true;
-                }
+        Request r = head;
+        if (r.address >= 0) {
+            return r;
+        }
+        if (r != tail) {
+            r = r.next;
+            head = r;
+            if (r.address >= 0) {
+                return r;
             }
         }
-        return currentRequest;
+        core.step();
+        f0Pin.opCode = true;
+        return r;
     }
 
     public String toString() {
@@ -153,15 +162,38 @@ public class IoQueue {
         return sb.toString();
     }
 
-    private void shiftWrite() {
+    private Request shiftWrite() {
         Request lTail;
-        if ((lTail = tail).address >= 0) {
-            Request next;
-            if ((next = lTail.next).address != -1) {
-                (tail = lTail.next = new Request()).next = next;
-            } else {
-                tail = next;
-            }
+        if ((lTail = tail).address < 0) {
+            return lTail;
         }
+        Request next;
+        if ((next = lTail.next).address < 0) {
+            return (tail = next);
+        }
+        Request newRequest = (tail = lTail.next = new Request());
+        newRequest.next = next;
+        return newRequest;
+    }
+
+    private Request acquire() {
+        Request t = tail;
+        if (t.address < 0) {
+            return t;
+        }
+        return advance(t);
+    }
+
+    private Request advance(Request current) {
+        Request next = current.next;
+        if (next.address < 0) {
+            tail = next;
+            return next;
+        }
+        Request created = new Request();
+        created.next = next;
+        current.next = created;
+        tail = created;
+        return created;
     }
 }

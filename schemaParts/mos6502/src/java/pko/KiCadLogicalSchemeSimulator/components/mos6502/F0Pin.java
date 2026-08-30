@@ -35,6 +35,7 @@ import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.api.wire.InPin;
 import pko.KiCadLogicalSchemeSimulator.api.wire.Pin;
 import pko.KiCadLogicalSchemeSimulator.components.mos6502.core.Cpu;
+import pko.KiCadLogicalSchemeSimulator.components.mos6502.queue.Callback;
 import pko.KiCadLogicalSchemeSimulator.components.mos6502.queue.IoQueue;
 import pko.KiCadLogicalSchemeSimulator.components.mos6502.queue.Request;
 
@@ -51,7 +52,7 @@ public class F0Pin extends InPin {
     public Bus dOut;
     public Bus aOut;
     public boolean opCode;
-    public int resetCoutner=6;
+    public int resetCounter = 6;
 
     public F0Pin(String id, Mos6502 parent) {
         super(id, parent);
@@ -65,45 +66,52 @@ public class F0Pin extends InPin {
     @Override
     public void setLo() {
         state = false;
-        if (resetCoutner == 0) {
-            Request request = curentRequest;
-            if (isReady) {
-                if (request.read) {
-                    request.address = -1;
-                    request.callback.accept(dIn.state);
-                }
-                if (opCode) {
-                    syncPin.setLo();
-                    opCode = false;
-                }
-                request = curentRequest = queue.pop();
-            }
-            f2Pin.setLo();
-            if (!dOut.hiImpedance) {
-                dOut.setHiImpedance();
-            }
-            f1Pin.setHi();
-            if (isReady) {
-                aOut.setState(request.address);
-                if (request.read) {
-                    if (!rwPin.state) {
-                        rwPin.setHi();
-                    }
-                } else if (rwPin.state) {
-                    rwPin.setLo();
-                }
-                if (opCode) {
-                    syncPin.setHi();
-                }
-            }
-            isReady = !request.read || rdyPin.state;
+        if (resetCounter != 0) {
+            return;
         }
+        boolean ready = isReady;
+        Request request = curentRequest;
+        if (ready) {
+            if (request.read) {
+                Callback callback = request.callback;
+                int data = dIn.state;
+                request.address = -1;
+                callback.accept(data);
+            }
+            if (opCode) {
+                syncPin.setLo();
+                opCode = false;
+            }
+            curentRequest = request = queue.pop();
+        }
+        f2Pin.setLo();
+        Bus dout = dOut;
+        if (!dout.hiImpedance) {
+            dout.setHiImpedance();
+        }
+        f1Pin.setHi();
+        boolean read = request.read;
+        if (ready) {
+            aOut.setState(request.address);
+            Pin rw = rwPin;
+            if (rw.state != read) {
+                if (read) {
+                    rw.setHi();
+                } else {
+                    rw.setLo();
+                }
+            }
+            if (opCode) {
+                syncPin.setHi();
+            }
+        }
+        isReady = !read || rdyPin.state;
     }
 
     @Override
     public void setHi() {
         state = true;
-        if (resetCoutner == 0) {
+        if (resetCounter == 0) {
             f1Pin.setLo();
             Request request;
             f2Pin.setHi();
@@ -112,10 +120,10 @@ public class F0Pin extends InPin {
                 request.address = -1;
             }
         } else {
-            if (resetCoutner == 6) {
+            if (resetCounter == 6) {
                 reset();
             }
-            resetCoutner--;
+            resetCounter--;
         }
     }
 
@@ -123,7 +131,7 @@ public class F0Pin extends InPin {
         queue.clear();
         isReady = rdyPin.state;
         opCode = false;
-        resetCoutner = 6;
+        resetCounter = 6;
         curentRequest = new Request();
         ((Mos6502) parent).core.reset();
     }
