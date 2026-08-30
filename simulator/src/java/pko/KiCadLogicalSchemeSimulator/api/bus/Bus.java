@@ -112,7 +112,9 @@ public abstract class Bus extends ModelItem<Bus> {
     public Bus copyState(IModelItem<? extends Bus> oldBus, ModelItem<?> source) {
         state = oldBus.getState();
         hiImpedance = oldBus.isHiImpedance();
-        parent = oldBus.getParent();
+        if (parent == null) {
+            parent = oldBus.getParent();
+        }
         return this;
     }
 

@@ -69,7 +69,9 @@ public abstract class Pin extends ModelItem<Pin> {
         state = oldPin.getState() > 0;
         priority += oldPin.getPriority();
         strengthSensitive = oldPin.getThis().strengthSensitive;
-        parent = oldPin.getParent();
+        if (parent == null) {
+            parent = oldPin.getParent();
+        }
         return this;
     }
 
