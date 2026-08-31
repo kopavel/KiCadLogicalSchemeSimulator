@@ -29,101 +29,110 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
 package pko.KiCadLogicalSchemeSimulator.components.Z80.core.queue;
+@SuppressWarnings("FieldMayBeFinal")
 public class IoQueue {
     public Request request;
     public Request write;
-    int lowByte;
-    private final Callback loReadWordCallback = lowByte -> this.lowByte = lowByte;
     Callback wordCallback;
-    private final Callback hiWordReadCallback = (hiByte) -> wordCallback.accept((hiByte << 8) | lowByte);
+    int lowByte;
+    private Callback loReadWordCallback = lowByte -> this.lowByte = lowByte;
+    private Callback hiWordReadCallback = hiByte -> wordCallback.accept((hiByte << 8) | lowByte);
 
     public IoQueue() {
-        write = new Request();
-        request = write;
-        write.next = write;
+        Request first = new Request();
+        request = first;
+        write = first;
+        first.next = first;
     }
 
     public void writeWord(int address, int value) {
-        shiftWrite();
-        write.address = address;
-        write.read = false;
-        write.memory = true;
-        write.payload = value & 0xff;
-        shiftWrite();
-        write.address = address + 1;
-        write.read = false;
-        write.memory = true;
-        write.payload = value >> 8;
+        Request r = shiftWrite(write);
+        r.read = false;
+        r.memory = true;
+        r.payload = value & 0xff;
+        r.address = address;
+        r = shiftWrite(r);
+        r.read = false;
+        r.memory = true;
+        r.payload = value >> 8;
+        r.address = address + 1;
     }
 
     public void writeByte(int address, int value) {
-        shiftWrite();
-        write.address = address;
-        write.read = false;
-        write.memory = true;
-        write.payload = value;
+        Request r = shiftWrite(write);
+        r.read = false;
+        r.memory = true;
+        r.payload = value;
+        r.address = address;
     }
 
     public void readByte(int address, Callback callback) {
-        shiftWrite();
-        write.address = address;
-        write.read = true;
-        write.memory = true;
-        write.callback = callback;
+        Request r = shiftWrite(write);
+        r.callback = callback;
+        r.read = true;
+        r.memory = true;
+        r.address = address;
     }
 
     public void readWord(int address, Callback callback) {
-        shiftWrite();
         wordCallback = callback;
-        write.address = address;
-        write.read = true;
-        write.memory = true;
-        write.callback = loReadWordCallback;
-        shiftWrite();
-        write.address = address + 1;
-        write.read = true;
-        write.memory = true;
-        write.callback = hiWordReadCallback;
+        Request r = shiftWrite(write);
+        r.callback = loReadWordCallback;
+        r.read = true;
+        r.memory = true;
+        r.address = address;
+        r = shiftWrite(r);
+        r.callback = hiWordReadCallback;
+        r.read = true;
+        r.memory = true;
+        r.address = address + 1;
     }
 
     public void ioRead(int address, Callback callback) {
-        shiftWrite();
-        write.address = address;
-        write.read = true;
-        write.memory = false;
-        write.callback = callback;
+        Request r = shiftWrite(write);
+        r.callback = callback;
+        r.read = true;
+        r.memory = false;
+        r.address = address;
     }
 
     public void ioWrite(int address, int value) {
-        shiftWrite();
-        write.address = address;
-        write.read = false;
-        write.memory = false;
-        write.payload = value;
+        Request r = shiftWrite(write);
+        r.read = false;
+        r.memory = false;
+        r.payload = value;
+        r.address = address;
     }
 
     public void clear() {
-        request = write;
-        write.address = -1;
-        write.next = write;
+        Request r = request;
+        Request last = write;
+        while (true) {
+            r.address = -1;
+            if (r == last) {
+                break;
+            }
+            r = r.next;
+        }
+        request = last.next;
     }
 
     public void next() {
-        request.address = -1;
-        request = request.next;
+        Request current = request;
+        current.address = -1;
+        request = current.next;
     }
 
-    private void shiftWrite() {
-        if (write.next.address != -1) {
-            Request next = write.next;
-            Request newRequest = new Request();
-            newRequest.next = next;
-            write.next = newRequest;
-            write = newRequest;
-        } else {
-            write = write.next;
+    private Request shiftWrite(Request current) {
+        Request next = current.next;
+        if (next.address >= 0) {
+            Request created = new Request();
+            created.next = next;
+            current.next = created;
+            next = created;
         }
+        write = next;
+        return next;
     }
 }
