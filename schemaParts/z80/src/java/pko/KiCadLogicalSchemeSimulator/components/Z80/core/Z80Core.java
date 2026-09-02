@@ -13,9 +13,11 @@
  * limitations under the License.
  */
 
-/* 2025.04 Pavel Korzh.
-    Source gotten from https://github.com/codesqueak/Z80Processor and tuned for generating IO request in queue instead us read/write to/from BUS directly.
-*/
+/*
+ * Modified by Pavel Korzh, 2025.
+ * Adapted for queued asynchronous I/O used by KiCadLogicalSchemeSimulator.
+ * Original source: https://github.com/codesqueak/Z80Processor/blob/master/src/main/java/com/codingrodent/microprocessor/z80/Z80Core.java
+ */
 package pko.KiCadLogicalSchemeSimulator.components.Z80.core;
 import lombok.Getter;
 import pko.KiCadLogicalSchemeSimulator.components.Z80.core.queue.Callback;

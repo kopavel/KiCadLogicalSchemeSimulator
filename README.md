@@ -107,9 +107,12 @@ Here are some schema Netlist examples:
 
 ## License
 
-This project is licensed under the GNU General Public License v3.0 (GPL-3.0). You can find the full text of the license in the [LICENSE](LICENSE) file.
+KiCad Logical Scheme Simulator is licensed under the
+[GNU General Public License version 3 only](LICENSE) (`GPL-3.0-only`).
 
-Project use sources from other projects:
+Third-party-derived source files retain their original copyright and license notices.
 
-- https://github.com/sethm/symon for Mos6502 CPU core logic;
-- https://github.com/codesqueak/Z80Processor for Z80 CPU core logic;
+The project includes adapted source code from:
+
+- [SYMON - A 6502 System Simulator](https://github.com/sethm/symon) — MIT License, used as the basis for the MOS 6502 CPU core;
+- [Z80Processor](https://github.com/codesqueak/Z80Processor) — Apache License 2.0, used as the basis for the Z80 CPU core.

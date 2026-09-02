@@ -21,9 +21,11 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-/* 2025.04 Pavel Korzh.
-    Source gotten from https://github.com/sethm/symon and tuned for generating IO request in queue instead us read/write to/from BUS directly.
-*/
+/*
+ * Modified by Pavel Korzh, 2025.
+ * Adapted for queued asynchronous I/O used by KiCadLogicalSchemeSimulator.
+ * Original source: https://github.com/sethm/symon/blob/master/src/main/java/com/loomcom/symon/Cpu.java
+ */
 package pko.KiCadLogicalSchemeSimulator.components.mos6502.core;
 import lombok.Getter;
 import lombok.Setter;
