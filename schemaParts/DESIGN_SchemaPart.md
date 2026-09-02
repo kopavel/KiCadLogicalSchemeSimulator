@@ -537,8 +537,8 @@ public <T> void replaceIn(ModelItem<T> oldIn, ModelItem<T> newIn) {
 
 This requirement applies only to component-owned references that may otherwise continue pointing to the pre-optimisation object.
 
-Detailed optimiser behaviour and source-optimisation rules are documented separately.
-
+See [Runtime Optimiser Design](../simulator/src/java/pko/KiCadLogicalSchemeSimulator/optimiser/DESIGN_Optimiser.md)
+for detailed optimiser behaviour and source-optimisation rules.
 ---
 
 # Initial state
