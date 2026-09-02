@@ -1,5 +1,8 @@
 ## Schema parts
 
+For implementing or extending schema parts, see
+[Schema Part Design](DESIGN_SchemaPart.md).
+
 Some schema parts are interactive. Simulator create “representation” of that part on a “desc”.  
 They can be drugged across the desk and allow you to arrange it layout to complete device look.  
 Layout a stored at application exit in a file near '.net' or in KiKad project (if simulator started directly from iKiCad) with extension

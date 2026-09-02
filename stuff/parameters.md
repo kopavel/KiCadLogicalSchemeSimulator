@@ -23,7 +23,7 @@ Second option - use Simulation parameter file (see description below).
 
 ### Code optimiser
 
-- `-od, ----optimisedDir`: Cache directory path for generated optimised classes.  
+- `-od, --optimisedDir`: Cache directory path for generated optimised classes.  
   Simulator generate optimised class versions for specific cases.  
   For startup time optimisation those classes cached in specified here directory.  
   If not specified - "./optimised" in working folder used.

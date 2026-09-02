@@ -10,6 +10,14 @@ More info about [how to configure KiCad symbols mapping](stuff/kicad_symbols/REA
 
 Be sure helping this project by implementing new components and/or extend mapping for existing implementation and share result with comunity.
 
+## Developer documentation
+
+See [Architecture and developer documentation](DESIGN.md) for the simulator architecture, Signal API, SchemaPart development, NET filtering and runtime optimisation.
+
+## Requirements
+
+- JDK 25 or newer. A full JDK is required because the runtime optimiser dynamically compiles specialised Java classes.
+
 ## Building
 
 To build the project, execute the Gradle assemble task:
