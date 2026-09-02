@@ -28,7 +28,7 @@ switching configurations can still be represented when their relevant behaviour 
 * [Signal / wire and bus API](simulator/src/java/pko/KiCadLogicalSchemeSimulator/api/DESIGN_API.md)
 * [Schema-part design, SPI, configuration, UI and testing](schemaParts/DESIGN_SchemaPart.md)
 * [NET filtering and schematic-level optimisation](simulator/src/java/pko/KiCadLogicalSchemeSimulator/api/DESIGN_NetFiltering.md)
-
+* [Runtime optimiser design](simulator/src/java/pko/KiCadLogicalSchemeSimulator/optimiser/DESIGN_Optimiser.md)
 ## Simulator module
 
 The `simulator` module provides the simulation infrastructure and public APIs used by schema parts.
@@ -196,6 +196,9 @@ JVM JIT
 ```
 
 The optimiser therefore performs partial evaluation before the JVM sees the final hot code.
+
+See [Runtime Optimiser Design](simulator/src/java/pko/KiCadLogicalSchemeSimulator/optimiser/DESIGN_Optimiser.md)
+for source specialisation directives, generated classes and optimiser safety rules.
 
 ### 3. Runtime graph optimisation
 
