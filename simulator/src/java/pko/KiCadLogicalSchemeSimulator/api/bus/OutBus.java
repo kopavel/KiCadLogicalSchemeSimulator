@@ -80,7 +80,7 @@ public class OutBus extends Bus {
     public void addDestination(Pin pin, int destMask) {
         used = true;
         pin.used = true;
-        pin.state = (state & destMask) > 0;
+        pin.state = (state & destMask) != 0;
         pin.hiImpedance = hiImpedance;
         MaskGroupBus maskGroup = Arrays.stream(destinations)
                 .filter(dest -> dest instanceof MaskGroupBus)

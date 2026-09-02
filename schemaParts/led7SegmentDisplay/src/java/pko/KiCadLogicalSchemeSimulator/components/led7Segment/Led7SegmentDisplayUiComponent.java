@@ -80,13 +80,13 @@ public class Led7SegmentDisplayUiComponent extends AbstractUiComponent {
         g2d.setStroke(new BasicStroke(5)); // Sets line thickness to 5
         for (int i = 0; i < 8; i++) {
             int bit = 1 << i;
-            if ((parent.segmentsOn & parent.segmentsOff & bit) > 0) {
+            if ((parent.segmentsOn & parent.segmentsOff & bit) != 0) {
                 segmentsTime[i] = inertia;
             } else if (segmentsTime[i] > 0) {
                 segmentsTime[i]--;
             }
             Color segmentColor;
-            if ((parent.segmentsOn & bit) > 0) {
+            if ((parent.segmentsOn & bit) != 0) {
                 segmentColor = on;
             } else if (segmentsTime[i] > 0) {
                 float ratio = (float) segmentsTime[i] / inertia;

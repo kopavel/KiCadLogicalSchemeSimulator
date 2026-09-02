@@ -43,7 +43,7 @@ public class BusToWiresAdapter extends OutBus implements SupportMask, SupportOff
 
     public void addDestination(Pin pin) {
         pin.used = true;
-        pin.state = (state & mask) > 0;
+        pin.state = (state & mask) != 0;
         used = true;
         pinDestinations = Utils.addToArray(pinDestinations, pin);
         priority += pin.priority;
@@ -52,7 +52,7 @@ public class BusToWiresAdapter extends OutBus implements SupportMask, SupportOff
 
     @Override
     public int getState() {
-        return ((withState || source == null ? state : source.getState()) & mask) > 0 ? 1 : 0;
+        return ((withState || source == null ? state : source.getState()) & mask) != 0 ? 1 : 0;
     }
 
     @Override

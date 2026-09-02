@@ -67,7 +67,7 @@ public enum Utils {
     }
 
     public static int getMaskForSize(int size) {
-        return (1 << size) - 1;
+        return Math.toIntExact((1L << size) - 1);
     }
 
     @SafeVarargs

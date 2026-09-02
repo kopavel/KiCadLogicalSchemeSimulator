@@ -41,7 +41,7 @@ public abstract class Pin extends ModelItem<Pin> {
         used = true;
         strong = oldPin.isStrong();
         hiImpedance = oldPin.isTriState(source) && oldPin.hasTriStateIn() && oldPin.isHiImpedance();
-        state = oldPin.getState() > 0;
+        state = oldPin.getState() != 0;
         priority += oldPin.getPriority();
         strengthSensitive = oldPin.getThis().strengthSensitive;
         if (parent == null) {
