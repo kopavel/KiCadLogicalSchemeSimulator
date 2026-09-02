@@ -9,7 +9,7 @@ The `simulator` module provides the simulation infrastructure and public APIs us
 Responsibilities:
 
 - Publish the [wire and bus API](simulator/src/java/pko/KiCadLogicalSchemeSimulator/api/DESIGN_API.md) used
-  by [circuit components](schemaParts/SchemaPart_Design.md).
+  by [circuit components](schemaParts/DESIGN_SchemaPart.md).
 - Publish the UI API used by interactive schema parts.
 - Run the event-driven simulation model. An event is a wire or bus state change initiated by a schema part and propagated through the object graph.
 - Implement signal merging and splitting between multiple inputs and outputs.
