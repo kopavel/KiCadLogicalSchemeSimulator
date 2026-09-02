@@ -1,6 +1,33 @@
 # Architecture
 
-KiCad Logical Scheme Simulator is built around a small event-driven simulation core and a set of pluggable schema-part implementations. The design prioritises fast signal propagation and a simple component API.
+KiCad Logical Scheme Simulator is an event-driven binary circuit simulator built around a small simulation core and pluggable schema-part modules.
+
+The simulator operates on discrete signal states:
+
+```text
+LOW
+HIGH
+HIGH IMPEDANCE
+```
+
+Physical circuit topology is transformed into the simplest equivalent event-driven logical model before simulation where possible.
+
+The design prioritises:
+
+* fast signal propagation;
+* minimal runtime topology;
+* simple schema-part APIs;
+* topology- and configuration-aware optimisation;
+* separation between physical KiCad representation and runtime logical behaviour.
+
+The simulator does not attempt to model general continuous-time analogue propagation. Physical components such as diodes, passive elements and transistors in
+switching configurations can still be represented when their relevant behaviour can be expressed through discrete events.
+
+## Developer documentation
+
+* [Signal / wire and bus API](simulator/src/java/pko/KiCadLogicalSchemeSimulator/api/DESIGN_API.md)
+* [Schema-part design, SPI, configuration, UI and testing](schemaParts/DESIGN_SchemaPart.md)
+* [NET filtering and schematic-level optimisation](simulator/src/java/pko/KiCadLogicalSchemeSimulator/api/DESIGN_NetFIltering.md)
 
 ## Simulator module
 
@@ -8,48 +35,222 @@ The `simulator` module provides the simulation infrastructure and public APIs us
 
 Responsibilities:
 
-- Publish the [wire and bus API](simulator/src/java/pko/KiCadLogicalSchemeSimulator/api/DESIGN_API.md) used
-  by [circuit components](schemaParts/DESIGN_SchemaPart.md).
-- Publish the UI API used by interactive schema parts.
-- Run the event-driven simulation model. An event is a wire or bus state change initiated by a schema part and propagated through the object graph.
-- Implement signal merging and splitting between multiple inputs and outputs.
-- Parse KiCad schematic/netlist data and build the runtime schema-part object graph.
-- Perform runtime source optimisation of schema parts when configuration and topology make conditions known. The optimiser can:
-  - cut unreachable code and branches;
-  - bind runtime values as constants;
-  - unroll cycles/loops when their size is known.
-- Perform runtime interconnection optimisation and shortcutting between source and destination objects to reduce event-propagation overhead.
-- Stabilise the constructed model before simulation begins.
+* Parse KiCad NET data and resolve symbol mappings and component configuration.
+* Run pluggable NET filters before runtime graph construction.
+* Discover schema-part implementations through `SchemaPartSpi`.
+* Build the runtime schema-part object graph.
+* Interconnect pins and buses, including passive connections and signal mergers.
+* Run the event-driven signal model.
+* Optimise schema-part implementations using topology and configuration known at runtime.
+* Optimise and shortcut runtime source/destination interconnections.
+* Stabilise the complete model before normal simulation begins.
+* Provide UI and monitoring infrastructure for interactive schema parts.
 
-### Simulation lifecycle
+## Schema-part modules
 
-At a high level, the simulator performs the following stages:
+The `schemaParts` tree contains pluggable component implementations built on top of the simulator API.
 
-1. Parse the KiCad schematic/netlist.
-2. Build and interconnect schema-part objects.
-3. Optimise schema-part source using known runtime conditions.
-4. Optimise/shortcut runtime object interconnections.
-5. Stabilise the complete model.
-6. Start event-driven simulation.
+A schema-part module may provide:
 
-## Schema parts module
+* one or more `SchemaPartSpi` implementations;
+* component-specific pin/bus event logic;
+* runtime source optimisation;
+* interactive or monitoring UI;
+* `NetFilter` implementations required to transform physical KiCad topology into a suitable logical model;
+* Spock tests for generic and optimised component behaviour.
 
-The `schemaParts` module contains concrete component implementations built on top of the simulator API.
+Schema parts are discovered through Java service loading rather than direct dependencies from the simulator core.
 
-Responsibilities:
+## Simulation lifecycle
 
-- Implement the logic of specific schema parts using the simulator wire/bus API.
-- Implement schema-part UI for interactive components.
-- Implement KiCad NET-file preprocessing/filtering required by specific schema parts or component families.
+At a high level, a simulation is built in the following stages:
+
+```text
+KiCad NET
+    |
+    v
+resolve symbol mappings and configuration
+    |
+    v
+run NetFilters to a fixed point
+    |
+    v
+construct SchemaParts
+    |
+    v
+group and interconnect pins/buses
+    |
+    v
+build mergers and runtime signal graph
+    |
+    v
+specialise/optimise schema parts and interconnections
+    |
+    v
+stabilise the complete model
+    |
+    v
+event-driven simulation
+```
+
+### NET filtering
+
+Before runtime objects are built, all discovered `NetFilter` implementations are repeatedly applied until a complete pass makes no changes.
+
+Filtering can:
+
+* remove components whose behaviour is already determined;
+* merge nets through known conductive paths;
+* replace physical components with simpler logical equivalents;
+* rewrite logical pin roles;
+* add implicit/synthetic logical components.
+
+Repeated execution is necessary because one transformation may expose a topology that another filter can simplify on a later pass.
+
+This stage serves both compatibility and performance: it allows physical KiCad circuitry to be adapted to the simulator's event-driven binary model and prevents
+unnecessary physical abstractions from entering the runtime graph.
+
+See [NET Filter Design](simulator/src/java/pko/KiCadLogicalSchemeSimulator/api/DESIGN_NetFIltering.md).
+
+## Signal event model
+
+Signal propagation is the primary runtime hot path.
+
+A propagated signal event represents an **actual state change**.
+
+If a downstream model item receives:
+
+```java
+setHi()
+
+setLo()
+
+setState(...)
+
+setHiImpedance()
+```
+
+it may assume that the signal changed.
+
+Propagating an unchanged state is therefore forbidden.
+
+When a newly calculated state may equal the existing state, propagation must stop before entering the graph:
+
+```text
+calculate new state
+        |
+        v
+change required?
+    |        |
+   no       yes
+    |        |
+   STOP      v
+          propagate
+```
+
+When component semantics already guarantee that the state changes, the comparison itself should be omitted.
+
+This contract allows state-change detection to happen once rather than being repeated at every node in the propagation path.
+
+See [Signal API Design](simulator/src/java/pko/KiCadLogicalSchemeSimulator/api/DESIGN_API.md).
 
 ## Performance-oriented design
 
-Signal propagation is the primary hot path. The architecture intentionally allows implementation choices that would be unusual in less performance-sensitive application code.
+The simulator applies optimisation at several different stages.
 
-The optimiser performs partial evaluation before the JVM JIT compiler sees the hot code. Runtime-known topology and configuration are used to generate specialised Java classes with unnecessary branches removed, values bound as constants, and fixed-size loops unrolled. This gives the JVM a smaller and more concrete control-flow graph to optimise further.
+### 1. Schematic-level optimisation
 
-Runtime object interconnections are also optimised after the schema graph is known, reducing unnecessary intermediate propagation and indirection where possible.
+`NetFilter` removes or replaces unnecessary physical topology before runtime objects exist.
 
-## Anti-patterns
+```text
+physical KiCad NET
+        |
+        v
+minimal logical NET
+```
 
-- Treating method calls as free in hot paths. Every additional call can add dispatch, stack/inlining pressure, aliasing uncertainty, or prevent further JVM optimisation. Avoid getters/setters and unnecessary wrapper abstractions in event-propagation code; prefer direct object and field references where safe and practical.
+Anything eliminated here does not need to be constructed, interconnected, specialised or processed during simulation.
+
+### 2. Schema-part source specialisation
+
+Runtime-known configuration and topology can be used to generate specialised Java implementations.
+
+The source optimiser can:
+
+* cut unreachable branches and code;
+* bind runtime-known values as constants;
+* unroll fixed-size loops;
+* generate specialised component variants.
+
+Conceptually:
+
+```text
+generic schema-part source
+        |
+        | topology/configuration
+        v
+specialised Java class
+        |
+        v
+JVM JIT
+```
+
+The optimiser therefore performs partial evaluation before the JVM sees the final hot code.
+
+### 3. Runtime graph optimisation
+
+After actual source/destination topology is known, runtime objects can also be specialised or replaced.
+
+Examples include:
+
+* direct source-to-destination shortcutting;
+* specialised zero/one/multiple-destination implementations;
+* merger optimisation;
+* removal of unnecessary intermediate state storage and indirection.
+
+Because runtime objects may be replaced during this stage, schema parts must follow the rebinding contract described
+in [Schema Part Design](schemaParts/DESIGN_SchemaPart.md).
+
+### 4. JVM optimisation
+
+The resulting Java code and object graph are finally optimised by the JVM JIT compiler.
+
+The previous optimisation stages intentionally reduce abstraction, branching and indirection before JIT compilation so the JVM receives a smaller and more concrete
+hot path.
+
+## State storage
+
+Signal state does not necessarily need to be duplicated in every object along a propagation path.
+
+Optimisation may remove redundant intermediate state storage where component logic does not depend on it.
+
+Hot-path schema-part logic that requires a particular input state should use the local direct `state` field and must preserve that state during source optimisation.
+
+Generic state lookup through the source chain remains available for monitoring, diagnostics and other non-hot-path use.
+
+## Stabilisation
+
+After the graph is constructed and optimised, the simulator performs a stabilisation phase before normal simulation begins.
+
+Initial output states are propagated through the completed graph, merger/retry conditions are resolved, and schema parts are reset as required until the constructed
+model reaches its normal starting state.
+
+Only after stabilisation is the model treated as running simulation state.
+
+## UI separation
+
+Interactive schema parts may expose visual components and monitoring information, but UI processing is intentionally separated from the main signal propagation path.
+
+Fast-changing simulation state should normally be sampled or aggregated for presentation rather than causing expensive UI work for every propagated event.
+
+User interaction may initiate schema-part operations, but resulting signal changes still follow the normal signal event contract.
+
+## Design anti-patterns
+
+* Propagating an unchanged signal. Downstream logic is allowed to assume that every event represents a real change.
+* Re-checking a state change repeatedly along the propagation path when it was already guaranteed upstream.
+* Treating method calls and abstraction layers as free in hot event-processing code. Prefer direct object and field access where appropriate.
+* Keeping physical topology in the runtime model when it can be safely resolved by NET filtering beforehand.
+* Assuming constructor-created runtime pin/output objects will necessarily survive graph optimisation.
+* Removing local input state during optimisation when any hot-path component logic directly reads that state.
+* Performing UI rendering or refresh work for every high-frequency simulation event.
