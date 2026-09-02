@@ -616,13 +616,388 @@ normally be used as described by the Signal API contract.
 
 ---
 
-# Monitoring and interactive UI
+# UI integration
 
-`SchemaPart` also provides hooks used for monitoring and UI integration.
+A schema part may optionally expose a visual component.
 
-Those APIs are not part of the core schema-part signal contract and are documented separately in the UI design document.
+UI support is not required for normal schema parts and is intentionally separated from the simulation signal API.
 
-A schema part does not need to provide UI functionality unless the component is interactive or exposes additional monitoring information.
+There are two UI mechanisms:
+
+```text
+InteractiveSchemaPart
+    -> persistent component shown on the simulator desktop
+
+SchemaPart monitoring
+    -> optional diagnostic state/panel shown by SchemaPartMonitor
+```
+
+Neither mechanism should become part of the normal signal-propagation path.
+
+---
+
+# Interactive schema parts
+
+A schema part that needs a persistent visual representation implements:
+
+```java
+InteractiveSchemaPart
+```
+
+The interface contains a single method:
+
+```java
+AbstractUiComponent getComponent();
+```
+
+For example:
+
+```java
+public class MyPart extends SchemaPart implements InteractiveSchemaPart {
+    private final MyUiComponent uiComponent;
+
+    public MyPart(String id, String params) {
+        super(id, params);
+
+        ...
+        uiComponent = new MyUiComponent(id, this);
+    }
+
+    @Override
+    public AbstractUiComponent getComponent() {
+        return uiComponent;
+    }
+}
+```
+
+The component may also be created lazily when first requested.
+
+The simulator discovers interactive schema parts through the interface and places their UI components on the simulator desktop.
+
+---
+
+# AbstractUiComponent
+
+Interactive UI components extend:
+
+```java
+AbstractUiComponent
+```
+
+A component provides:
+
+```java
+protected AbstractUiComponent(String title, int size)
+```
+
+where:
+
+* `title` identifies the schema-part instance;
+* `size` defines the base size of the component's visual area.
+
+Custom drawing is implemented through:
+
+```java
+protected void draw(Graphics2D g2d)
+```
+
+For example:
+
+```java
+public class MyUiComponent extends AbstractUiComponent {
+    private final MyPart parent;
+
+    public MyUiComponent(String title, MyPart parent) {
+        super(title, 30);
+        this.parent = parent;
+    }
+
+    @Override
+    protected void draw(Graphics2D g2d) {
+        ...
+    }
+}
+```
+
+`AbstractUiComponent` provides the common component title, sizing and simulator layout behaviour.
+
+Interactive components can be moved on the simulator desktop. Their position and scale are managed by the simulator UI/layout infrastructure and should not normally
+be managed by the schema-part implementation.
+
+---
+
+# Model to UI
+
+UI rendering may inspect schema-part state.
+
+A simple component can expose state through a provider:
+
+```java
+uiComponent =new
+
+MyUiComponent(id,
+        this::isActive);
+```
+
+and read it while drawing:
+
+```java
+g2d.setColor(provider.isActive() ?onColor :offColor);
+```
+
+This keeps presentation logic outside the schema-part event implementation.
+
+For rapidly changing signals, UI updates should not be inserted into every simulation event merely to keep the screen current.
+
+The simulation event rate can be much higher than the useful UI refresh rate.
+
+Prefer:
+
+```text
+simulation
+    |
+    | update model state
+    v
+model
+    |
+    | sampled/read periodically
+    v
+UI redraw
+```
+
+instead of:
+
+```text
+simulation event
+    |
+    v
+UI update
+    |
+    v
+simulation event
+    |
+    v
+UI update
+    ...
+```
+
+`AbstractUiComponent.redrawPeriod` provides the common redraw period currently used by simple periodically refreshed components.
+
+For more complex UI, a schema part may maintain presentation state and request repaint only when useful.
+
+The important design rule is:
+
+> UI refresh must not add unnecessary work to the main signal propagation path.
+
+---
+
+# UI to model
+
+Interactive components may also initiate component behaviour.
+
+For example, a UI switch may call:
+
+```java
+parent.toggle(newState);
+```
+
+or a keyboard component may call:
+
+```java
+parent.keyEvent(key, pressed);
+```
+
+The schema part remains responsible for translating the UI action into simulator signal changes.
+
+Conceptually:
+
+```text
+user interaction
+      |
+      v
+UI component
+      |
+      | component-level operation
+      v
+SchemaPart
+      |
+      | Signal API
+      v
+simulation graph
+```
+
+The UI component should not manipulate the simulator graph directly.
+
+It should invoke an operation on its owning schema part and let the schema part apply the normal signal-event contract.
+
+Therefore signal changes initiated from UI must obey exactly the same rules as all other schema-part output changes:
+
+* do not propagate unchanged states;
+* use normal Pin/Bus signal methods;
+* preserve stop-fast behaviour;
+* treat propagated events as real state changes.
+
+Thread hand-off, if required by a particular interactive component, is component-specific. The UI API does not introduce a separate asynchronous event model for
+schema parts.
+
+---
+
+# UI state and simulation state
+
+The schema part is the owner of component behaviour.
+
+The UI component is a representation and/or user interface for that behaviour.
+
+Do not make UI-only state the authoritative state of a simulated component when that state affects circuit behaviour.
+
+Prefer:
+
+```text
+SchemaPart state
+      |
+      +----> simulation behaviour
+      |
+      +----> UI representation
+```
+
+rather than:
+
+```text
+UI state
+   |
+   +----> simulation behaviour
+```
+
+UI-local state is appropriate for presentation-only details such as:
+
+* cached drawing geometry;
+* currently displayed color;
+* mouse position;
+* temporary labels;
+* visual scale/layout information.
+
+Circuit-relevant state belongs to the schema part.
+
+---
+
+# Schema-part monitoring
+
+Every schema part can optionally expose additional diagnostic information through:
+
+```java
+String extraState()
+```
+
+The default implementation returns:
+
+```java
+null
+```
+
+meaning that no additional state is available.
+
+A component may override it:
+
+```java
+
+@Override
+public String extraState() {
+    return "Counter:" + counter;
+}
+```
+
+or return multiple lines:
+
+```java
+
+@Override
+public String extraState() {
+    return "Address:" + address + "\nData:" + data;
+}
+```
+
+`extraState()` is consumed by the schema-part monitoring UI.
+
+It is intended for diagnostics and observation, not for simulation behaviour.
+
+Because monitoring is outside the normal event model, `extraState()` may use operations that would be inappropriate in a signal hot path, including formatting and
+state inspection through slower APIs where necessary.
+
+It should not modify simulation state.
+
+---
+
+# Extra monitoring panel
+
+A schema part may additionally expose a custom monitoring panel through:
+
+```java
+Supplier<JPanel> extraPanel()
+```
+
+The default implementation returns:
+
+```java
+null
+```
+
+A component can provide one when richer diagnostic information is useful:
+
+```java
+
+@Override
+public Supplier<JPanel> extraPanel() {
+    return () -> new MemoryDumpPanel(memory);
+}
+```
+
+A `Supplier` is used so the additional UI does not have to be created unless the user actually opens it.
+
+This mechanism is appropriate for diagnostic views such as:
+
+* memory dumps;
+* internal register/state views;
+* component-specific debugging panels.
+
+It is separate from `InteractiveSchemaPart`.
+
+A component may therefore have:
+
+```text
+no UI
+```
+
+or:
+
+```text
+InteractiveSchemaPart
+```
+
+or:
+
+```text
+extraState / extraPanel
+```
+
+or both.
+
+---
+
+# UI design rules
+
+When adding UI to a schema part:
+
+* implement `InteractiveSchemaPart` only when the component needs a persistent simulator-desktop representation;
+* return an `AbstractUiComponent` from `getComponent()`;
+* implement custom rendering in `draw(Graphics2D)`;
+* keep circuit behaviour in the schema part, not in the UI component;
+* let UI actions call component-level methods on the schema part;
+* apply the normal Signal API contract to events initiated by UI;
+* avoid adding redraw work to every hot-path simulation event;
+* prefer UI sampling/polling or aggregated refresh for rapidly changing state;
+* use `extraState()` for lightweight diagnostic text;
+* use `extraPanel()` for richer optional diagnostic UI;
+* keep monitoring code observational and outside normal simulation behaviour.
 
 ---
 
