@@ -78,7 +78,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                     retryState = true;
                     retryImpedance = hiImpedance;
                     hiImpedance = false;
-                    parent.net.forRerty(this);
+                    parent.net.forRetry(this);
                     assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
                     return;
                     //endregion
@@ -106,7 +106,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                     //region shortcut
                     retryState = true;
                     retryImpedance = true;
-                    parent.net.forRerty(this);
+                    parent.net.forRetry(this);
                     assert Log.debug(getClass(), "Weak state shortcut on setting pin {}, try resend later", this);
                     return;
                     //endregion
@@ -123,7 +123,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                         //region shortcut
                         retryState = true;
                         retryImpedance = false;
-                        parent.net.forRerty(this);
+                        parent.net.forRetry(this);
                         assert Log.debug(getClass(), "Weak state shortcut on setting pin {}, try resend later", this);
                         return;
                         //endregion
@@ -136,7 +136,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                         //region shortcut
                         retryState = true;
                         retryImpedance = false;
-                        parent.net.forRerty(this);
+                        parent.net.forRetry(this);
                         assert Log.debug(getClass(), "Weak state shortcut on setting pin {}, try resend later", this);
                         return;
                         //endregion
@@ -228,7 +228,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                     retryState = false;
                     retryImpedance = hiImpedance;
                     hiImpedance = false;
-                    parent.net.forRerty(this);
+                    parent.net.forRetry(this);
                     assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
                     return;
                     //endregion
@@ -255,7 +255,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                     retryState = false;
                     retryImpedance = true;
                     hiImpedance = false;
-                    parent.net.forRerty(this);
+                    parent.net.forRetry(this);
                     assert Log.debug(getClass(), "Weak state shortcut on setting pin {}, try resend later", this);
                     return;
                     //endregion
@@ -273,7 +273,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                         //region shortcut
                         retryState = false;
                         retryImpedance = false;
-                        parent.net.forRerty(this);
+                        parent.net.forRetry(this);
                         assert Log.debug(getClass(), "Weak state shortcut on setting pin {}, try resend later", this);
                         return;
                         //endregion
@@ -287,7 +287,7 @@ public class WireMergerWireIn extends InPin implements MergerInput<Pin> {
                         //region shortcut
                         retryState = false;
                         retryImpedance = false;
-                        parent.net.forRerty(this);
+                        parent.net.forRetry(this);
                         assert Log.debug(getClass(), "Weak state shortcut on setting pin {}, try resend later", this);
                         return;
                         //endregion

@@ -100,7 +100,7 @@ public class BusMergerBusIn extends TriStateInBus implements MergerInput<Bus>, S
                 hiImpedance = false;
                 if (merger.strongPins != 0) {
                     retryState = newState;
-                    parent.net.forRerty(this);
+                    parent.net.forRetry(this);
                     assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
                     return;
                 }
@@ -143,7 +143,7 @@ public class BusMergerBusIn extends TriStateInBus implements MergerInput<Bus>, S
                 /*Optimiser bind m:mask*/
                 if ((merger.strongPins & mask) != 0) {
                     retryState = newState;
-                    parent.net.forRerty(this);
+                    parent.net.forRetry(this);
                     assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
                     return;
                 }

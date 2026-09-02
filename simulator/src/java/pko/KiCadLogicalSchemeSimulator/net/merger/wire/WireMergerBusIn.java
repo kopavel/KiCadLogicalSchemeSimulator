@@ -97,7 +97,7 @@ public class WireMergerBusIn extends InBus implements MergerInput<Bus>, SupportM
             if (merger.strong) { // merger not in hiImpedance or weak
                 //region shortcut
                 retryState = newState;
-                parent.net.forRerty(this);
+                parent.net.forRetry(this);
                 assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
                 return;
                 //endregion

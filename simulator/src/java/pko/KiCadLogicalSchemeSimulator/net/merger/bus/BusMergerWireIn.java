@@ -85,7 +85,7 @@ public class BusMergerWireIn extends TriStateInPin implements MergerInput<Pin> {
                     retryState = true;
                     retryImpedance = hiImpedance;
                     hiImpedance = false;
-                    parent.net.forRerty(this);
+                    parent.net.forRetry(this);
                     assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
                     return;
                 }
@@ -112,7 +112,7 @@ public class BusMergerWireIn extends TriStateInPin implements MergerInput<Pin> {
                 retryState = true;
                 retryImpedance = hiImpedance;
                 hiImpedance = false;
-                parent.net.forRerty(this);
+                parent.net.forRetry(this);
                 assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
                 return;
             }
@@ -215,7 +215,7 @@ public class BusMergerWireIn extends TriStateInPin implements MergerInput<Pin> {
                     retryState = false;
                     retryImpedance = hiImpedance;
                     hiImpedance = false;
-                    parent.net.forRerty(this);
+                    parent.net.forRetry(this);
                     assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
                     return;
                 }
@@ -242,7 +242,7 @@ public class BusMergerWireIn extends TriStateInPin implements MergerInput<Pin> {
                 retryState = false;
                 retryImpedance = hiImpedance;
                 hiImpedance = false;
-                parent.net.forRerty(this);
+                parent.net.forRetry(this);
                 assert Log.debug(getClass(), "Shortcut on setting pin {}, try resend later", this);
                 return;
             }

@@ -137,7 +137,7 @@ public class Net {
         }
     }
 
-    public void forRerty(MergerInput<?> item) {
+    public void forRetry(MergerInput<?> item) {
         forRetry.add(item);
         hasRetry = true;
     }
