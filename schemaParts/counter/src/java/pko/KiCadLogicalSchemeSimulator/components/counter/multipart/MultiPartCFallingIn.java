@@ -42,6 +42,7 @@ public class MultiPartCFallingIn extends FallingEdgePin implements MultiPartCIn 
         super(oldPin, variantId);
         countMask = oldPin.countMask;
         outBus = oldPin.outBus;
+        outPin = oldPin.outPin;
         partNo = oldPin.partNo;
         size = oldPin.size;
         skipMask = oldPin.skipMask;
