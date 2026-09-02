@@ -282,7 +282,7 @@ but:
 
 This applies equally to pins and buses.
 
-Detailed source-optimiser rules are documented separately.
+See [Runtime Optimiser Design](../optimiser/DESIGN_Optimiser.md) for detailed source-optimiser rules.
 
 ---
 
