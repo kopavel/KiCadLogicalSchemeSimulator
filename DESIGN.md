@@ -27,7 +27,7 @@ switching configurations can still be represented when their relevant behaviour 
 
 * [Signal / wire and bus API](simulator/src/java/pko/KiCadLogicalSchemeSimulator/api/DESIGN_API.md)
 * [Schema-part design, SPI, configuration, UI and testing](schemaParts/DESIGN_SchemaPart.md)
-* [NET filtering and schematic-level optimisation](simulator/src/java/pko/KiCadLogicalSchemeSimulator/api/DESIGN_NetFIltering.md)
+* [NET filtering and schematic-level optimisation](simulator/src/java/pko/KiCadLogicalSchemeSimulator/api/DESIGN_NetFiltering.md)
 
 ## Simulator module
 
@@ -110,7 +110,7 @@ Repeated execution is necessary because one transformation may expose a topology
 This stage serves both compatibility and performance: it allows physical KiCad circuitry to be adapted to the simulator's event-driven binary model and prevents
 unnecessary physical abstractions from entering the runtime graph.
 
-See [NET Filter Design](simulator/src/java/pko/KiCadLogicalSchemeSimulator/api/DESIGN_NetFIltering.md).
+See [NET Filter Design](simulator/src/java/pko/KiCadLogicalSchemeSimulator/api/DESIGN_NetFiltering.md).
 
 ## Signal event model
 
