@@ -143,6 +143,43 @@ public class Net {
         hasRetry = true;
     }
 
+    private void processInput(SchemaPart schemaPart,
+            String pinName,
+            SchemaPartConfig schemaPartConfig,
+            Collection<Pin> destinationPins,
+            Map<InBus, SortedSet<Byte>> destinationBusesOffsets) {
+        IModelItem<?> destination = schemaPart.getInItem(pinName);
+        if (replacement.containsKey(destination)) {
+            destination = replacement.get(destination);
+        }
+        switch (destination) {
+            case InPin pin -> destinationPins.add(pin);
+            case InBus bus -> destinationBusesOffsets.computeIfAbsent(bus, _ -> new TreeSet<>()).add(bus.getAliasOffset(pinName));
+            default -> throw new IllegalStateException("Unexpected input type: " + destination.getClass().getName());
+        }
+        if (schemaPartConfig.priority != null && schemaPartConfig.priority.containsKey(destination.getId())) {
+            ((ModelItem<?>) destination).priority += schemaPartConfig.priority.get(destination.getId()) ? 1 : -1;
+        }
+    }
+
+    private void processOutput(SchemaPart schemaPart, String pinName, String id, ParameterResolver.PowerState powerState, Map<IModelItem<?>, Byte> sourcesOffset) {
+        if (powerState.strong) {
+            throw new AssertionError("OUT pin " + id + "_" + pinName + " on power rail");
+        }
+        IModelItem<?> source = schemaPart.getOutItem(pinName);
+        if (source == null) {
+            throw new AssertionError("No pin named " + pinName + " in schema part " + schemaPart.id);
+        }
+        Byte aliasOffset = source.getAliasOffset(pinName);
+        if (aliasOffset == null) {
+            throw new AssertionError("No alias for pin " + pinName);
+        }
+        if (sourcesOffset.containsKey(source)) {
+            throw new AssertionError("Shortcut on outputs. Part " + source.getName() + " Pin " + sourcesOffset.get(source) + " and " + aliasOffset);
+        }
+        sourcesOffset.put(source, aliasOffset);
+    }
+
     private void groupSourcesByDestinations(pko.KiCadLogicalSchemeSimulator.parsers.pojo.net.Net net) {
         if (net.getName().startsWith("unconnected-")) {
             return;
@@ -166,51 +203,11 @@ public class Net {
                 throw new RuntimeException("Can't determinate pin type for " + id + ":" + pinName);
             }
             switch (pinType) {
-                case input -> {
-                    IModelItem<?> destination = schemaPart.getInItem(pinName);
-                    if (replacement.containsKey(destination)) {
-                        destination = replacement.get(destination);
-                    }
-                    switch (destination) {
-                        case InPin pin -> destinationPins.add(pin);
-                        case InBus bus -> destinationBusesOffsets.computeIfAbsent(bus, _ -> new TreeSet<>()).add(bus.getAliasOffset(pinName));
-                        default -> throw new IllegalStateException("Unexpected input type: " + destination.getClass().getName());
-                    }
-                    if (schemaPartConfig.priority != null && schemaPartConfig.priority.containsKey(destination.getId())) {
-                        ((ModelItem<?>) destination).priority += schemaPartConfig.priority.get(destination.getId()) ? 1 : -1;
-                    }
-                }
-                case output -> {
-                    if (powerState.strong) {
-                        throw new AssertionError("OUT pin " + id + "_" + pinName + " on power rail");
-                    }
-                    IModelItem<?> source = schemaPart.getOutItem(pinName);
-                    if (source == null) {
-                        throw new AssertionError("No pin named " + pinName + " in schema part " + schemaPart.id);
-                    }
-                    Byte aliasOffset = source.getAliasOffset(pinName);
-                    if (aliasOffset == null) {
-                        throw new AssertionError("No alias for pin " + pinName);
-                    }
-                    if (sourcesOffset.containsKey(source)) {
-                        throw new AssertionError("Shortcut on outputs.Part " + source.getName() + " Pin " + sourcesOffset.get(source) + " and " + aliasOffset);
-                    }
-                    sourcesOffset.put(source, aliasOffset);
-                }
+                case input -> processInput(schemaPart, pinName, schemaPartConfig, destinationPins, destinationBusesOffsets);
+                case output -> processOutput(schemaPart, pinName, id, powerState, sourcesOffset);
                 case bidirectional -> {
-                    if (powerState.strong) {
-                        throw new AssertionError("OUT pin on power rail");
-                    }
-                    IModelItem<?> destination = schemaPart.getInItem(pinName);
-                    switch (destination) {
-                        case InPin pin -> destinationPins.add(pin);
-                        case InBus bus -> destinationBusesOffsets.computeIfAbsent(bus, _ -> new TreeSet<>()).add(bus.getAliasOffset(pinName));
-                        default -> throw new IllegalStateException("Unexpected input type: " + destination.getClass().getName());
-                    }
-                    IModelItem<?> source = schemaPart.getOutItem(pinName);
-                    assert source != null : "No pin named " + pinName + " in schema part " + schemaPart.id;
-                    assert source.getAliasOffset(pinName) != null : "No alias for pin " + pinName;
-                    sourcesOffset.put(source, source.getAliasOffset(pinName));
+                    processInput(schemaPart, pinName, schemaPartConfig, destinationPins, destinationBusesOffsets);
+                    processOutput(schemaPart, pinName, id, powerState, sourcesOffset);
                 }
                 case passive -> {
                     if (powerState.strong) {
@@ -257,14 +254,13 @@ public class Net {
                     destinationBusDescriptors.computeIfAbsent((Bus) replacement.getOrDefault(destinationBus, destinationBus), _ -> new DestinationBusDescriptor());
             if (powerState == pwr) {
                 for (Byte destinationOffset : destinationOffsets) {
-                    SchemaPart pwr = createSchemaPart("Power", "pwr_" + destinationBus.getName(), "hi;strong");
+                    SchemaPart pwr = createSchemaPart("Power", "pwr_" + destinationBus.getName() + ":" + destinationOffset, "hi;strong");
                     schemaParts.put(pwr.id, pwr);
                     descriptor.add(pwr.getOutItem("OUT"), (byte) 0, destinationOffset);
-                    sourcesOffset.put(pwr.getOutItem("OUT"), (byte) 0);
                 }
             } else if (powerState == gnd) {
                 for (Byte destinationOffset : destinationOffsets) {
-                    SchemaPart gnd = createSchemaPart("Power", "gnd_" + destinationBus.getName(), "strong");
+                    SchemaPart gnd = createSchemaPart("Power", "gnd_" + destinationBus.getName() + ":" + destinationOffset, "strong");
                     schemaParts.put(gnd.id, gnd);
                     descriptor.add(gnd.getOutItem("OUT"), (byte) 0, destinationOffset);
                 }
