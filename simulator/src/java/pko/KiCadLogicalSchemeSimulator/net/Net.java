@@ -76,10 +76,11 @@ public class Net {
         Pin retVal = null;
         if (buses.size() + pins.size() + passivePins.size() > 1) {
             //connect a destination to multiple sources throe Merger
-            String mergerHash = Utils.getHash(pins, passivePins, buses.keySet()) + "masks:" + buses.values()
-                    .stream()
-                    .map(String::valueOf)
-                    .collect(Collectors.joining(":"));
+            String busesHash = buses.entrySet()
+                    .stream().sorted(Comparator.comparing(entry -> entry.getKey().getName()))
+                    .map(entry -> entry.getKey().getName() + ":mask" + entry.getKey().mask + "@" + entry.getValue())
+                    .collect(Collectors.joining(";"));
+            String mergerHash = Utils.getHash(pins, passivePins) + "|buses[" + busesHash + "]";
             if (wireMergers.containsKey(mergerHash)) {
                 //Use old merger.
                 OutPin oldMerger = wireMergers.get(mergerHash);
@@ -354,7 +355,8 @@ public class Net {
         if (schemaParts.values()
                 .stream()
                 .noneMatch(p -> "Oscillator".equals(p.getClass().getSimpleName()))) {
-            Thread.ofPlatform().start(() -> {
+            //ToDo queue are not thread safe some lock mechanism?
+            Thread.ofPlatform().daemon().start(() -> {
                 while (true) {
                     retry();
                     try {
@@ -484,15 +486,29 @@ public class Net {
 
         public String getHash() {
             StringBuilder sb = new StringBuilder();
-            offsets.forEach((offset, lists) -> {
-                sb.append(offset).append(':');
-                lists.passivePins.forEach(p -> sb.append(p.getName()).append(';'));
-                lists.pins.forEach(p -> sb.append(p.getName()).append(';'));
-            });
-            buses.forEach((bus, params) -> {
-                sb.append(bus.getName());
-                params.forEach((offset, mask) -> sb.append(offset).append(':').append(mask).append(';'));
-            });
+            sb.append("offsets[");
+            offsets.entrySet()
+                    .stream().sorted(Comparator.comparingInt(Map.Entry::getKey)).forEach((entry) -> {
+                       Byte offset = entry.getKey();
+                       BusPinsOffset lists = entry.getValue();
+                       sb.append(offset).append(":{pass:[");
+                       lists.passivePins.stream().sorted(Comparator.comparing(ModelItem::getName)).forEach(p -> sb.append(p.getName()).append(';'));
+                       sb.append("],pins:[");
+                       lists.pins.stream().sorted(Comparator.comparing(ModelItem::getName)).forEach(p -> sb.append(p.getName()).append(';'));
+                       sb.append("]};");
+                   });
+            sb.append("]|buses[");
+            buses.entrySet()
+                    .stream().sorted(Comparator.comparing(entry -> entry.getKey().getName())).forEach((entry) -> {
+                     sb.append(entry.getKey().getName()).append("={");
+                     entry.getValue()
+                          .entrySet()
+                             .stream()
+                             .sorted(Comparator.comparingInt(Map.Entry::getKey))
+                             .forEach((entry1) -> sb.append(entry1.getKey()).append(':').append(entry1.getValue()).append(';'));
+                     sb.append("};");
+                 });
+            sb.append("]");
             return sb.toString();
         }
     }
