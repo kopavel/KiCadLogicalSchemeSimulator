@@ -31,3 +31,4 @@ _autosave-*.kicad_sch
 /zigQueue/src/zig/*.lib
 /zigQueue/src/zig/*.obj
 /zigQueue/src/zig/*.pdb
+.pi

@@ -9,16 +9,20 @@ import pko.KiCadLogicalSchemeSimulator.api.ModelItem;
 import pko.KiCadLogicalSchemeSimulator.api.bus.Bus;
 import pko.KiCadLogicalSchemeSimulator.api.bus.InBus;
 import pko.KiCadLogicalSchemeSimulator.optimiser.ClassOptimiser;
+import pko.KiCadLogicalSchemeSimulator.tools.Utils;
 
+@SuppressWarnings("ConditionalExpressionWithNegatedCondition")
 public class DecoderABus extends InBus {
     public final Decoder parent;
     public Bus outBus;
     public boolean csState;
+    protected int mask;
 
     public DecoderABus(String id, Decoder parent, int size, String... aliases) {
         super(id, parent, size, aliases);
         this.parent = parent;
         outBus = parent.outBus;
+        mask = Utils.getMaskForSize((int) Math.pow(2, size));
     }
 
     /*Optimiser constructor*/
@@ -26,6 +30,7 @@ public class DecoderABus extends InBus {
         super(oldBus, variantId);
         outBus = oldBus.outBus;
         parent = oldBus.parent;
+        mask = oldBus.mask;
     }
 
     @Override
@@ -38,15 +43,24 @@ public class DecoderABus extends InBus {
                         outBus.state != (
                                 /*Optimiser line o block r*/
                                 parent.params.containsKey("outReverse") ?//
-                                (outState = ~((1 << newState)
-                                        /*Optimiser line d*///
-                                        % 10//
-                                ))
+                                        /*Optimiser bind mask*/
+                                (outState = mask ^ (1 << newState)
+                                        /*Optimiser block d*///
+                                        % (//
+                                        /*Optimiser line o*///
+                                        !parent.params.containsKey("decimal") ? mask ://
+                                        10)//
+                                        /*Optimiser blockEnd d*///
+                                )
                                         /*Optimiser line o blockEnd r block nr*///
                                                                         ://
                                 (outState = (1 << newState)
-                                        /*Optimiser line d*///
-                                        % 10//
+                                        /*Optimiser block d*///
+                                        % (//
+                                        /*Optimiser line o*///
+                                        !parent.params.containsKey("decimal") ? mask ://
+                                        10)//
+                                        /*Optimiser blockEnd d*///
                                 )
                                 /*Optimiser blockEnd nr*///
                         )) {
@@ -64,6 +78,7 @@ public class DecoderABus extends InBus {
         if (!parent.csPin.used) {
             optimiser.cut("cs");
         }
+        optimiser.bind("mask", mask);
         DecoderABus build = optimiser.build();
         build.source = source;
         parent.replaceIn(this, build);

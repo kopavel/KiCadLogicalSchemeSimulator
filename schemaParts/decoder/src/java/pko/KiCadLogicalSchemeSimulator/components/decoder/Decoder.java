@@ -20,9 +20,9 @@ public class Decoder extends SchemaPart {
             throw new RuntimeException("Component " + id + " has no parameter \"size\"");
         }
         int inSize = Integer.parseInt(params.get("size"));
-        aBus = addInBus(new DecoderABus("A", this, inSize));
-        csPin = addInPin(new DecoderCsPin("CS", this));
         int outSize = (int) Math.pow(2, inSize);
+        aBus = addInBus(new DecoderABus("A", this, inSize));
+        csPin = addInPin(new DecoderCsPin("CS", this, outSize));
         addTriStateOutBus("Q", outSize);
         aBus.csState = reverse;
     }
@@ -34,7 +34,7 @@ public class Decoder extends SchemaPart {
         csPin.outBus = outBus;
         outBus.useBitPresentation = true;
         if (reverse) {
-            outBus.state = params.containsKey("outReverse") ? (~1) & Utils.getMaskForSize(outBus.size) : 1;
+            outBus.state = params.containsKey("outReverse") ? 1 ^ Utils.getMaskForSize(outBus.size) : 1;
             outBus.hiImpedance = false;
         }
     }
