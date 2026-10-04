@@ -7,7 +7,7 @@
 import pko.KiCadLogicalSchemeSimulator.api.schemaPart.SchemaPartSpi;
 import pko.KiCadLogicalSchemeSimulator.components.XOR.XorGateSpi;
 
-module KiCadLogicalSchemeSimulator.components.XOR {
+open module KiCadLogicalSchemeSimulator.components.XOR {
     requires KiCadLogicalSchemeSimulator.simulator;
     provides SchemaPartSpi with XorGateSpi;
 }
