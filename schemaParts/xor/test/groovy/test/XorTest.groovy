@@ -27,8 +27,8 @@ class XorTest extends ChipSpec {
         )
     }
 
-    @Unroll("#optimized | #a AND #b -> #expected")
-    def "AndGate"() {
+    @Unroll("#optimized | #a XOR #b -> #expected")
+    def "XorGate"() {
         given:
         useChip(optimized)
         when:

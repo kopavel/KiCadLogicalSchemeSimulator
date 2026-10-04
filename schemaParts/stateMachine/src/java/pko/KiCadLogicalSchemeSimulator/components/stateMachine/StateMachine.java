@@ -167,7 +167,7 @@ public class StateMachine extends SchemaPart {
     @Override
     public void initOuts() {
         out = getOutBus("OUT");
-        out.state = reverse ? mask : 0;
+        out.state = reverse ? mask & ~states[0] : states[0];
         out.useBitPresentation = true;
     }
 }
